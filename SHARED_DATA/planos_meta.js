@@ -1,0 +1,3 @@
+// Fechas de actualización de los planos de fondo (por piso). Generado desde
+// las fechas de los archivos en CABIDA_DATA. Se muestra como leyenda en Atlas.
+window.PLANOS_META={"actualizado_mobiliario": "2026-06-30", "actualizado_color": "2026-07-01", "por_piso": {"P-1": "2026-06-30", "P-2": "2026-06-20", "P1": "2026-06-25", "P2": "2026-06-25", "P3": "2026-06-25", "P4": "2026-06-25"}, "color_por_piso": {"P-1": "2026-07-01", "P-3": "2026-07-01", "P1": "2026-07-01", "P2": "2026-07-01", "P3": "2026-07-01", "P4": "2026-07-01", "P5": "2026-07-01"}, "fuente": "Planos HDS-INGER · Coordinación Mobiliario (mobiliario) + Planos a color"};
