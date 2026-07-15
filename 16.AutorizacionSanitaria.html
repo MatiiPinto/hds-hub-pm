@@ -459,6 +459,54 @@
   .eq-add{font-family:inherit;font-size:11px;font-weight:700;color:var(--inst);background:#fff;border:1.5px dashed #bcd4ec;border-radius:8px;padding:6px 12px;cursor:pointer;margin:8px 14px}
   .eq-add:hover{background:#eef5fc}
   .eq-del{margin-left:6px;border:none;background:#fee2e2;color:#dc2626;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;padding:2px 8px}
+
+  /* ── Expediente de autorización (autocompletado desde matrices) ── */
+  .exp-block{margin-top:10px;border:1.5px solid #cfe0f2;border-radius:11px;background:#fbfdff;overflow:visible}
+  .exp-hd{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:800;color:#0c447c;background:#e6f1fb;
+    padding:8px 12px;border-bottom:1px solid #cfe0f2;border-radius:10px 10px 0 0}
+  .exp-hd small{font-weight:600;color:#7c93a8}
+  .exp-export{margin-left:auto;font-family:inherit;font-size:11px;font-weight:800;color:#fff;background:#16a34a;
+    border:none;border-radius:8px;padding:6px 13px;cursor:pointer}
+  .exp-export:hover{background:#15803d}
+  .exp-sec{padding:8px 12px;border-bottom:1px dashed #e4eef8}
+  .exp-sec:last-child{border-bottom:none}
+  .exp-t{display:block;font-size:9.5px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;color:#5b7a9b;margin-bottom:5px}
+  .exp-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}
+  .exp-chip{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:600;border-radius:8px;padding:3px 8px;max-width:100%}
+  .exp-chip.dot{background:#e4f3f1;color:#0f766e}
+  .exp-chip.car{background:#f7efdc;color:#a16207}
+  .exp-chip small{color:inherit;opacity:.7;font-size:10px}
+  .exp-chip button{border:none;background:rgba(0,0,0,.08);color:inherit;border-radius:50%;width:16px;height:16px;line-height:1;
+    font-size:11px;cursor:pointer;flex-shrink:0}
+  .exp-none{font-size:11px;color:#94a3b8}
+  .exp-search{position:relative}
+  .exp-search input{width:100%;box-sizing:border-box;font-family:inherit;font-size:12px;border:1.5px solid #dbe7f2;
+    border-radius:8px;padding:6px 10px;outline:none;background:#fff}
+  .exp-search input:focus{border-color:var(--inst)}
+  .exp-sugbox{position:absolute;left:0;right:0;top:100%;z-index:60;background:#fff;border:1.5px solid #bcd4ec;
+    border-radius:9px;box-shadow:0 8px 24px rgba(12,51,88,.18);max-height:260px;overflow-y:auto}
+  .exp-sug{padding:6px 10px;cursor:pointer;border-bottom:1px solid #f1f5f9;font-size:12px}
+  .exp-sug:hover{background:#eef5fc}
+  .exp-sug b{display:block;color:#0f2942}
+  .exp-sug small{color:#7c93a8;font-size:10.5px}
+  .exp-btn{display:inline-block;font-family:inherit;font-size:11.5px;font-weight:700;color:var(--inst);background:#fff;
+    border:1.5px dashed #bcd4ec;border-radius:8px;padding:6px 12px;cursor:pointer;margin-right:6px}
+  .exp-btn:hover:not(:disabled){background:#eef5fc}
+  .exp-btn:disabled{opacity:.45;cursor:default}
+  .exp-mini{font-family:inherit;font-size:10px;font-weight:700;color:#dc2626;background:#fff;border:1px solid #fecaca;
+    border-radius:7px;padding:3px 9px;cursor:pointer;margin-top:5px}
+  table.exp-emmc{width:100%;border-collapse:collapse;font-size:11px;background:#fff}
+  .exp-emmc th{background:#f1f7fd;color:#0c447c;font-size:9px;text-transform:uppercase;letter-spacing:.3px;text-align:left;
+    padding:4px 7px;border-bottom:1.5px solid #dbe7f2}
+  .exp-emmc td{padding:3px 7px;border-bottom:1px solid #eef4fa;vertical-align:middle}
+  .exp-emmc td.mono{font-family:ui-monospace,Menlo,monospace;font-size:10.5px;color:#6d4bb0;white-space:nowrap}
+  .exp-emmc td.num{text-align:center;font-weight:700}
+  .exp-emmc input{width:100%;box-sizing:border-box;border:1px solid #e4eef8;border-radius:6px;padding:3px 7px;
+    font-size:11px;font-family:inherit;outline:none}
+  .exp-emmc input:focus{border-color:var(--inst)}
+  .exp-print{display:flex;align-items:center;gap:10px}
+  .exp-print img{max-height:90px;border:1px solid #dbe7f2;border-radius:8px}
+  .exp-print span{font-size:11px;color:#5b7a9b}
   .req-subitem{box-shadow:inset 3px 0 0 #cfe0f2}
   .req-num{font-size:11px;font-weight:800;color:#94a3b8;text-align:center;background:#f1f5f9;border-radius:6px;padding:3px 6px;align-self:flex-start;min-height:26px;display:flex;align-items:center;justify-content:center}
   .req-text{font-size:12.5px;color:#1e293b;line-height:1.45;padding-top:2px}
@@ -1076,6 +1124,7 @@ const STORE_RECINTO = 'auth_sanit_recinto_eval_v1';
 const PR       = (window.SHARED_PAUTAS_RECINTOS && window.SHARED_PAUTAS_RECINTOS.asignaciones) || {};
 const REQUIP   = window.RECINTO_EQUIP || {};
 const RECBIM   = window.RECINTO_BIM || {};      // code → código BIM (ej. "13.4.4" → "A0145")
+const EQUIPCAT = (window.SHARED_EQUIPAMIENTO && window.SHARED_EQUIPAMIENTO.equipos) || {};  // t → {nombre, familia, marca, modelo}
 const RECMNC   = window.RECINTO_MNC || {};      // code → [{n,f,t,c}] mobiliario no clínico
 const RECMETA  = {};
 ((window.SHARED_RECINTOS && window.SHARED_RECINTOS.recintos) || []).forEach(r => { RECMETA[r.id] = r; });
@@ -1187,6 +1236,7 @@ function setCurrentRecinto(rid){
       if(!ast.ident.piso && r.piso) ast.ident.piso = pisoLabel(r.piso);
       if(!ast.ident.cod_recinto && r.code) ast.ident.cod_recinto = r.code;
       if(!ast.ident.cod_bim && r.code && RECBIM[r.code]) ast.ident.cod_bim = RECBIM[r.code];
+      if(!ast.ident.edificio) ast.ident.edificio = edificioDeRecinto(currentRecintoId);
       saveRecintoEval();
     }
   }
@@ -1440,6 +1490,258 @@ function rcShowInfra(){
     ${img}
     ${fic && fic.gases_clinicos ? `<div class="rc-modal-note" style="margin-top:10px"><b>Gases clínicos:</b> ${escapeHtml(fic.gases_clinicos)}</div>` : ''}`;
   rcModal('🏗 Infraestructura', body);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   EXPEDIENTE DE AUTORIZACIÓN · autocompletado desde las matrices HDS
+   - Responsables (dotación) · Prestaciones (cartera ~3.000 productos)
+   - Equipamiento EMMC del recinto (código+nombre+marca+modelo)
+   - Print de infraestructura · Export PDF con ruta Drive
+   Todo se guarda en el estado del ALCANCE activo (ast.exp).
+   ═══════════════════════════════════════════════════════════════ */
+function edificioDeRecinto(rid){
+  const fic = fichaForRecinto(rid);
+  return (fic && /\bAA\b/.test(fic.carpeta || '')) ? 'AA' : 'HDS';
+}
+// EMMC del recinto con fallback al código padre (el catastro indexa a veces
+// por sub-área: "1.2" en vez de "1.2.1"). Devuelve {items, src}.
+function requipFor(code){
+  if(!code) return {items:[], src:null};
+  if(REQUIP[code] && REQUIP[code].length) return {items:REQUIP[code], src:code};
+  const padre = code.replace(/_.+$/,'').split('.').slice(0,-1).join('.');
+  if(padre && REQUIP[padre] && REQUIP[padre].length) return {items:REQUIP[padre], src:padre};
+  return {items:[], src:null};
+}
+function expState(){
+  if(!currentAmbitoId) return null;
+  const ast = getAmbitoState(currentAmbitoId);
+  if(!ast.exp) ast.exp = { resp:[], cart:[], emmc:null, print:null };
+  return ast.exp;
+}
+function reRenderMeta(){ const ix=AMBITOS_INDEX[currentAmbitoId]; if(ix) renderPautaMeta(ix.ambito, ix.section); }
+
+/* ── Responsables (matriz de dotación, como los puestos de Atlas) ── */
+function expBuscarDot(q){
+  const toks = normTxt(q).trim().split(/\s+/).filter(t=>t.length>=2);
+  if(!toks.length || normTxt(q).trim().length < 3) return [];
+  const STAFF = (window.SHARED_DOTACION && window.SHARED_DOTACION.staff) || [];
+  const out = [];
+  for(const s of STAFF){
+    const hay = normTxt(s.n+' '+(s.c||'')+' '+(s.u||'')+' '+(s.sv||''));
+    if(toks.every(t => hay.includes(t))){ out.push(s); if(out.length>=8) break; }
+  }
+  return out;
+}
+function expDotInput(v){
+  const box = document.getElementById('exp-dot-sug'); if(!box) return;
+  const res = expBuscarDot(v);
+  box.innerHTML = res.map((s,i) =>
+    `<div class="exp-sug" onclick='expAddResp(${JSON.stringify({n:s.n,c:s.c||s.e||'',u:s.u||s.sv||''}).replace(/'/g,"&#39;")})'>
+       <b>${escapeHtml(s.n)}</b><small>${escapeHtml(s.c||s.e||'')} · ${escapeHtml(s.u||s.sv||'')}</small></div>`).join('');
+  box.style.display = res.length ? '' : 'none';
+}
+function expAddResp(p){
+  const e = expState(); if(!e) return;
+  if(!e.resp.some(x => x.n === p.n)) e.resp.push(p);
+  saveState(); reRenderMeta();
+}
+function expDelResp(i){ const e=expState(); if(!e) return; e.resp.splice(i,1); saveState(); reRenderMeta(); }
+
+/* ── Prestaciones (cartera de servicio) ── */
+function expBuscarCart(q){
+  const toks = normTxt(q).trim().split(/\s+/).filter(t=>t.length>=2);
+  if(!toks.length || normTxt(q).trim().length < 3) return [];
+  const PROD = (window.SHARED_CARTERA && window.SHARED_CARTERA.productos) || [];
+  const out = [];
+  for(const p of PROD){
+    const hay = normTxt((p.prod||'')+' '+(p.est||'')+' '+(p.linea||'')+' '+(p.serv||''));
+    if(toks.every(t => hay.includes(t))){ out.push(p); if(out.length>=8) break; }
+  }
+  return out;
+}
+function expCartInput(v){
+  const box = document.getElementById('exp-cart-sug'); if(!box) return;
+  const res = expBuscarCart(v);
+  box.innerHTML = res.map(p =>
+    `<div class="exp-sug" onclick='expAddCart(${JSON.stringify({prod:p.prod||'',est:p.est||'',serv:p.serv||''}).replace(/'/g,"&#39;")})'>
+       <b>${escapeHtml((p.prod||'').slice(0,70))}</b><small>${escapeHtml(p.est||'')} · ${escapeHtml(p.serv||'')}</small></div>`).join('');
+  box.style.display = res.length ? '' : 'none';
+}
+function expAddCart(p){
+  const e = expState(); if(!e) return;
+  if(!e.cart.some(x => x.prod === p.prod)) e.cart.push(p);
+  saveState(); reRenderMeta();
+}
+function expDelCart(i){ const e=expState(); if(!e) return; e.cart.splice(i,1); saveState(); reRenderMeta(); }
+
+/* ── Equipamiento EMMC del recinto (totalidad, con marca/modelo del catálogo) ── */
+function expCargarEMMC(){
+  const e = expState(); if(!e || !currentRecintoId) return;
+  const r = RECMETA[currentRecintoId] || {};
+  const {items:eq, src} = requipFor(r.code);
+  e.emmc = eq.map(x => {
+    const cat = EQUIPCAT[x.t] || {};
+    return { t:x.t||'', n:x.n||'', c:x.c||1, marca:cat.marca||'', modelo:cat.modelo||'' };
+  });
+  e.emmc_src = src;
+  saveState(); reRenderMeta();
+}
+function expSetEmmc(i, campo, val){
+  const e = expState(); if(!e || !e.emmc || !e.emmc[i]) return;
+  e.emmc[i][campo] = val; saveState();
+}
+function expQuitarEMMC(){ const e=expState(); if(!e) return; if(!confirm('¿Quitar el listado EMMC del expediente?')) return; e.emmc=null; saveState(); reRenderMeta(); }
+
+/* ── Print de infraestructura ── */
+function expTomarPrint(){
+  const e = expState(); if(!e) return;
+  const fic = fichaForRecinto(currentRecintoId);
+  if(fic && fic.imagen_url){
+    e.print = { url: fic.imagen_url, nombre: fic.nombre_recinto || '' };
+    saveState(); reRenderMeta();
+  } else {
+    alert('Este recinto no tiene print en las fichas AS. Usa "📷 Subir imagen" para adjuntar una.');
+  }
+}
+function expSubirPrint(files){
+  const e = expState(); if(!e || !files || !files[0]) return;
+  const fr = new FileReader();
+  fr.onload = () => { e.print = { data: fr.result, nombre: 'imagen adjunta' }; saveState(); reRenderMeta(); };
+  fr.readAsDataURL(files[0]);
+}
+function expDelPrint(){ const e=expState(); if(!e) return; e.print=null; saveState(); reRenderMeta(); }
+
+/* ── Render del bloque en la pauta ── */
+function renderExpedienteBlock(ambito){
+  if(!currentRecintoId) return '';
+  const e = expState(); if(!e) return '';
+  const resp = e.resp.map((p,i)=>`<span class="exp-chip dot">👤 ${escapeHtml(p.n)}<small>${escapeHtml(p.c)}</small><button onclick="expDelResp(${i})" title="Quitar">×</button></span>`).join('');
+  const cart = e.cart.map((p,i)=>`<span class="exp-chip car">🗂 ${escapeHtml((p.prod||'').slice(0,55))}<button onclick="expDelCart(${i})" title="Quitar">×</button></span>`).join('');
+  let emmc = '';
+  if(e.emmc && e.emmc.length){
+    const rows = e.emmc.map((x,i)=>`<tr>
+      <td class="mono">${escapeHtml(x.t)}</td><td>${escapeHtml(x.n)}</td><td class="num">${x.c}</td>
+      <td><input value="${escapeHtml(x.marca)}" placeholder="Marca…" oninput="expSetEmmc(${i},'marca',this.value)"></td>
+      <td><input value="${escapeHtml(x.modelo)}" placeholder="Modelo…" oninput="expSetEmmc(${i},'modelo',this.value)"></td>
+    </tr>`).join('');
+    emmc = `<table class="exp-emmc"><thead><tr><th>Código</th><th>Tipología de equipamiento</th><th>Cant.</th><th>Marca</th><th>Modelo</th></tr></thead><tbody>${rows}</tbody></table>
+      <button class="exp-mini" onclick="expQuitarEMMC()">✕ Quitar listado</button>`;
+  } else {
+    const {items, src} = requipFor((RECMETA[currentRecintoId]||{}).code);
+    const hint = src && src !== (RECMETA[currentRecintoId]||{}).code ? ` · del área ${src}` : '';
+    emmc = `<button class="exp-btn" onclick="expCargarEMMC()" ${items.length?'':'disabled'}>⚙ Cargar EMMC del recinto (${items.length} tipologías, con marca y modelo${hint})</button>`;
+  }
+  let print = '';
+  if(e.print){
+    const src = e.print.url || e.print.data;
+    print = `<div class="exp-print"><img src="${escapeHtml(src)}" alt="print" onerror="this.style.display='none'">
+      <span>${escapeHtml(e.print.nombre||'')}</span><button class="exp-mini" onclick="expDelPrint()">✕ Quitar</button></div>`;
+  } else {
+    print = `<button class="exp-btn" onclick="expTomarPrint()">🏗 Tomar print de la ficha AS</button>
+      <label class="exp-btn" style="cursor:pointer">📷 Subir imagen<input type="file" accept="image/*" style="display:none" onchange="expSubirPrint(this.files);this.value=''"></label>`;
+  }
+  return `<div class="exp-block">
+    <div class="exp-hd">📁 Expediente de autorización <small>· se incluye en el PDF exportado</small>
+      <button class="exp-export" onclick="exportarPautaPDF()">📄 Finalizar y exportar PDF</button></div>
+    <div class="exp-sec"><span class="exp-t">👥 Responsables del servicio</span>
+      <div class="exp-chips">${resp||'<span class="exp-none">Sin responsables agregados</span>'}</div>
+      <div class="exp-search"><input placeholder="＋ Agregar responsable: busca por nombre, cargo o unidad…" oninput="expDotInput(this.value)" autocomplete="off">
+        <div class="exp-sugbox" id="exp-dot-sug" style="display:none"></div></div></div>
+    <div class="exp-sec"><span class="exp-t">🗂 Prestaciones de la cartera (${((window.SHARED_CARTERA||{}).productos||[]).length.toLocaleString('es-CL')} disponibles)</span>
+      <div class="exp-chips">${cart||'<span class="exp-none">Sin prestaciones agregadas</span>'}</div>
+      <div class="exp-search"><input placeholder="＋ Agregar prestación: busca en la cartera de servicio…" oninput="expCartInput(this.value)" autocomplete="off">
+        <div class="exp-sugbox" id="exp-cart-sug" style="display:none"></div></div></div>
+    <div class="exp-sec"><span class="exp-t">⚙ Equipamiento EMMC del recinto</span>${emmc}</div>
+    <div class="exp-sec"><span class="exp-t">🏗 Infraestructura (print del recinto)</span>${print}</div>
+  </div>`;
+}
+
+/* ── Export PDF · ruta Drive: Autorización Sanitaria HDS → Edificio → Piso → Servicio ── */
+function drivePathFor(){
+  const r = RECMETA[currentRecintoId] || {};
+  const ast = currentAmbitoId ? getAmbitoState(currentAmbitoId) : {ident:{}};
+  const edificio = (ast.ident||{}).edificio || edificioDeRecinto(currentRecintoId);
+  return ['Autorización Sanitaria HDS', edificio, pisoLabel(r.piso)||'Piso s/d', r.servicio_name||'Servicio s/d'];
+}
+function pdfFileName(){
+  const r = RECMETA[currentRecintoId] || {};
+  const asg = PR[currentRecintoId] || {};
+  const tipo = tipoLabel(asg.regla || '') || (fichaForRecinto(currentRecintoId)||{}).as_tipo || 'Recinto';
+  const ast = currentAmbitoId ? getAmbitoState(currentAmbitoId) : {ident:{}};
+  const fecha = (ast.ident||{}).fecha || new Date().toISOString().slice(0,10);
+  return `${tipo} - ${r.name||r.code||currentRecintoId} - ${fecha}`;
+}
+function exportarPautaPDF(){
+  const ix = AMBITOS_INDEX[currentAmbitoId];
+  if(!ix || !currentRecintoId){ alert('Selecciona un recinto para exportar su pauta.'); return; }
+  const ambito = ix.ambito;
+  const ast = getAmbitoState(ambito.id);
+  const e = expState() || {resp:[],cart:[],emmc:null,print:null};
+  const r = RECMETA[currentRecintoId] || {};
+  const cnt = getCounts(ambito, scopeKey());
+  if(cnt.pending > 0 && !confirm(`La pauta tiene ${cnt.pending} requisitos sin evaluar. ¿Exportar igual?`)) return;
+  const ruta = drivePathFor();
+  const nombre = pdfFileName();
+  const ident = ast.ident || {};
+  const ST = {ok:'✓ Cumple', no:'✗ No cumple', na:'— N/A', pend:'⏱ Pendiente'};
+  const STR = {ok:'✓ Sí realiza', no:'✗ No realiza'};
+  const esRealiza = ambito.modo === 'realiza';
+  const reqs = effectiveRequisitos(ambito);
+  let filas = ''; let _g=null, _s=null;
+  reqs.forEach(rq => {
+    if((rq.grupo||null) !== _g){ _g=rq.grupo||null; if(_g) filas += `<tr class="pg"><td colspan="3">${escapeHtml(_g)}</td></tr>`; _s=null; }
+    if((rq.sub||null) !== _s){ _s=rq.sub||null; if(_s) filas += `<tr class="ps"><td colspan="3">${escapeHtml(_s)}</td></tr>`; }
+    const st = (ast.reqs||{})[rq.n] || {};
+    const lbl = rq.header ? '' : ((esRealiza?STR:ST)[st.st] || '—');
+    filas += `<tr${rq.header?' class="ph"':''}><td class="n">${rq.header?rq.n:(rq.sinNumero?'•':(rq.dn||rq.n))}</td>
+      <td>${escapeHtml(rq.text)}${st.obs?`<div class="obs">Obs: ${escapeHtml(st.obs)}</div>`:''}</td>
+      <td class="st">${lbl}</td></tr>`;
+  });
+  const printImg = e.print ? `<img class="print" src="${escapeHtml(e.print.url||e.print.data)}">` : '<p class="none">Sin print adjunto.</p>';
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${escapeHtml(nombre)}</title><style>
+    body{font-family:'Segoe UI',sans-serif;color:#1e293b;margin:28px;font-size:12px}
+    h1{font-size:17px;color:#0c447c;margin:0 0 2px} h2{font-size:13px;color:#0c447c;border-bottom:2px solid #1d6db8;padding-bottom:3px;margin:18px 0 7px}
+    .ruta{font-size:10.5px;color:#475569;background:#eef5fc;border:1px solid #cfe0f2;border-radius:6px;padding:5px 9px;margin:7px 0}
+    table{width:100%;border-collapse:collapse;font-size:11px} th{background:#e6f1fb;color:#0c447c;text-align:left;padding:4px 7px;border:1px solid #cfe0f2}
+    td{padding:4px 7px;border:1px solid #e2e8f0;vertical-align:top}
+    tr.pg td{background:#e6f1fb;font-weight:700;color:#0c447c} tr.ps td{background:#e0f4f1;font-weight:700;color:#0f766e;padding-left:18px}
+    tr.ph td{background:#aacdec;font-weight:700} td.n{width:34px;text-align:center} td.st{width:90px;white-space:nowrap}
+    .obs{font-size:10px;color:#64748b;font-style:italic;margin-top:2px}
+    .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:6px 0}
+    .cell{border:1px solid #e2e8f0;border-radius:6px;padding:4px 8px} .cell b{display:block;font-size:8.5px;color:#64748b;text-transform:uppercase}
+    .chip{display:inline-block;border:1px solid #cfe0f2;border-radius:8px;padding:3px 9px;margin:2px;font-size:11px}
+    img.print{max-width:100%;max-height:480px;border:1px solid #cfe0f2;border-radius:8px}
+    .none{color:#94a3b8} .firma{margin-top:34px;display:grid;grid-template-columns:1fr 1fr;gap:40px;text-align:center}
+    .firma div{border-top:1.5px solid #475569;padding-top:5px;font-size:11px}
+    @page{margin:14mm}
+  </style></head><body>
+  <h1>AUTORIZACIÓN SANITARIA HDS · ${escapeHtml(NORMAS[activeNormaId].label)}</h1>
+  <div>${escapeHtml(prettyName(ix.section.name))} › <b>${escapeHtml(ambito.name)}</b>${currentScope!=='recinto'?` · Alcance: ${currentScope==='servicio'?'Servicio completo':'Cama/Unidad '+currentUnit}`:''}</div>
+  <div class="ruta">📁 ${ruta.map(escapeHtml).join(' → ')} → <b>${escapeHtml(nombre)}.pdf</b></div>
+  <h2>Identificación</h2>
+  <div class="grid">
+    ${effectiveIdentFields().map(f=>`<div class="cell"><b>${escapeHtml(f.label)}</b>${escapeHtml(ident[f.k]||'—')}</div>`).join('')}
+    <div class="cell"><b>Código BIM</b>${escapeHtml(RECBIM[r.code]||ident.cod_bim||'—')}</div>
+    <div class="cell"><b>Avance</b>${cnt.pct}% (${cnt.ok}✓ ${cnt.no}✗ ${cnt.na} N/A · ${cnt.pending} pend.)</div>
+  </div>
+  <h2>👥 Responsables del servicio</h2>
+  ${e.resp.length? e.resp.map(p=>`<span class="chip">👤 <b>${escapeHtml(p.n)}</b> · ${escapeHtml(p.c)} · ${escapeHtml(p.u)}</span>`).join(''):'<p class="none">Sin responsables registrados.</p>'}
+  <h2>🗂 Prestaciones de la cartera de servicio</h2>
+  ${e.cart.length? e.cart.map(p=>`<span class="chip">${escapeHtml(p.prod)}</span>`).join(''):'<p class="none">Sin prestaciones registradas.</p>'}
+  <h2>⚙ Equipamiento EMMC del recinto</h2>
+  ${e.emmc&&e.emmc.length? `<table><thead><tr><th>Código</th><th>Tipología</th><th>Cant.</th><th>Marca</th><th>Modelo</th></tr></thead><tbody>${e.emmc.map(x=>`<tr><td>${escapeHtml(x.t)}</td><td>${escapeHtml(x.n)}</td><td>${x.c}</td><td>${escapeHtml(x.marca)}</td><td>${escapeHtml(x.modelo)}</td></tr>`).join('')}</tbody></table>`:'<p class="none">Sin listado EMMC cargado.</p>'}
+  <h2>🏗 Infraestructura</h2>
+  ${printImg}
+  <h2>📝 Pauta de cotejo (${reqs.length})</h2>
+  <table><thead><tr><th>N°</th><th>Requisito</th><th>Estado</th></tr></thead><tbody>${filas}</tbody></table>
+  ${ast.obs?`<h2>Observaciones generales</h2><p>${escapeHtml(ast.obs)}</p>`:''}
+  <div class="firma"><div>Inspector: ${escapeHtml(ident.inspector||'')}</div><div>Responsable del servicio</div></div>
+  <script>window.onload=()=>setTimeout(()=>window.print(),300);<\/script>
+  </body></html>`;
+  const w = window.open('', '_blank');
+  if(!w){ alert('El navegador bloqueó la ventana. Permite pop-ups para exportar.'); return; }
+  w.document.write(html); w.document.close();
+  logChange('export', `Pauta exportada a PDF · ${nombre} · ${ruta.join(' / ')}`);
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -1948,6 +2250,7 @@ const DEFAULT_IDENT_FIELDS = [
   { k: 'cod_recinto', label: 'Código de recinto', placeholder: 'Ej: 16.4.2' },
   { k: 'cod_bim',     label: 'Código BIM', placeholder: 'Ej: H0456, A4560' },
   { k: 'inspector',   label: 'Inspector', placeholder: 'Nombre del inspector' },
+  { k: 'edificio',    label: 'Edificio', type: 'select', options: ['HDS','AA'] },
 ];
 /* ── Editor de campos de la ficha de inspección (globales a todas las pautas) ──
    Si hay override en localStorage, ESE es el listado efectivo; si no, el default.
@@ -2126,6 +2429,7 @@ function renderPautaMeta(ambito, section){
       ${renderRecintoControls(ambito)}
       ${identBar}
       <div class="ident-grid${_identEditMode?' editing':''}">${fieldsHtml}</div>
+      ${renderExpedienteBlock(ambito)}
     </div>
     <div class="pauta-meta-right">
       <div class="pmr-hd">Progreso de la pauta</div>
