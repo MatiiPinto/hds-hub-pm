@@ -14,7 +14,7 @@
 // Por eso acá NUNCA se publican datos sensibles (RUT, correos, etc.).
 // ════════════════════════════════════════════════════════════════════════════
 window.PM_CONFIG = {
-  LOG_URL: '', /*__PM_LOG_URL__*/
+  LOG_URL: 'https://script.google.com/macros/s/AKfycbx-v6nDDB2YLNszxh3qg5eWJcxtKrBTlzKK1f91OQwV1NKAm6zKBQ6J_fBJvL9jrEA_/exec', /*__PM_LOG_URL__*/
   SESSION_HOURS: 12,
   USERS: {
     // usuario : sha256("usuario:clave")
