@@ -18,8 +18,14 @@ window.PM_CONFIG = {
   SESSION_HOURS: 12,
   USERS: {
     // usuario : sha256("usuario:clave")
-    'mpinto':   '3d334297c9a7e9d74f95bfe5e20ce10ecd100258601cad050a303233e52a6c96',
-    'invitado': '94879c776edff53fcf5be8f23c281a9b8e50377f2e4720c989ce1c69560c59fa'
+    // Equipo Puesta en Marcha (clave inicial: primeros 4 dígitos del RUT;
+    // cada persona debe cambiarla por otra de 4 dígitos vía Matías)
+    'lperez':     '8db82755fcf9a844add0114df36e3bb98234c54fc7f5a66682b2052ae630f8a2',
+    'mcanales':   '11ad79546ae4a772534aadb718d5218ad47f689e9585f16e8cd54508850dcf1b',
+    'faraya':     'a1d25346d1ea182cbd8613badf785628efedd8b0ceecde2c2fdc44a91009910f',
+    'jpacheco':   '6592df481d205fb4334a462a7452b83589defa01f4eeccfb6917429a7395d060',
+    'csepulveda': '78e0be6b452fc7d2b411c3f932739bab848ac2692ec0a2993750fbee86342d37',
+    'mpinto':     '405ce04bf68d5cf8cb2e74ae353d946916bd9676253c68b4ab2894bb850456b3'
   }
 };
 

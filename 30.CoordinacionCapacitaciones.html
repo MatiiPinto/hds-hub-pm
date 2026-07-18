@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<script src="pm_config.js"></script>
+<script src="pm_gate.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coordinación de Capacitaciones · HDS</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230B5FA5'/><text x='50' y='70' font-size='54' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>H</text></svg>">
+<style>
+:root{
+  --azul:#0B5FA5;--azul-osc:#084a82;--bg:#f4f6f9;--card:#fff;--bd:#e2e8f0;--tx:#1e293b;--tx2:#64748b;
+  --e-ejec:#16a34a;--e-ejec-bg:#dcfce7;--e-coor:#2563eb;--e-coor-bg:#dbeafe;
+  --e-porc:#b45309;--e-porc-bg:#fef3c7;--e-repr:#ea580c;--e-repr-bg:#ffedd5;--e-na:#64748b;--e-na-bg:#eef2f6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--tx);font-size:13px}
+header{background:linear-gradient(135deg,var(--azul),var(--azul-osc));color:#fff;padding:14px 22px;position:sticky;top:0;z-index:30;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.hrow{display:flex;align-items:center;gap:14px;max-width:1500px;margin:0 auto;flex-wrap:wrap}
+.logo{width:42px;height:42px;border-radius:9px;background:rgba(255,255,255,.18);display:grid;place-items:center;font-weight:800;font-size:18px}
+.htitle h1{font-size:18px;font-weight:700}.htitle p{font-size:12px;opacity:.85}
+.htools{margin-left:auto;display:flex;gap:8px}
+.btn{border:none;border-radius:7px;padding:8px 13px;font-size:12.5px;font-weight:600;cursor:pointer;background:rgba(255,255,255,.16);color:#fff}
+.btn:hover{background:rgba(255,255,255,.28)}
+main{max-width:1500px;margin:0 auto;padding:16px 22px 50px}
+.dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.kpi h3{font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--tx2);margin-bottom:7px;font-weight:700}
+.kpi .big{font-size:26px;font-weight:800;color:var(--azul)}
+.kpi .sub{font-size:11.5px;color:var(--tx2);margin-top:2px}
+.kpi.combo{background:linear-gradient(135deg,#0B5FA5,#084a82);color:#fff}
+.kpi.combo h3{color:rgba(255,255,255,.85)}.kpi.combo .big{color:#fff}.kpi.combo .sub{color:rgba(255,255,255,.8)}
+.bar{height:8px;border-radius:5px;background:#e2e8f0;overflow:hidden;margin-top:9px;display:flex}
+.bar i{display:block;height:100%}
+.kpi.combo .bar{background:rgba(255,255,255,.25)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin:4px 2px 14px;font-size:11.5px;color:var(--tx2)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.dot{width:11px;height:11px;border-radius:3px;display:inline-block}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tab{border:1px solid var(--bd);background:#fff;border-radius:9px;padding:9px 15px;font-size:13px;font-weight:600;cursor:pointer;color:var(--tx2)}
+.tab.on{background:var(--azul);color:#fff;border-color:var(--azul)}
+.tab .c{font-size:11px;opacity:.8;margin-left:5px}
+.filters{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:11px;align-items:center}
+.filters input,.filters select{border:1px solid var(--bd);border-radius:8px;padding:8px 11px;font-size:12.5px;background:#fff;color:var(--tx);max-width:230px}
+.filters input[type=text]{min-width:220px}
+.fcount{font-size:12px;color:var(--tx2);margin-left:auto}
+.twrap{overflow:auto;border:1px solid var(--bd);border-radius:11px;background:#fff;max-height:70vh}
+table{border-collapse:collapse;width:100%;font-size:12px;white-space:nowrap}
+thead th{background:var(--azul);color:#fff;position:sticky;top:0;padding:9px 10px;text-align:left;font-weight:600;font-size:11.5px;z-index:5}
+tbody td{padding:6px 10px;border-bottom:1px solid #eef2f6;vertical-align:middle}
+tbody tr:hover td{background:#f8fafc}
+td.edit input,td.edit textarea{width:100%;min-width:90px;border:1px solid transparent;border-radius:5px;padding:4px 6px;font-size:12px;background:transparent;font-family:inherit;color:var(--tx)}
+td.edit input:hover,td.edit textarea:hover{border-color:var(--bd);background:#fff}
+td.edit input:focus,td.edit textarea:focus{border-color:var(--azul);background:#fff;outline:none}
+.est-sel{border:none;border-radius:20px;padding:5px 9px;font-size:11.5px;font-weight:700;cursor:pointer;-webkit-appearance:none;appearance:none}
+.e-ejecutada,.e-entregado{background:#dcfce7;color:#16a34a}
+.e-coordinada{background:#fef9c3;color:#a16207}
+.e-por_coordinar{background:#eef2f6;color:#64748b}
+.e-por_entregar{background:#fef3c7;color:#b45309}
+.e-reprogramada{background:#dbeafe;color:#2563eb}
+.e-no_aplica{background:#ffffff;color:#64748b;border:1px solid #cbd5e1}
+.e-pendiente{background:#fee2e2;color:#dc2626}
+tr.row-ejecutada,tr.row-entregado{background:#f3fcf6}
+tr.row-coordinada{background:#fffdf2}
+tr.row-por_coordinar{background:#f8fafc}
+tr.row-por_entregar{background:#fffdf5}
+tr.row-reprogramada{background:#f4f8ff}
+tr.row-no_aplica{background:#ffffff}
+tr.row-pendiente{background:#fff5f5}
+.estbar{width:5px;padding:0!important}
+.eb-ejecutada,.eb-entregado{background:#16a34a}.eb-coordinada{background:#eab308}
+.eb-por_coordinar{background:#94a3b8}.eb-por_entregar{background:#f59e0b}.eb-reprogramada{background:#3b82f6}.eb-no_aplica{background:#e2e8f0}.eb-pendiente{background:#ef4444}
+.muted{color:var(--tx2)}
+.slotcell{min-width:245px}
+.slots{display:flex;flex-direction:column;gap:4px}
+.slot{display:flex;gap:4px;align-items:center}
+.slot input[type=date]{width:118px;border:1px solid var(--bd);border-radius:5px;padding:3px 5px;font-size:11px;font-family:inherit}
+.slot-h{width:90px;border:1px solid var(--bd);border-radius:5px;padding:3px 5px;font-size:11px;font-family:inherit}
+.slot-x{border:none;background:#fee2e2;color:#dc2626;border-radius:5px;cursor:pointer;font-size:13px;width:20px;height:23px;line-height:1;padding:0}
+.slot-add{border:1px dashed var(--azul);background:#eef6fc;color:var(--azul);border-radius:5px;cursor:pointer;font-size:11px;padding:3px 8px;align-self:flex-start}
+th.sortable{cursor:pointer;user-select:none}th.sortable:hover{background:#0a558f}
+.bulkbar{display:none;align-items:center;gap:12px;background:#0B5FA5;color:#fff;border-radius:10px;padding:9px 14px;margin-bottom:11px;font-size:13px;flex-wrap:wrap}
+.bulkbar.show{display:flex}
+.bulkbar b{font-weight:800}
+.bulkbar select{border:none;border-radius:7px;padding:6px 10px;font-size:12.5px;font-weight:600;color:#1e293b}
+.bulkbar button{border:none;border-radius:7px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer}
+.bb-apply{background:#16a34a;color:#fff}.bb-clear{background:rgba(255,255,255,.22);color:#fff}
+.chk{width:15px;height:15px;cursor:pointer}
+</style>
+</head>
+<body>
+<header>
+  <div class="hrow">
+    <div class="logo">HDS</div>
+    <div class="htitle"><h1>Coordinación de Capacitaciones</h1><p>Hospital del Salvador · Programa de Capacitación · Instructivos de Uso · Instrumental</p></div>
+    <div class="htools">
+      <span id="capUpdInfo" style="font-size:11px;color:#94a3b8;text-align:right;line-height:1.35"></span>
+      <button class="btn" id="btnCapUpd" onclick="actualizarDesdeExcel()" title="Vuelve a leer la hoja '4. Prog Capacitacion HDS' del Excel de Seguimiento y Control (Drive sincronizado) y regenera la reportería. Requiere el servidor local: python3 _DEV/deploy_server.py (o usá Actualizar-Capacitaciones.command).">⟳ Actualizar desde Excel</button>
+      <button class="btn" onclick="exportCSV()">⬇ Exportar CSV</button>
+      <button class="btn" onclick="resetEstados()">↺ Reiniciar estados</button>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="dash" id="dash"></div>
+  <div class="legend" id="legend"></div>
+  <div class="tabs" id="tabs"></div>
+  <div class="filters" id="filters"></div>
+  <div class="bulkbar" id="bulkbar"></div>
+  <div class="twrap"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+</main>
+
+<script src="SHARED_DATA/cap_data.js"></script>
+<script>
+"use strict";
+var D = window.CAP_DATA;
+var IDX={}; ["capacitaciones","instructivos","instrumental"].forEach(function(a){D[a].forEach(function(r){IDX[r.id]=r;});});
+var STORE_KEY = "hds_coordcap_v1";
+
+// estados por área
+var ST5 = [
+  {k:"ejecutada",lbl:"Ejecutada"},{k:"coordinada",lbl:"Coordinada"},
+  {k:"por_coordinar",lbl:"En Coordinación"},{k:"reprogramada",lbl:"Reprogramada"},{k:"no_aplica",lbl:"No aplica"}
+];
+var ST_CAP = [
+  {k:"ejecutada",lbl:"Ejecutada"},{k:"coordinada",lbl:"Coordinada"},
+  {k:"por_coordinar",lbl:"En Coordinación"},{k:"pendiente",lbl:"Por Coordinar"},{k:"reprogramada",lbl:"CSSO"},{k:"no_aplica",lbl:"No aplica"}
+];
+var ESTADOS = {
+  capacitaciones: ST_CAP,
+  instrumental:   ST5,
+  instructivos:   [{k:"entregado",lbl:"Entregado"},{k:"por_entregar",lbl:"Por entregar"}]
+};
+var DEFAULT_EST={capacitaciones:"por_coordinar",instrumental:"por_coordinar",instructivos:"por_entregar"};
+var DONE={capacitaciones:"ejecutada",instrumental:"ejecutada",instructivos:"entregado"};
+var DONE_WORD={capacitaciones:"ejecutadas",instrumental:"ejecutadas",instructivos:"entregados"};
+var EST_HEX={ejecutada:"#16a34a",coordinada:"#eab308",por_coordinar:"#94a3b8",reprogramada:"#3b82f6",no_aplica:"#cbd5e1",pendiente:"#ef4444",
+             entregado:"#16a34a",por_entregar:"#f59e0b"};
+var EST_LBL={};Object.keys(ESTADOS).forEach(function(a){ESTADOS[a].forEach(function(e){EST_LBL[e.k]=e.lbl;});});
+function validKeys(area){return ESTADOS[area].map(function(e){return e.k;});}
+
+var COLS = {
+  capacitaciones:[
+    {key:"codigo",label:"Código"},{key:"equipo",label:"Equipo"},
+    {key:"lugar",label:"Lugar",edit:1},{key:"_slots",label:"Fechas/horas propuestas",slots:1},
+    {key:"participantes",label:"Particip.",edit:1},
+    {key:"proveedor",label:"Proveedor"},{key:"marca",label:"Marca"},{key:"modelo",label:"Modelo"},
+    {key:"duracion",label:"Duración",edit:1},{key:"cant_equipos",label:"Cant. eq."},
+    {key:"establecimiento",label:"Estab."},{key:"tipo_entrenamiento",label:"Tipo entren."},
+    {key:"propuesta_adelantar",label:"Prop. adelantar",edit:1},{key:"detalle_servicios",label:"Servicio clínico"}
+  ],
+  instructivos:[
+    {key:"codigo",label:"Código"},{key:"equipo",label:"Equipo"},{key:"cant_equipos",label:"Cant. eq."},
+    {key:"establecimiento",label:"Estab."},{key:"proveedor",label:"Proveedor"},{key:"marca",label:"Marca"},
+    {key:"modelo",label:"Modelo"},{key:"detalle_servicios",label:"Servicio clínico"},
+    {key:"fecha_coord",label:"Fecha entrega",edit:1,type:"date"}
+  ],
+  instrumental:[
+    {key:"codigo",label:"Código"},{key:"especialidad",label:"Especialidad"},{key:"caja",label:"Caja"},
+    {key:"cant_cajas",label:"Cant. cajas"},{key:"piezas_caja",label:"Piezas/caja"},{key:"piezas_total",label:"Piezas tot."},
+    {key:"proveedor",label:"Proveedor"},{key:"marca",label:"Marca"},
+    {key:"_slots",label:"Fechas propuestas",slots:1}
+  ]
+};
+var AREAS=[["capacitaciones","Programa de Capacitación"],["instructivos","Instructivos de Uso"],["instrumental","Instrumental"]];
+// filtros desplegables por área
+var FILTERFIELDS={
+  capacitaciones:["establecimiento","proveedor","marca","detalle_servicios"],
+  instructivos:["establecimiento","proveedor"],
+  instrumental:["especialidad","proveedor"]
+};
+
+var overrides = load();
+(function(){ var FLAG=window.CAP_IMPORT_FLAG||"hds_coordcap_capimport_2026jun26b";
+  if(!localStorage.getItem(FLAG)){
+    Object.keys(overrides).forEach(function(id){ if(id.indexOf("cap-")===0) delete overrides[id]; });
+    localStorage.setItem(STORE_KEY, JSON.stringify(overrides));
+    localStorage.setItem(FLAG,"1");
+  }
+})();
+var active = "capacitaciones";
+var filtro = {q:"",estado:"",fields:{}};
+var selected = {};
+var sortBy = {key:null,dir:1};
+
+function load(){ try{return JSON.parse(localStorage.getItem(STORE_KEY)||"{}");}catch(e){return {};} }
+function save(){ localStorage.setItem(STORE_KEY, JSON.stringify(overrides)); }
+function ov(id){ return overrides[id]||(overrides[id]={}); }
+function areaOf(id){ return id.indexOf("cap-")===0?"capacitaciones":(id.indexOf("ins-")===0?"instructivos":"instrumental"); }
+function estadoOf(area,row){
+  var o=overrides[row.id]; var v=(o&&o.estado)||row._estado||DEFAULT_EST[area];
+  if(validKeys(area).indexOf(v)<0) v=DEFAULT_EST[area];
+  return v;
+}
+function valOf(row,key){ if(key==="_slots") return slotsText(row); var o=overrides[row.id]; if(o&&o.fields&&o.fields[key]!=null) return o.fields[key]; return row[key]!=null?row[key]:""; }
+function slotsOf(r){ var o=overrides[r.id]; if(o&&o.slots) return o.slots; return r._slots||[]; }
+function ensureSlots(id){ var o=ov(id); if(!o.slots){ o.slots=((IDX[id]&&IDX[id]._slots)||[]).map(function(s){return {f:s.f,h:s.h};}); } return o.slots; }
+function slotsText(r){ return slotsOf(r).map(function(s){return (s.f||"")+" "+(s.h||"");}).join(" | "); }
+function slotsCell(r){
+  var slots=slotsOf(r), h='<td class="slotcell"><div class="slots">';
+  slots.forEach(function(s,i){
+    h+='<div class="slot"><input type="date" value="'+esc(s.f||"")+'" onchange="setSlot(\''+r.id+'\','+i+',\'f\',this.value)">'+
+       '<input type="text" class="slot-h" placeholder="hora" value="'+esc(s.h||"")+'" onchange="setSlot(\''+r.id+'\','+i+',\'h\',this.value)">'+
+       '<button class="slot-x" onclick="delSlot(\''+r.id+'\','+i+')" title="Quitar fecha">\u00d7</button></div>';
+  });
+  h+='<button class="slot-add" onclick="addSlot(\''+r.id+'\')">+ fecha</button></div></td>';
+  return h;
+}
+function addSlot(id){ ensureSlots(id).push({f:"",h:""}); save(); renderTable(); }
+function delSlot(id,i){ var a=ensureSlots(id); a.splice(i,1); save(); renderTable(); }
+function setSlot(id,i,f,v){ var a=ensureSlots(id); if(a[i]){ a[i][f]=v; save(); } }
+function esc(s){var d=document.createElement("div");d.textContent=s==null?"":s;return d.innerHTML;}
+
+function counts(area){
+  var c={total:0}; validKeys(area).forEach(function(k){c[k]=0;});
+  D[area].forEach(function(r){ c[estadoOf(area,r)]++; c.total++; });
+  return c;
+}
+// Instrumental: % por tipologías de caja sobre el TOTAL (196), sin excluir No aplica.
+// Resto: ejecutadas/entregados sobre el total aplicable (excluye No aplica).
+function pctArea(area,c){
+  var base = (area==="instrumental") ? c.total : (c.total-(c.no_aplica||0));
+  return base>0?Math.round((c[DONE[area]]||0)/base*100):0;
+}
+function barArea(area,c){
+  var t=c.total||1,h='<div class="bar">';
+  validKeys(area).forEach(function(k){ h+='<i style="width:'+((c[k]||0)/t*100).toFixed(2)+'%;background:'+EST_HEX[k]+'"></i>'; });
+  return h+'</div>';
+}
+function comboStats(areas){
+  var done=0,total=0,na=0;
+  areas.forEach(function(a){var c=counts(a); done+=c[DONE[a]]||0; total+=c.total; na+=c.no_aplica||0;});
+  return {done:done,total:total,base:total-na,pct:(total-na)>0?Math.round(done/(total-na)*100):0};
+}
+function writeSummary(){
+  var areas=["capacitaciones","instructivos","instrumental"];
+  var gd=0,gt=0;
+  areas.forEach(function(a){ var c=counts(a); gd+=(c[DONE[a]]||0); gt+=c.total; });
+  var gpct= gt>0?Math.round(gd/gt*100):0;
+  var cc=counts("capacitaciones");
+  var sum={ts:Date.now(),
+    global:{done:gd,total:gt,pct:gpct},
+    capacitaciones:{done:(cc[DONE.capacitaciones]||0),total:cc.total,pct:pctArea("capacitaciones",cc)}};
+  try{ localStorage.setItem("hds_coordcap_summary", JSON.stringify(sum)); }catch(e){}
+}
+function barDone(p){ return '<div class="bar"><i style="width:'+p.toFixed(2)+'%;background:var(--e-ejec)"></i></div>'; }
+
+function renderDash(){
+  var h="";
+  AREAS.forEach(function(a){
+    var c=counts(a[0]);
+    h+='<div class="kpi"><h3>'+a[1]+'</h3><div class="big">'+pctArea(a[0],c)+'%</div>'+
+       '<div class="sub">'+(c[DONE[a[0]]]||0)+' '+DONE_WORD[a[0]]+' de '+c.total+'</div>'+barArea(a[0],c)+'</div>';
+  });
+  var c1=comboStats(["capacitaciones","instructivos"]);
+  var c2=comboStats(["capacitaciones","instructivos","instrumental"]);
+  h+='<div class="kpi combo"><h3>Combinado · Capac. + Instructivos</h3><div class="big">'+c1.pct+'%</div>'+
+     '<div class="sub">'+c1.done+' completadas de '+c1.total+'</div>'+barDone(c1.pct)+'</div>';
+  h+='<div class="kpi combo"><h3>Combinado · las 3 áreas (+ Instrumental)</h3><div class="big">'+c2.pct+'%</div>'+
+     '<div class="sub">'+c2.done+' completadas de '+c2.total+'</div>'+barDone(c2.pct)+'</div>';
+  document.getElementById("dash").innerHTML=h;
+  writeSummary();
+}
+function renderLegend(){
+  document.getElementById("legend").innerHTML=
+    '<span class="muted" style="font-weight:600">'+AREAS.filter(function(a){return a[0]===active;})[0][1]+':</span>'+
+    ESTADOS[active].map(function(e){return '<span><i class="dot" style="background:'+EST_HEX[e.k]+'"></i>'+e.lbl+'</span>';}).join("")+
+    '<span class="muted">· El % cuenta '+DONE_WORD[active]+' sobre el total aplicable</span>';
+}
+function renderTabs(){
+  document.getElementById("tabs").innerHTML=AREAS.map(function(a){
+    return '<button class="tab'+(active===a[0]?' on':'')+'" onclick="setArea(\''+a[0]+'\')">'+a[1]+'<span class="c">'+D[a[0]].length+'</span></button>';
+  }).join("");
+}
+function setArea(a){ active=a; filtro={q:"",estado:"",fields:{}}; selected={}; sortBy={key:null,dir:1}; renderTabs(); renderLegend(); renderFilters(); renderBulk(); renderTable(); }
+
+function uniq(area,key){var s={};D[area].forEach(function(r){var v=valOf(r,key);if(v)s[v]=1;});return Object.keys(s).sort();}
+function colByKey(k){return COLS[active].filter(function(c){return c.key===k;})[0]||{label:k};}
+function renderFilters(){
+  var h='<input type="text" id="fq" placeholder="Buscar…" value="'+esc(filtro.q)+'" oninput="filtro.q=this.value;renderTable()">';
+  h+='<select onchange="filtro.estado=this.value;renderTable()"><option value="">Todos los estados</option>'+
+     ESTADOS[active].map(function(e){return '<option value="'+e.k+'"'+(filtro.estado===e.k?' selected':'')+'>'+e.lbl+'</option>';}).join("")+'</select>';
+  FILTERFIELDS[active].forEach(function(fk){
+    var col=colByKey(fk), cur=filtro.fields[fk]||"";
+    h+='<select onchange="setFieldFilter(\''+fk+'\',this.value)"><option value="">'+col.label+': todos</option>'+
+       uniq(active,fk).map(function(v){return '<option'+(cur===v?' selected':'')+'>'+esc(v)+'</option>';}).join("")+'</select>';
+  });
+  h+='<span class="fcount" id="fcount"></span>';
+  document.getElementById("filters").innerHTML=h;
+}
+function setFieldFilter(fk,v){ if(v) filtro.fields[fk]=v; else delete filtro.fields[fk]; renderTable(); }
+
+function filtered(){
+  var q=filtro.q.toLowerCase();
+  return D[active].filter(function(r){
+    if(filtro.estado && estadoOf(active,r)!==filtro.estado) return false;
+    for(var fk in filtro.fields){ if(valOf(r,fk)!==filtro.fields[fk]) return false; }
+    if(q){ var hay=COLS[active].some(function(c){return (valOf(r,c.key)+"").toLowerCase().indexOf(q)>-1;}); if(!hay) return false; }
+    return true;
+  });
+}
+function renderTable(){
+  var cols=COLS[active];
+  var rows=filtered();
+  if(sortBy.key){
+    rows=rows.slice().sort(function(a,b){
+      var va=sortBy.key==='_estado'?lblOf(active,estadoOf(active,a)):valOf(a,sortBy.key);
+      var vb=sortBy.key==='_estado'?lblOf(active,estadoOf(active,b)):valOf(b,sortBy.key);
+      return (''+va).localeCompare(''+vb,'es',{numeric:true,sensitivity:'base'})*sortBy.dir;
+    });
+  }
+  var allSel=rows.length>0 && rows.every(function(r){return selected[r.id];});
+  document.getElementById("thead").innerHTML='<tr><th class="estbar"></th>'+
+    '<th><input type="checkbox" class="chk" '+(allSel?'checked':'')+' onclick="toggleAll(this.checked)" title="Seleccionar todos"></th>'+
+    '<th class="sortable" onclick="setSort(\'_estado\')">Estado'+arrow('_estado')+'</th>'+
+    cols.map(function(c){return '<th class="sortable" onclick="setSort(\''+c.key+'\')">'+c.label+arrow(c.key)+'</th>';}).join("")+'<th>Notas coordinación</th></tr>';
+  var tb=rows.map(function(r){
+    var est=estadoOf(active,r);
+    var sel='<select class="est-sel e-'+est+'" onchange="setEstado(\''+r.id+'\',this.value)">'+
+      ESTADOS[active].map(function(e){return '<option value="'+e.k+'"'+(est===e.k?' selected':'')+'>'+e.lbl+'</option>';}).join("")+'</select>';
+    var tds=cols.map(function(c){
+      if(c.slots) return slotsCell(r);
+      var v=valOf(r,c.key);
+      if(c.edit) return '<td class="edit"><input type="'+(c.type||"text")+'" value="'+esc(v)+'" onchange="setField(\''+r.id+'\',\''+c.key+'\',this.value)"></td>';
+      return '<td>'+esc(v)+'</td>';
+    }).join("");
+    var notas=(overrides[r.id]&&overrides[r.id].notas)||"";
+    var ncell='<td class="edit"><input type="text" value="'+esc(notas)+'" placeholder="…" onchange="setNotas(\''+r.id+'\',this.value)" style="min-width:160px"></td>';
+    return '<tr class="row-'+est+'"><td class="estbar eb-'+est+'"></td>'+'<td><input type="checkbox" class="chk" '+(selected[r.id]?'checked':'')+' onclick="toggleSel(\''+r.id+'\',this.checked)"></td>'+'<td>'+sel+'</td>'+tds+ncell+'</tr>';
+  }).join("");
+  document.getElementById("tbody").innerHTML=tb||'<tr><td colspan="24" style="padding:30px;text-align:center" class="muted">Sin resultados.</td></tr>';
+  var fc=document.getElementById("fcount"); if(fc) fc.textContent=rows.length+" de "+D[active].length;
+}
+function setEstado(id,v){ ov(id).estado=v; save(); renderDash(); renderTable(); }
+function setField(id,key,v){ var o=ov(id); (o.fields=o.fields||{})[key]=v; save(); }
+function setNotas(id,v){ ov(id).notas=v; save(); }
+function resetEstados(){ if(confirm("¿Borrar todos los estados y anotaciones guardados y volver al estado inicial?")){ overrides={}; save(); renderDash(); renderTable(); } }
+function exportCSV(){
+  var cols=COLS[active];
+  var head=["Estado"].concat(cols.map(function(c){return c.label;})).concat(["Notas"]);
+  var lines=[head.map(q).join(",")];
+  filtered().forEach(function(r){
+    var row=[lblOf(active,estadoOf(active,r))].concat(cols.map(function(c){return valOf(r,c.key);})).concat([(overrides[r.id]&&overrides[r.id].notas)||""]);
+    lines.push(row.map(q).join(","));
+  });
+  var blob=new Blob(["﻿"+lines.join("\n")],{type:"text/csv;charset=utf-8;"});
+  var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="coordinacion_"+active+"_HDS.csv";a.click();
+}
+function q(v){v=(v==null?"":""+v);return '"'+v.replace(/"/g,'""')+'"';}
+function lblOf(area,k){var e=ESTADOS[area].filter(function(x){return x.k===k;})[0];return e?e.lbl:k;}
+function arrow(k){ return sortBy.key===k?(sortBy.dir>0?' \u25B2':' \u25BC'):''; }
+function setSort(k){ if(sortBy.key===k) sortBy.dir*=-1; else { sortBy.key=k; sortBy.dir=1; } renderTable(); }
+
+function toggleSel(id,ch){ if(ch) selected[id]=true; else delete selected[id]; renderBulk(); syncSelAll(); }
+function toggleAll(ch){ filtered().forEach(function(r){ if(ch) selected[r.id]=true; else delete selected[r.id]; }); renderTable(); renderBulk(); }
+function syncSelAll(){ var rows=filtered(); var all=rows.length>0&&rows.every(function(r){return selected[r.id];}); var b=document.querySelector('#thead .chk'); if(b) b.checked=all; }
+function selCount(){ return Object.keys(selected).length; }
+function renderBulk(){
+  var n=selCount(); var bb=document.getElementById("bulkbar");
+  if(n===0){ bb.className="bulkbar"; bb.innerHTML=""; return; }
+  bb.className="bulkbar show";
+  bb.innerHTML='<b>'+n+'</b> seleccionado'+(n>1?'s':'')+
+    ' · Cambiar estado a: <select id="bulkSel">'+
+    ESTADOS[active].map(function(e){return '<option value="'+e.k+'">'+e.lbl+'</option>';}).join("")+'</select>'+
+    '<button class="bb-apply" onclick="applyBulk()">Aplicar a seleccionados</button>'+
+    '<button class="bb-clear" onclick="clearSel()">Limpiar selección</button>';
+}
+function applyBulk(){
+  var v=document.getElementById("bulkSel").value;
+  Object.keys(selected).forEach(function(id){ ov(id).estado=v; });
+  save(); selected={}; renderDash(); renderTable(); renderBulk();
+}
+function clearSel(){ selected={}; renderTable(); renderBulk(); }
+
+renderDash();renderTabs();renderLegend();renderFilters();renderBulk();renderTable();
+
+// ── ACTUALIZAR DESDE EXCEL (botón del header) ───────────────────────────────
+// Pide al servidor local (python3 _DEV/deploy_server.py, puerto 8799) que corra
+// el generador build_capacitaciones_from_xlsx.py y recarga. En la versión de
+// consulta (HUB PM / público) el botón se oculta; la fecha queda visible.
+var PUBLIC_BUILD = true; /*__PUBLIC_FLAG__*/
+var PUBLIC = PUBLIC_BUILD || new URLSearchParams(location.search).get('public')==='1';
+(function(){
+  var info=document.getElementById('capUpdInfo');
+  if(info && window.CAP_GENERADO){
+    info.innerHTML='Última actualización: <b style="color:#e2e8f0">'+window.CAP_GENERADO+'</b>'
+      +(window.CAP_EXCEL_MOD?('<br>Excel al '+window.CAP_EXCEL_MOD):'');
+  }
+  if(PUBLIC){
+    var b=document.getElementById('btnCapUpd'); if(b) b.remove();
+    var r=document.querySelector('[onclick="resetEstados()"]'); if(r) r.remove();
+  }
+})();
+function actualizarDesdeExcel(){
+  var b=document.getElementById('btnCapUpd');
+  b.disabled=true; b.textContent='⟳ Actualizando…';
+  fetch('http://localhost:8799/build-capacitaciones',{method:'POST'})
+    .then(function(r){return r.json();})
+    .then(function(j){
+      if(j.ok){ b.textContent='✔ Actualizado'; setTimeout(function(){location.reload();},600); }
+      else { alert('El generador reportó un problema:\n\n'+(j.log||'')); b.disabled=false; b.textContent='⟳ Actualizar desde Excel'; }
+    })
+    .catch(function(){
+      alert('No encuentro el servidor local de actualización.\n\nOpciones:\n· Dejá corriendo:  python3 _DEV/deploy_server.py\n· O hacé doble clic en  Actualizar-Capacitaciones.command\n  y recargá esta página.');
+      b.disabled=false; b.textContent='⟳ Actualizar desde Excel';
+    });
+}
+</script>
+</body>
+</html>
