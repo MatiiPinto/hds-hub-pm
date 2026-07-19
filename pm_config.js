@@ -16,7 +16,7 @@
 window.PM_CONFIG = {
   LOG_URL: 'https://script.google.com/macros/s/AKfycbx-v6nDDB2YLNszxh3qg5eWJcxtKrBTlzKK1f91OQwV1NKAm6zKBQ6J_fBJvL9jrEA_/exec', /*__PM_LOG_URL__*/
   // Armador de Pautas (etapa 2): backend Apps Script propio (ver _setup/Code_pautas.gs)
-  PAUTAS_URL: '', /*__PM_PAUTAS_URL__*/
+  PAUTAS_URL: 'https://script.google.com/macros/s/AKfycby-FekqC8Lo1FimauntBJKmloeUrCD5NroP63LbwIdM0LxRVqRwf1JXuHVNqyjlrhsX/exec', /*__PM_PAUTAS_URL__*/
   // usuarios con rol asignador (pueden ASIGNAR pautas AS a recintos desde la
   // plataforma de Autorización Sanitaria del HUB-PM; el resto solo consulta)
   ASIGNADORES: ['mpinto', 'mcanales', 'csepulveda'],

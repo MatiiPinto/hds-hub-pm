@@ -75,7 +75,7 @@ function doGet(e) {
         out[String(data[i][0])] = {
           estado: String(data[i][1] || 'validada'),
           p: amb,
-          fecha: (data[i][3] instanceof Date)
+          fecha: (Object.prototype.toString.call(data[i][3]) === '[object Date]')
                  ? Utilities.formatDate(data[i][3], TZ, 'yyyy-MM-dd') : String(data[i][3] || ''),
           por: String(data[i][5] || '')
         };
