@@ -1,31 +1,26 @@
 // ════════════════════════════════════════════════════════════════════════════
-// Code_pautas.gs — Armador de Pautas · HUB Puesta en Marcha HDS (etapa 2)
+// Code_pautas.gs — Asignación central de pautas AS · HUB Puesta en Marcha HDS
 //
-// Guarda y lista las PAUTAS ARMADAS por el equipo PM: nivel (recinto/servicio/
-// HDS), referencia, ámbitos del Anexo 1 seleccionados, responsable, prestaciones
-// asociadas y estado (armada → ensayo → oficial → aplicada).
+// Guarda las asignaciones de pautas (Autorización Sanitaria → recintos) hechas
+// por los ASIGNADORES desde el HUB-PM (mpinto, mcanales, csepulveda). Una fila
+// por recinto, que se ACTUALIZA en cada cambio (upsert por RecintoId).
 //
-// INSTALACIÓN (una vez, mismo ritual que el log):
-//   1. Crear una Google Sheet nueva (ej. "PAUTAS HUB-PM HDS").
+// INSTALACIÓN (una vez, mismo ritual de siempre):
+//   1. Crear una Google Sheet nueva (ej. "PAUTAS HDS").
 //   2. Extensiones → Apps Script → pegar este archivo completo.
 //   3. Implementar → Nueva implementación → "Aplicación web":
 //        · Ejecutar como: Yo   · Acceso: Cualquier persona
 //   4. Copiar la URL /exec y pegarla en pm_config.js → PAUTAS_URL.
 //
 // API:
-//   POST accion=guardar  → agrega fila, responde "ok:<id>"
-//   POST accion=estado   → cambia estado de una pauta (id, estado)
-//   GET  ?list=1         → JSON array con todas las pautas armadas
-//   GET  (sin params)    → "Pautas HUB-PM activas" (prueba)
-//
-// Roadmap 2.b (no incluido aún): print del recinto y export PDF a Drive al
-// aplicar la pauta (DriveApp + Utilities.newBlob(html).getAs PDF).
+//   POST accion=asignar  {rid, estado, p(JSON array), por}  → upsert, "ok"
+//   POST accion=quitar   {rid, por}                          → borra fila, "ok"
+//   GET  ?list=1  → JSON {rid: {estado, p:[...], fecha, por}, ...}
+//   GET  (sin params) → "Pautas HDS activas" (prueba)
 // ════════════════════════════════════════════════════════════════════════════
 var TZ = 'America/Santiago';
-var HOJA = 'PAUTAS';
-var COLS = ['ID', 'Fecha', 'Hora', 'Estado', 'Nivel', 'RefCodigo', 'RefNombre',
-            'Servicio', 'Ambitos', 'NumAmbitos', 'Responsable', 'ResponsableCargo',
-            'Prestaciones', 'Notas', 'Armador'];
+var HOJA = 'ASIGNACIONES';
+var COLS = ['RecintoId', 'Estado', 'Ambitos', 'Fecha', 'Hora', 'Por'];
 
 function _sheet() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -33,42 +28,36 @@ function _sheet() {
   if (sh.getLastRow() === 0) { sh.appendRow(COLS); sh.setFrozenRows(1); }
   return sh;
 }
+function _filaDe(sh, rid) {
+  var data = sh.getDataRange().getValues();
+  for (var i = 1; i < data.length; i++) {
+    if (String(data[i][0]) === String(rid)) return i + 1;
+  }
+  return 0;
+}
 
 function doPost(e) {
   try {
     var p = (e && e.parameter) || {};
     var sh = _sheet();
-    if (p.accion === 'estado') {
-      var data = sh.getDataRange().getValues();
-      for (var i = 1; i < data.length; i++) {
-        if (String(data[i][0]) === String(p.id)) {
-          sh.getRange(i + 1, 4).setValue(String(p.estado || '').slice(0, 20));
-          return ContentService.createTextOutput('ok:' + p.id);
-        }
-      }
-      return ContentService.createTextOutput('error: id no encontrado');
+    var rid = String(p.rid || '').slice(0, 40);
+    if (!rid) return ContentService.createTextOutput('error: falta rid');
+    var fila = _filaDe(sh, rid);
+    if (p.accion === 'quitar') {
+      if (fila) sh.deleteRow(fila);
+      return ContentService.createTextOutput('ok');
     }
-    // accion=guardar (default)
+    // accion=asignar (default): upsert
     var now = new Date();
-    var id = 'PA-' + Utilities.formatDate(now, TZ, 'yyMMdd-HHmmss');
-    sh.appendRow([
-      id,
+    var valores = [rid,
+      String(p.estado || 'validada').slice(0, 20),
+      String(p.p || '[]').slice(0, 45000),
       Utilities.formatDate(now, TZ, 'yyyy-MM-dd'),
       Utilities.formatDate(now, TZ, 'HH:mm:ss'),
-      'armada',
-      String(p.nivel || '').slice(0, 15),
-      String(p.refCodigo || '').slice(0, 40),
-      String(p.refNombre || '').slice(0, 120),
-      String(p.servicio || '').slice(0, 120),
-      String(p.ambitos || '').slice(0, 45000),
-      String(p.numAmbitos || '').slice(0, 6),
-      String(p.responsable || '').slice(0, 120),
-      String(p.responsableCargo || '').slice(0, 120),
-      String(p.prestaciones || '').slice(0, 45000),
-      String(p.notas || '').slice(0, 2000),
-      String(p.armador || '').slice(0, 40)
-    ]);
-    return ContentService.createTextOutput('ok:' + id);
+      String(p.por || '').slice(0, 30)];
+    if (fila) sh.getRange(fila, 1, 1, COLS.length).setValues([valores]);
+    else sh.appendRow(valores);
+    return ContentService.createTextOutput('ok');
   } catch (err) {
     return ContentService.createTextOutput('error: ' + err);
   }
@@ -79,16 +68,22 @@ function doGet(e) {
     var p = (e && e.parameter) || {};
     if (p.list) {
       var data = _sheet().getDataRange().getValues();
-      var out = [];
+      var out = {};
       for (var i = 1; i < data.length; i++) {
-        var row = {};
-        for (var j = 0; j < COLS.length; j++) row[COLS[j]] = data[i][j];
-        out.push(row);
+        var amb = [];
+        try { amb = JSON.parse(data[i][2] || '[]'); } catch (err) {}
+        out[String(data[i][0])] = {
+          estado: String(data[i][1] || 'validada'),
+          p: amb,
+          fecha: (data[i][3] instanceof Date)
+                 ? Utilities.formatDate(data[i][3], TZ, 'yyyy-MM-dd') : String(data[i][3] || ''),
+          por: String(data[i][5] || '')
+        };
       }
       return ContentService.createTextOutput(JSON.stringify(out))
                            .setMimeType(ContentService.MimeType.JSON);
     }
-    return ContentService.createTextOutput('Pautas HUB-PM activas');
+    return ContentService.createTextOutput('Pautas HDS activas');
   } catch (err) {
     return ContentService.createTextOutput('error: ' + err);
   }

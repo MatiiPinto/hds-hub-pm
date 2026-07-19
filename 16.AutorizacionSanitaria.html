@@ -1089,6 +1089,17 @@ const PUBLIC = PUBLIC_BUILD || new URLSearchParams(location.search).get('public'
 function applyPublicMode(){
   if(!PUBLIC) return;
   document.body.classList.add('public');
+  // En el 🟡: traer la matriz central para TODOS, y para los asignadores
+  // (mpinto/mcanales/csepulveda) habilitar el 🧩 pese al modo consulta.
+  try{ pautasRemotePull(); }catch(e){}
+  if(typeof ES_ASIGNADOR_PM!=='undefined' && ES_ASIGNADOR_PM){
+    const b=document.createElement('button');
+    b.textContent='🧩 Asignación de pautas';
+    b.title='Asignar pautas de Autorización Sanitaria a recintos (rol asignador: se guarda en la hoja central)';
+    b.style.cssText='position:fixed;bottom:18px;left:18px;z-index:9000;background:#0f2547;color:#fff;border:1px solid rgba(41,170,226,.55);border-radius:999px;padding:11px 18px;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 6px 24px rgba(0,0,0,.3);font-family:inherit';
+    b.onclick=()=>openAsignacion();
+    document.body.appendChild(b);
+  }
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -1200,6 +1211,35 @@ const STORE_RECINTO = 'auth_sanit_recinto_eval_v1';
 const PAUTAS_MANUAL_KEY = 'pautas_recintos_manual_v1';
 function pmStore(){ try{ const s=JSON.parse(localStorage.getItem(PAUTAS_MANUAL_KEY)); return (s&&typeof s==='object')?Object.assign({recintos:{},servicios:{}},s):{recintos:{},servicios:{}}; }catch(e){ return {recintos:{},servicios:{}}; } }
 function pmSave(st){ try{ localStorage.setItem(PAUTAS_MANUAL_KEY, JSON.stringify(st)); }catch(e){} }
+// ── Backend CENTRAL de asignaciones (HUB-PM · Apps Script) ──────────────────
+// En el 🟡 (PM_CONFIG presente) las asignaciones se leen/escriben en la hoja
+// central "PAUTAS HDS": así lo que asigna mpinto/mcanales/csepulveda queda
+// consolidado y visible para todos. Local (🔴) sigue offline con localStorage.
+const PAUTAS_REMOTE = (window.PM_CONFIG && window.PM_CONFIG.PAUTAS_URL) || '';
+const ES_ASIGNADOR_PM = !!(window.PM_CONFIG && typeof pmSession==='function' && pmSession()
+  && (window.PM_CONFIG.ASIGNADORES||[]).indexOf(pmSession().u) !== -1);
+function pautasRemotePush(rid, val){
+  if(!PAUTAS_REMOTE || !ES_ASIGNADOR_PM) return;
+  const body = val===null
+    ? new URLSearchParams({accion:'quitar', rid:rid, por:pmSession().u})
+    : new URLSearchParams({accion:'asignar', rid:rid, estado:val.estado||'validada',
+        p:JSON.stringify(val.p||[]), por:pmSession().u});
+  try{ fetch(PAUTAS_REMOTE, {method:'POST', mode:'no-cors', keepalive:true,
+    headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:body.toString()}); }catch(e){}
+}
+function pautasRemotePull(){
+  if(!PAUTAS_REMOTE) return;
+  fetch(PAUTAS_REMOTE + '?list=1').then(r=>r.json()).then(remoto=>{
+    if(!remoto || typeof remoto!=='object') return;
+    const st = pmStore(); st.recintos = remoto; pmSave(st);   // central manda
+    // refrescar la matriz fusionada en caliente
+    for(const rid in remoto){
+      if(remoto[rid].estado==='no_corresponde') delete PR[rid];
+      else PR[rid] = {p: remoto[rid].p||[], regla:'manual'};
+    }
+    try{ if(document.getElementById('asgQ')) asgBuscar(); }catch(e){}
+  }).catch(function(){});
+}
 const PR = (function(){
   const base = (window.SHARED_PAUTAS_RECINTOS && window.SHARED_PAUTAS_RECINTOS.asignaciones) || {};
   const merged = Object.assign({}, base);
@@ -2265,6 +2305,10 @@ function _asgSet(val, accion){
   const st = pmStore();
   if(val===null) delete st.recintos[rid]; else st.recintos[rid]=val;
   pmSave(st);
+  pautasRemotePush(rid, val);   // consolidar en la hoja central (si está el 🟡)
+  if(val===null){ if(PR_BASE_AS[rid]) PR[rid]=PR_BASE_AS[rid]; else delete PR[rid]; }
+  else if(val.estado==='no_corresponde') delete PR[rid];
+  else PR[rid] = {p: val.p||[], regla:'manual'};
   try{ logChange('edición', accion+' · '+((RECMETA[rid]||{}).name||rid)); }catch(e){}
   asgBuscar(); asgDetalle(rid);
 }
