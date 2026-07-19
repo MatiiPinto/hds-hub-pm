@@ -178,56 +178,60 @@ window.SHARED_NORMA_CM = {
               "n": 17,
               "text": "Recintos clínicos",
               "notes": [],
-              "grupo": "Procedimientos de rutina de limpieza y aseo general del establecimiento",
+              "grupo": "En el establecimiento se constata la existencia de procedimientos respecto de:",
               "grupo_notes": [],
-              "grupo_full": true,
-              "grupo_indent": true
+              "sub": "Procedimientos de rutina de limpieza y aseo general del establecimiento",
+              "sub_notes": []
             },
             {
               "n": 18,
               "text": "Recintos administrativos y de uso público",
               "notes": [],
-              "grupo": "Procedimientos de rutina de limpieza y aseo general del establecimiento",
+              "grupo": "En el establecimiento se constata la existencia de procedimientos respecto de:",
               "grupo_notes": [],
-              "grupo_full": true,
-              "grupo_indent": true
+              "sub": "Procedimientos de rutina de limpieza y aseo general del establecimiento",
+              "sub_notes": []
             },
             {
               "n": 19,
               "text": "Servicios higiénicos",
               "notes": [],
-              "grupo": "Procedimientos de rutina de limpieza y aseo general del establecimiento",
+              "grupo": "En el establecimiento se constata la existencia de procedimientos respecto de:",
               "grupo_notes": [],
-              "grupo_full": true,
-              "grupo_indent": true
+              "sub": "Procedimientos de rutina de limpieza y aseo general del establecimiento",
+              "sub_notes": []
             },
             {
               "n": 20,
               "text": "Pasillos y vías de circulación horizontales y verticales",
               "notes": [],
-              "grupo": "Procedimientos de rutina de limpieza y aseo general del establecimiento",
+              "grupo": "En el establecimiento se constata la existencia de procedimientos respecto de:",
               "grupo_notes": [],
-              "grupo_full": true,
-              "grupo_indent": true
+              "sub": "Procedimientos de rutina de limpieza y aseo general del establecimiento",
+              "sub_notes": []
             },
             {
               "n": 21,
               "text": "Recintos generales (talleres, bodegas, mantención, calderas, etc)",
               "notes": [],
-              "grupo": "Procedimientos de rutina de limpieza y aseo general del establecimiento",
+              "grupo": "En el establecimiento se constata la existencia de procedimientos respecto de:",
               "grupo_notes": [],
-              "grupo_full": true,
-              "grupo_indent": true
+              "sub": "Procedimientos de rutina de limpieza y aseo general del establecimiento",
+              "sub_notes": []
             },
             {
               "n": 22,
               "text": "Procedimientos de limpieza de sistema de climatización (equipos aire, filtros, rejillas, otros)",
-              "notes": []
+              "notes": [],
+              "grupo": "En el establecimiento se constata la existencia de procedimientos respecto de:",
+              "grupo_notes": []
             },
             {
               "n": 23,
               "text": "Procedimientos para manejo, retiro y disposición final de residuos del establecimiento",
-              "notes": []
+              "notes": [],
+              "grupo": "En el establecimiento se constata la existencia de procedimientos respecto de:",
+              "grupo_notes": []
             }
           ],
           "observaciones_general": ""
@@ -307,17 +311,15 @@ window.SHARED_NORMA_CM = {
               "n": 33,
               "text": "Registros Estadísticos",
               "notes": [],
-              "grupo": "El establecimiento cuenta con sistemas de registros clínicos e información estadística que mantendrá el establecimiento, que incluyen al menos lo siguiente:",
-              "grupo_full": true,
               "header": true
             },
             {
               "n": 34,
               "text": "Registro de ingresos y egresos",
               "notes": [],
-              "grupo": "El establecimiento cuenta con sistemas de registros clínicos e información estadística que mantendrá el establecimiento, que incluyen al menos lo siguiente:",
-              "grupo_full": true,
-              "grupo_indent": true
+              "grupo": "Registros Estadísticos",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 35,
@@ -325,19 +327,17 @@ window.SHARED_NORMA_CM = {
               "notes": [
                 7
               ],
-              "grupo": "El establecimiento cuenta con sistemas de registros clínicos e información estadística que mantendrá el establecimiento, que incluyen al menos lo siguiente:",
-              "grupo_full": true,
-              "grupo_indent": true,
+              "grupo": "Registros Estadísticos",
               "notes_at": {
                 "7": 33
-              }
+              },
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 36,
               "text": "Registros Clínicos",
               "notes": [],
-              "grupo": "El establecimiento cuenta con sistemas de registros clínicos e información estadística que mantendrá el establecimiento, que incluyen al menos lo siguiente:",
-              "grupo_full": true,
               "header": true
             },
             {
@@ -346,36 +346,36 @@ window.SHARED_NORMA_CM = {
               "notes": [
                 8
               ],
-              "grupo": "El establecimiento cuenta con sistemas de registros clínicos e información estadística que mantendrá el establecimiento, que incluyen al menos lo siguiente:",
-              "grupo_full": true,
-              "grupo_indent": true,
+              "grupo": "Registros Clínicos",
               "notes_at": {
                 "8": 70
-              }
+              },
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 38,
               "text": "Registros de Atención Profesional",
               "notes": [],
-              "grupo": "El establecimiento cuenta con sistemas de registros clínicos e información estadística que mantendrá el establecimiento, que incluyen al menos lo siguiente:",
-              "grupo_full": true,
-              "grupo_indent": true
+              "grupo": "Registros Clínicos",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 39,
               "text": "Carné o Informe de alta",
               "notes": [],
-              "grupo": "El establecimiento cuenta con sistemas de registros clínicos e información estadística que mantendrá el establecimiento, que incluyen al menos lo siguiente:",
-              "grupo_full": true,
-              "grupo_indent": true
+              "grupo": "Registros Clínicos",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 40,
               "text": "Registros enfermedades de notificación obligatoria",
               "notes": [],
-              "grupo": "El establecimiento cuenta con sistemas de registros clínicos e información estadística que mantendrá el establecimiento, que incluyen al menos lo siguiente:",
-              "grupo_full": true,
-              "grupo_indent": true
+              "grupo": "Registros Clínicos",
+              "grupo_notes": [],
+              "grupo_noHd": true
             }
           ],
           "observaciones_general": "RECURSOS HUMANOS"
@@ -583,42 +583,63 @@ window.SHARED_NORMA_CM = {
             {
               "n": 62,
               "text": "Salas de espera",
-              "notes": []
+              "notes": [],
+              "grupo": "El establecimiento cuenta con las siguientes dependencias, las que pueden ser comunes para varias salas de procedimientos y/o consultas:",
+              "grupo_notes": []
             },
             {
               "n": 63,
               "text": "Servicios higiénicos para público y personal",
-              "notes": []
+              "notes": [],
+              "grupo": "El establecimiento cuenta con las siguientes dependencias, las que pueden ser comunes para varias salas de procedimientos y/o consultas:",
+              "grupo_notes": []
             },
             {
               "n": 64,
               "text": "Los edificios tienen al menos 1 baño universal accesible a sillas de ruedas",
-              "notes": []
+              "notes": [],
+              "grupo": "El establecimiento cuenta con las siguientes dependencias, las que pueden ser comunes para varias salas de procedimientos y/o consultas:",
+              "grupo_notes": []
             },
             {
               "n": 65,
               "text": "Vestuario de personal",
-              "notes": []
+              "notes": [],
+              "grupo": "El establecimiento cuenta con las siguientes dependencias, las que pueden ser comunes para varias salas de procedimientos y/o consultas:",
+              "grupo_notes": []
             },
             {
               "n": 66,
               "text": "Comedor de personal",
-              "notes": []
+              "notes": [],
+              "grupo": "El establecimiento cuenta con las siguientes dependencias, las que pueden ser comunes para varias salas de procedimientos y/o consultas:",
+              "grupo_notes": []
             },
             {
               "n": 67,
               "text": "Archivo",
-              "notes": []
+              "notes": [],
+              "grupo": "El establecimiento cuenta con las siguientes dependencias, las que pueden ser comunes para varias salas de procedimientos y/o consultas:",
+              "grupo_notes": []
             },
             {
               "n": 68,
               "text": "Bodegas",
-              "notes": []
+              "notes": [],
+              "grupo": "El establecimiento cuenta con las siguientes dependencias, las que pueden ser comunes para varias salas de procedimientos y/o consultas:",
+              "grupo_notes": []
             },
             {
               "n": 69,
-              "text": "Sector Aseo y depósito transitorio de basuras Observaciones 6",
-              "notes": []
+              "text": "Sector Aseo y depósito transitorio de basuras",
+              "notes": [
+                6
+              ],
+              "grupo": "El establecimiento cuenta con las siguientes dependencias, las que pueden ser comunes para varias salas de procedimientos y/o consultas:",
+              "grupo_notes": [],
+              "notes_at": {
+                "6": 45
+              }
             }
           ],
           "observaciones_general": "6"
@@ -626,7 +647,7 @@ window.SHARED_NORMA_CM = {
         {
           "id": "cm_infraestructura__inf__sala-para-atenci-n-consulta-con-examen",
           "tipo": "INFRAESTRUCTURA",
-          "name": "SALA PARA ATENCIÖN CONSULTA CON EXAMEN",
+          "name": "SALA PARA ATENCIÓN CONSULTA CON EXAMEN",
           "notes_in_title": [],
           "objetivo": "Disponer de recintos que permitan efectuar entrevista al paciente y sus acompañante; examen físico en la camilla.",
           "notes_in_objetivo": [],
@@ -759,10 +780,6 @@ window.SHARED_NORMA_CM = {
               "notes": [
                 18
               ],
-              "grupo": "La sala de procedimiento cuenta con:",
-              "grupo_full": true,
-              "grupo_indent": true,
-              "grupo_notes": [],
               "header": true,
               "notes_at": {
                 "18": 156
@@ -772,19 +789,17 @@ window.SHARED_NORMA_CM = {
               "n": 85,
               "text": "Set Instrumental Curación, Set-caja de Cirugía Menor, Electrobisturí, Ropa de Pabellón",
               "notes": [],
-              "grupo": "La sala de procedimiento cuenta con:",
-              "grupo_full": true,
-              "grupo_indent": true,
-              "grupo_notes": []
+              "grupo": "En caso de realizar, en Sala de Procedimientos de un centro de salud con red de derivación, intervenciones de cirugía menor acotada a lo señalado en la nota deberá contar con:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 86,
               "text": "En caso de efectuar registros se requiere Superficie de apoyo para registros y estadísticas separado del mesón de trabajo limpio 7",
               "notes": [],
-              "grupo": "La sala de procedimiento cuenta con:",
-              "grupo_full": true,
-              "grupo_indent": true,
-              "grupo_notes": []
+              "grupo": "En caso de realizar, en Sala de Procedimientos de un centro de salud con red de derivación, intervenciones de cirugía menor acotada a lo señalado en la nota deberá contar con:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             }
           ],
           "observaciones_general": ""
@@ -792,7 +807,7 @@ window.SHARED_NORMA_CM = {
         {
           "id": "cm_infraestructura__inf__sala-para-atenci-n-gineco-obstetrica",
           "tipo": "INFRAESTRUCTURA",
-          "name": "SALA PARA ATENCIÖN GINECO-OBSTETRICA",
+          "name": "SALA PARA ATENCIÓN GINECO-OBSTETRICA",
           "notes_in_title": [],
           "objetivo": "Disponer de recintos que permitan efectuar entrevista al paciente y sus acompañantes; examen físico y procedimientos.",
           "notes_in_objetivo": [],
@@ -961,7 +976,7 @@ window.SHARED_NORMA_CM = {
         {
           "id": "cm_infraestructura__inf__box-de-atenci-n-de-afecciones-respirator",
           "tipo": "INFRAESTRUCTURA",
-          "name": "BOX DE ATENCIÖN DE AFECCIONES RESPIRATORIAS",
+          "name": "BOX DE ATENCIÓN DE AFECCIONES RESPIRATORIAS",
           "notes_in_title": [],
           "objetivo": "Disponer de recintos que permitan realizar terapia a personas con afecciones respiratorias",
           "notes_in_objetivo": [],
@@ -1143,19 +1158,25 @@ window.SHARED_NORMA_CM = {
               "n": 132,
               "text": "Salivera portátil con agua circulante y desagüe con aspiración y filtro",
               "notes": [],
-              "grupo_indent": true
+              "grupo": "Sistema eliminación desechos:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 133,
               "text": "Sistema de aspiración baja potencia (eyector) ó",
               "notes": [],
-              "grupo_indent": true
+              "grupo": "Sistema eliminación desechos:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 134,
               "text": "Sistema aspirador de alta potencia (aspirador)",
               "notes": [],
-              "grupo_indent": true
+              "grupo": "Sistema eliminación desechos:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 135,
@@ -1187,10 +1208,12 @@ window.SHARED_NORMA_CM = {
               "notes": [
                 34
               ],
-              "grupo_indent": true,
               "notes_at": {
                 "34": 10
-              }
+              },
+              "grupo": "La sala de procedimientos odontológicos cuenta con:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 140,
@@ -1198,16 +1221,20 @@ window.SHARED_NORMA_CM = {
               "notes": [
                 35
               ],
-              "grupo_indent": true,
               "notes_at": {
                 "35": 34
-              }
+              },
+              "grupo": "La sala de procedimientos odontológicos cuenta con:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 141,
               "text": "Un lavamanos",
               "notes": [],
-              "grupo_indent": true
+              "grupo": "La sala de procedimientos odontológicos cuenta con:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 142,
@@ -1215,10 +1242,12 @@ window.SHARED_NORMA_CM = {
               "notes": [
                 36
               ],
-              "grupo_indent": true,
               "notes_at": {
                 "36": 80
-              }
+              },
+              "grupo": "La sala de procedimientos odontológicos cuenta con:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 143,
@@ -1226,16 +1255,20 @@ window.SHARED_NORMA_CM = {
               "notes": [
                 37
               ],
-              "grupo_indent": true,
               "notes_at": {
                 "37": 86
-              }
+              },
+              "grupo": "La sala de procedimientos odontológicos cuenta con:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 144,
               "text": "Negatoscopio cuando corresponda",
               "notes": [],
-              "grupo_indent": true
+              "grupo": "La sala de procedimientos odontológicos cuenta con:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 145,
@@ -1243,16 +1276,20 @@ window.SHARED_NORMA_CM = {
               "notes": [
                 38
               ],
-              "grupo_indent": true,
               "notes_at": {
                 "38": 23
-              }
+              },
+              "grupo": "La sala de procedimientos odontológicos cuenta con:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 146,
               "text": "Area limpia delimitada para preparación de material a esterilizar y autoclave en caso de no contar con Unidad de Esterilización en el Establecimiento.",
               "notes": [],
-              "grupo_indent": true
+              "grupo": "La sala de procedimientos odontológicos cuenta con:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             }
           ],
           "observaciones_general": ""
@@ -1418,7 +1455,7 @@ window.SHARED_NORMA_CM = {
                 44
               ],
               "notes_at": {
-                "44": 55
+                "44": 58
               }
             },
             {
@@ -1431,25 +1468,33 @@ window.SHARED_NORMA_CM = {
               "n": 170,
               "text": "Las instalaciones y funcionamiento cumplen con la normativa vigente (D.S.133 /84 y 3/ 85 )",
               "notes": [],
-              "grupo_indent": true
+              "grupo": "Este espacio tiene las siguientes condiciones:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 171,
               "text": "Las salas que utilicen radiaciones ionizantes están ubicadas en zonas de uso restringido al público",
               "notes": [],
-              "grupo_indent": true
+              "grupo": "Este espacio tiene las siguientes condiciones:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 172,
               "text": "Existe señalización de advertencia de exposición a RX",
               "notes": [],
-              "grupo_indent": true
+              "grupo": "Este espacio tiene las siguientes condiciones:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 173,
               "text": "Personal cuenta con dosímetros personales",
               "notes": [],
-              "grupo_indent": true
+              "grupo": "Este espacio tiene las siguientes condiciones:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 174,
@@ -1457,16 +1502,20 @@ window.SHARED_NORMA_CM = {
               "notes": [
                 45
               ],
-              "grupo_indent": true,
               "notes_at": {
                 "45": 67
-              }
+              },
+              "grupo": "Este espacio tiene las siguientes condiciones:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 175,
               "text": "Existe espacio para almacenamiento de insumos de trabajo",
               "notes": [],
-              "grupo_indent": true
+              "grupo": "Este espacio tiene las siguientes condiciones:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 176,
@@ -1478,13 +1527,17 @@ window.SHARED_NORMA_CM = {
               "n": 177,
               "text": "Mesón de trabajo con revelado manual",
               "notes": [],
-              "grupo_indent": true
+              "grupo": "El área de revelado cuenta con:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 178,
               "text": "Reveladora de Placas",
               "notes": [],
-              "grupo_indent": true
+              "grupo": "El área de revelado cuenta con:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 179,
@@ -1525,7 +1578,9 @@ window.SHARED_NORMA_CM = {
               "n": 182,
               "text": "Depósito de lavado profundo",
               "notes": [],
-              "grupo_indent": true
+              "grupo": "Este espacio tiene las siguientes condiciones:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 183,
@@ -1533,16 +1588,20 @@ window.SHARED_NORMA_CM = {
               "notes": [
                 48
               ],
-              "grupo_indent": true,
               "notes_at": {
                 "48": 49
-              }
+              },
+              "grupo": "Este espacio tiene las siguientes condiciones:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 184,
               "text": "Contenedores para depósitos transitorios de residuos sólidos, impermeables y con tapa.",
               "notes": [],
-              "grupo_indent": true
+              "grupo": "Este espacio tiene las siguientes condiciones:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             }
           ],
           "observaciones_general": ""
@@ -1578,12 +1637,18 @@ window.SHARED_NORMA_CM = {
               ],
               "notes_at": {
                 "49": 21
-              }
+              },
+              "grupo": "Esta área presenta las siguientes características:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 188,
               "text": "Sistema de lavado para contenedores",
-              "notes": []
+              "notes": [],
+              "grupo": "Esta área presenta las siguientes características:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": 189,

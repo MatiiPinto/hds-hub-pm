@@ -108,25 +108,35 @@ window.SHARED_NORMA_QM = {
               "n": "15",
               "text": "El establecimiento cuenta con un plan escrito de medidas de prevención de riesgos y actuación frente a urgencias clínicas, emergencias, desastres y catástrofes, que incluye:",
               "notes": [],
-              "ref_norma": "DA. 74/2015 Art. 5 letra e"
+              "ref_norma": "DA. 74/2015 Art. 5 letra e",
+              "header": true
             },
             {
               "n": "16",
               "text": "Plan de acciones de emergencia y evacuación, que contempla al personal del establecimiento y a los pacientes",
               "notes": [],
-              "ref_norma": "DA. 74/2015 Art. 5 letra e"
+              "ref_norma": "DA. 74/2015 Art. 5 letra e",
+              "grupo": "El establecimiento cuenta con un plan escrito de medidas de prevención de riesgos y actuación frente a urgencias clínicas, emergencias, desastres y catástrofes, que incluye:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "17",
               "text": "Protocolo de reanimación cardiopulmonar",
               "notes": [],
-              "ref_norma": "DA. 74/2015 Art. 5 letra e"
+              "ref_norma": "DA. 74/2015 Art. 5 letra e",
+              "grupo": "El establecimiento cuenta con un plan escrito de medidas de prevención de riesgos y actuación frente a urgencias clínicas, emergencias, desastres y catástrofes, que incluye:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "18",
               "text": "Normas y procedimientos de uso y manejo del carro de paro",
               "notes": [],
-              "ref_norma": "DA. 74/2015 Art. 5 letra e"
+              "ref_norma": "DA. 74/2015 Art. 5 letra e",
+              "grupo": "El establecimiento cuenta con un plan escrito de medidas de prevención de riesgos y actuación frente a urgencias clínicas, emergencias, desastres y catástrofes, que incluye:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             }
           ]
         }
@@ -366,193 +376,285 @@ window.SHARED_NORMA_QM = {
               "n": "50",
               "text": "Los establecimientos en que se otorguen prestaciones de administración de quimioterapia oncológica deberán contar, a lo menos, con las siguientes dependencias, de acuerdo con el número y tipo de prestaciones que otorguen:",
               "notes": [],
-              "ref_norma": "Art. 10"
+              "ref_norma": "Art. 10",
+              "header": true
             },
             {
               "n": "51",
               "text": "Sala de espera",
               "notes": [],
-              "ref_norma": "Art. 10, a"
+              "ref_norma": "Art. 10, a",
+              "grupo": "Los establecimientos en que se otorguen prestaciones de administración de quimioterapia oncológica deberán contar, a lo menos, con las siguientes dependencias, de acuerdo con el número y tipo de prestaciones que otorguen:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "52",
               "text": "Existencia de acceso restringido y diferenciado en lo que respecta a pacientes y personal autorizado, (área debe estar señalizada con acceso restringido para el público general)",
               "notes": [],
-              "ref_norma": "RE N° 1093/2016 Anexo N° 1 Ítem II 80"
+              "ref_norma": "RE N° 1093/2016 Anexo N° 1 Ítem II 80",
+              "grupo": "Los establecimientos en que se otorguen prestaciones de administración de quimioterapia oncológica deberán contar, a lo menos, con las siguientes dependencias, de acuerdo con el número y tipo de prestaciones que otorguen:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "53",
               "text": "Secretaría o recepción con espacio para mantener archivo y documentación",
               "notes": [],
-              "ref_norma": "Art. 10, letra b"
+              "ref_norma": "Art. 10, letra b",
+              "grupo": "Los establecimientos en que se otorguen prestaciones de administración de quimioterapia oncológica deberán contar, a lo menos, con las siguientes dependencias, de acuerdo con el número y tipo de prestaciones que otorguen:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "54",
               "text": "Existencia de áreas destinadas a tareas administrativas, separadas de aquellas destinadas a la preparación previa a la administración",
               "notes": [],
-              "ref_norma": "RE N° 1093/2016 Anexo N° 1 Ítem II 84"
+              "ref_norma": "RE N° 1093/2016 Anexo N° 1 Ítem II 84",
+              "grupo": "Los establecimientos en que se otorguen prestaciones de administración de quimioterapia oncológica deberán contar, a lo menos, con las siguientes dependencias, de acuerdo con el número y tipo de prestaciones que otorguen:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "55",
               "text": "Existencia de área segregada física y aerodinámicamente, respecto de áreas relacionadas. (Áreas separadas de manera de no compartir el mismo aire)",
               "notes": [],
-              "ref_norma": "RE N° 1093/2016 Anexo N° 1 Ítem II 81"
+              "ref_norma": "RE N° 1093/2016 Anexo N° 1 Ítem II 81",
+              "grupo": "Los establecimientos en que se otorguen prestaciones de administración de quimioterapia oncológica deberán contar, a lo menos, con las siguientes dependencias, de acuerdo con el número y tipo de prestaciones que otorguen:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "56",
               "text": "Existencia de sistema de comunicación externa",
               "notes": [],
-              "ref_norma": "RE N° 1093/2016 Anexo N° 1 Ítem II 93"
+              "ref_norma": "RE N° 1093/2016 Anexo N° 1 Ítem II 93",
+              "grupo": "Los establecimientos en que se otorguen prestaciones de administración de quimioterapia oncológica deberán contar, a lo menos, con las siguientes dependencias, de acuerdo con el número y tipo de prestaciones que otorguen:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "57",
               "text": "Recintos y accesos habilitados para la circulación de camillas y sillas de ruedas",
               "notes": [],
-              "ref_norma": "Art. 10, c"
+              "ref_norma": "Art. 10, c",
+              "grupo": "Los establecimientos en que se otorguen prestaciones de administración de quimioterapia oncológica deberán contar, a lo menos, con las siguientes dependencias, de acuerdo con el número y tipo de prestaciones que otorguen:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "58",
               "text": "Servicios higiénicos para pacientes con, al menos, un servicio universal accesible a silla de ruedas con ducha teléfono conectada al WC",
               "notes": [],
-              "ref_norma": "Art. 10, d"
+              "ref_norma": "Art. 10, d",
+              "grupo": "Los establecimientos en que se otorguen prestaciones de administración de quimioterapia oncológica deberán contar, a lo menos, con las siguientes dependencias, de acuerdo con el número y tipo de prestaciones que otorguen:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "59",
               "text": "Vestidores con casilleros para pacientes",
               "notes": [],
-              "ref_norma": "Art. 10, e"
+              "ref_norma": "Art. 10, e",
+              "grupo": "Los establecimientos en que se otorguen prestaciones de administración de quimioterapia oncológica deberán contar, a lo menos, con las siguientes dependencias, de acuerdo con el número y tipo de prestaciones que otorguen:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "60",
               "text": "Sala para exámenes de pacientes con lavamanos e insumos para el lavado y secado de manos, y con los medios necesarios para el control de peso, de temperatura y de la presión de los pacientes",
               "notes": [],
-              "ref_norma": "Art. 10, f"
+              "ref_norma": "Art. 10, f",
+              "grupo": "Los establecimientos en que se otorguen prestaciones de administración de quimioterapia oncológica deberán contar, a lo menos, con las siguientes dependencias, de acuerdo con el número y tipo de prestaciones que otorguen:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "61",
               "text": "Existencia de verificación de la iluminación entre 500 y 700 lux, según DS 594/99",
               "notes": [],
-              "ref_norma": "DS. 594/99 Art. 103"
+              "ref_norma": "DS. 594/99 Art. 103",
+              "grupo": "Los establecimientos en que se otorguen prestaciones de administración de quimioterapia oncológica deberán contar, a lo menos, con las siguientes dependencias, de acuerdo con el número y tipo de prestaciones que otorguen:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "62",
               "text": "Existencia de a lo menos 6 renovaciones de aire/hora",
               "notes": [],
-              "ref_norma": "RE N° 1093/2016 Anexo N° 1 Ítem II 99 · DS. 594 Art. 34"
+              "ref_norma": "RE N° 1093/2016 Anexo N° 1 Ítem II 99 · DS. 594 Art. 34",
+              "grupo": "Los establecimientos en que se otorguen prestaciones de administración de quimioterapia oncológica deberán contar, a lo menos, con las siguientes dependencias, de acuerdo con el número y tipo de prestaciones que otorguen:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "63",
               "text": "Recinto de aseo con depósito para lavado y almacenamiento de artículos de limpieza",
               "notes": [],
-              "ref_norma": "Art. 10, g"
+              "ref_norma": "Art. 10, g",
+              "grupo": "Los establecimientos en que se otorguen prestaciones de administración de quimioterapia oncológica deberán contar, a lo menos, con las siguientes dependencias, de acuerdo con el número y tipo de prestaciones que otorguen:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "64",
               "text": "Área para la disposición transitoria de residuos",
               "notes": [],
-              "ref_norma": "Art. 10, h"
+              "ref_norma": "Art. 10, h",
+              "grupo": "Los establecimientos en que se otorguen prestaciones de administración de quimioterapia oncológica deberán contar, a lo menos, con las siguientes dependencias, de acuerdo con el número y tipo de prestaciones que otorguen:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "65",
               "text": "Bodega para almacenamiento de equipos, ropa y demás",
               "notes": [],
-              "ref_norma": "Art. 10 inc. 2 letra a"
+              "ref_norma": "Art. 10 inc. 2 letra a",
+              "grupo": "Los establecimientos en que se otorguen prestaciones de administración de quimioterapia oncológica deberán contar, a lo menos, con las siguientes dependencias, de acuerdo con el número y tipo de prestaciones que otorguen:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "66",
               "text": "Bodega para almacenamiento de insumos clínicos",
               "notes": [],
-              "ref_norma": "Art. 10 inc. 2 letra b"
+              "ref_norma": "Art. 10 inc. 2 letra b",
+              "grupo": "Los establecimientos en que se otorguen prestaciones de administración de quimioterapia oncológica deberán contar, a lo menos, con las siguientes dependencias, de acuerdo con el número y tipo de prestaciones que otorguen:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "67",
               "text": "Sala de administración de quimioterapia que considere:",
               "notes": [],
-              "ref_norma": "Art. 10 inc. 3 letra a"
+              "ref_norma": "Art. 10 inc. 3 letra a",
+              "header": true
             },
             {
               "n": "68",
               "text": "Puesto de observación de enfermería con visión sobre todos los pacientes y mesón para trabajo administrativo",
               "notes": [],
-              "ref_norma": "Art. 10 inc. 3 letra a punto I"
+              "ref_norma": "Art. 10 inc. 3 letra a punto I",
+              "grupo": "Sala de administración de quimioterapia que considere:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "69",
               "text": "Espacio para la localización del carro de reanimación cardiopulmonar",
               "notes": [],
-              "ref_norma": "Art. 10 inc. 3 letra a punto II"
+              "ref_norma": "Art. 10 inc. 3 letra a punto II",
+              "grupo": "Sala de administración de quimioterapia que considere:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "70",
               "text": "Un lavamanos que disponga de insumos para el lavado y secado de manos, que se encuentre distante, como máximo, a cuatro metros de cada módulo de administración de quimioterapia",
               "notes": [],
-              "ref_norma": "Art. 10 inc. 3 letra a punto III"
+              "ref_norma": "Art. 10 inc. 3 letra a punto III",
+              "grupo": "Sala de administración de quimioterapia que considere:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "71",
               "text": "Los módulos de administración de quimioterapia están separados entre sí por tabiques o biombos",
               "notes": [],
-              "ref_norma": "DA. 74/2015 Art. 10 inc. 3 letra a punto IV"
+              "ref_norma": "DA. 74/2015 Art. 10 inc. 3 letra a punto IV",
+              "grupo": "Sala de administración de quimioterapia que considere:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "72",
               "text": "Cada uno de estos módulos debe estar dotado, al menos de: un sillón reclinable o cama, una mesa rodante multiuso, un dispositivo portasuero rodante, mantas protectoras y una silla. Deberá existir una distancia de, al menos, un metro entre cada sillón reclinable o cama",
               "notes": [],
-              "ref_norma": "Art. 10 inc. 3 letra a punto IV"
+              "ref_norma": "Art. 10 inc. 3 letra a punto IV",
+              "grupo": "Sala de administración de quimioterapia que considere:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "73",
               "text": "Existe una distancia de, al menos, un metro entre cada sillón reclinable o cama",
               "notes": [],
-              "ref_norma": "DA. 74/2015 Art. 10 inc. 3 letra a punto IV · RE N° 1093/2016 Anexo N° 1 Ítem II 104"
+              "ref_norma": "DA. 74/2015 Art. 10 inc. 3 letra a punto IV · RE N° 1093/2016 Anexo N° 1 Ítem II 104",
+              "grupo": "Sala de administración de quimioterapia que considere:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "74",
               "text": "Suministro de oxígeno, red centralizada o balones con sistema de seguridad anti volcamiento, que dispongan de manómetro, flujómetro y humidificador",
               "notes": [],
-              "ref_norma": "Art. 10 inc. 3 letra a punto V"
+              "ref_norma": "Art. 10 inc. 3 letra a punto V",
+              "grupo": "Sala de administración de quimioterapia que considere:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "75",
               "text": "Sistema de aspiración centralizada o portátil, con vacuómetro y frasco de aspiración",
               "notes": [],
-              "ref_norma": "Art. 10 inc. 3 letra a punto VI"
+              "ref_norma": "Art. 10 inc. 3 letra a punto VI",
+              "grupo": "Sala de administración de quimioterapia que considere:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "76",
               "text": "Respaldo eléctrico para conexión de los equipos necesarios en casos de interrupción del suministro eléctrico",
               "notes": [],
-              "ref_norma": "Art. 10 inc. 3 letra a punto VII"
+              "ref_norma": "Art. 10 inc. 3 letra a punto VII",
+              "grupo": "Sala de administración de quimioterapia que considere:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "77",
               "text": "Áreas de trabajo limpia y sucia",
               "notes": [],
-              "ref_norma": "Art. 10 inc. 3 letra b"
+              "ref_norma": "Art. 10 inc. 3 letra b",
+              "grupo": "Sala de administración de quimioterapia que considere:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "78",
               "text": "Para el evento que el establecimiento no obtenga los medicamentos citostáticos debidamente fragmentados y reconstituidos según se precisen para su uso, ya sea de un proveedor externo o de la unidad de farmacia del establecimiento de salud de que forma parte, deberá contar con un recetario en que se efectúe esta labor",
               "notes": [],
-              "ref_norma": "Art. 11"
+              "ref_norma": "Art. 11",
+              "grupo": "Sala de administración de quimioterapia que considere:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "79",
               "text": "Dicha unidad cuenta con autorización sanitaria de acuerdo a las disposiciones del Decreto N° 79, de 2010, del Ministerio de Salud que aprueba el Reglamento Aplicable a la elaboración de preparados farmacéuticos en recetarios de farmacia, y deberá encontrarse aislada respecto de las demás áreas del establecimiento mediante un sistema que impida el ingreso de personal no autorizado. Asimismo, deberá contar con sistemas que permitan mantener una temperatura ambiental de entre 18 y 20 grados Celsius y una humedad relativa entre 30 y 60%",
               "notes": [],
-              "ref_norma": "Art. 11"
+              "ref_norma": "Art. 11",
+              "grupo": "Sala de administración de quimioterapia que considere:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "80",
               "text": "El establecimiento deberá poseer un área de control del producto terminado, provisto de un refrigerador para el almacenamiento de los productos terminados y de aire ISO clase 8, que dé cumplimiento al Decreto N° 6, de 2009, del Ministerio de Salud, Reglamento sobre manejo de Residuos de Establecimientos de Atención de Salud, en lo que le sea aplicable",
               "notes": [],
-              "ref_norma": "Art. 12"
+              "ref_norma": "Art. 12",
+              "grupo": "Sala de administración de quimioterapia que considere:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             },
             {
               "n": "81",
               "text": "En lo que respecta a la mantención y disposición de los residuos que genere su actividad, los establecimientos de administración de quimioterapia oncológica deberán ceñirse a las disposiciones del Decreto N° 148 de 2003, Reglamento Sanitario sobre manejo de Residuos Peligrosos y al Decreto N° 6 de 2009, Reglamento sobre manejo de Residuos de Establecimientos de Atención de Salud, ambos del Ministerio de Salud",
               "notes": [],
-              "ref_norma": "Art. 13"
+              "ref_norma": "Art. 13",
+              "grupo": "Sala de administración de quimioterapia que considere:",
+              "grupo_notes": [],
+              "grupo_noHd": true
             }
           ]
         }

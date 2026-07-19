@@ -981,12 +981,12 @@ try{ _dotNameSide=JSON.parse(localStorage.getItem('cabida_dotname_side')||'{}')|
 function flipDotName(key,defRight){
   const cur=_dotNameSide[key]||(defRight?'R':'L');
   _dotNameSide[key]=(cur==='R')?'L':'R';
-  try{ localStorage.setItem('cabida_dotname_side',JSON.stringify(_dotNameSide)); }catch(e){}
+  try{ _lsSet('cabida_dotname_side',JSON.stringify(_dotNameSide)); }catch(e){}
   renderSVG();
 }
 function toggleDotNames(){
   S.showDotNames=!S.showDotNames;
-  try{localStorage.setItem('cabida_show_dotnames',S.showDotNames?'1':'0');}catch(e){}
+  try{_lsSet('cabida_show_dotnames',S.showDotNames?'1':'0');}catch(e){}
   const b=document.getElementById('btnDotNames'); if(b)b.classList.toggle('active',S.showDotNames);
   renderSVG();
 }
@@ -1055,10 +1055,29 @@ let _sb = { floor: null, area: null };
 // (WEB_DATA/atlas_web_data.js) y NUNCA se escribe nada del estado principal.
 const _WD=window.ATLAS_WEB_DATA||{};
 function lg(k,d){ if(_WD[k]!==undefined && _WD[k]!==null) return _WD[k]; return d; }
+const _SELFTEST=/[?&]selftest/.test(location.search);
 function ls(k,v){}
 function _lsSet(k,v){ if(!/^cabida_cad/.test(k)) try{localStorage.setItem(k,v);}catch(e){} }
 let boxState    = lg('cabida_cad_boxes',{areas:{},rooms:{}});
-let wsState     = lg('cabida_cad_ws',{dots:{}});
+// ── VERSIONADO DE ESQUEMA ────────────────────────────────────────────────────
+// Todo cambio de estructura de wsState se registra como una migración numerada
+// (nunca un if suelto en el código de carga). Se aplican en cadena al cargar;
+// _v viaja en cada guardado. Los respaldos (.bak/.day) permiten volver atrás.
+const SCHEMA_V=2;
+const MIGRATIONS={
+  1: st=>{  // v1→v2 · equip por índice (array) → mapa por unidad {clave:{x,y}}
+    if(st.equip) for(const k in st.equip){ if(Array.isArray(st.equip[k])) st.equip[k]={}; }
+    return st;
+  }
+};
+function migrateState(st){
+  if(!st || typeof st!=='object') return st;
+  let v=st._v||1;
+  while(v<SCHEMA_V){ if(MIGRATIONS[v]) st=MIGRATIONS[v](st)||st; v++; }
+  st._v=SCHEMA_V;
+  return st;
+}
+let wsState     = migrateState(lg('cabida_cad_ws',{dots:{}}));
 // PROTECCIÓN DE ASIGNACIONES: snapshot diario de los puestos de trabajo.
 // Independiente del .bak (que se sobreescribe con cada guardado): si un día de
 // trabajo sale mal, cabida_cad_ws.day conserva el estado con que ABRIÓ el día.
@@ -1841,7 +1860,9 @@ const applyT = () => { imgWrap.style.transform=`translate(${S.ox}px,${S.oy}px) s
 
 function fitView(){
   const vW=viewer.clientWidth,vH=viewer.clientHeight;
-  const z=Math.min(vW/IMG_W,vH/IMG_H)*.96;
+  // clamp: si el viewer mide 0 en este instante (panel colgado, ventana en
+  // background) el zoom saldría 0 o negativo y el plano se espeja.
+  const z=Math.max(0.01, Math.min(vW/IMG_W,vH/IMG_H)*.96);
   return{zoom:z,ox:(vW-IMG_W*z)/2,oy:(vH-IMG_H*z)/2};
 }
 function s2i(sx,sy){
@@ -1866,7 +1887,7 @@ function animTo(tz,tox,toy,dur=600,cb=null){
 }
 function zoomTo(bnd,pad=80){
   const vW=viewer.clientWidth,vH=viewer.clientHeight;
-  const tz=Math.min((vW-2*pad)/bnd.w,(vH-2*pad)/bnd.h,14);
+  const tz=Math.max(0.01, Math.min((vW-2*pad)/bnd.w,(vH-2*pad)/bnd.h,14));
   const cx=bnd.x+bnd.w/2,cy=bnd.y+bnd.h/2;
   // Duración aumentada a 900ms para transición más fluida entre vistas
   animTo(tz,vW/2-cx*tz,vH/2-cy*tz,900);
@@ -1889,7 +1910,12 @@ window.addEventListener('mousemove',e=>{
   if(didPan){ S.ox=pan.ox+dx; S.oy=pan.oy+dy; applyT(); }
 });
 window.addEventListener('mouseup',()=>{
-  if(pan){ pan=null; viewer.classList.remove('panning'); }
+  if(pan){
+    pan=null; viewer.classList.remove('panning');
+    // el click del MISMO gesto dispara antes que este timeout (y se suprime);
+    // después la bandera se libera para no bloquear clics de la barra lateral
+    setTimeout(()=>{ didPan=false; },0);
+  }
 });
 
 // ═══ MIDDLE-CLICK PAN — works in ALL modes (edit, draw, move, etc.) ════════
@@ -2770,6 +2796,10 @@ function toggleDotLink(roomId,i){
   }
   sWs(); renderSVG();
 }
+// Soltar Cmd/Ctrl cierra la sesión de unión: el próximo Cmd+clic parte un
+// grupo NUEVO (evita seguir colgando puestos a un 4º turno ya cerrado).
+window.addEventListener('keyup',e=>{ if(e.key==='Meta'||e.key==='Control') _linkAnchor=null; });
+window.addEventListener('blur',()=>{ _linkAnchor=null; });
 // Los enlaces y las tarjetas se dibujan en una pasada global al final del
 // render (microtask): permite anti-solape entre tarjetas y líneas entre dots.
 let _ovPend=false;
@@ -2782,7 +2812,28 @@ function _scheduleDotOverlays(){
   });
 }
 function renderDotLinks(){
-  (wsState.dotLinks||[]).forEach(grp=>{
+  const groups=(wsState.dotLinks||[]); if(!groups.length) return;
+  // marcador de flecha (una sola vez por render; el svg se limpia en cada pasada)
+  let defs=svg.querySelector('#dotlinkArrowDefs');
+  if(!defs){
+    defs=el('defs',{id:'dotlinkArrowDefs'});
+    const mk=el('marker',{id:'dotlinkArrow',viewBox:'0 0 10 10',refX:'8',refY:'5',
+      markerWidth:'5',markerHeight:'5',orient:'auto-start-reverse'});
+    mk.appendChild(el('path',{d:'M0,0L10,5L0,10z',fill:'#6366f1'}));
+    defs.appendChild(mk); svg.appendChild(defs);
+  }
+  const firstDot=svg.querySelector('.ws-dot');
+  // segmento punteado con punta de flecha, recortado al borde de cada dot
+  const seg=(a,b,doble)=>{
+    const dx=b.x-a.x, dy=b.y-a.y, L=Math.hypot(dx,dy)||1, ux=dx/L, uy=dy/L;
+    const ln=el('line',{x1:a.x+ux*(DOT_R+3), y1:a.y+uy*(DOT_R+3),
+      x2:b.x-ux*(DOT_R+6), y2:b.y-uy*(DOT_R+6),
+      stroke:'#6366f1','stroke-width':2.5,'stroke-dasharray':'7 5',opacity:.85,
+      'pointer-events':'none','marker-end':'url(#dotlinkArrow)',
+      ...(doble?{'marker-start':'url(#dotlinkArrow)'}:{})});
+    if(firstDot) svg.insertBefore(ln,firstDot); else svg.appendChild(ln);
+  };
+  groups.forEach(grp=>{
     const pts=[];
     grp.forEach(k=>{
       if(!_renderedDotKeys.has(k)) return;
@@ -2793,11 +2844,8 @@ function renderDotLinks(){
     if(pts.length<2) return;
     const cx=pts.reduce((a,p)=>a+p.x,0)/pts.length, cy=pts.reduce((a,p)=>a+p.y,0)/pts.length;
     pts.sort((a,b)=>Math.atan2(a.y-cy,a.x-cx)-Math.atan2(b.y-cy,b.x-cx));
-    const ptStr=pts.map(p=>p.x+','+p.y).join(' ')+(pts.length>2?(' '+pts[0].x+','+pts[0].y):'');
-    const poly=el('polyline',{points:ptStr,fill:'none',stroke:'#6366f1','stroke-width':2.5,
-      'stroke-dasharray':'7 5',opacity:.85,'stroke-linejoin':'round','pointer-events':'none'});
-    const firstDot=svg.querySelector('.ws-dot');
-    if(firstDot) svg.insertBefore(poly,firstDot); else svg.appendChild(poly);
+    if(pts.length===2){ seg(pts[0],pts[1],true); return; }   // ida y vuelta
+    for(let i=0;i<pts.length;i++) seg(pts[i],pts[(i+1)%pts.length],false);  // ciclo de rotación
   });
 }
 // Colocación global de tarjetas de nombres: evita que se superpongan entre sí
@@ -6933,6 +6981,141 @@ function init(){
 }
 window.addEventListener('load',init);
 document.addEventListener('DOMContentLoaded',updateScenUI); if(document.readyState!=='loading') updateScenUI();
+// ── SELFTEST (?selftest=1) ───────────────────────────────────────────────────
+// Batería de invariantes previa a cada commit. Corre con ls() bloqueado:
+// siembra, muta y exporta sin persistir nada; salir = recargar sin el parámetro.
+async function runSelfTest(){
+  const out=[]; const T=(nm,fn)=>{ try{ const r=fn(); if(r===false) out.push([0,nm,'aserción falsa']); else out.push([1,nm,'']); }catch(e){ out.push([0,nm,e.message]); } };
+  const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+  if(typeof _abWrite==='function') window._abWrite=()=>{};
+  if(S.viewOnly){ _stReport([[0,'Selftest','solo disponible en el Atlas principal (esta es la versión de consulta)']]); return; }
+
+  T('Datos base: pisos y planos', ()=>FLOORS.length>0);
+  T('Datos base: matriz de dotación', ()=>dotDB&&dotDB.staff&&dotDB.staff.length>100);
+  T('Datos base: catálogo EMMC', ()=>Object.keys(window.RECINTO_EQUIP||{}).length>100);
+
+  // aislamiento: guardar en selftest NO toca localStorage
+  const rawAntes=localStorage.getItem('cabida_cad_ws');
+  sWs(); sBox(); sNames();
+  T('Aislamiento: ls() bloqueado en selftest', ()=>localStorage.getItem('cabida_cad_ws')===rawAntes);
+
+  // siembra de prueba (solo en memoria)
+  const fl=FLOORS[0];
+  fl.areas.push({id:'st_a', name:'ST', rooms:[{id:'st_r1'},{id:'st_r2'}]});
+  boxState.areas['st_a']=[{x:800,y:800,w:2600,h:2000}];
+  boxState.rooms['st_r1']=[{x:900,y:900,w:1100,h:900}];
+  boxState.rooms['st_r2']=[{x:2200,y:900,w:1100,h:900}];
+  nameState.areas['st_a']='ST'; nameState.rooms['st_r1']='Uno'; nameState.rooms['st_r2']='Dos';
+  wsState.dots['st_r1']=[
+    {id:'st_d1',x:1000,y:1000,tipo:'fijo',nombre:(dotDB.staff.find(s=>s.nombre)||{}).nombre||'X'},
+    {id:'st_d2',x:1300,y:1000,tipo:'fijo',nombre:'ST EXTERNA',externa:true},
+    {id:'st_d3',x:1600,y:1000,tipo:'fijo',nombre:'ST CDS',cds:true,externa:true}
+  ];
+  _codeBoxIndex=null;
+
+  T('Navegación L1→L2→L3', ()=>{ didPan=false; goFloor(fl.id); didPan=false; goArea('st_a'); didPan=false; goRoom('st_r1'); return S.level===3; });
+  await sleep(60);
+  T('Vista 3: dots renderizados', ()=>svg.querySelectorAll('.ws-dot').length===3);
+  T('Color CdS violeta', ()=>[...svg.querySelectorAll('.ws-dot circle')].some(c=>c.getAttribute('stroke')==='#8b5cf6'));
+
+  // recinto fusionado: el contenido debe SUMAR ambos códigos
+  const RE=window.RECINTO_EQUIP||{};
+  const dosCodigos=Object.keys(RE).filter(k=>RE[k].length&&!k.includes('/')).slice(0,2);
+  if(dosCodigos.length===2){
+    nameState.codes['st_r2']=dosCodigos.join(' / '); _codeBoxIndex=null;
+    const suma=c=>equipOfCode(c).reduce((a,e)=>a+Math.max(1,parseInt(e.c)||1),0);
+    const share=c=>{ const {N,k}=_codeShareOf('st_r2',c); return equipOfCode(c).reduce((a,e)=>a+(N<=1?Math.max(1,parseInt(e.c)||1):_shareQty(N,k,Math.max(1,parseInt(e.c)||1))),0); };
+    const esperado=share(dosCodigos[0])+share(dosCodigos[1]);
+    T('Fusión de códigos suma ambos ('+dosCodigos.join(' / ')+')',
+      ()=>equipForRoom('st_r2').reduce((a,e)=>a+Math.max(1,parseInt(e.c)||1),0)===esperado);
+  }
+
+  // 4º turno: unir 2, soltar Cmd cierra el grupo
+  const gAntes=(wsState.dotLinks||[]).length;
+  toggleDotLink('st_r1',0); toggleDotLink('st_r1',1);
+  T('4º turno: grupo de 2 creado', ()=>(wsState.dotLinks||[]).length===gAntes+1);
+  window.dispatchEvent(new KeyboardEvent('keyup',{key:'Meta'}));
+  T('4º turno: soltar Cmd cierra la sesión', ()=>_linkAnchor===null);
+  await sleep(60);
+  T('4º turno: flechas dibujadas', ()=>[...svg.querySelectorAll('line[stroke-dasharray="7 5"]')].some(l=>l.getAttribute('marker-end')));
+
+  // tarjetas de nombres sin solapes
+  if(!S.showDotNames) toggleDotNames();
+  await sleep(100);
+  T('Tarjetas: se dibujan', ()=>svg.querySelectorAll('.ws-card rect').length>=3);
+  T('Tarjetas: sin solapes', ()=>{
+    const cs=[...svg.querySelectorAll('.ws-card rect')].map(r=>({x:+r.getAttribute('x'),y:+r.getAttribute('y'),w:+r.getAttribute('width'),h:+r.getAttribute('height')}));
+    for(let a=0;a<cs.length;a++)for(let b=a+1;b<cs.length;b++){
+      const r1=cs[a],r2=cs[b];
+      if(!(r1.x+r1.w<=r2.x||r2.x+r2.w<=r1.x||r1.y+r1.h<=r2.y||r2.y+r2.h<=r1.y)) return false;
+    }
+    return true;
+  });
+  if(S.showDotNames) toggleDotNames();
+
+  // exportación: 4 hojas, estructura y filas fijas
+  const origWF=XLSX.writeFile; let cap=null;
+  try{ XLSX.writeFile=(wb,fn)=>{cap={wb,fn};}; exportAsignaciones(); } finally { XLSX.writeFile=origWF; }
+  T('Export: nombre Cubicacion_Dotacion_HDS', ()=>cap&&/^Cubicacion_Dotacion_HDS_/.test(cap.fn));
+  T('Export: hojas esperadas', ()=>cap&&['Dotación Completa','Sin Asignar','Resumen'].every(h=>cap.wb.SheetNames.includes(h)));
+  T('Export: encabezados y freeze', ()=>{
+    const ws=cap.wb.Sheets['Dotación Completa'];
+    const g=(r,c)=>{const x=ws[XLSX.utils.encode_cell({r,c})];return x?x.v:'';};
+    return g(1,0)==='Subdirección'&&g(1,17)==='Tipo de puesto'&&ws['!freeze'].ySplit===2;
+  });
+
+  // vista nunca espejada
+  T('fitView: zoom siempre positivo', ()=>fitView().zoom>0);
+  T('Revisión: chequeos corren sin error', ()=>{ _externaPendientes(); return true; });
+
+  // limpieza en memoria (nada se persistió)
+  delete boxState.rooms['st_r1']; delete boxState.rooms['st_r2']; delete boxState.areas['st_a'];
+  delete wsState.dots['st_r1']; delete nameState.rooms['st_r1']; delete nameState.rooms['st_r2'];
+  delete nameState.areas['st_a']; delete nameState.codes['st_r2'];
+  wsState.dotLinks=(wsState.dotLinks||[]).filter(g=>!g.some(k=>k.startsWith('st_r')));
+  FLOORS.forEach(f=>{ f.areas=f.areas.filter(a=>a.id!=='st_a'); });
+  _codeBoxIndex=null; S.level=1; S.areaId=null; S.roomId=null; renderSVG();
+  _stReport(out);
+}
+function _stReport(out){
+  const ok=out.filter(x=>x[0]).length;
+  const d=document.createElement('div');
+  d.style.cssText='position:fixed;top:12px;left:12px;z-index:100000;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:16px 20px;font:12.5px/1.6 ui-monospace,Menlo,monospace;box-shadow:0 12px 40px rgba(0,0,0,.5);max-width:520px;max-height:80vh;overflow:auto';
+  d.innerHTML='<div style="font-weight:800;font-size:14px;margin-bottom:2px">🧪 Selftest Atlas · '+ok+'/'+out.length+' OK</div>'
+    +'<div style="color:#94a3b8;font-size:11px;margin-bottom:10px">Modo aislado: nada se guardó en esta sesión.</div>'
+    +out.map(([p,nm,err])=>'<div style="color:'+(p?'#4ade80':'#f87171')+'">'+(p?'✅ ':'❌ ')+nm+(err?(' — <span style="color:#fca5a5">'+err+'</span>'):'')+'</div>').join('')
+    +'<button onclick="location.href=location.pathname" style="margin-top:12px;background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-weight:700;cursor:pointer">Salir del selftest (recargar)</button>';
+  document.body.appendChild(d);
+}
+if(_SELFTEST) window.addEventListener('load',()=>setTimeout(runSelfTest,700));
+// ── GUARD MULTI-PESTAÑA ──────────────────────────────────────────────────────
+// Dos pestañas del Atlas editando a la vez se pisan (última escritura gana).
+// Protocolo ping/pong por localStorage: ambas pestañas muestran advertencia.
+(function(){
+  if(S.viewOnly) return;
+  const MY=Math.random().toString(36).slice(2);
+  const warn=()=>{
+    if(document.getElementById('tabWarn')) return;
+    const d=document.createElement('div'); d.id='tabWarn';
+    d.style.cssText='position:fixed;top:0;left:0;right:0;z-index:99999;background:#dc2626;color:#fff;font-weight:700;font-size:13px;padding:9px 16px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)';
+    d.innerHTML='⚠ Atlas está abierto en OTRA pestaña o ventana: los cambios pueden pisarse entre sí. Cierra una de las dos. '
+      +'<button onclick="location.reload()" style="margin-left:10px;background:#fff;color:#b91c1c;border:none;border-radius:6px;padding:4px 10px;font-weight:800;cursor:pointer">Recargar esta</button>'
+      +'<button onclick="this.parentNode.remove()" style="margin-left:6px;background:transparent;color:#fff;border:1px solid #fff;border-radius:6px;padding:4px 10px;font-weight:700;cursor:pointer">Entendido</button>';
+    document.body.appendChild(d);
+  };
+  window.addEventListener('storage',e=>{
+    if(!e.key||!e.newValue) return;
+    if(e.key==='cabida_tab_ping' && !String(e.newValue).startsWith(MY+'|')){
+      try{_lsSet('cabida_tab_pong',MY+'|'+Date.now());}catch(x){}
+      warn();                                    // otra pestaña acaba de abrir
+    } else if(e.key==='cabida_tab_pong' && !String(e.newValue).startsWith(MY+'|')){
+      warn();                                    // una pestaña previa respondió
+    } else if(/^cabida_cad/.test(e.key)){
+      warn();                                    // otra pestaña GUARDÓ datos
+    }
+  });
+  try{_lsSet('cabida_tab_ping',MY+'|'+Date.now());}catch(e){}
+})();
 (function(){ const f=()=>{ const b=document.getElementById('btnDotNames'); if(b)b.classList.toggle('active',!!S.showDotNames); };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',f); else f(); })();
 

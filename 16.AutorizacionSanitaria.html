@@ -507,6 +507,14 @@
   .exp-print{display:flex;align-items:center;gap:10px}
   .exp-print img{max-height:90px;border:1px solid #dbe7f2;border-radius:8px}
   .exp-print span{font-size:11px;color:#5b7a9b}
+  /* Certificados de operadores */
+  .cert-form{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:8px}
+  .cert-form select,.cert-form input{font-family:inherit;font-size:11.5px;border:1.5px solid #dbe7f2;border-radius:8px;padding:6px 9px;outline:none}
+  .cert-form select:focus,.cert-form input:focus{border-color:var(--inst)}
+  .cert-est{font-size:9px;font-weight:800;padding:1px 7px;border-radius:8px;margin-left:4px}
+  .cert-est.venc{background:#fee2e2;color:#dc2626}
+  .cert-est.prox{background:#fef9c3;color:#a16207}
+  .cert-est.ok{background:#dcfce7;color:#16a34a}
   .req-subitem{box-shadow:inset 3px 0 0 #cfe0f2}
   .req-num{font-size:11px;font-weight:800;color:#94a3b8;text-align:center;background:#f1f5f9;border-radius:6px;padding:3px 6px;align-self:flex-start;min-height:26px;display:flex;align-items:center;justify-content:center}
   .req-text{font-size:12.5px;color:#1e293b;line-height:1.45;padding-top:2px}
@@ -820,12 +828,19 @@
 <script src="SHARED_DATA/norma_medicina_nuclear.js"></script>
 <script src="SHARED_DATA/norma_quimioterapia.js"></script>
 <script src="SHARED_DATA/norma_farmacia.js"></script>
+<!-- Lote 2 · esqueletos pendientes de carga (documentos en recolección) -->
+<script src="SHARED_DATA/norma_dr.js"></script>
+<script src="SHARED_DATA/norma_cz.js"></script>
+<script src="SHARED_DATA/norma_re.js"></script>
+<script src="SHARED_DATA/norma_al.js"></script>
+<script src="SHARED_DATA/norma_cp.js"></script>
 <script src="SHARED_DATA/dotacion.js"></script>
 <script src="SHARED_DATA/equipamiento.js"></script>
 <script src="SHARED_DATA/recintos.js"></script>
 <script src="SHARED_DATA/cartera.js"></script>
 <script src="SHARED_DATA/fichas_as.js"></script>
 <script src="SHARED_DATA/pautas_recintos.js"></script>
+<script src="SHARED_DATA/pauta_labels.js"></script>
 <script src="SHARED_DATA/recinto_equipamiento.js"></script>
 <script src="SHARED_DATA/recinto_bim.js"></script>
 <script src="SHARED_DATA/recinto_mnc.js"></script>
@@ -914,6 +929,27 @@
           <small>Pautas ISP · Funcionamiento v03 (Oct 2025) + Instalación v02 · 98 requisitos</small>
         </div>
       </button>
+      <div style="font-size:9px;font-weight:800;letter-spacing:.6px;color:#94a3b8;padding:7px 14px 3px;border-top:1px solid #e2e8f0;text-transform:uppercase">Lote 2 · normativa complementaria</div>
+      <button class="norma-item" data-id="dr" onclick="switchNorma('dr')">
+        <span class="norma-item-tag" style="background:#7c3aed">D.466</span>
+        <div class="norma-item-info"><strong>Droguería</strong><small>D.S. 466/84 · Título III · 10 requisitos</small></div>
+      </button>
+      <button class="norma-item" data-id="cz" onclick="switchNorma('cz')">
+        <span class="norma-item-tag" style="background:#0891b2">NGT 25</span>
+        <div class="norma-item-info"><strong>Central de Mezclas</strong><small>Antineoplásicos · prepara en casa · 26 requisitos</small></div>
+      </button>
+      <button class="norma-item" data-id="re" onclick="switchNorma('re')">
+        <span class="norma-item-tag" style="background:#16a34a">D.6/09</span>
+        <div class="norma-item-info"><strong>REAS · Residuos</strong><small>D.S. 6/2009 · 55 requisitos</small></div>
+      </button>
+      <button class="norma-item" data-id="al" onclick="switchNorma('al')">
+        <span class="norma-item-tag" style="background:#a16207">RSA</span>
+        <div class="norma-item-info"><strong>Alimentación</strong><small>D.S. 977/96 · Título I · 84 requisitos</small></div>
+      </button>
+      <button class="norma-item" data-id="cp" onclick="switchNorma('cp')">
+        <span class="norma-item-tag" style="background:#be123c">D.10/13</span>
+        <div class="norma-item-info"><strong>Calderas y Autoclaves</strong><small>D.S. 10/2013 · 86 requisitos</small></div>
+      </button>
     </div>
   </div>
   <div class="hd-sep"></div>
@@ -927,6 +963,10 @@
     <!-- Easter-egg invisible button: triple-click → estampa "Cathy's Nurse Seal Approved" -->
     <button id="secretStamp" class="hd-stamp-btn" aria-hidden="true" tabindex="-1"></button>
     <button class="hd-btn" onclick="openTipologias()" title="Buscar pauta por tipología (catálogo finito de recintos)">🔎 Tipologías</button>
+    <button class="hd-btn" onclick="openCertificados()" title="Repositorio de certificados de operadores (calderas/autoclaves y radiaciones ionizantes), conectado a la dotación">🎓 Certificados<span id="cert-count" class="hd-badge" style="display:none"></span></button>
+    <button class="hd-btn" onclick="abrirDrivePautas()" title="Abrir en Drive la carpeta con las pautas ya cotejadas (compartida con el equipo)">☁ Pautas cotejadas</button>
+    <button class="hd-btn" onclick="openRespaldo()" title="Respaldo del avance, estado del almacenamiento y selftest">💾 Respaldo<span id="bk-dot" class="hd-badge" style="display:none">!</span></button>
+    <button class="hd-btn" onclick="openAsignacion()" title="Asignar pautas a recintos por código BIM (validación de la matriz Fase 1)">🧩 Asignación</button>
     <button class="hd-btn" onclick="openChangelog()" title="Control de cambios: historial de altas, bajas, ediciones y fotos">📋 Cambios<span id="cl-count" class="hd-badge" style="display:none"></span></button>
     <button class="hd-btn" onclick="exportData()" title="Exportar evaluación a JSON">⬇ Exportar</button>
     <button class="hd-btn" onclick="window.print()" title="Imprimir pauta activa">🖨 Imprimir</button>
@@ -1063,33 +1103,66 @@ const NORMAS = {
   im: { id:'im', data: window.SHARED_NORMA_IM, label: 'Imagenología · Decreto 133/1984', short: 'Imagenología' },
   mn: { id:'mn', data: window.SHARED_NORMA_MN, label: 'Medicina Nuclear · NT 223 (Dec. Exento 48/2022)', short: 'Medicina Nuclear' },
   qm: { id:'qm', data: window.SHARED_NORMA_QM, label: 'Quimioterapia Oncológica · DA 74/2015',            short: 'Quimioterapia' },
-  fa: { id:'fa', data: window.SHARED_NORMA_FA, label: 'Checklist Farmacia · Pautas ISP',                 short: 'Farmacia' }
+  fa: { id:'fa', data: window.SHARED_NORMA_FA, label: 'Checklist Farmacia · Pautas ISP',                 short: 'Farmacia' },
+  // Lote 2 · normativa complementaria (construida desde los textos oficiales)
+  dr: { id:'dr', data: window.SHARED_NORMA_DR, label: 'Droguería · D.S. 466/84',                 short: 'Droguería' },
+  cz: { id:'cz', data: window.SHARED_NORMA_CZ, label: 'Central de Mezclas · NGT 25',             short: 'Central Mezclas' },
+  re: { id:'re', data: window.SHARED_NORMA_RE, label: 'REAS · D.S. 6/2009',                      short: 'REAS' },
+  al: { id:'al', data: window.SHARED_NORMA_AL, label: 'Alimentación · RSA D.S. 977/96',          short: 'Alimentación' },
+  cp: { id:'cp', data: window.SHARED_NORMA_CP, label: 'Calderas y Autoclaves · D.S. 10/2013',    short: 'Calderas' }
 };
 const STORE_KEY = 'auth_sanit_normas_v3';
 const STORE_ACTIVE = 'auth_sanit_active_norma_v3';
+
+/* ════════════════════════════════════════════════════════════════
+   HARNESS · VERSIÓN DE ESQUEMA + MIGRACIONES
+   Cada cambio de forma de los datos guardados sube SCHEMA_VERSION y agrega
+   su migración. Así los datos viejos se adaptan en vez de quedar huérfanos.
+   ═══════════════════════════════════════════════════════════════ */
+const SCHEMA_VERSION = 2;
+const SCHEMA_KEY = 'auth_sanit_schema_version';
+const MIGRACIONES = {
+  // v1 → v2: la evaluación por recinto pasó a guardarse por ALCANCE
+  // (recinto | SVC:<code> | <rid>#U<n>). Las claves planas ya son válidas
+  // como alcance "recinto", así que solo se sella la versión.
+  2: function(){ return 'evaluación por recinto reinterpretada como alcance «recinto»'; }
+};
+function migrarEsquema(){
+  let v = 0;
+  try { v = parseInt(localStorage.getItem(SCHEMA_KEY) || '0', 10) || 0; } catch(e){ return; }
+  if(v === SCHEMA_VERSION) return;
+  // instalación nueva (sin datos) ⇒ sellar sin migrar
+  let vacio = true;
+  try { vacio = !localStorage.getItem(STORE_KEY) && !localStorage.getItem('auth_sanit_recinto_eval_v1'); } catch(e){}
+  const hechas = [];
+  if(!vacio){
+    for(let n = v + 1; n <= SCHEMA_VERSION; n++){
+      if(MIGRACIONES[n]){
+        try { hechas.push('v'+n+': '+MIGRACIONES[n]()); }
+        catch(e){ console.warn('[AS] migración v'+n+' falló:', e); }
+      }
+    }
+  }
+  try { localStorage.setItem(SCHEMA_KEY, String(SCHEMA_VERSION)); } catch(e){}
+  if(hechas.length) console.info('[AS] esquema migrado a v'+SCHEMA_VERSION+' →', hechas.join(' · '));
+}
+migrarEsquema();
 
 let activeNormaId = localStorage.getItem(STORE_ACTIVE) || 'ac';
 if(!NORMAS[activeNormaId] || !NORMAS[activeNormaId].data) activeNormaId = 'ac';
 let NORMA = NORMAS[activeNormaId].data;
 
 function loadState(){
-  try { const all = JSON.parse(localStorage.getItem(STORE_KEY)) || {};
-    if(!all.ac) all.ac = {};
-    if(!all.cm) all.cm = {};
-    if(!all.hp) all.hp = {};
-    if(!all.di) all.di = {};
-    if(!all.lc) all.lc = {};
-    if(!all.im) all.im = {};
-    if(!all.mn) all.mn = {};
-    if(!all.qm) all.qm = {};
-    if(!all.fa) all.fa = {};
-    return all;
-  }
-  catch { return { ac:{}, cm:{}, hp:{}, di:{}, lc:{}, im:{}, mn:{}, qm:{}, fa:{} }; }
+  // Un espacio de estado por norma registrada en NORMAS (robusto a normas nuevas)
+  let all = {};
+  try { all = JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch { all = {}; }
+  Object.keys(NORMAS).forEach(k => { if(!all[k]) all[k] = {}; });
+  return all;
 }
 function saveState(){
   if(currentRecintoId){ saveRecintoEval(); return; }   // en modo recinto, el estado vive en recintoEval
   localStorage.setItem(STORE_KEY, JSON.stringify(state));
+  if(typeof bkTick === 'function') bkTick();
 }
 let state = loadState();
 // Accesor del estado de la norma activa
@@ -1121,7 +1194,22 @@ function getAmbitoState(ambitoId){
    currentRecintoId=null ⇒ modo "Plantilla" (evaluación modelo, comportamiento previo).
    ═══════════════════════════════════════════════════════════════ */
 const STORE_RECINTO = 'auth_sanit_recinto_eval_v1';
-const PR       = (window.SHARED_PAUTAS_RECINTOS && window.SHARED_PAUTAS_RECINTOS.asignaciones) || {};
+// Matriz Fase 1 (borrador auto) FUSIONADA con las validaciones manuales hechas
+// en Atlas o aquí (clave localStorage COMPARTIDA pautas_recintos_manual_v1).
+// El override manual gana; estado 'no_corresponde' deja al recinto sin pauta.
+const PAUTAS_MANUAL_KEY = 'pautas_recintos_manual_v1';
+function pmStore(){ try{ const s=JSON.parse(localStorage.getItem(PAUTAS_MANUAL_KEY)); return (s&&typeof s==='object')?Object.assign({recintos:{},servicios:{}},s):{recintos:{},servicios:{}}; }catch(e){ return {recintos:{},servicios:{}}; } }
+function pmSave(st){ try{ localStorage.setItem(PAUTAS_MANUAL_KEY, JSON.stringify(st)); }catch(e){} }
+const PR = (function(){
+  const base = (window.SHARED_PAUTAS_RECINTOS && window.SHARED_PAUTAS_RECINTOS.asignaciones) || {};
+  const merged = Object.assign({}, base);
+  const man = pmStore().recintos;
+  for(const rid in man){
+    if(man[rid].estado==='no_corresponde') delete merged[rid];
+    else merged[rid] = { p: man[rid].p||[], regla: 'manual' };
+  }
+  return merged;
+})();
 const REQUIP   = window.RECINTO_EQUIP || {};
 const RECBIM   = window.RECINTO_BIM || {};      // code → código BIM (ej. "13.4.4" → "A0145")
 const EQUIPCAT = (window.SHARED_EQUIPAMIENTO && window.SHARED_EQUIPAMIENTO.equipos) || {};  // t → {nombre, familia, marca, modelo}
@@ -1162,8 +1250,11 @@ function scopeKey(){
 function loadRecintoEval(){ try { return JSON.parse(localStorage.getItem(STORE_RECINTO)) || {}; } catch { return {}; } }
 let recintoEval = loadRecintoEval();
 function saveRecintoEval(){
-  try { localStorage.setItem(STORE_RECINTO, JSON.stringify(recintoEval)); }
-  catch(e){ alert('No se pudo guardar la evaluación del recinto (almacenamiento lleno). Exporta el avance para liberar espacio.'); }
+  try { localStorage.setItem(STORE_RECINTO, JSON.stringify(recintoEval)); if(typeof bkTick === 'function') bkTick(); }
+  catch(e){
+    alert('⚠ No se pudo guardar: almacenamiento lleno.\n\nDescarga un respaldo (☁ Respaldo) y exporta a PDF las pautas ya terminadas para liberar espacio.');
+    if(typeof openRespaldo === 'function') openRespaldo();
+  }
 }
 // ¿el recinto ya tiene alguna marca registrada en este ámbito?
 function recintoEvaluado(rid, ambitoId){
@@ -1742,6 +1833,299 @@ function exportarPautaPDF(){
   if(!w){ alert('El navegador bloqueó la ventana. Permite pop-ups para exportar.'); return; }
   w.document.write(html); w.document.close();
   logChange('export', `Pauta exportada a PDF · ${nombre} · ${ruta.join(' / ')}`);
+  // Fase HUB PM: si el endpoint Drive está configurado, además sube el
+  // expediente (Apps Script lo convierte a PDF y crea el árbol de carpetas).
+  const subida = driveUpload({ tipo:'pauta', ruta, nombre, mime:'text/html',
+    base64: btoa(unescape(encodeURIComponent(html))) },
+    j => alert(j.ok ? `☁ Subido al Drive: ${ruta.join(' / ')} / ${nombre}.pdf` : '⚠ Falló la subida al Drive: '+(j.error||'')));
+  if(subida) logChange('export', `Subida al Drive iniciada · ${nombre}`);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   CERTIFICADOS DE OPERADORES · repositorio conectado a la dotación
+   (calderas/autoclaves D.S.10/2012 · radiaciones ionizantes D.S.133/84 · otros)
+   Custodia final: mismo Drive de las pautas, carpeta "Certificados Operadores".
+   ═══════════════════════════════════════════════════════════════ */
+const CERT_KEY='as_certificados_v1';
+let certificados=(function(){ try{ return JSON.parse(localStorage.getItem(CERT_KEY))||[]; }catch(e){ return []; } })();
+function saveCerts(){
+  try{ localStorage.setItem(CERT_KEY, JSON.stringify(certificados)); }
+  catch(e){ alert('Almacenamiento lleno: el archivo adjunto es muy pesado. Usa una imagen más liviana o guarda solo los datos (sin archivo).'); }
+  updateCertBadge();
+}
+const CERT_TIPOS=['Radiaciones Ionizantes (operador)','Caldera / Autoclave (operador)','Otro'];
+function certVencido(c){ return c.vencimiento && c.vencimiento < new Date().toISOString().slice(0,10); }
+function certPorVencer(c){
+  if(!c.vencimiento || certVencido(c)) return false;
+  const lim=new Date(); lim.setDate(lim.getDate()+90);
+  return c.vencimiento <= lim.toISOString().slice(0,10);
+}
+function updateCertBadge(){
+  const el=document.getElementById('cert-count'); if(!el) return;
+  const venc=certificados.filter(certVencido).length;
+  el.textContent = venc ? venc : certificados.length;
+  el.style.display = certificados.length ? '' : 'none';
+  el.style.background = venc ? '#dc2626' : '';
+}
+let _certForm={persona:null, tipo:CERT_TIPOS[0]};
+function certDotInput(v){
+  const box=document.getElementById('cert-dot-sug'); if(!box) return;
+  const res=expBuscarDot(v);
+  box.innerHTML=res.map(s=>`<div class="exp-sug" onclick='certPickPersona(${JSON.stringify({n:s.n,c:s.c||s.e||'',u:s.u||s.sv||''}).replace(/'/g,"&#39;")})'>
+    <b>${escapeHtml(s.n)}</b><small>${escapeHtml(s.c||s.e||'')} · ${escapeHtml(s.u||s.sv||'')}</small></div>`).join('');
+  box.style.display=res.length?'':'none';
+}
+function certPickPersona(p){ _certForm.persona=p; openCertificados(); }
+function certGuardar(){
+  const g=id=>document.getElementById(id)?.value||'';
+  if(!_certForm.persona){ alert('Primero busca y selecciona a la persona (matriz de dotación).'); return; }
+  const c={ id:'c'+Math.random().toString(36).slice(2,9), persona:_certForm.persona,
+    tipo:g('cert-tipo')||CERT_TIPOS[0], numero:g('cert-num'), emisor:g('cert-emisor'),
+    emision:g('cert-emision'), vencimiento:g('cert-venc'), archivo:_certForm.archivo||null };
+  certificados.push(c); _certForm={persona:null, tipo:CERT_TIPOS[0]};
+  saveCerts(); logChange('alta', `Certificado ${c.tipo} · ${c.persona.n}`); openCertificados();
+}
+function certArchivo(files){
+  if(!files||!files[0]) return;
+  const f=files[0];
+  if(f.size > 1500000){ alert('Archivo de '+Math.round(f.size/1024)+' KB: usa una imagen/PDF más liviano (máx ~1.5 MB) para no llenar el almacenamiento local. En la fase Drive los archivos van directo a la nube.'); return; }
+  const fr=new FileReader();
+  fr.onload=()=>{ _certForm.archivo={name:f.name, data:fr.result}; document.getElementById('cert-file-lbl').textContent='📎 '+f.name; };
+  fr.readAsDataURL(f);
+}
+function certDel(id){
+  const i=certificados.findIndex(c=>c.id===id); if(i<0) return;
+  if(!confirm('¿Eliminar el certificado de '+certificados[i].persona.n+'?')) return;
+  certificados.splice(i,1); saveCerts(); openCertificados();
+}
+function certRow(c){
+  const est = certVencido(c) ? '<span class="cert-est venc">VENCIDO</span>'
+           : certPorVencer(c) ? '<span class="cert-est prox">por vencer</span>'
+           : (c.vencimiento ? '<span class="cert-est ok">vigente</span>' : '');
+  return `<div class="rev-row">
+    <span class="rev-num">${escapeHtml((c.tipo||'').split(' ')[0])}</span>
+    <span class="rev-txt"><b>${escapeHtml(c.persona.n)}</b> · ${escapeHtml(c.persona.c||'')}
+      <small>${escapeHtml(c.tipo)} · N° ${escapeHtml(c.numero||'s/n')} · ${escapeHtml(c.emisor||'')} · vence: ${escapeHtml(c.vencimiento||'s/f')} ${est}${c.archivo?` · 📎 ${escapeHtml(c.archivo.name)}`:''}</small></span>
+    <span class="rev-act">
+      ${c.archivo?`<button class="rev-btn" onclick="certVer('${c.id}')">👁 Ver</button>`:''}
+      <button class="rev-btn" onclick="certImprimir('${c.id}')">🖨</button>
+      <button class="rev-btn" style="color:#dc2626;border-color:#fecaca" onclick="certDel('${c.id}')">✕</button></span></div>`;
+}
+function certVer(id){
+  const c=certificados.find(x=>x.id===id); if(!c||!c.archivo) return;
+  const w=window.open('','_blank'); if(!w) return;
+  w.document.write(`<title>${escapeHtml(c.persona.n)}</title><img src="${c.archivo.data}" style="max-width:100%">`);
+}
+function certImprimir(id){
+  const lista = id ? certificados.filter(c=>c.id===id) : certificados;
+  if(!lista.length){ alert('No hay certificados cargados.'); return; }
+  const filas=lista.map(c=>`<tr><td>${escapeHtml(c.persona.n)}</td><td>${escapeHtml(c.persona.c||'')}</td>
+    <td>${escapeHtml(c.tipo)}</td><td>${escapeHtml(c.numero||'')}</td><td>${escapeHtml(c.emisor||'')}</td>
+    <td>${escapeHtml(c.emision||'')}</td><td>${escapeHtml(c.vencimiento||'')}${certVencido(c)?' ⚠ VENCIDO':''}</td></tr>`).join('');
+  const imgs=lista.filter(c=>c.archivo).map(c=>`<div style="page-break-before:always"><h3>${escapeHtml(c.persona.n)} · ${escapeHtml(c.tipo)}</h3><img src="${c.archivo.data}" style="max-width:100%;max-height:90vh"></div>`).join('');
+  const w=window.open('','_blank'); if(!w){ alert('Permite pop-ups para imprimir.'); return; }
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Certificados Operadores HDS</title>
+    <style>body{font-family:'Segoe UI',sans-serif;margin:24px;font-size:12px}h1{font-size:16px;color:#0c447c}
+    table{width:100%;border-collapse:collapse;font-size:11px}th{background:#e6f1fb;color:#0c447c;text-align:left;padding:4px 7px;border:1px solid #cfe0f2}
+    td{padding:4px 7px;border:1px solid #e2e8f0}</style></head><body>
+    <h1>AUTORIZACIÓN SANITARIA HDS · Certificados de Operadores</h1>
+    <p style="font-size:10.5px;color:#475569">📁 Autorización Sanitaria HDS → Certificados Operadores · ${lista.length} certificado(s) · ${new Date().toISOString().slice(0,10)}</p>
+    <table><thead><tr><th>Persona</th><th>Cargo</th><th>Tipo</th><th>N°</th><th>Emisor</th><th>Emisión</th><th>Vencimiento</th></tr></thead><tbody>${filas}</tbody></table>
+    ${imgs}<script>window.onload=()=>setTimeout(()=>window.print(),300);<\/script></body></html>`);
+  w.document.close();
+}
+function openCertificados(){
+  const venc=certificados.filter(certVencido).length, prox=certificados.filter(certPorVencer).length;
+  const persona=_certForm.persona;
+  const body=`
+    <div class="rc-modal-note">Repositorio conectado a la <b>matriz de dotación</b>. Tipos: operadores de radiaciones ionizantes (D.S. 133/84) y de calderas/autoclaves (D.S. 10/2012). Custodia final: el mismo Drive de las pautas (📁 Autorización Sanitaria HDS → Certificados Operadores). Carga masiva lista para cuando lleguen los documentos.</div>
+    <div class="rc-sec-t">＋ Agregar certificado</div>
+    <div class="exp-search" style="margin-bottom:6px">
+      ${persona?`<div class="exp-chips"><span class="exp-chip dot">👤 ${escapeHtml(persona.n)}<small>${escapeHtml(persona.c)}</small><button onclick="_certForm.persona=null;openCertificados()">×</button></span></div>`
+               :`<input placeholder="Busca a la persona en la dotación (nombre, cargo o unidad)…" oninput="certDotInput(this.value)" autocomplete="off">
+                 <div class="exp-sugbox" id="cert-dot-sug" style="display:none"></div>`}
+    </div>
+    <div class="cert-form">
+      <select id="cert-tipo">${CERT_TIPOS.map(t=>`<option>${t}</option>`).join('')}</select>
+      <input id="cert-num" placeholder="N° certificado/licencia">
+      <input id="cert-emisor" placeholder="Emisor (SEREMI…)">
+      <input id="cert-emision" type="date" title="Fecha de emisión">
+      <input id="cert-venc" type="date" title="Fecha de vencimiento">
+      <label class="rev-btn" style="cursor:pointer" id="cert-file-lbl">📎 Adjuntar<input type="file" accept="image/*,.pdf" style="display:none" onchange="certArchivo(this.files)"></label>
+      <button class="exp-export" onclick="certGuardar()">Guardar</button>
+    </div>
+    <div class="rc-sec-t">🎓 Certificados cargados <b>${certificados.length}</b>${venc?` · <span style="color:#dc2626">${venc} vencidos</span>`:''}${prox?` · ${prox} por vencer (90 días)`:''}
+      ${certificados.length?`<button class="rev-btn" style="margin-left:8px" onclick="certImprimir()">🖨 Imprimir todos</button>`:''}</div>
+    ${certificados.length? certificados.map(certRow).join('') : '<div class="rc-empty">Aún no hay certificados. La información está en recolección — este repositorio queda listo para la carga.</div>'}`;
+  rcModalGeneric('🎓 Certificados de Operadores', body);
+}
+
+/* ── DRIVE · subida directa (se activa configurando el endpoint del HUB PM) ──
+   Se configura desde 💾 Respaldo → ☁ Subida automática al Drive
+   (guarda as_drive_endpoint + as_drive_token; ver _DOCS/Code_AS_Drive.gs)
+   (WEB_DEPLOY/github_pautas/Code_AS_Drive.gs). Sin configurar ⇒ flujo local. */
+function driveEndpoint(){ try{ return localStorage.getItem('as_drive_endpoint')||''; }catch(e){ return ''; } }
+function driveToken(){ try{ return localStorage.getItem('as_drive_token')||''; }catch(e){ return ''; } }
+/* Configuración de la subida a Drive (sin consola): URL del Apps Script + clave */
+function configurarDrive(){
+  const url=(document.getElementById('drv-url')||{}).value||'';
+  const tok=(document.getElementById('drv-tok')||{}).value||'';
+  const u=url.trim();
+  if(u && !/^https:\/\/script\.google\.com\/.*\/exec$/.test(u)){
+    if(!confirm('La URL no parece la de una aplicación web de Apps Script (debería terminar en /exec).\n\n¿Guardar igual?')) return;
+  }
+  try{
+    if(u) localStorage.setItem('as_drive_endpoint', u); else localStorage.removeItem('as_drive_endpoint');
+    if(tok.trim()) localStorage.setItem('as_drive_token', tok.trim()); else localStorage.removeItem('as_drive_token');
+  }catch(e){}
+  logChange('edición','Conexión a Drive configurada');
+  probarDrive();
+}
+function probarDrive(){
+  const el=document.getElementById('drv-estado');
+  if(!driveEndpoint()){ if(el) el.innerHTML='<span style="color:#a16207">Sin endpoint: el export queda solo local (imprimir/guardar PDF).</span>'; return; }
+  if(el) el.innerHTML='<span style="color:#475569">Probando conexión…</span>';
+  fetch(driveEndpoint(), {method:'POST', body: JSON.stringify({accion:'ping', token:driveToken()})})
+    .then(r=>r.json())
+    .then(j=>{ if(el) el.innerHTML = j.ok
+        ? `<span style="color:#16a34a;font-weight:700">✓ Conectado a la carpeta «${escapeHtml(j.carpeta||'')}» · con permiso de escritura</span>`
+        : `<span style="color:#dc2626;font-weight:700">✗ ${escapeHtml(j.error||'error desconocido')}</span>`; })
+    .catch(err=>{ if(el) el.innerHTML=`<span style="color:#dc2626">✗ No se pudo contactar el endpoint (${escapeHtml(String(err).slice(0,80))}).<br><small>Revisa que la implementación tenga acceso «Cualquier persona» y que la URL termine en /exec.</small></span>`; });
+}
+/* Carpeta Drive donde caen las pautas cotejadas (compartida con el equipo).
+   Se configura una vez por dispositivo; el botón ☁ del header la abre. */
+function driveFolderUrl(){ try{ return localStorage.getItem('as_drive_folder_url')||''; }catch(e){ return ''; } }
+function abrirDrivePautas(){
+  let url = driveFolderUrl();
+  if(!url){
+    url = prompt('📁 Carpeta de Drive con las pautas cotejadas\n\nPega la URL de la carpeta compartida "Autorización Sanitaria HDS".\nDentro se crean automáticamente: Edificio → Piso → Servicio.\n\n(Se guarda en este equipo; cada integrante la configura una vez.)', '');
+    if(!url) return;
+    url = url.trim();
+    if(!/^https?:\/\//i.test(url)){ alert('La URL debe empezar con https://'); return; }
+    try{ localStorage.setItem('as_drive_folder_url', url); }catch(e){}
+    logChange('edición', 'Carpeta Drive de pautas cotejadas configurada');
+  }
+  window.open(url, '_blank', 'noopener');
+}
+function reconfigurarDrive(){
+  try{ localStorage.removeItem('as_drive_folder_url'); }catch(e){}
+  abrirDrivePautas();
+}
+
+/* ════════════════════════════════════════════════════════════════
+   HARNESS · RESPALDO AUTOMÁTICO + MEDIDOR DE CUOTA
+   El avance vive en localStorage; sin respaldo, una limpieza del navegador
+   lo borra. Se recuerda respaldar cada N cambios y se avisa al acercarse
+   al límite de almacenamiento.
+   ═══════════════════════════════════════════════════════════════ */
+const BK_KEY='as_backup_meta_v1', BK_CADA=25;   // cambios entre recordatorios
+let bkMeta=(function(){ try{ return JSON.parse(localStorage.getItem(BK_KEY))||{cambios:0,ultimo:null}; }catch(e){ return {cambios:0,ultimo:null}; } })();
+function bkSave(){ try{ localStorage.setItem(BK_KEY, JSON.stringify(bkMeta)); }catch(e){} }
+// Bytes ocupados por las claves de la plataforma (aprox. UTF-16 → *2)
+function usoAlmacenamiento(){
+  let bytes=0;
+  try{
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(k && (k.startsWith('as_')||k.startsWith('auth_sanit_'))) bytes += (k.length+(localStorage.getItem(k)||'').length)*2;
+    }
+  }catch(e){}
+  return bytes;
+}
+const CUOTA_APROX = 5*1024*1024;   // ~5 MB típico por origen
+function pctAlmacenamiento(){ return Math.min(100, Math.round(usoAlmacenamiento()/CUOTA_APROX*100)); }
+function bkPayload(){
+  return { app:'Autorización Sanitaria HDS', schema:SCHEMA_VERSION,
+    fecha:new Date().toISOString(),
+    estado_normas: state, evaluacion_por_alcance: recintoEval,
+    unidades_por_recinto: recintoUnits, certificados: certificados,
+    correcciones_notas: noteFixes, ubicaciones_notas: notePos,
+    pauta_edits: (function(){ try{ return JSON.parse(localStorage.getItem('as_pauta_edits_v1'))||{}; }catch(e){ return {}; } })() };
+}
+function descargarRespaldo(silencioso){
+  try{
+    const blob=new Blob([JSON.stringify(bkPayload(),null,1)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download=`respaldo_autorizacion_sanitaria_${new Date().toISOString().slice(0,10)}.json`;
+    a.click(); URL.revokeObjectURL(a.href);
+    bkMeta.cambios=0; bkMeta.ultimo=new Date().toISOString(); bkSave();
+    if(!silencioso) logChange('export','Respaldo descargado');
+    return true;
+  }catch(e){ alert('No se pudo generar el respaldo: '+e); return false; }
+}
+function restaurarRespaldo(files){
+  if(!files||!files[0]) return;
+  const fr=new FileReader();
+  fr.onload=()=>{
+    try{
+      const d=JSON.parse(fr.result);
+      if(!d.estado_normas && !d.evaluacion_por_alcance) throw new Error('archivo no reconocido');
+      if(!confirm('¿Restaurar este respaldo?\n\nFecha: '+(d.fecha||'—')+'\n\nSe REEMPLAZA la evaluación actual de este equipo.')) return;
+      if(d.estado_normas){ state=d.estado_normas; localStorage.setItem(STORE_KEY, JSON.stringify(state)); }
+      if(d.evaluacion_por_alcance){ recintoEval=d.evaluacion_por_alcance; saveRecintoEval(); }
+      if(d.unidades_por_recinto){ recintoUnits=d.unidades_por_recinto; localStorage.setItem(STORE_UNITS, JSON.stringify(recintoUnits)); }
+      if(d.certificados){ certificados=d.certificados; saveCerts(); }
+      if(d.correcciones_notas){ noteFixes=d.correcciones_notas; saveNoteFixes(); }
+      if(d.ubicaciones_notas){ notePos=d.ubicaciones_notas; saveNotePos(); }
+      alert('✓ Respaldo restaurado. Se recargará la plataforma.');
+      location.reload();
+    }catch(e){ alert('No se pudo restaurar: '+e.message); }
+  };
+  fr.readAsText(files[0]);
+}
+// Se llama en cada guardado de estado
+function bkTick(){
+  bkMeta.cambios=(bkMeta.cambios||0)+1; bkSave();
+  const pct=pctAlmacenamiento();
+  if(pct>=85){
+    if(!bkMeta.avisoCuota){ bkMeta.avisoCuota=true; bkSave();
+      alert(`⚠ Almacenamiento local al ${pct}%.\n\nDescarga un respaldo ahora (☁ Respaldo) y considera exportar las pautas terminadas a PDF/Drive para liberar espacio.`); }
+  } else if(bkMeta.avisoCuota){ bkMeta.avisoCuota=false; bkSave(); }
+  if(bkMeta.cambios>=BK_CADA){
+    bkMeta.cambios=0; bkSave();
+    if(confirm('💾 Llevas '+BK_CADA+' cambios sin respaldar.\n\n¿Descargar ahora un respaldo del avance?')) descargarRespaldo();
+  }
+}
+function openRespaldo(){
+  const pct=pctAlmacenamiento(), kb=Math.round(usoAlmacenamiento()/1024);
+  const col = pct>=85?'#dc2626':pct>=60?'#a16207':'#16a34a';
+  const body=`
+    <div class="rc-modal-note">El avance se guarda en <b>este navegador</b>. Descarga respaldos periódicos: es el seguro ante limpiezas del navegador o cambio de equipo. Las pautas terminadas, además, van a PDF/Drive.</div>
+    <div class="rc-sec-t">💾 Estado del almacenamiento local</div>
+    <div style="padding:6px 4px">
+      <div style="height:10px;background:#eef4fa;border-radius:6px;overflow:hidden"><div style="height:100%;width:${pct}%;background:${col}"></div></div>
+      <div style="font-size:11.5px;color:#475569;margin-top:5px">${kb} KB usados · ${pct}% de la cuota estimada${pct>=85?' · <b style="color:#dc2626">crítico</b>':''}</div>
+      <div style="font-size:11px;color:#7c93a8;margin-top:3px">Último respaldo: ${bkMeta.ultimo? new Date(bkMeta.ultimo).toLocaleString('es-CL') : 'nunca'} · cambios sin respaldar: ${bkMeta.cambios||0}</div>
+    </div>
+    <div class="rc-sec-t">Acciones</div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap;padding:4px">
+      <button class="exp-export" onclick="descargarRespaldo()">⬇ Descargar respaldo</button>
+      <label class="rev-btn" style="cursor:pointer">⬆ Restaurar respaldo<input type="file" accept="application/json" style="display:none" onchange="restaurarRespaldo(this.files)"></label>
+      <button class="rev-btn" onclick="reconfigurarDrive()">📁 Cambiar carpeta Drive</button>
+      <button class="rev-btn" onclick="location.href='?selftest=1'">🧪 Selftest</button>
+    </div>
+    <div class="rc-sec-t">☁ Subida automática al Drive <b style="color:${driveEndpoint()?'#16a34a':'#a16207'}">${driveEndpoint()?'CONFIGURADA':'no configurada'}</b></div>
+    <div class="rc-modal-note">Pega la URL de la aplicación web de Apps Script (termina en <b>/exec</b>) y la clave que definiste en el script. Instrucciones completas en <b>_DOCS/Code_AS_Drive.gs</b>. Sin esto, "Finalizar y exportar PDF" funciona igual pero solo local.</div>
+    <div style="display:flex;flex-direction:column;gap:6px;padding:4px">
+      <input id="drv-url" placeholder="https://script.google.com/macros/s/…/exec" value="${escapeHtml(driveEndpoint())}"
+        style="font-family:inherit;font-size:12px;border:1.5px solid #dbe7f2;border-radius:8px;padding:7px 10px;outline:none">
+      <input id="drv-tok" placeholder="Clave definida en el script (TOKEN)" value="${escapeHtml(driveToken())}"
+        style="font-family:inherit;font-size:12px;border:1.5px solid #dbe7f2;border-radius:8px;padding:7px 10px;outline:none">
+      <div style="display:flex;gap:7px;flex-wrap:wrap">
+        <button class="exp-export" onclick="configurarDrive()">Guardar y probar conexión</button>
+        <button class="rev-btn" onclick="probarDrive()">🔌 Probar conexión</button>
+      </div>
+      <div id="drv-estado" style="font-size:11.5px;min-height:18px"></div>
+    </div>`;
+  rcModalGeneric('💾 Respaldo y almacenamiento', body);
+}
+function driveUpload(payload, cb){
+  const url=driveEndpoint(); if(!url) return false;
+  payload = Object.assign({token: driveToken()}, payload);
+  fetch(url, {method:'POST', body: JSON.stringify(payload)})
+    .then(r=>r.json()).then(j=>cb&&cb(j)).catch(err=>cb&&cb({ok:false,error:String(err)}));
+  return true;
 }
 
 /* ════════════════════════════════════════════════════════════════
@@ -1773,6 +2157,137 @@ const TIPOLOGIAS = (function(){
 function tipoLabel(regla){ return TIPO_LABELS[regla] || regla; }
 function tipoPrimaryAmbito(t){ let best=null, bn=-1; for(const [aid,n] of Object.entries(t.ambitos)){ if(n>bn){ bn=n; best=aid; } } return best; }
 // Modal genérico (reutiliza estilos rc-overlay/rc-modal)
+// ── 🧩 ASIGNACIÓN DE PAUTAS A RECINTOS (vía BIM · valida la matriz Fase 1) ──
+// Guarda en la clave compartida pautas_recintos_manual_v1 (la misma que usa el
+// modo 🩺 Aut. Sanitaria del Atlas). Deja traza en el control de cambios.
+const PR_BASE_AS = (window.SHARED_PAUTAS_RECINTOS && window.SHARED_PAUTAS_RECINTOS.asignaciones) || {};
+const ASG_TXT = {sin:'🔴 sin pauta', sugerida:'🟠 sugerida', validada:'🟢 validada', no_corresponde:'⚪ no corresponde'};
+function asgEstado(rid){
+  const man = pmStore().recintos[rid];
+  if(man) return man.estado==='no_corresponde' ? 'no_corresponde' : 'validada';
+  return (PR_BASE_AS[rid] && PR_BASE_AS[rid].p && PR_BASE_AS[rid].p.length) ? 'sugerida' : 'sin';
+}
+let _ASG_IX = null;
+function asgIx(){
+  if(_ASG_IX) return _ASG_IX;
+  _ASG_IX = {};
+  for(const nid in NORMAS){
+    const d = NORMAS[nid].data; if(!d || !d.secciones) continue;
+    d.secciones.forEach(s => (s.ambitos||[]).forEach(a => {
+      _ASG_IX[a.id] = {n: NORMAS[nid].short||nid, s: s.name||'', name: a.name||a.id};
+    }));
+  }
+  return _ASG_IX;
+}
+function asgLbl(aid){
+  const m = asgIx()[aid];
+  if(m) return m.n + ' · ' + m.name + (m.s ? ' · ' + m.s : '');
+  const pl = (window.PAUTA_LABELS||{})[aid];
+  return pl ? ((pl.normaLabel||'') + ' · ' + (pl.name||aid)) : aid;
+}
+let asgSelSet = new Set(), asgRidActual = null;
+function openAsignacion(){
+  const body =
+    `<input id="asgQ" type="text" placeholder="Buscar recinto por código BIM (ej. A0145), nombre, código o servicio…"`+
+    ` style="width:100%;border:1px solid #cbd5e1;border-radius:8px;padding:9px 12px;font-size:13px" oninput="asgBuscar()">`+
+    `<div id="asgRes" style="max-height:200px;overflow:auto;margin-top:8px;border:1px solid #e2e8f0;border-radius:8px"></div>`+
+    `<div id="asgDet" style="margin-top:10px"></div>`+
+    `<a href="#" onclick="asgExport();return false" style="display:block;margin-top:10px;font-size:11px;color:#94a3b8">⬇ Exportar matriz de asignaciones (Fase 1 + validaciones manuales)</a>`;
+  rcModalGeneric('🧩 Asignación de pautas a recintos', body);
+  asgBuscar();
+}
+function asgBuscar(){
+  const q = (document.getElementById('asgQ').value||'').trim().toLowerCase();
+  const out = [];
+  for(const rid in RECMETA){
+    const r = RECMETA[rid];
+    const bim = (r.code && RECBIM[r.code]) || '';
+    if(q){
+      const hay = ((r.name||'')+' '+(r.code||'')+' '+bim+' '+(r.servicio_name||'')).toLowerCase();
+      if(hay.indexOf(q) === -1) continue;
+    }
+    out.push({rid, r, bim});
+    if(out.length >= 40) break;
+  }
+  document.getElementById('asgRes').innerHTML = out.map(o =>
+    `<div onclick="asgDetalle('${o.rid}')" style="padding:7px 10px;font-size:12px;cursor:pointer;border-bottom:1px solid #f1f5f9">`+
+    `${ASG_TXT[asgEstado(o.rid)]} · <b>${o.r.name||o.rid}</b> · ${o.r.code||''}${o.bim?' · <b style="color:#0369a1">BIM '+o.bim+'</b>':''} `+
+    `<span style="color:#94a3b8">· ${o.r.servicio_name||''} · ${o.r.piso||''}</span></div>`).join('')
+    || '<div style="padding:10px;font-size:12px;color:#94a3b8">Sin resultados</div>';
+}
+function asgDetalle(rid){
+  asgRidActual = rid;
+  const r = RECMETA[rid]||{}; const man = pmStore().recintos[rid];
+  const cur = man ? (man.p||[]) : ((PR_BASE_AS[rid]||{}).p||[]);
+  asgSelSet = new Set(cur);
+  const e = asgEstado(rid);
+  const bim = (r.code && RECBIM[r.code]) || '';
+  const normaOpts = Object.keys(NORMAS).filter(n=>NORMAS[n].data)
+    .map(n=>`<option value="${n}">${NORMAS[n].short||n}</option>`).join('');
+  document.getElementById('asgDet').innerHTML =
+    `<div style="border:1px solid #cbd5e1;border-radius:10px;padding:10px 12px;background:#f8fafc">`+
+    `<div style="font-size:13px"><b>${r.name||rid}</b> · ${r.code||''}${bim?' · BIM '+bim:''} <span style="color:#64748b">· ${r.servicio_name||''}</span> — ${ASG_TXT[e]}</div>`+
+    `<div id="asgCur" style="margin:7px 0 4px;font-size:11.5px">${[...asgSelSet].map(a=>'• '+asgLbl(a)).join('<br>')||'<i style="color:#94a3b8">sin ámbitos seleccionados</i>'}</div>`+
+    `<div style="display:flex;gap:6px;margin-top:7px">`+
+    `<select id="asgNorma" onchange="asgPickSec()" style="flex:1;font-size:12px;padding:6px">${normaOpts}</select>`+
+    `<select id="asgSec" onchange="asgPickAmb()" style="flex:2;font-size:12px;padding:6px"></select></div>`+
+    `<div id="asgAmb" style="max-height:170px;overflow:auto;margin-top:6px"></div>`+
+    `<div style="margin-top:9px">`+
+    `<button class="hd-btn" style="background:#0f2547;color:#fff" onclick="asgGuardar()">💾 Guardar (validada)</button> `+
+    (e==='sugerida'?`<button class="hd-btn" onclick="asgConfirmar()">✔ Confirmar sugerencia</button> `:'')+
+    `<button class="hd-btn" onclick="asgNoCorresponde()">⚪ No corresponde</button> `+
+    (man?`<button class="hd-btn" onclick="asgQuitar()">↺ Quitar validación</button>`:'')+
+    `</div></div>`;
+  asgPickSec();
+}
+function asgPickSec(){
+  const nid = document.getElementById('asgNorma').value;
+  const d = NORMAS[nid].data;
+  document.getElementById('asgSec').innerHTML = (d.secciones||[])
+    .map((s,i)=>`<option value="${i}">${s.name}</option>`).join('');
+  asgPickAmb();
+}
+function asgPickAmb(){
+  const nid = document.getElementById('asgNorma').value;
+  const si = +document.getElementById('asgSec').value || 0;
+  const sec = (NORMAS[nid].data.secciones||[])[si] || {ambitos:[]};
+  document.getElementById('asgAmb').innerHTML = (sec.ambitos||[]).map(a =>
+    `<label style="display:flex;gap:7px;align-items:flex-start;font-size:11.5px;padding:3px 2px;border-bottom:1px dashed #f1f5f9;cursor:pointer">`+
+    `<input type="checkbox" ${asgSelSet.has(a.id)?'checked':''} onchange="asgToggle('${a.id}',this.checked)">`+
+    `<span>${a.name||a.id} <span style="color:#94a3b8">· ${a.tipo||''} · ${(a.requisitos||[]).length} req.</span></span></label>`).join('');
+}
+function asgToggle(aid, on){
+  if(on) asgSelSet.add(aid); else asgSelSet.delete(aid);
+  document.getElementById('asgCur').innerHTML = [...asgSelSet].map(a=>'• '+asgLbl(a)).join('<br>')||'<i style="color:#94a3b8">sin ámbitos seleccionados</i>';
+}
+function _asgSet(val, accion){
+  const rid = asgRidActual; if(!rid) return;
+  const st = pmStore();
+  if(val===null) delete st.recintos[rid]; else st.recintos[rid]=val;
+  pmSave(st);
+  try{ logChange('edición', accion+' · '+((RECMETA[rid]||{}).name||rid)); }catch(e){}
+  asgBuscar(); asgDetalle(rid);
+}
+function asgGuardar(){
+  if(!asgSelSet.size){ alert('Selecciona al menos un ámbito, o usa "No corresponde".'); return; }
+  _asgSet({estado:'validada', p:[...asgSelSet], fecha:new Date().toISOString().slice(0,10), por:'as'}, 'Asignación de pauta validada');
+}
+function asgConfirmar(){
+  const sug = PR_BASE_AS[asgRidActual];
+  if(!(sug&&sug.p&&sug.p.length)) return;
+  _asgSet({estado:'validada', p:sug.p.slice(), regla:sug.regla, fecha:new Date().toISOString().slice(0,10), por:'as'}, 'Sugerencia de pauta confirmada');
+}
+function asgNoCorresponde(){ _asgSet({estado:'no_corresponde', p:[], fecha:new Date().toISOString().slice(0,10), por:'as'}, 'Pauta marcada no-corresponde'); }
+function asgQuitar(){ _asgSet(null, 'Validación de pauta retirada'); }
+function asgExport(){
+  const payload = {version:'export '+new Date().toISOString().slice(0,10)+' · matriz Fase 1 + validación manual',
+    base:(window.SHARED_PAUTAS_RECINTOS&&window.SHARED_PAUTAS_RECINTOS.version)||'', manual:pmStore()};
+  const blob = new Blob([JSON.stringify(payload,null,1)],{type:'application/json'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'pautas_manual_'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+  URL.revokeObjectURL(a.href);
+}
+
 function rcModalGeneric(title, bodyHtml){
   rcCloseModal();
   const ov = document.createElement('div');
@@ -1989,6 +2504,9 @@ const SEC_ICONS = {
   'anatomia-patologica': '🔬',
   'anexo-esterilizacion': '♨',
   'anexo-laboratorios': '🧪',
+  'en-preparacion': '🚧',
+  // Lote 2
+  're-req': '♻', 'cp-req': '🔥', 'dr-req': '💊', 'al-req': '🍽', 'cz-req': '⚗',
   // Anexo 2 · Cirugía Menor
   'organizacion': '📋',
   'recursos-humanos': '👥',
@@ -3325,9 +3843,131 @@ window.addEventListener('DOMContentLoaded', () => {
   renderSidebar();
   renderDashboard();
   updateCtxBar();
+  updateCertBadge();
+  // Harness: ?selftest=1 corre las comprobaciones y muestra el informe
+  let _st=false; try{ _st=new URLSearchParams(location.search).get('selftest')==='1'; }catch(e){}
+  if(_st){ runSelftest(); return; }
+  // aviso de respaldo pendiente
+  const _bkDot=document.getElementById('bk-dot');
+  if(_bkDot && (pctAlmacenamiento()>=85 || (bkMeta.cambios||0)>=BK_CADA)){ _bkDot.style.display=''; _bkDot.style.background='#dc2626'; }
   preloadFromURL();   // ?recinto=<id> / ?pauta=<ambitoId> (llegada desde Atlas)
   initCathySeal(); // easter egg
 });
+
+/* ════════════════════════════════════════════════════════════════
+   HARNESS · SELFTEST  (abrir con ?selftest=1)
+   Valida invariantes de datos y render antes de commitear/publicar.
+   ═══════════════════════════════════════════════════════════════ */
+function runSelftest(){
+  // ok  = invariante (falla ⇒ no publicar)
+  // warn= brecha de datos conocida, se trabaja desde el panel de revisión
+  const R=[]; const ok=(n,c,d)=>R.push({n, nivel:c?'OK':'FALLA', ok:!!c, d:d||''});
+  const warn=(n,c,d)=>R.push({n, nivel:c?'OK':'AVISO', ok:true, d:d||''});
+  const normas=Object.keys(NORMAS).filter(k=>NORMAS[k].data);
+
+  ok('Normas cargadas', normas.length>=14, normas.length+' normas con datos');
+
+  // 1 · claves n únicas por ámbito (colisión = estados compartidos)
+  let dup=[];
+  normas.forEach(k=>{
+    (NORMAS[k].data.secciones||[]).forEach(s=>(s.ambitos||[]).forEach(a=>{
+      const vis=new Set();
+      (a.requisitos||[]).forEach(r=>{ const key=String(r.n);
+        if(vis.has(key)) dup.push(`${k}:${a.id}:${key}`); vis.add(key); });
+    }));
+  });
+  ok('Claves de requisito únicas por ámbito', dup.length===0, dup.length?dup.slice(0,5).join(', '):'sin duplicados');
+
+  // 2 · totales declarados vs reales
+  let malTot=[];
+  normas.forEach(k=>{
+    const d=NORMAS[k].data;
+    const real=(d.secciones||[]).reduce((s,x)=>s+(x.ambitos||[]).reduce((t,a)=>t+(a.requisitos||[]).length,0),0);
+    if(d.total_requisitos!==real) malTot.push(`${k}: declara ${d.total_requisitos}, real ${real}`);
+  });
+  ok('Totales declarados = reales', malTot.length===0, malTot.join(' · ')||'coinciden');
+
+  // 3 · notas al pie sin referencias rotas
+  let rotas=[];
+  normas.forEach(k=>{
+    const d=NORMAS[k].data, defs=d.notas_al_pie||{};
+    (d.secciones||[]).forEach(s=>(s.ambitos||[]).forEach(a=>(a.requisitos||[]).forEach(r=>{
+      [].concat(r.notes||[], r.grupo_notes||[], r.sub_notes||[]).forEach(n=>{ if(!defs[n]) rotas.push(`${k}:${r.n}→${n}`); });
+    })));
+  });
+  warn('Referencias de nota resueltas', rotas.length===0,
+       rotas.length?`${rotas.length} sin definición (${rotas.slice(0,4).join(', ')}) — ver 🔎 Casos de revisión`:'todas resuelven');
+
+  // 4 · textos no vacíos
+  let vacios=[];
+  normas.forEach(k=>(NORMAS[k].data.secciones||[]).forEach(s=>(s.ambitos||[]).forEach(a=>(a.requisitos||[]).forEach(r=>{
+    if(!r.header && !String(r.text||'').trim()) vacios.push(`${k}:${r.n}`); }))));
+  ok('Sin requisitos de texto vacío', vacios.length===0, vacios.slice(0,5).join(', ')||'todos con texto');
+
+  // 5 · render de TODOS los ámbitos sin excepción
+  const normaPrev=activeNormaId, ambPrev=currentAmbitoId, recPrev=currentRecintoId;
+  let fallos=[], render=0;
+  try{
+    normas.forEach(k=>{
+      switchNorma(k);
+      Object.keys(AMBITOS_INDEX).forEach(aid=>{
+        try{ openAmbito(aid); render++; }
+        catch(e){ fallos.push(`${k}:${aid}: ${e.message}`); }
+      });
+    });
+  }catch(e){ fallos.push('fatal: '+e.message); }
+  ok('Render de todos los ámbitos', fallos.length===0, `${render} ámbitos renderizados${fallos.length?' · fallos: '+fallos.slice(0,3).join(' | '):''}`);
+
+  // 6 · matriz recinto→pauta apunta a ámbitos existentes
+  const idsAC=new Set(); normas.forEach(k=>(NORMAS[k].data.secciones||[]).forEach(s=>(s.ambitos||[]).forEach(a=>idsAC.add(a.id))));
+  let prRotas=[];
+  Object.entries(PR).forEach(([rid,v])=>(v.p||[]).forEach(aid=>{ if(!idsAC.has(aid)) prRotas.push(`${rid}→${aid}`); }));
+  ok('Matriz recinto→pauta consistente', prRotas.length===0, prRotas.length?`${prRotas.length} vínculos rotos: ${prRotas.slice(0,3).join(', ')}`:`${Object.keys(PR).length} recintos vinculados`);
+
+  // 7 · alcances producen claves distintas
+  const rid=Object.keys(PR)[0];
+  if(rid){
+    switchNorma('ac');
+    const aid=(PR[rid].p||[])[0];
+    if(aid && AMBITOS_INDEX[aid]){
+      openAmbito(aid); setCurrentRecinto(rid);
+      const k1=scopeKey(); setScope('servicio'); const k2=scopeKey();
+      setScope('unidad'); const k3=scopeKey();
+      // navegar unidades solo aporta claves nuevas si el recinto tiene N>1
+      const N0=unitCount(rid); addUnit(); const k4=scopeKey(); setUnitCount(rid, N0);
+      setScope('recinto'); currentUnit=1;
+      const distintas=new Set([k1,k2,k3,k4]).size===4;
+      ok('Alcances con almacenamiento independiente', distintas, [k1,k2,k3,k4].join(' · '));
+    }
+  }
+
+  // 8 · esquema sellado
+  let sv=null; try{ sv=localStorage.getItem(SCHEMA_KEY); }catch(e){}
+  ok('Versión de esquema sellada', String(sv)===String(SCHEMA_VERSION), 'v'+sv+' (esperada v'+SCHEMA_VERSION+')');
+
+  // 9 · almacenamiento con holgura
+  ok('Almacenamiento bajo el 85%', pctAlmacenamiento()<85, pctAlmacenamiento()+'% usado');
+
+  // restaurar contexto
+  try{ switchNorma(normaPrev); if(ambPrev&&AMBITOS_INDEX[ambPrev]){ openAmbito(ambPrev); if(recPrev) setCurrentRecinto(recPrev); } }catch(e){}
+
+  const fail=R.filter(x=>x.nivel==='FALLA').length;
+  const avisos=R.filter(x=>x.nivel==='AVISO').length;
+  document.body.innerHTML=`<div style="font-family:'Segoe UI',sans-serif;max-width:900px;margin:32px auto;padding:0 18px">
+    <h1 style="font-size:20px;color:${fail?'#dc2626':'#16a34a'}">${fail?'✗':'✓'} Selftest · Autorización Sanitaria HDS</h1>
+    <p style="font-size:12.5px;color:#475569">${R.length-fail-avisos} OK · ${avisos} aviso(s) · ${fail} falla(s) · esquema v${SCHEMA_VERSION} · ${new Date().toLocaleString('es-CL')}${fail?'':' · <b style="color:#16a34a">apto para publicar</b>'}</p>
+    <table style="width:100%;border-collapse:collapse;font-size:12.5px;margin-top:12px">
+      <thead><tr><th style="text-align:left;background:#e6f1fb;color:#0c447c;padding:6px 9px;border:1px solid #cfe0f2">Comprobación</th>
+      <th style="text-align:left;background:#e6f1fb;color:#0c447c;padding:6px 9px;border:1px solid #cfe0f2">Resultado</th>
+      <th style="text-align:left;background:#e6f1fb;color:#0c447c;padding:6px 9px;border:1px solid #cfe0f2">Detalle</th></tr></thead>
+      <tbody>${R.map(x=>{const c=x.nivel==='OK'?'#16a34a':x.nivel==='AVISO'?'#a16207':'#dc2626';
+        return `<tr><td style="padding:5px 9px;border:1px solid #e2e8f0">${x.n}</td>
+        <td style="padding:5px 9px;border:1px solid #e2e8f0;font-weight:800;color:${c}">${x.nivel}</td>
+        <td style="padding:5px 9px;border:1px solid #e2e8f0;color:#475569">${escapeHtml(String(x.d))}</td></tr>`;}).join('')}</tbody></table>
+    <p style="margin-top:16px"><a href="16.AutorizacionSanitaria.html" style="color:#1d6db8;font-weight:700">← Volver a la plataforma</a></p></div>`;
+  console.info('[AS selftest]', R);
+  return R;
+}
 
 /* Precarga desde Atlas: abre la pauta del recinto y lo deja seleccionado.
    Sin parámetros → flujo normal (panel). */

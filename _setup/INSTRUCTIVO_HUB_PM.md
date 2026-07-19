@@ -1,7 +1,7 @@
 # HUB Puesta en Marcha (HUB-PM) — Instructivo
 
 HUB de **acceso controlado** para el equipo de Puesta en Marcha del Nuevo HDS.
-URL (cuando esté publicado): `https://matiipinto.github.io/minihub-hds-pm/`
+URL (cuando esté publicado): `https://matiipinto.github.io/hds-hub-pm/`
 
 **Plataformas (6, solo consulta):** Atlas (versión web), QuirurBox, EquiBox,
 Dotación, Autorización Sanitaria, Cartera de Servicios.
@@ -42,10 +42,10 @@ Dotación, Autorización Sanitaria, Cartera de Servicios.
 
 ## Publicación inicial (una vez)
 
-1. Crear el repo **público** `minihub-hds-pm` en github.com/MatiiPinto (sin README).
+1. Crear el repo **público** `hds-hub-pm` en github.com/MatiiPinto (sin README).
 2. En GitHub: Settings → Pages → Branch `main` / root.
 3. Local (ya hecho por Claude si ves .git en esta carpeta):
-   `git init` + `git remote add origin https://github.com/MatiiPinto/minihub-hds-pm.git`
+   `git init` + `git remote add origin https://github.com/MatiiPinto/hds-hub-pm.git`
 4. `python3 _DEV/deploy_web_pm.py` → commit + push automático.
 
 ## ⚠ Límite honesto de seguridad
