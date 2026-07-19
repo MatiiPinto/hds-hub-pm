@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>Pautas por Recinto — HUB PM · HDS</title>
+<link rel="icon" type="image/png" href="Logos HUB-HDS/0.HUB-HDS.png">
+<script src="pm_config.js"></script>
+<script src="pm_gate.js"></script>
+<style>
+:root{--navy2:#1D2D5B;--cyan:#29aae2;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f0f4fa;color:#1e293b;min-height:100vh;}
+header{background:var(--navy2);border-bottom:1.5px solid rgba(41,170,226,.25);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:62px;position:sticky;top:0;z-index:100;}
+.hd-left{display:flex;align-items:center;gap:14px;}
+.hd-back{display:flex;align-items:center;gap:6px;color:#cbe9f8;text-decoration:none;font-size:.78rem;font-weight:600;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:6px 12px;}
+.hd-back:hover{background:rgba(255,255,255,.16);}
+.hd-title{color:var(--cyan);font-size:.8rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
+.hd-sub{color:rgba(255,255,255,.4);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;}
+.hd-user{color:#cbe9f8;font-size:.72rem;background:rgba(41,170,226,.14);border:1px solid rgba(41,170,226,.35);border-radius:999px;padding:4px 11px;}
+main{max-width:1100px;margin:0 auto;padding:22px 16px 80px;}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+.kpi{background:#fff;border:1px solid rgba(29,45,91,.12);border-radius:11px;padding:12px 14px;text-align:center;}
+.kpi b{display:block;font-size:1.5rem;}
+.kpi span{font-size:.66rem;color:#64748b;text-transform:uppercase;letter-spacing:.06em;}
+.filtros{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:8px;margin-bottom:12px;}
+.filtros input,.filtros select{border:1px solid #cbd5e1;border-radius:8px;padding:8px 10px;font-size:.82rem;background:#fff;font-family:inherit;}
+.card{background:#fff;border:1px solid rgba(29,45,91,.12);border-radius:11px;padding:12px 15px;margin-bottom:9px;}
+.card .top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+.card h4{font-size:.9rem;}
+.card .meta{font-size:.72rem;color:#94a3b8;margin-top:2px;}
+.est{border-radius:999px;padding:3px 11px;font-size:.68rem;font-weight:700;white-space:nowrap;}
+.est-validada{background:#d1fae5;color:#065f46;} .est-sugerida{background:#fef3c7;color:#92400e;}
+.est-no{background:#f1f5f9;color:#64748b;} .est-sin{background:#fee2e2;color:#b91c1c;}
+.ambs{margin-top:7px;display:flex;flex-direction:column;gap:3px;}
+.amb{font-size:.74rem;color:#475569;background:#f8fafc;border:1px solid #eef2f7;border-radius:7px;padding:4px 9px;}
+.abrir{display:inline-block;margin-top:8px;font-size:.76rem;color:#2563eb;text-decoration:none;font-weight:600;}
+.nota{font-size:.74rem;color:#94a3b8;text-align:center;padding:12px;}
+.sec-t{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--navy2);font-weight:700;margin:18px 0 10px;display:flex;align-items:center;gap:10px;}
+.sec-t::after{content:'';flex:1;height:1px;background:rgba(29,45,91,.12);}
+@media(max-width:700px){.kpis{grid-template-columns:repeat(2,1fr);}.filtros{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hd-left">
+    <a class="hd-back" href="index.html">&#8592; HUB PM</a>
+    <div>
+      <div class="hd-title">Pautas por Recinto</div>
+      <div class="hd-sub">Autorización Sanitaria · listas para aplicar</div>
+    </div>
+  </div>
+  <span class="hd-user" id="hd-user">—</span>
+</header>
+
+<main>
+  <div class="kpis">
+    <div class="kpi" style="border-bottom:3px solid #16a34a"><b id="k-val">—</b><span>🟢 Validadas (listas)</span></div>
+    <div class="kpi" style="border-bottom:3px solid #d97706"><b id="k-sug">—</b><span>🟠 Sugeridas (por validar)</span></div>
+    <div class="kpi" style="border-bottom:3px solid #dc2626"><b id="k-sin">—</b><span>🔴 Sin pauta</span></div>
+    <div class="kpi" style="border-bottom:3px solid #94a3b8"><b id="k-no">—</b><span>⚪ No corresponde</span></div>
+  </div>
+
+  <div class="filtros">
+    <input id="f-q" type="text" placeholder="Buscar recinto, código o servicio…" oninput="pintar()">
+    <select id="f-est" onchange="pintar()">
+      <option value="">Estado: todos</option>
+      <option value="validada">🟢 Validadas</option>
+      <option value="sugerida">🟠 Sugeridas</option>
+      <option value="sin">🔴 Sin pauta</option>
+      <option value="no">⚪ No corresponde</option>
+    </select>
+    <select id="f-srv" onchange="pintar()"><option value="">Servicio: todos</option></select>
+    <select id="f-piso" onchange="pintar()"><option value="">Piso: todos</option></select>
+  </div>
+
+  <div id="srv-pautas"></div>
+  <div class="sec-t">Recintos</div>
+  <div id="lista"></div>
+  <div class="nota" id="nota"></div>
+</main>
+
+<script src="SHARED_DATA/recintos.js"></script>
+<script src="SHARED_DATA/pautas_recintos.js"></script>
+<script src="SHARED_DATA/pauta_labels.js"></script>
+<script>
+const SES = pmSession();
+document.getElementById('hd-user').textContent = '👤 ' + (SES ? SES.u : '');
+
+const RECS  = (window.SHARED_RECINTOS && SHARED_RECINTOS.recintos) || [];
+const MAT   = window.SHARED_PAUTAS_RECINTOS || {};
+const ASIG  = MAT.asignaciones || {};
+const NOCOR = new Set(MAT.no_corresponde || []);
+const SRV_P = MAT.asignaciones_servicio || {};
+const PL    = window.PAUTA_LABELS || {};
+const NORMA_NOMBRE = {ac:'Atención Cerrada', cm:'Cirugía Menor', hp:'Hosp. Psiquiátrica', di:'Diálisis',
+                      lc:'Laboratorio', im:'Imagenología', mn:'Medicina Nuclear', qm:'Quimioterapia', fa:'Farmacia'};
+
+function lbl(aid){
+  const m = PL[aid];
+  if (m) return (m.normaLabel||'') + ' · ' + (m.name||aid) + (m.seccion ? ' · ' + m.seccion : '');
+  // fallback legible desde el id: norma_seccion__tipo__slug
+  const norma = NORMA_NOMBRE[aid.split('_')[0]] || aid.split('_')[0].toUpperCase();
+  const partes = aid.split('__');
+  const slug = (partes[partes.length-1]||'').replace(/-/g,' ');
+  return norma + ' · ' + slug;
+}
+function estadoDe(rid){
+  if (NOCOR.has(rid)) return 'no';
+  const a = ASIG[rid];
+  if (a && a.p && a.p.length) return a.regla === 'manual' ? 'validada' : 'sugerida';
+  return 'sin';
+}
+const EST_TXT = {validada:'🟢 Validada · lista para aplicar', sugerida:'🟠 Sugerida · por validar',
+                 sin:'🔴 Sin pauta', no:'⚪ No corresponde'};
+
+// KPIs + selectores
+(function init(){
+  let v=0,s=0,n=0,g=0;
+  RECS.forEach(r=>{ const e=estadoDe(r.id);
+    if(e==='validada')v++; else if(e==='sugerida')s++; else if(e==='no')g++; else n++; });
+  document.getElementById('k-val').textContent = v.toLocaleString('es-CL');
+  document.getElementById('k-sug').textContent = s.toLocaleString('es-CL');
+  document.getElementById('k-sin').textContent = n.toLocaleString('es-CL');
+  document.getElementById('k-no').textContent  = g.toLocaleString('es-CL');
+  const servicios = [...new Set(RECS.map(r=>r.servicio_name).filter(Boolean))].sort();
+  document.getElementById('f-srv').innerHTML = '<option value="">Servicio: todos</option>' +
+    servicios.map(x=>`<option>${x}</option>`).join('');
+  const pisos = [...new Set(RECS.map(r=>r.piso).filter(Boolean))];
+  document.getElementById('f-piso').innerHTML = '<option value="">Piso: todos</option>' +
+    pisos.map(x=>`<option>${x}</option>`).join('');
+  // Pautas a nivel de SERVICIO completo (si la matriz publicada las trae)
+  const srvKeys = Object.keys(SRV_P);
+  if (srvKeys.length){
+    const bySvc = {}; RECS.forEach(r=>{ if(r.servicio_code!=null) bySvc['CAD-'+r.servicio_code]=r.servicio_name; });
+    document.getElementById('srv-pautas').innerHTML =
+      '<div class="sec-t">Pautas de servicio completo</div>' +
+      srvKeys.map(aid=>{
+        const m = SRV_P[aid]; if(!m || m.estado==='no_corresponde') return '';
+        const svcName = bySvc[aid.replace(/^P\d+-/,'')] || aid;
+        return `<div class="card"><div class="top"><div><h4>🏥 ${svcName}</h4></div>`+
+          `<span class="est est-validada">🟢 Validada</span></div>`+
+          `<div class="ambs">${(m.p||[]).map(a=>`<div class="amb">${lbl(a)}</div>`).join('')}</div></div>`;
+      }).join('');
+  }
+  pintar();
+})();
+
+function pintar(){
+  const q    = document.getElementById('f-q').value.trim().toLowerCase();
+  const fEst = document.getElementById('f-est').value;
+  const fSrv = document.getElementById('f-srv').value;
+  const fPiso= document.getElementById('f-piso').value;
+  const MAXR = 200;
+  let hits = 0, html = '';
+  for (const r of RECS){
+    const e = estadoDe(r.id);
+    if (fEst && e !== fEst) continue;
+    if (fSrv && r.servicio_name !== fSrv) continue;
+    if (fPiso && r.piso !== fPiso) continue;
+    if (q && ((r.name||'')+' '+(r.code||'')+' '+(r.servicio_name||'')).toLowerCase().indexOf(q)===-1) continue;
+    hits++;
+    if (hits > MAXR) continue;
+    const a = ASIG[r.id];
+    const ambs = (a && a.p || []).map(x=>`<div class="amb">${lbl(x)}</div>`).join('');
+    const abrir = (a && a.p && a.p.length)
+      ? `<a class="abrir" href="16.AutorizacionSanitaria.html?recinto=${encodeURIComponent(r.id)}&pauta=${encodeURIComponent(a.p[0])}">📋 Abrir la pauta de este recinto →</a>` : '';
+    html += `<div class="card"><div class="top">`+
+      `<div><h4>${r.name||r.id}</h4><div class="meta">${r.code||''} · ${r.piso||''} · ${r.servicio_name||''}${r.area_m2?(' · '+r.area_m2+' m²'):''}</div></div>`+
+      `<span class="est est-${e}">${EST_TXT[e]}</span></div>`+
+      (ambs?`<div class="ambs">${ambs}</div>`:'')+ abrir + `</div>`;
+  }
+  document.getElementById('lista').innerHTML = html ||
+    '<div class="nota">Sin resultados con estos filtros.</div>';
+  document.getElementById('nota').textContent = hits > MAXR
+    ? `Mostrando ${MAXR} de ${hits.toLocaleString('es-CL')} recintos — afina los filtros para ver el resto.`
+    : (hits ? `${hits.toLocaleString('es-CL')} recinto(s).` : '');
+}
+</script>
+</body>
+</html>

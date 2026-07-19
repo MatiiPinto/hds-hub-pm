@@ -15,6 +15,10 @@
 // ════════════════════════════════════════════════════════════════════════════
 window.PM_CONFIG = {
   LOG_URL: 'https://script.google.com/macros/s/AKfycbx-v6nDDB2YLNszxh3qg5eWJcxtKrBTlzKK1f91OQwV1NKAm6zKBQ6J_fBJvL9jrEA_/exec', /*__PM_LOG_URL__*/
+  // Armador de Pautas (etapa 2): backend Apps Script propio (ver _setup/Code_pautas.gs)
+  PAUTAS_URL: '', /*__PM_PAUTAS_URL__*/
+  // usuarios con rol asignador (pueden ARMAR pautas; el resto solo consulta)
+  ASIGNADORES: ['mpinto', 'lperez', 'csepulveda'],
   SESSION_HOURS: 12,
   USERS: {
     // usuario : sha256("usuario:clave")
