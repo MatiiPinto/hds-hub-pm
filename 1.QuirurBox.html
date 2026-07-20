@@ -565,6 +565,7 @@ table.excel-tbl tr:nth-child(even) td{background:#f8fafc}
 <script src="data/quirurbox_adjudicado.js"></script>
 <script src="data/quirurbox_boxes.js"></script>
 <script src="data/quirurbox_catalogos.js"></script>
+<script src="data/quirurbox_iconos.js"></script>
 <script>
 const BOXES = window.QUIRURBOX_BOXES;
 // ── Totales del header (Familias · Tipologías · Cajas · Instrumental) ──
@@ -736,82 +737,12 @@ function abbrevBrand(raw) {
   return raw.replace(/\n/g, ' / ').replace(/\s+/g,' ').trim();
 }
 
-// ── SVG ILLUSTRATIONS (card banners – white stroke on colored bg) ───
-function illus(paths, size) {
-  return `<svg width="${size}" height="${size}" viewBox="0 0 64 64" fill="none" class="instr-illustration" style="opacity:.92">${paths}</svg>`;
-}
-// Scalpel – Cirugía General
-function svgSurgerySet(s){ return illus(`
-  <path d="M14 50 L44 14" stroke="rgba(255,255,255,.9)" stroke-width="3" stroke-linecap="round"/>
-  <path d="M44 14 L52 11 L54 19 L50 21 L36 27 L34 21Z" stroke="rgba(255,255,255,.85)" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M14 50 Q18 46 19 50 Q20 54 16 55 Q12 54 14 50Z" stroke="rgba(255,255,255,.8)" stroke-width="1.8"/>
-`,s); }
-// Bone – Traumatología
-function svgBone(s){ return illus(`
-  <path d="M18 46 L46 18" stroke="rgba(255,255,255,.9)" stroke-width="3" stroke-linecap="round"/>
-  <circle cx="14" cy="50" r="7" stroke="rgba(255,255,255,.85)" stroke-width="2"/>
-  <circle cx="50" cy="14" r="7" stroke="rgba(255,255,255,.85)" stroke-width="2"/>
-  <circle cx="14" cy="50" r="2.8" fill="rgba(255,255,255,.7)"/>
-  <circle cx="50" cy="14" r="2.8" fill="rgba(255,255,255,.7)"/>
-`,s); }
-// Tooth – Dental
-function svgDental(s){ return illus(`
-  <path d="M16 20 Q14 13 20 10 Q25 8 32 13 Q39 8 44 10 Q50 13 48 20 L46 36 Q44 46 41 48 Q38 52 36 48 L32 40 L28 48 Q26 52 23 48 Q20 46 18 36 Z" stroke="rgba(255,255,255,.88)" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M20 20 Q26 17 32 20 Q38 17 44 20" stroke="rgba(255,255,255,.5)" stroke-width="1.4" stroke-linecap="round"/>
-`,s); }
-// Trocar – Laparoscopía
-function svgLaparo(s){ return illus(`
-  <line x1="50" y1="12" x2="16" y2="48" stroke="rgba(255,255,255,.9)" stroke-width="3" stroke-linecap="round"/>
-  <path d="M50 12 L58 10 L58 18 L54 20Z" stroke="rgba(255,255,255,.85)" stroke-width="1.8" stroke-linejoin="round"/>
-  <circle cx="13" cy="51" r="5.5" stroke="rgba(255,255,255,.8)" stroke-width="2"/>
-  <line x1="16" y1="48" x2="18" y2="38" stroke="rgba(255,255,255,.7)" stroke-width="1.8" stroke-linecap="round"/>
-  <path d="M13 30 Q18 30 18 38" stroke="rgba(255,255,255,.7)" stroke-width="1.8" stroke-linecap="round"/>
-  <rect x="9" y="24" width="8" height="8" rx="2" stroke="rgba(255,255,255,.65)" stroke-width="1.6"/>
-`,s); }
-// Eye – Oftalmología
-function svgEye(s){ return illus(`
-  <path d="M4 32 Q16 14 32 14 Q48 14 60 32 Q48 50 32 50 Q16 50 4 32Z" stroke="rgba(255,255,255,.85)" stroke-width="2" stroke-linejoin="round"/>
-  <circle cx="32" cy="32" r="10" stroke="rgba(255,255,255,.8)" stroke-width="1.8"/>
-  <circle cx="32" cy="32" r="3.5" fill="rgba(255,255,255,.9)"/>
-  <line x1="47" y1="10" x2="36" y2="26" stroke="rgba(255,255,255,.9)" stroke-width="2.2" stroke-linecap="round"/>
-  <line x1="53" y1="10" x2="41" y2="28" stroke="rgba(255,255,255,.9)" stroke-width="2.2" stroke-linecap="round"/>
-`,s); }
-// Ear – ORL
-function svgORL(s){ return illus(`
-  <path d="M26 8 Q14 8 12 22 Q10 36 18 44 Q22 48 22 54 L22 56 Q22 58 28 58 L34 58 Q38 58 38 56 L38 52" stroke="rgba(255,255,255,.85)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M38 26 Q46 24 48 32 Q50 42 42 46 Q38 48 38 44" stroke="rgba(255,255,255,.8)" stroke-width="2" stroke-linecap="round"/>
-  <path d="M26 8 Q40 6 42 20 Q44 28 40 30" stroke="rgba(255,255,255,.7)" stroke-width="2" stroke-linecap="round"/>
-`,s); }
-// Kidneys – Urología
-function svgUrology(s){ return illus(`
-  <path d="M16 12 Q8 18 8 28 Q8 42 16 48 Q22 52 24 46 Q26 40 25 32 Q24 20 19 12 Q17 9 16 12Z" stroke="rgba(255,255,255,.85)" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M48 12 Q56 18 56 28 Q56 42 48 48 Q42 52 40 46 Q38 40 39 32 Q40 20 45 12 Q47 9 48 12Z" stroke="rgba(255,255,255,.85)" stroke-width="2" stroke-linejoin="round"/>
-  <path d="M24 44 Q32 48 40 44" stroke="rgba(255,255,255,.6)" stroke-width="1.6" stroke-linecap="round"/>
-  <ellipse cx="32" cy="54" rx="10" ry="5" stroke="rgba(255,255,255,.6)" stroke-width="1.6"/>
-`,s); }
-// Generic tray
-function svgTray(s){ return illus(`
-  <rect x="8" y="38" width="48" height="16" rx="4" stroke="rgba(255,255,255,.85)" stroke-width="2"/>
-  <line x1="18" y1="38" x2="18" y2="22" stroke="rgba(255,255,255,.8)" stroke-width="2.5" stroke-linecap="round"/>
-  <line x1="32" y1="38" x2="32" y2="18" stroke="rgba(255,255,255,.8)" stroke-width="2.5" stroke-linecap="round"/>
-  <line x1="46" y1="38" x2="46" y2="22" stroke="rgba(255,255,255,.8)" stroke-width="2.5" stroke-linecap="round"/>
-  <path d="M14 22 L22 22" stroke="rgba(255,255,255,.6)" stroke-width="1.8" stroke-linecap="round"/>
-  <path d="M28 18 L36 18" stroke="rgba(255,255,255,.6)" stroke-width="1.8" stroke-linecap="round"/>
-  <path d="M42 22 L50 22" stroke="rgba(255,255,255,.6)" stroke-width="1.8" stroke-linecap="round"/>
-`,s); }
-function svgLaryngo(s){ return svgORL(s); }
-
+// ── ILUSTRACIONES DE CAJAS (data/quirurbox_iconos.js) ───────────────
+// Pictograma por NOMBRE de caja (18 motivos, reglas de keywords ajustadas
+// a la matriz HDS) en duotono blanco sobre el gradiente de la especialidad.
 function getIllustration(box, size) {
-  const sp=box.specialty||'', nm=box.name.toLowerCase();
-  if(sp.includes('Traumatología'))  return svgBone(size);
-  if(sp.includes('Dental'))         return svgDental(size);
-  if(sp.includes('Laparoscopía'))   return svgLaparo(size);
-  if(sp.includes('Oftalmología'))   return svgEye(size);
-  if(sp.includes('Otorrin'))        return svgORL(size);
-  if(sp.includes('Urología'))       return svgUrology(size);
-  if(nm.includes('bandeja')||nm.includes('mosquito')) return svgTray(size);
-  if(nm.includes('laringoscop'))    return svgORL(size);
-  return svgSurgerySet(size);
+  if (!window.QuirurBox) return '';
+  return QuirurBox.icono(box.name, { size: size });
 }
 
 // ── PIECE PARSER ──────────────────────────────────────────
@@ -1814,7 +1745,7 @@ document.addEventListener('keydown', e => {
 });
 
 </script>
-  <span style="font-size:0.63rem;color:rgba(255,255,255,0.35);letter-spacing:0.06em;text-transform:uppercase;">Ingeniería Biomédica Hospitalaria · INGER-HDS</span>
+  <span style="font-size:0.63rem;color:rgba(255,255,255,0.35);letter-spacing:0.06em;text-transform:uppercase;">Matías Pinto · Ingeniero Biomédico · Puesta en Marcha Nuevo HDS</span>
 </footer>
 <script>
 // ── Botón "Recepción y revisión": muestra/oculta los KPIs + cronograma ──
@@ -1877,5 +1808,6 @@ function exportExcelCSV(){
 }
 document.addEventListener('keydown',e=>{ if(e.key==='Escape') closeExcel(); });
 </script>
+<script src="hub-home.js"></script>
 </body>
 </html>

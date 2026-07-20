@@ -1868,7 +1868,8 @@ function exportarPautaPDF(){
   ${ast.obs?`<h2>Observaciones generales</h2><p>${escapeHtml(ast.obs)}</p>`:''}
   <div class="firma"><div>Inspector: ${escapeHtml(ident.inspector||'')}</div><div>Responsable del servicio</div></div>
   <script>window.onload=()=>setTimeout(()=>window.print(),300);<\/script>
-  </body></html>`;
+  <script src="hub-home.js"></script>
+</body></html>`;
   const w = window.open('', '_blank');
   if(!w){ alert('El navegador bloqueó la ventana. Permite pop-ups para exportar.'); return; }
   w.document.write(html); w.document.close();

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<script src="pm_config.js"></script>
+<script src="pm_gate.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interés Web · HUB Público — HDS</title>
+<link rel="icon" type="image/x-icon" href="Logos%20HUB-HDS/favicon-hds.ico">
+<script src="assets/vendor/chart-4.4.0.umd.min.js"></script>
+<style>
+:root{--navy:#264281;--navy2:#1D2D5B;--cyan:#29aae2;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:#f0f4fa;color:#1e293b;min-height:100vh;}
+header{background:linear-gradient(90deg,var(--navy2),var(--navy));color:#fff;padding:0 26px;display:flex;align-items:center;justify-content:space-between;height:62px;position:sticky;top:0;z-index:50;box-shadow:0 2px 14px rgba(0,0,0,.25);}
+.hd-left{display:flex;align-items:center;gap:14px;}
+.hd-back{display:flex;align-items:center;gap:6px;color:#cbe9f8;text-decoration:none;font-size:.78rem;font-weight:600;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:6px 12px;}
+.hd-back:hover{background:rgba(255,255,255,.16);}
+.hd-title{color:var(--cyan);font-size:.8rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;}
+.hd-sub{color:rgba(255,255,255,.4);font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;}
+.hd-right{display:flex;align-items:center;gap:10px;font-size:.75rem;}
+.hd-right select{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;border-radius:7px;padding:5px 8px;font-size:.75rem;}
+.hd-right select option{color:#1e293b;}
+main{max-width:1150px;margin:0 auto;padding:22px 16px 70px;}
+.aviso{background:#fffbeb;border:1px solid #fcd34d;color:#92400e;border-radius:10px;padding:12px 16px;font-size:.8rem;margin-bottom:16px;line-height:1.5;}
+.aviso code{background:#fef3c7;padding:1px 5px;border-radius:4px;}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:16px;}
+.kpi{background:#fff;border:1px solid rgba(29,45,91,.12);border-radius:11px;padding:13px 10px;text-align:center;}
+.kpi b{display:block;font-size:1.45rem;color:var(--navy2);}
+.kpi span{font-size:.62rem;color:#64748b;text-transform:uppercase;letter-spacing:.05em;}
+.grid2{display:grid;grid-template-columns:3fr 2fr;gap:12px;margin-bottom:12px;}
+.grid2b{display:grid;grid-template-columns:2fr 3fr;gap:12px;margin-bottom:12px;}
+.card{background:#fff;border:1px solid rgba(29,45,91,.12);border-radius:11px;padding:14px 16px;}
+.card h3{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--navy2);margin-bottom:10px;}
+.tema{display:flex;align-items:center;gap:8px;font-size:.76rem;padding:4px 0;border-bottom:1px dashed #f1f5f9;}
+.tema .bar{height:8px;background:var(--cyan);border-radius:4px;min-width:2px;}
+.tema .n{color:#64748b;min-width:28px;text-align:right;font-weight:700;}
+.tema .t{flex:1;color:#334155;}
+.pie{font-size:.68rem;color:#94a3b8;text-align:center;margin-top:14px;}
+@media(max-width:800px){.kpis{grid-template-columns:repeat(2,1fr);}.grid2,.grid2b{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hd-left">
+    <a class="hd-back" href="index.html">&#8592; HUB</a>
+    <div>
+      <div class="hd-title">Interés Web · HUB Público</div>
+      <div class="hd-sub">Reportería de visitas, permanencia y temas · datos anónimos</div>
+    </div>
+  </div>
+  <div class="hd-right">
+    <label>Período</label>
+    <select id="dias" onchange="cargar()">
+      <option value="30">30 días</option>
+      <option value="90" selected>90 días</option>
+      <option value="180">180 días</option>
+      <option value="365">1 año</option>
+    </select>
+    <span id="estado" style="color:rgba(255,255,255,.5)">cargando…</span>
+  </div>
+</header>
+
+<main>
+  <div id="aviso" class="aviso" style="display:none"></div>
+
+  <div class="kpis">
+    <div class="kpi"><b id="k-visitantes">—</b><span>👤 Visitantes únicos</span></div>
+    <div class="kpi"><b id="k-sesiones">—</b><span>🔁 Sesiones</span></div>
+    <div class="kpi"><b id="k-visitas">—</b><span>📄 Páginas vistas</span></div>
+    <div class="kpi"><b id="k-tiempo">—</b><span>⏱ Permanencia media</span></div>
+    <div class="kpi"><b id="k-movil">—</b><span>📱 Desde móvil</span></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card"><h3>📈 Visitas por día</h3><canvas id="ch-dias" height="130"></canvas></div>
+    <div class="card"><h3>📚 Visitas por plataforma</h3><canvas id="ch-plat" height="170"></canvas></div>
+  </div>
+
+  <div class="grid2b">
+    <div class="card"><h3>💻 Dispositivos</h3><canvas id="ch-disp" height="170"></canvas></div>
+    <div class="card"><h3>🔥 Temas más consultados</h3><div id="temas"></div></div>
+  </div>
+
+  <div class="card"><h3>⏱ Permanencia media por plataforma</h3><canvas id="ch-tiempo" height="90"></canvas></div>
+
+  <p class="pie">Fuente: telemetría anónima del HUB Público (sin IP ni datos personales) · hoja METRICAS · Se excluyen los latidos del conteo de páginas.</p>
+</main>
+
+<script>
+const METRICS_URL = 'https://script.google.com/macros/s/AKfycbxw6n_702jMlCGYBC6pZ6irM1PlZnj_R9WBH6YnODl3w-3NVQM2rU1o23Ql856oAawf/exec';
+const NOMBRE_PLAT = {
+  'index.html':'HUB (portada)', '1.QuirurBox.html':'QuirurBox', '2.EquiBox.html':'EquiBox',
+  '3.QuiroBox.html':'QuiroBox', '7.PAPS.html':'PAPS', '25.CorreoNeumatico.html':'Correo Neumático',
+  '26.ManualBuenasPracticas.html':'Buenas Prácticas', 'equibox_directorio.html':'EquiBox Directorio'
+};
+let charts = [];
+
+// Normaliza fechas: el Apps Script puede devolver "yyyy-MM-dd" o el toString
+// crudo de un Date de Google ("Sat Jul 18 2026 00:00:00 GMT-0400 (…)").
+function normFecha(f){
+  if (/^\d{4}-\d{2}-\d{2}$/.test(f)) return f;
+  const d = new Date(f);
+  return isNaN(d) ? String(f)
+    : d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+function fmtMin(seg){
+  if (!seg) return '0 min';
+  const m = Math.floor(seg/60), s = Math.round(seg%60);
+  return m ? (m + ' min ' + (s? s+' s':'')) : (s + ' s');
+}
+
+async function cargar(){
+  const dias = document.getElementById('dias').value;
+  const est = document.getElementById('estado');
+  est.textContent = 'cargando…';
+  let rows;
+  try {
+    const r = await fetch(METRICS_URL + '?list=1&dias=' + dias);
+    const t = await r.text();
+    rows = JSON.parse(t);
+    if (!Array.isArray(rows)) throw new Error('no-array');
+  } catch(e){
+    est.textContent = 'sin conexión';
+    document.getElementById('aviso').style.display = 'block';
+    document.getElementById('aviso').innerHTML =
+      '⚠ No pude leer los datos. Si aún no actualizaste el Apps Script de métricas con el endpoint de lectura: ' +
+      'abre la planilla METRICAS → Extensiones → Apps Script → pega la versión nueva de <code>Code_metricas.gs</code> ' +
+      '(carpeta <code>WEB_DEPLOY/hds-hub-publico/_setup/</code>) → <b>Implementar → Administrar implementaciones → ✏ → Versión: Nueva → Implementar</b> ' +
+      '(así la URL se mantiene). Detalle: ' + e.message;
+    return;
+  }
+  document.getElementById('aviso').style.display = 'none';
+  est.textContent = rows.length.toLocaleString('es-CL') + ' eventos';
+  charts.forEach(c=>c.destroy()); charts = [];
+
+  const visitas  = rows.filter(r=>r.e==='visita');
+  const temasEv  = rows.filter(r=>['tab','subtema','ficha','clic_tarjeta'].includes(r.e));
+  const unicos   = new Set(rows.map(r=>r.v)).size;
+  const sesiones = new Set(rows.map(r=>r.s)).size;
+
+  // permanencia por sesión (y por plataforma): máx entre 'salida' y latidos*30
+  const ses = {};
+  rows.forEach(r=>{
+    const k = r.s + '|' + r.p;
+    ses[k] = ses[k] || {lat:0, sal:0, p:r.p};
+    if (r.e==='latido') ses[k].lat = Math.max(ses[k].lat, (+r.d||0));
+    if (r.e==='salida') ses[k].sal = Math.max(ses[k].sal, (+r.d||0));
+  });
+  const tiempos = Object.values(ses).map(x=>({p:x.p, seg:Math.max(x.lat, x.sal)})).filter(x=>x.seg>0);
+  const tTotal  = tiempos.reduce((a,b)=>a+b.seg,0);
+  const tProm   = tiempos.length ? tTotal/tiempos.length : 0;
+  const movil   = visitas.length ? Math.round(100*visitas.filter(r=>r.disp==='movil').length/visitas.length) : 0;
+
+  document.getElementById('k-visitantes').textContent = unicos.toLocaleString('es-CL');
+  document.getElementById('k-sesiones').textContent   = sesiones.toLocaleString('es-CL');
+  document.getElementById('k-visitas').textContent    = visitas.length.toLocaleString('es-CL');
+  document.getElementById('k-tiempo').textContent     = fmtMin(tProm);
+  document.getElementById('k-movil').textContent      = movil + '%';
+
+  // serie por día
+  const porDia = {};
+  visitas.forEach(r=>{ const f=normFecha(r.f); porDia[f]=(porDia[f]||0)+1; });
+  const diasOrd = Object.keys(porDia).sort();
+  charts.push(new Chart(document.getElementById('ch-dias'), {
+    type:'line',
+    data:{labels:diasOrd.map(d=>d.slice(5)), datasets:[{label:'Visitas', data:diasOrd.map(d=>porDia[d]),
+      borderColor:'#29aae2', backgroundColor:'rgba(41,170,226,.15)', fill:true, tension:.3}]},
+    options:{plugins:{legend:{display:false}}, scales:{y:{beginAtZero:true,ticks:{precision:0}}}}
+  }));
+
+  // por plataforma
+  const porPlat = {};
+  visitas.forEach(r=>{ const n=NOMBRE_PLAT[r.p]||r.p; porPlat[n]=(porPlat[n]||0)+1; });
+  const platOrd = Object.entries(porPlat).sort((a,b)=>b[1]-a[1]);
+  charts.push(new Chart(document.getElementById('ch-plat'), {
+    type:'bar',
+    data:{labels:platOrd.map(x=>x[0]), datasets:[{data:platOrd.map(x=>x[1]), backgroundColor:'#1d4ed8'}]},
+    options:{indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{beginAtZero:true,ticks:{precision:0}}}}
+  }));
+
+  // dispositivos
+  const porDisp = {};
+  visitas.forEach(r=>{ const d=r.disp||'?'; porDisp[d]=(porDisp[d]||0)+1; });
+  charts.push(new Chart(document.getElementById('ch-disp'), {
+    type:'doughnut',
+    data:{labels:Object.keys(porDisp), datasets:[{data:Object.values(porDisp),
+      backgroundColor:['#1e40af','#29aae2','#94a3b8']}]},
+    options:{plugins:{legend:{position:'bottom', labels:{font:{size:11}}}}}
+  }));
+
+  // temas top
+  const porTema = {};
+  temasEv.forEach(r=>{
+    const plat=NOMBRE_PLAT[r.p]||r.p;
+    const k=plat+' · '+(r.d||r.e);
+    porTema[k]=(porTema[k]||0)+1;
+  });
+  const temasOrd = Object.entries(porTema).sort((a,b)=>b[1]-a[1]).slice(0,15);
+  const maxT = temasOrd.length ? temasOrd[0][1] : 1;
+  document.getElementById('temas').innerHTML = temasOrd.map(([t,n])=>
+    `<div class="tema"><span class="n">${n}</span><span class="bar" style="width:${Math.round(90*n/maxT)}px"></span><span class="t">${t}</span></div>`
+  ).join('') || '<div style="font-size:.78rem;color:#94a3b8;padding:8px">Aún sin eventos de temas (pestañas/fichas). Aparecerán con el uso real.</div>';
+
+  // permanencia media por plataforma
+  const tPlat = {};
+  tiempos.forEach(x=>{ const n=NOMBRE_PLAT[x.p]||x.p; (tPlat[n]=tPlat[n]||[]).push(x.seg); });
+  const tpOrd = Object.entries(tPlat).map(([n,arr])=>[n, arr.reduce((a,b)=>a+b,0)/arr.length])
+    .sort((a,b)=>b[1]-a[1]);
+  charts.push(new Chart(document.getElementById('ch-tiempo'), {
+    type:'bar',
+    data:{labels:tpOrd.map(x=>x[0]), datasets:[{data:tpOrd.map(x=>Math.round(x[1]/6)/10), backgroundColor:'#0d9488'}]},
+    options:{plugins:{legend:{display:false}, tooltip:{callbacks:{label:c=>c.parsed.y+' min'}}},
+      scales:{y:{beginAtZero:true, title:{display:true, text:'minutos'}}}}
+  }));
+}
+cargar();
+</script>
+<script src="hub-home.js"></script>
+</body>
+</html>

@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<script src="pm_config.js"></script>
+<script src="pm_gate.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Reportería Despliegue EMMC · HDS</title>
+<link rel="icon" type="image/x-icon" href="Logos%20HUB-HDS/favicon-hds.ico">
+<link rel="icon" type="image/png" sizes="256x256" href="Logos%20HUB-HDS/favicon-hds.png">
+<link rel="shortcut icon" href="Logos%20HUB-HDS/favicon-hds.ico">
+<link rel="apple-touch-icon" href="Logos%20HUB-HDS/favicon-hds-180.png">
+
+<style>
+:root{
+  --inst:#1D2D5B;
+  --accent:#29AAE2;
+  --bg:#f4f6fb;
+  --card:#fff;
+  --border:#dde3ef;
+  --text:#1a2340;
+  --muted:#6b7a99;
+  --green:#27ae60;
+  --yellow:#f39c12;
+  --red:#e74c3c;
+  --cyan:#29AAE2;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Verdana,Geneva,sans-serif;background:var(--bg);color:var(--text);font-size:.72rem;}
+
+/* HEADER */
+.hdr{background:var(--inst);color:#fff;padding:16px 28px;display:flex;align-items:center;gap:18px;border-bottom:3px solid var(--accent);}
+.hdr-logo{width:44px;height:44px;border-radius:8px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.hdr-title{font-size:.95rem;font-weight:700;letter-spacing:.04em;}
+.hdr-sub{font-size:.63rem;opacity:.75;margin-top:2px;}
+.hdr-badge{margin-left:auto;background:rgba(41,170,226,.22);border:1px solid var(--accent);color:var(--accent);padding:4px 12px;border-radius:20px;font-size:.62rem;font-weight:700;white-space:nowrap;}
+
+/* LAYOUT */
+.container{max-width:1280px;margin:0 auto;padding:20px 22px;}
+
+/* SECTION TITLE */
+.sec-title{font-size:.67rem;font-weight:700;color:var(--inst);text-transform:uppercase;letter-spacing:.08em;border-left:3px solid var(--accent);padding-left:10px;margin-bottom:14px;}
+
+/* KPI CARDS */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px;}
+.kpi-card{background:var(--card);border-radius:10px;padding:16px 18px;border:1px solid var(--border);box-shadow:0 1px 4px rgba(29,45,91,.06);}
+.kpi-label{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
+.kpi-val{font-size:1.5rem;font-weight:700;color:var(--inst);line-height:1;}
+.kpi-sub{font-size:.6rem;color:var(--muted);margin-top:4px;}
+.kpi-card.accent .kpi-val{color:var(--accent);}
+.kpi-card.green .kpi-val{color:var(--green);}
+.kpi-card.yellow .kpi-val{color:var(--yellow);}
+.kpi-card.red .kpi-val{color:var(--red);}
+
+/* BIG PROGRESS */
+.prog-hero{background:var(--card);border-radius:12px;padding:20px 24px;border:1px solid var(--border);box-shadow:0 1px 6px rgba(29,45,91,.07);margin-bottom:22px;}
+.prog-hero-label{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.prog-hero-pct{font-size:2.4rem;font-weight:700;color:var(--accent);line-height:1;margin-bottom:6px;}
+.prog-hero-sub{font-size:.61rem;color:var(--muted);margin-bottom:14px;}
+.prog-bar-bg{height:14px;background:#e8edf5;border-radius:99px;overflow:hidden;}
+.prog-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--inst),var(--accent));transition:width .8s ease;}
+.prog-legend{display:flex;gap:18px;margin-top:10px;flex-wrap:wrap;}
+.prog-legend-item{display:flex;align-items:center;gap:6px;font-size:.6rem;color:var(--muted);}
+.dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+
+/* TWO COL */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:22px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:22px;}
+
+/* CARD */
+.card{background:var(--card);border-radius:10px;padding:18px 20px;border:1px solid var(--border);box-shadow:0 1px 4px rgba(29,45,91,.06);}
+
+/* PIPELINE */
+.pipeline{display:flex;align-items:stretch;gap:0;margin-bottom:22px;}
+.pipe-stage{flex:1;background:var(--card);border:1px solid var(--border);padding:14px 16px;position:relative;text-align:center;}
+.pipe-stage:not(:last-child)::after{content:'▶';position:absolute;right:-10px;top:50%;transform:translateY(-50%);z-index:2;color:var(--accent);font-size:.8rem;}
+.pipe-stage:first-child{border-radius:10px 0 0 10px;}
+.pipe-stage:last-child{border-radius:0 10px 10px 0;}
+.pipe-lbl{font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);margin-bottom:6px;}
+.pipe-n{font-size:1.3rem;font-weight:700;color:var(--inst);}
+.pipe-pct{font-size:.6rem;color:var(--muted);margin-top:2px;}
+.pipe-sub{font-size:.58rem;color:var(--muted);margin-top:6px;line-height:1.5;}
+.pipe-stage.done{background:linear-gradient(135deg,#e8f5e9,#f0fdf4);border-color:#a8d5b5;}
+.pipe-stage.done .pipe-n{color:var(--green);}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:.62rem;}
+.tbl th{background:var(--inst);color:#fff;padding:7px 10px;text-align:left;font-weight:700;font-size:.58rem;text-transform:uppercase;letter-spacing:.05em;}
+.tbl td{padding:6px 10px;border-bottom:1px solid var(--border);}
+.tbl tr:hover td{background:#f0f4fb;}
+.tbl tr:last-child td{border-bottom:none;}
+.tbl .n{text-align:right;font-variant-numeric:tabular-nums;}
+
+/* INLINE PROGRESS BAR IN TABLE */
+.bar-cell{min-width:90px;}
+.mini-bar{height:7px;background:#e8edf5;border-radius:99px;overflow:hidden;margin-top:3px;}
+.mini-fill{height:100%;border-radius:99px;}
+.pct-lbl{font-size:.58rem;font-weight:700;}
+
+/* STACKED BAR */
+.stacked-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.stacked-lbl{width:90px;font-size:.6rem;font-weight:700;color:var(--inst);text-align:right;flex-shrink:0;}
+.stacked-bar-bg{flex:1;height:20px;background:#e8edf5;border-radius:5px;overflow:hidden;display:flex;}
+.stacked-seg{height:100%;display:flex;align-items:center;justify-content:center;font-size:.52rem;font-weight:700;color:#fff;transition:width .6s;}
+.stacked-nums{font-size:.58rem;color:var(--muted);white-space:nowrap;width:60px;text-align:right;}
+
+/* DONUT */
+.donut-wrap{display:flex;align-items:center;gap:18px;}
+.donut-legend{flex:1;}
+.donut-legend-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+.donut-legend-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0;}
+.donut-legend-lbl{font-size:.61rem;color:var(--text);}
+.donut-legend-val{margin-left:auto;font-size:.61rem;font-weight:700;color:var(--inst);}
+
+/* TAG */
+.tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:.55rem;font-weight:700;text-transform:uppercase;}
+.tag-green{background:#e8f5e9;color:var(--green);}
+.tag-yellow{background:#fff8e1;color:var(--yellow);}
+.tag-red{background:#ffebee;color:var(--red);}
+.tag-blue{background:#e3f2fd;color:#1565c0;}
+
+/* FOOTER */
+.footer{text-align:center;color:var(--muted);font-size:.58rem;padding:18px 0;border-top:1px solid var(--border);margin-top:10px;}
+
+/* TAB FILTER */
+.tab-bar{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap;}
+.tab-btn{border:1px solid var(--border);background:#fff;padding:5px 14px;border-radius:20px;font-size:.6rem;font-weight:700;cursor:pointer;color:var(--muted);font-family:Verdana,Geneva,sans-serif;}
+.tab-btn.active{background:var(--inst);color:#fff;border-color:var(--inst);}
+
+@media(max-width:768px){
+  .two-col,.three-col{grid-template-columns:1fr;}
+  .pipeline{flex-direction:column;}
+  .pipe-stage:not(:last-child)::after{content:'▼';right:50%;top:auto;bottom:-12px;transform:translateX(50%);}
+  .pipe-stage:first-child{border-radius:10px 10px 0 0;}
+  .pipe-stage:last-child{border-radius:0 0 10px 10px;}
+}
+
+.hdr-help{width:26px;height:26px;border-radius:50%;background:rgba(41,170,226,.22);border:1px solid var(--accent);color:#fff;font-size:14px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;line-height:1;}
+.hdr-help:hover{background:var(--accent);}
+.info-modal{display:none;position:fixed;inset:0;background:rgba(2,6,23,.55);z-index:300;align-items:flex-start;justify-content:center;padding:60px 16px;overflow-y:auto;}
+.info-modal.open{display:flex;}
+.info-modal .im-box{background:#fff;border-radius:14px;max-width:720px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.info-modal .im-hd{background:var(--inst);color:#fff;padding:14px 20px;border-radius:14px 14px 0 0;display:flex;align-items:center;justify-content:space-between;font-weight:800;font-size:.8rem;}
+.info-modal .im-bd{padding:18px 22px;font-size:.72rem;line-height:1.75;color:var(--text);}
+.info-modal .im-x{background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:15px;}
+.cap-h{font-size:.6rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:10px;}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-logo">🏥</div>
+  <div>
+    <div class="hdr-title">REPORTERÍA · DESPLIEGUE EQUIPAMIENTO MÉDICO</div>
+    <div class="hdr-sub">Hospital Digitalmente Sustentable · HDS + AA · Corte 22/05/2026</div>
+  </div>
+  <div style="margin-left:auto;display:flex;align-items:center;gap:10px;"><button class="hdr-help" onclick="document.getElementById('infoModal').classList.add('open')" title="¿Qué muestra esta reportería?">?</button><div class="hdr-badge" style="margin-left:0;">📅 Corte: 22 Mayo 2026</div></div>
+</div>
+
+<div class="info-modal" id="infoModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="im-box"><div class="im-hd"><span>¿Qué muestra esta reportería?</span><button class="im-x" onclick="document.getElementById('infoModal').classList.remove('open')">×</button></div><div class="im-bd">Refleja el estado de los <strong>8.335 ítems de equipamiento médico</strong> (PINS) asignados a los edificios <strong>HDS y AA</strong> del Hospital Digitalmente Sustentable, con corte al <strong>22 de mayo de 2026</strong>. No incluye equipos del edificio INGER.<br><br>
+    Cada ítem puede estar en uno de cuatro estados: <span style="color:var(--red);font-weight:700;">Sin Recepción</span> — el equipo aún no ha ingresado físicamente al recinto; <span style="color:var(--yellow);font-weight:700;">Pendiente</span> — recibido pero aún en bodega o sin instalación iniciada; <span style="color:var(--accent);font-weight:700;">Posicionado</span> — ubicado en su lugar definitivo pero sin pruebas de funcionamiento; y <span style="color:var(--green);font-weight:700;">Conectado / N/A</span> — instalado y operativo, o declarado no aplicable.<br><br>
+    Se considera <strong>desplegado</strong> a todo ítem en estado <em>Posicionado</em> o <em>Conectado/N/A</em>. Al corte, el avance acumulado es de <strong>16,6%</strong> (1.385 ítems), quedando <strong>6.406 ítems pendientes</strong> de despliegue y <strong>544 sin recepción</strong> aún por ingresar al recinto.</div></div></div>
+
+<div class="container">
+
+  <!-- AVANCE GLOBAL -->
+  <div class="sec-title">Avance Global de Despliegue</div>
+
+  
+
+  <div style="display:grid;grid-template-columns:300px 1fr;gap:14px;margin-bottom:22px;">
+    <div class="prog-hero">
+      <div class="prog-hero-label">% Desplegado (POSICIONADO + CONECTADO)</div>
+      <div class="prog-hero-pct">16,6%</div>
+      <div class="prog-hero-sub">1.385 de 8.335 ítems en estado final · HDS + AA</div>
+      <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:16.6%"></div></div>
+      <div class="prog-legend">
+        <div class="prog-legend-item"><div class="dot" style="background:var(--green)"></div>Conectado-N/A: 697</div>
+        <div class="prog-legend-item"><div class="dot" style="background:var(--accent)"></div>Posicionado: 688</div>
+        <div class="prog-legend-item"><div class="dot" style="background:var(--yellow)"></div>Pendiente: 6.406</div>
+        <div class="prog-legend-item"><div class="dot" style="background:var(--red)"></div>Sin Recepción: 544</div>
+      </div>
+    </div>
+
+    <div class="kpi-grid" style="margin-bottom:0;">
+      <div class="kpi-card">
+        <div class="kpi-label">Total Ítems</div>
+        <div class="kpi-val">8.335</div>
+        <div class="kpi-sub">PINS HDS + AA</div>
+      </div>
+      <div class="kpi-card green">
+        <div class="kpi-label">Conectado / N/A</div>
+        <div class="kpi-val">697</div>
+        <div class="kpi-sub">8,4% del total</div>
+      </div>
+      <div class="kpi-card accent">
+        <div class="kpi-label">Posicionado</div>
+        <div class="kpi-val">688</div>
+        <div class="kpi-sub">8,3% del total</div>
+      </div>
+      <div class="kpi-card yellow">
+        <div class="kpi-label">Pendiente</div>
+        <div class="kpi-val">6.406</div>
+        <div class="kpi-sub">76,9% del total</div>
+      </div>
+      <div class="kpi-card red">
+        <div class="kpi-label">Sin Recepción</div>
+        <div class="kpi-val">544</div>
+        <div class="kpi-sub">6,5% del total</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CAPACITACIÓN HDS (arriba) -->
+  <div class="sec-title">Avance de Capacitación · solo HDS</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+    <div class="card"><div class="cap-h">Programa de Capacitación · <span id="cap-prog-total"></span></div><div id="cap-prog"></div></div>
+    <div class="card"><div class="cap-h">Instructivos de Uso · <span id="cap-inst-total"></span></div><div id="cap-inst"></div></div>
+  </div>
+  <div class="card" id="cap-total" style="margin-bottom:22px;"></div>
+
+  <!-- REVISIÓN DE INSTRUMENTAL -->
+  <div class="sec-title">Avance de Revisión de Instrumental Quirúrgico · Corte 30/06/2026</div>
+
+  <div style="display:grid;grid-template-columns:300px 1fr;gap:14px;margin-bottom:14px;">
+    <div class="prog-hero" style="margin-bottom:0;">
+      <div class="prog-hero-label">% Piezas revisadas (acumulado)</div>
+      <div class="prog-hero-pct">51,6%</div>
+      <div class="prog-hero-sub">31.006 de 60.070 piezas · acumulado 8 meses</div>
+      <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:51.6%"></div></div>
+      <div class="prog-legend">
+        <div class="prog-legend-item"><div class="dot" style="background:var(--green)"></div>Revisadas: 31.006</div>
+        <div class="prog-legend-item"><div class="dot" style="background:var(--yellow)"></div>Pendientes: 29.064</div>
+      </div>
+    </div>
+
+    <div class="kpi-grid" style="margin-bottom:0;">
+      <div class="kpi-card green">
+        <div class="kpi-label">Revisadas acumuladas</div>
+        <div class="kpi-val">31.006</div>
+        <div class="kpi-sub">51,6% del universo</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Universo total</div>
+        <div class="kpi-val">60.070</div>
+        <div class="kpi-sub">piezas del programa</div>
+      </div>
+      <div class="kpi-card yellow">
+        <div class="kpi-label">Pendientes</div>
+        <div class="kpi-val">29.064</div>
+        <div class="kpi-sub">48,4% por revisar</div>
+      </div>
+      <div class="kpi-card accent">
+        <div class="kpi-label">Revisadas en junio</div>
+        <div class="kpi-val">1.824</div>
+        <div class="kpi-sub">en 5 días efectivos · 365 pzas/día</div>
+      </div>
+      <div class="kpi-card yellow">
+        <div class="kpi-label">Backlog cierre junio</div>
+        <div class="kpi-val">3.690</div>
+        <div class="kpi-sub">listas para revisar</div>
+      </div>
+      <div class="kpi-card red">
+        <div class="kpi-label">Disponibles julio</div>
+        <div class="kpi-val">8.008</div>
+        <div class="kpi-sub">3.690 backlog + 4.318 nuevas SC</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;">
+    <div class="card">
+      <div class="cap-h">Junio 2026 · Programado vs Ejecutado</div>
+      <table class="tbl">
+        <thead><tr><th>Concepto</th><th>Programado</th><th>Ejecutado</th><th>Dif.</th></tr></thead>
+        <tbody>
+          <tr><td>Días de revisión</td><td>6</td><td>5</td><td style="color:var(--red);font-weight:700;">−1 día</td></tr>
+          <tr><td>Piezas revisadas</td><td>~1.800</td><td>1.824</td><td style="color:var(--green);font-weight:700;">+24</td></tr>
+          <tr><td>Piezas llegadas (informado SC)</td><td>6.700</td><td>—</td><td>—</td></tr>
+          <tr><td>Backlog al cierre</td><td>—</td><td>3.690</td><td>a julio</td></tr>
+        </tbody>
+      </table>
+      <div style="font-size:.6rem;color:var(--muted);margin-top:10px;line-height:1.5;">Con 1 día menos, el rendimiento diario mejoró levemente. La capacidad instalada sigue muy por debajo del flujo de llegada.</div>
+    </div>
+
+    <div class="card">
+      <div class="cap-h">Capacidad de revisión</div>
+      <table class="tbl">
+        <thead><tr><th>Parámetro</th><th>Valor</th></tr></thead>
+        <tbody>
+          <tr><td>Rendimiento por revisor</td><td><strong>150 piezas/día</strong></td></tr>
+          <tr><td>Máximo simultáneo en recinto</td><td><strong>4 personas</strong></td></tr>
+          <tr><td>TENS asignados en junio</td><td>2 (R. Saldías, F. Donoso)</td></tr>
+          <tr><td>Días requeridos p/ 6.700 pzas (4 pers.)</td><td><strong>11 días</strong></td></tr>
+          <tr><td>Capacidad programada junio</td><td>~1.800 piezas</td></tr>
+          <tr><td>Brecha estimada junio</td><td style="color:var(--red);font-weight:700;">~4.900 piezas</td></tr>
+        </tbody>
+      </table>
+      <div style="font-size:.6rem;color:var(--muted);margin-top:10px;line-height:1.5;">La revisión se realiza en obra a medida que la SC entrega las piezas; el Servicio de Esterilización HDS aporta los TENS.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:22px;border-left:3px solid var(--red);">
+    <div class="cap-h" style="color:var(--red);">⚠ Riesgo al hito · 1er paciente noviembre 2026</div>
+    <div style="font-size:.63rem;line-height:1.6;color:var(--text);">
+      <strong>Brecha estructural de capacidad:</strong> el flujo de llegada de instrumental supera sistemáticamente la capacidad de revisión programada.<br>
+      <strong>Julio:</strong> hay <strong>8.008 piezas</strong> disponibles para revisar. Al ritmo de junio (~1.824 pzas/mes) la cobertura sería de solo <strong style="color:var(--red);">22,8%</strong>.<br>
+      <strong>Proyección:</strong> de mantenerse el ritmo, las <strong>29.064 piezas restantes (48,4%)</strong> no alcanzarán a revisarse antes del hito de noviembre 2026.<br>
+      <strong>Acción sugerida (SSO → HDS):</strong> reforzar la dotación de TENS asignados y ampliar los días disponibles en calendario, según el cuadro resumen jun–sep del 02-jun-2026.
+    </div>
+  </div>
+
+  <!-- PIPELINE -->
+  <div class="sec-title">Pipeline de Despliegue</div>
+  <div style="font-size:.61rem;color:var(--muted);margin-bottom:10px;line-height:1.6;">
+    Flujo de avance de los ítems según su <strong>lugar físico</strong> en el proceso. Cada etapa indica dónde se encuentra el equipo: desde la recepción en bodega hasta su instalación definitiva en el recinto clínico.
+  </div>
+  <div class="pipeline" style="margin-bottom:22px;">
+    <div class="pipe-stage">
+      <div class="pipe-lbl">⛔ Sin Recepción</div>
+      <div class="pipe-n">529</div>
+      <div class="pipe-pct">6,3%</div>
+      <div class="pipe-sub">No ingresados<br>al recinto</div>
+    </div>
+    <div class="pipe-stage">
+      <div class="pipe-lbl">📦 Bulto</div>
+      <div class="pipe-n">5.318</div>
+      <div class="pipe-pct">63,8%</div>
+      <div class="pipe-sub">En bodega/bulto<br>sin desplegar</div>
+    </div>
+    <div class="pipe-stage">
+      <div class="pipe-lbl">🔧 Despliegue</div>
+      <div class="pipe-n">1.697</div>
+      <div class="pipe-pct">20,4%</div>
+      <div class="pipe-sub" style="color:#1565c0;">en proceso<br>de instalación</div>
+    </div>
+    <div class="pipe-stage done">
+      <div class="pipe-lbl">✅ Recinto Definitivo</div>
+      <div class="pipe-n">791</div>
+      <div class="pipe-pct">9,5%</div>
+      <div class="pipe-sub" style="color:var(--green);">posicionado<br>+ conectado</div>
+    </div>
+  </div>
+
+  <!-- POR EDIFICIO -->
+  <div class="sec-title">Avance por Edificio</div>
+  <div class="card" style="margin-bottom:22px;">
+    <div id="edificio-bars"></div>
+  </div>
+
+  <!-- POR PISO -->
+  <div class="two-col">
+    <div>
+      <div class="sec-title">Avance por Piso</div>
+      <div class="card">
+        <div id="piso-bars"></div>
+      </div>
+    </div>
+    <div>
+      <div class="sec-title">Estado PINS</div>
+      <div class="card">
+        <div style="font-size:.6rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:10px;">Estado PINS</div>
+        <div id="pins-bars"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECINTOS -->
+  <div class="sec-title">Avance por Recinto (Top 20)</div>
+  <div class="card" style="margin-bottom:22px;overflow-x:auto;">
+    <table class="tbl" id="recintos-tbl">
+      <thead>
+        <tr>
+          <th>Recinto</th>
+          <th>Edificio</th>
+          <th class="n">Total</th>
+          <th class="n">Desplegado</th>
+          <th class="n">Pendiente</th>
+          <th>Avance</th>
+        </tr>
+      </thead>
+      <tbody id="recintos-body"></tbody>
+    </table>
+  </div>
+
+  <!-- PROVEEDORES + EQUIPOS -->
+  <div class="two-col">
+    <div>
+      <div class="sec-title">Top Proveedores</div>
+      <div class="card" style="overflow-x:auto;">
+        <table class="tbl">
+          <thead><tr><th>Proveedor</th><th class="n">Ítems</th><th class="n">%</th></tr></thead>
+          <tbody id="prov-body"></tbody>
+        </table>
+      </div>
+    </div>
+    <div>
+      <div class="sec-title">Top Tipos de Equipamiento</div>
+      <div class="card" style="overflow-x:auto;">
+        <table class="tbl">
+          <thead><tr><th>Equipo</th><th class="n">Ítems</th><th class="n">Desplegado</th><th>Avance</th></tr></thead>
+          <tbody id="equip-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">Reportería Despliegue EMMC · HDS + AA (excluye INGER) · Datos al 22/05/2026 · Generado 27/05/2026</div>
+
+  <!-- ── CRONOGRAMA REVISIÓN INSTRUMENTAL Qx (Email Felipe Rojas - SSMO, 02-06-2026) ── -->
+  <div class="sec-title" style="margin-top:32px;">Cronograma Revisión Instrumental Quirúrgico (jun–oct 26)</div>
+  
+  <!-- Alerta de brecha -->
+  <div style="background:linear-gradient(135deg,#fef2f2,#fee2e2);border:1px solid #fca5a5;border-radius:10px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:14px;">
+    <div style="width:32px;height:32px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px;flex-shrink:0;">!</div>
+    <div style="flex:1;">
+      <div style="font-size:.72rem;font-weight:700;color:#991b1b;margin-bottom:3px;">ALERTA · Brecha de 4.900 piezas en JUN-26</div>
+      <div style="font-size:.6rem;color:#7f1d1d;">Programado: 2 personas × 6 días = 1.800 piezas revisables. Demanda: 6.700 piezas / 4 personas × 11 días. <strong>Pendiente respuesta de Esterilización HDS sobre aumento de recursos.</strong></div>
+    </div>
+  </div>
+  
+  <!-- KPIs cronograma -->
+  <div class="kpi-grid" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr));">
+    <div class="kpi-card accent">
+      <div class="kpi-label">Total piezas jun-oct</div>
+      <div class="kpi-val">30.804</div>
+      <div class="kpi-sub">391 cajas unitarias</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Tipos de cajas</div>
+      <div class="kpi-val">99</div>
+      <div class="kpi-sub">Distintos modelos</div>
+    </div>
+    <div class="kpi-card yellow">
+      <div class="kpi-label">Días revisión necesarios</div>
+      <div class="kpi-val">51</div>
+      <div class="kpi-sub">Con 4 personas full</div>
+    </div>
+    <div class="kpi-card red">
+      <div class="kpi-label">Brecha junio</div>
+      <div class="kpi-val">4.900</div>
+      <div class="kpi-sub">Piezas sin revisar</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">Capacidad/persona/día</div>
+      <div class="kpi-val">150</div>
+      <div class="kpi-sub">Piezas estimadas</div>
+    </div>
+  </div>
+  
+  <div class="two-col">
+    <!-- Tabla mensual -->
+    <div class="card">
+      <div class="sec-title" style="margin-bottom:10px;">Llegadas e hitos mensuales</div>
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Mes</th>
+            <th class="n">Tipos</th>
+            <th class="n">Cajas</th>
+            <th class="n">Piezas</th>
+            <th class="n">Días (4p)</th>
+            <th>Hito</th>
+          </tr>
+        </thead>
+        <tbody id="cronograma-body"></tbody>
+      </table>
+    </div>
+    
+    <!-- Programación junio -->
+    <div class="card">
+      <div class="sec-title" style="margin-bottom:10px;">Programación Junio 2026</div>
+      <div style="display:flex;gap:14px;margin-bottom:12px;">
+        <div style="flex:1;text-align:center;padding:10px;background:#fef3c7;border-radius:8px;border:1px solid #fcd34d;">
+          <div style="font-size:.55rem;color:#92400e;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Capacidad actual</div>
+          <div style="font-size:1.2rem;font-weight:700;color:#92400e;">1.800</div>
+          <div style="font-size:.55rem;color:#a16207;">2p × 6 días</div>
+        </div>
+        <div style="flex:1;text-align:center;padding:10px;background:#fef2f2;border-radius:8px;border:1px solid #fca5a5;">
+          <div style="font-size:.55rem;color:#991b1b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px;">Demanda</div>
+          <div style="font-size:1.2rem;font-weight:700;color:#991b1b;">6.700</div>
+          <div style="font-size:.55rem;color:#b91c1c;">4p × 11 días</div>
+        </div>
+      </div>
+      
+      <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;font-weight:700;">Días asignados</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px;">
+        <span style="background:var(--accent);color:#fff;padding:5px 10px;border-radius:6px;font-size:.6rem;font-weight:700;">01 jun</span>
+        <span style="background:var(--accent);color:#fff;padding:5px 10px;border-radius:6px;font-size:.6rem;font-weight:700;">02 jun</span>
+        <span style="background:var(--accent);color:#fff;padding:5px 10px;border-radius:6px;font-size:.6rem;font-weight:700;">08 jun</span>
+        <span style="background:var(--accent);color:#fff;padding:5px 10px;border-radius:6px;font-size:.6rem;font-weight:700;">19 jun</span>
+        <span style="background:var(--accent);color:#fff;padding:5px 10px;border-radius:6px;font-size:.6rem;font-weight:700;">25 jun</span>
+        <span style="background:var(--accent);color:#fff;padding:5px 10px;border-radius:6px;font-size:.6rem;font-weight:700;">26 jun</span>
+      </div>
+      
+      <div style="font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;font-weight:700;">TENS asignados (Esterilización HDS)</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:#f0fdf4;border-radius:6px;border:1px solid #86efac;">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.6rem;">RS</div>
+          <div style="font-size:.62rem;font-weight:700;color:var(--inst);">Ruth Saldías</div>
+          <div style="font-size:.55rem;color:var(--muted);margin-left:auto;">TENS</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:#f0fdf4;border-radius:6px;border:1px solid #86efac;">
+          <div style="width:24px;height:24px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.6rem;">FD</div>
+          <div style="font-size:.62rem;font-weight:700;color:var(--inst);">Fernando Donoso</div>
+          <div style="font-size:.55rem;color:var(--muted);margin-left:auto;">TENS</div>
+        </div>
+      </div>
+      
+      <div style="margin-top:12px;padding:8px 10px;background:#f8fafc;border-radius:6px;font-size:.55rem;color:var(--muted);line-height:1.5;">
+        <strong style="color:var(--inst);">Hilo del correo:</strong><br>
+        29-05 17:14 · Sandra Córdova (HDS) → asigna TENS para junio<br>
+        29-05 17:21 · Felipe Rojas (SSMO) → comparte programación llegada<br>
+        02-06 10:21 · Felipe Rojas (SSMO) → análisis brecha 4.900 piezas
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+<script>
+// ── DATA (HDS + AA + PABH — excluye ING) ─────────────────────────────────
+const TOTAL = 8335;
+
+const edificios = [
+  {n:'HDS',  total:6294, con:457, pos:523, pend:4861, sinrec:453},
+  {n:'AA',   total:2028, con:240, pos:165, pend:1536, sinrec:87},
+  {n:'PABH', total:9,    con:0,   pos:0,   pend:9,    sinrec:0},
+];
+
+const pisos = [
+  {n:'P04', total:1150, con:46,  pos:213, pend:883,  sinrec:8},
+  {n:'P03', total:1392, con:101, pos:186, pend:1054, sinrec:51},
+  {n:'P02', total:2491, con:348, pos:134, pend:1853, sinrec:156},
+  {n:'P01', total:1385, con:130, pos:67,  pend:1047, sinrec:141},
+  {n:'PS1', total:1877, con:72,  pos:88,  pend:1533, sinrec:184},
+  {n:'PS2', total:36,   con:0,   pos:0,   pend:36,   sinrec:0},
+];
+
+const recintos = [
+  {n:'HDSP01 UNIDAD DE EMERGENCIA',                                total:587, dep:51,  edif:'HDS'},
+  {n:'HDSP02 PABELLONES CENTRALES MÓD. 1',                        total:463, dep:69,  edif:'HDS'},
+  {n:'S1HDSPS1 MEDICINA FÍSICA Y REHABILITACIÓN',                  total:380, dep:13,  edif:'HDS'},
+  {n:'HDSP02 PABELLONES CENTRALES MÓD. 2',                        total:347, dep:54,  edif:'HDS'},
+  {n:'S1HDSPS1 LABORATORIO',                                       total:323, dep:27,  edif:'HDS'},
+  {n:'AAP01 OFTALMOLOGÍA',                                         total:300, dep:121, edif:'AA'},
+  {n:'HDSP03 UNIDAD Nº1. Doble 30+30 camas',                       total:258, dep:64,  edif:'HDS'},
+  {n:'HDSP03 UNIDAD Nº2. Doble 30+30 camas',                       total:258, dep:45,  edif:'HDS'},
+  {n:'HDSP04 UNIDAD Nº4. Doble 30+30 camas',                       total:257, dep:75,  edif:'HDS'},
+  {n:'HDSP04 UNIDAD Nº5. Doble 30+30 camas',                       total:256, dep:76,  edif:'HDS'},
+  {n:'HDSP04 UNIDAD Nº6. Doble 30+30 camas',                       total:252, dep:77,  edif:'HDS'},
+  {n:'HDSP03 UNIDAD Nº3. Doble 30+30 camas',                       total:241, dep:49,  edif:'HDS'},
+  {n:'S1HDSPS1 ANATOMÍA PATOLÓGICA',                               total:226, dep:37,  edif:'HDS'},
+  {n:'HDSP02 UPC 1',                                               total:209, dep:59,  edif:'HDS'},
+  {n:'HDSP02 UPC 3',                                               total:193, dep:53,  edif:'HDS'},
+  {n:'HDSP02 UPC 2',                                               total:189, dep:38,  edif:'HDS'},
+  {n:'HDSP02 UPC 4',                                               total:185, dep:35,  edif:'HDS'},
+  {n:'S1HDSPS1 DIÁLISIS',                                          total:170, dep:31,  edif:'HDS'},
+  {n:'AAP03 ODONTOLOGÍA',                                          total:168, dep:47,  edif:'AA'},
+  {n:'AAP02 QUIMIOTERAPIA ONCOHEMATOLÓGICA',                        total:155, dep:68,  edif:'AA'},
+];
+
+const proveedores = [
+  {n:'SONDA S.A',                v:1827},
+  {n:'RUDOLF CHILE SA',           v:819},
+  {n:'STRYKER CORPORATION',       v:666},
+  {n:'FISIOMARKET LTDA',          v:661},
+  {n:'ARQUIMED LTDA',             v:640},
+  {n:'PLUSMEDICAL SPA',           v:528},
+  {n:'BLUEMEDICAL SPA',           v:486},
+  {n:'TECNIGEN SA',               v:254},
+  {n:'GEMCO SA',                  v:199},
+  {n:'HEMISFERIO SUR SA',         v:146},
+  {n:'PV EQUIP SA',               v:142},
+  {n:'NEW PATH CHILE SPA',        v:137},
+  {n:'GREENWICH MEDICAL SPA',     v:130},
+  {n:'ESTERILIZACIÓN IBARRA',     v:121},
+  {n:'MEDIPLEX SA',               v:119},
+];
+
+const equipos = [
+  {n:'Computador Bajo Rendimiento',             total:1388, dep:0},
+  {n:'Soporte Universal',                       total:541,  dep:23},
+  {n:'Mobiliario Clínico Pac. Hosp. Eléctrico', total:400,  dep:329},
+  {n:'Computador Alto Rendimiento',             total:282,  dep:0},
+  {n:'Piso Clínico',                            total:272,  dep:29},
+  {n:'Fonendoscopio',                           total:264,  dep:264},
+  {n:'Monitor PANI + Oximetría',                total:238,  dep:35},
+  {n:'Camilla Traslado',                        total:193,  dep:12},
+  {n:'Camilla Examen',                          total:162,  dep:7},
+  {n:'Piso Taburete Clínico',                   total:112,  dep:0},
+  {n:'Carro Procedimientos',                    total:108,  dep:18},
+  {n:'Carro 2 Bandejas',                        total:105,  dep:2},
+  {n:'Notebook',                                total:103,  dep:0},
+  {n:'Mesa Mayo',                               total:99,   dep:17},
+  {n:'Sillón Clínico',                          total:95,   dep:20},
+];
+
+// ── COLORS ────────────────────────────────────────────────────────────────
+const C_CON  = '#27ae60';
+const C_POS  = '#29AAE2';
+const C_PEND = '#f39c12';
+const C_SIN  = '#e74c3c';
+
+// ── RENDER STACKED BARS ────────────────────────────────────────────────────
+function stackedBarsHtml(data, showPct=true){
+  return data.map(d=>{
+    const dep = d.con + d.pos;
+    const pct = (dep/d.total*100).toFixed(1);
+    const pCon  = (d.con/d.total*100).toFixed(1);
+    const pPos  = (d.pos/d.total*100).toFixed(1);
+    const pPend = (d.pend/d.total*100).toFixed(1);
+    const pSin  = (d.sinrec/d.total*100).toFixed(1);
+    return `
+    <div class="stacked-row">
+      <div class="stacked-lbl">${d.n}</div>
+      <div class="stacked-bar-bg" title="${d.n}: ${dep} desplegados de ${d.total}">
+        ${pCon>0?`<div class="stacked-seg" style="width:${pCon}%;background:${C_CON};" title="Conectado: ${d.con}">${d.con>50?d.con:''}</div>`:''}
+        ${pPos>0?`<div class="stacked-seg" style="width:${pPos}%;background:${C_POS};" title="Posicionado: ${d.pos}">${d.pos>50?d.pos:''}</div>`:''}
+        ${pPend>0?`<div class="stacked-seg" style="width:${pPend}%;background:${C_PEND};" title="Pendiente: ${d.pend}">${d.pend>200?d.pend:''}</div>`:''}
+        ${pSin>0?`<div class="stacked-seg" style="width:${pSin}%;background:${C_SIN};" title="Sin Recepción: ${d.sinrec}"></div>`:''}
+      </div>
+      <div class="stacked-nums"><strong>${pct}%</strong></div>
+    </div>`;
+  }).join('');
+}
+
+// ── LEGEND (common) ───────────────────────────────────────────────────────
+function legendHtml(){
+  return `<div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;">
+    ${[['Conectado/N/A',C_CON],['Posicionado',C_POS],['Pendiente',C_PEND],['Sin Recepción',C_SIN]].map(([l,c])=>
+    `<div style="display:flex;align-items:center;gap:5px;font-size:.58rem;color:#6b7a99;">
+      <div style="width:10px;height:10px;border-radius:2px;background:${c};flex-shrink:0;"></div>${l}</div>`).join('')}
+  </div>`;
+}
+
+// ── RENDER EDIFICIO ───────────────────────────────────────────────────────
+document.getElementById('edificio-bars').innerHTML = legendHtml() + stackedBarsHtml(edificios);
+
+// ── RENDER PISO ───────────────────────────────────────────────────────────
+document.getElementById('piso-bars').innerHTML = legendHtml() + stackedBarsHtml(pisos);
+
+// ── PINS ──────────────────────────────────────────────────────────────────
+const pins=[{n:'SI',v:7755,c:C_CON},{n:'PARCIAL',v:460,c:C_PEND},{n:'NO',v:120,c:C_SIN}];
+document.getElementById('pins-bars').innerHTML = pins.map(p=>{
+  const pct=(p.v/TOTAL*100).toFixed(1);
+  return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:9px;">
+    <div style="width:60px;font-size:.62rem;font-weight:700;text-align:right;">${p.n}</div>
+    <div style="flex:1;height:14px;background:#e8edf5;border-radius:99px;overflow:hidden;">
+      <div style="width:${pct}%;height:100%;background:${p.c};border-radius:99px;"></div>
+    </div>
+    <div style="width:70px;font-size:.6rem;color:#6b7a99;">${p.v.toLocaleString('es-CL')} (${pct}%)</div>
+  </div>`;
+}).join('');
+
+// ── CAPACITACION · SOLO HDS (Prog. Capacitación hoja 4 + Instructivos de Uso hoja 5) ──
+// Fuente: "1.Seguimiento y Control EMMC HDS jun 26" · estado por color de celda.
+// Vista simplificada: sólo Ejecutado vs Por ejecutar (los números cuadran al total).
+const CAP_HDS = {
+  prog: { total:225, items:[
+    {n:'Ejecutadas',   v:51,  c:'#16a34a'},
+    {n:'Por ejecutar', v:174, c:'#f59e0b'}
+  ]},
+  inst: { total:191, items:[
+    {n:'Entregados',   v:183, c:'#16a34a'},
+    {n:'Por entregar', v:8,   c:'#f59e0b'}
+  ]}
+};
+function _capBar(p,total){
+  const pct = total? (p.v/total*100).toFixed(1) : '0.0';
+  return `<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+    <div style="width:130px;font-size:.58rem;font-weight:700;text-align:right;color:#334155;line-height:1.2;">${p.n}</div>
+    <div style="flex:1;height:13px;background:#e8edf5;border-radius:99px;overflow:hidden;">
+      <div style="width:${pct}%;height:100%;background:${p.c};border-radius:99px;"></div>
+    </div>
+    <div style="width:78px;font-size:.58rem;color:#6b7a99;">${p.v.toLocaleString('es-CL')} (${pct}%)</div>
+  </div>`;
+}
+document.getElementById('cap-prog').innerHTML = CAP_HDS.prog.items.map(p=>_capBar(p,CAP_HDS.prog.total)).join('');
+document.getElementById('cap-inst').innerHTML = CAP_HDS.inst.items.map(p=>_capBar(p,CAP_HDS.inst.total)).join('');
+document.getElementById('cap-prog-total').textContent = CAP_HDS.prog.total;
+document.getElementById('cap-inst-total').textContent = CAP_HDS.inst.total;
+(function(){
+  const realiz = CAP_HDS.prog.items[0].v + CAP_HDS.inst.items[0].v; // ejecutadas + entregados (verde)
+  const totAll = CAP_HDS.prog.total + CAP_HDS.inst.total;
+  const pct = totAll ? (realiz/totAll*100).toFixed(1) : '0.0';
+  document.getElementById('cap-total').innerHTML =
+    '<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">'
+    + '<div style="min-width:170px;"><div style="font-size:.58rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Total acumulado · Capacitación HDS</div>'
+    + '<div style="font-size:1.6rem;font-weight:800;color:var(--inst);line-height:1.1;">'+pct+'%</div>'
+    + '<div style="font-size:.6rem;color:var(--muted);">'+realiz+' de '+totAll+' realizadas (ejecutadas + instructivos entregados)</div></div>'
+    + '<div style="flex:1;min-width:180px;height:16px;background:#e8edf5;border-radius:99px;overflow:hidden;"><div style="width:'+pct+'%;height:100%;background:#16a34a;border-radius:99px;"></div></div>'
+    + '</div>';
+})();
+
+// ── RECINTOS TABLE ────────────────────────────────────────────────────────
+document.getElementById('recintos-body').innerHTML = recintos.map(r=>{
+  const pct = (r.dep/r.total*100).toFixed(1);
+  const pend = r.total - r.dep;
+  const color = +pct>=50?C_CON:+pct>=25?C_POS:+pct>=10?C_PEND:C_SIN;
+  return `<tr>
+    <td>${r.n}</td>
+    <td><span class="tag tag-blue">${r.edif}</span></td>
+    <td class="n">${r.total}</td>
+    <td class="n">${r.dep}</td>
+    <td class="n">${pend}</td>
+    <td class="bar-cell">
+      <span class="pct-lbl" style="color:${color}">${pct}%</span>
+      <div class="mini-bar"><div class="mini-fill" style="width:${pct}%;background:${color}"></div></div>
+    </td>
+  </tr>`;
+}).join('');
+
+// ── PROVEEDORES TABLE ─────────────────────────────────────────────────────
+document.getElementById('prov-body').innerHTML = proveedores.map(p=>{
+  const pct=(p.v/TOTAL*100).toFixed(1);
+  return `<tr>
+    <td>${p.n}</td>
+    <td class="n">${p.v.toLocaleString('es-CL')}</td>
+    <td class="n">${pct}%</td>
+  </tr>`;
+}).join('');
+
+// ── EQUIPOS TABLE ─────────────────────────────────────────────────────────
+document.getElementById('equip-body').innerHTML = equipos.map(e=>{
+  const pct=(e.dep/e.total*100).toFixed(1);
+  const color=+pct>=50?C_CON:+pct>=25?C_POS:+pct>=10?C_PEND:C_SIN;
+  return `<tr>
+    <td>${e.n}</td>
+    <td class="n">${e.total}</td>
+    <td class="n">${e.dep}</td>
+    <td class="bar-cell">
+      <span class="pct-lbl" style="color:${color}">${pct}%</span>
+      <div class="mini-bar"><div class="mini-fill" style="width:${pct}%;background:${color}"></div></div>
+    </td>
+  </tr>`;
+}).join('');
+</script>
+<script>
+// ── CRONOGRAMA REVISIÓN INSTRUMENTAL ──────────────────────────────────────
+const cronograma = [
+  {mes:'jun-26', tipos:22, cajas:92,  piezas:6700, dias:11, hito:''},
+  {mes:'jul-26', tipos:27, cajas:100, piezas:4318, dias:7,  hito:'PSP'},
+  {mes:'ago-26', tipos:18, cajas:46,  piezas:6635, dias:11, hito:''},
+  {mes:'sept-26',tipos:24, cajas:120, piezas:8838, dias:15, hito:''},
+  {mes:'oct-26', tipos:8,  cajas:33,  piezas:4313, dias:7,  hito:'1er PACIENTE'}
+];
+const cronoBody = document.getElementById('cronograma-body');
+if(cronoBody){
+  cronoBody.innerHTML = cronograma.map(c=>{
+    const hitoBadge = c.hito === 'PSP' 
+      ? '<span style="background:var(--inst);color:#fff;padding:3px 8px;border-radius:5px;font-size:.55rem;font-weight:700;">PSP</span>'
+      : c.hito === '1er PACIENTE' 
+      ? '<span style="background:var(--red);color:#fff;padding:3px 8px;border-radius:5px;font-size:.55rem;font-weight:700;">1er PACIENTE</span>'
+      : '<span style="color:var(--muted);font-size:.55rem;">—</span>';
+    const filaColor = c.mes==='jun-26'?'background:#fef2f2;':'';
+    return `<tr style="${filaColor}">
+      <td><strong>${c.mes}</strong></td>
+      <td class="n">${c.tipos}</td>
+      <td class="n">${c.cajas}</td>
+      <td class="n"><strong>${c.piezas.toLocaleString('es-CL')}</strong></td>
+      <td class="n">${c.dias}</td>
+      <td>${hitoBadge}</td>
+    </tr>`;
+  }).join('');
+}
+</script>
+</body>
+</html>
