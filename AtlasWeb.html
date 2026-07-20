@@ -151,6 +151,23 @@ button,input,select,textarea{font-family:inherit}
 #planLoading.show{display:flex}
 #planLoading .pl-spin{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#60a5fa;border-radius:50%;animation:plspin .7s linear infinite}
 @keyframes plspin{to{transform:rotate(360deg)}}
+/* ── Modo Aut. Sanitaria: dot de estado de pauta por recinto/servicio ── */
+@keyframes psdBlink{0%,100%{opacity:1}50%{opacity:.2}}
+@keyframes psdTwinkle{0%,100%{opacity:1}50%{opacity:.55}}
+.psdot{cursor:pointer}
+.psdot circle{stroke:#fff;stroke-width:2.5}
+.psd-rojo circle{fill:#dc2626;animation:psdBlink 1s ease-in-out infinite}
+.psd-ambar circle{fill:#d97706}
+.psd-verde circle{fill:#16a34a;animation:psdTwinkle 2.4s ease-in-out infinite}
+.psd-gris circle{fill:#94a3b8}
+#psPanel{position:fixed;top:70px;right:14px;width:420px;max-width:94vw;max-height:calc(100vh - 90px);overflow:auto;background:#fff;border:1px solid #cbd5e1;border-radius:14px;box-shadow:0 18px 60px rgba(15,23,42,.35);z-index:9500;font-size:13px;color:#1e293b}
+#psPanel .ps-hd{position:sticky;top:0;background:#0f2547;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+#psPanel .ps-bd{padding:12px 16px 16px}
+#psPanel .ps-chip{display:inline-block;border-radius:999px;padding:2px 10px;font-size:11px;font-weight:700;margin-left:6px}
+#psPanel .ps-amb{border:1px solid #e2e8f0;border-radius:8px;padding:6px 9px;margin:4px 0;font-size:12px;background:#f8fafc}
+#psPanel label.ps-opt{display:flex;gap:8px;align-items:flex-start;padding:4px 2px;font-size:12px;cursor:pointer;border-bottom:1px dashed #f1f5f9}
+#psPanel .ps-btn{border:none;border-radius:8px;padding:9px 13px;font-size:12.5px;font-weight:700;cursor:pointer;margin:3px 4px 0 0}
+
 #svgLayer{position:absolute;top:0;left:0;width:16208px;height:12337px;overflow:visible;pointer-events:none;transition:opacity .18s}
 #svgLayer.interactive{pointer-events:all}
 /* Visibilidad de las cajas dibujadas y su información (para ver el plano de fondo) */
@@ -489,6 +506,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="tb-btn" id="btnUndo" onclick="doUndo()" title="Deshacer el último cambio (Ctrl+Z)" style="display:none">↩ Deshacer</button>
       <span class="tb-div"></span>
       <button class="tb-btn" id="btnFicha" onclick="toggleFichaMode()" title="Ver ficha del recinto: equipamiento, mobiliario y pauta de Autorización Sanitaria">🔍 Ficha recinto</button>
+      <button class="tb-btn" id="btnAutSan" onclick="toggleAutSanMode()" title="Asignación de pautas de Autorización Sanitaria — dot por recinto/servicio: 🔴 sin pauta · 🟠 sugerida (por validar) · 🟢 validada · ⚪ no corresponde. Clic en el dot para asignar.">🩺 Aut. Sanitaria</button>
       <button class="tb-btn" id="btnEquip" onclick="toggleEquipMode()" title="Ver y reposicionar en el plano el equipamiento (EquiBox) de cada recinto">⚙️ Equipamiento</button>
       <button class="tb-btn" id="btnScen" onclick="toggleScenario()" title="Alternar entre el Despliegue 0 (catálogo oficial, sin traslados) y la Propuesta de reubicación (con los traslados aplicados)">📦 Despliegue 0</button>
       <button class="tb-btn" id="btnMoves" onclick="openMovesList()" style="display:none" title="Ver el listado completo de traslados propuestos">↪ 0</button>
@@ -1030,7 +1048,7 @@ let S = {
   zoom: 1, ox: 0, oy: 0, rafId: null,
   editMode: false, drawMode: false, delDotMode: false,
   selIds: new Set(), history: [], moveMode: false, bedMode: false, fichaMode: false,
-  equipMode: false, equipRoomId: null, auditMode: false,
+  equipMode: false, equipRoomId: null, auditMode: false, autsanMode: false,
   viewOnly: true,   // versión web: siempre consulta
   showSen: (function(){try{return localStorage.getItem('cabida_show_sen')==='1';}catch(e){return false;}})(),
   planKind: (function(){try{return localStorage.getItem('cabida_plan_kind')||'mobiliario';}catch(e){return 'mobiliario';}})(),
@@ -1255,6 +1273,122 @@ function pautaForRoom(roomId){
   if(rule){ const p=ruleExemplar(rule); if(p) return {regla:rule, p:p, _byType:true}; }
   return null;
 }
+
+// ── ASIGNACIÓN DE PAUTAS (modo 🩺 Aut. Sanitaria) ───────────────────────────
+// Overrides manuales sobre la matriz Fase 1, en clave localStorage COMPARTIDA
+// con 16.AutorizacionSanitaria (mismo origen → una sola fuente de verdad).
+// Estados por recinto: sin (🔴) · sugerida (🟠, matriz/regla por validar) ·
+// validada (🟢, confirmada a mano) · no_corresponde (⚪).
+const PAUTAS_MANUAL_KEY='pautas_recintos_manual_v1';
+function pmStore(){ try{ const s=JSON.parse(localStorage.getItem(PAUTAS_MANUAL_KEY)); return (s&&typeof s==='object')?Object.assign({recintos:{},servicios:{}},s):{recintos:{},servicios:{}}; }catch(e){ return {recintos:{},servicios:{}}; } }
+function pmSave(st){ try{ _lsSet(PAUTAS_MANUAL_KEY, JSON.stringify(st)); }catch(e){} }
+window.addEventListener('storage',e=>{ if(e.key===PAUTAS_MANUAL_KEY && S.autsanMode){ renderSVG(); } });
+function pautaEstadoRoom(id){
+  const ov=pmStore().recintos[id];
+  if(ov) return {estado:(ov.estado==='no_corresponde')?'no_corresponde':'validada', p:ov.p||[], manual:ov};
+  const asg=pautaForRoom(id);
+  if(asg && asg.p && asg.p.length) return {estado:'sugerida', p:asg.p, regla:asg.regla};
+  return {estado:'sin', p:[]};
+}
+function pautaEstadoArea(aid){
+  const ov=pmStore().servicios[aid];
+  if(ov) return {estado:(ov.estado==='no_corresponde')?'no_corresponde':'validada', p:ov.p||[], manual:ov};
+  return {estado:'sin', p:[]};
+}
+function psdClase(e){ return e==='validada'?'psd-verde':e==='sugerida'?'psd-ambar':e==='no_corresponde'?'psd-gris':'psd-rojo'; }
+function psResumen(){
+  let v=0,su=0,g=0,r=0;
+  for(const fl of FLOORS) for(const a of fl.areas) for(const rm of a.rooms){
+    const e=pautaEstadoRoom(rm.id).estado;
+    if(e==='validada')v++; else if(e==='sugerida')su++; else if(e==='no_corresponde')g++; else r++;
+  }
+  return `Pautas · 🟢 ${v} validadas · 🟠 ${su} sugeridas · 🔴 ${r} sin pauta · ⚪ ${g} no corresponde`;
+}
+function toggleAutSanMode(){
+  S.autsanMode=!S.autsanMode;
+  const b=document.getElementById('btnAutSan'); if(b) b.classList.toggle('active',S.autsanMode);
+  if(typeof tbInfo!=='undefined'&&tbInfo) tbInfo.textContent=S.autsanMode?psResumen():'';
+  if(!S.autsanMode) psCerrar();
+  renderSVG();
+}
+function psCerrar(){ const p=document.getElementById('psPanel'); if(p) p.remove(); }
+function _psLbl(aid){ const m=(window.PAUTA_LABELS||{})[aid]||{}; return (m.normaLabel?m.normaLabel+' · ':'')+(m.name||aid)+(m.seccion?' · '+m.seccion:''); }
+// Panel de asignación (recinto: kind='r' · servicio: kind='s')
+function openPautaPanel(id, kind){
+  kind=kind||'r'; psCerrar();
+  const esRec=(kind==='r');
+  const est=esRec?pautaEstadoRoom(id):pautaEstadoArea(id);
+  const nombre=esRec?rName(id):aName(id);
+  const code=esRec?rCode(id):''; const bim=esRec?rBim(id):'';
+  const sug=esRec?pautaForRoom(id):null;
+  const PL=window.PAUTA_LABELS||{};
+  const estTxt={sin:'🔴 Sin pauta',sugerida:'🟠 Sugerida (por validar)',validada:'🟢 Validada',no_corresponde:'⚪ No corresponde'}[est.estado];
+  const estBg={sin:'#fee2e2',sugerida:'#fef3c7',validada:'#d1fae5',no_corresponde:'#f1f5f9'}[est.estado];
+  const sugHtml=(sug&&sug.p&&sug.p.length)?
+    `<div style="font-size:11px;color:#64748b;margin:8px 0 3px">Sugerencia de la matriz (regla: <b>${esc((sug.regla||'').replace(/_/g,' '))}</b>):</div>`+
+    sug.p.map(a=>`<div class="ps-amb">${esc(_psLbl(a))}</div>`).join('')+
+    `<button class="ps-btn" style="background:#16a34a;color:#fff" onclick="psConfirmar('${id}','${kind}')">✔ Confirmar sugerencia</button>` : '';
+  const marcados=est.p||[];
+  const dirHtml=Object.keys(PL).map(aid=>
+    `<label class="ps-opt" data-lbl="${esc(_psLbl(aid).toLowerCase())}"><input type="checkbox" value="${esc(aid)}" ${marcados.indexOf(aid)>-1?'checked':''}><span>${esc(_psLbl(aid))}</span></label>`).join('');
+  const d=document.createElement('div'); d.id='psPanel';
+  d.innerHTML=
+    `<div class="ps-hd"><div><b style="font-size:14px">${esc(nombre)}</b>`+
+    `<div style="font-size:11px;color:#a5c8e8;margin-top:2px">${esRec?('Recinto '+esc(code||'—')+(bim?' · BIM '+esc(bim):'')):'Servicio completo (Vista General)'}</div></div>`+
+    `<button onclick="psCerrar()" style="background:none;border:none;color:#fff;font-size:19px;cursor:pointer">×</button></div>`+
+    `<div class="ps-bd">`+
+    `<div style="background:${estBg};border-radius:8px;padding:7px 11px;font-weight:700;font-size:12px">${estTxt}</div>`+
+    sugHtml+
+    `<div style="font-size:11px;color:#64748b;margin:12px 0 4px">Elegir del directorio de pautas (${Object.keys(PL).length}):</div>`+
+    `<input type="text" placeholder="Filtrar…" style="width:100%;border:1px solid #cbd5e1;border-radius:7px;padding:6px 9px;font-size:12px;margin-bottom:5px" oninput="psFiltrar(this.value)">`+
+    `<div style="max-height:220px;overflow:auto" id="psDir">${dirHtml}</div>`+
+    `<div style="margin-top:12px">`+
+    `<button class="ps-btn" style="background:#0f2547;color:#fff" onclick="psGuardar('${id}','${kind}')">💾 Guardar selección</button>`+
+    `<button class="ps-btn" style="background:#f1f5f9;color:#334155" onclick="psNoCorresponde('${id}','${kind}')">⚪ No corresponde</button>`+
+    (est.manual?`<button class="ps-btn" style="background:#fff;border:1px solid #fca5a5;color:#b91c1c" onclick="psQuitar('${id}','${kind}')">↺ Quitar validación</button>`:'')+
+    `</div>`+
+    (esRec?`<a href="16.AutorizacionSanitaria.html?recinto=${encodeURIComponent(id)}${est.p[0]?('&pauta='+encodeURIComponent(est.p[0])):''}" target="_blank" rel="noopener" style="display:inline-block;margin-top:10px;font-size:12px;color:#2563eb">📋 Abrir en Autorización Sanitaria →</a>`:'')+
+    `<a href="#" onclick="psExportMatriz();return false" style="display:block;margin-top:8px;font-size:11px;color:#94a3b8">⬇ Exportar matriz de asignaciones (Fase 1 + validaciones manuales)</a>`+
+    `</div>`;
+  document.body.appendChild(d);
+}
+function psFiltrar(q){
+  q=(q||'').toLowerCase();
+  document.querySelectorAll('#psDir .ps-opt').forEach(l=>{ l.style.display=(!q||l.dataset.lbl.indexOf(q)>-1)?'':'none'; });
+}
+function _psSet(id, kind, val){
+  const st=pmStore();
+  const bag=(kind==='s')?st.servicios:st.recintos;
+  if(val===null) delete bag[id]; else bag[id]=val;
+  pmSave(st); psCerrar();
+  if(typeof tbInfo!=='undefined'&&tbInfo&&S.autsanMode) tbInfo.textContent=psResumen();
+  renderSVG();
+  const fm=document.getElementById('fichaModal');
+  if(fm&&fm.classList.contains('show')&&kind==='r') openFichaRecinto(id);
+}
+function psGuardar(id, kind){
+  const sel=[...document.querySelectorAll('#psDir input:checked')].map(c=>c.value);
+  if(!sel.length){ alert('Selecciona al menos un ámbito, o usa "No corresponde".'); return; }
+  _psSet(id, kind, {estado:'validada', p:sel, fecha:new Date().toISOString().slice(0,10), por:'atlas'});
+}
+function psConfirmar(id, kind){
+  const sug=(kind==='r')?pautaForRoom(id):null;
+  if(!(sug&&sug.p&&sug.p.length)) return;
+  _psSet(id, kind, {estado:'validada', p:sug.p.slice(), regla:sug.regla, fecha:new Date().toISOString().slice(0,10), por:'atlas'});
+}
+function psNoCorresponde(id, kind){ _psSet(id, kind, {estado:'no_corresponde', p:[], fecha:new Date().toISOString().slice(0,10), por:'atlas'}); }
+function psQuitar(id, kind){ _psSet(id, kind, null); }
+// Exportar la matriz (Fase 1 + validaciones manuales) para regenerar SHARED_DATA
+function psExportMatriz(){
+  const man=pmStore();
+  const payload={version:'export '+new Date().toISOString().slice(0,10)+' · matriz Fase 1 + validación manual',
+    base:(window.SHARED_PAUTAS_RECINTOS&&window.SHARED_PAUTAS_RECINTOS.version)||'',
+    manual:man};
+  const blob=new Blob([JSON.stringify(payload,null,1)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='pautas_manual_'+new Date().toISOString().slice(0,10)+'.json'; a.click();
+  URL.revokeObjectURL(a.href);
+}
 if(!nameState.recup)nameState.recup={};
 function rRecup(id){ const r=(nameState.recup||{})[id]; return {camas:(r&&+r.camas)||0, bergere:(r&&+r.bergere)||0}; }
 
@@ -1404,7 +1538,8 @@ function exportForWeb(){
         const ao={id:a.id, name:aName(a.id), shapes:ash.map(rd), rooms:[]};
         for(const r of a.rooms){
           const rsh=rShapes(r); if(!rsh.length) continue; // solo recintos dibujados/posicionados
-          ao.rooms.push({id:r.id, code:rCode(r.id), name:rName(r.id), type:rType(r.id), sen:rSenaletica(r.id), shapes:rsh.map(rd)});
+          const _pw=pautaEstadoRoom(r.id);
+          ao.rooms.push({id:r.id, code:rCode(r.id), name:rName(r.id), type:rType(r.id), sen:rSenaletica(r.id), shapes:rsh.map(rd), pauta:{e:_pw.estado, p:_pw.p}});
         }
         if(ao.rooms.length || ao.shapes.length) fo.areas.push(ao);
       }
@@ -2443,6 +2578,15 @@ function renderL1(fl){
         }
       });
     }
+    // Dot de pauta a nivel SERVICIO (modo 🩺 Aut. Sanitaria, Vista General)
+    if(S.autsanMode){
+      const pe=pautaEstadoArea(area.id);
+      const pr=Math.max(14,Math.min(36,b.w/16,b.h/8));
+      const g=el('g',{class:'psdot '+psdClase(pe.estado),transform:`translate(${b.x+b.w-pr*1.5},${b.y+pr*1.5})`});
+      g.appendChild(el('circle',{cx:0,cy:0,r:pr}));
+      g.addEventListener('click',e=>{e.stopPropagation();openPautaPanel(area.id,'s');});
+      svg.appendChild(g);
+    }
     // Label centred on bounding box: nombre · total de puestos · asignados/disponibles
     const fs=Math.max(20,Math.min(70,b.w/14,b.h/6));
     const ws=areaWsStats(area);
@@ -2556,6 +2700,15 @@ function renderL2(){
         svg.appendChild(r);
         if(S.editMode&&!S.drawMode&&!S.moveMode) drawHandles(s,'room',room.id,si);
       });
+    }
+    // Dot de estado de pauta (modo 🩺 Aut. Sanitaria) — esquina sup. derecha
+    if(S.autsanMode){
+      const pe=pautaEstadoRoom(room.id);
+      const pr=Math.max(10,Math.min(28,b.w/12,b.h/6));
+      const g=el('g',{class:'psdot '+psdClase(pe.estado),transform:`translate(${b.x+b.w-pr*1.5},${b.y+pr*1.5})`});
+      g.appendChild(el('circle',{cx:0,cy:0,r:pr}));
+      g.addEventListener('click',e=>{e.stopPropagation();openPautaPanel(room.id,'r');});
+      svg.appendChild(g);
     }
     // (La X de borrado sobre el plano fue retirada: los recintos se eliminan desde
     //  el árbol de la barra lateral izquierda, en modo edición.)
@@ -5190,19 +5343,26 @@ function openFichaRecinto(roomId){
   const mobCliHtml=secHtml(mobCli,false,'Sin mobiliario clínico registrado para este recinto.');
   const tiHtml   = secHtml(informatica,true,'Sin equipos de informática registrados para este recinto.');
   const mobNcHtml= secHtml(mobNc,false,'Sin mobiliario no clínico registrado para este recinto.');
-  // pauta
-  const asg=pautaForRoom(roomId);
+  // pauta (con estado de asignación: manual > matriz/regla)
+  const _pe=pautaEstadoRoom(roomId);
+  const _peTxt={sin:'🔴 Sin pauta',sugerida:'🟠 Sugerida · por validar',validada:'🟢 Validada',no_corresponde:'⚪ No corresponde'}[_pe.estado];
+  const _peBtn=`<button class="fk-open" style="border:none;background:#0f2547;color:#fff;cursor:pointer;margin-top:6px" onclick="openPautaPanel('${roomId}','r')">🩺 Asignar / validar pauta</button>`+
+    `<div style="font-size:11px;color:#64748b;margin-top:4px">Estado: <b>${_peTxt}</b>${_pe.manual&&_pe.manual.fecha?(' · validada el '+_pe.manual.fecha):''}</div>`;
+  const asg=_pe.manual&&_pe.estado==='validada' ? {regla:'validación manual', p:_pe.p} :
+            (_pe.estado==='no_corresponde' ? null : pautaForRoom(roomId));
   const PL=window.PAUTA_LABELS||{};
   let pautaHtml, normaForOpen='';
-  if(asg && asg.p && asg.p.length){
+  if(_pe.estado==='no_corresponde'){
+    pautaHtml=`<div class="fk-pauta"><div class="fk-empty" style="padding:0">⚪ Marcado como "no corresponde pauta" para este recinto.</div>${_peBtn}</div>`;
+  } else if(asg && asg.p && asg.p.length){
     const items=asg.p.map(aid=>{const m=PL[aid]||{};return {nb:m.normaLabel||(aid.split('_')[0]),name:m.name||aid,sec:m.seccion||''};});
     if(items[0]) normaForOpen=(PL[asg.p[0]]||{}).norma||'';
     const lis=items.map(i=>`<div class="pa-item"><span class="nb">${esc(i.nb)}</span><span>${esc(i.name)}${i.sec?(' · '+esc(i.sec)):''}</span></div>`).join('');
     pautaHtml=`<div class="fk-pauta"><div class="pa-rule">Regla: ${esc((asg.regla||'').replace(/_/g,' '))}</div>${lis}`+
-      `<a class="fk-open" href="16.AutorizacionSanitaria.html?recinto=${encodeURIComponent(roomId)}&pauta=${encodeURIComponent(asg.p[0])}" target="_blank" rel="noopener" onclick="try{_lsSet('auth_sanit_active_norma_v3','${normaForOpen}')}catch(e){}">📋 Evaluar este recinto en Autorización Sanitaria →</a></div>`;
+      `<a class="fk-open" href="16.AutorizacionSanitaria.html?recinto=${encodeURIComponent(roomId)}&pauta=${encodeURIComponent(asg.p[0])}" target="_blank" rel="noopener" onclick="try{_lsSet('auth_sanit_active_norma_v3','${normaForOpen}')}catch(e){}">📋 Evaluar este recinto en Autorización Sanitaria →</a>${_peBtn}</div>`;
   } else {
     pautaHtml=`<div class="fk-pauta"><div class="fk-empty" style="padding:0">Sin pauta asignada a este recinto (matriz en validación).</div>`+
-      `<a class="fk-open" href="16.AutorizacionSanitaria.html?recinto=${encodeURIComponent(roomId)}" target="_blank" rel="noopener">📋 Abrir Autorización Sanitaria (elegir tipología) →</a></div>`;
+      `<a class="fk-open" href="16.AutorizacionSanitaria.html?recinto=${encodeURIComponent(roomId)}" target="_blank" rel="noopener">📋 Abrir Autorización Sanitaria (elegir tipología) →</a>${_peBtn}</div>`;
   }
   // Señalética (nombre/numeración) — matriz + override editable
   const senVal=rSenaletica(roomId), senMatriz=(code&&SEN_BY_CODE[code])||'';
@@ -5977,23 +6137,25 @@ function _repartoPendientes(){
   })));
   return out;
 }
-// Personas asignadas FUERA de la matriz de dotación: al actualizar la matriz,
-// las que ya aparezcan en ella se marcan "reemplazar" (reasignar desde el buscador
-// para que quede vinculada a la matriz y salga de esta lista).
+// Personas asignadas FUERA de la matriz de dotación (incluye Compra de
+// Servicio: también deben incorporarse a la dotación vía RR.HH., manteniendo
+// clara la diferencia). Al actualizar la matriz, las que ya aparezcan en ella
+// se marcan "reemplazar" (reasignar desde el buscador para vincularlas).
 function _externaPendientes(){
   const out=[];
   FLOORS.forEach(fl=>fl.areas.forEach(a=>(a.rooms||[]).forEach(r=>{
     (wsState.dots[r.id]||[]).forEach((d,idx)=>{
-      const push=(nombre,enM)=>out.push({fl,area:a,r,idx,nombre,enMatriz:enM,cargo:[d.cargo,d.estamento].filter(Boolean).join(' · ')});
+      const push=(nombre,enM,cds)=>out.push({fl,area:a,r,idx,nombre,enMatriz:enM,cds:!!cds,cargo:[d.cargo,d.estamento].filter(Boolean).join(' · ')});
       if(d.tipo==='dinamico'){
-        (d.turnos||[]).forEach(x=>{ if(x.externa&&!x.cds) push(x.nombre, isInMatrix(x.nombre)); });
-      } else if(d.externa && !d.cds && d.nombre && d.nombre.trim()){
-        push(d.nombre, isInMatrix(d.nombre));
+        (d.turnos||[]).forEach(x=>{ if((x.externa||x.cds)&&x.nombre) push(x.nombre, isInMatrix(x.nombre), x.cds); });
+      } else if((d.externa||d.cds) && d.nombre && d.nombre.trim()){
+        push(d.nombre, isInMatrix(d.nombre), d.cds);
       }
     });
   })));
-  // primero las que YA están en la matriz (accionables)
-  return out.sort((x,y)=>(y.enMatriz?1:0)-(x.enMatriz?1:0));
+  // orden: primero las YA en matriz (accionables), luego fuera de matriz
+  // simples, y al final las Compra de Servicio (gestión con RR.HH.)
+  return out.sort((x,y)=>((x.enMatriz?0:1)-(y.enMatriz?0:1)) || ((x.cds?1:0)-(y.cds?1:0)) || String(x.nombre||'').localeCompare(String(y.nombre||''),'es'));
 }
 const REV_CHECKS={
   pma:{label:'BIM oficial (PMA)',
@@ -6030,12 +6192,15 @@ const REV_CHECKS={
     find:_emmcDiffPendientes, noDialog:true, flat:true,
     subText:p=>p.diff?(p.diff.unidades+' unidades · '+p.diff.motivo+' · '+p.fl.label):'',
     done:'El Despliegue EMMC cuadra completo con Atlas (8.358 unidades).'},
-  externa:{label:'Personas fuera de matriz',
+  externa:{label:'Fuera de matriz / Compra de Servicio',
     find:_externaPendientes, flat:true,
     go:p=>{ if(S.floorId!==p.fl.id) goFloor(p.fl.id); goArea(p.area.id); goRoom(p.r.id);
       if(!S.viewOnly) setTimeout(()=>{ try{ openModal(p.r.id,p.idx); }catch(e){} },820); },
-    subText:p=>(p.enMatriz?'✔ YA EN LA MATRIZ — reemplazar · ':'aún fuera de matriz · ')+[p.cargo,p.fl.label].filter(Boolean).join(' · '),
-    done:'No hay personas asignadas fuera de la matriz de dotación.'},
+    subText:p=>(p.enMatriz?'✔ YA EN LA MATRIZ — reemplazar · '
+              :(p.cds?'🛒 Compra de Servicio — incorporar a dotación vía RR.HH. · '
+                     :'⚠ fuera de matriz — gestionar con RR.HH. · '))
+              +[p.cargo,p.fl.label].filter(Boolean).join(' · '),
+    done:'No hay personas asignadas fuera de la matriz de dotación (incluye Compra de Servicio).'},
   multibim:{label:'Multi-BIM sin revisar',
     // más de 1 código BIM; los baños quedan fuera (legítimamente tienen 2);
     // guardar la ficha del recinto lo marca revisado aunque el BIM no cambie

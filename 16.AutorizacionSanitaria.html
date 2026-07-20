@@ -1867,9 +1867,8 @@ function exportarPautaPDF(){
   <table><thead><tr><th>N°</th><th>Requisito</th><th>Estado</th></tr></thead><tbody>${filas}</tbody></table>
   ${ast.obs?`<h2>Observaciones generales</h2><p>${escapeHtml(ast.obs)}</p>`:''}
   <div class="firma"><div>Inspector: ${escapeHtml(ident.inspector||'')}</div><div>Responsable del servicio</div></div>
-  <script>window.onload=()=>setTimeout(()=>window.print(),300);<\/script>
-  <script src="hub-home.js"></script>
-</body></html>`;
+  <scr\ipt>window.onload=()=>setTimeout(()=>window.print(),300);<\/scr\ipt>
+<\/body><\/html>`;
   const w = window.open('', '_blank');
   if(!w){ alert('El navegador bloqueó la ventana. Permite pop-ups para exportar.'); return; }
   w.document.write(html); w.document.close();
@@ -1972,7 +1971,7 @@ function certImprimir(id){
     <h1>AUTORIZACIÓN SANITARIA HDS · Certificados de Operadores</h1>
     <p style="font-size:10.5px;color:#475569">📁 Autorización Sanitaria HDS → Certificados Operadores · ${lista.length} certificado(s) · ${new Date().toISOString().slice(0,10)}</p>
     <table><thead><tr><th>Persona</th><th>Cargo</th><th>Tipo</th><th>N°</th><th>Emisor</th><th>Emisión</th><th>Vencimiento</th></tr></thead><tbody>${filas}</tbody></table>
-    ${imgs}<script>window.onload=()=>setTimeout(()=>window.print(),300);<\/script></body></html>`);
+    ${imgs}<scr\ipt>window.onload=()=>setTimeout(()=>window.print(),300);<\/scr\ipt><\/body><\/html>`);
   w.document.close();
 }
 function openCertificados(){
@@ -4740,5 +4739,6 @@ async function pixelDissolve(wrap, source){
 })();
 </script>
 
+<script src="hub-home.js"></script>
 </body>
 </html>
