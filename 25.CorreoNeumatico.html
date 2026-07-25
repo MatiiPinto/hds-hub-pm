@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<script src="pm_config.js"></script>
+<script src="pm_gate.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Correo Neumático · HDS</title>
+<link rel="icon" type="image/x-icon" href="Logos%20HUB-HDS/favicon-hds.ico">
+<link rel="icon" type="image/png" sizes="256x256" href="Logos%20HUB-HDS/favicon-hds.png">
+<link rel="shortcut icon" href="Logos%20HUB-HDS/favicon-hds.ico">
+<link rel="apple-touch-icon" href="Logos%20HUB-HDS/favicon-hds-180.png">
+
+<script src="SHARED_DATA/correo_neumatico.js"></script>
+<script src="SHARED_DATA/correo_neumatico_pos.js"></script>
+<style>
+:root{
+  --bg:#0b1228;--panel:#111a36;--panel2:#0f1730;--border:#1e293b;--border2:#28406b;
+  --cyan:#22d3ee;--text:#e6eefc;--muted:#9fb2d4;--dim:#5d75a6;
+  --t1:#a855f7;--t2:#38bdf8;--t3:#eab308;--t4:#fb923c;--gen:#94a3b8;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:radial-gradient(1200px 700px at 70% -10%,#16224a,#0b1228 60%);
+  color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;min-height:100vh}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+header{display:flex;align-items:center;gap:14px;padding:14px 22px;border-bottom:1px solid var(--border);
+  background:rgba(10,16,40,.6);backdrop-filter:blur(8px);position:sticky;top:0;z-index:50}
+header .logo{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,#22d3ee,#6366f1);
+  display:flex;align-items:center;justify-content:center;font-size:22px}
+header h1{margin:0;font-size:17px;font-weight:800}
+header .sub{font-size:11px;color:var(--muted)}
+.hub-back{background:rgba(255,255,255,.06);border:1px solid var(--border2);color:var(--muted);
+  padding:8px 14px;border-radius:9px;font-size:12px;font-weight:600}
+.hub-back:hover{background:rgba(255,255,255,.12);color:#fff}
+.wrap{max-width:1280px;margin:0 auto;padding:20px}
+
+/* KPIs */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px 16px}
+.kpi .n{font-size:26px;font-weight:800;color:var(--cyan)}
+.kpi .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-top:2px}
+
+/* Tabs */
+.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.tab{background:rgba(255,255,255,.05);border:1px solid var(--border2);color:var(--muted);
+  padding:9px 16px;border-radius:10px;font-size:13px;font-weight:700}
+.tab.on{background:linear-gradient(135deg,#22d3ee,#3b82f6);border:none;color:#06223a}
+
+.view{display:none}.view.on{display:block}
+
+/* Filtros */
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.filters input[type=text]{flex:1;min-width:200px;background:var(--panel2);border:1px solid var(--border2);
+  color:var(--text);border-radius:10px;padding:10px 14px;font-size:13px;outline:none}
+.filters select{background:var(--panel2);border:1px solid var(--border2);color:var(--text);
+  border-radius:10px;padding:9px 12px;font-size:12px;outline:none}
+.chip-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.fchip{background:rgba(255,255,255,.05);border:1px solid var(--border2);color:var(--muted);
+  padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600}
+.fchip.on{color:#fff}
+.fchip.t1.on{background:var(--t1);border-color:var(--t1)}
+.fchip.t2.on{background:var(--t2);border-color:var(--t2);color:#06223a}
+.fchip.t3.on{background:var(--t3);border-color:var(--t3);color:#3a2e00}
+.fchip.t4.on{background:var(--t4);border-color:var(--t4);color:#3a1c00}
+.fchip.gen.on{background:var(--gen);border-color:var(--gen);color:#1a2030}
+
+/* Grid de estaciones */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.st{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:14px;border-left:4px solid var(--c,#64748b);position:relative}
+.st .top{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.st .sysdot{width:10px;height:10px;border-radius:3px;background:var(--c)}
+.st .id{font-size:11px;font-family:ui-monospace,monospace;color:var(--dim)}
+.st .nm{font-size:14px;font-weight:800;margin:2px 0}
+.st .row{font-size:12px;color:var(--muted);margin:3px 0;display:flex;gap:6px}
+.st .row b{color:var(--text);font-weight:600}
+.st .badges{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.bdg{font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;background:rgba(255,255,255,.08);color:var(--muted)}
+.bdg.sys{color:#fff;background:var(--c)}
+.bdg.tipo{background:rgba(34,211,238,.15);color:var(--cyan)}
+.empty{text-align:center;color:var(--dim);padding:40px;font-style:italic}
+
+/* Vista por sistema */
+.sys-card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:16px;border-top:4px solid var(--c)}
+.sys-head{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.sys-head .tag{font-size:13px;font-weight:800;color:#fff;background:var(--c);padding:3px 12px;border-radius:8px}
+.sys-head h3{margin:0;font-size:16px;font-weight:800}
+.sys-meta{font-size:12px;color:var(--muted);margin-bottom:12px}
+.sys-nodes{display:flex;flex-direction:column;gap:6px}
+.node{display:flex;align-items:center;gap:10px;background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:8px 12px;font-size:13px}
+.node.central{border-color:var(--c);background:rgba(255,255,255,.04);font-weight:700}
+.node .nid{font-family:ui-monospace,monospace;font-size:10px;color:var(--dim);min-width:120px}
+.node .ntipo{margin-left:auto;font-size:10px;color:var(--muted);background:rgba(255,255,255,.06);padding:2px 8px;border-radius:6px}
+
+/* Specs / docs */
+.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:18px;margin-bottom:16px}
+.card h2{margin:0 0 12px;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--cyan)}
+.spec-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.spec{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.spec .k{font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.5px}
+.spec .v{font-size:13px;font-weight:600;margin-top:2px}
+.docnote{font-size:12px;color:var(--muted);line-height:1.6}
+.btn{background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.4);color:var(--cyan);
+  border-radius:9px;padding:9px 16px;font-size:12px;font-weight:700}
+.btn:hover{background:rgba(34,211,238,.22)}
+.toolbar{display:flex;justify-content:flex-end;margin-bottom:12px}
+
+/* ── PLANOS POR PISO ── */
+.plan-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.floor-btns{display:flex;gap:6px}
+.fl-btn{background:var(--panel);border:1px solid var(--border2);color:var(--muted);border-radius:8px;
+  padding:7px 13px;font-size:12px;font-weight:800;cursor:pointer;transition:all .12s}
+.fl-btn:hover{color:var(--text);border-color:var(--cyan)}
+.fl-btn.on{background:rgba(34,211,238,.16);border-color:var(--cyan);color:var(--cyan)}
+.plan-hint{font-size:11px;color:var(--dim)}
+.plan-stage{position:relative;background:#fff;border:1px solid var(--border2);border-radius:12px;overflow:hidden}
+.plan-stage img{width:100%;display:block;user-select:none}
+.plan-stage svg{position:absolute;inset:0;width:100%;height:100%}
+.st-dot{cursor:pointer}
+.st-dot circle.c{stroke:#fff;stroke-width:2;filter:drop-shadow(0 1px 3px rgba(0,0,0,.4))}
+.st-dot text{font:700 11px 'Segoe UI',sans-serif;fill:#0f172a;stroke:#fff;stroke-width:3;paint-order:stroke;text-anchor:middle;pointer-events:none}
+.st-dot.dragging circle.c{stroke:#22d3ee;stroke-width:3}
+.tube{fill:none;stroke-linecap:round;opacity:.45}
+
+/* ── PERSPECTIVA ── */
+.persp-stage{background:radial-gradient(120% 90% at 50% 12%,#152647,#0a1124);border:1px solid var(--border2);
+  border-radius:12px;overflow:hidden}
+.persp-stage svg{display:block;width:100%;height:calc(100vh - 320px);min-height:520px}
+.pf-img{opacity:.85}
+.pf-edge{fill:none;stroke:rgba(140,170,220,.45);stroke-width:1.5}
+.pf-lbl{font:800 15px 'Segoe UI',sans-serif;fill:#cfe1ff}
+.pn-dot{stroke:#fff;stroke-width:1.6;filter:drop-shadow(0 1px 3px rgba(0,0,0,.6))}
+.pn-lbl{font:600 9px 'Segoe UI',sans-serif;fill:#dbe7ff;opacity:.85;pointer-events:none}
+.ptube{fill:none;stroke-linecap:round}
+.ptube.ramal{opacity:.5;stroke-width:1.6}
+.ptube.troncal{opacity:.85;stroke-width:3.2}
+.ptube.espina{opacity:.9;stroke-width:4;stroke:#22d3ee}
+.capsula{filter:drop-shadow(0 0 6px currentColor)}
+#btnSim.sim-on{background:rgba(251,146,60,.18);border-color:#fb923c;color:#fdba74}
+</style>
+</head>
+<body>
+
+<header>
+  <a class="hub-back" href="index.html" title="Volver al HUB">← HUB</a>
+  <div class="logo">✉️</div>
+  <div>
+    <h1>Correo Neumático · HDS</h1>
+    <div class="sub" id="hdrSub">Directorio de estaciones · sistemas T1–T4</div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="kpis" id="kpis"></div>
+
+  <div class="tabs">
+    <button class="tab on" data-v="dir" onclick="setView('dir')">📇 Directorio</button>
+    <button class="tab" data-v="sys" onclick="setView('sys')">🔀 Por sistema</button>
+    <button class="tab" data-v="plan" onclick="setView('plan')">🗺 Planos</button>
+    <button class="tab" data-v="persp" onclick="setView('persp')">🏢 Perspectiva</button>
+    <button class="tab" data-v="info" onclick="setView('info')">⚙ Especificaciones</button>
+  </div>
+
+  <!-- DIRECTORIO -->
+  <div class="view on" id="view-dir">
+    <div class="filters">
+      <input type="text" id="q" placeholder="Buscar por estación, ubicación, servicio o id…" oninput="renderDir()">
+      <select id="fEdif" onchange="renderDir()"><option value="">Todos los edificios</option></select>
+      <select id="fPiso" onchange="renderDir()"><option value="">Todos los pisos</option></select>
+      <select id="fTipo" onchange="renderDir()"><option value="">Todos los tipos</option></select>
+    </div>
+    <div class="chip-row" id="sysChips"></div>
+    <div class="toolbar"><button class="btn" onclick="exportCSV()">📥 Exportar CSV</button></div>
+    <div class="grid" id="dirGrid"></div>
+  </div>
+
+  <!-- POR SISTEMA -->
+  <div class="view" id="view-sys"></div>
+
+  <!-- PLANOS POR PISO -->
+  <div class="view" id="view-plan">
+    <div class="plan-bar">
+      <div class="floor-btns" id="planFloors"></div>
+      <div class="chip-row" id="planChips" style="margin:0"></div>
+      <span class="plan-hint" id="planHint"></span>
+      <button class="btn" id="btnExportPos" onclick="exportPos()" style="display:none">📥 Exportar posiciones</button>
+    </div>
+    <div class="plan-stage" id="planStage">
+      <img id="planImg" alt="Plano del piso" draggable="false">
+      <svg id="planOv" xmlns="http://www.w3.org/2000/svg"></svg>
+    </div>
+  </div>
+
+  <!-- PERSPECTIVA -->
+  <div class="view" id="view-persp">
+    <div class="plan-bar">
+      <div class="chip-row" id="perspChips" style="margin:0"></div>
+      <button class="btn" id="btnSim" onclick="toggleSim()">▶ Simular envíos</button>
+      <label class="plan-hint" style="display:flex;align-items:center;gap:6px">Velocidad
+        <input type="range" id="simSpeed" min="40" max="260" value="120" style="width:110px">
+      </label>
+      <span class="plan-hint">Cápsulas recorren: estación → troncal del sistema → central de impulsión (PS1) → destino</span>
+    </div>
+    <div class="persp-stage" id="perspStage">
+      <svg id="perspSvg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 950" preserveAspectRatio="xMidYMid meet"></svg>
+    </div>
+  </div>
+
+  <!-- ESPECIFICACIONES -->
+  <div class="view" id="view-info">
+    <div class="card">
+      <h2>Especificaciones técnicas</h2>
+      <div class="spec-grid" id="specGrid"></div>
+    </div>
+    <div class="card">
+      <h2>Documentación (manuales y planos)</h2>
+      <p class="docnote">Aquí se enlazarán los <b>manuales de uso</b> y los <b>planos de distribución</b> por edificio/piso cuando estén disponibles. Para agregarlos, déjalos en una carpeta del proyecto y se vinculan a cada sistema o estación.</p>
+      <div id="docList" class="spec-grid" style="margin-top:10px"></div>
+    </div>
+    <div class="card">
+      <h2>Fuente</h2>
+      <p class="docnote" id="fuente"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+const DATA = window.CORREO_NEUMATICO_DATA || {estaciones:[],sistemas:{},tipos_estacion:{},stats:{},especificaciones_tecnicas:{}};
+const EST = DATA.estaciones||[];
+const SYS = DATA.sistemas||{};
+const TIPOS = DATA.tipos_estacion||{};
+const SYS_COLOR = {T1:'var(--t1)',T2:'var(--t2)',T3:'var(--t3)',T4:'var(--t4)',GEN:'var(--gen)'};
+let _sysFilter = ''; // chip de sistema activo
+
+const esc = s => (s||'').toString().replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const uniq = arr => [...new Set(arr)].filter(Boolean).sort();
+
+// ── KPIs ──
+function renderKpis(){
+  const s = DATA.stats || {};
+  const kpis = [
+    ['Estaciones', EST.length],
+    ['Edificios', Object.keys(s.por_edificio||{}).length || uniq(EST.map(e=>e.edificio)).length],
+    ['Sistemas', Object.keys(SYS).length],
+    ['Servicios', s.servicios_cubiertos || uniq(EST.map(e=>e.servicio)).length]
+  ];
+  document.getElementById('kpis').innerHTML = kpis.map(([l,n])=>`<div class="kpi"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+}
+
+// ── Poblar filtros ──
+function fillFilters(){
+  const ed=document.getElementById('fEdif'), pi=document.getElementById('fPiso'), ti=document.getElementById('fTipo');
+  uniq(EST.map(e=>e.edificio)).forEach(v=>ed.innerHTML+=`<option value="${v}">${v}</option>`);
+  uniq(EST.map(e=>e.piso)).forEach(v=>pi.innerHTML+=`<option value="${v}">${v}</option>`);
+  uniq(EST.map(e=>e.tipo)).forEach(v=>ti.innerHTML+=`<option value="${v}">${TIPOS[v]||v}</option>`);
+  // chips de sistema
+  const chips=document.getElementById('sysChips');
+  chips.innerHTML = `<span class="fchip ${_sysFilter===''?'on':''}" style="${_sysFilter===''?'background:#334155;border-color:#334155;color:#fff':''}" onclick="setSys('')">Todos</span>` +
+    Object.keys(SYS).map(k=>`<span class="fchip ${k.toLowerCase()} ${_sysFilter===k?'on':''}" onclick="setSys('${k}')">${k} · ${esc(SYS[k].nombre)}</span>`).join('');
+}
+function setSys(k){ _sysFilter=k; fillFilters(); renderDir(); }
+
+// ── Directorio ──
+function renderDir(){
+  const q=(document.getElementById('q').value||'').toLowerCase().trim();
+  const fe=document.getElementById('fEdif').value, fp=document.getElementById('fPiso').value, ft=document.getElementById('fTipo').value;
+  let rows = EST.filter(e=>{
+    if(_sysFilter && e.sistema!==_sysFilter) return false;
+    if(fe && e.edificio!==fe) return false;
+    if(fp && e.piso!==fp) return false;
+    if(ft && e.tipo!==ft) return false;
+    if(q){ const blob=[e.id,e.nombre,e.ubicacion,e.servicio,e.edificio,e.piso,e.sistema].join(' ').toLowerCase(); if(!blob.includes(q)) return false; }
+    return true;
+  });
+  const grid=document.getElementById('dirGrid');
+  if(!rows.length){ grid.innerHTML='<div class="empty">Sin estaciones que coincidan con el filtro.</div>'; return; }
+  grid.innerHTML = rows.map(e=>{
+    const col = SYS_COLOR[e.sistema]||'#64748b';
+    return `<div class="st" style="--c:${col}">
+      <div class="top"><span class="sysdot"></span><span class="id">${esc(e.id)}</span></div>
+      <div class="nm">${esc(e.nombre)}</div>
+      <div class="row">📍 <b>${esc(e.ubicacion||'—')}</b></div>
+      <div class="row">🏥 ${esc(e.servicio||'—')}</div>
+      <div class="row">🏢 ${esc(e.edificio)} · ${esc(e.piso)}${e.altura?' · '+esc(e.altura):''}</div>
+      <div class="badges">
+        <span class="bdg sys" style="--c:${col}">${esc(e.sistema)}</span>
+        <span class="bdg tipo">${esc(TIPOS[e.tipo]||e.tipo)}</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Por sistema (esquema lógico) ──
+function renderSys(){
+  const wrap=document.getElementById('view-sys');
+  const orden=['equipo_impulsion','recepcion_masiva','masivo','final','paso','auxiliar'];
+  wrap.innerHTML = Object.keys(SYS).map(k=>{
+    const col=SYS_COLOR[k]||'#64748b';
+    const sys=SYS[k];
+    const nodes = EST.filter(e=>e.sistema===k).sort((a,b)=>orden.indexOf(a.tipo)-orden.indexOf(b.tipo));
+    return `<div class="sys-card" style="--c:${col}">
+      <div class="sys-head"><span class="tag">${esc(k)}</span><h3>${esc(sys.nombre)}</h3></div>
+      <div class="sys-meta">Edificio(s): ${(sys.edificios||[]).join(', ')||'—'} · Tubería: ${esc(sys.diametro||'—')} · ${nodes.length} estaciones</div>
+      <div class="sys-nodes">${nodes.map(n=>{
+        const central = (n.tipo==='masivo'||n.tipo==='recepcion_masiva'||n.tipo==='equipo_impulsion');
+        return `<div class="node ${central?'central':''}">
+          <span class="nid">${esc(n.id)}</span>
+          <span>${central?'⭑ ':''}${esc(n.nombre)} — <span style="color:var(--muted)">${esc(n.ubicacion||'')}</span></span>
+          <span class="ntipo">${esc(TIPOS[n.tipo]||n.tipo)}</span>
+        </div>`;
+      }).join('')}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── Especificaciones ──
+function renderInfo(){
+  const sp=DATA.especificaciones_tecnicas||{};
+  const labels={diametro_tuberia:'Diámetro tubería',capsulas:'Cápsulas',carga_max_capsula:'Carga máx. cápsula',
+    velocidad_envio:'Velocidad de envío',alimentacion_turbinas:'Alimentación turbinas',normativa_pvc:'Normativa PVC',
+    sello_cortafuego:'Sello cortafuego',radio_min_curvatura:'Radio mín. curvatura'};
+  document.getElementById('specGrid').innerHTML = Object.entries(sp).map(([k,v])=>
+    `<div class="spec"><div class="k">${esc(labels[k]||k)}</div><div class="v">${esc(v)}</div></div>`).join('') || '<div class="empty">Sin especificaciones.</div>';
+  // documentos por sistema (placeholders)
+  document.getElementById('docList').innerHTML = Object.keys(SYS).map(k=>
+    `<div class="spec"><div class="k">Sistema ${esc(k)}</div><div class="v" style="font-size:12px;color:var(--dim)">Manual y plano: pendiente de cargar</div></div>`).join('');
+  document.getElementById('fuente').innerHTML = `${esc(DATA.fuente||'—')}<br><span style="color:var(--dim)">Versión: ${esc(DATA.version||'')} · Generado: ${esc(DATA.generado||'')}</span><br><span style="color:var(--dim)">${esc(DATA.observacion||'')}</span>`;
+}
+
+// ── Tabs ──
+function setView(v){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.v===v));
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('on'));
+  document.getElementById('view-'+v).classList.add('on');
+  if(v==='sys') renderSys();
+  if(v==='info') renderInfo();
+  if(v==='plan'){ renderPlanFloors(); renderPlan(); }
+  if(v==='persp'){ renderPlanFloors(); buildPersp(); }
+  if(v!=='persp' && typeof _simOn!=='undefined' && _simOn) toggleSim();   // pausar al salir
+}
+
+// ── Export CSV ──
+function exportCSV(){
+  const head=['id','edificio','piso','altura','sistema','tipo','nombre','ubicacion','servicio'];
+  const rows=[head].concat(EST.map(e=>head.map(h=>e[h]||'')));
+  const csv=rows.map(r=>r.map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+  a.download='correo_neumatico_HDS.csv'; document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},100);
+}
+
+// ── Init ──
+// ════════════════════════════════════════════════════════════════════════════
+// PLANOS POR PISO + PERSPECTIVA con simulación de cápsulas
+// Posiciones: SHARED_DATA/correo_neumatico_pos.js (auto-ubicadas por servicio↔
+// áreas Atlas, nx/ny 0..1). Ajuste local arrastrando (localStorage override);
+// "Exportar posiciones" regenera el archivo para fijarlas al repo.
+// ════════════════════════════════════════════════════════════════════════════
+const SYS_HEX={T1:'#a855f7',T2:'#38bdf8',T3:'#eab308',T4:'#fb923c',GEN:'#94a3b8'};
+const PLAN_FLOORS=[['P-1','PS1'],['P1','P1'],['P2','P2'],['P3','P3'],['P4','P4']];
+const estFloor=e=>e.piso==='PS1'?'P-1':e.piso;
+let _posOverride={}; try{_posOverride=JSON.parse(localStorage.getItem('correo_pos_override')||'{}');}catch(_){}
+function getPos(id){ return _posOverride[id]||((window.CORREO_POS||{})[id])||{nx:.5,ny:.5}; }
+let _planFloor='P1', _mapSys='';
+
+// ── Troncales: columna vertical por sistema en el centroide de sus estaciones ─
+function sysColumn(sys){
+  const es=EST.filter(e=>e.sistema===sys && e.tipo!=='equipo_impulsion');
+  if(!es.length) return {nx:.5,ny:.5};
+  let sx=0,sy=0; es.forEach(e=>{const p=getPos(e.id);sx+=p.nx;sy+=p.ny;});
+  return {nx:sx/es.length, ny:sy/es.length};
+}
+const CENTRAL=()=>EST.find(e=>e.tipo==='equipo_impulsion')||EST[0];
+
+// ── VISTA PLANOS ─────────────────────────────────────────────────────────────
+function renderPlanFloors(){
+  document.getElementById('planFloors').innerHTML=PLAN_FLOORS.map(([id,lb])=>
+    `<button class="fl-btn ${_planFloor===id?'on':''}" onclick="setPlanFloor('${id}')">${lb}</button>`).join('');
+  const chips=(tgt)=>`<span class="fchip ${_mapSys===''?'on':''}" onclick="setMapSys('')">Todos</span>`+
+    Object.keys(SYS).map(k=>`<span class="fchip ${k.toLowerCase()} ${_mapSys===k?'on':''}" onclick="setMapSys('${k}')">${k}</span>`).join('');
+  document.getElementById('planChips').innerHTML=chips();
+  const pc=document.getElementById('perspChips'); if(pc) pc.innerHTML=chips();
+}
+function setPlanFloor(f){ _planFloor=f; renderPlanFloors(); renderPlan(); }
+function setMapSys(s){ _mapSys=s; renderPlanFloors(); renderPlan();
+  if(document.getElementById('view-persp').classList.contains('on')) buildPersp(); }
+function renderPlan(){
+  const img=document.getElementById('planImg');
+  img.onload=()=>drawPlanOverlay();
+  img.src='CABIDA_DATA/correo_plans/plan_'+_planFloor+'.webp';
+  if(img.complete&&img.naturalWidth) drawPlanOverlay();
+  document.getElementById('planHint').textContent = PUBLIC?'':'✋ Arrastrá una estación para ajustar su posición (se guarda local)';
+  const be=document.getElementById('btnExportPos'); if(be) be.style.display=PUBLIC?'none':'';
+}
+function drawPlanOverlay(){
+  const img=document.getElementById('planImg'), ov=document.getElementById('planOv');
+  const W=img.naturalWidth||1600, H=img.naturalHeight||1200;
+  ov.setAttribute('viewBox',`0 0 ${W} ${H}`);
+  const es=EST.filter(e=>estFloor(e)===_planFloor&&(!_mapSys||e.sistema===_mapSys));
+  let h='';
+  // tubos del piso: estación → columna de su sistema
+  es.forEach(e=>{ if(e.sistema==='GEN')return;
+    const p=getPos(e.id), c=sysColumn(e.sistema);
+    h+=`<path class="tube" stroke="${SYS_HEX[e.sistema]}" stroke-width="3" d="M${p.nx*W},${p.ny*H} L${c.nx*W},${p.ny*H} L${c.nx*W},${c.ny*H}"/>`;
+  });
+  // nodo troncal por sistema presente en el piso
+  [...new Set(es.map(e=>e.sistema))].filter(s=>s!=='GEN').forEach(s=>{
+    const c=sysColumn(s);
+    h+=`<circle cx="${c.nx*W}" cy="${c.ny*H}" r="7" fill="${SYS_HEX[s]}" opacity=".9" stroke="#fff" stroke-width="1.5"/>`;
+  });
+  es.forEach(e=>{
+    const p=getPos(e.id), col=SYS_HEX[e.sistema]||'#94a3b8';
+    const r=e.tipo==='equipo_impulsion'?14:(e.tipo&&e.tipo.includes('masiv')?11:9);
+    h+=`<g class="st-dot" data-id="${e.id}" transform="translate(${p.nx*W},${p.ny*H})">
+      <circle class="c" r="${r}" fill="${col}"><title>${esc(e.id)} · ${esc(e.nombre)}\n${esc(e.ubicacion||'')} · ${esc(e.servicio||'')}</title></circle>
+      <text y="${r+13}">${esc(e.nombre)}</text></g>`;
+  });
+  ov.innerHTML=h;
+  if(!PUBLIC) enablePlanDrag(W,H);
+}
+function enablePlanDrag(W,H){
+  const ov=document.getElementById('planOv'), stage=document.getElementById('planStage');
+  ov.querySelectorAll('.st-dot').forEach(g=>{
+    g.addEventListener('pointerdown',ev=>{
+      ev.preventDefault(); const id=g.dataset.id; g.classList.add('dragging');
+      const move=e2=>{
+        const r=stage.getBoundingClientRect();
+        const nx=Math.min(1,Math.max(0,(e2.clientX-r.left)/r.width));
+        const ny=Math.min(1,Math.max(0,(e2.clientY-r.top)/r.height));
+        _posOverride[id]={nx:+nx.toFixed(4),ny:+ny.toFixed(4)};
+        g.setAttribute('transform',`translate(${nx*W},${ny*H})`);
+      };
+      const up=()=>{ window.removeEventListener('pointermove',move); window.removeEventListener('pointerup',up);
+        g.classList.remove('dragging');
+        localStorage.setItem('correo_pos_override',JSON.stringify(_posOverride));
+        drawPlanOverlay(); };
+      window.addEventListener('pointermove',move); window.addEventListener('pointerup',up);
+    });
+  });
+}
+function exportPos(){
+  const all={...(window.CORREO_POS||{}),..._posOverride};
+  const js='// Posiciones de estaciones del correo neumático sobre los planos (nx,ny normalizados 0..1 por piso)\n'
+    +'// Exportado desde la plataforma el '+new Date().toISOString().slice(0,10)+'. Reemplazar SHARED_DATA/correo_neumatico_pos.js\n'
+    +'window.CORREO_POS = '+JSON.stringify(all)+';\n';
+  const b=new Blob([js],{type:'text/javascript'}); const a=document.createElement('a');
+  a.href=URL.createObjectURL(b); a.download='correo_neumatico_pos.js'; a.click(); URL.revokeObjectURL(a.href);
+}
+
+// ── VISTA PERSPECTIVA ────────────────────────────────────────────────────────
+// Proyección afín: cada piso es un paralelogramo apilado; misma matriz para
+// planos, estaciones y tubos → interconexiones dibujables en un solo SVG.
+const PP={PW:820, SKEW:-210, FLAT:315, GAP:118, OX:330, OY:100};
+function proj(nx,ny,fi){ // fi: 0=P-1 (abajo) .. 4=P4 (arriba)
+  const lvl=4-fi;
+  return { x:PP.OX+nx*PP.PW+ny*PP.SKEW, y:PP.OY+lvl*PP.GAP+ny*PP.FLAT };
+}
+const FI={ 'P-1':0,'P1':1,'P2':2,'P3':3,'P4':4 };
+let _simOn=false,_caps=[],_lastT=0,_spawnT=0,_raf=null;
+function buildPersp(){
+  const svg=document.getElementById('perspSvg');
+  let h='';
+  // pisos (de atrás/arriba hacia adelante/abajo para orden de pintado)
+  for(let fi=4;fi>=0;fi--){
+    const id=PLAN_FLOORS[fi][0], lb=PLAN_FLOORS[fi][1];
+    const p00=proj(0,0,fi),p10=proj(1,0,fi),p11=proj(1,1,fi),p01=proj(0,1,fi);
+    // imagen con transform afín (alto exacto del webp de cada piso)
+    const IH={'P-1':1227,'P1':1166,'P2':1168,'P3':1168,'P4':1169}[id]||1166;
+    const a=(p10.x-p00.x)/1600, b=(p10.y-p00.y)/1600, c=(p01.x-p00.x)/IH, d=(p01.y-p00.y)/IH;
+    h+=`<g opacity="${_mapSys?'.95':'1'}">
+      <image class="pf-img" href="CABIDA_DATA/correo_plans/plan_${id}.webp" width="1600" height="${IH}"
+        transform="matrix(${a},${b},${c},${d},${p00.x},${p00.y})" preserveAspectRatio="none"/>
+      <path class="pf-edge" d="M${p00.x},${p00.y} L${p10.x},${p10.y} L${p11.x},${p11.y} L${p01.x},${p01.y} Z"/>
+      <text class="pf-lbl" x="${p01.x-64}" y="${p01.y+4}">${lb}</text></g>`;
+    // contenido del piso: tubos + estaciones
+    const es=EST.filter(e=>estFloor(e)===id&&(!_mapSys||e.sistema===_mapSys));
+    es.forEach(e=>{ if(e.sistema==='GEN')return;
+      const p=getPos(e.id), cc=sysColumn(e.sistema);
+      const A=proj(p.nx,p.ny,fi), B=proj(cc.nx,p.ny,fi), C=proj(cc.nx,cc.ny,fi);
+      h+=`<path class="ptube ramal" stroke="${SYS_HEX[e.sistema]}" d="M${A.x},${A.y} L${B.x},${B.y} L${C.x},${C.y}"/>`;
+    });
+    es.forEach(e=>{
+      const p=getPos(e.id), P=proj(p.nx,p.ny,fi), col=SYS_HEX[e.sistema]||'#94a3b8';
+      const r=e.tipo==='equipo_impulsion'?8:(e.tipo&&e.tipo.includes('masiv')?6.5:5);
+      h+=`<circle class="pn-dot" cx="${P.x}" cy="${P.y}" r="${r}" fill="${col}"><title>${esc(e.id)} · ${esc(e.nombre)}</title></circle>`;
+      if(e.tipo==='equipo_impulsion') h+=`<text class="pn-lbl" x="${P.x+11}" y="${P.y+3}" style="font-size:11px;font-weight:800;fill:#67e8f9">CENTRAL DE IMPULSIÓN</text>`;
+    });
+  }
+  // columnas troncales verticales por sistema + espina hacia la central en P-1
+  const cen=CENTRAL(), cp=getPos(cen.id), CEN=proj(cp.nx,cp.ny,0);
+  Object.keys(SYS).filter(s=>s!=='GEN'&&(!_mapSys||s===_mapSys)).forEach(s=>{
+    const c=sysColumn(s);
+    const pisos=[...new Set(EST.filter(e=>e.sistema===s).map(e=>FI[estFloor(e)]))];
+    const top=Math.max(...pisos), bot=0;
+    const A=proj(c.nx,c.ny,top), B=proj(c.nx,c.ny,bot);
+    h+=`<path class="ptube troncal" stroke="${SYS_HEX[s]}" d="M${A.x},${A.y} L${B.x},${B.y}"/>`;
+    h+=`<path class="ptube espina" d="M${B.x},${B.y} L${CEN.x},${CEN.y}" stroke-dasharray="7 6"/>`;
+  });
+  h+=`<g id="capsLayer"></g>`;
+  svg.innerHTML=h;
+}
+// ── Simulación de cápsulas ───────────────────────────────────────────────────
+function rutaCapsula(){
+  const pool=EST.filter(e=>e.sistema!=='GEN'&&(!_mapSys||e.sistema===_mapSys));
+  if(pool.length<2) return null;
+  const o=pool[Math.floor(Math.random()*pool.length)];
+  let d=pool[Math.floor(Math.random()*pool.length)], tries=0;
+  while(d.id===o.id&&tries++<9) d=pool[Math.floor(Math.random()*pool.length)];
+  const cen=CENTRAL(), cp=getPos(cen.id);
+  const po=getPos(o.id), pd=getPos(d.id), co=sysColumn(o.sistema), cd=sysColumn(d.sistema);
+  const fo=FI[estFloor(o)], fd=FI[estFloor(d)];
+  const pts=[ proj(po.nx,po.ny,fo), proj(co.nx,po.ny,fo), proj(co.nx,co.ny,fo),
+    proj(co.nx,co.ny,0), proj(cp.nx,cp.ny,0),
+    proj(cd.nx,cd.ny,0), proj(cd.nx,cd.ny,fd), proj(cd.nx,pd.ny,fd), proj(pd.nx,pd.ny,fd) ];
+  const segs=[]; let L=0;
+  for(let i=1;i<pts.length;i++){ const dx=pts[i].x-pts[i-1].x,dy=pts[i].y-pts[i-1].y;
+    const l=Math.hypot(dx,dy); segs.push({a:pts[i-1],b:pts[i],l}); L+=l; }
+  return {segs,L,t:0,color:SYS_HEX[o.sistema]};
+}
+function stepSim(ts){
+  if(!_simOn){_raf=null;return;}
+  const dt=Math.min(50,ts-(_lastT||ts)); _lastT=ts;
+  const v=+document.getElementById('simSpeed').value;
+  if(ts-_spawnT>900 && _caps.length<10){ const c=rutaCapsula(); if(c){_caps.push(c);} _spawnT=ts; }
+  _caps.forEach(c=>c.t+=v*dt/1000);
+  _caps=_caps.filter(c=>c.t<c.L);
+  const layer=document.getElementById('capsLayer');
+  if(layer){ layer.innerHTML=_caps.map(c=>{
+    let d=c.t;
+    for(const s of c.segs){ if(d<=s.l){ const f=d/s.l;
+      const x=s.a.x+(s.b.x-s.a.x)*f, y=s.a.y+(s.b.y-s.a.y)*f;
+      return `<g class="capsula" style="color:${c.color}"><ellipse cx="${x}" cy="${y}" rx="7" ry="4.5" fill="${c.color}" stroke="#fff" stroke-width="1.2"/></g>`;
+    } d-=s.l; } return ''; }).join(''); }
+  _raf=requestAnimationFrame(stepSim);
+}
+function toggleSim(){
+  _simOn=!_simOn;
+  const b=document.getElementById('btnSim');
+  b.textContent=_simOn?'⏸ Pausar simulación':'▶ Simular envíos';
+  b.classList.toggle('sim-on',_simOn);
+  if(_simOn){ _lastT=0;_spawnT=0; if(!_raf) _raf=requestAnimationFrame(stepSim); }
+  else { _caps=[]; const l=document.getElementById('capsLayer'); if(l) l.innerHTML=''; }
+}
+
+// ── MODO PÚBLICO (consulta) — el deploy invierte PUBLIC_BUILD a true ─────────
+const PUBLIC_BUILD = true; /*__PUBLIC_FLAG__*/
+const PUBLIC = PUBLIC_BUILD || new URLSearchParams(location.search).get('public')==='1';
+function applyPublicMode(){ if(!PUBLIC) return; document.body.classList.add('public'); document.querySelectorAll('[onclick*="exportCSV"]').forEach(el=>el.remove()); }
+function applyUrlFilter(){ const s=new URLSearchParams(location.search).get('sistema'); if(s&&typeof setSys==='function') setSys(s); }
+renderKpis(); fillFilters(); renderDir();
+applyPublicMode(); applyUrlFilter();
+document.getElementById('hdrSub').textContent = `${EST.length} estaciones · ${Object.keys(SYS).length} sistemas · ${uniq(EST.map(e=>e.edificio)).length} edificios`;
+</script>
+<script src="hub-home.js"></script>
+</body>
+</html>
