@@ -841,6 +841,7 @@
 <script src="SHARED_DATA/fichas_as.js"></script>
 <script src="SHARED_DATA/pautas_recintos.js"></script>
 <script src="SHARED_DATA/pauta_labels.js"></script>
+<script src="SHARED_DATA/pautas_remote.js"></script>
 <script src="SHARED_DATA/recinto_equipamiento.js"></script>
 <script src="SHARED_DATA/recinto_bim.js"></script>
 <script src="SHARED_DATA/recinto_mnc.js"></script>
@@ -1215,15 +1216,23 @@ function pmSave(st){ try{ localStorage.setItem(PAUTAS_MANUAL_KEY, JSON.stringify
 // En el 🟡 (PM_CONFIG presente) las asignaciones se leen/escriben en la hoja
 // central "PAUTAS HDS": así lo que asigna mpinto/mcanales/csepulveda queda
 // consolidado y visible para todos. Local (🔴) sigue offline con localStorage.
-const PAUTAS_REMOTE = (window.PM_CONFIG && window.PM_CONFIG.PAUTAS_URL) || '';
-const ES_ASIGNADOR_PM = !!(window.PM_CONFIG && typeof pmSession==='function' && pmSession()
-  && (window.PM_CONFIG.ASIGNADORES||[]).indexOf(pmSession().u) !== -1);
+const PAUTAS_REMOTE = (window.PM_CONFIG && window.PM_CONFIG.PAUTAS_URL)
+  || (window.PAUTAS_CENTRAL && window.PAUTAS_CENTRAL.url) || '';
+// En el 🟡 exige sesión de asignador; en local (🔴, sin PM_CONFIG) siempre puede.
+const ES_ASIGNADOR_PM = window.PM_CONFIG
+  ? !!(typeof pmSession==='function' && pmSession()
+       && (window.PM_CONFIG.ASIGNADORES||[]).indexOf(pmSession().u) !== -1)
+  : true;
+function _pautasPor(){
+  try{ if(window.PM_CONFIG&&typeof pmSession==='function'){ const s=pmSession(); if(s&&s.u) return s.u; } }catch(e){}
+  return (window.PAUTAS_CENTRAL&&window.PAUTAS_CENTRAL.por)||'as';
+}
 function pautasRemotePush(rid, val){
   if(!PAUTAS_REMOTE || !ES_ASIGNADOR_PM) return;
   const body = val===null
-    ? new URLSearchParams({accion:'quitar', rid:rid, por:pmSession().u})
+    ? new URLSearchParams({accion:'quitar', rid:rid, por:_pautasPor()})
     : new URLSearchParams({accion:'asignar', rid:rid, estado:val.estado||'validada',
-        p:JSON.stringify(val.p||[]), por:pmSession().u});
+        p:JSON.stringify(val.p||[]), por:_pautasPor()});
   try{ fetch(PAUTAS_REMOTE, {method:'POST', mode:'no-cors', keepalive:true,
     headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:body.toString()}); }catch(e){}
 }
@@ -1231,7 +1240,13 @@ function pautasRemotePull(){
   if(!PAUTAS_REMOTE) return;
   fetch(PAUTAS_REMOTE + '?list=1').then(r=>r.json()).then(remoto=>{
     if(!remoto || typeof remoto!=='object') return;
-    const st = pmStore(); st.recintos = remoto; pmSave(st);   // central manda
+    const st = pmStore();
+    // Semilla: central vacía + validaciones locales previas → se SUBEN, no se pisan.
+    if(!Object.keys(remoto).length && Object.keys(st.recintos).length){
+      for(const rid in st.recintos) pautasRemotePush(rid, st.recintos[rid]);
+      return;
+    }
+    st.recintos = remoto; pmSave(st);   // central manda
     // refrescar la matriz fusionada en caliente
     for(const rid in remoto){
       if(remoto[rid].estado==='no_corresponde') delete PR[rid];
@@ -1250,6 +1265,9 @@ const PR = (function(){
   }
   return merged;
 })();
+// Hidratar desde la hoja central también en LOCAL (en el 🟡 lo repite
+// applyPublicMode; el pull es idempotente).
+try{ pautasRemotePull(); }catch(e){}
 const REQUIP   = window.RECINTO_EQUIP || {};
 const RECBIM   = window.RECINTO_BIM || {};      // code → código BIM (ej. "13.4.4" → "A0145")
 const EQUIPCAT = (window.SHARED_EQUIPAMIENTO && window.SHARED_EQUIPAMIENTO.equipos) || {};  // t → {nombre, familia, marca, modelo}

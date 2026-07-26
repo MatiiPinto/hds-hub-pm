@@ -88,6 +88,7 @@ main{max-width:1100px;margin:0 auto;padding:22px 16px 80px;}
 <script src="SHARED_DATA/recintos.js"></script>
 <script src="SHARED_DATA/pautas_recintos.js"></script>
 <script src="SHARED_DATA/pauta_labels.js"></script>
+<script src="SHARED_DATA/pautas_remote.js"></script>
 <script>
 const SES = pmSession();
 document.getElementById('hd-user').textContent = '👤 ' + (SES ? SES.u : '');
@@ -118,6 +119,27 @@ function estadoDe(rid){
 }
 const EST_TXT = {validada:'🟢 Validada · lista para aplicar', sugerida:'🟠 Sugerida · por validar',
                  sin:'🔴 Sin pauta', no:'⚪ No corresponde'};
+
+// ── Validaciones manuales: localStorage compartido + hoja CENTRAL ───────────
+function aplicarManual(man){ for(const rid in man){ const v=man[rid];
+  if(v.estado==='no_corresponde'){ NOCOR.add(rid); delete ASIG[rid]; }
+  else { NOCOR.delete(rid); ASIG[rid]={p:v.p||[], regla:'manual'}; } } }
+function refrescarEstados(){
+  let v=0,s=0,n=0,g=0;
+  RECS.forEach(r=>{ const e=estadoDe(r.id);
+    if(e==='validada')v++; else if(e==='sugerida')s++; else if(e==='no')g++; else n++; });
+  const put=(id,x)=>{ const el=document.getElementById(id); if(el) el.textContent=x.toLocaleString('es-CL'); };
+  put('k-val',v); put('k-sug',s); put('k-sin',n); put('k-no',g);
+  try{ pintar(); }catch(e){}
+}
+try{ const st=JSON.parse(localStorage.getItem('pautas_recintos_manual_v1')); if(st&&st.recintos) aplicarManual(st.recintos); }catch(e){}
+const _PC=(window.PM_CONFIG&&window.PM_CONFIG.PAUTAS_URL)||(window.PAUTAS_CENTRAL&&window.PAUTAS_CENTRAL.url)||'';
+if(_PC) fetch(_PC+'?list=1').then(r=>r.json()).then(remoto=>{
+  if(!remoto||typeof remoto!=='object'||!Object.keys(remoto).length) return;
+  try{ const st=JSON.parse(localStorage.getItem('pautas_recintos_manual_v1'))||{recintos:{},servicios:{}};
+       st.recintos=remoto; localStorage.setItem('pautas_recintos_manual_v1', JSON.stringify(st)); }catch(e){}
+  aplicarManual(remoto); refrescarEstados();
+}).catch(()=>{});
 
 // KPIs + selectores
 (function init(){

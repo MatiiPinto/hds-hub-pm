@@ -113,11 +113,22 @@ header .sub{font-size:11px;color:var(--muted)}
 .fl-btn:hover{color:var(--text);border-color:var(--cyan)}
 .fl-btn.on{background:rgba(34,211,238,.16);border-color:var(--cyan);color:var(--cyan)}
 .plan-hint{font-size:11px;color:var(--dim)}
-.plan-stage{position:relative;background:#fff;border:1px solid var(--border2);border-radius:12px;overflow:hidden}
-.plan-stage img{width:100%;display:block;user-select:none}
-.plan-stage svg{position:absolute;inset:0;width:100%;height:100%}
+.plan-stage{position:relative;background:#fff;border:1px solid var(--border2);border-radius:12px;overflow:hidden;cursor:grab;touch-action:none}
+.plan-stage.panning{cursor:grabbing}
+.plan-stage.placing{cursor:crosshair}
+#planWrap{position:relative;width:100%;transform-origin:0 0}
+#planWrap img{width:100%;display:block;user-select:none;-webkit-user-drag:none}
+#planWrap svg{position:absolute;inset:0;width:100%;height:100%}
+.plan-zoombar{position:absolute;right:10px;top:10px;display:flex;gap:3px;z-index:5;background:rgba(15,23,42,.78);border:1px solid #334155;border-radius:9px;padding:3px}
+.plan-zoombar button{width:28px;height:28px;border:none;border-radius:6px;background:transparent;color:#cbd5e1;font-size:15px;cursor:pointer;line-height:1}
+.plan-zoombar button:hover{background:#1e293b}
+.plan-zoombar .zlab{color:#94a3b8;font-size:10.5px;display:flex;align-items:center;padding:0 6px;min-width:42px;justify-content:center;font-variant-numeric:tabular-nums}
+.plan-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:8px 0 6px}
+.plan-tools select{background:var(--panel2,#0f1730);border:1px solid var(--border2);border-radius:8px;color:inherit;padding:6px 8px;font-size:12px;max-width:340px}
 .st-dot{cursor:pointer}
 .st-dot circle.c{stroke:#fff;stroke-width:2;filter:drop-shadow(0 1px 3px rgba(0,0,0,.4))}
+.st-dot.est circle.c{stroke-dasharray:3 3}          /* posición estimada (falta ubicar) */
+.st-dot.ovr circle.c{stroke:#22d3ee}                /* ajustada localmente, sin exportar */
 .st-dot text{font:700 11px 'Segoe UI',sans-serif;fill:#0f172a;stroke:#fff;stroke-width:3;paint-order:stroke;text-anchor:middle;pointer-events:none}
 .st-dot.dragging circle.c{stroke:#22d3ee;stroke-width:3}
 .tube{fill:none;stroke-linecap:round;opacity:.45}
@@ -183,11 +194,24 @@ header .sub{font-size:11px;color:var(--muted)}
       <div class="floor-btns" id="planFloors"></div>
       <div class="chip-row" id="planChips" style="margin:0"></div>
       <span class="plan-hint" id="planHint"></span>
+    </div>
+    <div class="plan-tools" id="planTools">
+      <select id="locSel" title="Estación a ubicar — ✎ ajustada local · ◌ estimada (falta ubicar) · ✓ posición del repo"></select>
+      <button class="btn" onclick="startPlace()" id="btnUbicar">🎯 Ubicar en el plano</button>
+      <button class="btn" onclick="resetFloorPos()" title="Quita los ajustes locales de este piso y vuelve a las posiciones del repositorio">↺ Restaurar piso</button>
       <button class="btn" id="btnExportPos" onclick="exportPos()" style="display:none">📥 Exportar posiciones</button>
     </div>
     <div class="plan-stage" id="planStage">
-      <img id="planImg" alt="Plano del piso" draggable="false">
-      <svg id="planOv" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div id="planWrap">
+        <img id="planImg" alt="Plano del piso" draggable="false">
+        <svg id="planOv" xmlns="http://www.w3.org/2000/svg"></svg>
+      </div>
+      <div class="plan-zoombar">
+        <button onclick="pzStep(-1)" title="Alejar">−</button>
+        <span class="zlab" id="pzLab">100%</span>
+        <button onclick="pzStep(1)" title="Acercar">+</button>
+        <button onclick="pzReset()" title="Ajustar a la ventana (doble clic en el plano hace lo mismo)">⤢</button>
+      </div>
     </div>
   </div>
 

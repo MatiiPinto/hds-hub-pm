@@ -238,6 +238,16 @@ button,input,select,textarea{font-family:inherit}
 /* Modal Ficha de recinto */
 #fichaModal,#estadoModal,#equipModal{position:fixed;inset:0;background:rgba(15,30,52,.55);display:none;align-items:center;justify-content:center;z-index:120;padding:20px}
 #fichaModal.show,#estadoModal.show,#equipModal.show{display:flex}
+/* ── Impresión de ficha de recinto: solo el modal, a página completa ── */
+#fkPrintStamp{display:none}
+@media print{
+  body.print-ficha>*{display:none !important}
+  body.print-ficha #fichaModal{display:block !important;position:static;background:#fff;padding:0}
+  body.print-ficha #fichaModal .ficha-box{max-width:100%;width:100%;max-height:none;box-shadow:none;border-radius:0}
+  body.print-ficha #fichaModal .ficha-body{max-height:none;overflow:visible}
+  body.print-ficha .ficha-x,body.print-ficha .fk-open,body.print-ficha button{display:none !important}
+  body.print-ficha #fkPrintStamp{display:block;font-size:10.5px;color:#64748b;margin-top:4px}
+}
 /* Panel de equipamiento del recinto: lista con miniaturas de EquiBox. Mientras
    está abierto, el overlay deja el plano estático; al cerrarlo vuelve a ser interactivo. */
 .eqp-box{background:#fff;border-radius:14px;width:min(94vw,780px);max-height:84vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 18px 50px rgba(15,30,52,.35)}
@@ -701,7 +711,9 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <div>
         <div class="ficha-title" id="fkTitle">Recinto</div>
         <div class="ficha-sub" id="fkSub"></div>
+        <div id="fkPrintStamp"></div>
       </div>
+      <button class="ficha-x" onclick="printFicha()" title="Imprimir ficha del recinto">🖨</button>
       <button class="ficha-x" onclick="closeFicha()" title="Cerrar">×</button>
     </div>
     <div class="ficha-body" id="fkBody"></div>
@@ -764,6 +776,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 <script src="SHARED_DATA/senaletica.js"></script>
 <script src="SHARED_DATA/pautas_recintos.js"></script>
 <script src="SHARED_DATA/pauta_labels.js"></script>
+<script src="SHARED_DATA/pautas_remote.js"></script>
 <script>
 // ═══ DATA ═══════════════════════════════════════════════════════════════════
 const FLOORS=[
@@ -1283,6 +1296,43 @@ const PAUTAS_MANUAL_KEY='pautas_recintos_manual_v1';
 function pmStore(){ try{ const s=JSON.parse(localStorage.getItem(PAUTAS_MANUAL_KEY)); return (s&&typeof s==='object')?Object.assign({recintos:{},servicios:{}},s):{recintos:{},servicios:{}}; }catch(e){ return {recintos:{},servicios:{}}; } }
 function pmSave(st){ try{ _lsSet(PAUTAS_MANUAL_KEY, JSON.stringify(st)); }catch(e){} }
 window.addEventListener('storage',e=>{ if(e.key===PAUTAS_MANUAL_KEY && S.autsanMode){ renderSVG(); } });
+// ── Sincronización con la hoja CENTRAL de pautas (fuente de verdad) ─────────
+// URL: PM_CONFIG (🟡, inyectado por el deploy) o pautas_remote.js (🔴 local).
+function pautasCentralUrl(){ return (window.PM_CONFIG&&window.PM_CONFIG.PAUTAS_URL)||(window.PAUTAS_CENTRAL&&window.PAUTAS_CENTRAL.url)||''; }
+function pautasCentralUser(){
+  try{ if(window.PM_CONFIG&&typeof pmSession==='function'){ const s=pmSession(); if(s&&s.u) return s.u; } }catch(e){}
+  return (window.PAUTAS_CENTRAL&&window.PAUTAS_CENTRAL.por)||'atlas';
+}
+// En el 🟡 solo los ASIGNADORES escriben; en local (sin PM_CONFIG) siempre.
+function pautasCentralPuedeEscribir(){
+  if(!window.PM_CONFIG) return true;
+  return (window.PM_CONFIG.ASIGNADORES||[]).indexOf(pautasCentralUser())!==-1;
+}
+function pautasRemotePush(rid, val){
+  const url=pautasCentralUrl(); if(!url||!pautasCentralPuedeEscribir()) return;
+  const body = val===null
+    ? new URLSearchParams({accion:'quitar', rid:rid, por:pautasCentralUser()})
+    : new URLSearchParams({accion:'asignar', rid:rid, estado:val.estado||'validada',
+        p:JSON.stringify(val.p||[]), por:pautasCentralUser()});
+  try{ fetch(url,{method:'POST',mode:'no-cors',keepalive:true,
+    headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()}); }catch(e){}
+}
+function pautasRemotePull(){
+  const url=pautasCentralUrl(); if(!url) return;
+  fetch(url+'?list=1').then(r=>r.json()).then(remoto=>{
+    if(!remoto||typeof remoto!=='object') return;
+    const st=pmStore();
+    // Semilla: si la hoja central está vacía y acá hay validaciones locales
+    // previas, se SUBEN (no se pisan) — protege el trabajo hecho offline.
+    if(!Object.keys(remoto).length && Object.keys(st.recintos).length){
+      for(const rid in st.recintos) pautasRemotePush(rid, st.recintos[rid]);
+      return;
+    }
+    if(JSON.stringify(st.recintos)===JSON.stringify(remoto)) return;   // sin cambios
+    st.recintos=remoto; pmSave(st);                                    // central manda
+    if(S.autsanMode){ renderSVG(); if(typeof tbInfo!=='undefined'&&tbInfo) tbInfo.textContent=psResumen(); }
+  }).catch(function(){});
+}
 function pautaEstadoRoom(id){
   const ov=pmStore().recintos[id];
   if(ov) return {estado:(ov.estado==='no_corresponde')?'no_corresponde':'validada', p:ov.p||[], manual:ov};
@@ -1361,6 +1411,7 @@ function _psSet(id, kind, val){
   const bag=(kind==='s')?st.servicios:st.recintos;
   if(val===null) delete bag[id]; else bag[id]=val;
   pmSave(st); psCerrar();
+  if(kind==='r') pautasRemotePush(id, val);   // consolidar en la hoja central
   if(typeof tbInfo!=='undefined'&&tbInfo&&S.autsanMode) tbInfo.textContent=psResumen();
   renderSVG();
   const fm=document.getElementById('fichaModal');
@@ -4905,6 +4956,15 @@ function mncOfCode(code){
   return out;
 }
 function closeFicha(){ document.getElementById('fichaModal').classList.remove('show'); }
+// Imprime SOLO la ficha del recinto (CSS body.print-ficha oculta el resto).
+function printFicha(){
+  const st=document.getElementById('fkPrintStamp');
+  if(st) st.textContent='Atlas HDS · ficha impresa el '+new Date().toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
+  document.body.classList.add('print-ficha');
+  const fin=()=>{ document.body.classList.remove('print-ficha'); window.removeEventListener('afterprint',fin); };
+  window.addEventListener('afterprint',fin);
+  window.print();
+}
 // Detalle EquiBox de un elemento (equipamiento o informática) de la ficha.
 function openEquipDetail(it){
   const cat=((window.SHARED_EQUIPAMIENTO||{}).equipos||{})[String(it.t||'')]||null;
@@ -7179,6 +7239,7 @@ function init(){
     chip.style.cssText='background:#fef3c7;border:1px solid #f59e0b;color:#78350f;font-size:10px;font-weight:800;border-radius:8px;padding:4px 10px;margin-left:8px;white-space:nowrap';
     document.getElementById('hdr')?.appendChild(chip);
   }
+  try{ pautasRemotePull(); }catch(e){}   // hidratar asignaciones desde la hoja central
   // El fit inicial solo cuando el viewer YA tiene tamaño: si la pestaña abre
   // en background o el layout no terminó, clientWidth es 0 y el plano quedaría
   // microscópico. rAF reintenta (y en pestañas ocultas espera a ser visibles).
