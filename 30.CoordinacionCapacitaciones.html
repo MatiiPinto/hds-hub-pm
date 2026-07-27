@@ -110,7 +110,10 @@ th.sortable{cursor:pointer;user-select:none}th.sortable:hover{background:#0a558f
   <div class="twrap"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
 </main>
 
-<script src="SHARED_DATA/cap_data.js"></script>
+<!-- cap_data se pide con URL única por carga: el navegador no puede servir
+     una copia vieja (Safari cacheaba la versión de días atrás y la reportería
+     se veía desactualizada aunque el Excel ya estuviera importado) -->
+<script>document.write('<scr'+'ipt src="SHARED_DATA/cap_data.js?v='+Date.now()+'"></scr'+'ipt>');</script>
 <script>
 "use strict";
 var D = window.CAP_DATA;
@@ -173,7 +176,9 @@ var FILTERFIELDS={
 var overrides = load();
 (function(){ var FLAG=window.CAP_IMPORT_FLAG||"hds_coordcap_capimport_2026jun26b";
   if(!localStorage.getItem(FLAG)){
-    Object.keys(overrides).forEach(function(id){ if(id.indexOf("cap-")===0) delete overrides[id]; });
+    // el Excel manda: en cada import se limpian los ajustes locales de las
+    // TRES áreas (capacitaciones, instructivos e instrumental vienen de la planilla)
+    Object.keys(overrides).forEach(function(id){ if(id.indexOf("cap-")===0||id.indexOf("ins-")===0||id.indexOf("instr-")===0) delete overrides[id]; });
     localStorage.setItem(STORE_KEY, JSON.stringify(overrides));
     localStorage.setItem(FLAG,"1");
   }
@@ -227,6 +232,16 @@ function barArea(area,c){
   validKeys(area).forEach(function(k){ h+='<i style="width:'+((c[k]||0)/t*100).toFixed(2)+'%;background:'+EST_HEX[k]+'"></i>'; });
   return h+'</div>';
 }
+// Instrumental ponderado por CAJAS FÍSICAS: cada tipo pesa su cant_cajas,
+// así el % refleja las ~1.500+ cajas reales y no solo los ~196 tipos.
+function cajasCounts(){
+  var c={total:0}; validKeys("instrumental").forEach(function(k){c[k]=0;});
+  D.instrumental.forEach(function(r){
+    var q=parseInt(String(valOf(r,"cant_cajas")).replace(/\D/g,""),10)||1;
+    c[estadoOf("instrumental",r)]+=q; c.total+=q;
+  });
+  return c;
+}
 function comboStats(areas){
   var done=0,total=0,na=0;
   areas.forEach(function(a){var c=counts(a); done+=c[DONE[a]]||0; total+=c.total; na+=c.no_aplica||0;});
@@ -249,15 +264,25 @@ function renderDash(){
   var h="";
   AREAS.forEach(function(a){
     var c=counts(a[0]);
+    if(a[0]==="instrumental"){
+      // % por TIPOLOGÍAS de caja; las cajas físicas quedan como referencia
+      var cw=cajasCounts();
+      h+='<div class="kpi"><h3>'+a[1]+'</h3><div class="big">'+pctArea("instrumental",c)+'%</div>'+
+         '<div class="sub">'+(c[DONE.instrumental]||0)+' de '+c.total+' tipologías · '+(cw[DONE.instrumental]||0)+'/'+cw.total+' cajas</div>'+barArea("instrumental",c)+'</div>';
+      return;
+    }
     h+='<div class="kpi"><h3>'+a[1]+'</h3><div class="big">'+pctArea(a[0],c)+'%</div>'+
        '<div class="sub">'+(c[DONE[a[0]]]||0)+' '+DONE_WORD[a[0]]+' de '+c.total+'</div>'+barArea(a[0],c)+'</div>';
   });
   var c1=comboStats(["capacitaciones","instructivos"]);
   var c2=comboStats(["capacitaciones","instructivos","instrumental"]);
+  // el texto muestra la MISMA base del % (aplicables = total sin "No aplica")
+  var subCombo=function(c){ var na=c.total-c.base;
+    return c.done+' de '+c.base+' aplicables'+(na>0?' · '+na+' no aplican':''); };
   h+='<div class="kpi combo"><h3>Combinado · Capac. + Instructivos</h3><div class="big">'+c1.pct+'%</div>'+
-     '<div class="sub">'+c1.done+' completadas de '+c1.total+'</div>'+barDone(c1.pct)+'</div>';
+     '<div class="sub">'+subCombo(c1)+'</div>'+barDone(c1.pct)+'</div>';
   h+='<div class="kpi combo"><h3>Combinado · las 3 áreas (+ Instrumental)</h3><div class="big">'+c2.pct+'%</div>'+
-     '<div class="sub">'+c2.done+' completadas de '+c2.total+'</div>'+barDone(c2.pct)+'</div>';
+     '<div class="sub">'+subCombo(c2)+'</div>'+barDone(c2.pct)+'</div>';
   document.getElementById("dash").innerHTML=h;
   writeSummary();
 }
