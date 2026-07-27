@@ -482,6 +482,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button onclick="exportMobiliarioNoClinico();closeExpMenu()">🧱 Mobiliario no clínico y otros (MNC·TI·MOA)</button>
       <div class="exp-menu-sep"></div>
       <button onclick="exportBackup();closeExpMenu()">💾 Respaldo completo (JSON)</button>
+      <button onclick="publicarAtlasPM();closeExpMenu()" title="Publica el estado actual del Atlas DIRECTO al HUB Puesta en Marcha (🟡): instala el snapshot en WEB_DATA/ y corre el deploy. Requiere el servidor local de acciones (el mismo del botón 'Actualizar web' del HUB).">🟡 Publicar en HUB PM</button>
       <button onclick="(_abHandle?_abWrite(true):(document.getElementById('autoBkLbl').textContent==='clic para reactivar'?_abReactivate():setupAutoBackup()));" title="Elegí una carpeta (idealmente sincronizada a OneDrive/Drive): Atlas guardará ahí un respaldo cada 5 minutos si hay cambios">⚙ Respaldo automático: <span id="autoBkLbl">configurar…</span></button>
       <button onclick="copyConsultaLink();closeExpMenu()" title="Copia un link que abre Atlas en solo lectura (para jefaturas o tablet)">🔗 Copiar link modo consulta</button>
       <button onclick="exportForWeb();closeExpMenu()">🌐 Snapshot para versión web</button>
@@ -1503,6 +1504,29 @@ function _backupPayload(){
       cabida_cad_structures: structuresState,
       cabida_cad_dxf_calib:  DXF_EXT_OVERRIDES
     };
+}
+// Publica el snapshot DIRECTO al 🟡 HUB-PM vía el servidor local de acciones
+// (localhost:8799): instala WEB_DATA/atlas_web_data.js + deploy + commit.
+// Fallback sin servidor: exportWebData() + doble clic en Actualizar-Web-PM.command.
+async function publicarAtlasPM(){
+  const js='// Snapshot de Atlas HDS para la versión web de consulta — generado '
+    +new Date().toISOString()+'\n'
+    +'window.ATLAS_WEB_DATA='+JSON.stringify(_backupPayload())+';\n';
+  try{ await fetch('http://localhost:8799/ping',{cache:'no-store'}); }
+  catch(e){
+    alert('El botón necesita el servidor local de acciones (el del HUB).\n\n'+
+      'Alternativa en 2 pasos:\n  1. Exportar ▾ → 🌐 Actualizar versión web (datos)\n  2. Doble clic en Actualizar-Web-PM.command');
+    return;
+  }
+  if(typeof tbInfo!=='undefined'&&tbInfo) tbInfo.textContent='🟡 Publicando el Atlas en el HUB PM…';
+  try{
+    const r=await fetch('http://localhost:8799/publicar-atlas-pm',
+      {method:'POST', headers:{'Content-Type':'text/javascript'}, body:js});
+    const j=await r.json();
+    if(j.ok){ if(typeof tbInfo!=='undefined'&&tbInfo) tbInfo.textContent='🟡 Publicado en el HUB PM ✓ — GitHub Pages refresca en unos minutos'; }
+    else alert('Falló la publicación al HUB PM:\n\n'+(j.error||j.log||'error desconocido'));
+  }catch(e){ alert('Error publicando al HUB PM: '+e); }
+  setTimeout(()=>{ if(typeof tbInfo!=='undefined'&&tbInfo) tbInfo.textContent=''; }, 9000);
 }
 function exportBackup(){
   try{
