@@ -176,9 +176,17 @@ var FILTERFIELDS={
 var overrides = load();
 (function(){ var FLAG=window.CAP_IMPORT_FLAG||"hds_coordcap_capimport_2026jun26b";
   if(!localStorage.getItem(FLAG)){
-    // el Excel manda: en cada import se limpian los ajustes locales de las
-    // TRES áreas (capacitaciones, instructivos e instrumental vienen de la planilla)
-    Object.keys(overrides).forEach(function(id){ if(id.indexOf("cap-")===0||id.indexOf("ins-")===0||id.indexOf("instr-")===0) delete overrides[id]; });
+    // El Excel manda SOLO sobre lo que ya conocía: en cada import se limpian
+    // los ajustes locales ANTERIORES a la edición del Excel. Lo ingresado en
+    // la plataforma DESPUÉS (sellado con _ts por ov()) sobrevive hasta que
+    // llegue un Excel más nuevo que lo incorpore.
+    var excelTs=0;
+    try{ if(window.CAP_EXCEL_MOD) excelTs=new Date(window.CAP_EXCEL_MOD.replace(' ','T')).getTime()||0; }catch(e){}
+    Object.keys(overrides).forEach(function(id){
+      if(id.indexOf("cap-")!==0&&id.indexOf("ins-")!==0&&id.indexOf("instr-")!==0) return;
+      var o=overrides[id]||{};
+      if(!o._ts || o._ts<=excelTs) delete overrides[id];   // viejo → el Excel manda
+    });
     localStorage.setItem(STORE_KEY, JSON.stringify(overrides));
     localStorage.setItem(FLAG,"1");
   }
@@ -190,7 +198,10 @@ var sortBy = {key:null,dir:1};
 
 function load(){ try{return JSON.parse(localStorage.getItem(STORE_KEY)||"{}");}catch(e){return {};} }
 function save(){ localStorage.setItem(STORE_KEY, JSON.stringify(overrides)); }
-function ov(id){ return overrides[id]||(overrides[id]={}); }
+// cada ajuste local queda SELLADO con fecha (_ts): el import del Excel solo
+// borra ajustes ANTERIORES a la edición del Excel — lo ingresado después
+// (aún no reflejado en la planilla) sobrevive.
+function ov(id){ var o=overrides[id]||(overrides[id]={}); o._ts=Date.now(); return o; }
 function areaOf(id){ return id.indexOf("cap-")===0?"capacitaciones":(id.indexOf("ins-")===0?"instructivos":"instrumental"); }
 function estadoOf(area,row){
   var o=overrides[row.id]; var v=(o&&o.estado)||row._estado||DEFAULT_EST[area];
@@ -221,11 +232,11 @@ function counts(area){
   D[area].forEach(function(r){ c[estadoOf(area,r)]++; c.total++; });
   return c;
 }
-// Instrumental: % por tipologías de caja sobre el TOTAL (196), sin excluir No aplica.
-// Resto: ejecutadas/entregados sobre el total aplicable (excluye No aplica).
+// % SIEMPRE sobre el TOTAL del área (criterio Matías jul-2026): los "No
+// aplica" de capacitaciones significan "aún no se puede avanzar" — esas
+// capacitaciones SÍ se harán, así que cuentan en el universo (77/250).
 function pctArea(area,c){
-  var base = (area==="instrumental") ? c.total : (c.total-(c.no_aplica||0));
-  return base>0?Math.round((c[DONE[area]]||0)/base*100):0;
+  return c.total>0?Math.round((c[DONE[area]]||0)/c.total*100):0;
 }
 function barArea(area,c){
   var t=c.total||1,h='<div class="bar">';
@@ -243,9 +254,10 @@ function cajasCounts(){
   return c;
 }
 function comboStats(areas){
-  var done=0,total=0,na=0;
-  areas.forEach(function(a){var c=counts(a); done+=c[DONE[a]]||0; total+=c.total; na+=c.no_aplica||0;});
-  return {done:done,total:total,base:total-na,pct:(total-na)>0?Math.round(done/(total-na)*100):0};
+  // mismo criterio que pctArea: completados sobre el TOTAL (sin excluir No aplica)
+  var done=0,total=0;
+  areas.forEach(function(a){var c=counts(a); done+=c[DONE[a]]||0; total+=c.total;});
+  return {done:done,total:total,base:total,pct:total>0?Math.round(done/total*100):0};
 }
 function writeSummary(){
   var areas=["capacitaciones","instructivos","instrumental"];
@@ -274,23 +286,23 @@ function renderDash(){
     h+='<div class="kpi"><h3>'+a[1]+'</h3><div class="big">'+pctArea(a[0],c)+'%</div>'+
        '<div class="sub">'+(c[DONE[a[0]]]||0)+' '+DONE_WORD[a[0]]+' de '+c.total+'</div>'+barArea(a[0],c)+'</div>';
   });
+  // los GLOBALES (tarjetas azules) van primero; después el detalle por área
   var c1=comboStats(["capacitaciones","instructivos"]);
   var c2=comboStats(["capacitaciones","instructivos","instrumental"]);
-  // el texto muestra la MISMA base del % (aplicables = total sin "No aplica")
-  var subCombo=function(c){ var na=c.total-c.base;
-    return c.done+' de '+c.base+' aplicables'+(na>0?' · '+na+' no aplican':''); };
-  h+='<div class="kpi combo"><h3>Combinado · Capac. + Instructivos</h3><div class="big">'+c1.pct+'%</div>'+
-     '<div class="sub">'+subCombo(c1)+'</div>'+barDone(c1.pct)+'</div>';
-  h+='<div class="kpi combo"><h3>Combinado · las 3 áreas (+ Instrumental)</h3><div class="big">'+c2.pct+'%</div>'+
-     '<div class="sub">'+subCombo(c2)+'</div>'+barDone(c2.pct)+'</div>';
-  document.getElementById("dash").innerHTML=h;
+  var subCombo=function(c){ return c.done+' completadas de '+c.total; };
+  var combos=
+    '<div class="kpi combo"><h3>Combinado · las 3 áreas (+ Instrumental)</h3><div class="big">'+c2.pct+'%</div>'+
+    '<div class="sub">'+subCombo(c2)+'</div>'+barDone(c2.pct)+'</div>'+
+    '<div class="kpi combo"><h3>Combinado · Capac. + Instructivos</h3><div class="big">'+c1.pct+'%</div>'+
+    '<div class="sub">'+subCombo(c1)+'</div>'+barDone(c1.pct)+'</div>';
+  document.getElementById("dash").innerHTML=combos+h;
   writeSummary();
 }
 function renderLegend(){
   document.getElementById("legend").innerHTML=
     '<span class="muted" style="font-weight:600">'+AREAS.filter(function(a){return a[0]===active;})[0][1]+':</span>'+
     ESTADOS[active].map(function(e){return '<span><i class="dot" style="background:'+EST_HEX[e.k]+'"></i>'+e.lbl+'</span>';}).join("")+
-    '<span class="muted">· El % cuenta '+DONE_WORD[active]+' sobre el total aplicable</span>';
+    '<span class="muted">· El % cuenta '+DONE_WORD[active]+' sobre el TOTAL del área (los "No aplica" aún no gestionables también cuentan)</span>';
 }
 function renderTabs(){
   document.getElementById("tabs").innerHTML=AREAS.map(function(a){
