@@ -1,0 +1,3208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<script src="pm_config.js"></script>
+<script src="pm_gate.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HDS · Navegación</title>
+<link rel="icon" type="image/png" href="Logos%20HUB-HDS/favicon-nhds-amarillo-64.png">
+<link rel="icon" type="image/png" sizes="512x512" href="Logos%20HUB-HDS/favicon-nhds-amarillo-512.png">
+<link rel="shortcut icon" href="Logos%20HUB-HDS/favicon-nhds-amarillo-64.png">
+<link rel="apple-touch-icon" href="Logos%20HUB-HDS/favicon-nhds-amarillo-512.png">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0c1a2e;color:#cbd5e1;font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column}
+
+/* ── HEADER (turquesa/navegación) ── */
+#hdr{background:linear-gradient(180deg,#0f4c5c 0%,#0e7490 100%);border-bottom:2px solid #06b6d4;padding:0 18px;height:54px;display:flex;align-items:center;gap:14px;flex-shrink:0;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+#hdr h1{font-size:16px;font-weight:800;color:#fff;letter-spacing:.5px;white-space:nowrap;display:flex;align-items:center;gap:8px}
+.hdr-stat{font-size:11px;color:#a5f3fc;text-align:center;min-width:60px}
+.hdr-stat strong{display:block;font-size:18px;color:#fff;font-weight:800;line-height:1}
+.hdr-sep{width:1px;height:32px;background:rgba(255,255,255,.2)}
+#gSearch{position:relative;flex:1;max-width:300px}
+#gSearchInput{width:100%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);border-radius:20px;color:#fff;padding:6px 12px 6px 32px;font-size:12px;outline:none;transition:all .15s}
+#gSearchInput::placeholder{color:rgba(255,255,255,.5)}
+#gSearchInput:focus{background:rgba(255,255,255,.2);border-color:#67e8f9}
+#gSearchIcon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;pointer-events:none;color:rgba(255,255,255,.7)}
+#saveBadge{font-size:10px;border-radius:10px;padding:3px 10px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.08);color:#a5f3fc;font-weight:600;white-space:nowrap;flex-shrink:0;transition:opacity .2s}
+
+/* ── LAYOUT ── */
+#layout{display:flex;flex:1;overflow:hidden}
+#sidebar{width:200px;background:#0f1e34;border-right:1px solid #1e293b;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+#sidebar h2{font-size:10px;font-weight:700;color:#67e8f9;text-transform:uppercase;letter-spacing:1.5px;padding:14px 14px 8px}
+#floorList{flex:1;overflow-y:auto;padding:0 8px 8px}
+.fl-btn{width:100%;background:none;border:1px solid transparent;border-radius:8px;padding:10px 10px;cursor:pointer;text-align:left;color:#cbd5e1;transition:all .15s;margin-bottom:4px;display:block}
+.fl-btn:hover{background:rgba(6,182,212,.15);border-color:#06b6d4;color:#fff}
+.fl-btn.active{background:rgba(6,182,212,.25);border-color:#06b6d4;color:#fff}
+.fl-name{font-size:13px;font-weight:700;display:block}
+.fl-sub{font-size:10px;color:#94a3b8;margin-top:2px;display:block}
+.fl-cnt{display:flex;gap:4px;margin-top:5px;font-size:10px;flex-wrap:wrap}
+.fl-cnt .pill{padding:1px 5px;border-radius:6px;font-weight:700;font-size:9px}
+
+/* ── MAIN ── */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;background:#0c1a2e}
+/* La barra tenia alto fijo 42px + overflow-x:auto: con 15+ botones los
+   ultimos quedaban fuera de pantalla (el selector de vista no se alcanzaba).
+   Ahora fluye en varias lineas y nada queda inaccesible. */
+#toolbar{min-height:42px;background:#0f1e34;border-bottom:1px solid #1e293b;display:flex;align-items:center;flex-wrap:wrap;padding:5px 14px;gap:6px;flex-shrink:0;z-index:5;row-gap:6px}
+.tb-btn{background:#1e293b;border:1px solid #334155;border-radius:6px;color:#e2e8f0;cursor:pointer;padding:5px 10px;font-size:11px;font-weight:600;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.tb-btn:hover{background:#334155;border-color:#475569}
+.tb-btn.active{background:#06b6d4;border-color:#22d3ee;color:#0c4a6e}
+.tb-btn.warn{background:#7c2d12;border-color:#c2410c;color:#fed7aa}
+.tb-btn.warn.active{background:#ea580c;border-color:#f97316;color:#fff}
+.tb-btn.bk{border-color:#2f7d5b;color:#a7f3d0}
+  .tb-btn.bk:hover{background:#123b2c}
+  .tb-sep{flex:1}
+.tb-info{font-size:10px;color:#94a3b8;font-style:italic}
+.legend{display:flex;align-items:center;gap:10px;font-size:10px;color:#cbd5e1;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:4px;white-space:nowrap}
+.legend-dot{width:12px;height:12px;border-radius:3px;border:2px solid #fff;flex-shrink:0}
+
+/* ── VIEWER ── */
+#viewer{flex:1;position:relative;overflow:hidden;cursor:grab;background:#1e293b;user-select:none}
+#viewer.panning{cursor:grabbing}
+#viewer.add-mode{cursor:crosshair}
+#viewer.pc-edit{cursor:default}
+#viewer.pc-fill{cursor:crosshair}
+/* ── Barra de herramientas de dibujo (flotante, derecha) ── */
+#pcTools{position:absolute;right:12px;top:50%;transform:translateY(-50%) translateX(70px);display:flex;flex-direction:column;gap:3px;background:rgba(15,30,52,.94);border:1px solid #27405e;border-radius:12px;padding:8px 6px;z-index:30;box-shadow:0 6px 24px rgba(0,0,0,.45);opacity:0;pointer-events:none;transition:transform .18s ease,opacity .18s ease}
+#pcTools.show{opacity:1;pointer-events:auto;transform:translateY(-50%) translateX(0)}
+#pcTools .pct-btn{width:38px;height:34px;border:1px solid transparent;border-radius:8px;background:transparent;color:#cbd5e1;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .12s;padding:0}
+#pcTools .pct-btn:hover{background:#1b2f4d}
+#pcTools .pct-btn.on{background:#2563eb;color:#fff;border-color:#3b82f6}
+#pcTools .pct-btn.warn:hover{background:#7f1d1d}
+#pcTools .pct-btn:disabled{opacity:.32;cursor:default;background:transparent}
+#pcTools .pct-sep{height:1px;background:#27405e;margin:3px 2px}
+/* selección y manijas de tramos de circulación */
+.pc-rect-ghost{fill:none;stroke:#94a3b8;stroke-dasharray:5 7;opacity:.55;pointer-events:none}
+.pc-sel-outline{fill:none;stroke:#fff;stroke-dasharray:11 8;pointer-events:none;filter:drop-shadow(0 0 3px rgba(0,0,0,.8))}
+.pc-handle{fill:#fff;stroke:#0369a1}
+#viewer.del-mode{cursor:not-allowed}
+#imgWrap{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform}
+#planSvg{display:block;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,.5);border-radius:4px}
+#overlay{position:absolute;top:0;left:0;overflow:visible;pointer-events:none}
+#overlay.interactive{pointer-events:all}
+
+/* ── ÁREAS OVERLAY (importadas de Atlas HDS) ── */
+
+/* ── VISTA 2 · CIRCULACIONES: los servicios pasan a contorno tenue para que
+   los polígonos de circulación manden (mismo criterio que Atlas). ── */
+#viewer.vista-circ .area-shape{ opacity:.16; }
+#viewer.vista-circ .area-label{ opacity:.22; }
+#viewer.vista-circ .pcirc-path{ stroke-width:5; }
+.vista-seg{display:inline-flex;border:1px solid #23506e;border-radius:9px;overflow:hidden;margin-right:6px}
+.vista-seg button{background:#0b1b28;color:#8fb6cd;border:0;padding:6px 11px;font-size:12px;font-weight:700;cursor:pointer}
+.vista-seg button.on{background:#1c4a68;color:#eaf6ff}
+.zres{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:5px 10px;font-size:11.5px;color:#cfe3f0}
+.zres b{color:#fff}
+.area-shape{fill:rgba(59,130,246,.10);stroke:#3b82f6;stroke-width:2.5;cursor:pointer;transition:fill .15s}
+.area-shape:hover{fill:rgba(59,130,246,.22)}
+/* ── RECINTOS de Atlas (vista 2) traídos a Navegación ── */
+.rec-shape{fill:rgba(37,99,235,.07);stroke:#2563eb;stroke-width:2;pointer-events:none}
+/* Propuesta de relleno inverso: lo que NO es recinto, para corregir borrando */
+.rel-shape{fill:rgba(16,185,129,.22);stroke:#059669;stroke-width:2;stroke-dasharray:7 5;pointer-events:none}
+.area-shape.sel{fill:rgba(251,191,36,.30);stroke:#fbbf24;stroke-width:3.5}
+.area-label{fill:#0c4a6e;stroke:rgba(255,255,255,.9);stroke-width:8;paint-order:stroke fill;font-family:'Segoe UI',sans-serif;pointer-events:none;font-weight:700;text-anchor:middle;dominant-baseline:middle}
+
+/* ── CIRCULATION MARKERS ── */
+/* Sin transform:scale en :hover — reemplazaba al translate que posiciona el
+   cuadro, lo hacía saltar fuera del cursor y provocaba el parpadeo. El realce
+   de hover es solo el borde (no mueve el elemento). */
+.circ-marker{cursor:pointer;pointer-events:all}
+.circ-marker rect.bg,.circ-marker circle.bg{stroke:#fff;stroke-width:1.5;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35));transition:stroke .1s,stroke-width .1s}
+.circ-marker:hover rect.bg,.circ-marker:hover circle.bg{stroke:#22d3ee;stroke-width:2.5}
+.circ-marker text{fill:#fff;text-anchor:middle;dominant-baseline:central;font-weight:800;pointer-events:none;font-family:'Segoe UI',sans-serif}
+.circ-marker.sel rect.bg,.circ-marker.sel circle.bg{stroke:#fbbf24;stroke-width:2.5}
+.box-preview{fill:rgba(6,182,212,.12);stroke:#22d3ee;stroke-width:2;stroke-dasharray:9 7;pointer-events:none}
+.resize-handle{fill:#fff;stroke:#06b6d4;stroke-width:1.2;pointer-events:all}
+.resize-handle:hover{fill:#22d3ee}
+.exit-arrow{stroke:#fff;stroke-width:1.5;stroke-linejoin:round;cursor:pointer;filter:drop-shadow(0 1px 1px rgba(0,0,0,.3))}
+.exit-arrow:hover{stroke:#22d3ee}
+
+/* tipos */
+.circ-marker .bg.asc-pub{fill:#3b82f6}
+.circ-marker .bg.asc-pac{fill:#10b981}
+.circ-marker .bg.asc-cam{fill:#f97316}
+.circ-marker .bg.asc-svc{fill:#64748b}
+.circ-marker .bg.esc-nor{fill:#8b5cf6}
+.circ-marker .bg.esc-mec{fill:#ec4899}
+
+
+/* ── FLOATING HINTS ── */
+.float-hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);background:#0f1e34;border:1px solid #06b6d4;border-radius:8px;padding:8px 18px;font-size:12px;color:#a5f3fc;display:none;z-index:10;pointer-events:none;white-space:nowrap;box-shadow:0 4px 12px rgba(0,0,0,.5)}
+.float-hint.show{display:block}
+.float-hint.warn{border-color:#f97316;color:#fed7aa}
+
+/* ── BARRA DE ZONAS DE CIRCULACIÓN ── */
+.pcirc-bar{position:absolute;top:12px;left:50%;transform:translateX(-50%);display:none;gap:6px;background:#0f1e34;border:1px solid #334155;border-radius:10px;padding:7px 9px;z-index:11;box-shadow:0 6px 18px rgba(0,0,0,.55);align-items:center}
+.pcirc-bar.show{display:flex}
+.pcirc-bar .lbl{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px;margin-right:2px}
+.pcirc-z{border:2px solid transparent;border-radius:7px;padding:5px 11px;font-size:11px;font-weight:700;color:#fff;cursor:pointer;transition:all .12s;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.pcirc-z .sw{width:11px;height:11px;border-radius:3px;border:1px solid rgba(255,255,255,.7)}
+.pcirc-z:hover{filter:brightness(1.12)}
+.pcirc-z.on{border-color:#fff;box-shadow:0 0 0 2px rgba(255,255,255,.22)}
+.measure-readout{position:absolute;top:12px;right:14px;display:none;background:#fbbf24;color:#7c2d12;border-radius:9px;padding:7px 14px;font-size:14px;font-weight:700;z-index:11;box-shadow:0 4px 14px rgba(0,0,0,.45)}
+.measure-readout.show{display:block}
+.measure-readout b{font-size:16px}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.75);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(4px)}
+.modal-bg.show{display:flex}
+.modal{background:#0f1e34;border:1px solid #1e293b;border-radius:14px;padding:24px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 12px 40px rgba(0,0,0,.6)}
+.modal h3{font-size:16px;font-weight:800;color:#fff;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.modal h3 .tag{font-size:10px;background:#06b6d4;color:#0c4a6e;padding:2px 8px;border-radius:10px;letter-spacing:.5px;font-weight:800}
+.modal .subtitle{font-size:11px;color:#67e8f9;margin-bottom:18px}
+.form-row{margin-bottom:14px}
+.form-row label{display:block;font-size:10px;color:#94a3b8;text-transform:uppercase;margin-bottom:5px;letter-spacing:.8px;font-weight:700}
+.form-row input,.form-row select,.form-row textarea{width:100%;background:#1e293b;border:1px solid #334155;border-radius:6px;color:#e2e8f0;padding:8px 12px;font-size:13px;outline:none;font-family:inherit}
+.form-row input:focus,.form-row select:focus,.form-row textarea:focus{border-color:#06b6d4}
+.type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.type-btn{padding:10px 6px;border-radius:8px;border:2px solid #334155;background:#1e293b;color:#cbd5e1;font-size:10px;cursor:pointer;text-align:center;transition:all .15s;font-weight:600;line-height:1.3}
+.type-btn:hover{border-color:#475569}
+.type-btn .icon{display:block;font-size:18px;margin-bottom:4px}
+.type-btn.sel{color:#fff;font-weight:700}
+.type-btn[data-t="asc-pub"].sel{border-color:#3b82f6;background:rgba(59,130,246,.2)}
+.type-btn[data-t="asc-pac"].sel{border-color:#10b981;background:rgba(16,185,129,.2)}
+.type-btn[data-t="asc-cam"].sel{border-color:#f97316;background:rgba(249,115,22,.2)}
+.type-btn[data-t="asc-svc"].sel{border-color:#64748b;background:rgba(100,116,139,.3)}
+.type-btn[data-t="esc-nor"].sel{border-color:#8b5cf6;background:rgba(139,92,246,.2)}
+.type-btn[data-t="esc-mec"].sel{border-color:#ec4899;background:rgba(236,72,153,.2)}
+.floor-grid{display:flex;flex-wrap:wrap;gap:6px}
+.floor-chip{flex:1 0 calc(33% - 4px);padding:8px 4px;border-radius:6px;border:2px solid #334155;background:#1e293b;color:#94a3b8;font-size:12px;font-weight:700;cursor:pointer;text-align:center;transition:all .15s}
+.floor-chip:hover{border-color:#475569;color:#fff}
+.floor-chip.on{background:rgba(6,182,212,.25);border-color:#06b6d4;color:#fff}
+.modal-actions{display:flex;gap:8px;margin-top:18px}
+.modal-actions button{flex:1;padding:10px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:700;transition:all .15s}
+.btn-save{background:#06b6d4;color:#0c4a6e}.btn-save:hover{background:#22d3ee}
+.btn-del{background:#7f1d1d;color:#fff;border:1px solid #dc2626;flex:0 0 auto;padding:10px 16px}.btn-del:hover{background:#991b1b}
+.btn-cancel{background:#334155;color:#e2e8f0}.btn-cancel:hover{background:#475569}
+.color-grid{display:flex;flex-wrap:wrap;gap:8px}
+.color-swatch{width:40px;height:40px;border-radius:8px;border:3px solid #334155;cursor:pointer;transition:all .12s;position:relative;flex-shrink:0}
+.color-swatch:hover{transform:scale(1.08)}
+.color-swatch.sel{border-color:#fff;box-shadow:0 0 0 2px #06b6d4}
+.color-swatch.sel::after{content:'\2713';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:18px;font-weight:900;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.color-swatch.def{background:#1e293b;color:#94a3b8;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.1}
+.color-swatch.def.sel::after{content:''}
+.id-pick{font-size:11px;color:#94a3b8;background:#1e293b;border:1px dashed #334155;border-radius:6px;padding:10px;margin-bottom:14px}
+.id-pick strong{color:#67e8f9}
+.id-pick select{margin-top:6px;width:100%}
+
+/* ── ROUTE PANEL (slide-in from right) ── */
+#routePanel,#ascPanel{position:absolute;top:42px;right:0;bottom:0;width:340px;background:#0f1e34;border-left:1px solid #1e293b;display:none;flex-direction:column;z-index:20;box-shadow:-4px 0 20px rgba(0,0,0,.4)}
+#ascPanel.show{display:flex}
+.asc-row{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #1e293b;border-radius:8px;margin-bottom:5px;cursor:pointer;background:#13243d}
+.asc-row:hover{border-color:#06b6d4}
+.asc-row .lt{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:12px;flex-shrink:0}
+.asc-row .info{flex:1;min-width:0}
+.asc-row .info .nm{font-size:12.5px;color:#e2e8f0;font-weight:700}
+.asc-row .info .sub{font-size:10px;color:#94a3b8}
+.asc-row .ok{font-size:11px;font-weight:800;color:#10b981}
+.asc-row .pend{font-size:10px;font-weight:700;color:#f59e0b}
+#routePanel.show{display:flex}
+#routePanel .rp-hdr,#ascPanel .rp-hdr{padding:16px 20px;border-bottom:1px solid #1e293b;display:flex;align-items:center;gap:8px;flex-shrink:0}
+#routePanel .rp-hdr h3,#ascPanel .rp-hdr h3{font-size:14px;font-weight:800;color:#fff;display:flex;align-items:center;gap:8px}
+#routePanel .rp-hdr .close,#ascPanel .rp-hdr .close{margin-left:auto;background:none;border:none;color:#94a3b8;font-size:20px;cursor:pointer;width:28px;height:28px;border-radius:6px}
+#routePanel .rp-hdr .close:hover,#ascPanel .rp-hdr .close:hover{background:#1e293b;color:#fff}
+#routePanel .rp-body,#ascPanel .rp-body{flex:1;min-height:0;overflow-y:auto;padding:16px 20px}
+.rp-step{position:relative;padding:8px 0 8px 28px;font-size:12px;color:#e2e8f0;border-left:2px dashed #1e293b;margin-left:8px}
+.rp-step:last-child{border-left:none}
+.rp-step .dot{position:absolute;left:-7px;top:8px;width:14px;height:14px;border-radius:50%;background:#06b6d4;border:3px solid #0f1e34}
+.rp-step.origen .dot{background:#16a34a}
+.rp-step.destino .dot{background:#dc2626}
+.rp-step .meta{font-size:10px;color:#94a3b8;margin-top:2px}
+.rp-empty{text-align:center;padding:30px 20px;color:#94a3b8;font-size:12px}
+
+/* ── SCROLL ── */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#0f1e34}
+::-webkit-scrollbar-thumb{background:#334155;border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:#475569}
+/* ── Vista en perspectiva (pisos apilados 3D) ── */
+#persp{flex:1;position:relative;overflow:hidden;background:radial-gradient(120% 90% at 50% 18%,#1b2a44,#0b1120);}
+#perspScene{position:absolute;inset:0;perspective:1900px;}
+#perspStage{position:absolute;left:50%;top:54%;transform-style:preserve-3d;transition:transform .25s ease;will-change:transform;}
+.pfloor{position:absolute;transform-style:preserve-3d;}
+.pfloor .plate{position:absolute;inset:0;border:1px solid rgba(130,170,210,.42);border-radius:7px;background:rgba(13,22,40,.6);box-shadow:0 26px 44px -18px rgba(0,0,0,.7);}
+.pfloor .plate>img{position:absolute;inset:0;width:100%;height:100%;opacity:.42;filter:invert(.92) hue-rotate(185deg) saturate(.35);pointer-events:none;}
+.pfloor .plate>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}
+.pfloor .lbl{position:absolute;top:5px;left:5px;background:#1d4ed8;color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:5px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.45);cursor:pointer;}
+.pfloor .lbl .c{opacity:.85;font-weight:600;margin-left:6px;}
+.pfloor.empty .plate{opacity:.4;}
+.pmk{stroke:#fff;stroke-width:2.5;cursor:pointer;}
+.pmk:hover{stroke-width:3.5;}
+.ppath{fill:none;stroke:#38bdf8;stroke-width:2;opacity:.4;stroke-linecap:round;stroke-linejoin:round;}
+#perspCtrl{position:absolute;left:14px;bottom:14px;background:rgba(11,18,32,.9);border:1px solid #2c3e57;border-radius:11px;padding:11px 13px;display:flex;flex-direction:column;gap:9px;z-index:6;color:#cbd5e1;font-size:12px;min-width:178px;}
+#perspCtrl label{display:flex;flex-direction:column;gap:3px;font-size:11px;color:#94a3b8;}
+#perspCtrl input[type=range]{width:100%;accent-color:#1d4ed8;}
+#perspTotals{position:absolute;right:14px;top:14px;background:rgba(11,18,32,.9);border:1px solid #2c3e57;border-radius:11px;padding:10px 14px;z-index:6;color:#e2e8f0;font-size:12px;line-height:1.65;}
+.persp-toggle.active{background:#1d4ed8 !important;color:#fff !important;border-color:#1d4ed8 !important;}
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<div id="hdr">
+  <a href="index.html" class="hub-back" title="Volver al HUB" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;padding:7px 12px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:6px;flex-shrink:0;transition:all .15s" onmouseover="this.style.background='rgba(255,255,255,.22)'" onmouseout="this.style.background='rgba(255,255,255,.12)'">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>HUB
+  </a>
+  <h1>🧭 HDS · NAVEGACIÓN</h1>
+  <div class="hdr-sep"></div>
+  <div class="hdr-stat"><strong id="statAreas">0</strong>Áreas</div>
+  <div class="hdr-stat"><strong id="statAsc">0</strong>Ascensores</div>
+  <div class="hdr-stat"><strong id="statEsc">0</strong>Escaleras</div>
+  <div class="hdr-sep"></div>
+  <div id="gSearch">
+    <span id="gSearchIcon">🔍</span>
+    <input id="gSearchInput" placeholder="Buscar área o servicio..." autocomplete="off" spellcheck="false">
+    <div id="gSearchDrop" style="position:absolute;left:0;right:0;top:calc(100% + 6px);background:#0f1e34;border:1px solid #1e293b;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.5);z-index:600;display:none;max-height:320px;overflow-y:auto"></div>
+  </div>
+  <span id="saveBadge">✓ Guardado</span>
+</div>
+
+<!-- ── LAYOUT ── -->
+<div id="layout">
+  <aside id="sidebar">
+    <h2>Pisos</h2>
+    <div id="floorList"></div>
+  </aside>
+
+  <div id="main">
+    <div id="toolbar">
+      <button class="tb-btn" id="btnAscDir" onclick="openAscDirectorio()" title="Directorio de ascensores: tipología, cabinas dobles (A1/A2) y en qué pisos se detiene cada uno. Todo editable.">🛗 Directorio</button>
+      <button class="tb-btn" id="btnAsc" onclick="openAscPanel()" title="Ubicar los ascensores del directorio (A–Y) en el plano">🛗 Ascensores</button>
+      <button class="tb-btn" id="btnAdd" onclick="toggleMode('add')" title="Colocar circulación vertical (ascensores, escaleras): arrastra para dibujar el cuadro">➕ Colocar circulación</button>
+      <button class="tb-btn" id="btnPcirc" onclick="toggleMode('pcirc')" title="Circulación peatonal · DIBUJO RÁPIDO: clic o arrastre IZQUIERDO pinta y fusiona; clic o arrastre DERECHO recorta. Elegí la zona en la barra.">▦ Circulación peatonal</button>
+      <button class="tb-btn" id="btnPmark" onclick="toggleMode('pmark')" title="Colocar marcadores sobre la circulación: puerta, corredera automática, escalera, escalera mecánica, rampa, control de acceso">⚑ Marcadores</button>
+      <button class="tb-btn" id="btnMedir" onclick="toggleMode('medir')" title="Medir el largo de un recorrido: clic en cada punto y se acumula la distancia en metros">📏 Medir largo</button>
+      <button class="tb-btn" id="btnShape" onclick="toggleMode('shape')" title="Editar formas: clic en un cuadro para seleccionarlo, arrastra las manijas (esquinas/aristas) para redimensionar o el cuadro para moverlo. Clic en la flecha para girar la salida.">◱ Redimensionar</button>
+      <button class="tb-btn" id="btnCalibPlano" onclick="calibrarTodosLosPlanos()" title="Calibrar los planos de TODOS los pisos usando como referencia los ascensores que dibujaste manualmente en cada piso: con todos los que existan también en el Piso 1 se calcula (mínimos cuadrados) la escala y el corrimiento del plano para que quede en el mismo registro que el Piso 1. Los pisos sin ajustes quedan igual.">📐 Calibrar planos</button>
+      <button class="tb-btn" id="btnPoi" onclick="toggleMode('poi')" title="Marcar puntos de interés y flujo: accesos, llegada de pacientes/familiares, REAS, logística, medicamentos, laboratorio, vestidores, reloj control…">📍 Puntos de flujo</button>
+      <button class="tb-btn warn" id="btnDel" onclick="toggleMode('del')">🗑 Eliminar</button>
+      <span class="vista-seg" id="vistaSeg"><button id="vsServ" onclick="setVista('servicios')" title="Vista general: servicios de Atlas">🏥 Servicios</button><button id="vsCirc" onclick="setVista('circulaciones')" title="Vista 2: circulaciones fusionadas por zona; los servicios quedan de fondo">🚶 Circulaciones</button></span>
+      <button class="tb-btn active" id="btnAreas" onclick="toggleAreas()" title="Mostrar / ocultar las áreas de servicios importadas de Atlas — deja el plano limpio para dibujar circulaciones, escaleras y ascensores · tecla A">👁 Áreas</button>
+      <button class="tb-btn" onclick="reloadServicios()" title="Recargar los servicios generales dibujados en Atlas HDS (sin recintos pequeños)">📐 Recargar servicios</button>
+      <button class="tb-btn" id="btnRecintos" onclick="toggleRecintos()" title="Mostrar los RECINTOS dibujados en Atlas (vista 2) sobre el plano — misma geometría que en Atlas · tecla R">🚪 Recintos</button>
+      <button class="tb-btn" id="btnRelleno" onclick="toggleRelleno()" title="Propuesta de relleno inverso: pinta como circulación todo lo que no es recinto, para corregir borrando lo que no corresponde">🪣 Relleno</button>
+      <button class="tb-btn" id="btnAplicarRelleno" onclick="aplicarRelleno()" style="display:none;background:#065f46;border-color:#10b981;color:#d1fae5" title="Convertir la propuesta de este piso en cuadros de circulación editables (no toca lo que ya dibujaste; se deshace con ⌘Z)">✅ Aplicar relleno</button>
+      <button class="tb-btn bk" onclick="exportData()" title="RESPALDO COMPLETO a un archivo JSON: ascensores, áreas de circulación peatonal, marcadores, puntos de flujo y calibración de planos">💾 Respaldar</button>
+      <button class="tb-btn bk" onclick="importData()" title="Restaurar desde un archivo de respaldo (reemplaza el estado actual; deja un respaldo previo en el navegador)">⬆ Restaurar</button>
+      <button class="tb-btn bk" onclick="restaurarAuto()" title="Restaurar uno de los respaldos automáticos guardados en este navegador (hasta 3 días)">⏱ Auto</button>
+      <button class="tb-btn persp-toggle" id="btnPersp" onclick="togglePerspective()" title="Vista en perspectiva 3D: todos los pisos con sus circulaciones (ascensores, escaleras) y corredores">🏢 Perspectiva</button>
+      <div class="tb-sep"></div>
+      <div class="legend">
+        <div class="legend-item"><span class="legend-dot" style="background:#7AC143"></span>Verde · Público</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#FBB000"></span>Amarillo · Servicio</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#0B2A6B"></span>Azul · Montacamas mayor</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#29ABE2"></span>Celeste · Montacamas</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#8b5cf6"></span>Escaleras</div>
+      </div>
+    </div>
+
+    <div id="viewer">
+      <div id="imgWrap">
+        <img id="planSvg" alt="Plano del piso">
+        <svg id="overlay" xmlns="http://www.w3.org/2000/svg" class="interactive"></svg>
+      </div>
+      <div class="float-hint" id="addHint">📍 Clic en el plano para colocar un punto de circulación · ESC para salir</div>
+      <div class="float-hint warn" id="delHint">⚠ Clic sobre una circulación / tramo para eliminarlo SOLO de este piso · ESC para salir</div>
+      <div class="pcirc-bar" id="pcircBar"></div>
+      <!-- Barra de herramientas de dibujo de circulación (se despliega a la derecha) -->
+      <div id="pcTools" onmousedown="event.stopPropagation()">
+        <button class="pct-btn" id="pctUndo" onclick="pcUndo()" disabled title="Deshacer (⌘Z)">↩︎</button>
+        <button class="pct-btn" id="pctRedo" onclick="pcRedo()" disabled title="Rehacer (⇧⌘Z)">↪︎</button>
+        <div class="pct-sep"></div>
+        <button class="pct-btn on" id="pctDraw" onclick="pcSetTool('draw')" title="Dibujar (1) · clic o arrastre pinta · clic DERECHO recorta">▦</button>
+        <button class="pct-btn" id="pctEdit" onclick="pcSetTool('edit')" title="Editar (2) · seleccioná un tramo y arrastrá sus vértices o aristas · Shift suma a la selección · Shift + arrastre sobre el vacío = lazo que selecciona todo lo que quede dentro, y ⌫ lo borra de una">✏️</button>
+        <button class="pct-btn" id="pctFill" onclick="pcFillBtn()" title="Rellenar (3) · clic dentro de un pasillo y el área crece sola hasta los muros del plano · con selección, agranda lo seleccionado">🪄</button>
+        <button class="pct-btn" id="pctPeel" onclick="pcDespegar()" title="Despegar de muros · retrae los tramos seleccionados (o todo el piso) para que ninguno quede montado sobre las líneas del plano">🧹</button>
+        <div class="pct-sep"></div>
+        <button class="pct-btn on" id="pctSnap" onclick="pcToggleSnap()" title="Imán · al mover o editar, las aristas se pegan a los tramos vecinos · mantené ⌘ durante el arrastre para mover LIBRE sin imán">🧲</button>
+        <button class="pct-btn" id="pctDup" onclick="pcDupSel()" disabled title="Duplicar la selección">⧉</button>
+        <button class="pct-btn" id="pctSplit" onclick="pcSplitSel()" disabled title="Dividir (desfusionar) · corta cada tramo seleccionado en dos">✂️</button>
+        <button class="pct-btn" id="pctZona" onclick="pcZonaSel()" disabled title="Fusionar por zona · aplica la zona elegida arriba a la selección">🎨</button>
+        <button class="pct-btn warn" id="pctDel" onclick="pcDelSel()" disabled title="Eliminar la selección (Supr)">🗑</button>
+      </div>
+      <div class="pcirc-bar" id="pmarkBar"></div>
+      <div class="measure-readout" id="measureReadout"></div>
+    </div>
+
+    <div id="persp" style="display:none">
+      <div id="perspScene"><div id="perspStage"></div></div>
+      <div id="perspTotals"></div>
+      <div id="perspCtrl">
+        <label>Separación de pisos <input type="range" id="perspGap" min="60" max="320" value="170"></label>
+        <label>Inclinación <input type="range" id="perspTilt" min="30" max="72" value="56"></label>
+        <label>Giro <input type="range" id="perspRot" min="-60" max="60" value="-28"></label>
+        <button class="tb-btn" onclick="resetPerspective()" style="margin-top:2px">↺ Reencuadrar</button>
+      </div>
+    </div>
+
+    <!-- Panel de ascensores (slide-in) -->
+    <div id="ascPanel" style="display:none">
+      <div class="rp-hdr">
+        <h3>🛗 Ascensores · directorio</h3>
+        <button class="close" onclick="closeAscPanel()">×</button>
+      </div>
+      <div class="rp-body" id="ascBody">
+        <button class="tb-btn" style="width:100%;justify-content:center;margin-bottom:8px;background:#0891b2;border-color:#22d3ee;color:#fff" onclick="emplazarTodosLosAscensores()" title="Coloca las 26 letras (A–Y, Ñ) en TODOS los pisos, ordenadas en una grilla arriba a la izquierda del plano. Después arrastrás cada una a su lugar en cada piso y eliminás (🗑) las que no correspondan — el borrado es solo del piso actual.">⬇ Emplazar TODOS en todos los pisos</button>
+        <div style="font-size:11px;color:#94a3b8;margin-bottom:10px">Toca un ascensor y luego haz clic en el plano para ubicarlo. ✓ = ya ubicado.</div>
+        <div id="ascList"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="modal-bg" id="poiModalBg">
+  <div class="modal" style="max-width:560px">
+    <h3 style="margin:0 0 10px;color:#e2e8f0;font-size:15px">📍 Punto de interés / flujo</h3>
+    <div class="type-grid" id="poiTypeGrid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px"></div>
+    <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:3px">Nombre (opcional — ej: "Acceso Av. Salvador", "Entrada Pabellón")</label>
+    <input id="poiName" style="width:100%;background:#0f1e34;border:1px solid #334155;border-radius:8px;color:#e2e8f0;padding:9px 10px;font-size:13px;margin-bottom:8px" placeholder="Nombre del punto">
+    <label style="font-size:11px;color:#94a3b8;display:block;margin-bottom:3px">Notas</label>
+    <input id="poiNotas" style="width:100%;background:#0f1e34;border:1px solid #334155;border-radius:8px;color:#e2e8f0;padding:9px 10px;font-size:13px;margin-bottom:12px" placeholder="Observaciones">
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closePoiModal()">Cancelar</button>
+      <button class="btn-del" id="poiDelBtn" style="background:#7f1d1d;color:#fecaca;display:none" onclick="deletePoi()">🗑 Eliminar</button>
+      <button class="btn-save" onclick="savePoi()">Guardar</button>
+    </div>
+  </div>
+</div>
+<div class="modal-bg" id="circModalBg">
+  <div class="modal">
+    <h3 id="circTitle">Nueva circulación<span class="tag" id="circTagFloor">P1</span></h3>
+    <div class="subtitle" id="circSubtitle">Marca un punto de circulación vertical en este piso</div>
+
+    <div class="form-row">
+      <label>Tipo</label>
+      <div class="type-grid">
+        <button class="type-btn" data-t="asc-pub" onclick="setCircType('asc-pub')">
+          <span class="icon">🛗</span>Asc. Públicos
+        </button>
+        <button class="type-btn" data-t="asc-pac" onclick="setCircType('asc-pac')">
+          <span class="icon">🛗</span>Asc. Pacientes
+        </button>
+        <button class="type-btn" data-t="asc-cam" onclick="setCircType('asc-cam')">
+          <span class="icon">🛗</span>Asc. Camilleros
+        </button>
+        <button class="type-btn" data-t="asc-svc" onclick="setCircType('asc-svc')">
+          <span class="icon">🛗</span>Asc. Servicio
+        </button>
+        <button class="type-btn" data-t="esc-nor" onclick="setCircType('esc-nor')">
+          <span class="icon">▤</span>Escalera Normal
+        </button>
+        <button class="type-btn" data-t="esc-mec" onclick="setCircType('esc-mec')">
+          <span class="icon">↑↑</span>Esc. Mecánica
+        </button>
+        <button class="type-btn" data-t="zona" onclick="setCircType('zona')">
+          <span class="icon">▦</span>Zona de circulación
+        </button>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <label>Color del cuadro</label>
+      <div class="color-grid" id="circColors"></div>
+    </div>
+
+    <div class="form-row">
+      <label>Etiqueta del cuadro (identificador — ej. A1, A2)</label>
+      <input id="circLabel" placeholder="Se numera solo (A1, A2…); podés escribir una etiqueta propia">
+    </div>
+
+    <div class="form-row">
+      <label>Salida del ascensor (puerta)</label>
+      <div class="floor-grid" id="circExit"></div>
+    </div>
+
+    <div class="id-pick">
+      <strong>Agrupador</strong>: si esta circulación ya existe en otro piso, asignala a su mismo grupo para que aparezcan conectadas verticalmente.
+      <select id="circGroup">
+        <option value="__new__">— Crear nuevo grupo —</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <label>Nombre / etiqueta</label>
+      <input id="circName" placeholder="ej. Ascensor central, Escalera norte, AA.01">
+    </div>
+
+    <div class="form-row">
+      <label>Pisos que conecta</label>
+      <div class="floor-grid" id="circFloors"></div>
+    </div>
+
+    <div class="form-row">
+      <label>Notas / restricciones</label>
+      <textarea id="circNotas" placeholder="ej. requiere llave, horario limitado, solo personal..."></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-del" id="btnDeleteCirc" onclick="deleteCurrentCirc()" style="display:none" title="Quita este cuadro solo del piso actual; en los demás pisos se mantiene">🗑 Quitar de este piso</button>
+      <button class="btn-cancel" onclick="closeCircModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveCirc()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<script src="SHARED_DATA/ascensores_hds.js"></script>
+<script src="SHARED_DATA/circulaciones.js"></script>
+<!-- siembra base de circulación peatonal, con URL única por carga (anti-caché) -->
+<script>document.write('<scr'+'ipt src="SHARED_DATA/circulaciones_pcirc.js?v='+Date.now()+'"></scr'+'ipt>');</script>
+<script src="SHARED_DATA/cabida_web_snapshot.js"></script>
+<!-- recintos de Atlas (vista 2) ya convertidos a metros DXF, y la propuesta de
+     relleno inverso de circulación; ambos con URL única por carga (anti-caché) -->
+<script>document.write('<scr'+'ipt src="SHARED_DATA/recintos_nav.js?v='+Date.now()+'"></scr'+'ipt>');</script>
+<script>document.write('<scr'+'ipt src="SHARED_DATA/relleno_circulacion.js?v='+Date.now()+'"></scr'+'ipt>');</script>
+<script>
+// ═══════════════════════════════════════════════════════════════════════════
+//  HDS · NAVEGACIÓN · Wayfinding multi-piso con áreas Atlas HDS + circulación
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ── DATA ────────────────────────────────────────────────────────────────────
+const FLOORS=[
+  {id:'P-3',label:'Subterráneo 3',name:'Piso -3'},
+  {id:'P-2',label:'Subterráneo 2',name:'Piso -2'},
+  {id:'P-1',label:'Subterráneo 1',name:'Piso -1'},
+  {id:'P1', label:'Piso 1',       name:'Piso 1'},
+  {id:'P2', label:'Piso 2',       name:'Piso 2'},
+  {id:'P3', label:'Piso 3',       name:'Piso 3'},
+  {id:'P4', label:'Piso 4',       name:'Piso 4'},
+  {id:'P5', label:'Piso 5',       name:'Piso 5'},
+];
+// Planos re-renderizados desde los PDF A0 (misma escala y encuadre para los 8
+// pisos) → quedan alineados entre sí. SVG_DIMS se sobrescribe al cargar cada JPG
+// (todos ~6400×4953); estos valores son sólo el respaldo inicial.
+const _PLAN_DIM={w:15996,h:11663};   // planos de Atlas (mobiliario/color), nativos a las áreas
+const SVG_DIMS={'P-3':{..._PLAN_DIM},'P-2':{..._PLAN_DIM},'P-1':{..._PLAN_DIM},'P1':{..._PLAN_DIM},'P2':{..._PLAN_DIM},'P3':{..._PLAN_DIM},'P4':{..._PLAN_DIM},'P5':{..._PLAN_DIM}};
+// UN ÚNICO sistema de coordenadas para todos los pisos (planos ya alineados) →
+// lo dibujado en un piso cae en la misma posición en todos. Calibración fina
+// (posición absoluta) con los ascensores A/T de referencia.
+const _EXT={xmin:25, ymin:-107.8, xmax:300, ymax:105};
+const DXF_EXT={'P-3':_EXT,'P-2':_EXT,'P-1':_EXT,'P1':_EXT,'P2':_EXT,'P3':_EXT,'P4':_EXT,'P5':_EXT};
+// Atlas HDS (áreas de servicios) usa su propio PNG; tras re-renderizar los
+// planos, las áreas importadas requieren re-sincronizarse desde Atlas.
+const _PNG_DIM={w:16000,h:11663};
+const CABIDA_PNG_DIMS={'P-3':{..._PNG_DIM},'P-2':{..._PNG_DIM},'P-1':{..._PNG_DIM},'P1':{..._PNG_DIM},'P2':{..._PNG_DIM},'P3':{..._PNG_DIM},'P4':{..._PNG_DIM},'P5':{..._PNG_DIM}};
+
+const CIRC_TYPES={
+  'asc-pub':{label:'Asc. Públicos',color:'#3b82f6',short:'PB',shape:'circle'},
+  'asc-pac':{label:'Asc. Pacientes',color:'#10b981',short:'PA',shape:'circle'},
+  'asc-cam':{label:'Asc. Camilleros',color:'#f97316',short:'CA',shape:'rect'},
+  'asc-svc':{label:'Asc. Servicio',color:'#64748b',short:'SC',shape:'rect'},
+  'esc-nor':{label:'Escalera Normal',color:'#8b5cf6',short:'EN',shape:'rect'},
+  'esc-mec':{label:'Esc. Mecánica',color:'#ec4899',short:'EM',shape:'rect'},
+  'zona'   :{label:'Zona de circulación',color:'#94A3B8',short:'ZC',shape:'rect'}
+};
+// ── PUNTOS DE INTERÉS / FLUJOS ──────────────────────────────────────────────
+// Puntos clave por servicio para conectar rutas A→B por tipo de flujo.
+const POI_TYPES={
+  'acc-pea' :{label:'Acceso peatonal',        icon:'🚶', color:'#22c55e'},
+  'acc-veh' :{label:'Acceso vehicular',       icon:'🚗', color:'#84cc16'},
+  'amb'     :{label:'Llegada ambulancias',    icon:'🚑', color:'#ef4444'},
+  'lleg-pac':{label:'Llegada de pacientes',   icon:'🛏', color:'#3b82f6'},
+  'lleg-fam':{label:'Llegada de familiares',  icon:'👪', color:'#06b6d4'},
+  'reas'    :{label:'Flujo REAS (residuos)',  icon:'♻️', color:'#65a30d'},
+  'logi'    :{label:'Logística / abastecimiento', icon:'📦', color:'#f59e0b'},
+  'farm'    :{label:'Flujo de medicamentos',  icon:'💊', color:'#d946ef'},
+  'anat'    :{label:'Anatomía patológica / cadáveres', icon:'⚰️', color:'#64748b'},
+  'lab'     :{label:'Muestras de laboratorio',icon:'🧪', color:'#14b8a6'},
+  'prov'    :{label:'Proveedores',            icon:'🚚', color:'#f97316'},
+  'vest'    :{label:'Flujo a vestidores',     icon:'👔', color:'#8b5cf6'},
+  'reloj'   :{label:'Reloj control',          icon:'⏰', color:'#eab308'},
+  'alim'    :{label:'Alimentación (SEDILE)',  icon:'🍽', color:'#f43f5e'},
+  'ropa'    :{label:'Ropa limpia / sucia',    icon:'🧺', color:'#0ea5e9'},
+  'otro'    :{label:'Otro punto',             icon:'📍', color:'#94a3b8'}
+};
+
+/* ── MODO PÚBLICO / CONSULTA (HUB-PM) ───────────────────────────────────────
+   La copia publicada se genera con PUBLIC_BUILD=true (el deploy invierte el
+   flag): body.public oculta TODO el dibujo/edición/respaldo y deja la consulta
+   (ver planos, circulaciones, ascensores, recintos, medir, perspectiva).
+   Los datos vienen de la siembra base SHARED_DATA/*, no del localStorage.
+   Para probar localmente sin desplegar: agregá ?public=1 a la URL. */
+const PUBLIC_BUILD = true; /*__PUBLIC_FLAG__*/
+const PUBLIC = PUBLIC_BUILD || new URLSearchParams(location.search).get('public')==='1';
+// Modos que implican editar el plano (bloqueados en consulta)
+const _MODOS_EDICION = ['add','pcirc','pmark','shape','poi','del'];
+function applyPublicMode(){
+  if(!PUBLIC) return;
+  document.body.classList.add('public');
+  const st=document.createElement('style');
+  st.textContent=
+    '#btnAdd,#btnPcirc,#btnPmark,#btnShape,#btnCalibPlano,#btnPoi,#btnDel,'+
+    '#btnAsc,#btnRelleno,#btnAplicarRelleno,#pcTools,#pcircBar,#pmarkBar,'+
+    '#addHint,#delHint,.tb-btn.bk,[onclick*="reloadServicios"]{display:none !important}';
+  document.head.appendChild(st);
+  // el directorio de ascensores queda de solo lectura (es informativo)
+  const _dir=window.renderAscDirectorio;
+  if(typeof _dir==='function'){
+    window.renderAscDirectorio=function(){
+      const r=_dir.apply(this,arguments);
+      const b=document.getElementById('ascDirBody');
+      if(b) b.querySelectorAll('input,select,textarea,button').forEach(el=>{
+        el.disabled=true; el.readOnly=true; el.style.pointerEvents='none';
+      });
+      return r;
+    };
+  }
+}
+
+// ── STATE ───────────────────────────────────────────────────────────────────
+let S={floorId:'P1',mode:'view',zoom:1,ox:0,oy:0,selectedCircId:null};
+
+// ── PERSISTENCE ─────────────────────────────────────────────────────────────
+function lg(k,d){try{return JSON.parse(localStorage.getItem(k))||d;}catch{return d;}}
+function ls(k,v){localStorage.setItem(k,JSON.stringify(v));}
+// circulationState: { groups: {gid: {id, type, name, notas, floors:[]}}, nodes: [{id, gid, floor, x_m, y_m}] }
+let circState=lg('nav_circulation',{groups:{},nodes:[]});
+// Atlas HDS areas snapshot: { floorId: [ {areaId, name, shapes:[{x,y,w,h}], color} ] }
+let cabidaState=lg('nav_cabida_areas',{areas:{},names:{}});
+// Puntos de interés/flujo: [{id,type,name,floor,x_m,y_m,notas}]
+let poiState=lg('nav_pois',{items:[]});
+// Circulación peatonal: el área se dibuja como cuadros que se fusionan (como los
+// recintos de Atlas) y se clasifica por zona de acceso.
+// { floors: { floorId: [ {id, zona, x_m,y_m,w_m,h_m} ] } }
+let pcircState=lg('nav_pcirc',{floors:{}});
+// Siembra base del repo (SHARED_DATA/circulaciones_pcirc.js): puebla los pisos
+// que NO tienen trabajo local — así el sembrado automático y el trabajo
+// publicado se ven en cualquier navegador. Lo dibujado localmente SIEMPRE manda.
+(function(){
+  const B=((window.PCIRC_BASE||{}).floors)||{};
+  let n=0;
+  Object.keys(B).forEach(f=>{
+    if(!(pcircState.floors[f]||[]).length && (B[f]||[]).length){
+      pcircState.floors[f]=JSON.parse(JSON.stringify(B[f])); n+=B[f].length;
+    }
+  });
+  if(n) console.log('PCIRC: siembra base cargada ('+n+' tramos en pisos sin trabajo local)');
+})();
+const ZONA_CIRC={
+  general:{label:'Circulación general / pública', color:'#22c55e', short:'General'},
+  semi:   {label:'Semirestringida',               color:'#eab308', short:'Semirestr.'},
+  restr:  {label:'Restringida',                    color:'#ef4444', short:'Restringida'},
+  func:   {label:'Circulación de funcionarios',    color:'#3b82f6', short:'Funcionarios'},
+  tecnica:{label:'Técnica / instalaciones',        color:'#a855f7', short:'Técnica'}
+};
+// Elementos verticales: se DIBUJAN igual de fluido que la circulación (misma
+// barra y mismas herramientas: editar, imán, despegar, deshacer…), pero cada
+// caja mantiene identidad propia (NO se fusiona). Flujo acordado con Matías:
+// primero DELIMITAR las cajas; después describir tipología, puertas, etc.
+const ELEM_CIRC={
+  asc:   {label:'Caja de ascensor',    color:'#0ea5e9', short:'🛗 Ascensor',      icon:'🛗'},
+  esc:   {label:'Escalera',            color:'#8b5cf6', short:'🪜 Escalera',      icon:'🪜'},
+  escmec:{label:'Escalera mecánica',   color:'#ec4899', short:'⤴ Esc. mecánica',  icon:'⤴'}
+};
+const esElem = z => !!ELEM_CIRC[z];
+let _pcircZona='general';
+// Marcadores físicos sobre la circulación: { floorId: [{id,tipo,x_m,y_m}] }
+pcircState.markers = pcircState.markers || {};
+const MARCA_CIRC={
+  puerta:   {label:'Puerta',               icon:'🚪'},
+  corredera:{label:'Corredera automática', icon:'⇥⇤'},
+  escalera: {label:'Escalera',             icon:'🪜'},
+  escmec:   {label:'Escalera mecánica',    icon:'↗'},
+  rampa:    {label:'Rampa',                icon:'◣'},
+  control:  {label:'Control de acceso',    icon:'🔒'}
+};
+let _pmarkTipo='puerta';
+// Ajuste fino por piso del PLANO (matriz CSS): { floorId:[a,b,c,d,e,f] } — calibra
+// la escala/posición del plano de cada piso para que coincida con el Piso 1.
+let planXform=lg('nav_plan_xform',{});
+
+// ── ASCENSORES · directorio pre-sembrado (circulaciones.js) ─────────────────
+const CAT_TO_CIRC={publico:'asc-pub','montacamas':'asc-cam','montacamas-mayor':'asc-cam',servicio:'asc-svc'};
+const NAV_FLOORS=new Set(FLOORS.map(f=>f.id));
+// Nomenclatura oficial de colores (lámina "Detalle Ascensores", circulaciones.js)
+const NOM_COLOR={publico:'#7AC143','montacamas-mayor':'#0B2A6B','montacamas':'#29ABE2',servicio:'#FBB000'};
+// Paleta de colores sólidos asignables en la edición
+const SOLID_COLORS=[
+  {c:'#7AC143',lbl:'Verde · Público'},
+  {c:'#FBB000',lbl:'Amarillo · Servicio'},
+  {c:'#0B2A6B',lbl:'Azul · Montacamas mayor'},
+  {c:'#29ABE2',lbl:'Celeste · Montacamas'}
+];
+// Color efectivo de un grupo: override manual → color de categoría oficial → color del tipo
+function circColor(g){ return (g&&g.color)||(g&&g.cat&&NOM_COLOR[g.cat])||(CIRC_TYPES[g&&g.type]||{}).color||'#3b82f6'; }
+// Texto legible según luminancia del fondo (blanco sobre oscuro, oscuro sobre claro)
+function textOn(hex){ const h=hex.replace('#',''); const r=parseInt(h.slice(0,2),16),gc=parseInt(h.slice(2,4),16),b=parseInt(h.slice(4,6),16); return (0.299*r+0.587*gc+0.114*b)>150?'#0c2233':'#fff'; }
+// ── TIPOLOGÍAS · medidas interiores reales por categoría (Proyecto Rev. I) ──
+// El plano está en METROS: la caja por defecto se dibuja a escala real (ancho×fondo).
+// Montacamas y Servicio: 1800×2700 (láminas NH). Público y "mayor superficie": asumidos (ajustables).
+const ASC_DIM_MM={
+  'publico':          {ancho:1600, fondo:1400},
+  'montacamas-mayor': {ancho:2100, fondo:2900},
+  'montacamas':       {ancho:1800, fondo:2700},
+  'servicio':         {ancho:1800, fondo:2700}
+};
+function ascBoxM(cat){ const d=ASC_DIM_MM[cat]||ASC_DIM_MM['publico']; return {w_m:d.ancho/1000, h_m:d.fondo/1000}; }
+// Dirección de salida por defecto (puerta del ascensor): 's' = hacia abajo
+const EXIT_DIRS=[['n','↑'],['e','→'],['s','↓'],['w','←']];
+function seedAscensores(){
+  const dir=(window.SHARED_CIRCULACIONES&&window.SHARED_CIRCULACIONES.ascensores)||[];
+  let added=0;
+  dir.forEach(a=>{
+    const gid='asc_'+a.id;
+    const floors=(a.pisos||[]).filter(p=>NAV_FLOORS.has(p));
+    if(!floors.length) return;
+    if(!circState.groups[gid]){
+      circState.groups[gid]={id:gid,type:CAT_TO_CIRC[a.cat]||'asc-pub',
+        name:'Ascensor '+a.id, notas:(a.zona||'')+' · '+(a.rango||''),
+        floors, letra:a.id, ascLetter:a.id, seq:1, cat:a.cat, color:NOM_COLOR[a.cat]||null, seeded:true, cambia:!!a.cambiaProyecto};
+      added++;
+    } else { // mantener metadata fresca (sin pisar la etiqueta de una cabina ya ubicada)
+      const g=circState.groups[gid]; g.ascLetter=a.id; g.cat=a.cat; if(g.seq==null) g.seq=1;
+      if(!circState.nodes.some(n=>n.gid===gid)) g.letra=a.id;
+      if(!g.floors||!g.floors.length) g.floors=floors;
+      if(!g.color) g.color=NOM_COLOR[a.cat]||null;
+    }
+  });
+  if(added){ saveAll(); }
+  return added;
+}
+// Metadata de catálogo de un ascensor (desde circulaciones.js)
+function ascMeta(letra){
+  const a=((window.SHARED_CIRCULACIONES&&window.SHARED_CIRCULACIONES.ascensores)||[]).find(x=>x.id===letra)||{};
+  const floors=(a.pisos||[]).filter(p=>NAV_FLOORS.has(p));
+  return {cat:a.cat, color:NOM_COLOR[a.cat]||null, type:CAT_TO_CIRC[a.cat]||'asc-pub', floors, notas:(a.zona||'')+' · '+(a.rango||'')};
+}
+// Cabinas (grupos con nodos) ubicadas para una letra de ascensor
+function ascInstances(letra){ return Object.values(circState.groups).filter(g=>g.ascLetter===letra && circState.nodes.some(n=>n.gid===g.id)); }
+function ascCount(letra){ return ascInstances(letra).length; }
+// Renumera las cabinas de una letra: 1 sola → "A"; varias → "A1","A2"… (respeta etiquetas manuales)
+function renumberAsc(letra){
+  const placed=ascInstances(letra).sort((a,b)=>(a.seq||1)-(b.seq||1));
+  if(placed.length<=1){ placed.forEach(g=>{ if(!g.manualLabel) g.letra=letra; }); }
+  else { placed.forEach((g,i)=>{ if(!g.manualLabel) g.letra=letra+(i+1); }); }
+}
+function startPlaceAsc(letra){
+  S.mode='placeAsc'; S.placeAscLetter=letra;
+  viewer.classList.add('add-mode');
+  const next=ascCount(letra)+1;
+  addHint.textContent='🛗 Arrastra para dibujar el cuadro del Ascensor '+letra+(next>1?' (cabina '+letra+next+')':'')+' · o un clic = tamaño estándar · ESC para salir';
+  addHint.classList.add('show');
+  closeAscPanel();
+}
+function placeAscAt(sx,sy,w_svg,h_svg){
+  const letra=S.placeAscLetter; if(!letra) return;
+  const m=svgToDxf(S.floorId,sx,sy); if(!m) return;
+  const bare=circState.groups['asc_'+letra], meta=ascMeta(letra);
+  const cat=(bare&&bare.cat)||meta.cat;
+  // Arrastre → tamaño dibujado; clic → tipología real de la categoría (a escala)
+  const box=(w_svg&&h_svg)?svgSizeToDxf(S.floorId,w_svg,h_svg):ascBoxM(cat);
+  const floors=(bare&&bare.floors&&bare.floors.length)?bare.floors:(meta.floors.length?meta.floors:[S.floorId]);
+  // 1ª cabina → usa el grupo base; siguientes → nueva cabina numerada
+  let gid;
+  if(bare && !circState.nodes.some(n=>n.gid==='asc_'+letra)){
+    gid='asc_'+letra;
+  } else {
+    const seq=(Math.max(0,...Object.values(circState.groups).filter(g=>g.ascLetter===letra).map(g=>g.seq||1)))+1;
+    gid='asc_'+letra+'__'+seq;
+    circState.groups[gid]={id:gid, type:(bare&&bare.type)||meta.type,
+      name:'Ascensor '+letra, notas:(bare&&bare.notas)||meta.notas,
+      floors:floors.slice(), letra:letra, ascLetter:letra, seq,
+      cat:(bare&&bare.cat)||meta.cat, color:(bare&&bare.color)||meta.color||null};
+  }
+  // colocar los nodos SOLO de esta cabina (no toca las demás), en la posición exacta
+  circState.nodes=circState.nodes.filter(n=>n.gid!==gid);
+  floors.forEach(fl=>{ circState.nodes.push({id:gid+'_'+fl, gid, floor:fl, x_m:m.cx_m, y_m:m.cy_m, w_m:box.w_m, h_m:box.h_m}); });
+  renumberAsc(letra);
+  saveAll(); S.mode='view'; S.placeAscLetter=null;
+  viewer.classList.remove('add-mode'); addHint.classList.remove('show');
+  renderOverlay(); updateStats(); renderSidebar(); renderAscPanel();
+}
+// ── CALIBRAR PLANOS · mínimos cuadrados con TODAS las circulaciones ──────────
+// El usuario dibuja los ascensores manualmente en su lugar real en CADA piso.
+// Para cada piso ≠ P1, toda circulación presente en ese piso y en el P1 es un
+// par de referencia; con todos los pares se ajusta (mínimos cuadrados) la
+// escala + traslación que registra ese plano contra el Piso 1. Las
+// circulaciones del piso se transforman junto con el plano (quedan pegadas).
+function _calMsg(txt,warn){ addHint.textContent=txt; addHint.classList.add('show'); addHint.classList.toggle('warn',!!warn); setTimeout(()=>{addHint.classList.remove('show');addHint.classList.remove('warn');},12000); }
+// ── CALIBRACIÓN DE PLANOS DESDE LOS ASCENSORES ──────────────────────────────
+// Usa las posiciones EMPLAZADAS como referencia: cada cabina define su posición
+// canónica = MEDIANA de sus pisos (ducto vertical; la mediana descarta sola los
+// pisos mal ubicados). Para cada piso se ajusta una similaridad (escala+
+// traslación) que lleva el plano desde donde quedaron dibujados los ascensores
+// hasta esa posición canónica, con rechazo iterativo de outliers para que un par
+// mal puesto no tuerza el ajuste. Luego los nodos se fijan a la canónica →
+// planos alineados entre sí y cajas verticales de tamaño uniforme.
+function _medArr(a){ const s=a.slice().sort((x,y)=>x-y); const m=s.length>>1; return s.length?(s.length%2?s[m]:(s[m-1]+s[m])/2):0; }
+function _flName(fl){ const f=FLOORS.find(x=>x.id===fl); return f?f.name:fl; }
+function _canonicosAsc(){
+  const by={}; circState.nodes.forEach(n=>{ (by[n.gid]=by[n.gid]||[]).push(n); });
+  const C={};
+  Object.keys(by).forEach(g=>{ const ns=by[g];
+    C[g]={x_m:_medArr(ns.map(n=>n.x_m)), y_m:_medArr(ns.map(n=>n.y_m)),
+          w_m:_medArr(ns.map(n=>n.w_m||0)), h_m:_medArr(ns.map(n=>n.h_m||0))}; });
+  return C;
+}
+function _fitSimilaridad(pairs){
+  const fit=ps=>{ const n=ps.length;
+    const cX=ps.reduce((a,p)=>a+p.c.x,0)/n, cY=ps.reduce((a,p)=>a+p.c.y,0)/n;
+    const rX=ps.reduce((a,p)=>a+p.r.x,0)/n, rY=ps.reduce((a,p)=>a+p.r.y,0)/n;
+    let num=0,den=0;
+    ps.forEach(p=>{ num+=(p.c.x-cX)*(p.r.x-rX)+(p.c.y-cY)*(p.r.y-rY); den+=(p.c.x-cX)**2+(p.c.y-cY)**2; });
+    const s=den>1e-6?num/den:1; return {s,tx:rX-s*cX,ty:rY-s*cY}; };
+  let ps=pairs.slice(), f=fit(ps);
+  for(let it=0; it<3 && ps.length>=3; it++){
+    const res=ps.map(p=>Math.hypot(f.s*p.c.x+f.tx-p.r.x, f.s*p.c.y+f.ty-p.r.y));
+    const thr=Math.max(_medArr(res)*3, 60);
+    const keep=ps.filter((p,i)=>res[i]<=thr);
+    if(keep.length>=3 && keep.length<ps.length){ ps=keep; f=fit(ps); } else break;
+  }
+  const res=ps.map(p=>Math.hypot(f.s*p.c.x+f.tx-p.r.x, f.s*p.c.y+f.ty-p.r.y));
+  f.err=res.length?res.reduce((a,b)=>a+b,0)/res.length:0; f.n=ps.length; f.drop=pairs.length-ps.length;
+  return f;
+}
+function calibrarTodosLosPlanos(){
+  const cur=S.floorId;
+  const C=_canonicosAsc();
+  const floors=[...new Set(circState.nodes.map(n=>n.floor))];
+  const hechos=[], fallidos=[];
+  floors.forEach(fl=>{
+    const pairs=[];
+    circState.nodes.filter(n=>n.floor===fl && C[n.gid]).forEach(n=>{
+      const c=dxfToSvg(fl,n.x_m,n.y_m), r=dxfToSvg(fl,C[n.gid].x_m,C[n.gid].y_m);
+      if(c&&r) pairs.push({c,r});
+    });
+    if(pairs.length<2){ fallidos.push(_flName(fl)+' (sin refs)'); return; }
+    const f=_fitSimilaridad(pairs);
+    if(!(f.s>0.2&&f.s<5)){ fallidos.push(_flName(fl)+' (inestable)'); return; }
+    planXform[fl]=[f.s,0,0,f.s,f.tx,f.ty];
+    hechos.push(_flName(fl)+' ×'+f.s.toFixed(3)+' ('+f.n+' ref'+(f.drop?', '+f.drop+' outlier'+(f.drop>1?'s':''):'')+', ±'+Math.round(f.err)+'px)');
+  });
+  // Nodos → posición y tamaño canónicos (ductos verticales, tamaño uniforme)
+  circState.nodes.forEach(n=>{ const c=C[n.gid]; if(!c) return; n.x_m=c.x_m; n.y_m=c.y_m; n.w_m=c.w_m; n.h_m=c.h_m; });
+  ls('nav_plan_xform',planXform); saveAll();
+  S.floorId=cur; applyPlanXform(); renderOverlay(); updateStats();
+  let msg = hechos.length ? '🎯 Planos calibrados desde los ascensores: '+hechos.join(' · ')+'.' : 'No se calibró ningún piso.';
+  if(fallidos.length) msg+=' ⚠ '+fallidos.join(', ')+'.';
+  _calMsg(msg, !hechos.length);
+}
+// ── EMPLAZAR TODOS · etapa de identificación piso a piso ─────────────────────
+// Coloca las 26 letras del directorio en TODOS los pisos (independiente de qué
+// pisos sirvan según el catálogo), ordenadas en una grilla arriba a la
+// izquierda del plano para poder identificarlas y arrastrarlas. Idempotente:
+// no pisa cuadros ya colocados. El usuario luego elimina (por piso) las que no
+// correspondan y las une verticalmente al final.
+function emplazarTodosLosAscensores(){
+  seedAscensores();
+  const ALL=FLOORS.map(f=>f.id);
+  const dir=(window.SHARED_CIRCULACIONES&&window.SHARED_CIRCULACIONES.ascensores)||[];
+  let added=0;
+  dir.forEach((a,i)=>{
+    const gid='asc_'+a.id, g=circState.groups[gid]; if(!g) return;
+    g.floors=ALL.slice();                       // en identificación, todas las letras en todos los pisos
+    const box=ascBoxM(g.cat);
+    // Grilla de estacionamiento: 2 filas de 13, esquina superior izquierda
+    const col=i%13, row=Math.floor(i/13);
+    const x=35+col*9, y=100-row*8;
+    ALL.forEach(fl=>{
+      if(circState.nodes.some(n=>n.gid===gid&&n.floor===fl)) return;   // ya colocado: no tocar
+      circState.nodes.push({id:gid+'_'+fl,gid,floor:fl,x_m:x,y_m:y,w_m:box.w_m,h_m:box.h_m});
+      added++;
+    });
+  });
+  saveAll(); renderOverlay(); updateStats(); renderSidebar(); renderAscPanel(); closeAscPanel();
+  _calMsg(added
+    ? '🛗 Emplazados '+added+' cuadros ('+dir.length+' letras × '+ALL.length+' pisos) en la grilla superior izquierda. Arrastralos a su lugar en cada piso; 🗑 elimina SOLO del piso actual.'
+    : 'Todas las letras ya estaban colocadas en todos los pisos.');
+}
+function openAscPanel(){ seedAscensores(); renderAscPanel(); const p=document.getElementById('ascPanel'); p.style.display='flex'; p.classList.add('show'); }
+function closeAscPanel(){ const p=document.getElementById('ascPanel'); if(p){ p.classList.remove('show'); p.style.display='none'; } }
+function renderAscPanel(){
+  const dir=(window.SHARED_CIRCULACIONES&&window.SHARED_CIRCULACIONES.ascensores)||[];
+  const el=document.getElementById('ascList'); if(!el) return;
+  let nP=0;
+  let totCab=0;
+  el.innerHTML=dir.map(a=>{
+    const gid='asc_'+a.id, cnt=ascCount(a.id); if(cnt){nP++;totCab+=cnt;}
+    const ct=CIRC_TYPES[CAT_TO_CIRC[a.cat]||'asc-pub']||{};
+    const col=(circState.groups[gid]&&circState.groups[gid].color)||NOM_COLOR[a.cat]||ct.color||'#3b82f6';
+    return '<div class="asc-row" onclick="startPlaceAsc(\''+a.id+'\')">'
+      +'<span class="lt" style="background:'+col+';color:'+textOn(col)+'">'+a.id+'</span>'
+      +'<span class="info"><span class="nm">Ascensor '+a.id+(a.cambiaProyecto?' ⭐':'')+(cnt>1?' · '+cnt+' cabinas':'')+'</span>'
+      +'<span class="sub">'+(ct.label||'')+' · '+(a.zona||'')+' · '+(a.rango||'')+'</span></span>'
+      +(cnt?'<span class="ok">'+(cnt>1?cnt+'✓':'✓')+'</span>':'')
+      +'<span class="pend">'+(cnt?'＋ cabina ›':'ubicar ›')+'</span></div>';
+  }).join('');
+  const h=document.querySelector('#ascPanel .rp-hdr h3'); if(h) h.textContent='🛗 Ascensores · '+nP+'/'+dir.length+' letras · '+totCab+' cabinas';
+}
+
+function _markSaved(){const el=document.getElementById('saveBadge');if(!el)return;el.textContent='✓ Guardado';el.style.color='#a5f3fc'}
+function _markDirty(){const el=document.getElementById('saveBadge');if(!el)return;el.textContent='✏️ Guardando…';el.style.color='#fed7aa'}
+let _saveTimer=null;
+function saveAll(){
+  _markDirty();
+  if(_saveTimer)clearTimeout(_saveTimer);
+  _saveTimer=setTimeout(()=>{
+    ls('nav_circulation',circState);
+    ls('nav_circulation.bak',circState);
+    ls('nav_cabida_areas',cabidaState);
+    ls('nav_pois',poiState);
+    ls('nav_pcirc',pcircState);
+    ls('nav_plan_xform',planXform);
+    _markSaved();
+  },200);
+}
+function flushSave(){if(_saveTimer){clearTimeout(_saveTimer);ls('nav_circulation',circState);_markSaved();}}
+window.addEventListener('beforeunload',flushSave);
+// red de seguridad: foto diaria del estado apenas carga la plataforma
+window.addEventListener('load',()=>{ try{ _navAutoRespaldo(); }catch(e){} });
+window.addEventListener('pagehide',flushSave);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushSave();});
+
+// ── COORDS ──────────────────────────────────────────────────────────────────
+function dxfToSvg(fId,cx_m,cy_m){
+  const ext=DXF_EXT[fId];if(!ext)return null;
+  const d=SVG_DIMS[fId];if(!d)return null;
+  return {x:(cx_m-ext.xmin)/(ext.xmax-ext.xmin)*d.w, y:(ext.ymax-cy_m)/(ext.ymax-ext.ymin)*d.h};
+}
+function svgToDxf(fId,sx,sy){
+  const ext=DXF_EXT[fId];if(!ext)return null;
+  const d=SVG_DIMS[fId];if(!d)return null;
+  return {cx_m:ext.xmin+(sx/d.w)*(ext.xmax-ext.xmin), cy_m:ext.ymax-(sy/d.h)*(ext.ymax-ext.ymin)};
+}
+// Tamaño de cuadro: svg px → metros dxf (y viceversa). Si no hay tamaño, usa el default.
+const DEF_BOX_SVG=140;
+function svgSizeToDxf(fId,w_svg,h_svg){
+  const ext=DXF_EXT[fId], d=SVG_DIMS[fId];
+  const ws=(w_svg&&w_svg>8)?w_svg:DEF_BOX_SVG, hs=(h_svg&&h_svg>8)?h_svg:DEF_BOX_SVG;
+  if(!ext||!d) return {w_m:null,h_m:null};
+  return {w_m:ws/d.w*(ext.xmax-ext.xmin), h_m:hs/d.h*(ext.ymax-ext.ymin)};
+}
+function dxfSizeToSvg(fId,w_m,h_m){
+  const ext=DXF_EXT[fId], d=SVG_DIMS[fId];
+  if(!ext||!d||!w_m||!h_m) return {w:DEF_BOX_SVG,h:DEF_BOX_SVG};
+  return {w:w_m/(ext.xmax-ext.xmin)*d.w, h:h_m/(ext.ymax-ext.ymin)*d.h};
+}
+// Atlas HDS guarda en pixeles del PNG (16000×11680). Convertir a SVG (10268×7512).
+function cabidaPxToSvg(fId,px,py){
+  const png=CABIDA_PNG_DIMS[fId], svg=SVG_DIMS[fId];
+  if(!png||!svg)return {x:0,y:0};
+  return {x:px*(svg.w/png.w), y:py*(svg.h/png.h)};
+}
+
+// ── DOM ─────────────────────────────────────────────────────────────────────
+const viewer=document.getElementById('viewer');
+const imgWrap=document.getElementById('imgWrap');
+const planSvg=document.getElementById('planSvg');
+const overlay=document.getElementById('overlay');
+const btnAdd=document.getElementById('btnAdd');
+const btnDel=document.getElementById('btnDel');
+const addHint=document.getElementById('addHint');
+const delHint=document.getElementById('delHint');
+
+// ── FLOOR LOAD ──────────────────────────────────────────────────────────────
+function applyFloorDims(w,h){
+  // El espacio de coordenadas del overlay = tamaño REAL del JPG mostrado
+  // (optimizado ~6400px). El overlay usa proporciones (SVG_DIMS/CABIDA_PNG_DIMS),
+  // así que el mapeo de áreas/ejes sigue siendo exacto y la capa es liviana.
+  SVG_DIMS[S.floorId]={w,h};
+  planSvg.style.width=w+'px';  planSvg.style.height=h+'px';
+  overlay.setAttribute('width',w); overlay.setAttribute('height',h);
+  overlay.setAttribute('viewBox',`0 0 ${w} ${h}`);
+  overlay.style.width=w+'px';  overlay.style.height=h+'px';
+}
+// Aplica al PLANO (solo la imagen, no el overlay) el ajuste fino del piso actual.
+function applyPlanXform(){
+  const m=planXform[S.floorId];
+  planSvg.style.transformOrigin='0 0';
+  planSvg.style.transform = m ? 'matrix('+m.join(',')+')' : 'none';
+}
+let _planLoadId=0;
+function loadFloor(fId){
+  if(S.floorId!==fId && typeof pcSel!=='undefined'){ pcSel.clear(); _wallS=null; }  // selección y muros son por piso
+  S.floorId=fId;
+  // Plano de Atlas (mismo que 6.AtlasHDS) → las áreas de servicio calzan nativas
+  // y sin distorsión. Cadena: mobiliario LIMPIO primero (webp→jpg), y si el piso
+  // sólo tiene la variante a color (P-3, P5), cae a _color.
+  planSvg.onload=()=>{
+    if(planSvg.naturalWidth>0) applyFloorDims(planSvg.naturalWidth,planSvg.naturalHeight);
+    applyPlanXform(); fitView(); renderOverlay();
+  };
+  const chain=[`CABIDA_DATA/plan_${fId}.webp`,`CABIDA_DATA/plan_${fId}.jpg`,
+               `CABIDA_DATA/plan_${fId}_color.webp`,`CABIDA_DATA/plan_${fId}_color.jpg`,
+               `CABIDA_DATA/dxf_plan_${fId}.svg`];
+  const myId=++_planLoadId;
+  const tryNext=(i)=>{
+    if(myId!==_planLoadId) return;
+    if(i>=chain.length) return;
+    const pre=new Image(); pre.decoding='async';
+    pre.onload=()=>{ if(myId!==_planLoadId) return; planSvg.src=chain[i]; };
+    pre.onerror=()=>{ if(myId!==_planLoadId) return; tryNext(i+1); };
+    pre.src=chain[i];
+  };
+  tryNext(0);
+  renderSidebar();
+  updateStats();
+  if(typeof sincBotonesCapas==='function') sincBotonesCapas();
+}
+function curDims(){ return SVG_DIMS[S.floorId]||{w:1,h:1}; }
+function fitView(){
+  const vw=viewer.clientWidth, vh=viewer.clientHeight;
+  const d=curDims(); const iw=d.w||1, ih=d.h||1;
+  const z=Math.min(vw/iw, vh/ih)*0.95;
+  S.zoom=z; S.ox=(vw-iw*z)/2; S.oy=(vh-ih*z)/2; applyT(true);
+}
+function applyT(animate){
+  imgWrap.style.transition = animate ? 'transform .14s cubic-bezier(.22,.61,.36,1)' : 'none';
+  imgWrap.style.transform=`translate(${S.ox}px,${S.oy}px) scale(${S.zoom})`;
+}
+
+// ── PAN & ZOOM ──────────────────────────────────────────────────────────────
+let panState=null, didPan=false, _zoomRAF=null;
+const DRAW_MODES=new Set(['add','poi','placeAsc','pcirc','pmark','medir']);
+// Posición del cursor en coordenadas del plano (svg) + si cae dentro
+function planCoords(e){
+  const rect=planSvg.getBoundingClientRect(), d=curDims();
+  const sx=(e.clientX-rect.left)/(rect.width/d.w);
+  const sy=(e.clientY-rect.top)/(rect.height/d.h);
+  return {sx,sy,inside:sx>=0&&sy>=0&&sx<=d.w&&sy<=d.h,d};
+}
+// ── DIBUJO DE CUADRO (rubber-band) ──────────────────────────────────────────
+let _boxDraw=null, _boxPreviewEl=null;
+function _updateBoxPreview(){
+  if(!_boxDraw) return;
+  if(!_boxPreviewEl){
+    _boxPreviewEl=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    _boxPreviewEl.setAttribute('class','box-preview');
+    overlay.appendChild(_boxPreviewEl);
+  }
+  const x=Math.min(_boxDraw.x0,_boxDraw.x1), y=Math.min(_boxDraw.y0,_boxDraw.y1);
+  const w=Math.abs(_boxDraw.x1-_boxDraw.x0), h=Math.abs(_boxDraw.y1-_boxDraw.y0);
+  _boxPreviewEl.setAttribute('x',x);_boxPreviewEl.setAttribute('y',y);
+  _boxPreviewEl.setAttribute('width',w);_boxPreviewEl.setAttribute('height',h);
+}
+function _finishBox(){
+  const b=_boxDraw; _boxDraw=null;
+  if(_boxPreviewEl){ overlay.removeChild(_boxPreviewEl); _boxPreviewEl=null; }
+  if(!b) return;
+  const w=Math.abs(b.x1-b.x0), h=Math.abs(b.y1-b.y0);
+  const drag = w>12&&h>12;
+  const cxs = drag ? (b.x0+b.x1)/2 : b.x0;
+  const cys = drag ? (b.y0+b.y1)/2 : b.y0;
+  if(S.mode==='placeAsc'){
+    // clic → tipología real (placeAscAt sin tamaño); arrastre → tamaño dibujado
+    if(drag) placeAscAt(cxs,cys,w,h); else placeAscAt(cxs,cys);
+    return;
+  }
+  if(S.mode==='add'){
+    const m=svgToDxf(S.floorId,cxs,cys); if(!m) return;
+    const box=svgSizeToDxf(S.floorId, drag?w:DEF_BOX_SVG, drag?h:DEF_BOX_SVG);
+    _pendingCoord={x_m:m.cx_m,y_m:m.cy_m,w_m:box.w_m,h_m:box.h_m,sx:cxs,sy:cys};
+    _editingCirc=null; openCircModal();
+  }
+  if(S.mode==='pcirc'){
+    // DIBUJO RÁPIDO: clic/arrastre izquierdo SUMA (se fusiona solo al render);
+    // clic/arrastre DERECHO RESTA (recorta lo ya pintado).
+    // elementos (🛗/🪜/⤴): el clic simple NO pinta — la caja se dibuja con
+    // arrastre o con doble clic (ajuste automático al recinto)
+    if(!drag && !b.neg && esElem(_pcircZona)) return;
+    const ww = drag ? w : PCIRC_PINCEL, hh = drag ? h : PCIRC_PINCEL;
+    const m=svgToDxf(S.floorId,cxs,cys); if(!m) return;
+    const box=svgSizeToDxf(S.floorId,ww,hh);
+    pcHistPush();
+    if(b.neg){
+      const n=pcircRestar(S.floorId,{x_m:m.cx_m,y_m:m.cy_m,w_m:box.w_m,h_m:box.h_m});
+      if(n) toast('➖ Recortado ('+n+' tramo'+(n===1?'':'s')+' ajustado'+(n===1?'':'s')+')');
+    }else{
+      (pcircState.floors[S.floorId]=pcircState.floors[S.floorId]||[]).push({
+        id:'pc_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+        zona:_pcircZona, x_m:m.cx_m, y_m:m.cy_m, w_m:box.w_m, h_m:box.h_m });
+    }
+    saveAll(); renderOverlay(); updateStats&&updateStats(); renderSidebar&&renderSidebar(); renderZonaResumen&&renderZonaResumen();
+  }
+}
+
+// ── Dibujo rápido de circulación: pincel y resta ────────────────────────────
+// El clic simple pinta un cuadro de PCIRC_PINCEL px; el arrastre pinta el
+// rectángulo dibujado. La RESTA no borra cuadros enteros: parte cada rectángulo
+// afectado en los trozos que quedan FUERA del área restada (hasta 4 por cuadro),
+// así el resultado sigue siendo una lista de rectángulos y la fusión del render
+// no necesita cambios.
+const PCIRC_PINCEL = 26;   // px de plano para el clic simple
+
+function pcircRestar(floorId, sub){
+  const arr = (pcircState.floors[floorId]||[]);
+  if(!arr.length) return 0;
+  const sx0=sub.x_m-sub.w_m/2, sx1=sub.x_m+sub.w_m/2;
+  const sy0=sub.y_m-sub.h_m/2, sy1=sub.y_m+sub.h_m/2;
+  const out=[]; let tocados=0;
+  arr.forEach(r=>{
+    const x0=r.x_m-r.w_m/2, x1=r.x_m+r.w_m/2, y0=r.y_m-r.h_m/2, y1=r.y_m+r.h_m/2;
+    // sin solape → intacto
+    if(sx1<=x0 || sx0>=x1 || sy1<=y0 || sy0>=y1){ out.push(r); return; }
+    tocados++;
+    const ix0=Math.max(x0,sx0), ix1=Math.min(x1,sx1);
+    const iy0=Math.max(y0,sy0), iy1=Math.min(y1,sy1);
+    const frag=[];
+    if(iy1<y1) frag.push([x0,iy1,x1,y1]);   // arriba
+    if(iy0>y0) frag.push([x0,y0,x1,iy0]);   // abajo
+    if(ix0>x0) frag.push([x0,iy0,ix0,iy1]); // izquierda
+    if(ix1<x1) frag.push([ix1,iy0,x1,iy1]); // derecha
+    frag.forEach((f,k)=>{
+      const w=f[2]-f[0], h=f[3]-f[1];
+      if(w<=0.05||h<=0.05) return;          // descartar astillas
+      out.push({id:r.id+'_r'+k+Math.random().toString(36).slice(2,4), zona:r.zona,
+                x_m:(f[0]+f[2])/2, y_m:(f[1]+f[3])/2, w_m:w, h_m:h});
+    });
+  });
+  pcircState.floors[floorId]=out;
+  return tocados;
+}
+
+// ═══ HERRAMIENTAS DE DIBUJO DE CIRCULACIÓN (barra flotante derecha) ═════════
+// Al entrar en "Circulación peatonal" se despliega la barra: deshacer/rehacer,
+// dibujar, editar (vértices y aristas arrastrables; en tramos largos aparecen
+// varias manijas por arista), rellenar hasta muros, imán, duplicar, dividir,
+// zona y eliminar. Todo el trabajo fino de circulaciones se hace acá.
+let pcTool='draw';            // draw | edit | fill
+let pcSel=new Set();          // ids de tramos seleccionados (piso actual)
+let pcSnap=true;              // imán de aristas
+const PC_HIST_MAX=80;
+let _pcHistU=[], _pcHistR=[];
+
+function _pcArr(){ return pcircState.floors[S.floorId]=pcircState.floors[S.floorId]||[]; }
+function pcNuevoId(){ return 'pc_'+Date.now()+'_'+Math.random().toString(36).slice(2,5); }
+function _pcRectSvg(b){
+  const p=dxfToSvg(S.floorId,b.x_m,b.y_m), s=dxfSizeToSvg(S.floorId,b.w_m,b.h_m);
+  return p&&s?{x0:p.x-s.w/2,y0:p.y-s.h/2,x1:p.x+s.w/2,y1:p.y+s.h/2}:null;
+}
+function _pcWriteSvg(b,r){   // vuelca un rect en coords svg de vuelta a metros DXF
+  const m=svgToDxf(S.floorId,(r.x0+r.x1)/2,(r.y0+r.y1)/2);
+  const s=svgSizeToDxf(S.floorId,Math.max(4,r.x1-r.x0),Math.max(4,r.y1-r.y0));
+  if(!m||!s) return; b.x_m=m.cx_m; b.y_m=m.cy_m; b.w_m=s.w_m; b.h_m=s.h_m;
+}
+function pcHitAt(sx,sy){
+  const a=_pcArr();
+  for(let i=a.length-1;i>=0;i--){ const r=_pcRectSvg(a[i]); if(r&&sx>=r.x0&&sx<=r.x1&&sy>=r.y0&&sy<=r.y1) return a[i]; }
+  return null;
+}
+
+// ── Historial (deshacer / rehacer) ──────────────────────────────────────────
+function pcHistPush(){
+  _pcHistU.push({f:S.floorId, j:JSON.stringify(pcircState.floors[S.floorId]||[])});
+  if(_pcHistU.length>PC_HIST_MAX) _pcHistU.shift();
+  _pcHistR.length=0; pcToolsRefresh();
+}
+function _pcApply(sn){
+  if(sn.f!==S.floorId){ pcSel.clear(); loadFloor(sn.f); }
+  pcircState.floors[sn.f]=JSON.parse(sn.j);
+  const ids=new Set((pcircState.floors[sn.f]||[]).map(b=>b.id));
+  [...pcSel].forEach(id=>{ if(!ids.has(id)) pcSel.delete(id); });
+  saveAll(); renderOverlay(); updateStats&&updateStats(); renderZonaResumen&&renderZonaResumen(); pcToolsRefresh();
+}
+function pcUndo(){
+  if(!_pcHistU.length) return;
+  const sn=_pcHistU.pop();
+  _pcHistR.push({f:sn.f, j:JSON.stringify(pcircState.floors[sn.f]||[])});
+  _pcApply(sn);
+}
+function pcRedo(){
+  if(!_pcHistR.length) return;
+  const sn=_pcHistR.pop();
+  _pcHistU.push({f:sn.f, j:JSON.stringify(pcircState.floors[sn.f]||[])});
+  _pcApply(sn);
+}
+
+// ── Barra: estado de botones y cambio de herramienta ────────────────────────
+function pcToolsRefresh(){
+  const q=id=>document.getElementById(id);
+  if(q('pctUndo')) q('pctUndo').disabled=!_pcHistU.length;
+  if(q('pctRedo')) q('pctRedo').disabled=!_pcHistR.length;
+  const has=pcSel.size>0;
+  ['pctDup','pctSplit','pctZona','pctDel'].forEach(id=>{ if(q(id)) q(id).disabled=!has; });
+  q('pctSnap')?.classList.toggle('on',pcSnap);
+}
+function pcSetTool(t){
+  pcTool=t;
+  if(t!=='edit') pcSel.clear();
+  ['Draw','Edit','Fill'].forEach(n=>document.getElementById('pct'+n)?.classList.toggle('on',t===n.toLowerCase()));
+  const en=S.mode==='pcirc';
+  viewer.classList.toggle('pc-edit',en&&t==='edit');
+  viewer.classList.toggle('pc-fill',en&&t==='fill');
+  const hints={
+    draw:'▦ Pintá con clic o arrastre · clic DERECHO recorta · elegí la zona arriba · 2=editar · 3=rellenar',
+    edit:'✏️ Clic en un tramo para seleccionarlo (Shift suma) · arrastrá vértices/aristas para ajustar (⌘ = libre, sin imán) · flechas mueven (Shift=1 m) · Supr borra',
+    fill:'🪄 Clic dentro de un pasillo: el área crece sola hasta los muros del plano · si se escapa, deshacé con ⌘Z'};
+  if(en){ addHint.textContent=hints[t]; addHint.classList.add('show'); }
+  renderOverlay(); pcToolsRefresh();
+}
+function pcToggleSnap(){ pcSnap=!pcSnap; pcToolsRefresh(); toast(pcSnap?'🧲 Imán activado':'🧲 Imán desactivado'); }
+
+// ── Acciones sobre la selección ─────────────────────────────────────────────
+function pcDelSel(){
+  if(!pcSel.size) return; pcHistPush();
+  pcircState.floors[S.floorId]=_pcArr().filter(b=>!pcSel.has(b.id));
+  pcSel.clear(); saveAll(); renderOverlay(); renderZonaResumen&&renderZonaResumen(); pcToolsRefresh();
+  toast('🗑 Tramos eliminados');
+}
+function pcDupSel(){
+  if(!pcSel.size) return; pcHistPush();
+  const a=_pcArr(), nue=[];
+  a.forEach(b=>{ if(pcSel.has(b.id)) nue.push({...b,id:pcNuevoId(),x_m:b.x_m+1,y_m:b.y_m+1}); });
+  a.push(...nue); pcSel=new Set(nue.map(b=>b.id));
+  saveAll(); renderOverlay(); pcToolsRefresh();
+  toast('⧉ Duplicado — arrastralo a su lugar');
+}
+function pcSplitSel(){
+  if(!pcSel.size) return; pcHistPush();
+  const a=_pcArr(), out=[], nueSel=new Set();
+  a.forEach(b=>{
+    if(!pcSel.has(b.id)){ out.push(b); return; }
+    let r1,r2;
+    if(b.w_m>=b.h_m){ const w=b.w_m/2; r1={...b,id:pcNuevoId(),w_m:w,x_m:b.x_m-w/2}; r2={...b,id:pcNuevoId(),w_m:w,x_m:b.x_m+w/2}; }
+    else            { const h=b.h_m/2; r1={...b,id:pcNuevoId(),h_m:h,y_m:b.y_m-h/2}; r2={...b,id:pcNuevoId(),h_m:h,y_m:b.y_m+h/2}; }
+    out.push(r1,r2); nueSel.add(r1.id); nueSel.add(r2.id);
+  });
+  pcircState.floors[S.floorId]=out; pcSel=nueSel;
+  saveAll(); renderOverlay(); pcToolsRefresh();
+  toast('✂️ Dividido en dos — movelos o cambiales la zona');
+}
+function pcZonaSel(){
+  if(!pcSel.size) return; pcHistPush();
+  _pcArr().forEach(b=>{ if(pcSel.has(b.id)) b.zona=_pcircZona; });
+  saveAll(); renderOverlay(); renderZonaResumen&&renderZonaResumen();
+  toast('🎨 Zona aplicada — los tramos vecinos de la misma zona se fusionan');
+}
+function pcNudgeSel(dx_m,dy_m){
+  if(!pcSel.size) return; pcHistPush();
+  const s=dxfSizeToSvg(S.floorId,Math.abs(dx_m)||0.001,Math.abs(dy_m)||0.001)||{w:0,h:0};
+  const dx=Math.sign(dx_m)*s.w, dy=Math.sign(dy_m)*s.h;
+  _pcArr().forEach(b=>{ if(!pcSel.has(b.id)) return; const r=_pcRectSvg(b); if(!r) return;
+    _pcWriteSvg(b,{x0:r.x0+dx,y0:r.y0+dy,x1:r.x1+dx,y1:r.y1+dy}); });
+  saveAll(); renderOverlay();
+}
+
+// ── ⌘+clic: igualar tamaños de cajas ────────────────────────────────────────
+// 1er ⌘+clic toma la caja como REFERENCIA; cada ⌘+clic siguiente copia su
+// tamaño a la caja clicada (mantiene el centro). Ideal para baterías de
+// ascensores idénticos. ⌘+clic en vacío o Esc suelta la referencia.
+let _pcMatchRef=null;
+function pcMatchClick(e){
+  const c=planCoords(e); if(!c.inside) return;
+  const hit=pcHitAt(c.sx,c.sy);
+  if(!hit){ if(_pcMatchRef){ _pcMatchRef=null; toast('📐 Referencia liberada'); } return; }
+  const ref=_pcMatchRef && _pcArr().find(b=>b.id===_pcMatchRef);
+  if(!ref || hit.id===_pcMatchRef){
+    _pcMatchRef=hit.id;
+    toast('📐 Tamaño de referencia: '+hit.w_m.toFixed(2)+'×'+hit.h_m.toFixed(2)+' m — ⌘+clic en otras cajas para igualarlas');
+    return;
+  }
+  pcHistPush();
+  hit.w_m=ref.w_m; hit.h_m=ref.h_m;
+  saveAll(); renderOverlay(); renderZonaResumen&&renderZonaResumen();
+  toast('📐 Igualada a '+ref.w_m.toFixed(2)+'×'+ref.h_m.toFixed(2)+' m (⌘+clic sigue igualando · Esc suelta)');
+}
+
+// ── Edición: selección + arrastre de cuerpo, vértices y aristas ─────────────
+let _pcDrag=null;
+// ── Lazo de selección (⇧ + arrastre sobre el vacío) ─────────────────────────
+// Con el relleno inverso aparecen cientos de cuadros de una vez y corregir de a
+// uno no rinde: el lazo suma a la selección todo lo que quede dentro y ⌫ lo
+// borra de una. El arrastre sin ⇧ sigue siendo el paneo de siempre.
+let _pcMarq=null;
+function _pcMarqEl(){
+  let el=document.getElementById('pcMarqRect');
+  if(!el){
+    el=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    el.setAttribute('id','pcMarqRect');
+    el.setAttribute('fill','rgba(56,189,248,.16)');
+    el.setAttribute('stroke','#38bdf8'); el.setAttribute('stroke-width','3');
+    el.setAttribute('pointer-events','none');
+    overlay.appendChild(el);
+  }
+  return el;
+}
+function _pcMarqPinta(){
+  if(!_pcMarq) return;
+  const el=_pcMarqEl(), m=_pcMarq;
+  el.setAttribute('x',Math.min(m.x0,m.x1)); el.setAttribute('y',Math.min(m.y0,m.y1));
+  el.setAttribute('width',Math.abs(m.x1-m.x0)); el.setAttribute('height',Math.abs(m.y1-m.y0));
+  el.setAttribute('stroke-dasharray',(12/Math.max(.05,S.zoom))+' '+(8/Math.max(.05,S.zoom)));
+}
+window.addEventListener('mousemove',e=>{
+  if(!_pcMarq) return;
+  const c=planCoords(e); _pcMarq.x1=c.sx; _pcMarq.y1=c.sy; _pcMarqPinta();
+});
+window.addEventListener('mouseup',()=>{
+  if(!_pcMarq) return;
+  const m=_pcMarq; _pcMarq=null;
+  const el=document.getElementById('pcMarqRect'); if(el) el.remove();
+  const x0=Math.min(m.x0,m.x1), x1=Math.max(m.x0,m.x1);
+  const y0=Math.min(m.y0,m.y1), y1=Math.max(m.y0,m.y1);
+  if((x1-x0)<4 && (y1-y0)<4){            // sin arrastre: ⇧+clic de toda la vida
+    if(m.hit) pcSel.has(m.hit)?pcSel.delete(m.hit):pcSel.add(m.hit);
+    renderOverlay(); pcToolsRefresh(); return;
+  }
+  let n=0;
+  _pcArr().forEach(b=>{                       // entra lo que tenga el centro dentro
+    const r=_pcRectSvg(b); if(!r) return;
+    const cx=(r.x0+r.x1)/2, cy=(r.y0+r.y1)/2;
+    if(cx>=x0&&cx<=x1&&cy>=y0&&cy<=y1&&!pcSel.has(b.id)){ pcSel.add(b.id); n++; }
+  });
+  renderOverlay(); pcToolsRefresh();
+  if(n) toast('▭ '+n+' cuadros sumados a la selección ('+pcSel.size+' en total) · ⌫ para borrarlos');
+});
+
+function pcEditMouseDown(e){
+  const c=planCoords(e); if(!c.inside) return;
+  const hit=pcHitAt(c.sx,c.sy);
+  // ⇧ siempre abre el lazo, haya o no un cuadro debajo: con el relleno aplicado
+  // casi no queda vacío desde donde empezarlo. Si al final no hubo arrastre, el
+  // mouseup lo resuelve como el ⇧+clic de siempre.
+  if(e.shiftKey){
+    _pcMarq={x0:c.sx,y0:c.sy,x1:c.sx,y1:c.sy,hit:hit?hit.id:null}; _pcMarqPinta();
+    e.preventDefault(); e.stopPropagation(); return;
+  }
+  if(!hit){
+    if(pcSel.size){ pcSel.clear(); renderOverlay(); pcToolsRefresh(); }
+    panState={sx:e.clientX,sy:e.clientY,ox:S.ox,oy:S.oy}; didPan=false; viewer.classList.add('panning');
+    return;
+  }
+  if(!pcSel.has(hit.id)) pcSel=new Set([hit.id]);
+  pcStartDrag('move',null,e);            // arrastre del cuerpo → mover selección
+  renderOverlay(); pcToolsRefresh();
+}
+function pcStartDrag(kind,handle,e){
+  const orig={};
+  _pcArr().forEach(b=>{ if(pcSel.has(b.id)){ const r=_pcRectSvg(b); if(r) orig[b.id]=r; } });
+  if(!Object.keys(orig).length) return;
+  pcHistPush();
+  const sx=[], sy=[];                    // candidatos del imán: aristas de los NO seleccionados
+  if(pcSnap){ _pcArr().forEach(b=>{ if(pcSel.has(b.id)) return; const r=_pcRectSvg(b); if(!r) return; sx.push(r.x0,r.x1); sy.push(r.y0,r.y1); }); }
+  const c=planCoords(e);
+  _pcDrag={kind,handle,x0:c.sx,y0:c.sy,orig,snapX:sx,snapY:sy,moved:false,_raf:null};
+  e.stopPropagation(); e.preventDefault();
+}
+function _pcSnap1(v,cands){
+  if(!pcSnap||!cands.length) return v;
+  const th=10/Math.max(0.05,S.zoom); let best=v,bd=th;
+  for(const c of cands){ const d=Math.abs(c-v); if(d<bd){bd=d;best=c;} }
+  return best;
+}
+window.addEventListener('mousemove',e=>{
+  if(!_pcDrag) return;
+  const c=planCoords(e); const dx=c.sx-_pcDrag.x0, dy=c.sy-_pcDrag.y0;
+  if(Math.abs(dx)>1||Math.abs(dy)>1) _pcDrag.moved=true;
+  // ⌘ mantenida = movimiento LIBRE (sin imán): para acercarse a un muro sin
+  // que la arista salte a la referencia vecina y se pase del límite
+  const SN=e.metaKey ? (v)=>v : _pcSnap1;
+  const a=_pcArr();
+  if(_pcDrag.kind==='move'){
+    let adx=dx, ady=dy;
+    const first=Object.keys(_pcDrag.orig)[0], fo=_pcDrag.orig[first];
+    if(fo && !e.metaKey){  // imán: prueba pegar cada borde del rect de referencia
+      const c1=_pcSnap1(fo.x0+dx,_pcDrag.snapX)-fo.x0, c2=_pcSnap1(fo.x1+dx,_pcDrag.snapX)-fo.x1;
+      adx=(Math.abs(c2-dx)<Math.abs(c1-dx))?c2:c1;
+      const c3=_pcSnap1(fo.y0+dy,_pcDrag.snapY)-fo.y0, c4=_pcSnap1(fo.y1+dy,_pcDrag.snapY)-fo.y1;
+      ady=(Math.abs(c4-dy)<Math.abs(c3-dy))?c4:c3;
+    }
+    a.forEach(b=>{ const o=_pcDrag.orig[b.id]; if(!o) return;
+      _pcWriteSvg(b,{x0:o.x0+adx,y0:o.y0+ady,x1:o.x1+adx,y1:o.y1+ady}); });
+  }else{
+    const h=_pcDrag.handle;
+    a.forEach(b=>{ const o=_pcDrag.orig[b.id]; if(!o) return;
+      const r={...o};
+      if(h.ex<0) r.x0=SN(o.x0+dx,_pcDrag.snapX);
+      if(h.ex>0) r.x1=SN(o.x1+dx,_pcDrag.snapX);
+      if(h.ey<0) r.y0=SN(o.y0+dy,_pcDrag.snapY);
+      if(h.ey>0) r.y1=SN(o.y1+dy,_pcDrag.snapY);
+      if(r.x1-r.x0<4){ if(h.ex<0) r.x0=r.x1-4; else r.x1=r.x0+4; }
+      if(r.y1-r.y0<4){ if(h.ey<0) r.y0=r.y1-4; else r.y1=r.y0+4; }
+      _pcWriteSvg(b,r); });
+  }
+  if(!_pcDrag._raf){ _pcDrag._raf=requestAnimationFrame(()=>{ if(_pcDrag)_pcDrag._raf=null; renderOverlay(); }); }
+});
+window.addEventListener('mouseup',()=>{
+  if(!_pcDrag) return;
+  const moved=_pcDrag.moved; _pcDrag=null;
+  if(!moved){ _pcHistU.pop(); pcToolsRefresh(); }   // clic sin arrastre: no ensucia el historial
+  else { saveAll(); renderZonaResumen&&renderZonaResumen(); }
+  renderOverlay();
+});
+
+// Capa de edición: contorno de cada tramo + manijas de la selección.
+// En aristas largas se agregan varias manijas intermedias (todas estiran esa arista).
+function pcRenderEditLayer(){
+  if(S.mode!=='pcirc'||pcTool!=='edit') return;
+  const NS='http://www.w3.org/2000/svg', a=_pcArr();
+  const z=Math.max(.05,S.zoom);
+  a.forEach(b=>{ const r=_pcRectSvg(b); if(!r) return;
+    const el=document.createElementNS(NS,'rect'); el.setAttribute('class','pc-rect-ghost');
+    el.setAttribute('x',r.x0);el.setAttribute('y',r.y0);
+    el.setAttribute('width',r.x1-r.x0);el.setAttribute('height',r.y1-r.y0);
+    el.setAttribute('stroke-width',Math.max(1,1.5/z));
+    overlay.appendChild(el);
+  });
+  const hs=Math.max(8,Math.min(60,15/z));       // manija ≈15 px de pantalla
+  const step=Math.max(hs*4,170/z);              // separación entre manijas intermedias
+  a.forEach(b=>{
+    if(!pcSel.has(b.id)) return; const r=_pcRectSvg(b); if(!r) return;
+    const w=r.x1-r.x0, h=r.y1-r.y0;
+    const sel=document.createElementNS(NS,'rect'); sel.setAttribute('class','pc-sel-outline');
+    sel.setAttribute('x',r.x0);sel.setAttribute('y',r.y0);sel.setAttribute('width',w);sel.setAttribute('height',h);
+    sel.setAttribute('stroke-width',Math.max(1.5,2.5/z));
+    overlay.appendChild(sel);
+    const H=[[r.x0,r.y0,-1,-1],[r.x1,r.y0,1,-1],[r.x0,r.y1,-1,1],[r.x1,r.y1,1,1]];  // vértices
+    const addEdge=(horiz)=>{                     // manijas de arista (varias si es larga)
+      const len=horiz?w:h; if(len<hs*3) return;
+      const n=Math.max(1,Math.round(len/step));
+      for(let k=1;k<=n;k++){ const t=(horiz?r.x0:r.y0)+len*k/(n+1);
+        if(horiz){ H.push([t,r.y0,0,-1],[t,r.y1,0,1]); } else { H.push([r.x0,t,-1,0],[r.x1,t,1,0]); } }
+    };
+    addEdge(true); addEdge(false);
+    H.forEach(P=>{
+      const el=document.createElementNS(NS,'rect'); el.setAttribute('class','pc-handle');
+      el.setAttribute('x',P[0]-hs/2);el.setAttribute('y',P[1]-hs/2);
+      el.setAttribute('width',hs);el.setAttribute('height',hs);el.setAttribute('rx',hs*.22);
+      el.setAttribute('stroke-width',Math.max(1,2/z));
+      el.style.cursor=(P[2]&&P[3])?((P[2]*P[3]>0)?'nwse-resize':'nesw-resize'):(P[2]?'ew-resize':'ns-resize');
+      el.style.pointerEvents='all';
+      el.addEventListener('mousedown',ev=>{ if(ev.button!==0)return; ev.stopPropagation(); ev.preventDefault();
+        pcStartDrag('resize',{ex:P[2],ey:P[3]},ev); });
+      overlay.appendChild(el);
+    });
+  });
+}
+
+// ── RELLENAR: crece el rectángulo hasta los muros del plano ─────────────────
+// El plano limpio (strip HSV) deja los muros oscuros: se muestrea la imagen en
+// un canvas y cada arista avanza hasta que una fracción de ella toca muro.
+let _wallS=null;   // sampler {fId, sc, w, h, data, inv}
+function _mInv(m){ const [a,b,c,d,tx,ty]=m; const det=a*d-b*c||1e-9;
+  return [d/det,-b/det,-c/det,a/det,(c*ty-d*tx)/det,(b*tx-a*ty)/det]; }
+function _wallReady(){
+  if(_wallS&&_wallS.fId===S.floorId) return true;
+  if(!planSvg.naturalWidth) return false;
+  try{
+    const maxW=3000, sc=Math.min(1,maxW/planSvg.naturalWidth);
+    const w=Math.max(1,Math.round(planSvg.naturalWidth*sc)), h=Math.max(1,Math.round(planSvg.naturalHeight*sc));
+    const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
+    const cx=cv.getContext('2d',{willReadFrequently:true});
+    cx.fillStyle='#fff'; cx.fillRect(0,0,w,h);
+    cx.drawImage(planSvg,0,0,w,h);
+    const data=cx.getImageData(0,0,w,h).data;
+    const m=planXform[S.floorId];
+    _wallS={fId:S.floorId, sc, w, h, data, inv:m?_mInv(m):null};
+    return true;
+  }catch(err){ console.warn('wall sampler',err); return false; }
+}
+function _isWall(sx,sy){                 // sx,sy en coords del overlay
+  const s=_wallS; let x=sx,y=sy;
+  if(s.inv){ const [a,b,c,d,tx,ty]=s.inv; const nx=a*x+c*y+tx, ny=b*x+d*y+ty; x=nx; y=ny; }
+  const px=Math.round(x*s.sc), py=Math.round(y*s.sc);
+  if(px<0||py<0||px>=s.w||py>=s.h) return true;   // fuera del plano = muro
+  const i=(py*s.w+px)*4;
+  return (0.299*s.data[i]+0.587*s.data[i+1]+0.114*s.data[i+2])<135;
+}
+function _growRect(r,capM,frv){
+  // frv activa el MODO ELEMENTO (escaleras/ascensores): además del umbral de
+  // fracción, mide el GROSOR de la línea que bloquea — los peldaños (líneas
+  // finas) se SALTAN; solo un muro sólido frena. Validado con recinto
+  // sintético de escalera (peldaños c/4px, muros 3px).
+  const d=curDims(), step=3, FRAC=frv||0.12;
+  const cm=capM||45;                                        // tope por lado (m); recintos chicos usan menos
+  const _cs=dxfSizeToSvg(S.floorId,cm,cm)||{w:d.w,h:d.h};
+  const capPx=_cs.w, capPy=_cs.h;                           // px no cuadrados: tope por eje
+  const edgeWall=(fixed,axis,from,to)=>{
+    let wall=0,total=0; const n=Math.max(4,Math.floor((to-from)/6));
+    for(let k=0;k<=n;k++){ const t=from+(to-from)*k/n;
+      if(axis==='x'?_isWall(fixed,t):_isWall(t,fixed)) wall++; total++; }
+    return wall/total;
+  };
+  // grosor TOTAL (bidireccional) de la línea oscura que cruza el punto, en px
+  const espesor=(px,py,eje)=>{ let t=1;
+    for(const s of [1,-1]){ let g=1;
+      while(g<30){ const x=eje==='x'?px+s*g:px, y=eje==='x'?py:py+s*g;
+        if(!_isWall(x,y)) break; t++; g++; } }
+    return t; };
+  // fracción de arista bloqueada + grosor mediano de lo que bloquea
+  const sonda=(fixed,eje,d0,d1)=>{ const f=d0+(d1-d0)*0.12, t=d1-(d1-d0)*0.12;
+    const n=Math.max(4,Math.floor((t-f)/6)); let hit=0; const gs=[];
+    for(let k=0;k<=n;k++){ const p=f+(t-f)*k/n;
+      const x=eje==='x'?fixed:p, y=eje==='x'?p:fixed;
+      if(_isWall(x,y)){ hit++; gs.push(espesor(x,y,eje)); } }
+    gs.sort((a,b)=>a-b);
+    return {fr:hit/(n+1), med:gs.length?gs[Math.floor(gs.length/2)]:0}; };
+  const THIN=8;                                             // ≤8 px = línea fina (peldaño); muro real ≥10
+  let guard=0; const dirs={W:true,E:true,N:true,S:true};
+  while((dirs.W||dirs.E||dirs.N||dirs.S)&&guard++<5000){
+    const fy=r.y0+(r.y1-r.y0)*0.12, ty=r.y1-(r.y1-r.y0)*0.12;
+    const fx=r.x0+(r.x1-r.x0)*0.12, tx=r.x1-(r.x1-r.x0)*0.12;
+    if(!frv){
+      if(dirs.W){ if(r.x0-step<0||(r.x1-r.x0)>capPx||edgeWall(r.x0-step,'x',fy,ty)>FRAC) dirs.W=false; else r.x0-=step; }
+      if(dirs.E){ if(r.x1+step>d.w||(r.x1-r.x0)>capPx||edgeWall(r.x1+step,'x',fy,ty)>FRAC) dirs.E=false; else r.x1+=step; }
+      if(dirs.N){ if(r.y0-step<0||(r.y1-r.y0)>capPy||edgeWall(r.y0-step,'y',fx,tx)>FRAC) dirs.N=false; else r.y0-=step; }
+      if(dirs.S){ if(r.y1+step>d.h||(r.y1-r.y0)>capPy||edgeWall(r.y1+step,'y',fx,tx)>FRAC) dirs.S=false; else r.y1+=step; }
+      continue;
+    }
+    // modo elemento: avanzar; si bloquea una línea FINA, saltarla; muro = stop
+    if(dirs.W){ const c=r.x0-step;
+      if(c<0||(r.x1-r.x0)>capPx) dirs.W=false;
+      else{ const s=sonda(c,'x',fy,ty);
+        if(s.fr<=FRAC) r.x0=c; else if(s.med<=THIN) r.x0=c-(s.med+2); else dirs.W=false; } }
+    if(dirs.E){ const c=r.x1+step;
+      if(c>d.w||(r.x1-r.x0)>capPx) dirs.E=false;
+      else{ const s=sonda(c,'x',fy,ty);
+        if(s.fr<=FRAC) r.x1=c; else if(s.med<=THIN) r.x1=c+(s.med+2); else dirs.E=false; } }
+    if(dirs.N){ const c=r.y0-step;
+      if(c<0||(r.y1-r.y0)>capPy) dirs.N=false;
+      else{ const s=sonda(c,'y',fx,tx);
+        if(s.fr<=FRAC) r.y0=c; else if(s.med<=THIN) r.y0=c-(s.med+2); else dirs.N=false; } }
+    if(dirs.S){ const c=r.y1+step;
+      if(c>d.h||(r.y1-r.y0)>capPy) dirs.S=false;
+      else{ const s=sonda(c,'y',fx,tx);
+        if(s.fr<=FRAC) r.y1=c; else if(s.med<=THIN) r.y1=c+(s.med+2); else dirs.S=false; } }
+  }
+  if(frv){ r.x0+=1; r.x1-=1; r.y0+=1; r.y1-=1; return r; }  // elemento: sin retracción por fracción (los peldaños la confundirían)
+  return _pcRetraer(r);
+}
+// Retracción: el crecimiento frena cuando el borde YA tocó muro, así que el
+// rect puede quedar montado 1-3 px sobre la línea. Cada borde retrocede hasta
+// quedar limpio (+1 px de aire). También lo usa 🧹 "Despegar de muros".
+// umbral: fracción tolerada (default 0.03; escaleras usan más por los peldaños)
+function _pcRetraer(r, umbral){
+  const U=umbral||0.03;
+  const lim=26;   // retroceso máximo por borde (px de plano)
+  const fr=(fixed,eje,d0,d1)=>{ const f=d0+(d1-d0)*0.10, t=d1-(d1-d0)*0.10;
+    let hit=0,n=0; const N=Math.max(4,Math.floor((t-f)/6));
+    for(let k=0;k<=N;k++){ const p=f+(t-f)*k/N;
+      if(eje==='x'?_isWall(fixed,p):_isWall(p,fixed)) hit++; n++; }
+    return hit/n; };
+  let g;
+  g=0; while(g++<lim && r.x1-r.x0>6 && fr(r.x0,'x',r.y0,r.y1)>U) r.x0+=1;
+  g=0; while(g++<lim && r.x1-r.x0>6 && fr(r.x1,'x',r.y0,r.y1)>U) r.x1-=1;
+  g=0; while(g++<lim && r.y1-r.y0>6 && fr(r.y0,'y',r.x0,r.x1)>U) r.y0+=1;
+  g=0; while(g++<lim && r.y1-r.y0>6 && fr(r.y1,'y',r.x0,r.x1)>U) r.y1-=1;
+  r.x0+=1; r.x1-=1; r.y0+=1; r.y1-=1;   // 1 px de aire respecto al muro
+  return r;
+}
+// 🧹 Despegar de muros: retrae los tramos seleccionados (o TODOS los del piso)
+// para que ninguno quede montado sobre las líneas del plano.
+function pcDespegar(){
+  if(!_wallReady()){ toast('⏳ El plano aún no está listo para detectar muros'); return; }
+  const objetivo=pcSel.size? _pcArr().filter(b=>pcSel.has(b.id)) : _pcArr();
+  if(!objetivo.length){ toast('No hay tramos en este piso'); return; }
+  pcHistPush(); let n=0;
+  objetivo.forEach(b=>{ const r=_pcRectSvg(b); if(!r) return;
+    const a={...r}; _pcRetraer(r);
+    if(r.x0!==a.x0||r.x1!==a.x1||r.y0!==a.y0||r.y1!==a.y1){ _pcWriteSvg(b,r); n++; }
+  });
+  saveAll(); renderOverlay(); renderZonaResumen&&renderZonaResumen();
+  toast('🧹 '+n+' tramo'+(n===1?'':'s')+' despegado'+(n===1?'':'s')+' de los muros'+(pcSel.size?'':' (piso completo)'));
+}
+function pcFillClick(e){
+  const c=planCoords(e); if(!c.inside) return;
+  if(!_wallReady()){ toast('⏳ El plano aún no está listo para detectar muros'); return; }
+  if(_isWall(c.sx,c.sy)){ toast('🧱 Ese punto cae sobre un muro — hacé clic en el interior del pasillo'); return; }
+  const r=_growRect({x0:c.sx-8,y0:c.sy-8,x1:c.sx+8,y1:c.sy+8});
+  const d=curDims();
+  if((r.x1-r.x0)*(r.y1-r.y0)>d.w*d.h*0.35){ toast('⚠️ El relleno se escapó (zona muy abierta) — dibujá un tramo y usá 🪄 con él seleccionado'); return; }
+  // zona abierta: si creció hasta el tope en AMBOS sentidos, no tocó muros reales
+  const _cs45=dxfSizeToSvg(S.floorId,45,45)||{w:1e9,h:1e9};
+  if((r.x1-r.x0)>=_cs45.w*0.97 && (r.y1-r.y0)>=_cs45.h*0.97){
+    toast('⚠️ Zona demasiado abierta: creció 45×45 m sin encontrar muros — ese sector conviene dibujarlo a mano con ▦'); return; }
+  pcHistPush();
+  const m=svgToDxf(S.floorId,(r.x0+r.x1)/2,(r.y0+r.y1)/2), s=svgSizeToDxf(S.floorId,r.x1-r.x0,r.y1-r.y0);
+  if(!m||!s) return;
+  _pcArr().push({id:pcNuevoId(),zona:_pcircZona,x_m:m.cx_m,y_m:m.cy_m,w_m:s.w_m,h_m:s.h_m});
+  saveAll(); renderOverlay(); renderZonaResumen&&renderZonaResumen();
+  toast('🪄 Tramo rellenado hasta los muros ('+s.w_m.toFixed(1)+'×'+s.h_m.toFixed(1)+' m)');
+}
+function pcFillSel(){
+  if(!_wallReady()){ toast('⏳ El plano aún no está listo para detectar muros'); return; }
+  pcHistPush(); let n=0;
+  _pcArr().forEach(b=>{ if(!pcSel.has(b.id)) return; const r0=_pcRectSvg(b); if(!r0) return;
+    _pcWriteSvg(b,_growRect(r0)); n++; });
+  saveAll(); renderOverlay(); renderZonaResumen&&renderZonaResumen();
+  toast('🪄 '+n+' tramo'+(n===1?'':'s')+' expandido'+(n===1?'':'s')+' hasta los muros');
+}
+function pcFillBtn(){ if(pcSel.size) pcFillSel(); else pcSetTool('fill'); }
+// Doble clic con capa de ELEMENTO activa: la caja toma los límites del recinto
+// (escalera/ascensor son recintos cerrados chicos → tope 15 m por lado)
+function elemFillAt(e){
+  const c=planCoords(e); if(!c.inside) return;
+  if(!_wallReady()){ toast('⏳ El plano aún no está listo para detectar muros'); return; }
+  // vecindario 3×3: un peldaño de escalera bajo el cursor no invalida el clic
+  let oscuros=0;
+  for(let dy=-6;dy<=6;dy+=6) for(let dx=-6;dx<=6;dx+=6)
+    if(_isWall(c.sx+dx,c.sy+dy)) oscuros++;
+  if(oscuros>=6){ toast('🧱 Ese punto cae sobre muro sólido — doble clic DENTRO del recinto'); return; }
+  const ec=ELEM_CIRC[_pcircZona];
+  // frac 0.5: los peldaños (líneas finas) no frenan; los muros sólidos sí
+  const r=_growRect({x0:c.sx-6,y0:c.sy-6,x1:c.sx+6,y1:c.sy+6}, 15, 0.5);
+  const _cs15=dxfSizeToSvg(S.floorId,15,15)||{w:1e9,h:1e9};
+  if((r.x1-r.x0)>=_cs15.w*0.97 && (r.y1-r.y0)>=_cs15.h*0.97){
+    toast('⚠️ El recinto quedó muy abierto (creció 15×15 m) — dibujá la caja con arrastre'); return; }
+  pcHistPush();
+  const m=svgToDxf(S.floorId,(r.x0+r.x1)/2,(r.y0+r.y1)/2), s=svgSizeToDxf(S.floorId,r.x1-r.x0,r.y1-r.y0);
+  if(!m||!s) return;
+  _pcArr().push({id:pcNuevoId(),zona:_pcircZona,x_m:m.cx_m,y_m:m.cy_m,w_m:s.w_m,h_m:s.h_m});
+  saveAll(); renderOverlay(); renderZonaResumen&&renderZonaResumen();
+  toast(ec.icon+' Caja ajustada al recinto ('+s.w_m.toFixed(1)+'×'+s.h_m.toFixed(1)+' m)');
+}
+
+
+// ── VISTAS: 1) servicios (general)  2) circulaciones ────────────────────────
+// Igual que en Atlas: la misma planta con dos lecturas. En "circulaciones" los
+// servicios bajan a contorno tenue y mandan los polígonos fusionados por zona,
+// con el resumen de superficie de cada una.
+S.vista = lg('nav_vista','servicios');
+function setVista(v){
+  S.vista = (v==='circulaciones') ? 'circulaciones' : 'servicios';
+  ls('nav_vista', S.vista);
+  const vw=document.getElementById('viewer');
+  if(vw) vw.classList.toggle('vista-circ', S.vista==='circulaciones');
+  const a=document.getElementById('vsServ'), b=document.getElementById('vsCirc');
+  if(a) a.classList.toggle('on', S.vista==='servicios');
+  if(b) b.classList.toggle('on', S.vista==='circulaciones');
+  if(S.vista==='circulaciones') toggleAreas(true);   // el fondo sirve de referencia
+  renderOverlay(); renderZonaResumen();
+}
+// Superficie por zona del piso actual (área bruta de los cuadros dibujados)
+function zonaResumen(floorId){
+  // m² solo de ZONAS de circulación; los elementos (ascensor/escalera/esc.
+  // mecánica) se cuentan por unidades en elemResumen()
+  const arr=(pcircState.floors||{})[floorId||S.floorId]||[];
+  const r={}; arr.forEach(b=>{ if(!esElem(b.zona)) r[b.zona]=(r[b.zona]||0)+(b.w_m*b.h_m); });
+  return r;
+}
+function elemResumen(floorId){
+  const arr=(pcircState.floors||{})[floorId||S.floorId]||[];
+  const r={}; arr.forEach(b=>{ if(esElem(b.zona)) r[b.zona]=(r[b.zona]||0)+1; });
+  return r;
+}
+function renderZonaResumen(){
+  let host=document.getElementById('zonaResumen');
+  const bar=document.getElementById('pcircBar');
+  if(!host){
+    host=document.createElement('div'); host.id='zonaResumen'; host.className='zres';
+    (bar&&bar.parentNode?bar.parentNode:document.body).appendChild(host);
+  }
+  if(S.vista!=='circulaciones'){ host.style.display='none'; return; }
+  const r=zonaResumen(S.floorId);
+  const tot=Object.values(r).reduce((a,b)=>a+b,0);
+  if(!tot && !Object.keys(elemResumen(S.floorId)).length){ host.style.display='flex';
+    host.innerHTML='<span style="color:#7fa6bd">Sin circulación dibujada en este piso — pintá con el botón izquierdo (y recortá con el derecho).</span>';
+    return; }
+  host.style.display='flex';
+  host.innerHTML='<b>Circulación '+S.floorId+':</b>'
+    + Object.keys(ZONA_CIRC).filter(z=>r[z]).map(z=>{
+        const v=r[z], pc=Math.round(v/tot*100);
+        return '<span style="display:inline-flex;align-items:center;gap:4px">'
+          +'<i style="width:10px;height:10px;border-radius:2px;background:'+ZONA_CIRC[z].color+';display:inline-block"></i>'
+          +ZONA_CIRC[z].short+' <b>'+Math.round(v).toLocaleString('es-CL')+' m²</b> ('+pc+'%)</span>';
+      }).join('')
+    + (function(){ const e=elemResumen(S.floorId);
+        return Object.keys(ELEM_CIRC).filter(k=>e[k]).map(k=>
+          '<span style="display:inline-flex;align-items:center;gap:4px;margin-left:8px">'
+          +ELEM_CIRC[k].icon+' <b>'+e[k]+'</b></span>').join(''); })()
+    + '<span style="margin-left:auto;color:#7fa6bd">total <b>'+Math.round(tot).toLocaleString('es-CL')+' m²</b></span>';
+}
+window.addEventListener('load',()=>{ try{ setVista(S.vista); }catch(e){} });
+
+// ════════════════════════════════════════════════════════════════════════════
+// RECINTOS DE ATLAS + RELLENO INVERSO
+// Los recintos que se dibujan en Atlas (vista 2) llegan acá ya convertidos a
+// metros DXF por _DEV/build_recintos_nav.py, así que caen exactamente sobre el
+// mismo lugar del plano en las dos plataformas.
+//
+// El RELLENO INVERSO (_DEV/relleno_inverso.py) es la idea al revés: en vez de
+// trazar pasillo por pasillo, pinta como circulación TODO lo que no es recinto
+// y queda por corregir lo que sobra — borrar es mucho más rápido que dibujar.
+// Es una PROPUESTA: se ve como capa punteada y no toca nada hasta que se aplica
+// piso por piso, y al aplicarla se puede deshacer con ⌘Z como cualquier dibujo.
+// ════════════════════════════════════════════════════════════════════════════
+S.showRecintos = lg('nav_show_recintos', false);
+S.showRelleno  = lg('nav_show_relleno',  false);
+
+const recintosPiso = f => (((window.RECINTOS_NAV||{}).floors||{})[f]||[])
+  .flatMap(r => (r.r||[]).map(([x,y,w,h]) => ({x_m:x, y_m:y, w_m:w, h_m:h})));
+const rellenoPiso  = f => (((window.RELLENO_CIRC||{}).floors||{})[f]||[]);
+
+function dibujaCapaMetros(cajas, cls, visible){
+  if(!visible || !cajas || !cajas.length) return;
+  cajas.forEach(b => {
+    const p=dxfToSvg(S.floorId,b.x_m,b.y_m), s=dxfSizeToSvg(S.floorId,b.w_m,b.h_m);
+    if(!p||!s) return;
+    const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    r.setAttribute('x',p.x-s.w/2); r.setAttribute('y',p.y-s.h/2);
+    r.setAttribute('width',s.w);   r.setAttribute('height',s.h);
+    r.setAttribute('class',cls);
+    overlay.appendChild(r);
+  });
+}
+
+// Refleja en la barra el estado de las dos capas (y muestra "Aplicar" sólo
+// cuando hay una propuesta visible en el piso actual).
+function sincBotonesCapas(){
+  const br=document.getElementById('btnRecintos');
+  if(br) br.classList.toggle('active',!!S.showRecintos);
+  const bl=document.getElementById('btnRelleno');
+  if(bl) bl.classList.toggle('active',!!S.showRelleno);
+  const ba=document.getElementById('btnAplicarRelleno');
+  if(ba) ba.style.display=(S.showRelleno && rellenoPiso(S.floorId).length)?'':'none';
+}
+
+function toggleRecintos(){
+  S.showRecintos=!S.showRecintos; ls('nav_show_recintos',S.showRecintos);
+  sincBotonesCapas();
+  renderOverlay();
+  if(S.showRecintos && !recintosPiso(S.floorId).length)
+    toast('Este piso no tiene recintos dibujados en Atlas.');
+}
+function toggleRelleno(){
+  S.showRelleno=!S.showRelleno; ls('nav_show_relleno',S.showRelleno);
+  sincBotonesCapas();
+  renderOverlay(); renderSidebar&&renderSidebar();
+  const n=rellenoPiso(S.floorId).length;
+  if(S.showRelleno) toast(n ? ('🪣 Propuesta de relleno: '+n+' cuadros en '+S.floorId
+      +' — revisá y usá "Aplicar relleno" para convertirlos en circulación.')
+    : 'No hay propuesta de relleno para este piso.');
+}
+
+// Convierte la propuesta del piso actual en cuadros de circulación reales.
+function aplicarRelleno(){
+  const prop=rellenoPiso(S.floorId);
+  if(!prop.length){ alert('No hay propuesta de relleno para '+S.floorId+'.'); return; }
+  const arr=(pcircState.floors[S.floorId]=pcircState.floors[S.floorId]||[]);
+  const previos=arr.length;
+  const area=Math.round(prop.reduce((a,b)=>a+b.w_m*b.h_m,0));
+  if(!confirm('Aplicar el relleno inverso a '+S.floorId+':\n\n'
+    +'• '+prop.length+' cuadros nuevos ('+area.toLocaleString('es-CL')+' m²) como zona "'
+    +ZONA_CIRC[_pcircZona in ZONA_CIRC ? _pcircZona : 'general'].label+'".\n'
+    +'• Los '+previos+' cuadros que ya tenés en este piso NO se tocan.\n\n'
+    +'Después borrá lo que no sea circulación. Se puede deshacer con ⌘Z.')) return;
+  pcHistPush();
+  const zona=(_pcircZona in ZONA_CIRC)?_pcircZona:'general';
+  prop.forEach(b=>arr.push({id:pcNuevoId(),zona,x_m:b.x_m,y_m:b.y_m,w_m:b.w_m,h_m:b.h_m}));
+  S.showRelleno=false; ls('nav_show_relleno',false);
+  sincBotonesCapas();
+  saveAll(); renderOverlay(); updateStats&&updateStats(); renderSidebar&&renderSidebar();
+  toast('🪣 '+prop.length+' cuadros aplicados en '+S.floorId+' — ahora borrá lo que no sea circulación.');
+}
+
+function delPcirc(id){
+  pcHistPush();
+  const arr=(pcircState.floors[S.floorId]||[]);
+  pcircState.floors[S.floorId]=arr.filter(b=>b.id!==id);
+  pcSel.delete(id);
+  saveAll(); renderOverlay(); updateStats&&updateStats(); renderSidebar&&renderSidebar();
+}
+function buildPcircBar(){
+  const bar=document.getElementById('pcircBar'); if(!bar) return;
+  const btn=([k,v])=>'<button class="pcirc-z'+(_pcircZona===k?' on':'')+'" style="background:'+v.color+'" onclick="setPcircZona(\''+k+'\')">'
+    +'<span class="sw" style="background:'+v.color+'"></span>'+v.short+'</button>';
+  bar.innerHTML='<span class="lbl">Zona:</span>'+Object.entries(ZONA_CIRC).map(btn).join('')
+    +'<span class="lbl" style="margin-left:14px;border-left:1px solid rgba(148,163,184,.4);padding-left:14px">Elementos:</span>'
+    +Object.entries(ELEM_CIRC).map(btn).join('');
+}
+function setPcircZona(z){
+  _pcircZona=z; buildPcircBar();
+  // pista según lo elegido: zona fusiona, elemento delimita cajas individuales
+  if(S.mode==='pcirc' && addHint){
+    addHint.textContent = esElem(z)
+      ? (ELEM_CIRC[z].icon+' Arrastrá para dibujar cada '+ELEM_CIRC[z].label.toLowerCase()+' · DOBLE CLIC dentro del recinto = caja automática a los muros · ⌘+clic en 2 cajas iguala tamaños · clic derecho recorta')
+      : '▦ Pintá con clic o arrastre · clic DERECHO recorta · los tramos de la misma zona se fusionan';
+    addHint.classList.add('show');
+  }
+}
+// ── Marcadores físicos de circulación (puertas, escaleras, control…) ─────────
+function handlePmarkClick(e){
+  if(didPan) return;
+  const c=planCoords(e); if(!c.inside) return;
+  const m=svgToDxf(S.floorId,c.sx,c.sy); if(!m) return;
+  const nuevo={ id:'mk_'+Date.now()+'_'+Math.random().toString(36).slice(2,5),
+    tipo:_pmarkTipo, x_m:m.cx_m, y_m:m.cy_m };
+  if(ES_PUERTA[_pmarkTipo]){                 // puerta: geometría fiel al plano
+    nuevo.ang=0; nuevo.ancho_m=(_pmarkTipo==='corredera'?1.6:0.9); nuevo.giro='der';
+    nuevo.abre=zonaEnPunto(S.floorId,m.cx_m,m.cy_m)||'';
+  }
+  (pcircState.markers[S.floorId]=pcircState.markers[S.floorId]||[]).push(nuevo);
+  saveAll(); renderOverlay();
+  if(ES_PUERTA[nuevo.tipo]) editarPuerta(nuevo.id);   // abrir el ajuste al instante
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// PUERTAS FIELES AL PLANO
+// Una puerta no es un pin: tiene ORIENTACIÓN (ángulo libre 0-359°), ANCHO real,
+// lado de giro y —lo importante para el control de accesos— la ZONA hacia la
+// que abre. Se dibuja con el símbolo arquitectónico: hoja + arco de barrido.
+// ════════════════════════════════════════════════════════════════════════════
+const ES_PUERTA={puerta:1, corredera:1, control:1};
+
+// ¿En qué zona de circulación cae un punto? (para proponer "abre hacia")
+function zonaEnPunto(floorId,x,y){
+  const arr=(pcircState.floors||{})[floorId]||[];
+  for(let i=arr.length-1;i>=0;i--){ const r=arr[i];
+    if(Math.abs(x-r.x_m)<=r.w_m/2 && Math.abs(y-r.y_m)<=r.h_m/2) return r.zona; }
+  return '';
+}
+// Zona hacia la que barre la hoja. Se muestrea a varias distancias porque la
+// puerta suele quedar en el VANO entre dos zonas: a 0,7 m puede caer en el
+// hueco y no acertar ninguna. Devuelve la primera zona encontrada.
+function _zonaDestino(floorId,mk){
+  const a=(mk.ang||0)*Math.PI/180, w=(mk.ancho_m||0.9);
+  const sg=(mk.giro==='izq'?-1:1);
+  const nx=Math.sin(a)*sg, ny=-Math.cos(a)*sg;
+  for(const d of [w*0.7, w*1.2, w*2, w*3.5, w*5]){
+    const z=zonaEnPunto(floorId, mk.x_m+nx*d, mk.y_m+ny*d);
+    if(z) return z;
+  }
+  return '';
+}
+function buscarMk(id){
+  const arr=(pcircState.markers||{})[S.floorId]||[];
+  return arr.find(m=>m.id===id);
+}
+function setPuerta(id,campo,valor){
+  const mk=buscarMk(id); if(!mk) return;
+  mk[campo]=valor;
+  if(campo==='ang'||campo==='giro'||campo==='ancho_m'){
+    const z=_zonaDestino(S.floorId,mk);
+    if(z) mk.abre=z;                       // se recalcula la zona destino
+  }
+  saveAll(); renderOverlay(); editarPuerta(id,true);
+}
+function editarPuerta(id,soloRefrescar){
+  const mk=buscarMk(id); if(!mk||!ES_PUERTA[mk.tipo]) return;
+  let box=document.getElementById('puertaEd');
+  if(!box){
+    box=document.createElement('div'); box.id='puertaEd';
+    box.style.cssText='position:fixed;right:18px;bottom:18px;z-index:9997;width:280px;'
+      +'background:#0e2233;border:1px solid #29ABE2;border-radius:12px;padding:12px 14px;'
+      +'box-shadow:0 10px 34px rgba(0,0,0,.45);color:#dbeafe;font-size:12px';
+    document.body.appendChild(box);
+  }
+  box.style.display='block';
+  const zonas=Object.keys(ZONA_CIRC);
+  box.innerHTML=
+     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">'
+    +'<strong style="font-size:13px">'+(MARCA_CIRC[mk.tipo]||{}).icon+' '+(MARCA_CIRC[mk.tipo]||{}).label+'</strong>'
+    +'<button onclick="document.getElementById(\'puertaEd\').style.display=\'none\'" style="margin-left:auto;background:#1c3d55;color:#dbeafe;border:0;border-radius:7px;padding:3px 9px;cursor:pointer">Cerrar</button></div>'
+    +'<label style="display:block;margin-bottom:7px">Orientación <b>'+(mk.ang||0)+'°</b>'
+    +'<input type="range" min="0" max="359" value="'+(mk.ang||0)+'" style="width:100%"'
+    +' oninput="setPuerta(\''+id+'\',\'ang\',+this.value)"></label>'
+    +'<label style="display:block;margin-bottom:7px">Ancho (m) '
+    +'<input type="number" step="0.1" min="0.6" max="3" value="'+(mk.ancho_m||0.9)+'"'
+    +' onchange="setPuerta(\''+id+'\',\'ancho_m\',+this.value)"'
+    +' style="width:70px;background:#0b1b28;color:#dbeafe;border:1px solid #23506e;border-radius:6px;padding:2px 6px"></label>'
+    +(mk.tipo==='corredera'?'':'<div style="margin-bottom:7px">Giro: '
+      +['der','izq'].map(g=>'<button onclick="setPuerta(\''+id+'\',\'giro\',\''+g+'\')" style="margin-right:5px;background:'
+        +((mk.giro||'der')===g?'#1c4a68':'#0b1b28')+';color:#dbeafe;border:1px solid #23506e;border-radius:6px;padding:3px 9px;cursor:pointer">'
+        +(g==='der'?'Derecha':'Izquierda')+'</button>').join('')+'</div>')
+    +'<div style="margin-bottom:4px">Abre hacia:</div>'
+    +'<select onchange="setPuerta(\''+id+'\',\'abre\',this.value)" style="width:100%;background:#0b1b28;color:#dbeafe;border:1px solid #23506e;border-radius:6px;padding:4px 6px">'
+    +'<option value="">— sin definir —</option>'
+    + zonas.map(z=>'<option value="'+z+'"'+(mk.abre===z?' selected':'')+'>'+ZONA_CIRC[z].label+'</option>').join('')
+    +'</select>'
+    +'<div style="margin-top:8px;color:#7fa6bd;font-size:11px">La zona se propone sola según hacia dónde barre la hoja; podés forzarla.</div>';
+}
+
+function delPmark(id){
+  const arr=(pcircState.markers[S.floorId]||[]);
+  pcircState.markers[S.floorId]=arr.filter(m=>m.id!==id);
+  saveAll(); renderOverlay();
+}
+function buildPmarkBar(){
+  const bar=document.getElementById('pmarkBar'); if(!bar) return;
+  bar.innerHTML='<span class="lbl">Marcador:</span>'+Object.entries(MARCA_CIRC).map(([k,v])=>
+    '<button class="pcirc-z'+(_pmarkTipo===k?' on':'')+'" style="background:#1e293b" onclick="setPmarkTipo(\''+k+'\')">'
+    +'<span style="font-size:13px">'+v.icon+'</span>'+v.label+'</button>').join('');
+}
+function setPmarkTipo(t){ _pmarkTipo=t; buildPmarkBar(); }
+// ── Medición de largo (regla): clic para cada punto, largo acumulado en metros ─
+let _measure={pts:[]};
+function measureLen(){ let L=0; for(let i=1;i<_measure.pts.length;i++){ L+=Math.hypot(_measure.pts[i].x_m-_measure.pts[i-1].x_m,_measure.pts[i].y_m-_measure.pts[i-1].y_m); } return L; }
+function handleMeasureClick(e){
+  if(didPan) return;
+  const c=planCoords(e); if(!c.inside) return;
+  const m=svgToDxf(S.floorId,c.sx,c.sy); if(!m) return;
+  _measure.pts.push({x_m:m.cx_m,y_m:m.cy_m});
+  renderOverlay(); updateMeasureReadout();
+}
+function clearMeasure(){ _measure={pts:[]}; renderOverlay(); updateMeasureReadout(); }
+function updateMeasureReadout(){
+  const el=document.getElementById('measureReadout'); if(!el) return;
+  const n=_measure.pts.length;
+  if(S.mode!=='medir'||!n){ el.classList.remove('show'); return; }
+  el.classList.add('show');
+  el.innerHTML='📏 <b>'+measureLen().toFixed(2)+' m</b>'+(n<2?' · clic para el siguiente punto':' · '+n+' puntos · doble clic o ⌫ para reiniciar');
+}
+
+// ── EDITOR DE FORMAS · mover + redimensionar cuadros (modo 'shape') ──────────
+const MIN_M=0.4;   // tamaño mínimo del cuadro en metros
+const HANDLE_CURSOR={nw:'nwse-resize',n:'ns-resize',ne:'nesw-resize',e:'ew-resize',se:'nwse-resize',s:'ns-resize',sw:'nesw-resize',w:'ew-resize'};
+let _shapeDrag=null;
+function _boxEdges(n){ return {L:n.x_m-n.w_m/2, R:n.x_m+n.w_m/2, T:n.y_m+n.h_m/2, B:n.y_m-n.h_m/2}; }
+// Aplica al nodo del PISO ACTUAL solamente (posición por piso → permite calibrar
+// cada plano sin arrastrar los otros pisos de la misma cabina).
+function _applyBoxCurFloor(gid,b){ const n=circState.nodes.find(x=>x.gid===gid&&x.floor===S.floorId); if(n){ n.x_m=b.x_m; n.y_m=b.y_m; n.w_m=b.w_m; n.h_m=b.h_m; } }
+function startShapeMove(node,e){
+  if(e.button!==0||S.mode!=='shape') return;
+  e.stopPropagation();
+  S.selectedCircId=node.id;
+  const c=planCoords(e), cur=svgToDxf(S.floorId,c.sx,c.sy);
+  _shapeDrag={kind:'move',gid:node.gid,cur0:cur,c0:{x_m:node.x_m,y_m:node.y_m},moved:false};
+  renderOverlay();
+}
+function startShapeResize(handle,node,e){
+  e.stopPropagation(); e.preventDefault();
+  S.selectedCircId=node.id;
+  _shapeDrag={kind:'resize',handle,gid:node.gid,e0:_boxEdges(node)};
+  // Si es una cabina del ascensor A, guardar el tamaño base de TODOS los
+  // ascensores del piso para escalarlos en conjunto al redimensionar A1/A2.
+  const g=circState.groups[node.gid];
+  if(g && g.ascLetter==='A'){
+    const bs={};
+    circState.nodes.forEach(n=>{ if(n.floor===S.floorId){ const gg=circState.groups[n.gid]; if(gg&&(gg.type||'').indexOf('asc-')===0){ bs[n.gid]={w:n.w_m,h:n.h_m}; } } });
+    _shapeDrag.baseSizes=bs;
+  }
+}
+window.addEventListener('mousemove',e=>{
+  if(!_shapeDrag) return;
+  const c=planCoords(e), cur=svgToDxf(S.floorId,c.sx,c.sy); if(!cur) return;
+  if(_shapeDrag.kind==='move'){
+    const dx=cur.cx_m-_shapeDrag.cur0.cx_m, dy=cur.cy_m-_shapeDrag.cur0.cy_m;
+    _shapeDrag.moved=true;
+    const node=circState.nodes.find(n=>n.gid===_shapeDrag.gid&&n.floor===S.floorId); if(!node) return;
+    _applyBoxCurFloor(_shapeDrag.gid,{x_m:_shapeDrag.c0.x_m+dx,y_m:_shapeDrag.c0.y_m+dy,w_m:node.w_m,h_m:node.h_m});
+  } else {
+    let {L,R,T,B}=_shapeDrag.e0; const h=_shapeDrag.handle;
+    const corner=(h.length===2);   // nw, ne, se, sw
+    if(h.indexOf('w')>-1) L=cur.cx_m;
+    if(h.indexOf('e')>-1) R=cur.cx_m;
+    if(h.indexOf('n')>-1) T=cur.cy_m;
+    if(h.indexOf('s')>-1) B=cur.cy_m;
+    if(corner){
+      // Redimensión PROPORCIONAL desde la diagonal (aspecto bloqueado), esquina opuesta fija
+      const w0=_shapeDrag.e0.R-_shapeDrag.e0.L, h0=_shapeDrag.e0.T-_shapeDrag.e0.B, asp=w0/h0;
+      let w=R-L, hh=T-B;
+      if(Math.abs(w/w0-1)>=Math.abs(hh/h0-1)) hh=w/asp; else w=hh*asp;
+      if(h.indexOf('w')>-1) L=R-w; else R=L+w;
+      if(h.indexOf('n')>-1) T=B+hh; else B=T-hh;
+    }
+    if(R-L<MIN_M){ if(h.indexOf('w')>-1) L=R-MIN_M; else R=L+MIN_M; }
+    if(T-B<MIN_M){ if(h.indexOf('s')>-1) B=T-MIN_M; else T=B+MIN_M; }
+    _applyBoxCurFloor(_shapeDrag.gid,{x_m:(L+R)/2,y_m:(T+B)/2,w_m:R-L,h_m:T-B});
+    // Al redimensionar A1/A2 (proporcional), escalar TODOS los ascensores del piso igual
+    if(_shapeDrag.baseSizes && corner){
+      const factor=(R-L)/(_shapeDrag.e0.R-_shapeDrag.e0.L);
+      Object.keys(_shapeDrag.baseSizes).forEach(gid=>{
+        if(gid===_shapeDrag.gid) return;
+        const bs=_shapeDrag.baseSizes[gid];
+        const n=circState.nodes.find(x=>x.gid===gid&&x.floor===S.floorId);
+        if(n){ n.w_m=bs.w*factor; n.h_m=bs.h*factor; }
+      });
+    }
+  }
+  renderOverlay();
+});
+window.addEventListener('mouseup',()=>{
+  if(!_shapeDrag) return;
+  _shapeDrag=null;
+  saveAll(); renderOverlay();   // posición/tamaño exactos, sin ajuste automático
+});
+
+viewer.addEventListener('mousedown',e=>{
+  // Botón DERECHO en circulación peatonal = RESTAR área (solo herramienta dibujar).
+  if(e.button===2){
+    if(S.mode==='pcirc'&&pcTool==='draw'){
+      const c=planCoords(e);
+      if(c.inside){ e.preventDefault(); _boxDraw={x0:c.sx,y0:c.sy,x1:c.sx,y1:c.sy,neg:true}; }
+    }
+    return;
+  }
+  if(e.button!==0) return;
+  // ── MODOS DE DIBUJO ──────────────────────────────────────────────────────
+  // El clic sobre el plano SIEMPRE dibuja, aunque encima esté el overlay
+  // (áreas o markers). Antes se exigía e.target===planSvg, pero el overlay
+  // tiene pointer-events:all e intercepta TODOS los clics → el target nunca
+  // era planSvg y solo se hacía pan. Ahora calculamos la posición respecto al
+  // plano y actuamos sin importar qué elemento quede encima.
+  if(DRAW_MODES.has(S.mode)){
+    const c=planCoords(e);
+    if(!c.inside) return;   // clic fuera del plano en modo dibujo: no arrastrar
+    if(S.mode==='poi'){ handlePoiClick(e); return; }
+    if(S.mode==='pmark'){ handlePmarkClick(e); return; }
+    if(S.mode==='medir'){ handleMeasureClick(e); return; }
+    // ⌘+clic en cajas: igualar tamaños (1er clic = referencia, los siguientes copian)
+    if(S.mode==='pcirc'&&e.metaKey){ pcMatchClick(e); return; }
+    // Herramientas de circulación: editar selecciona/arrastra, rellenar crece hasta muros
+    if(S.mode==='pcirc'&&pcTool==='edit'){ pcEditMouseDown(e); return; }
+    if(S.mode==='pcirc'&&pcTool==='fill'){ pcFillClick(e); return; }
+    // add / placeAsc → dibujar un CUADRO: arrastrar define el rectángulo;
+    // un clic simple (sin arrastre) crea una caja de tamaño por defecto.
+    _boxDraw={x0:c.sx,y0:c.sy,x1:c.sx,y1:c.sy};
+    return;
+  }
+  // Modo formas: los cuadros/manijas frenan el evento (stopPropagation); si llega
+  // aquí es un clic en vacío → deseleccionar. Luego se permite el paneo normal.
+  if(S.mode==='shape' && S.selectedCircId){ S.selectedCircId=null; renderOverlay(); }
+  panState={sx:e.clientX,sy:e.clientY,ox:S.ox,oy:S.oy}; didPan=false;
+  viewer.classList.add('panning');
+});
+window.addEventListener('mousemove',e=>{
+  if(_boxDraw){ const c=planCoords(e); _boxDraw.x1=Math.max(0,Math.min(c.d.w,c.sx)); _boxDraw.y1=Math.max(0,Math.min(c.d.h,c.sy)); _updateBoxPreview(); return; }
+  if(!panState)return;
+  const dx=e.clientX-panState.sx, dy=e.clientY-panState.sy;
+  if(Math.abs(dx)>3||Math.abs(dy)>3)didPan=true;
+  S.ox=panState.ox+dx; S.oy=panState.oy+dy; applyT(false);
+});
+window.addEventListener('mouseup',e=>{ if((e.button===0||e.button===2)&&_boxDraw){ _finishBox(); } panState=null; viewer.classList.remove('panning'); });
+viewer.addEventListener('contextmenu',e=>{ if(S.mode==='pcirc') e.preventDefault(); });
+viewer.addEventListener('dblclick',e=>{
+  if(S.mode==='medir'){ e.preventDefault(); clearMeasure(); return; }
+  // capa de elemento activa (🛗/🪜/⤴) en herramienta dibujar: doble clic dentro
+  // del recinto → la caja toma los límites de los muros
+  if(S.mode==='pcirc' && pcTool==='draw' && esElem(_pcircZona)){ e.preventDefault(); elemFillAt(e); }
+});
+
+// ═══ PAN CON BOTÓN CENTRAL (portado de Atlas HDS) ═══════════════════════════
+// Captura el botón medio en fase de captura para tener prioridad sobre los
+// modos activos (pasillos, circulación, POI, etc.): permite desplazar el plano
+// sin salir del modo de dibujo.
+let midPan=null;
+viewer.addEventListener('mousedown',e=>{
+  if(e.button!==1) return;                  // solo botón medio
+  e.preventDefault();                       // evita el scroll auto-cursor del navegador
+  e.stopImmediatePropagation();             // gana a otros handlers (dibujo, markers…)
+  _zv=0; if(_zRaf){ cancelAnimationFrame(_zRaf); _zRaf=null; }   // corta la inercia del zoom
+  midPan={sx:e.clientX,sy:e.clientY,ox:S.ox,oy:S.oy};
+  viewer.classList.add('panning');
+  viewer.style.cursor='grabbing';
+},{capture:true});
+window.addEventListener('mousemove',e=>{
+  if(!midPan) return;
+  S.ox=midPan.ox+(e.clientX-midPan.sx); S.oy=midPan.oy+(e.clientY-midPan.sy); applyT(false);
+});
+window.addEventListener('mouseup',e=>{
+  if(midPan && e.button===1){ midPan=null; viewer.classList.remove('panning'); viewer.style.cursor=''; }
+});
+viewer.addEventListener('auxclick',e=>{ if(e.button===1) e.preventDefault(); });
+
+// ═══ ZOOM CON INERCIA (portado de Atlas HDS) ════════════════════════════════
+// Acumulador de velocidad en espacio logarítmico: el trackpad manda muchos
+// eventos pequeños que se suman con suavidad, en vez de saltos fijos.
+let _zv=0, _zmx=0, _zmy=0, _zRaf=null;
+const _FRICTION=0.80;   // decaimiento por frame: más alto = más deslizamiento
+const _MAX_V=0.08;      // tope de velocidad log-zoom por ráfaga
+function _zTick(){
+  if(Math.abs(_zv)<1e-4){ _zRaf=null; return; }
+  const nz=Math.min(Math.max(S.zoom*Math.exp(_zv),.03),22);
+  S.ox=_zmx-(_zmx-S.ox)*nz/S.zoom;
+  S.oy=_zmy-(_zmy-S.oy)*nz/S.zoom;
+  S.zoom=nz; applyT(false);
+  _zv*=_FRICTION;
+  _zRaf=requestAnimationFrame(_zTick);
+}
+viewer.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const r=viewer.getBoundingClientRect();
+  _zmx=e.clientX-r.left; _zmy=e.clientY-r.top;
+  // ctrlKey=true → gesto pinch de trackpad · false → rueda o scroll 2 dedos
+  const sens=e.ctrlKey?0.003:0.0015;
+  let d=e.deltaY; if(e.deltaMode===1) d*=16;             // líneas → px
+  _zv=Math.max(-_MAX_V,Math.min(_MAX_V,_zv-d*sens));
+  if(!_zRaf) _zTick();   // primer paso inmediato; la inercia sigue por RAF
+},{passive:false});
+// Tras el zoom, re-dibujar las manijas de edición (mantienen tamaño de pantalla)
+let _pcZoomT=null;
+viewer.addEventListener('wheel',()=>{
+  if(S.mode==='pcirc'&&pcTool==='edit'){ clearTimeout(_pcZoomT); _pcZoomT=setTimeout(()=>renderOverlay(),180); }
+},{passive:true});
+
+// ── MODES ───────────────────────────────────────────────────────────────────
+function toggleMode(m){
+  if(PUBLIC && _MODOS_EDICION.indexOf(m)!==-1) return;   // consulta: sin edición
+  const wasShape=(S.mode==='shape');
+  if(S.mode===m){ S.mode='view'; } else { S.mode=m; }
+  btnAdd.classList.toggle('active',S.mode==='add');
+  btnDel.classList.toggle('active',S.mode==='del');
+  document.getElementById('btnShape')?.classList.toggle('active',S.mode==='shape');
+  viewer.classList.toggle('del-mode',S.mode==='del');
+  document.getElementById('btnPoi')?.classList.toggle('active',S.mode==='poi');
+  document.getElementById('btnPcirc')?.classList.toggle('active',S.mode==='pcirc');
+  document.getElementById('btnPmark')?.classList.toggle('active',S.mode==='pmark');
+  viewer.classList.toggle('add-mode',S.mode==='add'||S.mode==='poi'||S.mode==='pcirc'||S.mode==='pmark'||S.mode==='medir');
+  { const bar=document.getElementById('pcircBar'); if(bar){ bar.classList.toggle('show',S.mode==='pcirc'); if(S.mode==='pcirc') buildPcircBar(); } }
+  { const bar=document.getElementById('pmarkBar'); if(bar){ bar.classList.toggle('show',S.mode==='pmark'); if(S.mode==='pmark') buildPmarkBar(); } }
+  document.getElementById('btnMedir')?.classList.toggle('active',S.mode==='medir');
+  if(S.mode!=='medir'){ _measure={pts:[]}; } updateMeasureReadout();
+  if(S.mode==='medir'){ addHint.textContent='📏 Clic en cada punto del recorrido · el largo se acumula en metros · doble clic o ⌫ reinicia · ESC para salir'; addHint.classList.add('show'); }
+  else if(S.mode==='pmark'){ addHint.textContent='⚑ Clic para colocar el marcador · elegí el tipo arriba (puerta, escalera, control…) · ESC para salir'; addHint.classList.add('show'); }
+  else if(S.mode==='pcirc'){ addHint.textContent='▦ Arrastra para pintar tramos del área de circulación (se fusionan) · elegí la zona arriba · ESC para salir'; addHint.classList.add('show'); }
+  else if(S.mode==='poi'){ addHint.textContent='📍 Clic en el plano para marcar un punto de flujo · ESC para salir'; addHint.classList.add('show'); }
+  else if(S.mode==='add'){ addHint.textContent='➕ Arrastra para dibujar el cuadro de la circulación (o un clic = tamaño estándar) · ESC para salir'; addHint.classList.add('show'); }
+  else if(S.mode==='shape'){ addHint.textContent='◱ Clic en un cuadro para seleccionarlo · arrastra las manijas para redimensionar o el cuadro para moverlo · clic en la flecha gira la salida · ESC para salir'; addHint.classList.add('show'); }
+  else { addHint.classList.remove('show'); }
+  delHint.classList.toggle('show',S.mode==='del');
+  // Barra de herramientas de circulación (flotante, derecha)
+  { const t=document.getElementById('pcTools'); if(t) t.classList.toggle('show',S.mode==='pcirc'); }
+  if(S.mode==='pcirc'){ pcSetTool(pcTool||'draw'); }
+  else { pcSel.clear(); _pcDrag=null; _pcMatchRef=null; viewer.classList.remove('pc-edit'); viewer.classList.remove('pc-fill'); }
+  // Al entrar/salir de formas: refrescar overlay (manijas) y limpiar selección al salir
+  if(wasShape && S.mode!=='shape'){ S.selectedCircId=null; }
+  if(wasShape || S.mode==='shape') renderOverlay();
+}
+window.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if(_boxDraw){ _boxDraw=null; if(_boxPreviewEl){ overlay.removeChild(_boxPreviewEl); _boxPreviewEl=null; } }
+    if(_shapeDrag){ _shapeDrag=null; }
+    else if(_pcDrag){ const sn=_pcHistU.pop(); _pcDrag=null; if(sn)_pcApply(sn); }   // cancela el arrastre
+    else if(S.mode==='pcirc'&&(pcSel.size||pcTool!=='draw'||_pcMatchRef)){ pcSel.clear(); _pcMatchRef=null; pcSetTool('draw'); }  // 1º Esc: volver a dibujar
+    else if(S.mode==='placeAsc'){ S.mode='view'; S.placeAscLetter=null; viewer.classList.remove('add-mode'); addHint.classList.remove('show'); }
+    else if(S.mode!=='view') toggleMode(S.mode);
+    closeCircModal(); closeAscPanel();
+  }
+  // ⌫ en modo medir: quita el último punto
+  if((e.key==='Backspace'||e.key==='Delete') && S.mode==='medir'){
+    const t=e.target; if(t&&/INPUT|TEXTAREA|SELECT/.test(t.tagName)) return;
+    e.preventDefault(); _measure.pts.pop(); renderOverlay(); updateMeasureReadout();
+  }
+  // A = mostrar/ocultar áreas (para dibujar sobre el plano limpio)
+  if((e.key==='a'||e.key==='A')&&!e.metaKey&&!e.ctrlKey&&!e.altKey){
+    const t=e.target; if(t&&/INPUT|TEXTAREA|SELECT/.test(t.tagName)) return;
+    toggleAreas();
+  }
+  // R = mostrar/ocultar los recintos de Atlas
+  if((e.key==='r'||e.key==='R')&&!e.metaKey&&!e.ctrlKey&&!e.altKey){
+    const t=e.target; if(t&&/INPUT|TEXTAREA|SELECT/.test(t.tagName)) return;
+    toggleRecintos();
+  }
+  // ⌘Z / ⇧⌘Z (o Ctrl+Y): deshacer / rehacer del dibujo de circulación
+  if((e.metaKey||e.ctrlKey)&&(e.key==='z'||e.key==='Z')){
+    const t=e.target; if(t&&/INPUT|TEXTAREA|SELECT/.test(t.tagName)) return;
+    e.preventDefault(); if(e.shiftKey) pcRedo(); else pcUndo(); return;
+  }
+  if((e.metaKey||e.ctrlKey)&&(e.key==='y'||e.key==='Y')){
+    const t=e.target; if(t&&/INPUT|TEXTAREA|SELECT/.test(t.tagName)) return;
+    e.preventDefault(); pcRedo(); return;
+  }
+  // Atajos de la barra de circulación
+  if(S.mode==='pcirc'){
+    const t=e.target; if(t&&/INPUT|TEXTAREA|SELECT/.test(t.tagName)) return;
+    if(e.key==='1') pcSetTool('draw');
+    if(e.key==='2') pcSetTool('edit');
+    if(e.key==='3') pcSetTool('fill');
+    if((e.key==='Backspace'||e.key==='Delete')&&pcSel.size){ e.preventDefault(); pcDelSel(); }
+    if(pcTool==='edit'&&pcSel.size&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){
+      e.preventDefault();
+      const st=e.shiftKey?1.0:0.1;   // metros por pulsación
+      pcNudgeSel(e.key==='ArrowLeft'?-st:e.key==='ArrowRight'?st:0,
+                 e.key==='ArrowUp'?-st:e.key==='ArrowDown'?st:0);
+    }
+  }
+});
+
+// ── ADD CIRCULATION (click on plan) ─────────────────────────────────────────
+let _pendingCoord=null, _editingCirc=null, _circType='asc-pub', _circGroup='__new__', _circFloorsSet=new Set(), _circColor=null, _circExit='s';
+function handleAddClick(e){
+  if(didPan) return;
+  const rect=planSvg.getBoundingClientRect();
+  const d=curDims();
+  const sx=(e.clientX-rect.left)/(rect.width/d.w);
+  const sy=(e.clientY-rect.top)/(rect.height/d.h);
+  if(sx<0||sy<0||sx>d.w||sy>d.h) return;
+  const m=svgToDxf(S.floorId,sx,sy); if(!m) return;
+  _pendingCoord={x_m:m.cx_m, y_m:m.cy_m, sx, sy};
+  _editingCirc=null;
+  openCircModal();
+}
+
+// ── POIs: colocación, edición y render ──────────────────────────────────────
+let _pendingPoi=null, _editingPoi=null, _poiType='acc-pea';
+function handlePoiClick(e){
+  if(didPan) return;
+  const rect=planSvg.getBoundingClientRect(); const d=curDims();
+  const sx=(e.clientX-rect.left)/(rect.width/d.w);
+  const sy=(e.clientY-rect.top)/(rect.height/d.h);
+  if(sx<0||sy<0||sx>d.w||sy>d.h) return;
+  const m=svgToDxf(S.floorId,sx,sy); if(!m) return;
+  _pendingPoi={x_m:m.cx_m, y_m:m.cy_m}; _editingPoi=null;
+  openPoiModal();
+}
+function openPoiModal(){
+  const grid=document.getElementById('poiTypeGrid');
+  grid.innerHTML=Object.entries(POI_TYPES).map(([k,v])=>
+    '<button class="type-btn'+(k===_poiType?' sel':'')+'" data-p="'+k+'" style="'+(k===_poiType?('border-color:'+v.color+';color:#fff;background:'+v.color+'33'):'')+'" onclick="setPoiType(\''+k+'\')">'+v.icon+'<br>'+v.label+'</button>').join('');
+  document.getElementById('poiName').value=_editingPoi?(_editingPoi.name||''):'';
+  document.getElementById('poiNotas').value=_editingPoi?(_editingPoi.notas||''):'';
+  document.getElementById('poiDelBtn').style.display=_editingPoi?'':'none';
+  if(_editingPoi) _poiType=_editingPoi.type;
+  document.getElementById('poiModalBg').classList.add('show');
+  setPoiType(_poiType);
+}
+function setPoiType(k){
+  _poiType=k;
+  document.querySelectorAll('#poiTypeGrid .type-btn').forEach(b=>{
+    const v=POI_TYPES[b.dataset.p]; const sel=b.dataset.p===k;
+    b.classList.toggle('sel',sel);
+    b.style.cssText=sel?('border-color:'+v.color+';color:#fff;background:'+v.color+'33'):'';
+  });
+}
+function closePoiModal(){ document.getElementById('poiModalBg').classList.remove('show'); _pendingPoi=null; _editingPoi=null; }
+function savePoi(){
+  const name=document.getElementById('poiName').value.trim();
+  const notas=document.getElementById('poiNotas').value.trim();
+  if(_editingPoi){ _editingPoi.type=_poiType; _editingPoi.name=name; _editingPoi.notas=notas; }
+  else if(_pendingPoi){
+    poiState.items.push({id:'poi_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+      type:_poiType, name, notas, floor:S.floorId, x_m:_pendingPoi.x_m, y_m:_pendingPoi.y_m});
+  }
+  saveAll(); closePoiModal(); renderOverlay(); updateStats&&updateStats();
+}
+function deletePoi(){
+  if(!_editingPoi) return;
+  poiState.items=poiState.items.filter(x=>x.id!==_editingPoi.id);
+  saveAll(); closePoiModal(); renderOverlay(); updateStats&&updateStats();
+}
+function renderPois(){
+  (poiState.items||[]).filter(p=>p.floor===S.floorId).forEach(p=>{
+    const v=POI_TYPES[p.type]||POI_TYPES.otro;
+    const s=dxfToSvg(S.floorId,p.x_m,p.y_m); if(!s) return;
+    const g=document.createElementNS('http://www.w3.org/2000/svg','g');
+    g.setAttribute('class','circ-marker'); g.setAttribute('transform','translate('+s.x+','+s.y+')');
+    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('r',52); c.setAttribute('fill',v.color); c.setAttribute('stroke','#fff'); c.setAttribute('stroke-width',8);
+    g.appendChild(c);
+    const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
+    tx.setAttribute('font-size',54); tx.setAttribute('y',4); tx.textContent=v.icon;
+    g.appendChild(tx);
+    if(p.name){ const nm=document.createElementNS('http://www.w3.org/2000/svg','text');
+      nm.setAttribute('font-size',40); nm.setAttribute('y',105); nm.setAttribute('fill','#fff');
+      nm.setAttribute('stroke','#0f1e34'); nm.setAttribute('stroke-width',6); nm.setAttribute('paint-order','stroke fill');
+      nm.textContent=p.name; g.appendChild(nm); }
+    const ti=document.createElementNS('http://www.w3.org/2000/svg','title');
+    ti.textContent=v.label+(p.name?(' · '+p.name):'')+(p.notas?('\n'+p.notas):''); g.appendChild(ti);
+    g.addEventListener('click',e=>{
+      e.stopPropagation(); if(didPan) return;
+      if(S.mode==='del'){ poiState.items=poiState.items.filter(x=>x.id!==p.id); saveAll(); renderOverlay(); return; }
+      _editingPoi=p; _pendingPoi=null; openPoiModal();
+    });
+    overlay.appendChild(g);
+  });
+}
+function openCircModal(){
+  document.getElementById('circModalBg').classList.add('show');
+  document.getElementById('circTagFloor').textContent=FLOORS.find(f=>f.id===S.floorId).label;
+  if(_editingCirc){
+    const g=circState.groups[_editingCirc.gid];
+    document.getElementById('circTitle').firstChild.nodeValue='Editar circulación ';
+    document.getElementById('btnDeleteCirc').style.display='';
+    document.getElementById('circName').value=g?.name||'';
+    document.getElementById('circNotas').value=g?.notas||'';
+    document.getElementById('circLabel').value=g?.letra||'';
+    setCircType(g?.type||'asc-pub');
+    _circFloorsSet=new Set(g?.floors||[]);
+    _circGroup=_editingCirc.gid;
+    _circColor=g?.color||null;
+    _circExit=_editingCirc.exit||g?.exit||'s';   // salida del PISO actual
+  } else {
+    document.getElementById('circTitle').firstChild.nodeValue='Nueva circulación ';
+    document.getElementById('btnDeleteCirc').style.display='none';
+    document.getElementById('circName').value='';
+    document.getElementById('circNotas').value='';
+    document.getElementById('circLabel').value='';
+    setCircType('asc-pub');
+    _circFloorsSet=new Set([S.floorId]);
+    _circGroup='__new__';
+    _circColor=null;
+    _circExit='s';
+  }
+  refreshGroupDropdown();
+  renderCircFloors();
+  renderCircColors();
+  renderCircExit();
+}
+function renderCircExit(){
+  const c=document.getElementById('circExit'); if(!c) return;
+  c.innerHTML='';
+  EXIT_DIRS.forEach(function(dd){
+    const b=document.createElement('button'); b.type='button';
+    b.className='floor-chip'+(_circExit===dd[0]?' on':'');
+    b.textContent=dd[1]+' '+({n:'Arriba',e:'Derecha',s:'Abajo',w:'Izquierda'}[dd[0]]);
+    b.onclick=function(){ _circExit=dd[0]; renderCircExit(); };
+    c.appendChild(b);
+  });
+}
+function renderCircColors(){
+  const c=document.getElementById('circColors'); if(!c) return;
+  c.innerHTML='';
+  // Opción "por tipo" (sin color manual → usa el color de la categoría/tipo)
+  const def=document.createElement('div');
+  def.className='color-swatch def'+(_circColor?'':' sel');
+  def.textContent='Por tipo';
+  def.title='Usar el color del tipo de circulación';
+  def.onclick=()=>{ _circColor=null; renderCircColors(); };
+  c.appendChild(def);
+  SOLID_COLORS.forEach(sc=>{
+    const s=document.createElement('div');
+    s.className='color-swatch'+(_circColor===sc.c?' sel':'');
+    s.style.background=sc.c;
+    s.title=sc.lbl;
+    s.onclick=()=>{ _circColor=sc.c; renderCircColors(); };
+    c.appendChild(s);
+  });
+}
+function refreshGroupDropdown(){
+  const sel=document.getElementById('circGroup');
+  sel.innerHTML='<option value="__new__">— Crear nuevo grupo —</option>';
+  Object.values(circState.groups)
+    .filter(g=>g.type===_circType)
+    .forEach(g=>{
+      const opt=document.createElement('option');
+      opt.value=g.id; opt.textContent=`${g.name||g.id} · pisos: ${(g.floors||[]).join(', ')||'—'}`;
+      if(_circGroup===g.id) opt.selected=true;
+      sel.appendChild(opt);
+    });
+  sel.onchange=()=>{
+    _circGroup=sel.value;
+    if(sel.value!=='__new__'){
+      const g=circState.groups[sel.value];
+      if(g){
+        document.getElementById('circName').value=g.name||'';
+        document.getElementById('circNotas').value=g.notas||'';
+        _circFloorsSet=new Set([...(g.floors||[]),S.floorId]);
+        _circColor=g.color||null;
+        _circExit=g.exit||'s';
+        renderCircFloors(); renderCircColors(); renderCircExit();
+      }
+    }
+  };
+}
+function renderCircFloors(){
+  const c=document.getElementById('circFloors');
+  c.innerHTML='';
+  FLOORS.forEach(f=>{
+    const b=document.createElement('button');
+    b.type='button';
+    b.className='floor-chip'+(_circFloorsSet.has(f.id)?' on':'');
+    b.textContent=f.id;
+    b.onclick=()=>{
+      if(_circFloorsSet.has(f.id) && f.id!==S.floorId) _circFloorsSet.delete(f.id);
+      else _circFloorsSet.add(f.id);
+      renderCircFloors();
+    };
+    c.appendChild(b);
+  });
+}
+function setCircType(t){
+  _circType=t;
+  document.querySelectorAll('#circModalBg .type-btn').forEach(b=>b.classList.toggle('sel',b.dataset.t===t));
+  refreshGroupDropdown();
+}
+function closeCircModal(){ document.getElementById('circModalBg').classList.remove('show'); _pendingCoord=null; _editingCirc=null; }
+function saveCirc(){
+  const name=document.getElementById('circName').value.trim()||CIRC_TYPES[_circType].label;
+  const notas=document.getElementById('circNotas').value.trim();
+  const label=document.getElementById('circLabel').value.trim();
+  // Crear o actualizar el grupo
+  let gid;
+  if(_circGroup==='__new__'){
+    gid='g_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
+    circState.groups[gid]={id:gid,type:_circType,name,notas,floors:Array.from(_circFloorsSet),color:_circColor||null};
+  } else {
+    gid=_circGroup;
+    circState.groups[gid]={...(circState.groups[gid]||{}),id:gid,type:_circType,name,notas,floors:Array.from(_circFloorsSet),color:_circColor||null};
+  }
+  const g=circState.groups[gid];
+  // Salida (puerta): al editar se guarda en el NODO del piso actual (puede variar
+  // por piso); al crear queda como default del grupo.
+  if(_editingCirc) _editingCirc.exit=_circExit||'s';
+  else g.exit=_circExit||'s';
+  // Etiqueta del cuadro (identificador). Vacío en un ascensor → vuelve a numeración A1/A2 automática.
+  if(label){ g.letra=label; g.manualLabel=true; }
+  else if(g.ascLetter){ g.manualLabel=false; }
+  else { delete g.letra; }
+  // Crear o actualizar nodo en este piso
+  if(_editingCirc){
+    _editingCirc.gid=gid;
+  } else {
+    // Posición/tamaño exactos (sin ajuste automático)
+    const p=_pendingCoord;
+    // Si ya existe un nodo de este grupo en este piso, no duplicar; solo actualizar coord/tamaño
+    const ex=circState.nodes.find(n=>n.gid===gid&&n.floor===S.floorId);
+    if(ex){ ex.x_m=p.x_m; ex.y_m=p.y_m; if(_pendingCoord.w_m){ ex.w_m=p.w_m; ex.h_m=p.h_m; } }
+    else circState.nodes.push({id:'n_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),gid,floor:S.floorId,x_m:p.x_m,y_m:p.y_m,w_m:_pendingCoord.w_m||null,h_m:_pendingCoord.h_m||null});
+  }
+  if(g.ascLetter) renumberAsc(g.ascLetter);
+  saveAll(); closeCircModal(); renderOverlay(); updateStats(); renderSidebar(); renderAscPanel();
+}
+function deleteCurrentCirc(){
+  if(!_editingCirc) return;
+  const gid=_editingCirc.gid, g=circState.groups[gid], letra=g&&g.ascLetter;
+  // Elimina SOLO el nodo del piso actual; el grupo entero recién cuando no queda en ningún piso
+  circState.nodes=circState.nodes.filter(n=>n.id!==_editingCirc.id);
+  if(!circState.nodes.some(n=>n.gid===gid)) delete circState.groups[gid];
+  else if(g) g.floors=(g.floors||[]).filter(f=>f!==_editingCirc.floor);
+  if(letra) renumberAsc(letra);
+  saveAll(); closeCircModal(); renderOverlay(); updateStats(); renderSidebar(); renderAscPanel();
+}
+
+// ── RENDER OVERLAY (áreas Atlas HDS + circulaciones + ruta) ────────────────────
+// ── FUSIÓN DE GEOMETRÍAS ────────────────────────────────────────────────────
+// Une los rectángulos de un servicio (exportados de Atlas) en un solo contorno
+// rectilíneo (path SVG con posibles huecos). Coordenadas casi iguales se
+// agrupan con tolerancia para que cajas dibujadas a mano "casi tocándose"
+// queden fusionadas sin líneas internas ni hendijas.
+const FUSE_EPS=10; // px del overlay (~6400 px de ancho de plano)
+function _clusterCoords(vals){
+  const sorted=[...new Set(vals)].sort((a,b)=>a-b);
+  const map=new Map(); let rep=null;
+  sorted.forEach(v=>{ if(rep===null||v-rep>FUSE_EPS){ rep=v; } map.set(v,rep); });
+  return map;
+}
+function unionRectsToPath(rects){
+  if(!rects.length) return '';
+  const mx=_clusterCoords(rects.flatMap(r=>[r.x,r.x+r.w]));
+  const my=_clusterCoords(rects.flatMap(r=>[r.y,r.y+r.h]));
+  const xs=[...new Set(mx.values())].sort((a,b)=>a-b);
+  const ys=[...new Set(my.values())].sort((a,b)=>a-b);
+  const xi=new Map(xs.map((v,i)=>[v,i])), yi=new Map(ys.map((v,i)=>[v,i]));
+  const nx=xs.length-1, ny=ys.length-1;
+  if(nx<1||ny<1) return '';
+  const cov=Array.from({length:ny},()=>new Uint8Array(nx));
+  rects.forEach(r=>{
+    const x0=xi.get(mx.get(r.x)), x1=xi.get(mx.get(r.x+r.w));
+    const y0=yi.get(my.get(r.y)), y1=yi.get(my.get(r.y+r.h));
+    for(let j=y0;j<y1;j++) for(let i=x0;i<x1;i++) cov[j][i]=1;
+  });
+  // Aristas de borde (celda cubierta junto a celda libre), dirigidas con el
+  // interior a la izquierda → los lazos se recorren de forma consistente.
+  const out=new Map(); // "x,y" origen → [destinos]
+  const addE=(x1,y1,x2,y2)=>{ const k=x1+','+y1; if(!out.has(k))out.set(k,[]); out.get(k).push([x2,y2]); };
+  for(let j=0;j<ny;j++) for(let i=0;i<nx;i++){
+    if(!cov[j][i]) continue;
+    if(j===0   ||!cov[j-1][i]) addE(xs[i],ys[j],xs[i+1],ys[j]);       // arriba →
+    if(j===ny-1||!cov[j+1][i]) addE(xs[i+1],ys[j+1],xs[i],ys[j+1]);   // abajo ←
+    if(i===0   ||!cov[j][i-1]) addE(xs[i],ys[j+1],xs[i],ys[j]);       // izq ↑
+    if(i===nx-1||!cov[j][i+1]) addE(xs[i+1],ys[j],xs[i+1],ys[j+1]);   // der ↓
+  }
+  // Coser lazos y simplificar puntos colineales
+  let d='';
+  for(const [k0] of out){
+    if(!out.get(k0)||!out.get(k0).length) continue;
+    const pts=[]; let key=k0;
+    while(out.has(key)&&out.get(key).length){
+      const [px,py]=key.split(',').map(Number);
+      pts.push([px,py]);
+      const nxt=out.get(key).pop();
+      key=nxt[0]+','+nxt[1];
+      if(key===k0) break;
+    }
+    if(pts.length<4) continue;
+    const simp=pts.filter((p,i)=>{
+      const a=pts[(i-1+pts.length)%pts.length], b=pts[(i+1)%pts.length];
+      return !((a[0]===p[0]&&p[0]===b[0])||(a[1]===p[1]&&p[1]===b[1]));
+    });
+    if(simp.length<3) continue;
+    d+='M'+simp.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join('L')+'Z';
+  }
+  return d;
+}
+
+// ── MOSTRAR / OCULTAR ÁREAS ─────────────────────────────────────────────────
+function toggleAreas(force){
+  S.showAreas = force!==undefined ? !!force : S.showAreas===false;
+  ls('nav_show_areas',S.showAreas);
+  const b=document.getElementById('btnAreas');
+  if(b){ b.classList.toggle('active',S.showAreas); b.innerHTML=S.showAreas?'👁 Áreas':'🙈 Áreas'; }
+  renderOverlay();
+}
+
+function renderOverlay(){
+  while(overlay.firstChild) overlay.removeChild(overlay.firstChild);
+
+  // 1) Áreas Atlas HDS (debajo de los markers) — geometrías fusionadas por servicio
+  const areas=S.showAreas===false ? [] : ((cabidaState.areas||{})[S.floorId]||[]);
+  areas.forEach(a=>{
+    if(!a.shapes||!a.shapes.length) return;
+    const cls='area-shape';
+    const fx=SVG_DIMS[S.floorId].w/CABIDA_PNG_DIMS[S.floorId].w;
+    const fy=SVG_DIMS[S.floorId].h/CABIDA_PNG_DIMS[S.floorId].h;
+    const rects=a.shapes.map(s=>({x:s.x*fx,y:s.y*fy,w:s.w*fx,h:s.h*fy}));
+    const dPath=unionRectsToPath(rects);
+    if(dPath){
+      const p=document.createElementNS('http://www.w3.org/2000/svg','path');
+      p.setAttribute('d',dPath);
+      p.setAttribute('fill-rule','evenodd');
+      p.setAttribute('class',cls);
+      p.addEventListener('click',e=>{
+        e.stopPropagation();
+      });
+      overlay.appendChild(p);
+    }
+    // Label en el bbox
+    const bb=areaBboxSvg(a);
+    if(bb){
+      const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('x',bb.x+bb.w/2);
+      t.setAttribute('y',bb.y+bb.h/2);
+      t.setAttribute('class','area-label');
+      t.setAttribute('font-size',Math.max(120,Math.min(360,bb.w/8,bb.h/4)));
+      t.textContent=a.name||a.id;
+      overlay.appendChild(t);
+    }
+  });
+
+  // 1b) Recintos de Atlas (vista 2) y propuesta de relleno inverso
+  dibujaCapaMetros(recintosPiso(S.floorId), 'rec-shape', S.showRecintos);
+  dibujaCapaMetros(rellenoPiso(S.floorId),  'rel-shape', S.showRelleno);
+
+  // 1.5) Circulación peatonal — cuadros fusionados por zona de acceso
+  const _pcb=(pcircState.floors||{})[S.floorId]||[];
+  if(_pcb.length){
+    const SVGNS='http://www.w3.org/2000/svg';
+    const byZ={}; _pcb.forEach(b=>{ (byZ[b.zona]=byZ[b.zona]||[]).push(b); });
+    Object.keys(byZ).forEach(z=>{
+      // ELEMENTOS (ascensor/escalera/esc. mecánica): cada caja individual con
+      // su ícono — NO se fusionan; conservan identidad para describirlas luego
+      if(esElem(z)){
+        const ec=ELEM_CIRC[z];
+        byZ[z].forEach(b=>{
+          const p=dxfToSvg(S.floorId,b.x_m,b.y_m), s=dxfSizeToSvg(S.floorId,b.w_m,b.h_m);
+          if(!p||!s) return;
+          const rc=document.createElementNS(SVGNS,'rect');
+          rc.setAttribute('x',p.x-s.w/2); rc.setAttribute('y',p.y-s.h/2);
+          rc.setAttribute('width',s.w);   rc.setAttribute('height',s.h);
+          rc.setAttribute('fill',ec.color+'40'); rc.setAttribute('stroke',ec.color);
+          rc.setAttribute('stroke-width','3'); rc.setAttribute('rx','4');
+          rc.setAttribute('pointer-events','none');
+          overlay.appendChild(rc);
+          const tx=document.createElementNS(SVGNS,'text');
+          tx.setAttribute('x',p.x); tx.setAttribute('y',p.y);
+          tx.setAttribute('text-anchor','middle'); tx.setAttribute('dominant-baseline','central');
+          tx.setAttribute('font-size',Math.max(16,Math.min(s.w,s.h)*0.55));
+          tx.setAttribute('pointer-events','none');
+          tx.textContent=ec.icon;
+          overlay.appendChild(tx);
+        });
+        return;
+      }
+      const zc=ZONA_CIRC[z]||ZONA_CIRC.general;
+      const rects=byZ[z].map(b=>{ const p=dxfToSvg(S.floorId,b.x_m,b.y_m); const s=dxfSizeToSvg(S.floorId,b.w_m,b.h_m);
+        return p&&s?{x:p.x-s.w/2,y:p.y-s.h/2,w:s.w,h:s.h}:null; }).filter(Boolean);
+      const dP=unionRectsToPath(rects);
+      if(dP){ const path=document.createElementNS(SVGNS,'path');
+        path.setAttribute('d',dP); path.setAttribute('class','pcirc-path'); path.setAttribute('fill-rule','evenodd');
+        path.setAttribute('fill',zc.color+'2e'); path.setAttribute('stroke',zc.color);
+        path.setAttribute('stroke-width','3'); path.setAttribute('stroke-linejoin','round');
+        path.setAttribute('pointer-events','none'); overlay.appendChild(path); }
+    });
+    if(S.mode==='del'){ _pcb.forEach(b=>{ const p=dxfToSvg(S.floorId,b.x_m,b.y_m); if(!p) return;
+      const c=document.createElementNS(SVGNS,'circle');
+      c.setAttribute('cx',p.x);c.setAttribute('cy',p.y);c.setAttribute('r',26);
+      c.setAttribute('fill','rgba(239,68,68,.35)');c.setAttribute('stroke','#fff');c.setAttribute('stroke-width','2');c.style.cursor='pointer';
+      c.addEventListener('click',ev=>{ev.stopPropagation(); delPcirc(b.id);}); overlay.appendChild(c); }); }
+  }
+  // Capa de edición de circulación (contornos + manijas de la selección)
+  pcRenderEditLayer();
+
+  // 1.6) Marcadores físicos de circulación (puertas, escaleras, control…)
+  const _pmk=(pcircState.markers||{})[S.floorId]||[];
+  _pmk.forEach(mk=>{
+    const v=MARCA_CIRC[mk.tipo]||MARCA_CIRC.puerta; const p=dxfToSvg(S.floorId,mk.x_m,mk.y_m); if(!p) return;
+    const SVGNS='http://www.w3.org/2000/svg';
+    // ── Puertas: símbolo arquitectónico (hoja + arco de barrido), a escala real
+    if(ES_PUERTA[mk.tipo]){
+      const sz=dxfSizeToSvg(S.floorId,(mk.ancho_m||0.9),(mk.ancho_m||0.9));
+      const L=sz?sz.w:60, sg=(mk.giro==='izq'?-1:1);
+      const zc=ZONA_CIRC[mk.abre]||null;
+      const gp=document.createElementNS(SVGNS,'g');
+      gp.setAttribute('transform','translate('+p.x+','+p.y+') rotate('+(mk.ang||0)+')');
+      const jamba=document.createElementNS(SVGNS,'line');
+      jamba.setAttribute('x1',0);jamba.setAttribute('y1',0);jamba.setAttribute('x2',L*sg);jamba.setAttribute('y2',0);
+      jamba.setAttribute('stroke','#0f1e34');jamba.setAttribute('stroke-width','9');jamba.setAttribute('stroke-linecap','round');
+      gp.appendChild(jamba);
+      if(mk.tipo==='corredera'){
+        const fl=document.createElementNS(SVGNS,'path');
+        fl.setAttribute('d','M '+(L*sg*0.15)+' -14 L '+(L*sg*0.85)+' -14 M '+(L*sg*0.7)+' -22 L '+(L*sg*0.85)+' -14 L '+(L*sg*0.7)+' -6');
+        fl.setAttribute('fill','none');fl.setAttribute('stroke',zc?zc.color:'#22d3ee');fl.setAttribute('stroke-width','6');
+        gp.appendChild(fl);
+      }else{
+        const hoja=document.createElementNS(SVGNS,'line');
+        hoja.setAttribute('x1',0);hoja.setAttribute('y1',0);hoja.setAttribute('x2',0);hoja.setAttribute('y2',-L);
+        hoja.setAttribute('stroke',zc?zc.color:'#22d3ee');hoja.setAttribute('stroke-width','7');hoja.setAttribute('stroke-linecap','round');
+        gp.appendChild(hoja);
+        const arco=document.createElementNS(SVGNS,'path');   // barrido de 90°
+        arco.setAttribute('d','M 0 '+(-L)+' A '+L+' '+L+' 0 0 '+(sg>0?1:0)+' '+(L*sg)+' 0');
+        arco.setAttribute('fill',zc?zc.color+'22':'rgba(34,211,238,.13)');
+        arco.setAttribute('stroke',zc?zc.color:'#22d3ee');arco.setAttribute('stroke-width','3');
+        arco.setAttribute('stroke-dasharray','10 8');
+        gp.appendChild(arco);
+      }
+      const ttl=document.createElementNS(SVGNS,'title');
+      ttl.textContent=v.label+' · '+(mk.ancho_m||0.9)+' m · '+(mk.ang||0)+'°'
+        +(mk.abre?' · abre hacia '+ZONA_CIRC[mk.abre].label:'');
+      gp.appendChild(ttl);
+      gp.style.cursor='pointer';
+      gp.addEventListener('click',ev=>{ ev.stopPropagation();
+        if(S.mode==='del') delPmark(mk.id); else editarPuerta(mk.id); });
+      overlay.appendChild(gp);
+      return;
+    }
+    const g=document.createElementNS(SVGNS,'g'); g.setAttribute('transform',`translate(${p.x},${p.y})`);
+    const c=document.createElementNS(SVGNS,'circle'); c.setAttribute('r',26);
+    c.setAttribute('fill','#0f1e34'); c.setAttribute('stroke',S.mode==='del'?'#ef4444':'#22d3ee'); c.setAttribute('stroke-width','3');
+    const t=document.createElementNS(SVGNS,'text'); t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','central');
+    t.setAttribute('font-size','26'); t.textContent=v.icon;
+    const tt=document.createElementNS(SVGNS,'title'); tt.textContent=v.label;
+    g.appendChild(c); g.appendChild(t); g.appendChild(tt);
+    if(S.mode==='del'){ g.style.cursor='pointer'; g.addEventListener('click',ev=>{ev.stopPropagation(); delPmark(mk.id);}); }
+    overlay.appendChild(g);
+  });
+
+  // 1.7) Regla de medición (largo del recorrido)
+  if(S.mode==='medir' && _measure.pts.length){
+    const SVGNS='http://www.w3.org/2000/svg';
+    for(let i=0;i<_measure.pts.length;i++){
+      const a=dxfToSvg(S.floorId,_measure.pts[i].x_m,_measure.pts[i].y_m); if(!a) continue;
+      if(i>0){ const b=dxfToSvg(S.floorId,_measure.pts[i-1].x_m,_measure.pts[i-1].y_m);
+        const ln=document.createElementNS(SVGNS,'line'); ln.setAttribute('x1',b.x);ln.setAttribute('y1',b.y);ln.setAttribute('x2',a.x);ln.setAttribute('y2',a.y);
+        ln.setAttribute('stroke','#fbbf24');ln.setAttribute('stroke-width','4');ln.setAttribute('stroke-dasharray','12 7');ln.setAttribute('stroke-linecap','round');ln.setAttribute('pointer-events','none'); overlay.appendChild(ln);
+        const d=Math.hypot(_measure.pts[i].x_m-_measure.pts[i-1].x_m,_measure.pts[i].y_m-_measure.pts[i-1].y_m);
+        const t=document.createElementNS(SVGNS,'text'); t.setAttribute('x',(a.x+b.x)/2);t.setAttribute('y',(a.y+b.y)/2-10);
+        t.setAttribute('fill','#7c2d12');t.setAttribute('stroke','#fff');t.setAttribute('stroke-width','6');t.setAttribute('paint-order','stroke');t.setAttribute('text-anchor','middle');t.setAttribute('font-size','130');t.setAttribute('font-weight','800');t.textContent=d.toFixed(1)+' m'; overlay.appendChild(t);
+      }
+      const c=document.createElementNS(SVGNS,'circle'); c.setAttribute('cx',a.x);c.setAttribute('cy',a.y);c.setAttribute('r',11);c.setAttribute('fill','#fbbf24');c.setAttribute('stroke','#fff');c.setAttribute('stroke-width','3');c.setAttribute('pointer-events','none'); overlay.appendChild(c);
+    }
+  }
+
+  // 2) Markers de circulación (encima de todo)
+  const nodes=circState.nodes.filter(n=>n.floor===S.floorId);
+  nodes.forEach(n=>{
+    const g=circState.groups[n.gid];if(!g)return;
+    const t=CIRC_TYPES[g.type]; if(!t) return;
+    const p=dxfToSvg(n.floor,n.x_m,n.y_m); if(!p) return;
+    const grp=document.createElementNS('http://www.w3.org/2000/svg','g');
+    grp.setAttribute('class','circ-marker'+(S.selectedCircId===n.id?' sel':''));
+    grp.setAttribute('transform',`translate(${p.x},${p.y})`);
+    grp.dataset.id=n.id;
+    // Todas las circulaciones se dibujan como CUADRO con su color sólido.
+    const col=circColor(g);
+    const sz=dxfSizeToSvg(n.floor,n.w_m,n.h_m);
+    const bw=Math.max(40,sz.w), bh=Math.max(40,sz.h);
+    const zona=(g.type==='zona');
+    const r=document.createElementNS('http://www.w3.org/2000/svg','rect');
+    r.setAttribute('class','bg');
+    r.setAttribute('x',-bw/2);r.setAttribute('y',-bh/2);
+    r.setAttribute('width',bw);r.setAttribute('height',bh);
+    r.setAttribute('rx',Math.min(14,bw/6,bh/6));
+    r.setAttribute('fill',col);
+    if(zona) r.setAttribute('fill-opacity','0.35');   // zona: semitransparente, deja ver el plano
+    grp.appendChild(r);
+    const tx=document.createElementNS('http://www.w3.org/2000/svg','text');
+    tx.setAttribute('font-size',Math.max(28,Math.min(64,bh*0.5)));tx.setAttribute('y',2);
+    tx.style.fill=zona?'#334155':textOn(col);   // inline gana al CSS .circ-marker text{fill:#fff}
+    tx.textContent=g.letra||t.short;
+    grp.appendChild(tx);
+    if(!zona){
+    // Flecha de SALIDA (puerta del ascensor) sobre la arista indicada
+    // Salida POR PISO: el nodo manda; el grupo es solo el default al crear
+    const exit=n.exit||g.exit||'s';
+    const aL=Math.max(9,Math.min(bw,bh)*0.42), aW=Math.max(10,Math.min(bw,bh)*0.55);
+    let apts;
+    if(exit==='n')      apts=[[0,-bh/2-aL],[-aW/2,-bh/2],[aW/2,-bh/2]];
+    else if(exit==='e') apts=[[bw/2+aL,0],[bw/2,-aW/2],[bw/2,aW/2]];
+    else if(exit==='w') apts=[[-bw/2-aL,0],[-bw/2,-aW/2],[-bw/2,aW/2]];
+    else                apts=[[0,bh/2+aL],[-aW/2,bh/2],[aW/2,bh/2]];   // 's'
+    const arr=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    arr.setAttribute('points',apts.map(p=>p.join(',')).join(' '));
+    arr.setAttribute('class','exit-arrow');
+    arr.setAttribute('fill',col);
+    arr.addEventListener('mousedown',e=>e.stopPropagation());   // no mover/panear al tocar la flecha
+    arr.addEventListener('click',e=>{
+      e.stopPropagation();
+      if(DRAW_MODES.has(S.mode)||S.mode==='del') return;
+      const order=['n','e','s','w']; n.exit=order[(order.indexOf(exit)+1)%4];   // gira solo en este piso
+      saveAll(); renderOverlay();
+    });
+    grp.appendChild(arr);
+    }   // fin !zona (las zonas de circulación no llevan flecha de salida)
+    // Modo formas: arrastrar el cuadro lo mueve (y lo selecciona)
+    if(S.mode==='shape'){ grp.style.cursor='move'; grp.addEventListener('mousedown',e=>startShapeMove(n,e)); }
+    grp.addEventListener('click',e=>{
+      e.stopPropagation(); if(didPan) return;
+      // En modos de dibujo el clic ya lo procesó el mousedown (colocar/pasillo):
+      // no abrir el editor por caer encima de un marker.
+      if(DRAW_MODES.has(S.mode)) return;
+      if(S.mode==='shape') return;   // en modo formas el clic solo selecciona/mueve
+      if(S.mode==='del'){
+        // Eliminar SOLO del piso actual (etapa de identificación piso a piso).
+        // Si el grupo queda sin nodos en ningún piso, recién ahí se borra entero.
+        const g=circState.groups[n.gid], letra=g&&g.ascLetter;
+        circState.nodes=circState.nodes.filter(x=>x.id!==n.id);
+        if(!circState.nodes.some(x=>x.gid===n.gid)) delete circState.groups[n.gid];
+        else if(g) g.floors=(g.floors||[]).filter(f=>f!==n.floor);
+        if(letra) renumberAsc(letra);
+        saveAll(); renderOverlay(); updateStats(); renderSidebar(); renderAscPanel(); return;
+      }
+      _editingCirc=n; _pendingCoord=null; openCircModal();
+    });
+    // Manijas de redimensión (8) cuando el cuadro está seleccionado en modo formas
+    if(S.mode==='shape' && S.selectedCircId===n.id){
+      const hs=Math.max(6,Math.min(22,Math.min(bw,bh)*0.16)), hx=bw/2, hy=bh/2;
+      [['nw',-hx,-hy],['n',0,-hy],['ne',hx,-hy],['e',hx,0],['se',hx,hy],['s',0,hy],['sw',-hx,hy],['w',-hx,0]].forEach(function(H){
+        const hr=document.createElementNS('http://www.w3.org/2000/svg','rect');
+        hr.setAttribute('class','resize-handle');
+        hr.setAttribute('x',H[1]-hs/2);hr.setAttribute('y',H[2]-hs/2);
+        hr.setAttribute('width',hs);hr.setAttribute('height',hs);
+        hr.setAttribute('rx',hs*0.2);
+        hr.style.cursor=HANDLE_CURSOR[H[0]];
+        hr.addEventListener('mousedown',ev=>startShapeResize(H[0],n,ev));
+        grp.appendChild(hr);
+      });
+    }
+    overlay.appendChild(grp);
+  });
+  renderPois();
+}
+
+function _renderOverlayPois(){ try{ renderPois(); }catch(e){} }
+function areaBboxSvg(a){
+  if(!a.shapes||!a.shapes.length) return null;
+  let xmin=Infinity,ymin=Infinity,xmax=-Infinity,ymax=-Infinity;
+  a.shapes.forEach(s=>{
+    const p=cabidaPxToSvg(S.floorId,s.x,s.y);
+    const w=s.w*(SVG_DIMS[S.floorId].w/CABIDA_PNG_DIMS[S.floorId].w);
+    const h=s.h*(SVG_DIMS[S.floorId].h/CABIDA_PNG_DIMS[S.floorId].h);
+    xmin=Math.min(xmin,p.x); ymin=Math.min(ymin,p.y);
+    xmax=Math.max(xmax,p.x+w); ymax=Math.max(ymax,p.y+h);
+  });
+  return {x:xmin,y:ymin,w:xmax-xmin,h:ymax-ymin};
+}
+
+// ── SIDEBAR ─────────────────────────────────────────────────────────────────
+function renderSidebar(){
+  const list=document.getElementById('floorList');
+  list.innerHTML='';
+  // De arriba hacia abajo: del piso más alto al más bajo (4 → -2)
+  [...FLOORS].reverse().forEach(f=>{
+    const nFromAreas=(cabidaState.areas||{})[f.id]?.length || 0;
+    const circ=circState.nodes.filter(n=>n.floor===f.id);
+    const byType={};
+    circ.forEach(n=>{const g=circState.groups[n.gid];if(!g)return; byType[g.type]=(byType[g.type]||0)+1;});
+    const pills=Object.entries(byType).map(([t,n])=>
+      `<span class="pill" style="background:${CIRC_TYPES[t].color}30;color:${CIRC_TYPES[t].color}">${CIRC_TYPES[t].short} ${n}</span>`).join(' ');
+    const b=document.createElement('button');
+    b.className='fl-btn'+(S.floorId===f.id?' active':'');
+    b.innerHTML=`
+      <span class="fl-name">${f.name}</span>
+      <span class="fl-sub">${nFromAreas} áreas · ${circ.length} circulaciones</span>
+      <span class="fl-cnt">${pills}</span>`;
+    b.addEventListener('click',()=>{ S.selectedCircId=null; loadFloor(f.id); });
+    list.appendChild(b);
+  });
+}
+
+// ── STATS ───────────────────────────────────────────────────────────────────
+function updateStats(){
+  const totalAreas=Object.values(cabidaState.areas||{}).reduce((a,x)=>a+x.length,0);
+  document.getElementById('statAreas').textContent=totalAreas;
+  // Contar CABINAS (grupos con nodos), no nodos por piso
+  let asc=0,esc=0;
+  Object.values(circState.groups).forEach(g=>{
+    if(!circState.nodes.some(n=>n.gid===g.id)) return;
+    if((g.type||'').startsWith('asc-')) asc++;
+    else if((g.type||'').startsWith('esc-')) esc++;
+  });
+  document.getElementById('statAsc').textContent=asc;
+  document.getElementById('statEsc').textContent=esc;
+}
+
+// ── CABIDA IMPORT ───────────────────────────────────────────────────────────
+function importFromCabida(){
+  try{
+    const cab=JSON.parse(localStorage.getItem('cabida_cad_boxes')||'{"areas":{}}');
+    const names=JSON.parse(localStorage.getItem('cabida_cad_names')||'{"areas":{}}');
+    const newAreas={};
+    Object.entries(cab.areas||{}).forEach(([areaId,shapes])=>{
+      // Inferir piso desde el prefix del id (e.g., "P3-CAD-12" o "P3-M…")
+      const m=/^(P-?\d)/.exec(areaId);
+      const floor=m?m[1]:null;
+      if(!floor) return;
+      if(!newAreas[floor]) newAreas[floor]=[];
+      newAreas[floor].push({
+        id:areaId,
+        name: (names.areas&&names.areas[areaId])||areaId,
+        shapes:shapes // [{x,y,w,h}]
+      });
+    });
+    cabidaState.areas=newAreas;
+    saveAll();
+    const cnt=Object.values(newAreas).reduce((a,x)=>a+x.length,0);
+    alert(`Importadas ${cnt} áreas desde Atlas HDS.\n\nAhora podés:\n• Ver los contornos sobre el plano.\n• Marcar puntos de origen/destino para rutas.`);
+    renderOverlay(); updateStats(); renderSidebar();
+  }catch(e){
+    alert('No se pudo leer el estado de Atlas HDS.\n\nAbrí 6.AtlasHDS.html en este mismo navegador, definí algunas áreas, y volvé a intentar.');
+  }
+}
+
+// ── EXPORT ──────────────────────────────────────────────────────────────────
+// ════════════════════════════════════════════════════════════════════════════
+// RESPALDO COMPLETO
+// El export anterior solo guardaba {grupos, nodos, planXform}: se perdian las
+// AREAS DE CIRCULACION PEATONAL y los MARCADORES (nav_pcirc) y los PUNTOS DE
+// FLUJO (nav_pois). Ahora el respaldo cubre TODO el estado de la plataforma.
+// ════════════════════════════════════════════════════════════════════════════
+const NAV_BK_VER = 2;
+
+function toast(msg){
+  try{
+    let el=document.getElementById('navToast');
+    if(!el){ el=document.createElement('div'); el.id='navToast';
+      el.style.cssText='position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:99999;'
+        +'background:#0f2537;color:#dbeafe;border:1px solid #29ABE2;border-radius:10px;'
+        +'padding:10px 16px;font-size:13px;font-weight:600;box-shadow:0 8px 28px rgba(0,0,0,.35);'
+        +'max-width:min(680px,92vw);text-align:center;';
+      document.body.appendChild(el); }
+    el.textContent=msg; el.style.display='block';
+    clearTimeout(el._t); el._t=setTimeout(()=>{el.style.display='none';},4200);
+  }catch(e){ console.log(msg); }
+}
+
+
+function _navSnapshot(conAreas){
+  const o = {
+    _formato: 'navegacion-hds', _version: NAV_BK_VER,
+    generadoEn: new Date().toISOString(),
+    circulacion: { groups: circState.groups, nodes: circState.nodes },
+    pcirc:  pcircState,     // areas de circulacion peatonal + marcadores
+    pois:   poiState,       // puntos de flujo
+    planXform: planXform,   // calibracion de planos
+    // compatibilidad con respaldos v1
+    grupos: circState.groups, nodos: circState.nodes
+  };
+  if(conAreas) o.cabidaAreas = cabidaState;   // areas de Atlas (grande, reimportable)
+  return o;
+}
+
+function _navResumen(d){
+  const g = Object.keys((d.circulacion&&d.circulacion.groups)||d.grupos||{}).length;
+  const n = ((d.circulacion&&d.circulacion.nodes)||d.nodos||[]).length;
+  const pf = Object.keys((d.pcirc&&d.pcirc.floors)||{}).length;
+  let pc = 0; const ff = (d.pcirc&&d.pcirc.floors)||{};
+  Object.keys(ff).forEach(k=>{ const v=ff[k]; pc += Array.isArray(v)?v.length:((v&&v.boxes||[]).length); });
+  const mk = Object.keys((d.pcirc&&d.pcirc.markers)||{}).length;
+  const po = ((d.pois&&d.pois.items)||[]).length;
+  const px = Object.keys(d.planXform||{}).length;
+  return {g,n,pf,pc,mk,po,px,
+    txt: g+' cabinas · '+n+' emplazamientos · '+pc+' áreas de circulación en '+pf+' pisos · '
+        +mk+' marcadores · '+po+' puntos de flujo · '+px+' ajustes de plano'};
+}
+
+function exportData(){
+  const conAreas = confirm('¿Incluir también las áreas de servicios importadas de Atlas?\n\n'
+    + 'Aceptar = respaldo COMPLETO (archivo más pesado)\n'
+    + 'Cancelar = solo tu trabajo de navegación (recomendado; las áreas se reimportan desde Atlas)');
+  const out = _navSnapshot(conAreas);
+  const r = _navResumen(out);
+  const blob = new Blob([JSON.stringify(out,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Navegacion_HDS_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('💾 Respaldo descargado — '+r.txt);
+}
+
+// ── Restaurar (acepta respaldos v1 y v2) ──
+function _navReemplazar(obj, src){
+  Object.keys(obj).forEach(k=>delete obj[k]);
+  Object.keys(src||{}).forEach(k=>obj[k]=src[k]);
+}
+
+function _navRestaurar(d, etiqueta){
+  const r = _navResumen(d);
+  const viejo = (!d._version || d._version < 2);
+  if(!confirm('Restaurar respaldo'+(etiqueta?' ('+etiqueta+')':'')+':\n\n'+r.txt+'\n\n'
+      + (viejo ? '⚠ Es un respaldo ANTIGUO: solo trae ascensores y ajustes de plano.\n'
+                 +'   Las áreas de circulación y marcadores NO se tocarán.\n\n' : '')
+      + 'Esto REEMPLAZA el estado actual. Se guarda un respaldo previo en el navegador. ¿Continuar?')) return false;
+  try{
+    localStorage.setItem('nav_respaldo_previo', JSON.stringify(_navSnapshot(false)));
+  }catch(e){}
+
+  const c = d.circulacion || {groups:d.grupos, nodes:d.nodos};
+  if(c && c.groups) circState.groups = c.groups;
+  if(c && Array.isArray(c.nodes)) circState.nodes = c.nodes;
+  if(d.pcirc && typeof d.pcirc==='object') _navReemplazar(pcircState, d.pcirc);
+  if(d.pois  && typeof d.pois==='object')  _navReemplazar(poiState,  d.pois);
+  if(d.planXform && typeof d.planXform==='object') _navReemplazar(planXform, d.planXform);
+  if(d.cabidaAreas && typeof d.cabidaAreas==='object') _navReemplazar(cabidaState, d.cabidaAreas);
+
+  saveAll();
+  loadFloor(S.floorId);
+  toast('✔ Restaurado — '+r.txt);
+  return true;
+}
+
+function importData(){
+  const inp=document.createElement('input');
+  inp.type='file'; inp.accept='.json,application/json';
+  inp.onchange=()=>{
+    const f=inp.files&&inp.files[0]; if(!f) return;
+    const rd=new FileReader();
+    rd.onload=()=>{
+      let d; try{ d=JSON.parse(rd.result); }catch(e){ alert('JSON inválido: '+e.message); return; }
+      if(!d||typeof d!=='object'||!(d.circulacion||d.grupos)){ alert('El archivo no parece un respaldo de Navegación.'); return; }
+      _navRestaurar(d, f.name);
+    };
+    rd.readAsText(f);
+  };
+  inp.click();
+}
+
+// ── SEARCH ──────────────────────────────────────────────────────────────────
+const searchInput=document.getElementById('gSearchInput');
+const searchDrop=document.getElementById('gSearchDrop');
+function norm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');}
+searchInput.addEventListener('input',()=>{
+  const q=norm(searchInput.value.trim());
+  if(q.length<2){searchDrop.style.display='none'; return;}
+  const hits=[];
+  Object.entries(cabidaState.areas||{}).forEach(([fid,areas])=>{
+    areas.forEach(a=>{ if(norm(a.name).includes(q)) hits.push({floor:fid,area:a}); });
+  });
+  searchDrop.innerHTML='';
+  if(!hits.length){
+    searchDrop.innerHTML='<div style="padding:10px;color:#94a3b8;font-size:12px">Sin resultados. ¿Importaste áreas de Atlas HDS?</div>';
+  } else {
+    hits.slice(0,15).forEach(h=>{
+      const it=document.createElement('div');
+      it.style.cssText='padding:8px 12px;cursor:pointer;border-bottom:1px solid #1e293b;transition:background .1s';
+      it.innerHTML=`<strong style="display:block;font-size:12px;color:#fff;font-weight:600">${h.area.name}</strong><span style="font-size:10px;color:#94a3b8">${h.floor}</span>`;
+      it.onmouseover=()=>it.style.background='#1e293b';
+      it.onmouseout=()=>it.style.background='';
+      it.onclick=()=>{
+        if(h.floor!==S.floorId) loadFloor(h.floor);
+        searchDrop.style.display='none'; searchInput.value='';
+        setTimeout(()=>{
+          const bb=areaBboxSvg(h.area);
+          if(bb){
+            const vw=viewer.clientWidth, vh=viewer.clientHeight;
+            S.zoom=Math.max(0.3,Math.min(2.5, Math.min(vw/bb.w, vh/bb.h)*0.6));
+            S.ox=vw/2 - (bb.x+bb.w/2)*S.zoom;
+            S.oy=vh/2 - (bb.y+bb.h/2)*S.zoom;
+            applyT();
+          }
+        },300);
+      };
+      searchDrop.appendChild(it);
+    });
+  }
+  searchDrop.style.display='block';
+});
+document.addEventListener('click',e=>{
+  if(!searchInput.contains(e.target)&&!searchDrop.contains(e.target)) searchDrop.style.display='none';
+});
+
+
+// ── Red de seguridad: respaldo automático diario en el navegador ──
+// Guarda hasta 3 fotos (sin las áreas de Atlas, que son grandes y reimportables).
+function _navAutoRespaldo(){
+  try{
+    const key='nav_respaldo_auto';
+    let arr=[]; try{ arr=JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){ arr=[]; }
+    const hoy=new Date().toISOString().slice(0,10);
+    const snap=_navSnapshot(false);
+    const r=_navResumen(snap);
+    if(r.g===0 && r.pc===0 && r.po===0) return;      // nada que respaldar
+    arr=arr.filter(x=>x.dia!==hoy);
+    arr.push({dia:hoy, ts:Date.now(), resumen:r.txt, data:snap});
+    arr=arr.slice(-3);
+    localStorage.setItem(key, JSON.stringify(arr));
+  }catch(e){ /* cuota llena: no romper la plataforma */ }
+}
+
+function restaurarAuto(){
+  let arr=[]; try{ arr=JSON.parse(localStorage.getItem('nav_respaldo_auto')||'[]'); }catch(e){}
+  const prev=localStorage.getItem('nav_respaldo_previo');
+  if(!arr.length && !prev){ alert('Todavía no hay respaldos automáticos guardados en este navegador.'); return; }
+  let msg='Respaldos automáticos disponibles:\n\n';
+  arr.slice().reverse().forEach((x,i)=>{ msg+=(i+1)+') '+x.dia+' — '+x.resumen+'\n'; });
+  if(prev) msg+=(arr.length+1)+') anterior a la última restauración\n';
+  msg+='\nEscribí el número a restaurar:';
+  const sel=prompt(msg,'1'); if(!sel) return;
+  const k=parseInt(sel,10);
+  if(k>=1 && k<=arr.length){ _navRestaurar(arr.slice().reverse()[k-1].data, arr.slice().reverse()[k-1].dia); return; }
+  if(prev && k===arr.length+1){ try{ _navRestaurar(JSON.parse(prev),'previo'); }catch(e){ alert('Respaldo ilegible'); } return; }
+  alert('Opción no válida.');
+}
+
+function loadServiciosFromAtlasLive(){
+  try{
+    const boxes=JSON.parse(localStorage.getItem('cabida_cad_boxes')||'null');
+    const names=JSON.parse(localStorage.getItem('cabida_cad_names')||'{}');
+    if(!boxes||!boxes.areas||!Object.keys(boxes.areas).length) return false;
+    const areasByFloor={};
+    Object.entries(boxes.areas).forEach(([areaId,shapes])=>{
+      if(!shapes||!shapes.length) return;
+      const m=/^(P-?\d+)/.exec(areaId); const fid=m?m[1]:null;
+      if(!fid||!NAV_FLOORS.has(fid)) return;
+      (areasByFloor[fid]=areasByFloor[fid]||[]).push({
+        id:areaId,
+        name:(names.areas&&names.areas[areaId])||areaId,
+        shapes:shapes.map(s=>({x:s.x,y:s.y,w:s.w,h:s.h}))
+      });
+    });
+    if(!Object.keys(areasByFloor).length) return false;
+    cabidaState.areas=areasByFloor;
+    cabidaState.names=names.areas||{};
+    // Recintos (para flujos internos por servicio): solo los dibujados
+    const roomsByFloor={};
+    Object.entries(boxes.rooms||{}).forEach(([roomId,shapes])=>{
+      if(!shapes||!shapes.length) return;
+      const m=/^(P-?\d+)/.exec(roomId); const fid=m?m[1]:null;
+      if(!fid||!NAV_FLOORS.has(fid)) return;
+      (roomsByFloor[fid]=roomsByFloor[fid]||[]).push({
+        id:roomId,
+        name:(names.rooms&&names.rooms[roomId])||roomId,
+        code:(names.codes&&names.codes[roomId])||'',
+        shapes:shapes.map(s=>({x:s.x,y:s.y,w:s.w,h:s.h}))
+      });
+    });
+    cabidaState.rooms=roomsByFloor;
+    saveAll();
+    return true;
+  }catch(e){ return false; }
+}
+function roomCenterDxf(ref){
+  const rooms=(cabidaState.rooms||{})[ref.floor]||[];
+  const r=rooms.find(x=>x.id===ref.id); if(!r||!r.shapes.length) return null;
+  let xs=0,ys=0,n=0;
+  r.shapes.forEach(s=>{
+    const p=cabidaPxToSvg(ref.floor,s.x+s.w/2,s.y+s.h/2);
+    const dxf=svgToDxf(ref.floor,p.x,p.y); if(!dxf) return;
+    xs+=dxf.cx_m; ys+=dxf.cy_m; n++;
+  });
+  return n?{cx_m:xs/n,cy_m:ys/n}:null;
+}
+function loadServiciosFromSnapshot(){
+  if(loadServiciosFromAtlasLive()) return true;   // Atlas vivo manda
+  const W=(typeof window!=='undefined' && window.CABIDA_WEB)?window.CABIDA_WEB:null;
+  if(!W||!W.floors) return false;
+  const areasByFloor={};
+  W.floors.forEach(f=>{
+    const fid=f.id;
+    const list=[];
+    (f.areas||[]).forEach(a=>{
+      if(!a.shapes||!a.shapes.length) return;        // descarta áreas sin contorno (p.ej. OTORRINO)
+      list.push({ id:a.id, name:a.name, shapes:a.shapes.map(s=>({x:s.x,y:s.y,w:s.w,h:s.h})) });
+    });
+    if(list.length) areasByFloor[fid]=list;
+  });
+  cabidaState.areas=areasByFloor;
+  cabidaState.names=cabidaState.names||{};
+  saveAll();
+  return true;
+}
+function reloadServicios(){
+  const ok=loadServiciosFromSnapshot();
+  if(ok){
+    const cnt=Object.values(cabidaState.areas).reduce((a,x)=>a+x.length,0);
+    renderOverlay(); updateStats(); renderSidebar();
+    alert(`Sincronizados ${cnt} servicios desde Atlas HDS (estado vivo del navegador; si Atlas no tiene datos aquí, se usa el snapshot).`);
+  } else {
+    alert('No se encontró el snapshot de Atlas HDS (SHARED_DATA/cabida_web_snapshot.js).');
+  }
+}
+function init(){
+  applyPublicMode();
+  seedAscensores();
+  loadServiciosFromSnapshot();   // sólo servicios generales (sin recintos pequeños)
+  // restaurar visibilidad de áreas (lectura directa: lg() con ||default se comería el false)
+  const _sa=localStorage.getItem('nav_show_areas');
+  toggleAreas(_sa===null ? true : _sa!=='false');
+  renderSidebar();
+  loadFloor('P1');
+}
+window.addEventListener('load',init);
+
+// ════════ VISTA EN PERSPECTIVA — pisos apilados en 3D ════════
+let _perspOn=false;
+const PERSP_W=300;
+function togglePerspective(){
+  _perspOn=!_perspOn;
+  document.getElementById('viewer').style.display=_perspOn?'none':'';
+  document.getElementById('persp').style.display=_perspOn?'block':'none';
+  document.getElementById('btnPersp').classList.toggle('active',_perspOn);
+  ['btnAdd','btnDel'].forEach(id=>{const b=document.getElementById(id); if(b)b.style.display=_perspOn?'none':'';});
+  if(_perspOn) buildPerspective();
+}
+function applyPerspTransform(){
+  const tilt=+document.getElementById('perspTilt').value;
+  const rot =+document.getElementById('perspRot').value;
+  document.getElementById('perspStage').style.transform=`translate(-50%,-50%) rotateX(${tilt}deg) rotateZ(${rot}deg)`;
+}
+function buildPerspective(){
+  const stage=document.getElementById('perspStage'); stage.innerHTML='';
+  const gap=+document.getElementById('perspGap').value;
+  const n=FLOORS.length;
+  FLOORS.forEach((f,i)=>{
+    const d=SVG_DIMS[f.id]||{w:10300,h:7550};
+    const W=PERSP_W, H=PERSP_W*d.h/d.w;
+    const nodes=circState.nodes.filter(nd=>nd.floor===f.id);
+    const z=(i-(n-1)/2)*gap;
+    const floor=document.createElement('div');
+    floor.className='pfloor'+(nodes.length?'':' empty');
+    floor.style.cssText=`width:${W}px;height:${H}px;left:${-W/2}px;top:${-H/2}px;transform:translateZ(${z}px);`;
+    // circulaciones (marcadores por tipo)
+    let mk='';
+    nodes.forEach(nd=>{ const g=circState.groups[nd.gid]; if(!g)return;
+      const col=(CIRC_TYPES[g.type]||{}).color||'#3b82f6';
+      const p=dxfToSvg(f.id,nd.x_m,nd.y_m); if(!p)return;
+      mk+=`<circle class="pmk" fill="${col}" cx="${(p.x/d.w*W).toFixed(1)}" cy="${(p.y/d.h*H).toFixed(1)}" r="5" data-floor="${f.id}"><title>${(g.name||g.type).replace(/"/g,'')}</title></circle>`; });
+    floor.innerHTML=`<div class="plate">
+        <img src="CABIDA_DATA/dxf_plan_${f.id}.svg" alt="">
+        <svg viewBox="0 0 ${W} ${H}">${mk}</svg>
+      </div>
+      <div class="lbl">${f.name||f.label||f.id}<span class="c">${nodes.length} circ.</span></div>`;
+    floor.querySelector('.lbl').addEventListener('click',()=>{ togglePerspective(); loadFloor(f.id); });
+    floor.querySelectorAll('.pmk').forEach(c=>c.addEventListener('click',ev=>{ ev.stopPropagation(); togglePerspective(); loadFloor(c.dataset.floor); }));
+    stage.appendChild(floor);
+  });
+  // totales por tipo de circulación
+  const tot={}; Object.keys(CIRC_TYPES).forEach(k=>tot[k]=0);
+  circState.nodes.forEach(nd=>{ const g=circState.groups[nd.gid]; if(g&&tot[g.type]!=null) tot[g.type]++; });
+  document.getElementById('perspTotals').innerHTML='<div style="font-weight:700;margin-bottom:5px">Circulaciones ubicadas</div>'+
+    Object.entries(CIRC_TYPES).map(([k,v])=>`<div><span style="color:${v.color}">●</span> ${v.label} <b>${tot[k]||0}</b></div>`).join('');
+  applyPerspTransform();
+}
+function resetPerspective(){
+  document.getElementById('perspGap').value=170;
+  document.getElementById('perspTilt').value=56;
+  document.getElementById('perspRot').value=-28;
+  buildPerspective();
+}
+['perspGap','perspTilt','perspRot'].forEach(id=>{
+  const el=document.getElementById(id);
+  if(el) el.addEventListener('input',()=>{ if(!_perspOn) return; (id==='perspGap')?buildPerspective():applyPerspTransform(); });
+});
+</script>
+<script>
+
+// ════════════════════════════════════════════════════════════════════════════
+// DIRECTORIO DE ASCENSORES · tipología · cabinas dobles · pisos donde se detiene
+// Base: SHARED_DATA/ascensores_hds.js (extraído de "planos ascensores.pptx").
+// Los cambios del usuario mandan y viven en localStorage 'nav_asc_override'
+// (p. ej.: el ascensor S NO se detiene en el Piso 1).
+// ════════════════════════════════════════════════════════════════════════════
+const ASC_PISOS = ['P-3','P-2','P-1','P1','P2','P3','P4','P5'];
+const ASC_TIPOS = {
+  publico:          {lbl:'Público',            c:'#7AC143'},
+  servicio:         {lbl:'Servicio',           c:'#FBB000'},
+  montacamas_mayor: {lbl:'Montacamas mayor',   c:'#0B2A6B'},
+  montacamas:       {lbl:'Montacamas',         c:'#29ABE2'}
+};
+let ascOverride = lg('nav_asc_override', {});
+
+function _ascPisosDeRecorrido(rec){
+  // "-3 al 4" | "-2 al piso técnico" | "1 al 4"  ->  lista de pisos
+  const m = String(rec||'').match(/(-?\d+)\s*al\s*(-?\d+|piso t[ée]cnico)/i);
+  if(!m) return [];
+  const a = parseInt(m[1],10);
+  const b = /t[ée]cnico/i.test(m[2]) ? 5 : parseInt(m[2],10);
+  const lo = Math.min(a,b), hi = Math.max(a,b);
+  return ASC_PISOS.filter(p=>{ const n = parseInt(p.replace('P',''),10); return n>=lo && n<=hi; });
+}
+function ascDatos(L){
+  const base = (window.ASCENSORES_HDS||{})[L] || {letra:L,cabinas:1,tipo:null,recorrido:'',ubicaciones:{}};
+  const ov = ascOverride[L] || {};
+  const d = Object.assign({}, base, ov);
+  if(!d.paradas) d.paradas = _ascPisosDeRecorrido(d.recorrido);
+  return d;
+}
+function ascGuardar(L, campo, valor){
+  ascOverride[L] = ascOverride[L] || {};
+  ascOverride[L][campo] = valor;
+  ls('nav_asc_override', ascOverride);
+  _markDirty && _markDirty();
+}
+function ascReset(L){
+  delete ascOverride[L]; ls('nav_asc_override', ascOverride);
+  renderAscDirectorio(); toast('↩ '+L+' vuelto al valor del PPT');
+}
+
+function openAscDirectorio(){
+  let ov=document.getElementById('ascDirOverlay');
+  if(!ov){
+    ov=document.createElement('div'); ov.id='ascDirOverlay';
+    ov.style.cssText='position:fixed;inset:0;background:rgba(4,12,22,.72);z-index:9998;'
+      +'display:flex;align-items:center;justify-content:center;padding:24px;';
+    ov.onclick=e=>{ if(e.target===ov) ov.style.display='none'; };
+    ov.innerHTML='<div style="background:#0e2233;border:1px solid #29ABE2;border-radius:14px;'
+      +'max-width:1180px;width:100%;max-height:88vh;display:flex;flex-direction:column;overflow:hidden">'
+      +'<div style="padding:14px 18px;border-bottom:1px solid #1c3d55;display:flex;align-items:center;gap:12px">'
+      +'<strong style="color:#dbeafe;font-size:15px">🛗 Directorio de ascensores</strong>'
+      +'<span style="color:#7fa6bd;font-size:11.5px">desde «planos ascensores.pptx» · editable · tus cambios mandan</span>'
+      +'<button onclick="document.getElementById(\'ascDirOverlay\').style.display=\'none\'" '
+      +'style="margin-left:auto;background:#1c3d55;color:#dbeafe;border:0;border-radius:8px;padding:6px 12px;cursor:pointer">Cerrar</button>'
+      +'</div><div id="ascDirBody" style="overflow:auto;padding:10px 14px 16px"></div></div>';
+    document.body.appendChild(ov);
+  }
+  ov.style.display='flex';
+  renderAscDirectorio();
+}
+
+function renderAscDirectorio(){
+  const body=document.getElementById('ascDirBody'); if(!body) return;
+  const letras=Object.keys(window.ASCENSORES_HDS||{});
+  let h='<table style="width:100%;border-collapse:collapse;font-size:12px;color:#cfe3f0">'
+    +'<thead><tr style="position:sticky;top:0;background:#0e2233">'
+    +'<th style="text-align:left;padding:6px">Asc.</th><th style="text-align:left">Tipología</th>'
+    +'<th style="text-align:center">Cabinas</th><th style="text-align:left">Cajas</th>'
+    +'<th style="text-align:left">Se detiene en</th><th></th></tr></thead><tbody>';
+  letras.forEach(L=>{
+    const d=ascDatos(L), t=ASC_TIPOS[d.tipo]||{lbl:'Por definir',c:'#64748b'};
+    const editado=!!ascOverride[L];
+    h+='<tr style="border-top:1px solid #1c3d55">'
+      +'<td style="padding:7px 6px;font-weight:800;color:#fff">'
+        +'<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:'+t.c+';margin-right:6px"></span>'+L
+        +(d.ambiguo?' <span title="El PPT lo muestra con dos colores: confirmar" style="color:#fbbf24">⚠</span>':'')
+        +(editado?' <span title="editado por vos" style="color:#34d399">●</span>':'')+'</td>'
+      +'<td><select onchange="ascGuardar(\''+L+'\',\'tipo\',this.value);renderAscDirectorio()" '
+        +'style="background:#0b1b28;color:#dbeafe;border:1px solid #23506e;border-radius:6px;padding:3px 6px">'
+        + Object.keys(ASC_TIPOS).map(k=>'<option value="'+k+'"'+(k===d.tipo?' selected':'')+'>'+ASC_TIPOS[k].lbl+'</option>').join('')
+        + '<option value=""'+(!d.tipo?' selected':'')+'>Por definir</option></select></td>'
+      +'<td style="text-align:center"><input type="number" min="1" max="4" value="'+(d.cabinas||1)+'" '
+        +'onchange="ascGuardar(\''+L+'\',\'cabinas\',+this.value);renderAscDirectorio()" '
+        +'style="width:52px;background:#0b1b28;color:#dbeafe;border:1px solid #23506e;border-radius:6px;padding:3px 6px;text-align:center"></td>'
+      +'<td style="color:#9fc6dd">'+((d.cabinas||1)>1 ? Array.from({length:d.cabinas},(_,i)=>L+(i+1)).join(' · ') : L)+'</td>'
+      +'<td>';
+    ASC_PISOS.forEach(p=>{
+      const on=(d.paradas||[]).indexOf(p)>=0;
+      h+='<label style="display:inline-flex;align-items:center;gap:3px;margin-right:8px;cursor:pointer;'
+        +'color:'+(on?'#a7f3d0':'#5b7d94')+'">'
+        +'<input type="checkbox"'+(on?' checked':'')+' onchange="ascToggleParada(\''+L+'\',\''+p+'\',this.checked)"> '+p+'</label>';
+    });
+    h+='</td><td style="text-align:right">'
+      +(editado?'<button onclick="ascReset(\''+L+'\')" title="Volver al valor del PPT" '
+        +'style="background:#1c3d55;color:#cfe3f0;border:0;border-radius:6px;padding:3px 8px;cursor:pointer">↩</button>':'')
+      +'</td></tr>';
+  });
+  h+='</tbody></table>';
+  const nEd=Object.keys(ascOverride).length;
+  h+='<div style="margin-top:10px;color:#7fa6bd;font-size:11.5px">'
+    +letras.length+' ascensores · '+letras.filter(L=>(ascDatos(L).cabinas||1)>1).length+' con caja doble'
+    +(nEd?' · <span style="color:#34d399">'+nEd+' editados por vos</span>':'')
+    +' · el recorrido del PPT es la base; lo que marques acá manda.</div>';
+  body.innerHTML=h;
+}
+function ascToggleParada(L,piso,on){
+  const d=ascDatos(L);
+  let ps=(d.paradas||[]).slice();
+  if(on){ if(ps.indexOf(piso)<0) ps.push(piso); } else { ps=ps.filter(x=>x!==piso); }
+  ps.sort((a,b)=>ASC_PISOS.indexOf(a)-ASC_PISOS.indexOf(b));
+  ascGuardar(L,'paradas',ps);
+  renderAscDirectorio();
+}
+
+</script>
+<script src="hub-home.js"></script>
+</body>
+</html>
