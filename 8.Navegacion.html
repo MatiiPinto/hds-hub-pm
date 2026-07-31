@@ -453,6 +453,7 @@ body{background:#0c1a2e;color:#cbd5e1;font-family:'Segoe UI',-apple-system,Blink
 <!-- siembra base de circulación peatonal, con URL única por carga (anti-caché) -->
 <script>document.write('<scr'+'ipt src="SHARED_DATA/circulaciones_pcirc.js?v='+Date.now()+'"></scr'+'ipt>');</script>
 <script>document.write('<scr'+'ipt src="SHARED_DATA/nav_base.js?v='+Date.now()+'"></scr'+'ipt>');</script>
+<script src="SHARED_DATA/nav_central.js"></script>
 <script src="SHARED_DATA/cabida_web_snapshot.js"></script>
 <!-- recintos de Atlas (vista 2) ya convertidos a metros DXF, y la propuesta de
      relleno inverso de circulación; ambos con URL única por carga (anti-caché) -->
@@ -917,7 +918,85 @@ function saveAll(){
     ls('nav_pcirc',pcircState);
     ls('nav_plan_xform',planXform);
     _markSaved();
+    navCloudGuardar();          // autoguardado central (si hay NAV_URL)
   },200);
+}
+
+/* ══ AUTOGUARDADO CENTRAL (Drive vía Apps Script · _setup/Code_nav.gs) ══════
+   El trabajo de Navegación deja de vivir solo en el navegador: se guarda en un
+   JSON central. MODELO: un solo editor a la vez — cada guardado sobrescribe el
+   estado vigente (el backend conserva las últimas 20 versiones fechadas).
+   Al abrir se compara la versión central con la local y se carga la más nueva.
+   Sin NAV_URL configurada, todo esto es no-op y la plataforma funciona igual. */
+const NAV_URL = (window.PM_CONFIG && window.PM_CONFIG.NAV_URL)
+             || (window.NAV_CENTRAL && window.NAV_CENTRAL.url) || '';
+const NAV_VER_KEY = 'nav_cloud_version';
+let _navCloudTimer=null, _navCloudUltima=0, _navCloudEnVuelo=false;
+
+function _navQuien(){
+  try{ if(window.PM_CONFIG && typeof pmSession==='function'){ const s=pmSession(); if(s&&s.u) return s.u; } }catch(e){}
+  return (window.NAV_CENTRAL && window.NAV_CENTRAL.por) || 'local';
+}
+function navCloudBadge(estado, txt){
+  let b=document.getElementById('navCloudBadge');
+  if(!b){
+    const tb=document.getElementById('toolbar'); if(!tb) return;
+    b=document.createElement('span'); b.id='navCloudBadge';
+    b.style.cssText='font-size:11px;border-radius:8px;padding:5px 10px;white-space:nowrap;'
+      +'border:1px solid transparent;margin-left:8px';
+    tb.appendChild(b);
+  }
+  const col={guardando:['#0c4a6e','#7dd3fc','rgba(125,211,252,.4)'],
+             ok:['#064e3b','#6ee7b7','rgba(110,231,183,.4)'],
+             error:['#7f1d1d','#fca5a5','rgba(252,165,165,.45)'],
+             info:['#1e293b','#cbd5e1','rgba(203,213,225,.3)']}[estado]||['#1e293b','#cbd5e1','transparent'];
+  b.style.background=col[0]; b.style.color=col[1]; b.style.borderColor=col[2];
+  b.textContent=txt;
+}
+// Guarda el estado completo en el backend central (debounce 3 s)
+function navCloudGuardar(){
+  if(!NAV_URL || PUBLIC) return;            // solo quien edita
+  if(_navCloudTimer) clearTimeout(_navCloudTimer);
+  navCloudBadge('guardando','☁ guardando…');
+  _navCloudTimer=setTimeout(async ()=>{
+    if(_navCloudEnVuelo){ navCloudGuardar(); return; }   // reintenta tras el actual
+    _navCloudEnVuelo=true;
+    const snap=_navSnapshot(false); snap._por=_navQuien();
+    try{
+      const r=await fetch(NAV_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},
+                                   body:JSON.stringify(snap)});
+      const j=await r.json();
+      if(j && j.ok){
+        _navCloudUltima=j.version||0;
+        try{ localStorage.setItem(NAV_VER_KEY, String(_navCloudUltima)); }catch(e){}
+        navCloudBadge('ok','☁ guardado '+(j.guardado||'').slice(11,16));
+      } else navCloudBadge('error','☁ no se pudo guardar');
+    }catch(e){ navCloudBadge('error','☁ sin conexión — se reintenta al próximo cambio'); }
+    finally{ _navCloudEnVuelo=false; }
+  },3000);
+}
+// Al abrir: si el estado central es MÁS NUEVO que el de este navegador, lo carga.
+async function navCloudCargar(){
+  if(!NAV_URL) return;
+  try{
+    const meta=await (await fetch(NAV_URL+'?meta=1',{cache:'no-store'})).json();
+    if(!meta || meta.vacio || !meta.version) return;
+    const localVer=+(localStorage.getItem(NAV_VER_KEY)||0);
+    if(localVer >= meta.version){ navCloudBadge('info','☁ al día'); return; }
+    const d=await (await fetch(NAV_URL+'?get=1',{cache:'no-store'})).json();
+    if(!d || d.vacio) return;
+    if(d.circulacion) circState={groups:d.circulacion.groups||{}, nodes:d.circulacion.nodes||[]};
+    if(d.pcirc)     pcircState=d.pcirc;
+    if(d.pois)      poiState=d.pois;
+    if(d.planXform) planXform=d.planXform;
+    try{ localStorage.setItem(NAV_VER_KEY, String(meta.version)); }catch(e){}
+    // persistir local sin re-disparar el guardado central
+    ls('nav_circulation',circState); ls('nav_pcirc',pcircState);
+    ls('nav_pois',poiState); ls('nav_plan_xform',planXform);
+    try{ renderSidebar(); loadFloor(S.floorId||'P1'); }catch(e){}
+    navCloudBadge('ok','☁ cargado del servidor · '+(meta.guardado||'').slice(0,16)
+                       +(meta.por?(' · '+meta.por):''));
+  }catch(e){ navCloudBadge('error','☁ sin conexión con el servidor'); }
 }
 function flushSave(){if(_saveTimer){clearTimeout(_saveTimer);ls('nav_circulation',circState);_markSaved();}}
 window.addEventListener('beforeunload',flushSave);
@@ -3122,6 +3201,7 @@ function init(){
   toggleAreas(_sa===null ? true : _sa!=='false');
   renderSidebar();
   loadFloor('P1');
+  navCloudCargar();   // trae el estado central si es más nuevo que el de este navegador
 }
 window.addEventListener('load',init);
 

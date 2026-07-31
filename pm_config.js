@@ -20,6 +20,10 @@ window.PM_CONFIG = {
   // usuarios con rol asignador (pueden ASIGNAR pautas AS a recintos desde la
   // plataforma de Autorización Sanitaria del HUB-PM; el resto solo consulta)
   ASIGNADORES: ['mpinto', 'mcanales', 'csepulveda'],
+  // Autoguardado de Navegación: backend Apps Script propio (ver _setup/Code_nav.gs).
+  // Guarda el estado en un JSON de Drive — el trabajo deja de vivir solo en el
+  // navegador de quien edita. Vacío = sin autoguardado (todo sigue funcionando).
+  NAV_URL: '', /*__PM_NAV_URL__*/
   // usuarios con rol EDITOR de Navegación (dibujan circulación peatonal y
   // vertical, marcadores, puntos de flujo y calibración desde el HUB-PM; el
   // resto del equipo solo consulta). Su trabajo se guarda en el navegador de

@@ -48,6 +48,27 @@ Dotación, Autorización Sanitaria, Cartera de Servicios.
    `git init` + `git remote add origin https://github.com/MatiiPinto/hds-hub-pm.git`
 4. `python3 _DEV/deploy_web_pm.py` → commit + push automático.
 
+## Autoguardado de Navegación (Code_nav.gs) — pendiente de activar
+
+Sin esto, lo que se dibuja en Navegación vive **solo en el navegador de quien
+edita**. Con esto, cada cambio se guarda solo en un JSON de Drive y se recupera
+al abrir desde cualquier equipo. Modelo de **un editor a la vez** (mpinto /
+rvargas); el backend conserva las últimas 20 versiones fechadas.
+
+1. script.google.com → **Nuevo proyecto**, nombre `NAV HDS`.
+2. Pegar `_setup/Code_nav.gs` completo.
+3. **Implementar → Nueva implementación → Aplicación web**
+   · Ejecutar como: **Yo** · Acceso: **Cualquier persona**.
+4. Autorizar (pide permiso de Drive: crea la carpeta `NAV HDS · estado`).
+5. Copiar la URL `/exec` y pegarla en **dos** lugares:
+   - `pm_config.js` → `NAV_URL` (para el 🟡 HUB-PM)
+   - `SHARED_DATA/nav_central.js` → `url` (para el entorno local 🔴)
+6. `python3 _DEV/deploy_web_pm.py`
+
+Verificación: abrir Navegación, mover algo y esperar 3 s — arriba a la derecha
+debe aparecer **☁ guardado HH:MM**. Al abrir en otro equipo: **☁ cargado del
+servidor**. Probar la URL `/exec` en el navegador responde el estado del backend.
+
 ## ⚠ Límite honesto de seguridad
 
 GitHub Pages es un sitio **estático**: el login disuade el acceso casual y deja
