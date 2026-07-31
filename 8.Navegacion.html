@@ -552,14 +552,16 @@ function applyPublicMode(){
   }
   if(_PUBLIC_RAW && !PUBLIC){   // editor dentro del 🟡: aviso de dónde vive su trabajo
     document.body.classList.add('nav-editor');
-    window.addEventListener('load',()=>{ try{
-      const tb=document.getElementById('toolbar'); if(!tb || document.getElementById('navEditorTag')) return;
-      const t=document.createElement('span'); t.id='navEditorTag';
-      t.textContent='✏️ Modo edición · tus cambios se guardan en ESTE navegador — usá 💾 Respaldar para compartirlos';
-      t.style.cssText='margin-left:auto;font-size:11px;color:#fde68a;background:rgba(180,83,9,.35);'
-        +'border:1px solid rgba(251,191,36,.5);border-radius:8px;padding:5px 10px;white-space:nowrap';
-      tb.appendChild(t);
-    }catch(e){} });
+    try{   // applyPublicMode ya corre dentro de init() (evento load): sin diferir
+      const tb=document.getElementById('toolbar');
+      if(tb && !document.getElementById('navEditorTag')){
+        const t=document.createElement('span'); t.id='navEditorTag';
+        t.textContent='✏️ Modo edición · tus cambios se guardan en ESTE navegador — usá 💾 Respaldar para compartirlos';
+        t.style.cssText='margin-left:auto;font-size:11px;color:#fde68a;background:rgba(180,83,9,.35);'
+          +'border:1px solid rgba(251,191,36,.5);border-radius:8px;padding:5px 10px;white-space:nowrap';
+        tb.appendChild(t);
+      }
+    }catch(e){}
   }
   if(!PUBLIC) return;
   document.body.classList.add('public');
