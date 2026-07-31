@@ -20,6 +20,11 @@ window.PM_CONFIG = {
   // usuarios con rol asignador (pueden ASIGNAR pautas AS a recintos desde la
   // plataforma de Autorización Sanitaria del HUB-PM; el resto solo consulta)
   ASIGNADORES: ['mpinto', 'mcanales', 'csepulveda'],
+  // usuarios con rol EDITOR de Navegación (dibujan circulación peatonal y
+  // vertical, marcadores, puntos de flujo y calibración desde el HUB-PM; el
+  // resto del equipo solo consulta). Su trabajo se guarda en el navegador de
+  // cada uno: para consolidarlo hay que usar 💾 Respaldar y enviar el JSON.
+  EDITORES_NAV: ['mpinto', 'rvargas'],
   SESSION_HOURS: 12,
   USERS: {
     // usuario : sha256("usuario:clave")
@@ -30,7 +35,9 @@ window.PM_CONFIG = {
     'faraya':     'a1d25346d1ea182cbd8613badf785628efedd8b0ceecde2c2fdc44a91009910f',
     'jpacheco':   '6592df481d205fb4334a462a7452b83589defa01f4eeccfb6917429a7395d060',
     'csepulveda': '78e0be6b452fc7d2b411c3f932739bab848ac2692ec0a2993750fbee86342d37',
-    'mpinto':     '405ce04bf68d5cf8cb2e74ae353d946916bd9676253c68b4ab2894bb850456b3'
+    'mpinto':     '405ce04bf68d5cf8cb2e74ae353d946916bd9676253c68b4ab2894bb850456b3',
+    // Renata Vargas · ingeniera biomédica (apoyo Puesta en Marcha) — editora de Navegación
+    'rvargas':    'e05cf96e26effda2598f05acb46a87a82bcc631a716a6b8eb77b35b7a069a6a8'
   }
 };
 

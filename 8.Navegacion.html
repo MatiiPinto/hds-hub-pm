@@ -289,6 +289,7 @@ body{background:#0c1a2e;color:#cbd5e1;font-family:'Segoe UI',-apple-system,Blink
       <button class="tb-btn bk" onclick="exportData()" title="RESPALDO COMPLETO a un archivo JSON: ascensores, áreas de circulación peatonal, marcadores, puntos de flujo y calibración de planos">💾 Respaldar</button>
       <button class="tb-btn bk" onclick="importData()" title="Restaurar desde un archivo de respaldo (reemplaza el estado actual; deja un respaldo previo en el navegador)">⬆ Restaurar</button>
       <button class="tb-btn bk" onclick="restaurarAuto()" title="Restaurar uno de los respaldos automáticos guardados en este navegador (hasta 3 días)">⏱ Auto</button>
+      <button class="tb-btn bk" id="btnPubPM" onclick="publicarNavPM()" title="Publica el trabajo de ESTE navegador como siembra del 🟡 HUB PM: ascensores y escaleras colocados, circulación peatonal, puntos de flujo y calibración de planos. Lo verán todos los que entren al HUB PM.">🟡 Publicar en HUB PM</button>
       <button class="tb-btn persp-toggle" id="btnPersp" onclick="togglePerspective()" title="Vista en perspectiva 3D: todos los pisos con sus circulaciones (ascensores, escaleras) y corredores">🏢 Perspectiva</button>
       <div class="tb-sep"></div>
       <div class="legend">
@@ -451,6 +452,7 @@ body{background:#0c1a2e;color:#cbd5e1;font-family:'Segoe UI',-apple-system,Blink
 <script src="SHARED_DATA/circulaciones.js"></script>
 <!-- siembra base de circulación peatonal, con URL única por carga (anti-caché) -->
 <script>document.write('<scr'+'ipt src="SHARED_DATA/circulaciones_pcirc.js?v='+Date.now()+'"></scr'+'ipt>');</script>
+<script>document.write('<scr'+'ipt src="SHARED_DATA/nav_base.js?v='+Date.now()+'"></scr'+'ipt>');</script>
 <script src="SHARED_DATA/cabida_web_snapshot.js"></script>
 <!-- recintos de Atlas (vista 2) ya convertidos a metros DXF, y la propuesta de
      relleno inverso de circulación; ambos con URL única por carga (anti-caché) -->
@@ -522,12 +524,43 @@ const POI_TYPES={
    flag): body.public oculta TODO el dibujo/edición/respaldo y deja la consulta
    (ver planos, circulaciones, ascensores, recintos, medir, perspectiva).
    Los datos vienen de la siembra base SHARED_DATA/*, no del localStorage.
-   Para probar localmente sin desplegar: agregá ?public=1 a la URL. */
+   Para probar localmente sin desplegar: agregá ?public=1 a la URL.
+
+   EXCEPCIÓN · rol EDITOR (PM_CONFIG.EDITORES_NAV): quienes trabajan la
+   circulación (mpinto, rvargas) conservan TODAS las herramientas dentro del
+   🟡. Su trabajo se guarda en el localStorage de SU navegador: para
+   consolidarlo hay que exportarlo con 💾 Respaldar y republicar la siembra. */
 const PUBLIC_BUILD = true; /*__PUBLIC_FLAG__*/
-const PUBLIC = PUBLIC_BUILD || new URLSearchParams(location.search).get('public')==='1';
+const _PUBLIC_RAW = PUBLIC_BUILD || new URLSearchParams(location.search).get('public')==='1';
+function _esEditorNav(){
+  try{
+    if(!window.PM_CONFIG || typeof pmSession!=='function') return false;
+    const s = pmSession();
+    return !!(s && (window.PM_CONFIG.EDITORES_NAV||[]).indexOf(s.u) !== -1);
+  }catch(e){ return false; }
+}
+// Consulta = build público Y sin rol de editor
+const PUBLIC = _PUBLIC_RAW && !_esEditorNav();
 // Modos que implican editar el plano (bloqueados en consulta)
 const _MODOS_EDICION = ['add','pcirc','pmark','shape','poi','del'];
 function applyPublicMode(){
+  if(_PUBLIC_RAW){
+    // "Publicar en HUB PM" solo existe en el entorno local (necesita el servidor de acciones)
+    const s0=document.createElement('style');
+    s0.textContent='#btnPubPM{display:none !important}';
+    document.head.appendChild(s0);
+  }
+  if(_PUBLIC_RAW && !PUBLIC){   // editor dentro del 🟡: aviso de dónde vive su trabajo
+    document.body.classList.add('nav-editor');
+    window.addEventListener('load',()=>{ try{
+      const tb=document.getElementById('toolbar'); if(!tb || document.getElementById('navEditorTag')) return;
+      const t=document.createElement('span'); t.id='navEditorTag';
+      t.textContent='✏️ Modo edición · tus cambios se guardan en ESTE navegador — usá 💾 Respaldar para compartirlos';
+      t.style.cssText='margin-left:auto;font-size:11px;color:#fde68a;background:rgba(180,83,9,.35);'
+        +'border:1px solid rgba(251,191,36,.5);border-radius:8px;padding:5px 10px;white-space:nowrap';
+      tb.appendChild(t);
+    }catch(e){} });
+  }
   if(!PUBLIC) return;
   document.body.classList.add('public');
   const st=document.createElement('style');
@@ -569,12 +602,14 @@ let pcircState=lg('nav_pcirc',{floors:{}});
 // Siembra base del repo (SHARED_DATA/circulaciones_pcirc.js): puebla los pisos
 // que NO tienen trabajo local — así el sembrado automático y el trabajo
 // publicado se ven en cualquier navegador. Lo dibujado localmente SIEMPRE manda.
+const _PCIRC_SEMBRADOS=new Set();   // pisos que vienen de la siembra automática
 (function(){
   const B=((window.PCIRC_BASE||{}).floors)||{};
   let n=0;
   Object.keys(B).forEach(f=>{
     if(!(pcircState.floors[f]||[]).length && (B[f]||[]).length){
       pcircState.floors[f]=JSON.parse(JSON.stringify(B[f])); n+=B[f].length;
+      _PCIRC_SEMBRADOS.add(f);
     }
   });
   if(n) console.log('PCIRC: siembra base cargada ('+n+' tramos en pisos sin trabajo local)');
@@ -611,6 +646,41 @@ let _pmarkTipo='puerta';
 // Ajuste fino por piso del PLANO (matriz CSS): { floorId:[a,b,c,d,e,f] } — calibra
 // la escala/posición del plano de cada piso para que coincida con el Piso 1.
 let planXform=lg('nav_plan_xform',{});
+// ── SIEMBRA COMPLETA (SHARED_DATA/nav_base.js) ──────────────────────────────
+// Publica el trabajo del entorno local para que se vea en el 🟡: ascensores y
+// escaleras colocados, puntos de flujo y calibración de planos (la circulación
+// peatonal ya se siembra desde PCIRC_BASE). Solo puebla lo que está VACÍO:
+// lo dibujado en este navegador siempre manda. Se genera con el botón
+// "🟡 Publicar en HUB PM".
+(function(){
+  const B=window.NAV_BASE; if(!B) return;
+  const partes=[];
+  const c=B.circulacion||{};
+  if(!Object.keys(circState.groups||{}).length && !(circState.nodes||[]).length
+     && (Object.keys(c.groups||{}).length || (c.nodes||[]).length)){
+    circState={groups:JSON.parse(JSON.stringify(c.groups||{})),
+               nodes:JSON.parse(JSON.stringify(c.nodes||[]))};
+    partes.push((circState.nodes||[]).length+' circulaciones verticales');
+  }
+  if(!((poiState.items)||[]).length && ((B.pois||{}).items||[]).length){
+    poiState={items:JSON.parse(JSON.stringify(B.pois.items))};
+    partes.push(poiState.items.length+' puntos de flujo');
+  }
+  if(!Object.keys(planXform||{}).length && Object.keys(B.planXform||{}).length){
+    planXform=JSON.parse(JSON.stringify(B.planXform));
+    partes.push('calibración de '+Object.keys(planXform).length+' planos');
+  }
+  // circulación peatonal: NAV_BASE (trabajo real) tiene prioridad sobre PCIRC_BASE
+  const pf=((B.pcirc||{}).floors)||{}; let np=0;
+  Object.keys(pf).forEach(f=>{
+    const soloSembrado = _PCIRC_SEMBRADOS.has(f);   // auto-siembra: NAV_BASE la reemplaza
+    if((soloSembrado || !(pcircState.floors[f]||[]).length) && (pf[f]||[]).length){
+      pcircState.floors[f]=JSON.parse(JSON.stringify(pf[f])); np+=pf[f].length;
+    }
+  });
+  if(np) partes.push(np+' tramos peatonales');
+  if(partes.length) console.log('NAV_BASE: siembra cargada — '+partes.join(' · '));
+})();
 
 // ── ASCENSORES · directorio pre-sembrado (circulaciones.js) ─────────────────
 const CAT_TO_CIRC={publico:'asc-pub','montacamas':'asc-cam','montacamas-mayor':'asc-cam',servicio:'asc-svc'};
@@ -2780,6 +2850,36 @@ function _navSnapshot(conAreas){
   };
   if(conAreas) o.cabidaAreas = cabidaState;   // areas de Atlas (grande, reimportable)
   return o;
+}
+
+// Publica el estado de ESTE navegador como siembra del 🟡 (SHARED_DATA/nav_base.js)
+// vía el servidor local de acciones (localhost:8799), igual que el Atlas.
+async function publicarNavPM(){
+  const snap=_navSnapshot(false);   // sin áreas de Atlas (se reimportan aparte)
+  const r=_navResumen(snap);
+  const det=[(snap.circulacion.nodes||[]).length+' circulaciones verticales',
+             Object.keys((snap.pcirc||{}).floors||{}).length+' pisos con circulación peatonal',
+             ((snap.pois||{}).items||[]).length+' puntos de flujo',
+             Object.keys(snap.planXform||{}).length+' planos calibrados'].join('\n• ');
+  if(!confirm('Publicar en el 🟡 HUB PM lo trabajado en este navegador:\n\n• '+det+
+              '\n\nEsto REEMPLAZA la siembra actual del HUB PM (lo que cada persona haya dibujado en su propio navegador se conserva).\n\n¿Continuar?')) return;
+  const js='// SHARED_DATA/nav_base.js — SIEMBRA COMPLETA de Navegación\n'
+    +'// GENERADO por el botón "🟡 Publicar en HUB PM" — no editar a mano.\n'
+    +'window.NAV_BASE='+JSON.stringify({
+        _meta:{generado:new Date().toISOString(), origen:'8.Navegacion.html (entorno local)'},
+        circulacion:snap.circulacion, pcirc:snap.pcirc,
+        pois:snap.pois, planXform:snap.planXform})+';\n';
+  try{ await fetch('http://localhost:8799/ping',{cache:'no-store'}); }
+  catch(e){ alert('El botón necesita el servidor local de acciones (el del HUB).\n\n'
+                 +'Alternativa: 💾 Respaldar y pasarme el JSON.'); return; }
+  const tag=document.getElementById('navEditorTag');
+  try{
+    const res=await fetch('http://localhost:8799/publicar-nav-pm',
+      {method:'POST', headers:{'Content-Type':'text/javascript'}, body:js});
+    const j=await res.json();
+    alert(j.ok ? '🟡 Publicado en el HUB PM ✓\n\n'+(r||'')+'\n\nGitHub Pages refresca en unos minutos.'
+               : 'Falló la publicación:\n\n'+(j.error||j.log||'error desconocido'));
+  }catch(e){ alert('Error publicando al HUB PM: '+e); }
 }
 
 function _navResumen(d){
