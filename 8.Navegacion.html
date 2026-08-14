@@ -252,6 +252,7 @@ body{background:#0c1a2e;color:#cbd5e1;font-family:'Segoe UI',-apple-system,Blink
   <div class="hdr-stat"><strong id="statAreas">0</strong>Áreas</div>
   <div class="hdr-stat"><strong id="statAsc">0</strong>Ascensores</div>
   <div class="hdr-stat"><strong id="statEsc">0</strong>Escaleras</div>
+  <div class="hdr-stat"><strong id="statEst">0</strong>Estacion.</div>
   <div class="hdr-sep"></div>
   <div id="gSearch">
     <span id="gSearchIcon">🔍</span>
@@ -270,9 +271,14 @@ body{background:#0c1a2e;color:#cbd5e1;font-family:'Segoe UI',-apple-system,Blink
 
   <div id="main">
     <div id="toolbar">
-      <button class="tb-btn" id="btnAscDir" onclick="openAscDirectorio()" title="Directorio de ascensores: tipología, cabinas dobles (A1/A2) y en qué pisos se detiene cada uno. Todo editable.">🛗 Directorio</button>
-      <button class="tb-btn" id="btnAsc" onclick="openAscPanel()" title="Ubicar los ascensores del directorio (A–Y) en el plano">🛗 Ascensores</button>
-      <button class="tb-btn" id="btnAdd" onclick="toggleMode('add')" title="Colocar circulación vertical (ascensores, escaleras): arrastra para dibujar el cuadro">➕ Colocar circulación</button>
+      <!-- BAJA jul-2026: el directorio A–Y traía errores de tipología y de pisos.
+           Ahora la caja dibujada en Circulación peatonal es la fuente de verdad y
+           se describe con su ficha (tipo, etiqueta, salida). El código del
+           directorio queda por si hiciera falta rescatar algún dato.
+      <button class="tb-btn" id="btnAscDir" onclick="openAscDirectorio()">🛗 Directorio</button>
+      <button class="tb-btn" id="btnAsc" onclick="openAscPanel()">🛗 Ascensores</button>
+      <button class="tb-btn" id="btnAdd" onclick="toggleMode('add')">➕ Colocar circulación</button>
+      -->
       <button class="tb-btn" id="btnPcirc" onclick="toggleMode('pcirc')" title="Circulación peatonal · DIBUJO RÁPIDO: clic o arrastre IZQUIERDO pinta y fusiona; clic o arrastre DERECHO recorta. Elegí la zona en la barra.">▦ Circulación peatonal</button>
       <button class="tb-btn" id="btnPmark" onclick="toggleMode('pmark')" title="Colocar marcadores sobre la circulación: puerta, corredera automática, escalera, escalera mecánica, rampa, control de acceso">⚑ Marcadores</button>
       <button class="tb-btn" id="btnMedir" onclick="toggleMode('medir')" title="Medir el largo de un recorrido: clic en cada punto y se acumula la distancia en metros">📏 Medir largo</button>
@@ -293,10 +299,10 @@ body{background:#0c1a2e;color:#cbd5e1;font-family:'Segoe UI',-apple-system,Blink
       <button class="tb-btn persp-toggle" id="btnPersp" onclick="togglePerspective()" title="Vista en perspectiva 3D: todos los pisos con sus circulaciones (ascensores, escaleras) y corredores">🏢 Perspectiva</button>
       <div class="tb-sep"></div>
       <div class="legend">
-        <div class="legend-item"><span class="legend-dot" style="background:#7AC143"></span>Verde · Público</div>
-        <div class="legend-item"><span class="legend-dot" style="background:#FBB000"></span>Amarillo · Servicio</div>
-        <div class="legend-item"><span class="legend-dot" style="background:#0B2A6B"></span>Azul · Montacamas mayor</div>
-        <div class="legend-item"><span class="legend-dot" style="background:#29ABE2"></span>Celeste · Montacamas</div>
+        <div class="legend-item" title="Ascensores de público"><span class="legend-dot" style="background:#7AC143"></span>Verde · General</div>
+        <div class="legend-item" title="Ascensores de servicio (personal y suministro)"><span class="legend-dot" style="background:#FBB000"></span>Amarillo · Servicio</div>
+        <div class="legend-item" title="Montacamas de mayor superficie"><span class="legend-dot" style="background:#0B2A6B"></span>Azul · Montacama+</div>
+        <div class="legend-item" title="Montacamas normal"><span class="legend-dot" style="background:#29ABE2"></span>Celeste · Montacama</div>
         <div class="legend-item"><span class="legend-dot" style="background:#8b5cf6"></span>Escaleras</div>
       </div>
     </div>
@@ -317,6 +323,7 @@ body{background:#0c1a2e;color:#cbd5e1;font-family:'Segoe UI',-apple-system,Blink
         <button class="pct-btn on" id="pctDraw" onclick="pcSetTool('draw')" title="Dibujar (1) · clic o arrastre pinta · clic DERECHO recorta">▦</button>
         <button class="pct-btn" id="pctEdit" onclick="pcSetTool('edit')" title="Editar (2) · seleccioná un tramo y arrastrá sus vértices o aristas · Shift suma a la selección · Shift + arrastre sobre el vacío = lazo que selecciona todo lo que quede dentro, y ⌫ lo borra de una">✏️</button>
         <button class="pct-btn" id="pctFill" onclick="pcFillBtn()" title="Rellenar (3) · clic dentro de un pasillo y el área crece sola hasta los muros del plano · con selección, agranda lo seleccionado">🪄</button>
+        <button class="pct-btn" id="pctCorte" onclick="pcSetTool('corte')" title="Cortar (4) · arrastrá una línea y parte TODOS los tramos que cruza — crea secciones para reclasificar por zona de acceso · el corte de una puerta (botón en su panel) atraviesa el polígono entero">🔪</button>
         <button class="pct-btn" id="pctPeel" onclick="pcDespegar()" title="Despegar de muros · retrae los tramos seleccionados (o todo el piso) para que ninguno quede montado sobre las líneas del plano">🧹</button>
         <div class="pct-sep"></div>
         <button class="pct-btn on" id="pctSnap" onclick="pcToggleSnap()" title="Imán · al mover o editar, las aristas se pegan a los tramos vecinos · mantené ⌘ durante el arrastre para mover LIBRE sin imán">🧲</button>
@@ -617,12 +624,17 @@ const _PCIRC_SEMBRADOS=new Set();   // pisos que vienen de la siembra automátic
   });
   if(n) console.log('PCIRC: siembra base cargada ('+n+' tramos en pisos sin trabajo local)');
 })();
+// Taxonomía de control de accesos (ago-2026): general pacientes / general
+// funcionarios / semirestringida / restringida (+ técnica). Las claves no
+// cambian para no invalidar lo ya dibujado.
+// Taxonomía de control de accesos (ago-2026). Las CLAVES no cambian para no
+// invalidar lo ya dibujado; solo la etiqueta visible.
 const ZONA_CIRC={
-  general:{label:'Circulación general / pública', color:'#22c55e', short:'General'},
-  semi:   {label:'Semirestringida',               color:'#eab308', short:'Semirestr.'},
-  restr:  {label:'Restringida',                    color:'#ef4444', short:'Restringida'},
-  func:   {label:'Circulación de funcionarios',    color:'#3b82f6', short:'Funcionarios'},
-  tecnica:{label:'Técnica / instalaciones',        color:'#a855f7', short:'Técnica'}
+  general:{label:'General abierta · acceso libre de público',   color:'#22c55e', short:'Gral. abierta'},
+  func:   {label:'General cerrada · pacientes y funcionarios',  color:'#3b82f6', short:'Gral. cerrada'},
+  semi:   {label:'Semirestringida',                             color:'#eab308', short:'Semirestr.'},
+  restr:  {label:'Restringida',                                 color:'#ef4444', short:'Restringida'},
+  tecnica:{label:'Técnica / instalaciones',                     color:'#a855f7', short:'Técnica'}
 };
 // Elementos verticales: se DIBUJAN igual de fluido que la circulación (misma
 // barra y mismas herramientas: editar, imán, despegar, deshacer…), pero cada
@@ -634,6 +646,47 @@ const ELEM_CIRC={
   escmec:{label:'Escalera mecánica',   color:'#ec4899', short:'⤴ Esc. mecánica',  icon:'⤴'}
 };
 const esElem = z => !!ELEM_CIRC[z];
+
+// ── TIPOLOGÍA DE ASCENSOR ───────────────────────────────────────────────────
+// Se asigna sobre la caja YA DIBUJADA (el directorio A–Y original traía errores
+// y quedó fuera de uso): la caja manda, y el tipo la colorea.
+// Las 4 tipologías oficiales del proyecto, con su color de lámina y la medida
+// interior de cabina (Proyecto Rev. I). En el plano NO se pintan sólidas: la
+// caja va en la tonalidad clara del color y el nombre en el color sólido.
+const ASC_TIPO={
+  general :{label:'General',     desc:'Ascensores de público',                 color:'#7AC143', icon:'🛗', w:1.6, h:1.4},
+  servicio:{label:'Servicio',    desc:'Ascensores de servicio (personal y suministro)', color:'#FBB000', icon:'📦', w:1.8, h:2.7},
+  mcmplus :{label:'Montacama+',  desc:'Montacamas de mayor superficie',        color:'#0B2A6B', icon:'🛏', w:2.1, h:2.9},
+  mcm     :{label:'Montacama',   desc:'Montacamas normal',                     color:'#29ABE2', icon:'🛏', w:1.8, h:2.7}
+};
+// Compatibilidad: las claves de la primera versión de la ficha (jul-2026).
+const ASC_TIPO_VIEJO={pub:'general', svc:'servicio', cam:'mcmplus', pac:'mcm'};
+(function migrarTipoAsc(){
+  let n=0;
+  Object.values(pcircState.floors||{}).forEach(arr=>(arr||[]).forEach(b=>{
+    if(b.zona==='asc' && b.tipo && ASC_TIPO_VIEJO[b.tipo]){ b.tipo=ASC_TIPO_VIEJO[b.tipo]; n++; }
+  }));
+  if(n){ try{ ls('nav_pcirc',pcircState); }catch(e){} console.log('ASC: '+n+' tipologías migradas'); }
+})();
+// Orientación de salida de la cabina (hacia dónde abre la puerta)
+const SALIDAS=[['n','↑','Norte (arriba)'],['e','→','Este (derecha)'],
+               ['s','↓','Sur (abajo)'],['w','←','Oeste (izquierda)']];
+
+// ── ESTACIONAMIENTOS ────────────────────────────────────────────────────────
+// Cada plaza es una caja con identidad propia (no se fusionan). Las medidas son
+// las del estándar chileno: 2,5×5,0 m la plaza corriente; 3,6 m de ancho la
+// accesible (banda de transferencia); la de ambulancia va sobredimensionada.
+const EST_CIRC={
+  'est-pub' :{label:'Público general', color:'#38bdf8', short:'🅿 Público',      icon:'🅿', w:2.5, h:5.0},
+  'est-disc':{label:'Discapacitados',  color:'#2563eb', short:'♿ Discapacit.',  icon:'♿', w:3.6, h:5.0},
+  'est-amb' :{label:'Ambulancias',     color:'#ef4444', short:'🚑 Ambulancia',   icon:'🚑', w:3.5, h:7.0},
+  'est-dir' :{label:'Directivos',      color:'#f59e0b', short:'★ Directivos',    icon:'★', w:2.5, h:5.0},
+  'est-func':{label:'Funcionarios',    color:'#14b8a6', short:'👥 Funcionarios', icon:'👥', w:2.5, h:5.0}
+};
+const esEst  = z => !!EST_CIRC[z];
+// "Caja con identidad": todo lo que no se fusiona por zona (elementos + plazas)
+const esCaja = z => esElem(z) || esEst(z);
+const cajaDef = z => ELEM_CIRC[z] || EST_CIRC[z] || null;
 let _pcircZona='general';
 // Marcadores físicos sobre la circulación: { floorId: [{id,tipo,x_m,y_m}] }
 pcircState.markers = pcircState.markers || {};
@@ -1090,6 +1143,8 @@ function loadFloor(fId){
   renderSidebar();
   updateStats();
   if(typeof sincBotonesCapas==='function') sincBotonesCapas();
+  // el botón "Identificar desde P1" depende del piso actual
+  if(typeof buildPcircBar==='function' && S.mode==='pcirc') buildPcircBar();
 }
 function curDims(){ return SVG_DIMS[S.floorId]||{w:1,h:1}; }
 function fitView(){
@@ -1152,6 +1207,17 @@ function _finishBox(){
     // elementos (🛗/🪜/⤴): el clic simple NO pinta — la caja se dibuja con
     // arrastre o con doble clic (ajuste automático al recinto)
     if(!drag && !b.neg && esElem(_pcircZona)) return;
+    // estacionamientos: el clic simple deja una plaza del tamaño estándar del
+    // tipo (2,5×5 m; 3,6 m la accesible; 3,5×7 la de ambulancia)
+    if(!drag && !b.neg && esEst(_pcircZona)){
+      const d=EST_CIRC[_pcircZona], m0=svgToDxf(S.floorId,cxs,cys); if(!m0) return;
+      pcHistPush();
+      (pcircState.floors[S.floorId]=pcircState.floors[S.floorId]||[]).push({
+        id:pcNuevoId(), zona:_pcircZona, x_m:m0.cx_m, y_m:m0.cy_m, w_m:d.w, h_m:d.h });
+      saveAll(); renderOverlay(); updateStats&&updateStats();
+      renderSidebar&&renderSidebar(); renderZonaResumen&&renderZonaResumen();
+      return;
+    }
     const ww = drag ? w : PCIRC_PINCEL, hh = drag ? h : PCIRC_PINCEL;
     const m=svgToDxf(S.floorId,cxs,cys); if(!m) return;
     const box=svgSizeToDxf(S.floorId,ww,hh);
@@ -1267,22 +1333,279 @@ function pcToolsRefresh(){
   const has=pcSel.size>0;
   ['pctDup','pctSplit','pctZona','pctDel'].forEach(id=>{ if(q(id)) q(id).disabled=!has; });
   q('pctSnap')?.classList.toggle('on',pcSnap);
+  if(typeof renderCajaPanel==='function') renderCajaPanel();   // ficha de la caja seleccionada
 }
 function pcSetTool(t){
   pcTool=t;
   if(t!=='edit') pcSel.clear();
-  ['Draw','Edit','Fill'].forEach(n=>document.getElementById('pct'+n)?.classList.toggle('on',t===n.toLowerCase()));
+  ['Draw','Edit','Fill','Corte'].forEach(n=>document.getElementById('pct'+n)?.classList.toggle('on',t===n.toLowerCase()));
   const en=S.mode==='pcirc';
   viewer.classList.toggle('pc-edit',en&&t==='edit');
   viewer.classList.toggle('pc-fill',en&&t==='fill');
   const hints={
-    draw:'▦ Pintá con clic o arrastre · clic DERECHO recorta · elegí la zona arriba · 2=editar · 3=rellenar',
-    edit:'✏️ Clic en un tramo para seleccionarlo (Shift suma) · arrastrá vértices/aristas para ajustar (⌘ = libre, sin imán) · flechas mueven (Shift=1 m) · Supr borra',
-    fill:'🪄 Clic dentro de un pasillo: el área crece sola hasta los muros del plano · si se escapa, deshacé con ⌘Z'};
+    draw:'▦ Pintá con clic o arrastre · clic DERECHO recorta · elegí la zona arriba · 2=editar · 3=rellenar · 4=cortar',
+    edit:'✏️ Clic selecciona (Shift suma, ⇧+arrastre = lazo) · DOBLE CLIC selecciona la sección entera para reclasificarla con 🎨 · arrastrá vértices/aristas (⌘ = libre) · Supr borra',
+    fill:'🪄 Clic dentro de un pasillo: el área crece sola hasta los muros del plano · si se escapa, deshacé con ⌘Z',
+    corte:'🔪 Arrastrá una línea sobre el verde: parte TODOS los tramos que cruza · el eje del arrastre define el corte · ⌘Z deshace'};
   if(en){ addHint.textContent=hints[t]; addHint.classList.add('show'); }
   renderOverlay(); pcToolsRefresh();
 }
 function pcToggleSnap(){ pcSnap=!pcSnap; pcToolsRefresh(); toast(pcSnap?'🧲 Imán activado':'🧲 Imán desactivado'); }
+
+// ── Herramienta CORTAR (🔪): arrastrá una línea y parte todo lo que cruza ──
+// El eje dominante del arrastre define si el corte es horizontal o vertical;
+// el largo del arrastre define hasta dónde llega (sin propagación: cortás
+// exactamente lo que delimitaste).
+let _pcCorte=null;
+function _pcCorteLineaEl(){
+  let el=document.getElementById('pcCorteLine');
+  if(!el){
+    el=document.createElementNS('http://www.w3.org/2000/svg','line');
+    el.setAttribute('id','pcCorteLine');
+    el.setAttribute('stroke','#dc2626'); el.setAttribute('stroke-width','4');
+    el.setAttribute('stroke-linecap','round'); el.setAttribute('pointer-events','none');
+    overlay.appendChild(el);
+  }
+  return el;
+}
+function _pcCortePinta(){
+  if(!_pcCorte) return;
+  const m=_pcCorte, horiz=Math.abs(m.x1-m.x0)>=Math.abs(m.y1-m.y0);
+  const el=_pcCorteLineaEl();
+  el.setAttribute('x1',m.x0); el.setAttribute('y1',horiz?m.y0:m.y0);
+  el.setAttribute('x2',horiz?m.x1:m.x0); el.setAttribute('y2',horiz?m.y0:m.y1);
+  el.setAttribute('stroke-dasharray',(14/Math.max(.05,S.zoom))+' '+(9/Math.max(.05,S.zoom)));
+}
+window.addEventListener('mousemove',e=>{
+  if(!_pcCorte) return;
+  const c=planCoords(e); _pcCorte.x1=c.sx; _pcCorte.y1=c.sy; _pcCortePinta();
+});
+window.addEventListener('mouseup',()=>{
+  if(!_pcCorte) return;
+  const m=_pcCorte; _pcCorte=null;
+  const el=document.getElementById('pcCorteLine'); if(el) el.remove();
+  const horiz=Math.abs(m.x1-m.x0)>=Math.abs(m.y1-m.y0);
+  if(Math.max(Math.abs(m.x1-m.x0),Math.abs(m.y1-m.y0))<6) return;   // clic suelto
+  const A=svgToDxf(S.floorId,m.x0,m.y0), B=svgToDxf(S.floorId,m.x1,m.y1);
+  if(!A||!B) return;
+  const coord=horiz? A.cy_m : A.cx_m;
+  const e0=horiz? Math.min(A.cx_m,B.cx_m) : Math.min(A.cy_m,B.cy_m);
+  const e1=horiz? Math.max(A.cx_m,B.cx_m) : Math.max(A.cy_m,B.cy_m);
+  pcHistPush();
+  const n=pcCortaLinea(horiz,coord,e0,e1);
+  if(!n){ _pcHistU.pop(); toast('🔪 El corte no cruzó ningún tramo.'); return; }
+  saveAll(); renderOverlay(); renderZonaResumen&&renderZonaResumen();
+  toast('🔪 '+n+' tramo'+(n===1?'':'s')+' partido'+(n===1?'':'s')
+    +' · doble clic selecciona la sección y 🎨 la reclasifica');
+});
+
+// ── Sección conectada (doble clic en ✏️ Editar) ────────────────────────────
+// Selecciona todos los tramos de la misma zona PEGADOS entre sí: se solapen
+// (pinceladas) o solo se toquen (rectángulos del relleno inverso). La junta de
+// 4 cm que deja cada corte es mayor que la tolerancia, así que la selección se
+// detiene exactamente en las líneas de corte y en las puertas.
+function pcSelSeccion(e){
+  const c=planCoords(e); if(!c.inside) return;
+  const hit=pcHitAt(c.sx,c.sy); if(!hit||esCaja(hit.zona)) return;
+  const arr=_pcArr().filter(b=>!esCaja(b.zona)&&b.zona===hit.zona);
+  const T=ADY_TOL;
+  const tocan=(a,b)=>{
+    const ox=Math.min(a.x_m+a.w_m/2,b.x_m+b.w_m/2)-Math.max(a.x_m-a.w_m/2,b.x_m-b.w_m/2);
+    const oy=Math.min(a.y_m+a.h_m/2,b.y_m+b.h_m/2)-Math.max(a.y_m-a.h_m/2,b.y_m-b.h_m/2);
+    // pegados por un LADO (no por una esquina: por ahí no se pasa)
+    return ox>=-T && oy>=-T && (ox>T || oy>T);
+  };
+  const sel=new Set([hit.id]); const cola=[hit];
+  while(cola.length){
+    const a=cola.pop();
+    arr.forEach(b=>{ if(!sel.has(b.id)&&tocan(a,b)){ sel.add(b.id); cola.push(b); } });
+  }
+  pcSel=sel; renderOverlay(); pcToolsRefresh();
+  toast('▣ Sección seleccionada: '+sel.size+' tramo'+(sel.size===1?'':'s')
+    +' · elegí la zona arriba y 🎨 para reclasificar · ⇧ y lazo suman más');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// FICHA DE LA CAJA · describir lo ya dibujado
+// Segunda mitad del flujo acordado: primero se DELIMITAN las cajas, después se
+// describen. La caja dibujada es la verdad (el directorio A–Y original traía
+// errores y quedó fuera de uso), así que acá se le pone tipo, etiqueta y salida.
+//
+// CONEXIÓN VERTICAL: por ahora los pisos no se entrelazan, pero la etiqueta es
+// la que va a unirlos — dos cajas que se llaman igual en pisos distintos son el
+// mismo ducto. Por eso el panel muestra en qué pisos ya existe esa etiqueta:
+// alcanza con nombrarlas igual para que después se conecten solas.
+// ════════════════════════════════════════════════════════════════════════════
+function _cajaSel(){
+  if(S.mode!=='pcirc' || pcTool!=='edit' || pcSel.size!==1) return null;
+  const b=_pcArr().find(x=>x.id===[...pcSel][0]);
+  return (b && esCaja(b.zona)) ? b : null;
+}
+
+// ── P1 como referencia maestra de ascensores ────────────────────────────────
+// Los planos comparten UN sistema de coordenadas: el mismo ducto cae en el
+// mismo punto en todos los pisos. Lo descrito en P1 (etiqueta + tipo + salida)
+// identifica al ascensor; en los demás pisos se hereda, para que se entienda
+// que es el mismo ascensor atravesando el edificio.
+function ascDeP1(){
+  return ((pcircState.floors||{})['P1']||[])
+    .filter(b=>b.zona==='asc' && b.etq)
+    .map(b=>({etq:b.etq, tipo:b.tipo||'', salida:b.salida||'',
+              x:b.x_m, y:b.y_m, w:b.w_m, h:b.h_m}));
+}
+function aplicarAscP1(etq){
+  const b=_cajaSel(); if(!b||b.zona!=='asc') return;
+  const ref=ascDeP1().find(a=>a.etq===etq); if(!ref) return;
+  pcHistPush();
+  b.etq=ref.etq;
+  if(ref.tipo) b.tipo=ref.tipo;
+  if(ref.salida && !b.salida) b.salida=ref.salida;
+  saveAll(); renderOverlay(); renderZonaResumen&&renderZonaResumen(); renderCajaPanel();
+  toast('🛗 Identificado como '+ref.etq+' (referencia P1'+(ref.tipo?' · '+ASC_TIPO[ref.tipo].label:'')+')');
+}
+// Pasada masiva: todo ascensor SIN etiqueta del piso actual hereda del
+// ascensor de P1 cuyo ducto le queda encima (o a menos de 3 m).
+function identificarAscDesdeP1(){
+  if(S.floorId==='P1'){ toast('🛗 Estás en P1: acá se DEFINE la referencia.'); return; }
+  const ref=ascDeP1();
+  if(!ref.length){ toast('🛗 P1 no tiene ascensores con etiqueta todavía.'); return; }
+  const arr=_pcArr().filter(b=>b.zona==='asc' && !b.etq);
+  if(!arr.length){ toast('🛗 Todos los ascensores de este piso ya tienen etiqueta.'); return; }
+  pcHistPush();
+  let n=0; const sin=[];
+  arr.forEach(b=>{
+    let mejor=null, md=1e9;
+    ref.forEach(a=>{
+      const d=Math.hypot(a.x-b.x_m, a.y-b.y_m);
+      if(d<md){ md=d; mejor=a; }
+    });
+    if(mejor && md<=3){
+      b.etq=mejor.etq;
+      if(mejor.tipo && !b.tipo) b.tipo=mejor.tipo;
+      if(mejor.salida && !b.salida) b.salida=mejor.salida;
+      n++;
+    } else sin.push(b);
+  });
+  if(!n){ _pcHistU.pop(); toast('🛗 Ningún ascensor de este piso calza con los ductos de P1 (¿están dibujados en su lugar?).'); return; }
+  saveAll(); renderOverlay(); renderZonaResumen&&renderZonaResumen(); pcToolsRefresh();
+  toast('🛗 '+n+' ascensor'+(n===1?'':'es')+' identificado'+(n===1?'':'s')+' desde P1'
+    +(sin.length?' · '+sin.length+' sin ducto de P1 cerca (etiquetalos a mano)':''));
+}
+// Etiquetas ya usadas en esa familia → { etiqueta: [pisos] }
+function etiquetasDe(zona){
+  const m={};
+  Object.entries(pcircState.floors||{}).forEach(([f,arr])=>{
+    (arr||[]).forEach(b=>{ if(b.zona===zona && b.etq) (m[b.etq]=m[b.etq]||new Set()).add(f); });
+  });
+  const o={}; Object.keys(m).sort().forEach(k=>o[k]=[...m[k]]);
+  return o;
+}
+function setCaja(campo,valor){
+  const b=_cajaSel(); if(!b) return;
+  pcHistPush();
+  if(campo==='etq'){ const v=String(valor||'').trim(); v?b.etq=v:delete b.etq; }
+  else if(campo==='girar'){ const w=b.w_m; b.w_m=b.h_m; b.h_m=w; }
+  else if(campo==='medida'){                     // medida normalizada del tipo
+    const d=(b.zona==='asc' && b.tipo) ? ASC_TIPO[b.tipo] : EST_CIRC[b.zona];
+    if(d){ b.w_m=d.w; b.h_m=d.h; }
+  }
+  else if(campo==='zona'){ b.zona=valor; }
+  else b[campo]=valor;
+  saveAll(); renderOverlay(); renderZonaResumen&&renderZonaResumen(); renderCajaPanel();
+}
+function cerrarCajaPanel(){ const p=document.getElementById('cajaEd'); if(p) p.style.display='none'; }
+
+function renderCajaPanel(){
+  const b=_cajaSel();
+  let box=document.getElementById('cajaEd');
+  if(!b){ if(box) box.style.display='none'; return; }
+  if(!box){
+    box=document.createElement('div'); box.id='cajaEd';
+    box.style.cssText='position:fixed;right:18px;bottom:18px;z-index:9997;width:300px;'
+      +'background:#0e2233;border:1px solid #29ABE2;border-radius:12px;padding:12px 14px;'
+      +'box-shadow:0 10px 34px rgba(0,0,0,.45);color:#dbeafe;font-size:12px';
+    box.addEventListener('mousedown',e=>e.stopPropagation());
+    document.body.appendChild(box);
+  }
+  box.style.display='block';
+  const def=cajaDef(b.zona), esAsc=(b.zona==='asc');
+  const bt=(activo,onclick,txt,color)=>'<button onclick="'+onclick+'" style="margin:0 5px 5px 0;background:'
+    +(activo?(color||'#1c4a68'):'#0b1b28')+';color:#dbeafe;border:1px solid '+(activo?(color||'#29ABE2'):'#23506e')
+    +';border-radius:7px;padding:4px 9px;cursor:pointer;font-size:11.5px">'+txt+'</button>';
+
+  let h='<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">'
+    +'<strong style="font-size:13px">'+def.icon+' '+def.label+'</strong>'
+    +'<button onclick="cerrarCajaPanel()" style="margin-left:auto;background:#1c3d55;color:#dbeafe;border:0;border-radius:7px;padding:3px 9px;cursor:pointer">Cerrar</button></div>';
+
+  if(esAsc){
+    h+='<div style="margin-bottom:3px;color:#9fc4db">Tipología</div><div>'
+      + Object.entries(ASC_TIPO).map(([k,v])=>bt(b.tipo===k,"setCaja('tipo','"+k+"')",
+          v.icon+' '+v.label,v.color).replace('<button','<button title="'+v.desc+' · cabina '
+          +v.w.toFixed(1)+'×'+v.h.toFixed(1)+' m"')).join('')
+      +'</div>'
+      +(b.tipo?'<div style="margin:0 0 7px">'+bt(false,"setCaja('medida')",
+          '📐 Cabina '+ASC_TIPO[b.tipo].w.toFixed(1)+'×'+ASC_TIPO[b.tipo].h.toFixed(1)+' m')+'</div>':'');
+  }
+  if(esEst(b.zona)){
+    h+='<div style="margin-bottom:3px;color:#9fc4db">Tipo de plaza</div><div>'
+      + Object.entries(EST_CIRC).map(([k,v])=>bt(b.zona===k,"setCaja('zona','"+k+"')",v.short,v.color)).join('')
+      +'</div>'
+      +'<div style="margin-bottom:7px">'+bt(false,"setCaja('girar')",'⟲ Girar 90°')
+      + bt(false,"setCaja('medida')",'📐 Medida estándar')+'</div>';
+  }
+
+  // Ascensor en piso ≠ P1: ofrecer la referencia de P1 (mismo ducto primero)
+  if(esAsc && S.floorId!=='P1'){
+    const refs=ascDeP1()
+      .map(a=>({...a, d:Math.hypot(a.x-b.x_m, a.y-b.y_m)}))
+      .sort((p,q)=>p.d-q.d).slice(0,8);
+    if(refs.length){
+      h+='<div style="margin-bottom:3px;color:#9fc4db">¿Cuál de los de P1 es?'
+        +(refs[0].d<=3?' <span style="color:#7AC143;font-weight:700">— el ducto calza con '+refs[0].etq+'</span>':'')
+        +'</div><div style="margin-bottom:5px">'
+        + refs.map(a=>{
+            const col=(a.tipo&&ASC_TIPO[a.tipo])?ASC_TIPO[a.tipo].color:'#1c4a68';
+            const cerca=a.d<=3;
+            return '<button onclick="aplicarAscP1(\''+a.etq.replace(/'/g,"\\'")+'\')" title="'
+              +(a.tipo?ASC_TIPO[a.tipo].label+' · ':'')+'a '+a.d.toFixed(1)+' m del ducto en P1"'
+              +' style="margin:0 5px 5px 0;background:'+(cerca?col:'#0b1b28')+';color:#dbeafe;border:1.5px solid '
+              +col+';border-radius:7px;padding:4px 10px;cursor:pointer;font-size:11.5px;font-weight:800">'
+              +a.etq+(cerca?' ✓':'')+'</button>';
+          }).join('')
+        +'</div>';
+    }
+  }
+
+  // Etiqueta: en ascensores y escaleras es la que une los pisos
+  const uneP = (esAsc || b.zona==='esc');
+  const usadas = etiquetasDe(b.zona);
+  h+='<label style="display:block;margin-bottom:5px">'
+    +(esAsc?'Letra o letra+número (A, T1…)':b.zona==='esc'?'Nombre de la escalera (igual en cada piso)':'Etiqueta')
+    +'<input list="cajaEtqs" value="'+(b.etq||'').replace(/"/g,'&quot;')+'"'
+    +' onchange="setCaja(\'etq\',this.value)"'
+    +' style="width:100%;margin-top:3px;background:#0b1b28;color:#dbeafe;border:1px solid #23506e;border-radius:6px;padding:4px 6px">'
+    +'</label>'
+    +'<datalist id="cajaEtqs">'+Object.keys(usadas).map(e=>'<option value="'+e+'">').join('')+'</datalist>';
+
+  if(esAsc){
+    h+='<div style="margin-bottom:3px;color:#9fc4db">Orientación de salida</div><div style="margin-bottom:6px">'
+      + SALIDAS.map(([k,f,t])=>bt(b.salida===k,"setCaja('salida','"+k+"')",f,'#1c4a68')
+          .replace('<button','<button title="'+t+'"')).join('')
+      + bt(!b.salida,"setCaja('salida','')",'—','#1c4a68')
+      +'</div>';
+  }
+
+  if(uneP){
+    const pisos=(b.etq&&usadas[b.etq])?usadas[b.etq]:[];
+    const otros=pisos.filter(f=>f!==S.floorId);
+    h+='<div style="margin-top:8px;padding-top:8px;border-top:1px solid #1c3d55;color:#7fa6bd;font-size:11px">'
+      +(!b.etq ? 'Sin etiqueta todavía. Poniéndole el mismo nombre en cada piso, después se conectan solas.'
+        : otros.length ? 'Ya existe con este nombre en: <b style="color:#dbeafe">'+otros.join(' · ')+'</b>'
+        : 'Por ahora solo en '+S.floorId+'. Usá el mismo nombre en los otros pisos.')
+      +'</div>';
+  }
+  box.innerHTML=h;
+}
 
 // ── Acciones sobre la selección ─────────────────────────────────────────────
 function pcDelSel(){
@@ -1719,12 +2042,12 @@ function zonaResumen(floorId){
   // m² solo de ZONAS de circulación; los elementos (ascensor/escalera/esc.
   // mecánica) se cuentan por unidades en elemResumen()
   const arr=(pcircState.floors||{})[floorId||S.floorId]||[];
-  const r={}; arr.forEach(b=>{ if(!esElem(b.zona)) r[b.zona]=(r[b.zona]||0)+(b.w_m*b.h_m); });
+  const r={}; arr.forEach(b=>{ if(!esCaja(b.zona)) r[b.zona]=(r[b.zona]||0)+(b.w_m*b.h_m); });
   return r;
 }
 function elemResumen(floorId){
   const arr=(pcircState.floors||{})[floorId||S.floorId]||[];
-  const r={}; arr.forEach(b=>{ if(esElem(b.zona)) r[b.zona]=(r[b.zona]||0)+1; });
+  const r={}; arr.forEach(b=>{ if(esCaja(b.zona)) r[b.zona]=(r[b.zona]||0)+1; });
   return r;
 }
 function renderZonaResumen(){
@@ -1749,9 +2072,9 @@ function renderZonaResumen(){
           +ZONA_CIRC[z].short+' <b>'+Math.round(v).toLocaleString('es-CL')+' m²</b> ('+pc+'%)</span>';
       }).join('')
     + (function(){ const e=elemResumen(S.floorId);
-        return Object.keys(ELEM_CIRC).filter(k=>e[k]).map(k=>
-          '<span style="display:inline-flex;align-items:center;gap:4px;margin-left:8px">'
-          +ELEM_CIRC[k].icon+' <b>'+e[k]+'</b></span>').join(''); })()
+        return Object.keys(ELEM_CIRC).concat(Object.keys(EST_CIRC)).filter(k=>e[k]).map(k=>
+          '<span style="display:inline-flex;align-items:center;gap:4px;margin-left:8px" title="'
+          +cajaDef(k).label+'">'+cajaDef(k).icon+' <b>'+e[k]+'</b></span>').join(''); })()
     + '<span style="margin-left:auto;color:#7fa6bd">total <b>'+Math.round(tot).toLocaleString('es-CL')+' m²</b></span>';
 }
 window.addEventListener('load',()=>{ try{ setVista(S.vista); }catch(e){} });
@@ -1848,9 +2171,19 @@ function buildPcircBar(){
   const bar=document.getElementById('pcircBar'); if(!bar) return;
   const btn=([k,v])=>'<button class="pcirc-z'+(_pcircZona===k?' on':'')+'" style="background:'+v.color+'" onclick="setPcircZona(\''+k+'\')">'
     +'<span class="sw" style="background:'+v.color+'"></span>'+v.short+'</button>';
+  const sep='margin-left:14px;border-left:1px solid rgba(148,163,184,.4);padding-left:14px';
   bar.innerHTML='<span class="lbl">Zona:</span>'+Object.entries(ZONA_CIRC).map(btn).join('')
-    +'<span class="lbl" style="margin-left:14px;border-left:1px solid rgba(148,163,184,.4);padding-left:14px">Elementos:</span>'
-    +Object.entries(ELEM_CIRC).map(btn).join('');
+    +'<button class="pcirc-z" style="background:#0e3a5c;margin-left:6px" onclick="pcUnificarZona()"'
+    +' title="Deja toda la circulación como UN SOLO bloque de la zona elegida — el punto de partida: después se corta en cada puerta y se reclasifica sección por sección">▦ Unificar</button>'
+    +'<span class="lbl" style="'+sep+'">Elementos:</span>'
+    +Object.entries(ELEM_CIRC).map(btn).join('')
+    +'<span class="lbl" style="'+sep+'">Estacionamientos:</span>'
+    +Object.entries(EST_CIRC).map(btn).join('')
+    // P1 define los ascensores; en los demás pisos, una pasada los identifica
+    +(S.floorId!=='P1'
+      ? '<button class="pcirc-z" style="background:#0e3a5c;'+sep.replace('padding-left','padding:5px 11px;padding-left',1)+'"'
+        +' onclick="identificarAscDesdeP1()" title="Toma los ascensores DESCRITOS en P1 (etiqueta, tipo, salida) y se los asigna a los cuadros de este piso que estén sobre el mismo ducto (≤3 m): es el mismo ascensor atravesando los pisos. No pisa etiquetas ya puestas.">🛗 Identificar desde P1</button>'
+      : '');
 }
 function setPcircZona(z){
   _pcircZona=z; buildPcircBar();
@@ -1951,7 +2284,119 @@ function editarPuerta(id,soloRefrescar){
     +'<option value="">— sin definir —</option>'
     + zonas.map(z=>'<option value="'+z+'"'+(mk.abre===z?' selected':'')+'>'+ZONA_CIRC[z].label+'</option>').join('')
     +'</select>'
-    +'<div style="margin-top:8px;color:#7fa6bd;font-size:11px">La zona se propone sola según hacia dónde barre la hoja; podés forzarla.</div>';
+    +'<button onclick="cortarCircEnPuerta(\''+id+'\')" style="width:100%;margin-top:9px;background:#3f2d0e;'
+    +'color:#fde68a;border:1px solid #a16207;border-radius:7px;padding:6px;cursor:pointer;font-size:11.5px">'
+    +'✂ Cortar la circulación en esta puerta</button>'
+    +'<div style="margin-top:8px;color:#7fa6bd;font-size:11px">El corte atraviesa el polígono ENTERO a la altura de la puerta: queda una sección a cada lado, y con doble clic + 🎨 le das su zona (gral. pacientes, funcionarios, semirestringida, restringida). Clic derecho en el plano = girar 90°.</div>';
+}
+
+// ── CORTE DE POLÍGONOS DE CIRCULACIÓN ───────────────────────────────────────
+// Para reclasificar el verde en secciones (gral. pacientes / funcionarios /
+// semirestringida / restringida) hay que poder CORTARLO. La línea de corte
+// parte TODOS los tramos que cruza — no solo uno — y la frontera natural es
+// la puerta: su corte se propaga a lo ancho del polígono completo.
+const CORTE_MIN=0.15;                    // no dejar astillas a ningún lado
+// JUNTA del corte: las dos mitades quedan separadas por 4 cm. Es lo que
+// convierte el corte en una frontera REAL — los cuadros del relleno inverso no
+// se solapan, solo se tocan, así que la conectividad se mide por adyacencia
+// (TOL) y sin esta junta un corte no separaría nada.
+const CORTE_JUNTA=0.04;
+const ADY_TOL=0.015;                     // ≤1,5 cm de separación = siguen pegados
+
+// Parte en coord (y si horiz, x si no) todo tramo cruzado dentro de [e0,e1].
+function pcCortaLinea(horiz, coord, e0, e1){
+  const arr=(pcircState.floors[S.floorId]=pcircState.floors[S.floorId]||[]);
+  const g=CORTE_JUNTA/2;
+  let n=0;
+  arr.slice().forEach(b=>{
+    if(esCaja(b.zona)) return;
+    const c0=horiz? b.y_m-b.h_m/2 : b.x_m-b.w_m/2;
+    const c1=horiz? b.y_m+b.h_m/2 : b.x_m+b.w_m/2;
+    const r0=horiz? b.x_m-b.w_m/2 : b.y_m-b.h_m/2;
+    const r1=horiz? b.x_m+b.w_m/2 : b.y_m+b.h_m/2;
+    if(coord-g-c0<CORTE_MIN || c1-(coord+g)<CORTE_MIN) return;  // no cruza (o astilla)
+    if(r1<e0 || r0>e1) return;                                   // fuera del alcance
+    const i=arr.indexOf(b); if(i<0) return;
+    const p1=(coord-g)-c0, p2=c1-(coord+g);
+    const A={...b,id:pcNuevoId()}, B={...b,id:pcNuevoId()};
+    if(horiz){ A.y_m=c0+p1/2; A.h_m=p1; B.y_m=(coord+g)+p2/2; B.h_m=p2; }
+    else     { A.x_m=c0+p1/2; A.w_m=p1; B.x_m=(coord+g)+p2/2; B.w_m=p2; }
+    arr.splice(i,1,A,B);
+    n++;
+  });
+  return n;
+}
+
+// ── Un solo gran bloque: todo el verde a la misma zona ──────────────────────
+// Punto de partida del trabajo de accesos: se unifica y desde ahí se corta.
+function pcUnificarZona(){
+  const z=(_pcircZona in ZONA_CIRC)?_pcircZona:'general';
+  const todos=confirm('Unificar la circulación como UN SOLO bloque "'+ZONA_CIRC[z].label+'".\n\n'
+    +'Aceptar = TODOS los pisos\nCancelar = solo '+S.floorId+'\n\n'
+    +'Las cajas de ascensor, escalera y estacionamiento no se tocan. Se deshace con ⌘Z.');
+  const pisos=todos?Object.keys(pcircState.floors||{}):[S.floorId];
+  pcHistPush();
+  let n=0;
+  pisos.forEach(f=>(pcircState.floors[f]||[]).forEach(b=>{
+    if(!esCaja(b.zona) && b.zona!==z){ b.zona=z; n++; }
+  }));
+  if(!n){ _pcHistU.pop(); toast('Ya estaba todo en «'+ZONA_CIRC[z].short+'».'); return; }
+  saveAll(); renderOverlay(); updateStats&&updateStats(); renderZonaResumen&&renderZonaResumen();
+  toast('▦ '+n+' tramo'+(n===1?'':'s')+' unificado'+(n===1?'':'s')+' como «'+ZONA_CIRC[z].short+'»'
+    +(todos?' en todos los pisos':' en '+S.floorId)+' · ahora cortá en cada puerta y reclasificá');
+}
+
+// Alcance conectado del corte de una puerta: crece por los tramos cruzados
+// que se van tocando, hasta que el polígono termina.
+function pcSpanConectado(horiz, coord, t0){
+  const arr=(pcircState.floors[S.floorId]||[]);
+  let e0=t0, e1=t0, cambio=true, guard=0;
+  while(cambio && guard++<200){
+    cambio=false;
+    arr.forEach(b=>{
+      if(esCaja(b.zona)) return;
+      const c0=horiz? b.y_m-b.h_m/2 : b.x_m-b.w_m/2;
+      const c1=horiz? b.y_m+b.h_m/2 : b.x_m+b.w_m/2;
+      if(coord-c0<CORTE_MIN || c1-coord<CORTE_MIN) return;
+      const r0=horiz? b.x_m-b.w_m/2 : b.y_m-b.h_m/2;
+      const r1=horiz? b.x_m+b.w_m/2 : b.y_m+b.h_m/2;
+      if(r1>=e0-0.05 && r0<=e1+0.05){
+        if(r0<e0){ e0=r0; cambio=true; }
+        if(r1>e1){ e1=r1; cambio=true; }
+      }
+    });
+  }
+  return [e0,e1];
+}
+
+// La puerta como límite entre zonas: su corte atraviesa el polígono ENTERO
+// (la división de áreas es siempre al cruzar una puerta).
+function cortarCircEnPuerta(id){
+  const mk=buscarMk(id); if(!mk||!ES_PUERTA[mk.tipo]) return;
+  const a=((((mk.ang||0)%180)+180)%180);
+  const horiz=(a<45||a>=135);            // jamba horizontal → el corte va en Y
+  const coord=horiz? mk.y_m : mk.x_m;
+  const [e0,e1]=pcSpanConectado(horiz,coord, horiz? mk.x_m : mk.y_m);
+  pcHistPush();
+  const n=pcCortaLinea(horiz,coord,e0,e1);
+  if(!n){ _pcHistU.pop(); toast('✂ La puerta no cruza ningún tramo de circulación.'); return; }
+  saveAll(); renderOverlay(); updateStats&&updateStats(); renderZonaResumen&&renderZonaResumen();
+  toast('✂ Corte a lo ancho del polígono: '+n+' tramo'+(n===1?'':'s')+' partido'+(n===1?'':'s')
+    +' · doble clic en una sección la selecciona entera y 🎨 la reclasifica');
+}
+
+// Clic DERECHO sobre una puerta o corredera ya colocada: la gira 90°
+// (0→90→180→270→0). Al instalarlas casi siempre hay que orientarlas al muro, y
+// abrir el panel para mover el deslizador de orientación fina es demasiado
+// trámite para el gesto más repetido. La zona hacia la que abre se recalcula.
+function girarPuerta90(id){
+  const mk=buscarMk(id); if(!mk||!ES_PUERTA[mk.tipo]) return;
+  mk.ang=(((mk.ang||0)+90)%360+360)%360;
+  const z=_zonaDestino(S.floorId,mk); if(z) mk.abre=z;
+  saveAll(); renderOverlay();
+  const ed=document.getElementById('puertaEd');
+  if(ed && ed.style.display!=='none') editarPuerta(id,true);   // el panel sigue el giro
+  toast('↻ '+((MARCA_CIRC[mk.tipo]||{}).label||'Puerta')+' a '+mk.ang+'°');
 }
 
 function delPmark(id){
@@ -2086,6 +2531,7 @@ viewer.addEventListener('mousedown',e=>{
     // Herramientas de circulación: editar selecciona/arrastra, rellenar crece hasta muros
     if(S.mode==='pcirc'&&pcTool==='edit'){ pcEditMouseDown(e); return; }
     if(S.mode==='pcirc'&&pcTool==='fill'){ pcFillClick(e); return; }
+    if(S.mode==='pcirc'&&pcTool==='corte'){ _pcCorte={x0:c.sx,y0:c.sy,x1:c.sx,y1:c.sy}; _pcCortePinta(); e.preventDefault(); return; }
     // add / placeAsc → dibujar un CUADRO: arrastrar define el rectángulo;
     // un clic simple (sin arrastre) crea una caja de tamaño por defecto.
     _boxDraw={x0:c.sx,y0:c.sy,x1:c.sx,y1:c.sy};
@@ -2105,12 +2551,14 @@ window.addEventListener('mousemove',e=>{
   S.ox=panState.ox+dx; S.oy=panState.oy+dy; applyT(false);
 });
 window.addEventListener('mouseup',e=>{ if((e.button===0||e.button===2)&&_boxDraw){ _finishBox(); } panState=null; viewer.classList.remove('panning'); });
-viewer.addEventListener('contextmenu',e=>{ if(S.mode==='pcirc') e.preventDefault(); });
+viewer.addEventListener('contextmenu',e=>{ if(S.mode==='pcirc'||S.mode==='pmark') e.preventDefault(); });
 viewer.addEventListener('dblclick',e=>{
   if(S.mode==='medir'){ e.preventDefault(); clearMeasure(); return; }
   // capa de elemento activa (🛗/🪜/⤴) en herramienta dibujar: doble clic dentro
   // del recinto → la caja toma los límites de los muros
   if(S.mode==='pcirc' && pcTool==='draw' && esElem(_pcircZona)){ e.preventDefault(); elemFillAt(e); }
+  // doble clic en Editar: seleccionar la SECCIÓN conectada para reclasificarla
+  if(S.mode==='pcirc' && pcTool==='edit'){ e.preventDefault(); pcSelSeccion(e); }
 });
 
 // ═══ PAN CON BOTÓN CENTRAL (portado de Atlas HDS) ═══════════════════════════
@@ -2172,7 +2620,7 @@ function toggleMode(m){
   if(PUBLIC && _MODOS_EDICION.indexOf(m)!==-1) return;   // consulta: sin edición
   const wasShape=(S.mode==='shape');
   if(S.mode===m){ S.mode='view'; } else { S.mode=m; }
-  btnAdd.classList.toggle('active',S.mode==='add');
+  btnAdd?.classList.toggle('active',S.mode==='add');   // el botón quedó de baja
   btnDel.classList.toggle('active',S.mode==='del');
   document.getElementById('btnShape')?.classList.toggle('active',S.mode==='shape');
   viewer.classList.toggle('del-mode',S.mode==='del');
@@ -2185,7 +2633,7 @@ function toggleMode(m){
   document.getElementById('btnMedir')?.classList.toggle('active',S.mode==='medir');
   if(S.mode!=='medir'){ _measure={pts:[]}; } updateMeasureReadout();
   if(S.mode==='medir'){ addHint.textContent='📏 Clic en cada punto del recorrido · el largo se acumula en metros · doble clic o ⌫ reinicia · ESC para salir'; addHint.classList.add('show'); }
-  else if(S.mode==='pmark'){ addHint.textContent='⚑ Clic para colocar el marcador · elegí el tipo arriba (puerta, escalera, control…) · ESC para salir'; addHint.classList.add('show'); }
+  else if(S.mode==='pmark'){ addHint.textContent='⚑ Clic para colocar el marcador · elegí el tipo arriba (puerta, escalera, control…) · clic DERECHO sobre una puerta o corredera la gira 90° · ESC para salir'; addHint.classList.add('show'); }
   else if(S.mode==='pcirc'){ addHint.textContent='▦ Arrastra para pintar tramos del área de circulación (se fusionan) · elegí la zona arriba · ESC para salir'; addHint.classList.add('show'); }
   else if(S.mode==='poi'){ addHint.textContent='📍 Clic en el plano para marcar un punto de flujo · ESC para salir'; addHint.classList.add('show'); }
   else if(S.mode==='add'){ addHint.textContent='➕ Arrastra para dibujar el cuadro de la circulación (o un clic = tamaño estándar) · ESC para salir'; addHint.classList.add('show'); }
@@ -2613,25 +3061,55 @@ function renderOverlay(){
     Object.keys(byZ).forEach(z=>{
       // ELEMENTOS (ascensor/escalera/esc. mecánica): cada caja individual con
       // su ícono — NO se fusionan; conservan identidad para describirlas luego
-      if(esElem(z)){
-        const ec=ELEM_CIRC[z];
+      if(esCaja(z)){
+        const ec=cajaDef(z);
         byZ[z].forEach(b=>{
           const p=dxfToSvg(S.floorId,b.x_m,b.y_m), s=dxfSizeToSvg(S.floorId,b.w_m,b.h_m);
           if(!p||!s) return;
+          // el tipo de ascensor manda el color de su caja
+          const col=(z==='asc' && b.tipo && ASC_TIPO[b.tipo]) ? ASC_TIPO[b.tipo].color : ec.color;
           const rc=document.createElementNS(SVGNS,'rect');
           rc.setAttribute('x',p.x-s.w/2); rc.setAttribute('y',p.y-s.h/2);
           rc.setAttribute('width',s.w);   rc.setAttribute('height',s.h);
-          rc.setAttribute('fill',ec.color+'40'); rc.setAttribute('stroke',ec.color);
+          // relleno en tonalidad CLARA del color (nunca sólido) + borde sólido
+          rc.setAttribute('fill',col+'2b'); rc.setAttribute('stroke',col);
           rc.setAttribute('stroke-width','3'); rc.setAttribute('rx','4');
           rc.setAttribute('pointer-events','none');
           overlay.appendChild(rc);
           const tx=document.createElementNS(SVGNS,'text');
           tx.setAttribute('x',p.x); tx.setAttribute('y',p.y);
           tx.setAttribute('text-anchor','middle'); tx.setAttribute('dominant-baseline','central');
-          tx.setAttribute('font-size',Math.max(16,Math.min(s.w,s.h)*0.55));
           tx.setAttribute('pointer-events','none');
-          tx.textContent=ec.icon;
+          // con etiqueta puesta manda la etiqueta; si no, el ícono del tipo
+          if(b.etq){
+            tx.setAttribute('font-size',Math.max(14,Math.min(s.w/(b.etq.length*0.62), s.h*0.62)));
+            tx.setAttribute('font-weight','800');
+            // el nombre va en el color SÓLIDO de la tipología, con halo blanco
+            // para que se lea sobre el mobiliario del plano
+            tx.setAttribute('fill',col); tx.setAttribute('stroke','#fff');
+            tx.setAttribute('stroke-width','5'); tx.setAttribute('paint-order','stroke');
+            tx.textContent=b.etq;
+          }else{
+            tx.setAttribute('font-size',Math.max(16,Math.min(s.w,s.h)*0.55));
+            tx.textContent=(z==='asc'&&b.tipo&&ASC_TIPO[b.tipo])?ASC_TIPO[b.tipo].icon:ec.icon;
+          }
           overlay.appendChild(tx);
+          // flecha de salida de la cabina, pegada al borde por el que abre
+          if(z==='asc' && b.salida){
+            const d={n:[0,-1],s:[0,1],e:[1,0],w:[-1,0]}[b.salida];
+            if(d){
+              // por FUERA del borde: no tapa la etiqueta y se lee como "sale por acá"
+              const L=Math.min(s.w,s.h)*0.34;
+              const bx=p.x+d[0]*(s.w/2+L*0.6), by=p.y+d[1]*(s.h/2+L*0.6);
+              const fl=document.createElementNS(SVGNS,'path');
+              fl.setAttribute('d','M '+(bx-d[0]*L/2-d[1]*L/2)+' '+(by-d[1]*L/2+d[0]*L/2)
+                +' L '+(bx+d[0]*L/2)+' '+(by+d[1]*L/2)
+                +' L '+(bx-d[0]*L/2+d[1]*L/2)+' '+(by-d[1]*L/2-d[0]*L/2)+' Z');
+              fl.setAttribute('fill',col); fl.setAttribute('stroke','#fff');
+              fl.setAttribute('stroke-width','2'); fl.setAttribute('pointer-events','none');
+              overlay.appendChild(fl);
+            }
+          }
         });
         return;
       }
@@ -2694,6 +3172,11 @@ function renderOverlay(){
       gp.style.cursor='pointer';
       gp.addEventListener('click',ev=>{ ev.stopPropagation();
         if(S.mode==='del') delPmark(mk.id); else editarPuerta(mk.id); });
+      // clic derecho = girar 90° (en modo Eliminar no, ahí manda el borrado)
+      gp.addEventListener('contextmenu',ev=>{
+        if(S.mode==='del') return;
+        ev.preventDefault(); ev.stopPropagation(); girarPuerta90(mk.id);
+      });
       overlay.appendChild(gp);
       return;
     }
@@ -2855,15 +3338,17 @@ function renderSidebar(){
 function updateStats(){
   const totalAreas=Object.values(cabidaState.areas||{}).reduce((a,x)=>a+x.length,0);
   document.getElementById('statAreas').textContent=totalAreas;
-  // Contar CABINAS (grupos con nodos), no nodos por piso
-  let asc=0,esc=0;
-  Object.values(circState.groups).forEach(g=>{
-    if(!circState.nodes.some(n=>n.gid===g.id)) return;
-    if((g.type||'').startsWith('asc-')) asc++;
-    else if((g.type||'').startsWith('esc-')) esc++;
-  });
+  // Cuenta las cajas DIBUJADAS en todos los pisos: son la fuente de verdad
+  // desde que el directorio A–Y quedó fuera de uso.
+  let asc=0,esc=0,est=0;
+  Object.values(pcircState.floors||{}).forEach(arr=>(arr||[]).forEach(b=>{
+    if(b.zona==='asc') asc++;
+    else if(b.zona==='esc'||b.zona==='escmec') esc++;
+    else if(esEst(b.zona)) est++;
+  }));
   document.getElementById('statAsc').textContent=asc;
   document.getElementById('statEsc').textContent=esc;
+  const se=document.getElementById('statEst'); if(se) se.textContent=est;
 }
 
 // ── CABIDA IMPORT ───────────────────────────────────────────────────────────

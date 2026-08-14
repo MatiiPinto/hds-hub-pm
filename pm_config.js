@@ -41,7 +41,9 @@ window.PM_CONFIG = {
     'csepulveda': '78e0be6b452fc7d2b411c3f932739bab848ac2692ec0a2993750fbee86342d37',
     'mpinto':     '405ce04bf68d5cf8cb2e74ae353d946916bd9676253c68b4ab2894bb850456b3',
     // Renata Vargas · ingeniera biomédica (apoyo Puesta en Marcha) — editora de Navegación
-    'rvargas':    'e05cf96e26effda2598f05acb46a87a82bcc631a716a6b8eb77b35b7a069a6a8'
+    'rvargas':    'e05cf96e26effda2598f05acb46a87a82bcc631a716a6b8eb77b35b7a069a6a8',
+    // Monserrat Rivera · biomédica (apoyo Puesta en Marcha) — mrivera@hsalvador.cl
+    'mrivera':    '330dc6785e48327d41569c8e057c0c2f56d1839800d2967890f9f35cd51551f4'
   }
 };
 

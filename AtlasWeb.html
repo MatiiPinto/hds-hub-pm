@@ -338,6 +338,27 @@ button,input,select,textarea{font-family:inherit}
 #wsModal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:100}
 #wsModal.show{display:flex}
 .modal-box{background:#f4f8fc;border:1px solid #a9c3d6;border-radius:14px;padding:24px;width:360px;max-width:90vw;box-shadow:0 18px 50px rgba(15,30,52,.35)}
+#wsModal .modal-wrap{display:flex;gap:14px;align-items:flex-start;max-height:92vh}
+.dot-panel{background:#fff;border:1px solid #a9c3d6;border-radius:14px;width:330px;max-width:44vw;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 18px 50px rgba(15,30,52,.35);overflow:hidden}
+.dot-panel .dp-h{padding:12px 14px 8px;border-bottom:1px solid #e2eaf4;flex-shrink:0}
+.dot-panel .dp-t{font-size:12.5px;font-weight:800;color:#17456e}
+.dot-panel .dp-s{font-size:10.5px;color:#64748b;margin-top:2px}
+.dot-panel .dp-body{overflow-y:auto;padding:4px 0}
+.dp-row{display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;border-bottom:1px solid #f1f5f9}
+.dp-row:hover{background:#eff6ff}
+.dp-row .nm{flex:1;min-width:0;font-size:11.5px;color:#0f172a;font-weight:600;line-height:1.25}
+.dp-row .sub{font-size:9.5px;color:#64748b;font-weight:400;display:block}
+.dp-row .st{font-size:9px;font-weight:800;border-radius:6px;padding:2px 6px;white-space:nowrap;flex-shrink:0}
+.dp-row.ok .st{background:#dcfce7;color:#15803d}
+.dp-row.no .st{background:#fee2e2;color:#b91c1c}
+.dp-row.grp .st{background:#e0edf9;color:#1d5fa0}
+.dp-row.grp.full .st{background:#dcfce7;color:#15803d}
+.dp-row.grp .nm::after{content:'›';float:right;color:#94a3b8;font-weight:800;margin-left:6px}
+.dp-sug{display:inline-block;margin-left:6px;font-size:8.5px;font-weight:800;color:#065f46;background:#dcfce7;border:1px solid #86efac;border-radius:5px;padding:0 4px;vertical-align:middle}
+.dp-crumb{font-size:10px;color:#48687e;margin-top:3px;line-height:1.5}
+.dp-crumb a{color:#1d5fa0;font-weight:700;cursor:pointer}
+.dp-crumb a:hover{text-decoration:underline}
+.dp-crumb .sep{color:#b6c6d6;margin:0 3px}
 .modal-box h3{font-size:14px;font-weight:800;color:#17456e;margin-bottom:16px}
 .form-row{margin-bottom:12px}
 .form-row label{display:block;font-size:10px;color:#48687e;text-transform:uppercase;margin-bottom:4px;letter-spacing:.5px}
@@ -470,6 +491,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
   <div class="exp-dd" id="expDD">
     <button class="export-btn" onclick="toggleExpMenu(event)" title="Exportar planillas (XLSX)">⬇ Exportar ▾</button>
     <div class="exp-menu" id="expMenu">
+      <div class="exp-menu-lbl" id="expDest" style="color:#1d5fa0;font-weight:800;text-transform:none;letter-spacing:0;font-size:10px;padding-bottom:6px">⬇ Se descarga a la carpeta de Descargas</div>
       <div class="exp-menu-lbl">Recintos</div>
       <button onclick="exportRecintos();closeExpMenu()">🚪 Recintos (código, BIM, señalética, tipo, aforo)</button>
       <button onclick="exportSenaletica();closeExpMenu()">🏷 Señalética por recinto</button>
@@ -483,7 +505,10 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <div class="exp-menu-sep"></div>
       <button onclick="exportBackup();closeExpMenu()">💾 Respaldo completo (JSON)</button>
       <button onclick="publicarAtlasPM();closeExpMenu()" title="Publica el estado actual del Atlas DIRECTO al HUB Puesta en Marcha (🟡): instala el snapshot en WEB_DATA/ y corre el deploy. Requiere el servidor local de acciones (el mismo del botón 'Actualizar web' del HUB).">🟡 Publicar en HUB PM</button>
-      <button onclick="(_abHandle?_abWrite(true):(document.getElementById('autoBkLbl').textContent==='clic para reactivar'?_abReactivate():setupAutoBackup()));" title="Elegí una carpeta (idealmente sincronizada a OneDrive/Drive): Atlas guardará ahí un respaldo cada 5 minutos si hay cambios">⚙ Respaldo automático: <span id="autoBkLbl">configurar…</span></button>
+      <button onclick="(_abHandle?_abWrite(true):(document.getElementById('autoBkLbl').textContent==='clic para reactivar'?_abReactivate():setupAutoBackup()));" title="Elegí una carpeta de trabajo (idealmente sincronizada a OneDrive/Drive): Atlas guardará ahí el respaldo automático cada 5 minutos Y todo lo que exportes, ordenado en Respaldos/, Planillas/ y Web/, en vez de la carpeta de Descargas">⚙ Carpeta de trabajo: <span id="autoBkLbl">configurar…</span></button>
+      <button onclick="fbakAhora(true);closeExpMenu()" title="Guarda AHORA el estado completo en «Respaldo y Export ATLAS/Estado/», vía el servidor local de acciones. Además se guarda solo cada pocos minutos mientras trabajas — es la protección que reemplaza al respaldo a carpeta, que solo funciona en Chrome.">📁 Guardar estado en archivo ahora</button>
+      <button onclick="fbakRestaurar();closeExpMenu()" title="Vuelve al último estado guardado en archivo por el respaldo automático">↩ Restaurar desde el respaldo automático</button>
+      <button onclick="diagGuardado();closeExpMenu()" title="Revisa si el guardado está funcionando: espacio usado en el navegador, prueba de escritura real, copias de recuperación y carpeta de trabajo">🩺 Diagnóstico de guardado</button>
       <button onclick="copyConsultaLink();closeExpMenu()" title="Copia un link que abre Atlas en solo lectura (para jefaturas o tablet)">🔗 Copiar link modo consulta</button>
       <button onclick="exportForWeb();closeExpMenu()">🌐 Snapshot para versión web</button>
     </div>
@@ -522,6 +547,9 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="tb-btn" id="btnScen" onclick="toggleScenario()" title="Alternar entre el Despliegue 0 (catálogo oficial, sin traslados) y la Propuesta de reubicación (con los traslados aplicados)">📦 Despliegue 0</button>
       <button class="tb-btn" id="btnMoves" onclick="openMovesList()" style="display:none" title="Ver el listado completo de traslados propuestos">↪ 0</button>
       <span class="tb-div"></span>
+      <button class="tb-btn" id="btnExpServ" onclick="exportServicioHTML()" style="display:none" title="Exportar este servicio como HTML autónomo: imagen del plano recortada al contorno punteado, recintos clicables con su ficha (equipamiento, mobiliario, TI, MNC) y opción de ocultar las cajas. No incluye información de funcionarios.">📄 Exportar servicio</button>
+      <button class="tb-btn" id="btnOrdenarDots" onclick="ordenarDots()" style="display:none" title="Ordenar los puestos del recinto en una cuadrícula alineada, con espacio suficiente para que las tarjetas de nombre no se superpongan">⊞ Ordenar puestos</button>
+      <button class="tb-btn" id="btnServPuestos" onclick="openServPuestos()" style="display:none" title="Ver todos los puestos asignados del servicio: en cantidad o con el nombre de cada funcionario">👥 Puestos del servicio</button>
       <button class="tb-btn" id="btnBoxVis" onclick="cycleBoxVis()" title="Ver u ocultar las cajas dibujadas y su información (para ver el plano de fondo)">👁 Cajas</button>
       <button class="tb-btn" id="btnDotNames" onclick="toggleDotNames()" title="Mostrar u ocultar el nombre de las personas asignadas a los puestos en vista 3 (útil en recintos con muchos funcionarios)">👤 Nombres</button>
       <div class="vw-dd" id="vwDD">
@@ -579,6 +607,9 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       </div>
       <div id="bimList" style="display:none;max-height:58vh;overflow-y:auto"></div>
       <div id="toolsBody" style="display:none">
+      <div class="rp-t" style="margin-top:2px">✏️ Nombres de recinto</div>
+      <button class="rp-bedbtn" style="background:#eef4fa;color:#1d5fa0;border:1px solid #a9c3d6" onclick="revisarNombres()" title="Revisa la ortografía de todos los nombres de recinto y quita las tildes (la Ñ se mantiene). Muestra los cambios antes de aplicarlos.">✏️ Revisar ortografía</button>
+      <div class="rp-hint">Corrige erratas detectadas y deja los nombres sin tildes. Muestra la lista de cambios y solo se aplica si lo confirmás.</div>
       <div class="rp-t" style="margin-top:2px">🛏 Numeración de puestos</div>
       <div class="rp-fld"><label>Tipo de puesto</label>
         <div class="bedkind-seg">
@@ -598,6 +629,11 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="rp-bedbtn" id="btnBedMode" onclick="toggleBedMode()">🛏 Colocar puestos</button>
       <div class="rp-hint">Numerá box de Urgencias, puestos de Quimio y Recuperaciones (Recuperación, Habitación o Clínica). Elegí Camilla o Sillón antes de colocar. Cada clic coloca un puesto y el número avanza solo. Clic en un puesto = editar N°/eliminar · Shift+clic = cambiar su tipo.</div>
       </div>
+    </div>
+    <div class="rp-card" id="rpSrvCard" style="display:none">
+      <div class="rp-t">🏥 <span id="srvName">Servicio</span> <span class="rp-total-badge">Recintos <b id="srvTotal">0</b></span></div>
+      <div id="srvBody" style="font-size:11px"></div>
+      <div id="srvFoot" style="font-size:10px;color:#94a3b8;margin-top:7px;font-style:italic"></div>
     </div>
     <div class="rp-card">
       <div class="rp-t">🚪 Recintos dibujados <span class="rp-total-badge">Total <b id="cntTotal">0</b></span></div>
@@ -656,6 +692,35 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button onclick="closeMovesList()" style="background:#e2eaf4;border:none;color:#1a3a5c;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer">Cerrar</button>
     </div>
     <div id="mvlBody" style="overflow-y:auto;margin-top:10px"></div>
+  </div>
+</div>
+<div id="nomModal" onclick="if(event.target===this)cerrarNombres()" style="position:fixed;inset:0;background:rgba(15,30,52,.6);display:none;align-items:center;justify-content:center;z-index:145;padding:20px">
+  <div style="background:#fff;border-radius:14px;width:min(94vw,680px);max-height:84vh;display:flex;flex-direction:column;padding:18px 20px;box-shadow:0 18px 50px rgba(15,30,52,.4)">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:15px;font-weight:800;color:#0f172a">✏️ Ortografía de los nombres de recinto</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px" id="nomSub"></div>
+      </div>
+      <button id="nomOk" onclick="aplicarNombres()" style="background:#15803d;border:none;color:#fff;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:800;cursor:pointer;flex-shrink:0">Aplicar</button>
+      <button onclick="cerrarNombres()" style="background:#e2eaf4;border:none;color:#1a3a5c;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">Cerrar</button>
+    </div>
+    <div id="nomBody" style="overflow-y:auto;margin-top:12px"></div>
+  </div>
+</div>
+<div id="servModal" onclick="if(event.target===this)closeServPuestos()" style="position:fixed;inset:0;background:rgba(15,30,52,.6);display:none;align-items:center;justify-content:center;z-index:140;padding:20px">
+  <div style="background:#fff;border-radius:14px;width:min(94vw,760px);max-height:84vh;display:flex;flex-direction:column;padding:18px 20px;box-shadow:0 18px 50px rgba(15,30,52,.4)">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:15px;font-weight:800;color:#0f172a" id="spTitle">👥 Puestos del servicio</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px" id="spSub"></div>
+      </div>
+      <div style="display:flex;gap:0;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden;flex-shrink:0">
+        <button id="spModoCant" onclick="servSetMode('cant')" style="background:#1d5fa0;color:#fff;border:none;padding:7px 13px;font-size:11.5px;font-weight:700;cursor:pointer">🔢 Cantidad</button>
+        <button id="spModoNom" onclick="servSetMode('nom')" style="background:#fff;color:#1a3a5c;border:none;border-left:1px solid #cbd5e1;padding:7px 13px;font-size:11.5px;font-weight:700;cursor:pointer">👤 Nombres</button>
+      </div>
+      <button onclick="closeServPuestos()" style="background:#e2eaf4;border:none;color:#1a3a5c;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">Cerrar</button>
+    </div>
+    <div id="spBody" style="overflow-y:auto;margin-top:12px"></div>
   </div>
 </div>
 <div id="moveModal" onclick="if(event.target===this)closeMoveDialog()" style="position:fixed;inset:0;background:rgba(15,30,52,.6);display:none;align-items:center;justify-content:center;z-index:140;padding:20px">
@@ -723,6 +788,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 
 <!-- WS Modal -->
 <div id="wsModal">
+ <div class="modal-wrap">
   <div class="modal-box"><form autocomplete="off" onsubmit="return false" style="margin:0">
     <h3 id="mTitle">Puesto</h3>
     <div class="form-row">
@@ -761,6 +827,23 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
     </div>
   </form>
   </div>
+  <div class="dot-panel" id="dotPanel">
+    <div class="dp-h">
+      <div class="dp-t" id="dpTitle">👥 Personal</div>
+      <div class="dp-crumb" id="dpCrumb"></div>
+      <div class="dp-s" id="dpSub"></div>
+      <div style="display:flex;gap:6px;margin-top:7px;align-items:center">
+        <input id="dpFiltro" placeholder="Filtrar por nombre o cargo…" spellcheck="false"
+          oninput="renderDotPanel()"
+          style="flex:1;min-width:0;border:1px solid #cbd5e1;border-radius:7px;padding:5px 8px;font-size:11px;font-family:inherit">
+        <label style="display:flex;align-items:center;gap:4px;font-size:10px;color:#b91c1c;font-weight:700;cursor:pointer;white-space:nowrap">
+          <input type="checkbox" id="dpSoloLibres" onchange="renderDotPanel()" style="width:auto;margin:0"> por asignar
+        </label>
+      </div>
+    </div>
+    <div class="dp-body" id="dpBody"></div>
+  </div>
+ </div>
 </div>
 <script src="WEB_DATA/atlas_web_data.js"></script>
 <script src="WEB_DATA/dotacion_slim.js"></script><!-- versión web: dotación SIN RUT/correos -->
@@ -1083,13 +1166,143 @@ function toggleSenaletica(){
 let _sb = { floor: null, area: null };
 
 // ═══ PERSISTENCE ════════════════════════════════════════════════════════════
+// ── COMPRESIÓN DEL ESTADO (LZW → UTF-16) ────────────────────────────────────
+// El navegador da ~5 MB por origen y NO se puede subir: no hay ajuste en
+// Safari ni en Chrome. La única salida es ocupar menos. Este LZW empaqueta 15
+// bits en cada carácter UTF-16, que es justo la unidad con que el navegador
+// cobra el espacio. Medido sobre los datos reales del HDS: 2,83 MB → 0,39 MB
+// (7,3×). Algoritmo LZ-string (Pieroxy, MIT).
+const LZ=(function(){
+  const f=String.fromCharCode;
+  function comprimir(entrada,bitsPorChar,charDeInt){
+    if(entrada==null) return '';
+    let i,value,dic={},dicNuevo={},c='',wc='',w='',
+        crecer=2,dicTam=3,nBits=2,out=[],val=0,pos=0,ii;
+    function push(bit){
+      val=(val<<1)|bit;
+      if(pos==bitsPorChar-1){ pos=0; out.push(charDeInt(val)); val=0; } else pos++;
+    }
+    function emitir(){                       // saca el código de w al flujo
+      if(Object.prototype.hasOwnProperty.call(dicNuevo,w)){
+        if(w.charCodeAt(0)<256){
+          for(i=0;i<nBits;i++) push(0);
+          value=w.charCodeAt(0);
+          for(i=0;i<8;i++){ push(value&1); value=value>>1; }
+        }else{
+          value=1;
+          for(i=0;i<nBits;i++){ push(value); value=0; }
+          value=w.charCodeAt(0);
+          for(i=0;i<16;i++){ push(value&1); value=value>>1; }
+        }
+        crecer--; if(crecer==0){ crecer=Math.pow(2,nBits); nBits++; }
+        delete dicNuevo[w];
+      }else{
+        value=dic[w];
+        for(i=0;i<nBits;i++){ push(value&1); value=value>>1; }
+      }
+      crecer--; if(crecer==0){ crecer=Math.pow(2,nBits); nBits++; }
+    }
+    for(ii=0;ii<entrada.length;ii+=1){
+      c=entrada.charAt(ii);
+      if(!Object.prototype.hasOwnProperty.call(dic,c)){ dic[c]=dicTam++; dicNuevo[c]=true; }
+      wc=w+c;
+      if(Object.prototype.hasOwnProperty.call(dic,wc)) w=wc;
+      else{ emitir(); dic[wc]=dicTam++; w=String(c); }
+    }
+    if(w!=='') emitir();
+    value=2;                                 // marca de fin de flujo
+    for(i=0;i<nBits;i++){ push(value&1); value=value>>1; }
+    while(true){                             // vaciar el último carácter
+      val=(val<<1);
+      if(pos==bitsPorChar-1){ out.push(charDeInt(val)); break; } else pos++;
+    }
+    return out.join('');
+  }
+  function descomprimir(largo,reset,siguiente){
+    let dic=[],crecer=4,dicTam=4,nBits=3,entry='',res=[],i,w,bits,resb,maxp,pot,c,
+        d={val:siguiente(0),pos:reset,idx:1};
+    function leer(n){
+      bits=0; maxp=Math.pow(2,n); pot=1;
+      while(pot!=maxp){
+        resb=d.val&d.pos; d.pos>>=1;
+        if(d.pos==0){ d.pos=reset; d.val=siguiente(d.idx++); }
+        bits|=(resb>0?1:0)*pot; pot<<=1;
+      }
+      return bits;
+    }
+    for(i=0;i<3;i+=1) dic[i]=i;
+    switch(leer(2)){ case 0: c=f(leer(8)); break; case 1: c=f(leer(16)); break; case 2: return ''; }
+    dic[3]=c; w=c; res.push(c);
+    while(true){
+      if(d.idx>largo) return '';
+      c=leer(nBits);
+      switch(c){
+        case 0: dic[dicTam++]=f(leer(8));  c=dicTam-1; crecer--; break;
+        case 1: dic[dicTam++]=f(leer(16)); c=dicTam-1; crecer--; break;
+        case 2: return res.join('');
+      }
+      if(crecer==0){ crecer=Math.pow(2,nBits); nBits++; }
+      if(dic[c]) entry=dic[c];
+      else if(c===dicTam) entry=w+w.charAt(0);
+      else return null;
+      res.push(entry);
+      dic[dicTam++]=w+entry.charAt(0);
+      crecer--; w=entry;
+      if(crecer==0){ crecer=Math.pow(2,nBits); nBits++; }
+    }
+  }
+  return {
+    empacar:  s=>s==null?'':comprimir(s,15,a=>f(a+32))+' ',
+    desempacar: s=>(s==null||s==='')?null:descomprimir(s.length,16384,i=>s.charCodeAt(i)-32)
+  };
+})();
+// Prefijo que marca un valor comprimido: ni un JSON serializado ni la salida
+// del empaquetador (que arranca en el codigo 32) pueden empezar asi.
+const LZ_MARCA='\u0001z';
+// Se verifica de verdad antes de confiar en ella: si el ida y vuelta no da
+// idéntico, se guarda sin comprimir y no se pierde nada.
+const LZ_OK=(function(){ try{
+  const m='{"a":[1,2,3],"ñ":"áé í","b":{"c":"'+'x'.repeat(300)+'"}}';
+  return LZ.desempacar(LZ.empacar(m))===m;
+}catch(e){ return false; } })();
 // VERSIÓN WEB (solo consulta): el estado viene del snapshot publicado
 // (WEB_DATA/atlas_web_data.js) y NUNCA se escribe nada del estado principal.
 const _WD=window.ATLAS_WEB_DATA||{};
 function lg(k,d){ if(_WD[k]!==undefined && _WD[k]!==null) return _WD[k]; return d; }
 const _SELFTEST=/[?&]selftest/.test(location.search);
-function ls(k,v){}
 function _lsSet(k,v){ if(!/^cabida_cad/.test(k)) try{localStorage.setItem(k,v);}catch(e){} }
+// ── ALMACENAMIENTO SEGURO ───────────────────────────────────────────────────
+// El navegador da ~5 MB por origen (y los cuenta en UTF-16: cada carácter pesa
+// 2 bytes). El Atlas escribía CUATRO copias .bak en cada guardado, más .day y
+// .prev_import, que nadie leía nunca: cuadruplicaban la ocupación hasta pasarse
+// de la cuota. Al pasarse, localStorage.setItem lanzaba excepción, y como ls()
+// no la capturaba, el guardado moría en silencio (nada se guardaba y el cuadro
+// de edición ni siquiera se cerraba).
+const LS_MUERTAS=['cabida_cad_boxes.bak','cabida_cad_ws.bak','cabida_cad_names.bak','cabida_cad_delta.bak',
+  'cabida_cad_boxes.prev_import','cabida_cad_ws.prev_import','cabida_cad_names.prev_import','cabida_cad_delta.prev_import',
+  'cabida_cad_ws.day','cabida_cad_ws.day.fecha'];
+function lsPurgar(){ let n=0; try{ LS_MUERTAS.forEach(k=>{ if(localStorage.getItem(k)!==null){ localStorage.removeItem(k); n++; } }); }catch(e){} return n; }
+lsPurgar();                                  // libera la cuota antes de nada
+function lsUso(){
+  let c=0; try{ for(const k in localStorage) if(Object.prototype.hasOwnProperty.call(localStorage,k)) c+=k.length+String(localStorage[k]).length; }catch(e){}
+  return {chars:c, mb:+(c*2/1048576).toFixed(2)};   // Chrome contabiliza UTF-16
+}
+let _lsFail=null;
+function _lsBanner(msg, ok){
+  let b=document.getElementById('lsAlert');
+  if(ok){ if(b) b.remove(); _lsFail=null; return; }
+  if(!b){ b=document.createElement('div'); b.id='lsAlert';
+    b.style.cssText='position:fixed;top:0;left:0;right:0;z-index:100000;background:#b91c1c;color:#fff;'+
+      'font-weight:800;font-size:13px;padding:10px 16px;text-align:center;box-shadow:0 3px 14px rgba(0,0,0,.45)';
+    (document.body||document.documentElement).appendChild(b);
+  }
+  b.innerHTML='⛔ EL TRABAJO NO SE ESTÁ GUARDANDO — '+msg+
+    ' <button onclick="exportBackup()" style="margin-left:10px;background:#fff;color:#b91c1c;border:none;border-radius:6px;padding:4px 12px;font-weight:800;cursor:pointer">💾 Respaldar a archivo ahora</button>';
+}
+// VERSIÓN WEB: solo consulta, ninguna escritura del estado principal.
+function ls(k,v){ return true; }
+function lsFlush(rapido){ return true; }
+function _lsRaw(k,valor,comprimir){ return true; }
 let boxState    = lg('cabida_cad_boxes',{areas:{},rooms:{}});
 // ── VERSIONADO DE ESQUEMA ────────────────────────────────────────────────────
 // Todo cambio de estructura de wsState se registra como una migración numerada
@@ -1113,13 +1326,12 @@ let wsState     = migrateState(lg('cabida_cad_ws',{dots:{}}));
 // PROTECCIÓN DE ASIGNACIONES: snapshot diario de los puestos de trabajo.
 // Independiente del .bak (que se sobreescribe con cada guardado): si un día de
 // trabajo sale mal, cabida_cad_ws.day conserva el estado con que ABRIÓ el día.
-try{
+// Ahora vive en IndexedDB (cuota de cientos de MB) en vez de gastar la de
+// localStorage, que es la que necesita el estado de trabajo.
+setTimeout(()=>{ try{
   const _hoy=new Date().toISOString().slice(0,10);
-  if(localStorage.getItem('cabida_cad_ws.day.fecha')!==_hoy){
-    _lsSet('cabida_cad_ws.day', JSON.stringify(wsState));
-    _lsSet('cabida_cad_ws.day.fecha', _hoy);
-  }
-}catch(e){}
+  _idbGet('day.fecha').then(f=>{ if(f!==_hoy){ _idbSet('day.ws',wsState); _idbSet('day.fecha',_hoy); } }).catch(()=>{});
+}catch(e){} },1200);
 if(!wsState.beds) wsState.beds={};   // camas: { contenedorId: [{id,x,y,num}] }
 if(!wsState.equip) wsState.equip={}; // equipamiento: { recintoId: { unitKey:{x,y} } } (posición por unidad)
 if(!wsState.equipMoves) wsState.equipMoves=[]; // traslados entre recintos: [{id,srcRoom,key,dstRoom,ts}]
@@ -1211,11 +1423,33 @@ const SEN_BY_CODE=(function(){
   return o;
 })();
 let floorsDelta = lg('cabida_cad_delta',{added_areas:{},removed_areas:[],added_rooms:{},removed_rooms:[]});
-function _markSaved(){ try{ window.__lastSavedAt=Date.now(); _lsSet('cabida_cad_lastchange', Date.now()); updateSaveBadge('saved'); updateBackupBadge(); }catch{} }
-function sBox(){ _codeBoxIndex=null; ls('cabida_cad_boxes',boxState);   ls('cabida_cad_boxes.bak',boxState);   _markSaved();  _undoQueue(); }
-function sWs(){  ls('cabida_cad_ws',wsState);       ls('cabida_cad_ws.bak',wsState);       _markSaved();  _undoQueue(); }
+// ok===false ⇒ el navegador rechazó la escritura: el distintivo NO puede decir
+// "guardado" (el aviso rojo de ls() ya está en pantalla).
+// El distintivo se actualiza SIEMPRE primero: si el navegador rechaza la marca
+// de tiempo (cuota llena), el usuario igual tiene que ver en qué estado quedó.
+function _markSaved(ok){
+  if(ok==='pend') return;                      // aún en cola: queda "Guardando…"
+  if(ok===false){ try{updateSaveBadge('error');}catch{} return; }
+  try{ updateSaveBadge('saved'); updateBackupBadge(); }catch{}
+  try{ window.__lastSavedAt=Date.now(); _lsSet('cabida_cad_lastchange', Date.now()); }catch{}
+  try{ fbakProgramar(); }catch{}   // agenda el respaldo a archivo (no bloquea)
+  // El testigo de memoria se refresca justo cuando la ocupación cambió, pero
+  // no más de una vez cada 3 s: recorrer localStorage entero no es gratis.
+  try{ if(Date.now()-_memUlt>3000) updateMemBar(); }catch{}
+}
+function sBox(){ _codeBoxIndex=null; _areaCol=null; const k=ls('cabida_cad_boxes',boxState); _idbBak('boxes',boxState); _markSaved(k); _undoQueue(); }
+function sWs(){  const k=ls('cabida_cad_ws',wsState);  _idbBak('ws',wsState);    _markSaved(k); _undoQueue(); }
 if(!nameState.codes)nameState.codes={};
-function sNames(){ _codeBoxIndex=null; ls('cabida_cad_names',nameState); ls('cabida_cad_names.bak',nameState); _markSaved(); _undoQueue(); }
+function sNames(){ _codeBoxIndex=null; _areaCol=null; const k=ls('cabida_cad_names',nameState); _idbBak('names',nameState); _markSaved(k); _undoQueue(); }
+// Respaldo interno de recuperación: va a IndexedDB (no gasta la cuota de
+// localStorage) y como mucho una vez por minuto por clave.
+const _idbBakT={};
+function _idbBak(k,v){
+  const now=Date.now();
+  if(_idbBakT[k] && now-_idbBakT[k]<60000) return;
+  _idbBakT[k]=now;
+  try{ _idbSet('bak.'+k, v).catch(()=>{}); }catch(e){}
+}
 /* ── DESHACER (Ctrl+Z) ─────────────────────────────────────────────────────
    Historial de snapshots del estado editable (cajas, nombres, puestos, delta).
    Se captura tras cada ráfaga de guardado (debounce) y se restaura al deshacer. */
@@ -1251,7 +1485,7 @@ window.addEventListener('keydown',e=>{
     e.preventDefault(); doUndo();
   }
 });
-function sDelta(){ ls('cabida_cad_delta',floorsDelta); ls('cabida_cad_delta.bak',floorsDelta); _markSaved();  _undoQueue(); }
+function sDelta(){ const k=ls('cabida_cad_delta',floorsDelta); _idbBak('delta',floorsDelta); _markSaved(k); _undoQueue(); }
 if(!nameState.capacity)nameState.capacity={};
 function rCapacity(id){ return (nameState.capacity||{})[id]||''; }
 function rPabellon(id){ return (nameState.pabellon||{})[id]||''; }   // '' | 'mayor' | 'menor'
@@ -1436,10 +1670,8 @@ function psExportMatriz(){
   const payload={version:'export '+new Date().toISOString().slice(0,10)+' · matriz Fase 1 + validación manual',
     base:(window.SHARED_PAUTAS_RECINTOS&&window.SHARED_PAUTAS_RECINTOS.version)||'',
     manual:man};
-  const blob=new Blob([JSON.stringify(payload,null,1)],{type:'application/json'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-  a.download='pautas_manual_'+new Date().toISOString().slice(0,10)+'.json'; a.click();
-  URL.revokeObjectURL(a.href);
+  guardarArchivo(EXP_DIRS.backup, 'pautas_manual_'+new Date().toISOString().slice(0,10)+'.json',
+    JSON.stringify(payload,null,1), 'application/json');
 }
 if(!nameState.recup)nameState.recup={};
 function rRecup(id){ const r=(nameState.recup||{})[id]; return {camas:(r&&+r.camas)||0, bergere:(r&&+r.bergere)||0}; }
@@ -1457,12 +1689,11 @@ function _saveAll(){
     ls('cabida_cad_ws',wsState);
     ls('cabida_cad_names',nameState);
     ls('cabida_cad_delta',floorsDelta);
-    // duplicados de respaldo
-    ls('cabida_cad_boxes.bak',boxState);
-    ls('cabida_cad_ws.bak',wsState);
-    ls('cabida_cad_names.bak',nameState);
-    ls('cabida_cad_delta.bak',floorsDelta);
-    _autosaveDirty=false; _markSaved();
+    // Los duplicados de respaldo van a IndexedDB, NO a localStorage: en
+    // localStorage duplicaban la ocupación hasta reventar la cuota.
+    _idbBak('boxes',boxState); _idbBak('ws',wsState);
+    _idbBak('names',nameState); _idbBak('delta',floorsDelta);
+    _autosaveDirty=false;      // el distintivo lo actualiza lsFlush()
   }catch(err){ updateSaveBadge('error'); }
 }
 function scheduleAutosave(){
@@ -1470,15 +1701,18 @@ function scheduleAutosave(){
   if(_autosaveTimer) clearTimeout(_autosaveTimer);
   _autosaveTimer=setTimeout(()=>{_saveAll(); _autosaveTimer=null;}, AUTOSAVE_DEBOUNCE_MS);
 }
-function flushAutosave(){
+// rapido=true ⇒ estamos cerrando: escribir sin comprimir para no arriesgar que
+// el navegador corte la pestaña a mitad de camino.
+function flushAutosave(rapido){
   if(_autosaveTimer){clearTimeout(_autosaveTimer); _autosaveTimer=null;}
   if(_autosaveDirty) _saveAll();
+  lsFlush(rapido===true);
 }
 // Cuelga listeners de ciclo de vida tan pronto como el DOM exista.
 function _attachLifecycleSave(){
-  window.addEventListener('beforeunload',flushAutosave);
-  window.addEventListener('pagehide',flushAutosave);
-  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') flushAutosave(); });
+  window.addEventListener('beforeunload',()=>flushAutosave(true));
+  window.addEventListener('pagehide',()=>flushAutosave(true));
+  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') flushAutosave(true); });
   // Muestra el badge inicial como "Guardado" desde el primer paint.
   setTimeout(()=>updateSaveBadge('saved'),50);
 }
@@ -1531,18 +1765,107 @@ async function publicarAtlasPM(){
 function exportBackup(){
   try{
     const payload = _backupPayload();
-    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
     const ts = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
-    a.href = url; a.download = 'Cabida_respaldo_'+ts+'.json';
-    document.body.appendChild(a); a.click();
-    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 100);
+    guardarArchivo(EXP_DIRS.backup, 'Cabida_respaldo_'+ts+'.json',
+      JSON.stringify(payload, null, 2), 'application/json');
     try{ _lsSet('cabida_cad_last_export', Date.now()); }catch{}
     updateSaveBadge('saved'); updateBackupBadge();
   }catch(err){
     alert('No se pudo exportar el respaldo: ' + (err && err.message || err));
   }
+}
+/* ── DIAGNÓSTICO DE GUARDADO ────────────────────────────────────────────────
+   Responde en 5 segundos la pregunta "¿se está guardando mi trabajo?": mide
+   la ocupación real del navegador clave por clave, hace una escritura de
+   prueba de verdad, y revisa las capas de recuperación (IndexedDB y carpeta
+   de trabajo). Pensado para que Matías pueda verificarlo solo en su Chrome. */
+async function diagGuardado(){
+  const L=[], KB=n=>(n/1024).toFixed(0)+' KB';
+  L.push('🩺 DIAGNÓSTICO DE GUARDADO — Atlas HDS');
+  L.push('');
+  if(_SELFTEST){
+    L.push('⛔ MODO SELFTEST ACTIVO (?selftest=1 en la URL).');
+    L.push('   En este modo Atlas NO guarda NADA a propósito.');
+    L.push('   → Quita "?selftest=1" del link y recarga.');
+    L.push('');
+  }
+  // 1 · ocupación
+  const u=lsUso();                          // el navegador da ~5 MB por origen
+  L.push('1) ESPACIO DEL NAVEGADOR');
+  L.push('   Origen: '+(location.origin==='null'||location.protocol==='file:'
+    ? 'archivo local (file://) — OJO: todas las plataformas HDS comparten estos ~5 MB'
+    : location.origin));
+  L.push('   Uso total: '+u.mb+' MB de ~5 MB  ('+Math.round(u.chars*2/1048576*100/5)+'% de la cuota)');
+  const filas=[], ajeno=[];
+  try{ for(const k in localStorage) if(Object.prototype.hasOwnProperty.call(localStorage,k)){
+    const n=String(localStorage[k]).length;
+    filas.push([k,n]);
+    if(!/^cabida_/.test(k)) ajeno.push([k,n]);
+  } }catch(e){}
+  filas.sort((a,b)=>b[1]-a[1]).slice(0,8).forEach(f=>L.push('     · '+f[0]+' — '+KB(f[1]*2)));
+  const pesoAjeno=ajeno.reduce((s,f)=>s+f[1],0);
+  if(pesoAjeno>50*1024){
+    L.push('   De eso, '+KB(pesoAjeno*2)+' son de OTRAS plataformas (no del Atlas):');
+    ajeno.sort((a,b)=>b[1]-a[1]).slice(0,5).forEach(f=>L.push('     · '+f[0]+' — '+KB(f[1]*2)));
+  }
+  L.push('   Compresión del estado: '+(LZ_OK?'activa (ocupa ~7 veces menos)':'NO disponible en este navegador'));
+  L.push('');
+  // 2 · escritura real
+  L.push('2) PRUEBA DE ESCRITURA REAL');
+  let okW=false;
+  if(_SELFTEST){ L.push('   (omitida: modo selftest)'); }
+  else{
+    try{
+      const probe='cabida_cad__diag', val='x'.repeat(2048)+Date.now();
+      _lsSet(probe,val);
+      okW = localStorage.getItem(probe)===val;
+      localStorage.removeItem(probe);
+      L.push(okW ? '   ✓ El navegador acepta escrituras. El guardado funciona.'
+                 : '   ⛔ Se escribió pero no se pudo releer: almacenamiento inestable.');
+    }catch(e){ L.push('   ⛔ FALLÓ: '+(e.name||'error')+' — '+(e.message||'')); L.push('      → Respalda a archivo AHORA (💾 Respaldar).'); }
+  }
+  L.push('');
+  // 3 · último guardado
+  L.push('3) ÚLTIMO GUARDADO / RESPALDO');
+  const le=+(localStorage.getItem('cabida_cad_last_export')||0);
+  L.push('   Último respaldo a archivo: '+(le?new Date(le).toLocaleString('es-CL'):'nunca'));
+  // Puestos y personas asignadas: es lo que hay que comparar contra un respaldo
+  // para saber si al navegador le falta trabajo.
+  let nPu=0, nAs=0, porPiso={};
+  for(const rid in (wsState.dots||{})){
+    const arr=wsState.dots[rid]; if(!Array.isArray(arr)) continue;
+    const piso=rid.startsWith('P-')?rid.split('-').slice(0,2).join('-'):rid.split('-')[0];
+    for(const ws of arr){ nPu++;
+      if((ws.nombre||'').trim()){ nAs++; porPiso[piso]=(porPiso[piso]||0)+1; } }
+  }
+  L.push('   Recintos dibujados: '+Object.keys(boxState.rooms||{}).length+
+         '  ·  con nombre: '+Object.keys(nameState.rooms||{}).length);
+  L.push('   Puestos: '+nPu+'  ·  con persona asignada: '+nAs);
+  L.push('     por piso: '+(Object.keys(porPiso).sort().map(k=>k+'='+porPiso[k]).join('  ')||'ninguno'));
+  L.push('');
+  // 4 · capas de recuperación
+  L.push('4) CAPAS DE RECUPERACIÓN');
+  for(const k of ['bak.boxes','bak.ws','bak.names','bak.delta','day.ws']){
+    try{ const v=await _idbGet(k);
+      L.push('   '+(v?'✓':'—')+' IndexedDB '+k+(v?' ('+KB(JSON.stringify(v).length*2)+')':' (sin copia todavía)'));
+    }catch(e){ L.push('   ⚠ IndexedDB '+k+': no accesible ('+(e.message||e)+')'); }
+  }
+  await fbakInfo();
+  if(_fbak.vivo){
+    L.push('   ✓ Respaldo automático a ARCHIVO (servidor local) — activo');
+    L.push('     '+_fbakResumen().split('\n').join('\n     '));
+  }else{
+    L.push('   ⛔ Respaldo automático a ARCHIVO — el servidor de acciones no responde');
+    L.push('     Es la única capa que sobrevive a una purga del navegador.');
+    L.push('     Arráncalo con el LaunchAgent cl.hsalvador.hub.acciones');
+    L.push('     o con: python3 _DEV/deploy_server.py');
+  }
+  L.push('   '+(_abHandle?'✓ Carpeta de trabajo (solo Chrome) — configurada'
+                        :'— Carpeta de trabajo: no aplica en Safari (API solo de Chrome)'));
+  L.push('');
+  L.push(okW && !_SELFTEST && _fbak.vivo ? '✅ Todo en orden.'
+    : '⚠ Revisa los puntos marcados arriba.');
+  alert(L.join('\n'));
 }
 /* ── RESPALDO AUTOMÁTICO A CARPETA (File System Access API) ─────────────────
    El usuario elige una carpeta una vez (idealmente sincronizada a OneDrive/Drive);
@@ -1554,7 +1877,7 @@ function _idb(){ return new Promise((res,rej)=>{ const r=indexedDB.open('atlas_f
   r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
 async function _idbSet(k,v){ const db=await _idb(); return new Promise((res,rej)=>{ const tx=db.transaction('kv','readwrite'); tx.objectStore('kv').put(v,k); tx.oncomplete=res; tx.onerror=()=>rej(tx.error); }); }
 async function _idbGet(k){ const db=await _idb(); return new Promise((res,rej)=>{ const tx=db.transaction('kv','readonly'); const g=tx.objectStore('kv').get(k); g.onsuccess=()=>res(g.result); g.onerror=()=>rej(g.error); }); }
-function _abLabel(state){ const el=document.getElementById('autoBkLbl'); if(el) el.textContent=state; }
+function _abLabel(state){ const el=document.getElementById('autoBkLbl'); if(el) el.textContent=state; try{expDestLabel();}catch(e){} }
 async function setupAutoBackup(){
   if(!window.showDirectoryPicker){ alert('Este navegador no soporta respaldo automático a carpeta (usa Chrome o Edge).'); return; }
   try{
@@ -1575,6 +1898,43 @@ async function _abReactivate(){
   try{ const h=await _idbGet('backupDir'); if(!h) return setupAutoBackup();
     if((await h.requestPermission({mode:'readwrite'}))==='granted'){ _abHandle=h; _abStart(); _abLabel('activo ✓'); _abWrite(true); }
   }catch(e){}
+}
+// ── DESTINO DE LAS EXPORTACIONES ────────────────────────────────────────────
+// Con carpeta de trabajo configurada (la misma del respaldo automático), TODO
+// lo que se exporta se guarda ahí, ordenado en subcarpetas, en vez de ir a
+// Descargas. Sin carpeta configurada se descarga como siempre.
+const EXP_DIRS={backup:'Respaldos', planilla:'Planillas', web:'Web'};
+async function _fsWrite(sub, nombre, data){
+  if(!_abHandle) return false;
+  try{
+    const dir = sub ? await _abHandle.getDirectoryHandle(sub,{create:true}) : _abHandle;
+    const fh=await dir.getFileHandle(nombre,{create:true});
+    const w=await fh.createWritable(); await w.write(data); await w.close();
+    return true;
+  }catch(e){ console.warn('carpeta de trabajo: no se pudo escribir —', e.message); return false; }
+}
+// Guarda en la carpeta de trabajo o, si no hay, descarga. Avisa dónde quedó.
+async function guardarArchivo(sub, nombre, data, mime){
+  const ok=await _fsWrite(sub, nombre, data);
+  if(!ok){
+    const blob=(data instanceof Blob)?data:new Blob([data],{type:mime||'application/octet-stream'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=nombre;
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); },4000);
+  }
+  if(typeof tbInfo!=='undefined'&&tbInfo){
+    tbInfo.textContent = ok ? ('📁 Guardado en '+(sub?sub+'/':'')+nombre) : ('⬇ Descargado: '+nombre);
+    setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },4500);
+  }
+  return ok;
+}
+function expDestLabel(){
+  const el=document.getElementById('expDest'); if(!el) return;
+  el.textContent = _abHandle ? ('📁 Se guarda en: '+(_abHandle.name||'carpeta de trabajo')+'/')
+                             : '⬇ Se descarga a la carpeta de Descargas';
+  el.title = _abHandle ? 'Respaldos/ · Planillas/ · Web/ dentro de esa carpeta'
+                       : 'Configurá una carpeta de trabajo abajo para guardar ahí en vez de Descargas';
 }
 function _abStart(){ clearInterval(_abTimer); _abTimer=setInterval(()=>_abWrite(false), 5*60*1000); }
 async function _abWrite(force){
@@ -1625,11 +1985,7 @@ function exportForWeb(){
     const js='// cabida_web_snapshot.js — generado por Atlas HDS · '+out.meta.exportedAt+'\n'+
              '// '+out.floors.length+' pisos · '+nAreas+' áreas · '+nRooms+' recintos posicionados\n'+
              'window.CABIDA_WEB = '+JSON.stringify(out)+';\n';
-    const blob=new Blob([js],{type:'application/javascript'});
-    const url=URL.createObjectURL(blob); const a=document.createElement('a');
-    a.href=url; a.download='cabida_web_snapshot.js';
-    document.body.appendChild(a); a.click();
-    setTimeout(()=>{URL.revokeObjectURL(url);a.remove();},100);
+    guardarArchivo(EXP_DIRS.web, 'cabida_web_snapshot.js', js, 'application/javascript');
     alert('Snapshot para web generado:\n'+out.floors.length+' pisos · '+nAreas+' áreas · '+nRooms+' recintos.\n\nSubí cabida_web_snapshot.js a la carpeta de la app web para actualizar los planos.');
   }catch(err){ alert('No se pudo generar el snapshot: '+(err&&err.message||err)); }
 }
@@ -1650,10 +2006,7 @@ function importBackup(ev){
       }
       // Backup defensivo del estado actual antes de sobrescribir
       try{
-        _lsSet('cabida_cad_boxes.prev_import', JSON.stringify(boxState));
-        _lsSet('cabida_cad_ws.prev_import',    JSON.stringify(wsState));
-        _lsSet('cabida_cad_names.prev_import', JSON.stringify(nameState));
-        _lsSet('cabida_cad_delta.prev_import', JSON.stringify(floorsDelta));
+        try{ _idbSet('prev_import',{boxes:boxState,ws:wsState,names:nameState,delta:floorsDelta,ts:Date.now()}).catch(()=>{}); }catch(e){}
       }catch{}
       // Aplicar
       if(data.cabida_cad_boxes)      ls('cabida_cad_boxes',      data.cabida_cad_boxes);
@@ -1662,6 +2015,7 @@ function importBackup(ev){
       if(data.cabida_cad_delta)      ls('cabida_cad_delta',       data.cabida_cad_delta);
       if(data.cabida_cad_structures) ls('cabida_cad_structures',  data.cabida_cad_structures);
       if(data.cabida_cad_dxf_calib)  ls('cabida_cad_dxf_calib',   data.cabida_cad_dxf_calib);
+      lsFlush(false);   // las cuatro claves grandes van en cola: escribir ANTES de recargar
       alert('✓ Respaldo restaurado correctamente.\n\nLa página se recargará para aplicar los cambios.');
       location.reload();
     }catch(err){
@@ -1722,10 +2076,21 @@ function updateBackupBadge(){
     const sb=document.getElementById('saveBadge');
     if(sb&&sb.parentNode) sb.parentNode.insertBefore(el, sb.nextSibling); else hdr.appendChild(el);
   }
-  const last=parseInt(localStorage.getItem('cabida_cad_last_export')||'0',10);
+  const lastExp=parseInt(localStorage.getItem('cabida_cad_last_export')||'0',10);
+  const lastFile=parseInt(localStorage.getItem('cabida_cad_last_filebak')||'0',10);
+  const last=Math.max(lastExp,lastFile);
   const chg=parseInt(localStorage.getItem('cabida_cad_lastchange')||'0',10);
-  const ago=ms=>{ const h=(Date.now()-ms)/3.6e6; if(h<1) return 'hace <1 h'; if(h<24) return 'hace '+Math.floor(h)+' h'; return 'hace '+Math.floor(h/24)+' d'; };
+  const ago=ms=>{ const h=(Date.now()-ms)/3.6e6; if(h<1){ const m=Math.round((Date.now()-ms)/6e4); return m<2?'recién':('hace '+m+' min'); } if(h<24) return 'hace '+Math.floor(h)+' h'; return 'hace '+Math.floor(h/24)+' d'; };
   let txt,bg,bd,fg,tip;
+  // Respaldo automático a archivo andando y al día: es la mejor protección que
+  // hay en Safari, y el distintivo lo tiene que mostrar.
+  if(typeof _fbak!=='undefined' && _fbak.vivo && lastFile && (Date.now()-lastFile)<6*3.6e6){
+    el.textContent='🗄 Archivo '+ago(lastFile);
+    el.style.background='#dcfce7'; el.style.borderColor='#16a34a'; el.style.color='#15803d';
+    el.title='Respaldo automático a archivo activo'+(_fbak.carpeta?(' en '+_fbak.carpeta):'')
+      +'. Se guarda solo mientras trabajas. Click para respaldar además a un .json descargado.';
+    return;
+  }
   if(!last){ txt='⚠ Sin respaldo'; bg='#fee2e2'; bd='#ef4444'; fg='#b91c1c'; tip='Nunca descargaste un respaldo a archivo. Si el navegador borra los datos, pierdes el trabajo. Click para respaldar ahora.'; }
   else { const stale=chg>last, d=(Date.now()-last)/8.64e7;
     if(stale||d>7){ txt='⚠ Respaldar ('+ago(last)+')'; bg='#fef3c7'; bd='#f59e0b'; fg='#78350f'; tip=(stale?'Tienes cambios sin respaldar a archivo. ':'Tu último respaldo es antiguo. ')+'Click para respaldar ahora.'; }
@@ -1736,6 +2101,157 @@ function updateBackupBadge(){
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',updateBackupBadge);
 else updateBackupBadge();
 setInterval(updateBackupBadge, 60000);   // refresca el "hace X" cada minuto
+
+/* ── TESTIGO DE MEMORIA DEL NAVEGADOR ───────────────────────────────────────
+   Barra chica y permanente con cuánto del cupo de localStorage está en uso.
+   Está acá porque el problema de agosto-2026 fue justamente invisible: la
+   cuota se llenó, el guardado empezó a fallar y nada en pantalla lo decía.
+   Verde hasta 60% · ámbar hasta 80% · rojo por encima. Click = diagnóstico. */
+const MEM_CUPO_MB=5;                     // ~5 MB por origen, no se puede subir
+let _memUlt=0;
+function updateMemBar(){
+  let el=document.getElementById('memBar');
+  // En consulta (AtlasWeb) el estado viene del snapshot: el cupo no significa nada.
+  if(typeof S!=='undefined' && S.viewOnly){ if(el) el.style.display='none'; return; }
+  if(!el){
+    const hdr=document.getElementById('hdr'); if(!hdr) return;
+    el=document.createElement('span'); el.id='memBar';
+    el.style.cssText='display:inline-flex;align-items:center;gap:5px;margin-left:8px;padding:3px 8px;'
+      +'border:1px solid #94b8d0;border-radius:10px;background:#eef4fa;cursor:pointer;'
+      +'flex-shrink:0;white-space:nowrap;font-size:10px;font-weight:600;transition:opacity .2s';
+    el.innerHTML='<span style="font-size:10px;line-height:1">🧠</span>'
+      +'<span id="memTrack" style="position:relative;width:46px;height:6px;border-radius:3px;background:#cbd9e6;overflow:hidden">'
+      +'<span id="memFill" style="position:absolute;left:0;top:0;bottom:0;width:0;border-radius:3px;transition:width .3s,background .3s"></span></span>'
+      +'<span id="memTxt" style="font-variant-numeric:tabular-nums"></span>';
+    el.onclick=()=>{ try{ diagGuardado(); }catch(e){} };
+    const bb=document.getElementById('backupBadge');
+    if(bb&&bb.parentNode) bb.parentNode.insertBefore(el, bb.nextSibling); else hdr.appendChild(el);
+  }
+  const u=lsUso(), pct=Math.min(100, Math.round(u.mb/MEM_CUPO_MB*100));
+  const col = pct>=80 ? '#dc2626' : pct>=60 ? '#f59e0b' : '#16a34a';
+  const fill=document.getElementById('memFill'), txt=document.getElementById('memTxt');
+  if(fill){ fill.style.width=Math.max(pct,2)+'%'; fill.style.background=col; }
+  if(txt){ txt.textContent=pct+'%'; txt.style.color=col; }
+  el.style.borderColor = pct>=80 ? '#dc2626' : '#94b8d0';
+  el.title='Memoria del navegador: '+u.mb+' MB de ~'+MEM_CUPO_MB+' MB ('+pct+'%).\n'
+    +(LZ_OK?'El estado se guarda comprimido (~7 veces menos).\n':'⚠ Compresión no disponible en este navegador.\n')
+    +(pct>=80?'⚠ Poco espacio: respalda a archivo y avisá.\n':'')
+    +'Este cupo NO se puede aumentar; se comparte con las demás plataformas del mismo origen.\n'
+    +'Click para el diagnóstico completo.';
+  _memUlt=Date.now();
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',updateMemBar);
+else updateMemBar();
+setInterval(updateMemBar, 30000);
+
+/* ── RESPALDO AUTOMÁTICO A ARCHIVO (servidor local de acciones) ─────────────
+   El estado vive en el navegador, y el navegador lo puede borrar sin avisar
+   (pasó el 21-jul-2026). El respaldo automático a carpeta usa File System
+   Access API, que SOLO existe en Chrome; acá se trabaja en Safari. Este canal
+   es el equivalente que anda en cualquier navegador: un POST al servidor de
+   acciones (127.0.0.1:8799), que escribe el estado a disco en
+   "Respaldo y Export ATLAS/Estado/" y va dejando copias fechadas.
+   Si el servidor no está corriendo, no molesta: se apaga solo y el badge lo
+   dice. */
+const SRV_ACC='http://localhost:8799';
+const FBAK_ESPERA=20000;   // manda 20 s después del último cambio…
+const FBAK_MIN=60000;      // …y como mucho una vez por minuto
+// Solo desde el equipo de trabajo y solo en modo edición: la versión web de
+// consulta (AtlasWeb, que puede estar publicada) no debe escribir NADA.
+const FBAK_APLICA=/^https?:$/.test(location.protocol)
+  && /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+// _SELFTEST tiene que estar acá SÍ O SÍ: el selftest muta el estado en memoria
+// a propósito, y esta capa manda _backupPayload() (memoria) sin pasar por ls(),
+// así que sin este guarda una corrida de prueba pisaba el respaldo real.
+function _fbakOff(){ return _SELFTEST || !FBAK_APLICA || (typeof S!=='undefined' && S.viewOnly); }
+let _fbak={vivo:null, ts:null, bytes:0, historicos:0, carpeta:'', ultimo:0,
+           timer:null, enVuelo:false, error:null};
+function _fbakEdad(){ const t=parseInt(localStorage.getItem('cabida_cad_last_filebak')||'0',10);
+  return t? (Date.now()-t) : Infinity; }
+async function fbakInfo(){
+  if(_fbakOff()){ _fbak.vivo=false; return _fbak; }
+  try{
+    const j=await (await fetch(SRV_ACC+'/atlas-estado/info',{cache:'no-store'})).json();
+    _fbak.vivo=true; _fbak.ts=j.existe?j.ts:null; _fbak.bytes=j.bytes||0;
+    _fbak.historicos=j.historicos||0; _fbak.carpeta=j.carpeta||''; _fbak.error=null;
+  }catch(e){ _fbak.vivo=false; _fbak.error='el servidor de acciones no responde'; }
+  try{ updateBackupBadge(); }catch(e){}
+  return _fbak;
+}
+// Se llama en cada guardado: agenda el envío sin bloquear nada.
+function fbakProgramar(){
+  if(_fbakOff()) return;
+  if(_fbak.vivo===false) return;                     // servidor caído: no insistir
+  if(_fbak.timer) clearTimeout(_fbak.timer);
+  const espera=Math.max(FBAK_ESPERA, FBAK_MIN-(Date.now()-_fbak.ultimo));
+  _fbak.timer=setTimeout(()=>{ _fbak.timer=null; fbakAhora(false); }, espera);
+}
+function _fbakResumen(){
+  if(_fbak.vivo===false) return 'Servidor de acciones no disponible.';
+  if(!_fbak.ts) return 'Todavía sin respaldo a archivo.';
+  return 'Último: '+_fbak.ts.replace('T',' ')+'  ·  '+(_fbak.bytes/1048576).toFixed(2)+' MB'
+       + '\nCopias fechadas: '+_fbak.historicos
+       + (_fbak.carpeta?('\nCarpeta: '+_fbak.carpeta):'');
+}
+async function fbakAhora(manual){
+  if(_fbakOff()){ if(manual) alert('El respaldo automático a archivo solo funciona en el Atlas local, en modo edición.'); return false; }
+  if(_fbak.enVuelo) return false;
+  _fbak.enVuelo=true;
+  try{
+    lsFlush(false);                                  // que el navegador quede al día también
+    const r=await fetch(SRV_ACC+'/atlas-estado',{method:'POST',
+      headers:{'Content-Type':'application/json'}, body:JSON.stringify(_backupPayload())});
+    const j=await r.json();
+    if(!j.ok) throw new Error(j.error||'el servidor rechazó el estado');
+    _fbak.vivo=true; _fbak.ultimo=Date.now(); _fbak.ts=j.ts; _fbak.bytes=j.bytes; _fbak.error=null;
+    if(j.historico) _fbak.historicos++;
+    try{ _lsSet('cabida_cad_last_filebak', Date.now()); }catch(e){}
+    if(j.aviso) console.warn('Atlas · respaldo a archivo: '+j.aviso);
+    if(manual) alert('✓ Estado guardado en archivo.\n\n'+_fbakResumen()
+      +(j.aviso?('\n\n⚠ '+j.aviso):''));
+    try{ updateBackupBadge(); }catch(e){}
+    return true;
+  }catch(e){
+    _fbak.vivo=false; _fbak.error=String(e&&e.message||e);
+    if(manual) alert('No se pudo guardar el estado en archivo:\n'+_fbak.error
+      +'\n\nRevisá que el servidor de acciones esté corriendo (LaunchAgent cl.hsalvador.hub.acciones).');
+    try{ updateBackupBadge(); }catch(e){}
+    return false;
+  }finally{ _fbak.enVuelo=false; }
+}
+async function fbakRestaurar(){
+  if(S.viewOnly){ alert('Modo consulta: la restauración está deshabilitada.'); return; }
+  try{
+    const r=await fetch(SRV_ACC+'/atlas-estado',{cache:'no-store'});
+    if(!r.ok) throw new Error('todavía no hay respaldo a archivo');
+    const d=await r.json();
+    if(!d || !d.cabida_cad_boxes) throw new Error('el archivo no parece un respaldo de Atlas');
+    const nR=Object.keys((d.cabida_cad_boxes||{}).rooms||{}).length,
+          nP=Object.keys((d.cabida_cad_ws||{}).dots||{}).length,
+          aR=Object.keys(boxState.rooms||{}).length,
+          aP=Object.keys(wsState.dots||{}).length;
+    if(!confirm('¿Restaurar el estado guardado en archivo?\n\n'
+      +'  En el archivo:  '+nR+' recintos · '+nP+' puestos\n'
+      +'  Ahora en pantalla: '+aR+' recintos · '+aP+' puestos\n\n'
+      +(nR<aR||nP<aP ? '⚠ El archivo tiene MENOS que lo que tienes en pantalla.\n\n' : '')
+      +'Se reemplaza lo que hay en pantalla. La página se recargará.')) return;
+    try{ _idbSet('prev_import',{boxes:boxState,ws:wsState,names:nameState,delta:floorsDelta,ts:Date.now()}).catch(()=>{}); }catch(e){}
+    if(d.cabida_cad_boxes)      ls('cabida_cad_boxes',      d.cabida_cad_boxes);
+    if(d.cabida_cad_ws)         ls('cabida_cad_ws',         d.cabida_cad_ws);
+    if(d.cabida_cad_names)      ls('cabida_cad_names',      d.cabida_cad_names);
+    if(d.cabida_cad_delta)      ls('cabida_cad_delta',      d.cabida_cad_delta);
+    if(d.cabida_cad_structures) ls('cabida_cad_structures', d.cabida_cad_structures);
+    if(d.cabida_cad_dxf_calib)  ls('cabida_cad_dxf_calib',  d.cabida_cad_dxf_calib);
+    lsFlush(false);                                  // escribir ANTES de recargar
+    alert('✓ Estado restaurado desde archivo.\n\nLa página se recargará.');
+    location.reload();
+  }catch(e){ alert('No se pudo restaurar desde archivo:\n'+(e&&e.message||e)); }
+}
+if(!_SELFTEST && FBAK_APLICA){
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>fbakInfo());
+  else fbakInfo();
+  setInterval(()=>{ if(_fbak.vivo===false) fbakInfo(); }, 300000);  // reintenta cada 5 min
+}
 
 // Display-name helpers — custom name overrides FLOORS default
 function aName(id){return nameState.areas[id]||FLOORS.flatMap(f=>f.areas).find(a=>a.id===id)?.name||id;}
@@ -2245,11 +2761,55 @@ function crumb0Click(){ if(S.level>1){ S.history=[]; goFloor(S.floorId); } }
 
 // ═══ SVG HELPERS ════════════════════════════════════════════════════════════
 const NS='http://www.w3.org/2000/svg';
+// Paleta de servicios (vista general). Tonos FRÍOS, todos institucionales; el
+// color de cada área se asigna por coloreado de grafo (áreas vecinas nunca
+// comparten tono), no por índice, para que se distingan aunque estén pegadas.
 const AREA_TONES = [
-  {fill:'rgba(59,130,246,.18)', stroke:'#3b82f6'},   // standard blue
-  {fill:'rgba(37,99,235,.20)',  stroke:'#2563eb'},    // deeper royal blue
-  {fill:'rgba(96,165,250,.15)', stroke:'#60a5fa'},    // lighter sky blue
+  {fill:'rgba(59,130,246,.18)', stroke:'#3b82f6'},   // azul
+  {fill:'rgba(13,148,136,.18)', stroke:'#0d9488'},   // verde azulado
+  {fill:'rgba(99,102,241,.18)', stroke:'#6366f1'},   // índigo
+  {fill:'rgba(8,145,178,.17)',  stroke:'#0891b2'},   // cian
+  {fill:'rgba(22,163,74,.16)',  stroke:'#16a34a'},   // verde
+  {fill:'rgba(124,58,237,.17)', stroke:'#7c3aed'},   // violeta
+  {fill:'rgba(2,132,199,.17)',  stroke:'#0284c7'},   // celeste
 ];
+// SERVICIOS CONCESIONADOS: único tono CÁLIDO + borde segmentado. Al ser el
+// único cálido de la paleta se reconocen de un vistazo entre los clínicos.
+const AREA_TONE_CONC = {fill:'rgba(217,119,6,.20)', stroke:'#b45309', dash:'30 14'};
+const CONC_PAT=/\(\s*sc\s*\)|casino|alimentac|aseo\b|lavander|roper[ií]a|seguridad|vigilanc|estacionam|residuo|\breas\b|cafeter|jard[ií]n infantil|sala cuna|mantenci[oó]n|mantenimiento/i;
+// Marca de concesionado: override explícito del usuario > heurística por nombre.
+function esConcesionado(areaId){
+  const f=(nameState.conc||{})[areaId];
+  if(f!==undefined) return !!f;
+  return CONC_PAT.test(aName(areaId)||'');
+}
+function setConcesionado(areaId,val,nombre){
+  if(!nameState.conc) nameState.conc={};
+  const auto=CONC_PAT.test(nombre||aName(areaId)||'');
+  if(!!val===auto) delete nameState.conc[areaId]; else nameState.conc[areaId]=val?1:0;
+}
+// Coloreado de grafo (Welsh–Powell): áreas cuyas cajas se tocan o quedan a
+// menos de GAP px reciben tonos distintos. Se recalcula al cambiar las cajas.
+let _areaCol=null;
+function areaColorMap(fl){
+  if(_areaCol && _areaCol._fl===fl.id) return _areaCol;
+  const its=fl.areas.map(a=>({id:a.id,sh:aShapes(a)})).filter(o=>o.sh.length)
+                    .map(o=>({id:o.id,b:bounds(o.sh)}));
+  const GAP=90;
+  const cerca=(p,q)=>!(p.b.x+p.b.w+GAP<q.b.x||q.b.x+q.b.w+GAP<p.b.x||
+                       p.b.y+p.b.h+GAP<q.b.y||q.b.y+q.b.h+GAP<p.b.y);
+  const adj={}; its.forEach(o=>adj[o.id]=[]);
+  for(let i=0;i<its.length;i++) for(let j=i+1;j<its.length;j++)
+    if(cerca(its[i],its[j])){ adj[its[i].id].push(its[j].id); adj[its[j].id].push(its[i].id); }
+  const map={_fl:fl.id};
+  its.slice().sort((p,q)=>adj[q.id].length-adj[p.id].length||String(p.id).localeCompare(String(q.id)))
+     .forEach(o=>{
+       const usados=new Set(adj[o.id].map(x=>map[x]).filter(v=>v!==undefined));
+       let c=0; while(usados.has(c)&&c<AREA_TONES.length) c++;
+       map[o.id]=c%AREA_TONES.length;
+     });
+  _areaCol=map; return map;
+}
 function el(tag,a={},txt=''){
   const e=document.createElementNS(NS,tag);
   for(const[k,v]of Object.entries(a))e.setAttribute(k,v);
@@ -2625,6 +3185,7 @@ function renderSVG(){
 
 function renderL1(fl){
   _areaLabels=[];
+  const CM=areaColorMap(fl);
   // Orden de pintado: los seleccionados se dibujan AL FINAL para que salten al
   // frente (z-order) cuando hay áreas superpuestas. Se conserva el índice
   // original (aIdx) para el tono y para no alterar nada más.
@@ -2633,7 +3194,9 @@ function renderL1(fl){
   order.forEach(({area,aIdx})=>{
     const sh=aShapes(area), sel=S.selIds.has(area.id);
     const cls='area-box'+(sel?' sel':'');
-    const t=AREA_TONES[aIdx%3];
+    const conc=esConcesionado(area.id);
+    const t=conc?AREA_TONE_CONC:AREA_TONES[(CM[area.id]!==undefined?CM[area.id]:aIdx)%AREA_TONES.length];
+    const stl=`fill:${t.fill};stroke:${t.stroke};stroke-width:4`+(t.dash?`;stroke-dasharray:${t.dash}`:'');
     // 2026-05-21 · Comportamiento clic en modo edición:
     //   • Clic simple → abre directamente el modal de info del área
     //   • Cmd (Mac) / Ctrl (Win/Linux) + clic → añade/quita de la multi-selección
@@ -2656,13 +3219,13 @@ function renderL1(fl){
 
     if(sh.length>1 && !S.editMode){
       // Merged multi-shape: single clean union polygon (no interior lines)
-      const p=el('path',{d:unionPath(sh),class:cls,'fill-rule':'evenodd',style:sel?'':`fill:${t.fill};stroke:${t.stroke};stroke-width:4`});
+      const p=el('path',{d:unionPath(sh),class:cls,'fill-rule':'evenodd',style:sel?'':stl});
       p.addEventListener('click',onCk); svg.appendChild(p);
     } else {
       // Single shape or edit mode: individual rects (editable)
       const multiA=sh.length>1;
       sh.forEach((s,si)=>{
-        const r=el('rect',{x:s.x,y:s.y,width:s.w,height:s.h,class:cls,style:sel?'':`fill:${t.fill};stroke:${t.stroke};stroke-width:4`});
+        const r=el('rect',{x:s.x,y:s.y,width:s.w,height:s.h,class:cls,style:sel?'':stl});
         r.addEventListener('click',onCk);
         if(S.editMode&&S.moveMode) r.addEventListener('mousedown',e=>{e.stopPropagation();startMoveBox(e,'area',area.id,si);});
         svg.appendChild(r);
@@ -2688,7 +3251,11 @@ function renderL1(fl){
     const fs=Math.max(20,Math.min(70,b.w/14,b.h/6));
     const ws=areaWsStats(area);
     const cx=b.x+b.w/2, cy=b.y+b.h/2;
-    const lbl=txt(cx,cy-fs*.78,aName(area.id),{class:'area-label','font-size':fs,'pointer-events':'none'});
+    // El nombre se arma en updateAreaLabelSizes(): ahí se sabe el tamaño real
+    // en pantalla y se decide si cabe en una línea o hay que partirlo en dos.
+    const lblTxt=(conc?'🏢 ':'')+aName(area.id);
+    const lbl=el('text',{x:cx,y:cy-fs*.78,'text-anchor':'middle','dominant-baseline':'middle',
+      class:'area-label','font-size':fs,'pointer-events':'none',...(conc?{fill:'#7c2d12'}:{})});
     const sub=txt(cx,cy+fs*.30,ws.total+(ws.total===1?' puesto':' puestos'),{class:'area-sub','font-size':fs*.55,'pointer-events':'none'});
     let sub2;
     if(ws.total>0){
@@ -2700,7 +3267,7 @@ function renderL1(fl){
       sub2=txt(cx,cy+fs*1.05,'sin puestos cargados',{class:'area-sub','font-size':fs*.42,'pointer-events':'none',fill:'#94a3b8'});
     }
     svg.appendChild(lbl); svg.appendChild(sub); svg.appendChild(sub2);
-    _areaLabels.push({lbl,sub,sub2,bw:b.w,bh:b.h});
+    _areaLabels.push({lbl,sub,sub2,bw:b.w,bh:b.h,cx,cy,name:lblTxt});
     // (La X de borrado ahora se dibuja por bloque en el loop de shapes, esquina
     //  inf-izquierda y pequeña: multi-bloque borra el bloque; única borra el área.)
   });
@@ -2710,14 +3277,48 @@ function renderL1(fl){
 
 function updateAreaLabelSizes(){
   if(!_areaLabels.length)return;
-  _areaLabels.forEach(({lbl,sub,sub2,bw,bh})=>{
-    // Target readable screen size: proportional to box screen area, clamped 13-22px
+  _areaLabels.forEach(({lbl,sub,sub2,bw,bh,cx,cy,name})=>{
+    // Tamaño legible en pantalla, proporcional al área visible (13-22 px)
     const screenArea = bw * bh * S.zoom * S.zoom;
     const targetPx = Math.max(13, Math.min(22, Math.sqrt(screenArea) / 22));
-    const fs = Math.round(targetPx / S.zoom);
+    let fs = Math.round(targetPx / S.zoom);
     lbl.setAttribute('font-size', fs);
+    // Nombre en 1 o 2 líneas según lo que quepa en el ANCHO del servicio: los
+    // nombres largos ya no se derraman sobre los servicios vecinos. Si con dos
+    // líneas aún no cabe, se achica la letra (con piso de legibilidad) en vez
+    // de recortar el nombre.
+    const K=0.56, maxW=bw*0.92, nm=String(name||'').trim();
+    const pal=nm.split(/\s+/).filter(Boolean);
+    let corte=null;                      // partición en 2 que deja la línea más corta
+    for(let i=1;i<pal.length;i++){
+      const a=pal.slice(0,i).join(' '), b=pal.slice(i).join(' ');
+      const m=Math.max(a.length,b.length);
+      if(!corte||m<corte.m) corte={a,b,m};
+    }
+    let lineas;
+    if(nm.length*K*fs<=maxW || !corte){
+      lineas=[nm];
+    } else {
+      lineas=[corte.a,corte.b];
+      const fsCabe=Math.floor(maxW/(corte.m*K));
+      if(fsCabe<fs) fs=Math.max(fsCabe, Math.round(9/S.zoom));   // no bajar de ~9 px
+      lbl.setAttribute('font-size', fs);
+    }
+    const firma=lineas.join('|');
+    if(lbl._firma!==firma){
+      lbl._firma=firma;
+      while(lbl.firstChild) lbl.removeChild(lbl.firstChild);
+      lineas.forEach((ln,i)=>lbl.appendChild(el('tspan',{x:cx, dy:(i?'0.95em':'0')},ln)));
+    }
+    // Con dos líneas el bloque completo (nombre + contadores) se recentra.
+    const dos=lineas.length>1;
+    lbl.setAttribute('y', Math.round(cy - fs*(dos?1.24:0.78)));
     sub.setAttribute('font-size', Math.round(fs * 0.55));
-    if(sub2) sub2.setAttribute('font-size', Math.round(fs * 0.50));
+    sub.setAttribute('y', Math.round(cy + fs*(dos?0.46:0.30)));
+    if(sub2){
+      sub2.setAttribute('font-size', Math.round(fs * 0.50));
+      sub2.setAttribute('y', Math.round(cy + fs*(dos?1.21:1.05)));
+    }
   });
 }
 
@@ -2944,11 +3545,11 @@ function renderL3(){
   if(!sh.length){
     // No box yet: show full-floor clickable zone for placing dots
     const az=el('rect',{x:0,y:0,width:IMG_W,height:IMG_H,class:'add-zone',rx:12});
-    az.addEventListener('click',e=>{
-      if(didPan||S.delDotMode)return;
-      const p=s2i(e.clientX,e.clientY);
-      addDot(room.id,p.x,p.y);
+    az.addEventListener('mousedown',e=>{
+      if(e.button!==0&&e.button!==2)return;
+      startPlaceDot(e,room.id,e.button===2);
     });
+    az.addEventListener('contextmenu',e=>e.preventDefault());
     svg.insertBefore(az,svg.firstChild);
     dots(room.id).forEach((dot,i)=>{
       const din=dot.tipo==='dinamico';
@@ -2982,12 +3583,12 @@ function renderL3(){
   }
   // Add zone (click empty space → add dot)
   const az=el('rect',{x:b.x,y:b.y,width:b.w,height:b.h,class:'add-zone',rx:12});
-  az.addEventListener('click',e=>{
-    if(didPan||S.delDotMode)return;
+  az.addEventListener('mousedown',e=>{
+    if(e.button!==0&&e.button!==2)return;
     if(e.target!==az)return;
-    const p=s2i(e.clientX,e.clientY);
-    addDot(room.id,p.x,p.y);
+    startPlaceDot(e,room.id,e.button===2);
   });
+  az.addEventListener('contextmenu',e=>e.preventDefault());
   svg.insertBefore(az,svg.firstChild);
   // Generate dots if empty
   const dd=dots(room.id);
@@ -4095,7 +4696,8 @@ function editBoxName(){
   const box=document.createElement('div');
   box.style.cssText=`position:absolute;left:${sx}px;top:${sy}px;transform:translate(-50%,-50%);
     background:#ffffff;border:2px solid #3b82f6;border-radius:8px;
-    padding:12px 14px;box-shadow:0 4px 20px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:8px;`;
+    padding:12px 14px;box-shadow:0 4px 20px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:8px;
+    max-height:88vh;overflow-y:auto;`;
 
   const lbl=document.createElement('div');
   lbl.textContent=isArea?'Nombre del área':'Nombre del recinto';
@@ -4116,7 +4718,20 @@ function editBoxName(){
   cancel.textContent='Cancelar'; cancel.style.cssText='background:#e2eaf4;color:#1a3a5c;border:none;border-radius:4px;padding:5px 14px;cursor:pointer;font-size:12px;';
 
   row.append(cancel,ok);
-  box.append(lbl,inp,row);
+  box.append(lbl,inp);
+
+  // Marca de SERVICIO CONCESIONADO (solo áreas): la vista general los pinta
+  // en el tono cálido para diferenciarlos de los servicios del hospital.
+  let concChk=null;
+  if(isArea){
+    const cw=document.createElement('label');
+    cw.style.cssText='display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#92400e;cursor:pointer;';
+    concChk=document.createElement('input');
+    concChk.type='checkbox'; concChk.checked=esConcesionado(id);
+    concChk.style.cssText='width:auto;margin:0';
+    cw.append(concChk, document.createTextNode('🏢 Servicio concesionado'));
+    box.append(cw);
+  }
 
   // ── Barra superior para tomar y desplazar el cuadro ────────────────────────
   // Se ancla como primer elemento del cuadro y ocupa todo su ancho (márgenes
@@ -4363,13 +4978,47 @@ function editBoxName(){
     );
   }
 
+  // Las acciones van al FINAL del cuadro (después de tipo, código, BIM y
+  // señalética) y quedan fijas al pie: antes aparecían pegadas al nombre, con
+  // todos los campos editables por debajo del botón Guardar.
+  row.style.cssText+='position:sticky;bottom:-12px;background:#fff;padding:9px 0 2px;margin-top:2px;border-top:1px solid #e2eaf4;z-index:2;';
+  box.append(row);
+  // Reencuadre: si el cuadro se sale de la ventana, se acomoda dentro.
+  // Síncrono (getBoundingClientRect fuerza el layout): con requestAnimationFrame
+  // no se ejecutaba si la pestaña no estaba pintando y el cuadro quedaba
+  // fuera de la pantalla, con el botón Guardar inalcanzable.
+  function _encuadrar(){
+    const VW=document.documentElement.clientWidth||window.innerWidth||0;
+    const VH=document.documentElement.clientHeight||window.innerHeight||0;
+    if(!VW||!VH) return;
+    const r=box.getBoundingClientRect(), M=10;
+    if(r.height<=0) return;
+    let l=r.left, tp=r.top;
+    if(r.height<VH-2*M){ if(r.bottom>VH-M) tp=VH-M-r.height; if(tp<M) tp=M; }
+    else tp=M;
+    if(r.width<VW-2*M){ if(r.right>VW-M) l=VW-M-r.width; if(l<M) l=M; }
+    else l=M;
+    if(Math.abs(l-r.left)>0.5||Math.abs(tp-r.top)>0.5){
+      box.style.boxSizing='border-box'; box.style.width=r.width+'px';
+      box.style.transform='none'; box.style.left=Math.round(l)+'px'; box.style.top=Math.round(tp)+'px';
+    }
+  }
+  _encuadrar();
+  setTimeout(_encuadrar,0);           // por si algún campo cambia el alto
+  window.addEventListener('resize',_encuadrar);
+
   function commit(){
     const v=inp.value.trim();
     const codVal=codeInp?codeInp.value.trim():'';
-    if(v){
-      if(isArea) nameState.areas[id]=v;
+    if(isArea && concChk) setConcesionado(id, concChk.checked, v);
+    // FIX: antes TODO el guardado colgaba de `if(v)`, así que en un recinto
+    // SIN NOMBRE no se guardaba nada —ni tipo, ni código, ni BIM, ni
+    // señalética— y el cuadro se cerraba como si hubiera guardado. El nombre
+    // es lo único condicionado: si se deja vacío, se conserva el que había.
+    {
+      if(isArea){ if(v) nameState.areas[id]=v; }
       else{
-        nameState.rooms[id]=v;
+        if(v) nameState.rooms[id]=v;
         if(!nameState.types)nameState.types={};
         nameState.types[id]=selectedType;
         if(!nameState.codes)nameState.codes={};
@@ -5443,18 +6092,40 @@ function openFichaRecinto(roomId){
   const eq=all.filter(e=>!esMobCli(e)&&!esTI(e));
   const split=(typeof _mncSplitRoom==='function')?_mncSplitRoom(roomId):{ti:[],mob:[]};
   const _inst=codeInstances(code);
+  // Recintos que comparten código: si el reparto por instancia dejó a ESTE en
+  // cero, la ficha mostraba nada. Se muestra entonces el total del código
+  // (atenuado y con aviso), para no perder la información de lo que hay.
+  const _partes=(typeof rCodeParts==='function')?rCodeParts(roomId):[code].filter(Boolean);
+  const _codeEq=_partes.reduce((a,c)=>a.concat(equipOfCode(c)),[]);
+  const _codeMnc=_partes.reduce((a,c)=>a.concat((typeof _mnc2CodeBase==='function')?_mnc2CodeBase(c):[]),[]);
+  const _isTI2=e=>_TI_FAMS.has(String(e.f||'').trim().toLowerCase());
+  const _cEq=_codeEq.filter(e=>!/mobiliario/i.test(e.f||'')&&!/apoyo ti|^ti$/i.test((e.f||'').trim()));
+  const _cMobCli=_codeEq.filter(e=>/mobiliario/i.test(e.f||''));
+  const _cTI=_codeEq.filter(e=>/apoyo ti|^ti$/i.test((e.f||'').trim())).concat(_codeMnc.filter(_isTI2));
+  const _cMobNc=_codeMnc.filter(e=>!_isTI2(e));
+  const _notaComp='<div class="fk-empty" style="color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:7px;padding:7px 9px;margin-bottom:5px;font-style:normal">'
+    +'⚠ El código '+esc(code)+' se reparte entre '+_inst+' recintos y las unidades quedaron en otro. '
+    +'Abajo, en gris, el total del código.</div>';
   const informatica=tiEmmc.concat(split.ti||[]);
   const mobNc=split.mob||[];
   // filas: Equipamiento e Informática son clicables → detalle EquiBox
   const rowHtml=(e,click)=>{
-    const attrs=click?` class="fk-eq fk-click" onclick='openEquipDetail(${JSON.stringify({t:e.t||'',n:e.n||'',f:e.f||'',c:e.c||1}).replace(/'/g,"&#39;")})' title="Ver detalle EquiBox"`:` class="fk-eq"`;
+    const dim=e._comp?' style="opacity:.6"':'';
+    const attrs=click?` class="fk-eq fk-click"${dim} onclick='openEquipDetail(${JSON.stringify({t:e.t||'',n:e.n||'',f:e.f||'',c:e.c||1}).replace(/'/g,"&#39;")})' title="Ver detalle EquiBox"`:` class="fk-eq"${dim}`;
     return `<div${attrs}><span class="q">${e.c||'—'}×</span><span class="nm">${esc(e.n)}</span><span class="fam">${esc(e.f||'')}</span>${click?'<span class="fk-go">›</span>':''}</div>`;
   };
-  const secHtml=(arr,click,vacio)=>arr.length?arr.map(e=>rowHtml(e,click)).join(''):`<div class="fk-empty">${vacio}</div>`;
-  const eqHtml   = secHtml(eq,true,'Sin equipamiento médico registrado para este recinto.');
-  const mobCliHtml=secHtml(mobCli,false,'Sin mobiliario clínico registrado para este recinto.');
-  const tiHtml   = secHtml(informatica,true,'Sin equipos de informática registrados para este recinto.');
-  const mobNcHtml= secHtml(mobNc,false,'Sin mobiliario no clínico registrado para este recinto.');
+  // Si a este recinto no le tocó nada pero el código sí tiene, se muestra el
+  // total del código atenuado en vez de dejar la sección en blanco.
+  const secHtml=(arr,click,vacio,codeArr)=>{
+    if(arr.length) return arr.map(e=>rowHtml(e,click)).join('');
+    if(codeArr&&codeArr.length) return _notaComp+codeArr.map(e=>rowHtml({...e,_comp:1},click)).join('');
+    return `<div class="fk-empty">${vacio}</div>`;
+  };
+  const _nada=q=>'La matriz no registra '+q+' para el código '+esc(code||'(sin código)')+'.';
+  const eqHtml   = secHtml(eq,true,_nada('equipamiento médico'),_cEq);
+  const mobCliHtml=secHtml(mobCli,false,_nada('mobiliario clínico'),_cMobCli);
+  const tiHtml   = secHtml(informatica,true,_nada('equipos de informática'),_cTI);
+  const mobNcHtml= secHtml(mobNc,false,_nada('mobiliario no clínico'),_cMobNc);
   // pauta (con estado de asignación: manual > matriz/regla)
   const _pe=pautaEstadoRoom(roomId);
   const _peTxt={sin:'🔴 Sin pauta',sugerida:'🟠 Sugerida · por validar',validada:'🟢 Validada',no_corresponde:'⚪ No corresponde'}[_pe.estado];
@@ -5661,9 +6332,46 @@ function rpShowTab(tab){
   _revOpen=rev;
   if(rev) renderBimPending();
 }
+// ── RECINTOS POR TIPO DEL SERVICIO (vista 2/3) ──────────────────────────────
+// Al entrar a un servicio, el panel derecho responde de inmediato "de qué está
+// hecho": 30 box de consulta, 1 sala de procedimiento, 2 baños…
+function renderSrvTipos(){
+  const card=document.getElementById('rpSrvCard'); if(!card) return;
+  const area=(S.level>=2 && S.areaId)?curArea():null;
+  if(!area){ card.style.display='none'; return; }
+  card.style.display='';
+  const cnt={}; let tot=0, dib=0, camas=0, puestos=0, asig=0;
+  (area.rooms||[]).forEach(r=>{
+    const t=rType(r.id), hay=(boxState.rooms[r.id]||[]).length>0;
+    (cnt[t]=cnt[t]||{n:0,d:0}).n++; if(hay) cnt[t].d++;
+    tot++; if(hay) dib++;
+    camas+=((wsState.beds||{})[r.id]||[]).filter(b=>b.kind!=='cupo'&&b.kind!=='puesto').length;
+    const dd=(wsState.dots||{})[r.id]||[];
+    puestos+=dd.length; asig+=dd.filter(isDotAsignado).length;
+  });
+  document.getElementById('srvName').textContent=aName(area.id);
+  document.getElementById('srvTotal').textContent=tot;
+  const filas=Object.entries(cnt).sort((a,b)=>b[1].n-a[1].n ||
+      String((ROOM_TYPES[a[0]]||{}).label||a[0]).localeCompare(String((ROOM_TYPES[b[0]]||{}).label||b[0]),'es'));
+  document.getElementById('srvBody').innerHTML = filas.length
+    ? filas.map(([k,v])=>{
+        const m=ROOM_TYPES[k]||ROOM_TYPES[''];
+        const pend=v.n-v.d;
+        return '<div class="rp-count"><span class="lbl"><span class="sw" style="background:'+m.col+'"></span>'+m.label
+          +(pend?'<span style="color:#b45309;font-weight:600;font-size:10px"> ('+pend+' sin dibujar)</span>':'')
+          +'</span><span class="num">'+v.n+'</span></div>';
+      }).join('')
+    : '<div style="padding:6px 0;color:#94a3b8">Este servicio aún no tiene recintos.</div>';
+  const extra=[];
+  if(camas) extra.push(camas+(camas===1?' cama colocada':' camas colocadas'));
+  if(puestos) extra.push(puestos+(puestos===1?' puesto':' puestos')+' · '+asig+' asignados');
+  document.getElementById('srvFoot').textContent =
+    (dib<tot ? (dib+' de '+tot+' dibujados') : 'todos dibujados') + (extra.length?(' · '+extra.join(' · ')):'');
+}
 function renderRightPanel(){
   syncBedCtrUI();
   try{ renderWorkpoints(); }catch(e){}
+  try{ renderSrvTipos(); }catch(e){}
   // Conteo de TODOS los tipos de recinto dibujados, con desglose por piso
   const byType={};            // tipo -> {total, byFloor:{}}
   let grandTotal=0, pabMayor=0, pabMenor=0;
@@ -5760,6 +6468,368 @@ function renderRightPanel(){
   }
 }
 
+// ── PUESTOS DEL SERVICIO (vista 3) ──────────────────────────────────────────
+// Panorama de todo el servicio sin salir del recinto: cuántos puestos hay y
+// quién está asignado en cada recinto. Dos lecturas: cantidad o nombres.
+let _servMode='cant';
+function _servPuestosData(){
+  const area=curArea(); if(!area) return null;
+  const rooms=[]; let tot=0, asig=0, pers=0;
+  (area.rooms||[]).forEach(r=>{
+    const dd=wsState.dots[r.id]||[]; if(!dd.length) return;
+    const gente=[];
+    dd.forEach(d=>{
+      if(d.tipo==='dinamico'){
+        (d.turnos||[]).forEach(x=>{ if(x.nombre) gente.push({n:x.nombre, c:[x.cargo,x.estamento].filter(Boolean).join(' · '), din:true, cds:!!x.cds, ext:!!x.externa, dc:!!x.dinClin}); });
+      } else if(d.nombre && d.nombre.trim()){
+        gente.push({n:d.nombre, c:[d.cargo,d.estamento].filter(Boolean).join(' · '), din:false, cds:!!d.cds, ext:!!d.externa, dc:!!d.dinClin});
+      }
+    });
+    const a=dd.filter(isDotAsignado).length;
+    tot+=dd.length; asig+=a; pers+=gente.length;
+    rooms.push({id:r.id, nombre:rName(r.id)||r.id, code:rCode(r.id)||'', total:dd.length, asig:a, gente});
+  });
+  rooms.sort((x,y)=>y.asig-x.asig || String(x.nombre).localeCompare(String(y.nombre),'es'));
+  return {area, rooms, tot, asig, disp:tot-asig, pers};
+}
+function openServPuestos(){ renderServPuestos(); document.getElementById('servModal').style.display='flex'; }
+function closeServPuestos(){ document.getElementById('servModal').style.display='none'; }
+function servSetMode(m){
+  _servMode=m;
+  const a=document.getElementById('spModoCant'), b=document.getElementById('spModoNom');
+  a.style.background=m==='cant'?'#1d5fa0':'#fff'; a.style.color=m==='cant'?'#fff':'#1a3a5c';
+  b.style.background=m==='nom'?'#1d5fa0':'#fff';  b.style.color=m==='nom'?'#fff':'#1a3a5c';
+  renderServPuestos();
+}
+function servGoRoom(rid){ closeServPuestos(); didPan=false; goRoom(rid); }
+function renderServPuestos(){
+  const D=_servPuestosData(); if(!D) return;
+  const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  document.getElementById('spTitle').textContent='👥 '+aName(D.area.id);
+  document.getElementById('spSub').textContent=
+    D.tot+(D.tot===1?' puesto':' puestos')+' · '+D.asig+' asignados · '+D.disp+' disponibles'
+    +(D.pers!==D.asig?(' · '+D.pers+' personas (incluye turnos)'):'')
+    +' · '+D.rooms.length+(D.rooms.length===1?' recinto':' recintos');
+  const chip=(t,bg,co,bo)=>'<span style="display:inline-block;margin-left:5px;font-size:9px;font-weight:700;color:'+co+';background:'+bg+';border:1px solid '+bo+';border-radius:6px;padding:1px 5px;vertical-align:middle">'+t+'</span>';
+  let html='';
+  if(!D.rooms.length){
+    html='<div style="padding:24px;text-align:center;color:#94a3b8;font-size:13px">Este servicio aún no tiene puestos cargados.</div>';
+  } else if(_servMode==='cant'){
+    html='<table style="width:100%;border-collapse:collapse;font-size:12.5px">'
+      +'<thead><tr style="background:#eef4fa;color:#48687e;font-size:10px;text-transform:uppercase;letter-spacing:.5px">'
+      +'<th style="text-align:left;padding:7px 9px">Recinto</th><th style="text-align:left;padding:7px 9px">Código</th>'
+      +'<th style="text-align:right;padding:7px 9px">Puestos</th><th style="text-align:right;padding:7px 9px">Asignados</th>'
+      +'<th style="text-align:right;padding:7px 9px">Disponibles</th></tr></thead><tbody>';
+    D.rooms.forEach(r=>{
+      const act=r.id===S.roomId;
+      html+='<tr onclick="servGoRoom(\''+r.id+'\')" style="cursor:pointer;border-bottom:1px solid #e8eef5;'+(act?'background:#eff6ff':'')+'"'
+        +' onmouseover="this.style.background=\'#f1f7fd\'" onmouseout="this.style.background=\''+(act?'#eff6ff':'transparent')+'\'">'
+        +'<td style="padding:7px 9px;font-weight:'+(act?'800':'600')+';color:#0f172a">'+(act?'▸ ':'')+esc(r.nombre)+'</td>'
+        +'<td style="padding:7px 9px;color:#64748b">'+esc(r.code||'—')+'</td>'
+        +'<td style="padding:7px 9px;text-align:right;font-weight:700;color:#1e293b">'+r.total+'</td>'
+        +'<td style="padding:7px 9px;text-align:right;font-weight:800;color:#15803d">'+r.asig+'</td>'
+        +'<td style="padding:7px 9px;text-align:right;font-weight:700;color:'+((r.total-r.asig)>0?'#b45309':'#94a3b8')+'">'+(r.total-r.asig)+'</td></tr>';
+    });
+    html+='</tbody><tfoot><tr style="background:#f8fafc;border-top:2px solid #cbd5e1;font-weight:800">'
+      +'<td style="padding:8px 9px" colspan="2">TOTAL</td>'
+      +'<td style="padding:8px 9px;text-align:right">'+D.tot+'</td>'
+      +'<td style="padding:8px 9px;text-align:right;color:#15803d">'+D.asig+'</td>'
+      +'<td style="padding:8px 9px;text-align:right;color:#b45309">'+D.disp+'</td></tr></tfoot></table>';
+  } else {
+    D.rooms.forEach(r=>{
+      const act=r.id===S.roomId;
+      html+='<div style="margin-bottom:10px;border:1px solid '+(act?'#93c5fd':'#e8eef5')+';border-radius:9px;overflow:hidden">'
+        +'<div onclick="servGoRoom(\''+r.id+'\')" style="cursor:pointer;background:'+(act?'#eff6ff':'#f8fafc')+';padding:7px 11px;display:flex;align-items:center;gap:8px">'
+        +'<b style="flex:1;color:#0f172a;font-size:12.5px">'+(act?'▸ ':'')+esc(r.nombre)+(r.code?' <span style="font-weight:400;color:#64748b">· '+esc(r.code)+'</span>':'')+'</b>'
+        +'<span style="font-size:11px;color:#15803d;font-weight:700">'+r.gente.length+(r.gente.length===1?' persona':' personas')+'</span>'
+        +'<span style="font-size:11px;color:#94a3b8">de '+r.total+'</span></div>';
+      html+= r.gente.length
+        ? '<div style="padding:4px 11px 8px">'+r.gente.map(g=>
+            '<div style="padding:4px 0;border-bottom:1px solid #f1f5f9;font-size:12.5px;color:#0f172a">👤 '+esc(g.n)
+            +(g.din?chip('turno','#dbeafe','#1e40af','#93c5fd'):'')
+            +(g.dc?chip('din. clínico','#e0f2fe','#0369a1','#7dd3fc'):'')
+            +(g.cds?chip('CdS','#f3e8ff','#5b21b6','#d8b4fe'):'')
+            +(g.ext&&!g.cds?chip('fuera de matriz','#fef3c7','#92400e','#fcd34d'):'')
+            +(g.c?'<div style="font-size:10.5px;color:#64748b">'+esc(g.c)+'</div>':'')+'</div>').join('')
+          +'</div>'
+        : '<div style="padding:8px 11px;font-size:11.5px;color:#94a3b8">Sin personal asignado ('+r.total+' disponibles).</div>';
+      html+='</div>';
+    });
+  }
+  document.getElementById('spBody').innerHTML=html;
+}
+// ── ORDENAR PUESTOS EN CUADRÍCULA ───────────────────────────────────────────
+// Reparte los puestos del recinto en una grilla alineada y justificada dentro
+// de su caja, con paso suficiente para que las tarjetas de nombre no se pisen
+// (mismo criterio visual que la sala de protocolo de anestesia del piso 2).
+function ordenarDots(){
+  if(S.viewOnly) return;
+  const room=curRoom(); if(!room) return;
+  const arr=(wsState.dots||{})[room.id]||[];
+  if(arr.length<2){ if(typeof tbInfo!=='undefined'&&tbInfo){tbInfo.textContent='Nada que ordenar: el recinto tiene '+arr.length+' puesto.';setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},3000);} return; }
+  const sh=rShapes(room); if(!sh.length) return;
+  const b=bounds(sh);
+  const n=arr.length;
+  // Paso mínimo: alto de una tarjeta de 2 líneas + aire; ancho, la mitad del
+  // texto típico (las tarjetas se alternan a izquierda y derecha del punto).
+  const PY=32, PX=95, pad=Math.max(DOT_R*2, Math.min(b.w,b.h)*0.10);
+  const W=Math.max(1,b.w-2*pad), H=Math.max(1,b.h-2*pad);
+  // columnas según la forma de la caja, acotadas por lo que realmente cabe
+  let cols=Math.max(1, Math.min(Math.round(Math.sqrt(n*(W/Math.max(1,H))*(PY/PX))), n, Math.max(1,Math.floor(W/PX)+1)));
+  let rows=Math.ceil(n/cols);
+  while(rows>1 && H/(rows-1)<PY*0.6 && cols<n){ cols++; rows=Math.ceil(n/cols); }
+  const dx=cols>1?W/(cols-1):0, dy=rows>1?H/(rows-1):0;
+  const x0=cols>1?b.x+pad:b.x+b.w/2, y0=rows>1?b.y+pad:b.y+b.h/2;
+  // Los puestos de un mismo 4º turno se colocan seguidos, para que su vínculo
+  // quede corto y legible en vez de cruzar todo el recinto.
+  const grupo={};
+  (wsState.dotLinks||[]).forEach((g,gi)=>g.forEach(k=>{
+    const sp=k.split('§'); if(sp[0]===room.id) grupo[sp.slice(1).join('§')]=gi;
+  }));
+  const orden=arr.map((d,i)=>({d,i,g:(d.id!==undefined&&grupo[d.id]!==undefined)?grupo[d.id]:-1}))
+    .sort((a,b)=>{
+      if(a.g!==b.g){ if(a.g<0) return 1; if(b.g<0) return -1; return a.g-b.g; }
+      return a.i-b.i;
+    });
+  orden.forEach((o,i)=>{
+    const c=i%cols, r=Math.floor(i/cols);
+    o.d.x=Math.round(x0+c*dx); o.d.y=Math.round(y0+r*dy);
+  });
+  sWs(); flushAutosave(); renderSVG(); updateStats();
+  if(typeof tbInfo!=='undefined'&&tbInfo){
+    tbInfo.textContent='⊞ '+n+' puestos ordenados en '+cols+'×'+rows+' (Ctrl+Z para deshacer)';
+    setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},4500);
+  }
+}
+// ── PANEL DE PERSONAL DEL SERVICIO (al asignar en vista 3) ──────────────────
+// Los servicios de dotación del área NO están declarados en ninguna parte: se
+// deducen de lo ya asignado en el propio servicio. Con eso se lista todo el
+// personal de esos servicios y se ve, en vivo, quién falta por asignar.
+// Servicios de dotación del área: NO están declarados en ninguna parte, se
+// deducen de lo ya asignado en el propio servicio, exigiendo presencia real
+// para que un funcionario suelto no arrastre a cientos de colegas.
+function _dpServiciosDelArea(areaId){
+  if(!dotDB||!dotDB.staff) return [];
+  const area=(curFloor()?curFloor().areas.find(a=>a.id===areaId):null); if(!area) return [];
+  const idx={}; dotDB.staff.forEach(s=>{ if(s.nombre) (idx[norm(s.nombre)]=idx[norm(s.nombre)]||[]).push(s); });
+  const cnt={};
+  (area.rooms||[]).forEach(r=>((wsState.dots||{})[r.id]||[]).forEach(d=>{
+    const nn=[];
+    if(d.tipo==='dinamico') (d.turnos||[]).forEach(x=>x.nombre&&nn.push(x.nombre));
+    else if(d.nombre) nn.push(d.nombre);
+    nn.forEach(n2=>(idx[norm(n2)]||[]).forEach(s=>{ const k=String(s.servicio||''); if(k) cnt[k]=(cnt[k]||0)+1; }));
+  }));
+  const orden=Object.entries(cnt).sort((a,b)=>b[1]-a[1]);
+  if(!orden.length) return [];
+  const tot=orden.reduce((s,[,v])=>s+v,0);
+  const rel=orden.filter(([,v])=>v>=Math.max(3, tot*0.12));
+  return (rel.length?rel:[orden[0]]).map(([k,v])=>({srv:k,n:v}));
+}
+// Dónde está asignada cada persona (nombre normalizado → recinto)
+function _dpAsignados(){
+  const m={};
+  for(const[rid,arr] of Object.entries(wsState.dots||{})) (arr||[]).forEach(d=>{
+    const nn=[];
+    if(d.tipo==='dinamico') (d.turnos||[]).forEach(x=>x.nombre&&nn.push(x.nombre));
+    else if(d.nombre&&d.nombre.trim()) nn.push(d.nombre);
+    nn.forEach(n2=>{ if(!m[norm(n2)]) m[norm(n2)]=rid; });
+  });
+  return m;
+}
+let _dpNav={sd:null,sv:null,u:null}, _dpSug=null, _dpLinks=[], _dpPeople=[];
+function _dpStaffAll(){ return (dotDB&&dotDB.staff)?dotDB.staff.filter(s=>s&&s.nombre):[]; }
+function _dpNodo(){
+  return _dpStaffAll().filter(s=>
+    (!_dpNav.sd || String(s.subdireccion||'')===_dpNav.sd) &&
+    (!_dpNav.sv || String(s.servicio||'')===_dpNav.sv) &&
+    (!_dpNav.u  || String(s.unidad||'')===_dpNav.u));
+}
+function _dpCnt(list,asg){ let a=0; list.forEach(s=>{ if(asg[norm(s.nombre)]) a++; }); return {n:list.length,a,p:list.length-a}; }
+function dpGo(sd,sv,u){ _dpNav={sd:sd||null,sv:sv||null,u:u||null}; renderDotPanel(); }
+function dpGoIdx(i){ const x=_dpLinks[i]; if(x) dpGo(x.sd,x.sv,x.u); }
+function buildDotPanel(){
+  const p=document.getElementById('dotPanel'); if(!p) return;
+  if(!dotDB||!dotDB.staff){ p.style.display='none'; return; }
+  p.style.display='';
+  _dpSug=null; _dpNav={sd:null,sv:null,u:null};
+  // Arranca en el servicio que sugiere lo ya asignado en esta área; desde ahí
+  // se puede subir y navegar todo el árbol de la dotación.
+  if(S.areaId){
+    const srvs=_dpServiciosDelArea(S.areaId);
+    if(srvs.length){
+      const sv=srvs[0].srv;
+      const s0=_dpStaffAll().find(s=>String(s.servicio||'')===sv);
+      _dpSug={sv, sd:(s0&&String(s0.subdireccion||''))||null};
+      _dpNav={sd:_dpSug.sd, sv:sv, u:null};
+    }
+  }
+  renderDotPanel();
+}
+function renderDotPanel(){
+  if(!dotDB||!dotDB.staff) return;
+  const asg=_dpAsignados();
+  const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const q=norm((document.getElementById('dpFiltro')||{}).value||'');
+  const solo=!!(document.getElementById('dpSoloLibres')||{}).checked;
+  const buscando=q.length>=2;
+  _dpLinks=[]; _dpPeople=[];
+  // ── migas de pan ──
+  const corto=s=>String(s||'').replace(/^SUBDIRECCION\s+(DE\s+)?/i,'').replace(/^DEPARTAMENTO\s+/i,'Depto. ').replace(/^SERVICIO\s+(DE\s+)?/i,'');
+  const mig=[];
+  _dpLinks.push({sd:null,sv:null,u:null});
+  mig.push('<a onclick="dpGoIdx('+(_dpLinks.length-1)+')">⌂ Todo</a>');
+  if(_dpNav.sd){ _dpLinks.push({sd:_dpNav.sd,sv:null,u:null});
+    mig.push('<a onclick="dpGoIdx('+(_dpLinks.length-1)+')">'+esc(corto(_dpNav.sd))+'</a>'); }
+  if(_dpNav.sv){ _dpLinks.push({sd:_dpNav.sd,sv:_dpNav.sv,u:null});
+    mig.push('<a onclick="dpGoIdx('+(_dpLinks.length-1)+')">'+esc(corto(_dpNav.sv))+'</a>'); }
+  if(_dpNav.u){ mig.push('<span>'+esc(corto(_dpNav.u))+'</span>'); }
+  document.getElementById('dpCrumb').innerHTML=buscando?'<span>🔎 búsqueda en toda la dotación</span>':mig.join('<span class="sep">›</span>');
+  // ── contenido ──
+  const base=buscando?_dpStaffAll():_dpNodo();
+  const c=_dpCnt(base,asg);
+  document.getElementById('dpSub').textContent=c.n+' personas · '+c.a+' asignadas · '+c.p+' por asignar';
+  const filas=[];
+  const personas=lista=>{
+    const vis=lista.filter(s=>{
+      if(solo&&asg[norm(s.nombre)]) return false;
+      if(!buscando) return true;
+      return norm(s.nombre+' '+(s.cargo||'')+' '+(s.estamento||'')+' '+(s.servicio||'')).includes(q);
+    }).sort((a,b)=>(asg[norm(a.nombre)]?1:0)-(asg[norm(b.nombre)]?1:0)||String(a.nombre).localeCompare(String(b.nombre),'es'));
+    vis.forEach(s=>{
+      const rid=asg[norm(s.nombre)];
+      _dpPeople.push(s.nombre);
+      const sub=[s.cargo||s.funcion,s.estamento].filter(Boolean).join(' · ');
+      filas.push('<div class="dp-row '+(rid?'ok':'no')+'" onclick="dpPick('+(_dpPeople.length-1)+')">'
+        +'<span class="nm">'+esc(s.nombre)+'<span class="sub">'+esc(sub||'—')
+        +(rid?(' · en '+esc(rName(rid)||'')):(buscando&&s.servicio?(' · '+esc(corto(s.servicio))):''))+'</span></span>'
+        +'<span class="st">'+(rid?'✔':'○')+'</span></div>');
+    });
+  };
+  const grupos=(campo,mk)=>{
+    const g={};
+    base.forEach(s=>{ const k=String(s[campo]||'(sin asignar)'); (g[k]=g[k]||[]).push(s); });
+    Object.entries(g).sort((a,b)=>b[1].length-a[1].length).forEach(([k,arr])=>{
+      const cc=_dpCnt(arr,asg);
+      if(solo&&!cc.p) return;
+      _dpLinks.push(mk(k));
+      const sug=(_dpSug&&(k===_dpSug.sd||k===_dpSug.sv));
+      filas.push('<div class="dp-row grp'+(cc.p?'':' full')+'" onclick="dpGoIdx('+(_dpLinks.length-1)+')">'
+        +'<span class="nm">'+esc(corto(k))+(sug?'<span class="dp-sug">sugerido</span>':'')
+        +'<span class="sub">'+cc.n+' personas · '+cc.a+' asignadas</span></span>'
+        +'<span class="st">'+(cc.p?cc.p+' por asignar':'completo')+'</span></div>');
+    });
+  };
+  if(buscando) personas(base);
+  else if(!_dpNav.sd) grupos('subdireccion', k=>({sd:k,sv:null,u:null}));
+  else if(!_dpNav.sv) grupos('servicio', k=>({sd:_dpNav.sd,sv:k,u:null}));
+  else if(!_dpNav.u){
+    const uns=new Set(base.map(s=>String(s.unidad||'')));
+    if(uns.size>1) grupos('unidad', k=>({sd:_dpNav.sd,sv:_dpNav.sv,u:k}));
+    else personas(base);
+  } else personas(base);
+  document.getElementById('dpBody').innerHTML = filas.length?filas.join('')
+    : '<div style="padding:18px;text-align:center;color:#94a3b8;font-size:11.5px">Sin resultados en este nivel.</div>';
+}
+function dpPick(i){
+  const nombre=_dpPeople[i]; if(!nombre) return;
+  const s=(dotDB.staff||[]).find(x=>norm(x.nombre)===norm(nombre)); if(!s) return;
+  const inp=document.getElementById('mNombre'); if(inp) inp.value=s.nombre;
+  const c=document.getElementById('mCargo'); if(c) c.value=s.cargo||s.funcion||'';
+  const e=document.getElementById('mEst'); if(e) e.value=s.estamento||'';
+  const info=document.getElementById('mServInfo'); if(info) info.textContent=s.servicio?('📋 '+s.servicio):'';
+  const ext=document.getElementById('mExterna'); if(ext) ext.checked=false;
+  const dr=document.getElementById('mNombreDrop'); if(dr) dr.style.display='none';
+  if(inp) inp.focus();
+}
+// ── NORMALIZACIÓN DE NOMBRES DE RECINTO ─────────────────────────────────────
+// Dos pasadas: (1) diccionario de erratas detectadas sobre los nombres reales
+// y (2) quita de tildes (la Ñ se conserva: es una letra, no una tilde —
+// "Baño" no puede quedar como "Bano").
+const NOM_FIX={
+  'Antomia Pat':'Anatomia Pat',
+  'Est Enermeria D':'Est Enfermeria D',
+  'Jefe Capacitacino':'Jefe Capacitacion',
+  'Lvachatas':'Lavachatas',
+  'Lavachata':'Lavachatas',
+  'Preaparacion':'Preparacion',
+  'Sala Procedimeinto Dialisis':'Sala Procedimiento Dialisis',
+  'Trabajo Limio':'Trabajo Limpio',
+  'Trabajo Limpia':'Trabajo Limpio',
+  'Ropa LImpia':'Ropa Limpia',
+  'Ropa limpia':'Ropa Limpia',
+  'Sala Biosias':'Sala Biopsias',
+  'Texiles':'Textiles',
+  'Inmunofluorecencia':'Inmunofluorescencia',
+  'Oftalmólogia':'Oftalmologia',
+  'Odontólogicos':'Odontologicos',
+  'Est trabajo':'Est Trabajo',
+  'Sala espera':'Sala Espera',
+  'Sala espera de Pacientes':'Sala Espera de Pacientes',
+  'Consulta salud mental':'Consulta Salud Mental',
+  'Ecografia ocular':'Ecografia Ocular',
+  'Procedimiento glaucoma':'Procedimiento Glaucoma',
+  'Jefe Med nuclear':'Jefe Med Nuclear',
+  'Pab Historicos A':'Pab Historico A',
+  'Consulta -':'Consulta',
+  'por definir':'Por Definir',
+};
+function _sinTilde(s){
+  return String(s||'')
+    .replace(/[áàäâ]/g,'a').replace(/[ÁÀÄÂ]/g,'A')
+    .replace(/[éèëê]/g,'e').replace(/[ÉÈËÊ]/g,'E')
+    .replace(/[íìïî]/g,'i').replace(/[ÍÌÏÎ]/g,'I')
+    .replace(/[óòöô]/g,'o').replace(/[ÓÒÖÔ]/g,'O')
+    .replace(/[úùüû]/g,'u').replace(/[ÚÙÜÛ]/g,'U');
+}
+function _nomNormalizado(s){
+  let v=String(s||'').replace(/\s+/g,' ').trim();
+  if(NOM_FIX[v]) v=NOM_FIX[v];
+  v=_sinTilde(v);
+  if(NOM_FIX[v]) v=NOM_FIX[v];
+  return v;
+}
+function _nomCambios(){
+  const out=[];
+  FLOORS.forEach(fl=>fl.areas.forEach(a=>(a.rooms||[]).forEach(r=>{
+    const act=nameState.rooms[r.id]; if(!act) return;
+    const nue=_nomNormalizado(act);
+    if(nue && nue!==act) out.push({id:r.id, de:act, a:nue, fl:fl.label, area:aName(a.id)});
+  })));
+  return out;
+}
+function revisarNombres(){
+  const cam=_nomCambios();
+  const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const cont=document.getElementById('nomBody');
+  document.getElementById('nomSub').textContent = cam.length
+    ? cam.length+(cam.length===1?' nombre por corregir':' nombres por corregir')+' · las tildes se quitan, la Ñ se mantiene'
+    : 'Todos los nombres están correctos y sin tildes.';
+  document.getElementById('nomOk').style.display=cam.length?'':'none';
+  const agr={};
+  cam.forEach(c=>{ (agr[c.de+' → '+c.a]=agr[c.de+' → '+c.a]||[]).push(c); });
+  cont.innerHTML = cam.length
+    ? Object.entries(agr).sort((x,y)=>y[1].length-x[1].length).map(([k,v])=>{
+        const [de,a]=k.split(' → ');
+        return '<div style="display:flex;align-items:center;gap:8px;padding:6px 2px;border-bottom:1px solid #eef2f7;font-size:12.5px">'
+          +'<span style="color:#b91c1c;text-decoration:line-through">'+esc(de)+'</span>'
+          +'<span style="color:#94a3b8">→</span>'
+          +'<b style="color:#15803d;flex:1">'+esc(a)+'</b>'
+          +'<span style="color:#64748b;font-size:11px">'+v.length+(v.length===1?' recinto':' recintos')+'</span></div>';
+      }).join('')
+    : '<div style="padding:22px;text-align:center;color:#15803d;font-size:13px;font-weight:700">✅ Nada que corregir.</div>';
+  document.getElementById('nomModal').style.display='flex';
+}
+function aplicarNombres(){
+  const cam=_nomCambios(); if(!cam.length) return;
+  cam.forEach(c=>{ nameState.rooms[c.id]=c.a; });
+  sNames(); flushAutosave(); renderSVG(); renderSidebar(); updateUI();
+  document.getElementById('nomModal').style.display='none';
+  if(typeof tbInfo!=='undefined'&&tbInfo){
+    tbInfo.textContent='✏️ '+cam.length+' nombres de recinto corregidos';
+    setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },4000);
+  }
+}
+function cerrarNombres(){ document.getElementById('nomModal').style.display='none'; }
 // ═══ WS MODAL ═══════════════════════════════════════════════════════════════
 let mCtx={roomId:null,idx:null};
 function openModal(roomId,idx){
@@ -5776,6 +6846,9 @@ function openModal(roomId,idx){
   setTipo(dot.tipo||'fijo');
   renderTurnosList(dot);
   const info=document.getElementById('mServInfo'); if(info) info.textContent='';
+  try{ const fl=document.getElementById('dpFiltro'); if(fl) fl.value='';
+       const sl=document.getElementById('dpSoloLibres'); if(sl) sl.checked=false;
+       buildDotPanel(); }catch(e){}
   document.getElementById('wsModal').classList.add('show');
 }
 function renderTurnosList(dot){
@@ -5900,6 +6973,52 @@ function deleteWs(){
   if(d.nombre&&d.nombre.trim()&&!confirm(`¿Eliminar puesto de "${d.nombre}"?`))return;
   if(d.id&&wsState.dotLinks) wsState.dotLinks=wsState.dotLinks.map(g=>g.filter(k=>k!==roomId+'§'+d.id)).filter(g=>g.length>1);
   wsState.dots[roomId].splice(idx,1); sWs(); closeModal(); renderSVG(); updateStats();
+}
+// ── COLOCACIÓN DE PUESTOS CON ARRASTRE ──────────────────────────────────────
+// Clic izquierdo sostenido: el puesto aparece de inmediato y sigue al cursor
+// hasta soltar. Clic derecho: coloca un 4º TURNO completo (4 puestos unidos)
+// en un solo gesto, arrastrable como conjunto.
+let _placing=null;
+function startPlaceDot(e, roomId, cuarto){
+  if(S.viewOnly||S.delDotMode) return;
+  e.preventDefault(); e.stopPropagation();       // no panear mientras se coloca
+  const p=s2i(e.clientX,e.clientY);
+  const arr=dots(roomId), base=String(Date.now()).slice(-6);
+  const D=DOT_R*2.2;
+  const off = cuarto ? [{dx:-D,dy:-D},{dx:D,dy:-D},{dx:D,dy:D},{dx:-D,dy:D}] : [{dx:0,dy:0}];
+  const nuevos=off.map((o,k)=>{
+    const d={id:roomId+'-WS'+base+(cuarto?('-T'+(k+1)):''),
+             x:Math.round(p.x+o.dx), y:Math.round(p.y+o.dy),
+             tipo:'fijo', nombre:'', cargo:'', estamento:''};
+    arr.push(d); return d;
+  });
+  if(cuarto){
+    if(!wsState.dotLinks) wsState.dotLinks=[];
+    wsState.dotLinks.push(nuevos.map(d=>roomId+'§'+d.id));
+    _linkAnchor=null;                            // grupo cerrado: no se le cuelga nada
+  }
+  _placing={dots:nuevos, sx:e.clientX, sy:e.clientY, ox:nuevos.map(d=>({x:d.x,y:d.y}))};
+  renderSVG();
+  window.addEventListener('mousemove',movePlaceDot);
+  window.addEventListener('mouseup',upPlaceDot);
+  if(typeof tbInfo!=='undefined'&&tbInfo)
+    tbInfo.textContent = cuarto ? '⛓ 4º turno · arrastra y suelta para fijarlo'
+                                : '👤 Puesto · arrastra y suelta para fijarlo';
+}
+function movePlaceDot(e){
+  if(!_placing) return;
+  const dx=(e.clientX-_placing.sx)/S.zoom, dy=(e.clientY-_placing.sy)/S.zoom;
+  _placing.dots.forEach((d,k)=>{ d.x=Math.round(_placing.ox[k].x+dx); d.y=Math.round(_placing.ox[k].y+dy); });
+  renderSVGThrottled();
+}
+function upPlaceDot(){
+  window.removeEventListener('mousemove',movePlaceDot);
+  window.removeEventListener('mouseup',upPlaceDot);
+  if(!_placing) return;
+  _placing=null;
+  _dotJustDragged=true; setTimeout(()=>{_dotJustDragged=false;},60);   // no abrir la ficha al soltar
+  sWs(); flushAutosave(); renderSVG(); updateStats();
+  if(typeof tbInfo!=='undefined'&&tbInfo) setTimeout(()=>{ if(tbInfo)tbInfo.textContent=''; },1800);
 }
 function addDot(roomId,x,y){
   wsState.dots[roomId].push({id:roomId+'-WS'+String(Date.now()).slice(-5),x:Math.round(x),y:Math.round(y),tipo:'fijo',nombre:'',cargo:'',estamento:''});
@@ -6583,6 +7702,9 @@ function updateUI(){
   // Auto-CAD: visible at level 1 (todo el piso) y level 2 (área actual)
   btnMove.style.display=(S.editMode&&S.level<3)?'':'none';
   btnDelDot.style.display=S.level===3?'':'none';
+  { const bsp=document.getElementById('btnServPuestos'); if(bsp) bsp.style.display=(S.level===3)?'':'none';
+    const bod=document.getElementById('btnOrdenarDots'); if(bod) bod.style.display=(S.level===3&&!S.viewOnly)?'':'none';
+    const bxs=document.getElementById('btnExpServ'); if(bxs) bxs.style.display=(S.level===2)?'':'none'; }
   // Area jump selector: show at level 1 so user can navigate to any area (even without drawn shape)
   if(S.level===1 && fl){
     const undrawn=fl.areas.filter(a=>(boxState.areas[a.id]||[]).length===0 && a.rooms && a.rooms.length>0);
@@ -6808,13 +7930,213 @@ function xlsxDownload(rows, sheetName, fileName, colW, extra){
     ws2['!freeze']={xSplit:0,ySplit:1}; ws2['!autofilter']={ref:ws2['!ref']}; ws2['!rows']=[{hpt:26}];
     XLSX.utils.book_append_sheet(wb,ws2,extra.name||'Hoja 2');
   }
-  XLSX.writeFile(wb,fileName);
+  const buf=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+  guardarArchivo(EXP_DIRS.planilla, fileName, new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
 }
 // Mapa contenedor(recinto)→{piso,área,recinto}
 function _roomLoc(){
   const m={};
   for(const fl of FLOORS) for(const area of fl.areas) for(const r of area.rooms) m[r.id]={fl,area,r};
   return m;
+}
+// ── EXPORTAR SERVICIO COMO HTML ABREVIADO ───────────────────────────────────
+// HTML autónomo del servicio activo en vista 2: plano recortado al contorno
+// punteado del área, recintos clicables con su ficha completa y botón para
+// ocultar/mostrar las cajas. SIN información de funcionarios.
+function _expFichaData(rid){
+  const code=rCode(rid)||'';
+  const all=equipForRoom(rid);
+  const esMobCli=e=>/mobiliario/i.test(e.f||'');
+  const esTI=e=>/apoyo ti|^ti$/i.test((e.f||'').trim());
+  const split=(typeof _mncSplitRoom==='function')?_mncSplitRoom(rid):{ti:[],mob:[]};
+  let eq=all.filter(e=>!esMobCli(e)&&!esTI(e)),
+      mob=all.filter(esMobCli),
+      ti=all.filter(esTI).concat(split.ti||[]),
+      mnc=split.mob||[], aviso=null;
+  if(!(eq.length||mob.length||ti.length||mnc.length)){
+    const parts=(typeof rCodeParts==='function')?rCodeParts(rid):[code].filter(Boolean);
+    const cEq=parts.reduce((a,c)=>a.concat(equipOfCode(c)),[]);
+    const cMnc=parts.reduce((a,c)=>a.concat((typeof _mnc2CodeBase==='function')?_mnc2CodeBase(c):[]),[]);
+    if(cEq.length||cMnc.length){
+      const isTI2=e=>_TI_FAMS.has(String(e.f||'').trim().toLowerCase());
+      eq=cEq.filter(e=>!esMobCli(e)&&!esTI(e)); mob=cEq.filter(esMobCli);
+      ti=cEq.filter(esTI).concat(cMnc.filter(isTI2)); mnc=cMnc.filter(e=>!isTI2(e));
+      aviso='El codigo '+code+' se reparte entre varios recintos: se muestra el TOTAL del codigo.';
+    }
+  }
+  const strip=a=>a.map(e=>({n:String(e.n||''),f:String(e.f||''),c:e.c||1}));
+  return {eq:strip(eq),mob:strip(mob),ti:strip(ti),mnc:strip(mnc),aviso};
+}
+function exportServicioHTML(){
+  const area=curArea();
+  if(!area){ alert('Entra a un servicio (vista 2) para exportarlo.'); return; }
+  const aSh=aShapes(area);
+  if(!aSh.length){ alert('Este servicio no tiene contorno dibujado.'); return; }
+  const PAD=60, ab=bounds(aSh);
+  const b={x:Math.max(0,ab.x-PAD), y:Math.max(0,ab.y-PAD)};
+  b.w=Math.min(IMG_W,ab.x+ab.w+PAD)-b.x; b.h=Math.min(IMG_H,ab.y+ab.h+PAD)-b.y;
+  // ── recorte del plano visible (con fallback si el canvas queda "tainted") ──
+  let dataURL=null, taintErr=null;
+  const maxW=2400, sc=Math.min(1, maxW/b.w);
+  try{
+    const cv=document.createElement('canvas');
+    cv.width=Math.round(b.w*sc); cv.height=Math.round(b.h*sc);
+    const cx=cv.getContext('2d');
+    cx.fillStyle='#ffffff'; cx.fillRect(0,0,cv.width,cv.height);
+    // Aislar el servicio: solo se pinta el plano DENTRO del contorno del área;
+    // los recintos colindantes de otros servicios quedan en blanco.
+    cx.save(); cx.beginPath();
+    aSh.forEach(s=>cx.rect((s.x-b.x)*sc,(s.y-b.y)*sc,s.w*sc,s.h*sc));
+    cx.clip();
+    cx.drawImage(floorImg, b.x,b.y,b.w,b.h, 0,0,cv.width,cv.height);
+    cx.restore();
+    dataURL=cv.toDataURL('image/jpeg',0.85);
+  }catch(e){ taintErr=e; }
+  const planAbs=new URL(floorImg.getAttribute('src'), location.href).href;
+  // ── datos de los recintos dibujados del área ──
+  const rooms=[]; let sinDibujo=0;
+  (area.rooms||[]).forEach(r=>{
+    const sh=rShapes(r); if(!sh.length){ sinDibujo++; return; }
+    const tp=rType(r.id), m=ROOM_TYPES[tp]||ROOM_TYPES[''];
+    rooms.push({
+      nm:rName(r.id)||r.id, code:rCode(r.id)||'', bim:rBim(r.id)||'',
+      tipo:m.label, col:m.col, m2:roomM2Label(r.id)||'',
+      sen:rSenaletica(r.id)||'', senN:rSenNum(r.id)||'',
+      sh:sh.map(s=>({x:+(s.x-b.x).toFixed(1), y:+(s.y-b.y).toFixed(1), w:+s.w.toFixed(1), h:+s.h.toFixed(1)})),
+      // Recintos de varios bloques: contorno único fusionado (sin líneas internas)
+      d:unionPath(sh.map(s=>({x:s.x-b.x, y:s.y-b.y, w:s.w, h:s.h}))).replace(/-?\d+\.\d+/g,m=>(+m).toFixed(1)),
+      f:_expFichaData(r.id)
+    });
+  });
+  if(!rooms.length){ alert('Este servicio no tiene recintos dibujados.'); return; }
+  rooms.sort((a,c)=>String(a.code).localeCompare(String(c.code),'es',{numeric:true}));
+  // ── contorno del área (línea punteada) relativo al recorte ──
+  // Perímetro del servicio como UNA sola figura: sin líneas cruzando por dentro
+  const guiaD=unionPath(aSh.map(s=>({x:s.x-b.x, y:s.y-b.y, w:s.w, h:s.h})))
+    .replace(/-?\d+\.\d+/g,m=>(+m).toFixed(1));
+  const fecha=new Date().toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const nomServ=aName(area.id), piso=(curFloor()||{}).label||S.floorId;
+  const tipos={};
+  rooms.forEach(r=>{ (tipos[r.tipo]=tipos[r.tipo]||{n:0,col:r.col}).n++; });
+  const DATA={serv:nomServ, piso, fecha, w:b.w, h:b.h,
+    img:dataURL?{d:dataURL}:{u:planAbs, full:{w:IMG_W,h:IMG_H}, off:{x:b.x,y:b.y}},
+    guiaD, rooms, sinDibujo,
+    tipos:Object.entries(tipos).sort((a,c)=>c[1].n-a[1].n).map(([k,v])=>({t:k,n:v.n,col:v.col}))};
+  const J=JSON.stringify(DATA).replace(/<\//g,'<\\/');
+  const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const html=['<!DOCTYPE html><html lang="es"><head><meta charset="utf-8">',
+'<meta name="viewport" content="width=device-width,initial-scale=1">',
+'<title>'+esc(nomServ)+' · Atlas HDS</title>',
+'<style>',
+'*{margin:0;padding:0;box-sizing:border-box}',
+'body{background:#cdd9e6;color:#1a3a5c;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}',
+'header{background:#1d5fa0;color:#fff;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}',
+'header h1{font-size:17px;font-weight:800;letter-spacing:.4px}',
+'header .sub{font-size:11px;opacity:.85;margin-top:2px}',
+'header .sp{flex:1}',
+'#tgl{background:#fff;color:#1d5fa0;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer}',
+'.leyenda{display:flex;gap:10px;flex-wrap:wrap;background:#eef4fa;padding:7px 20px;font-size:10.5px;color:#334155;border-bottom:1px solid #cbd5e1}',
+'.leyenda .it{display:flex;align-items:center;gap:5px;font-weight:600}',
+'.leyenda .sw{width:10px;height:10px;border-radius:3px;display:inline-block}',
+'.wrap{display:flex;gap:14px;padding:14px 20px;align-items:flex-start}',
+'.mapa{flex:1;min-width:0;background:#fff;border:1px solid #a9c3d6;border-radius:12px;overflow:hidden;box-shadow:0 6px 24px rgba(15,30,52,.15)}',
+'.lienzo{position:relative;width:100%}',
+'.lienzo svg{display:block;width:100%;height:auto;background:#fff}',
+'.rbx{cursor:pointer}',
+'.rbx rect{transition:fill-opacity .12s}',
+'.rbx:hover rect{fill-opacity:.42}',
+'.rbx.sel rect{stroke:#eab308;stroke-width:6}',
+'text{font-family:"Segoe UI",sans-serif;font-weight:700;pointer-events:none;paint-order:stroke fill;stroke:rgba(255,255,255,.9)}',
+'aside{width:350px;flex-shrink:0;background:#fff;border:1px solid #a9c3d6;border-radius:12px;padding:14px 16px;position:sticky;top:12px;max-height:calc(100vh - 40px);overflow-y:auto;box-shadow:0 6px 24px rgba(15,30,52,.15)}',
+'aside .vacio{color:#94a3b8;font-size:12px;padding:22px 6px;text-align:center}',
+'aside h2{font-size:14px;font-weight:800;color:#0f172a}',
+'aside .meta{font-size:11px;color:#48687e;margin:3px 0 10px;line-height:1.6}',
+'aside .meta b{color:#1e293b}',
+'.sec{margin-top:11px}',
+'.sec .t{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:#1d5fa0;border-bottom:2px solid #dbe7f2;padding-bottom:3px;margin-bottom:5px;display:flex;justify-content:space-between}',
+'.sec .t .n{color:#64748b}',
+'.fila{display:flex;gap:7px;font-size:11.5px;padding:3px 0;border-bottom:1px solid #f1f5f9;color:#0f172a}',
+'.fila .q{font-weight:800;color:#1d5fa0;min-width:26px;text-align:right}',
+'.fila .fam{margin-left:auto;color:#94a3b8;font-size:9.5px;white-space:nowrap;padding-top:2px}',
+'.aviso{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:8px;padding:7px 9px;font-size:10.5px;margin-top:8px}',
+'.nada{color:#94a3b8;font-size:10.5px;font-style:italic;padding:2px 0}',
+'footer{padding:8px 20px 16px;font-size:10px;color:#48687e}',
+'@media(max-width:900px){.wrap{flex-direction:column}aside{width:100%;position:static;max-height:none}}',
+'@media print{header .sp,#tgl{display:none}aside{position:static;max-height:none}}',
+'</style></head><body>',
+'<header><div><h1>🏥 '+esc(nomServ)+'</h1>',
+'<div class="sub">'+esc(piso)+' · '+rooms.length+' recintos · Atlas HDS · exportado '+fecha+'</div></div>',
+'<div class="sp"></div><button id="tgl" onclick="tgl()">👁 Ocultar cajas</button></header>',
+'<div class="leyenda" id="ley"></div>',
+'<div class="wrap"><div class="mapa"><div class="lienzo" id="lienzo"></div></div>',
+'<aside id="ficha"><div class="vacio">Clic en un recinto del plano para revisar su ficha.<br><br>El botón de arriba oculta o muestra las cajas para ver el plano limpio.</div></aside></div>',
+'<footer>Documento generado por Atlas HDS · solo consulta · no incluye información de funcionarios'+(sinDibujo?(' · '+sinDibujo+' recinto(s) del servicio aún sin dibujar no se incluyen'):'')+'</footer>',
+'<script>',
+'const D='+J+';',
+'let SEL=-1, CAJAS=true;',
+'const _ex=s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;");',
+'function build(){',
+' const L=document.getElementById("lienzo");',
+' let s=\'<svg viewBox="0 0 \'+D.w+\' \'+D.h+\'">\';',
+' s+=\'<defs><clipPath id="cpServ"><path d="\'+D.guiaD+\'"/></clipPath></defs>\';',
+' if(D.img.d) s+=\'<image href="\'+D.img.d+\'" x="0" y="0" width="\'+D.w+\'" height="\'+D.h+\'" clip-path="url(#cpServ)"/>\';',
+' else s+=\'<image href="\'+D.img.u+\'" x="\'+(-D.img.off.x)+\'" y="\'+(-D.img.off.y)+\'" width="\'+D.img.full.w+\'" height="\'+D.img.full.h+\'" clip-path="url(#cpServ)"/>\';',
+' s+=\'<path d="\'+D.guiaD+\'" fill="none" stroke="#e11d48" stroke-width="5" stroke-dasharray="26 12" stroke-linejoin="round"/>\';',
+' s+=\'<g id="ov">\';',
+' D.rooms.forEach((r,i)=>{',
+'  s+=\'<g class="rbx" data-i="\'+i+\'" onclick="pick(\'+i+\')">\';',
+'  if(r.d){ s+=\'<path d="\'+r.d+\'" fill-rule="evenodd" fill="\'+r.col+\'" fill-opacity=".18" stroke="\'+r.col+\'" stroke-width="3" stroke-linejoin="round"/>\'; }',
+'  else r.sh.forEach(q=>{ s+=\'<rect x="\'+q.x+\'" y="\'+q.y+\'" width="\'+q.w+\'" height="\'+q.h+\'" rx="8" fill="\'+r.col+\'" fill-opacity=".18" stroke="\'+r.col+\'" stroke-width="3"/>\'; });',
+'  const bx=r.sh.reduce((a,q)=>({x0:Math.min(a.x0,q.x),y0:Math.min(a.y0,q.y),x1:Math.max(a.x1,q.x+q.w),y1:Math.max(a.y1,q.y+q.h)}),{x0:1e9,y0:1e9,x1:-1e9,y1:-1e9});',
+'  const bw=bx.x1-bx.x0, bh=bx.y1-bx.y0, fs=Math.max(15,Math.min(40,bw/9,bh/4));',
+'  const words=String(r.nm).split(/\\s+/); let l1=r.nm,l2="";',
+'  if(r.nm.length*fs*.56>bw*.94&&words.length>1){ let best=null;',
+'   for(let j=1;j<words.length;j++){ const a=words.slice(0,j).join(" "),c=words.slice(j).join(" ");',
+'    const m=Math.max(a.length,c.length); if(!best||m<best.m) best={a,c,m}; }',
+'   l1=best.a; l2=best.c; }',
+'  const cx=bx.x0+bw/2, cy=bx.y0+bh/2;',
+'  s+=\'<title>\'+_ex(r.nm)+(r.code?(" \\u00b7 "+_ex(r.code)):"")+\'</title>\';',
+'  s+=\'<text x="\'+cx+\'" y="\'+(cy-(l2?fs*.55:fs*.15))+\'" text-anchor="middle" font-size="\'+fs+\'" fill="\'+r.col+\'" stroke-width="\'+(fs*.28)+\'">\'+_ex(l1)+\'</text>\';',
+'  if(l2) s+=\'<text x="\'+cx+\'" y="\'+(cy+fs*.55)+\'" text-anchor="middle" font-size="\'+fs+\'" fill="\'+r.col+\'" stroke-width="\'+(fs*.28)+\'">\'+_ex(l2)+\'</text>\';',
+'  if(r.code) s+=\'<text x="\'+cx+\'" y="\'+(cy+(l2?fs*1.55:fs*.95))+\'" text-anchor="middle" font-size="\'+(fs*.62)+\'" fill="#334155" stroke-width="\'+(fs*.18)+\'">\'+_ex(r.code)+\'</text>\';',
+'  s+="</g>";',
+' });',
+' s+="</g></svg>";',
+' L.innerHTML=s;',
+' document.getElementById("ley").innerHTML=D.tipos.map(t=>\'<span class="it"><span class="sw" style="background:\'+t.col+\'"></span>\'+_ex(t.t)+\' · \'+t.n+\'</span>\').join("");',
+'}',
+'function tgl(){ CAJAS=!CAJAS;',
+' document.getElementById("ov").style.display=CAJAS?"":"none";',
+' document.getElementById("tgl").textContent=CAJAS?"👁 Ocultar cajas":"🙈 Mostrar cajas"; }',
+'function sec(tit,arr){',
+' let h=\'<div class="sec"><div class="t"><span>\'+tit+\'</span><span class="n">\'+arr.length+\'</span></div>\';',
+' h+=arr.length?arr.map(e=>\'<div class="fila"><span class="q">\'+e.c+\'×</span><span>\'+_ex(e.n)+\'</span><span class="fam">\'+_ex(e.f)+\'</span></div>\').join(""):\'<div class="nada">Sin registro en la matriz.</div>\';',
+' return h+"</div>";',
+'}',
+'function pick(i){',
+' SEL=i;',
+' document.querySelectorAll(".rbx").forEach(g=>g.classList.toggle("sel",+g.dataset.i===i));',
+' const r=D.rooms[i], f=r.f;',
+' let h=\'<h2>\'+_ex(r.nm)+\'</h2><div class="meta">\';',
+' if(r.code) h+="Código <b>"+_ex(r.code)+"</b> · ";',
+' if(r.bim) h+="BIM <b>"+_ex(r.bim)+"</b><br>";',
+' h+=_ex(r.tipo)+(r.m2?(" · 📐 "+_ex(r.m2)):"");',
+' if(r.sen||r.senN) h+="<br>🪧 "+_ex([r.sen,r.senN].filter(Boolean).join(" · "));',
+' h+="</div>";',
+' if(f.aviso) h+=\'<div class="aviso">⚠ \'+_ex(f.aviso)+\'</div>\';',
+' h+=sec("⚙️ Equipamiento",f.eq)+sec("🛏️ Mobiliario Clínico",f.mob)+sec("🖥️ Informática",f.ti)+sec("🪑 Mobiliario No Clínico",f.mnc);',
+' document.getElementById("ficha").innerHTML=h;',
+'}',
+'build();',
+'<\/script></body></html>'].join('\n');
+  const nomArch='Servicio_'+String(nomServ).replace(/[^A-Za-z0-9Ññ]+/g,'_').replace(/^_|_$/g,'')+'_'+new Date().toISOString().slice(0,10)+'.html';
+  guardarArchivo('Servicios', nomArch, html, 'text/html').then(()=>{
+    if(taintErr && typeof tbInfo!=='undefined' && tbInfo){
+      tbInfo.textContent='⚠ El plano no pudo incrustarse (navegador via file://): el HTML lo referencia desde la carpeta del Atlas.';
+      setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },6000);
+    }
+  });
+  return html;
 }
 function exportRecintos(){
   const rows=[['Piso','Área','Código','Código BIM','Recinto','Tipo','Señalética','N° Señalética','# Puestos','# Asignados','# Camillas/Sillones','Dibujado']];
@@ -6904,7 +8226,7 @@ function exportSenaletica(){
     [{wch:11},{wch:28},{wch:12},{wch:18},{wch:30},{wch:16},{wch:26},{wch:14}]);
 }
 // ── Menú desplegable de exportación ─────────────────────────────────────────
-function toggleExpMenu(e){ if(e)e.stopPropagation(); const m=document.getElementById('expMenu'); if(m) m.classList.toggle('show'); }
+function toggleExpMenu(e){ if(e)e.stopPropagation(); try{expDestLabel();}catch(err){} const m=document.getElementById('expMenu'); if(m) m.classList.toggle('show'); }
 function closeExpMenu(){ const m=document.getElementById('expMenu'); if(m) m.classList.remove('show'); }
 document.addEventListener('click',function(e){ const dd=document.getElementById('expDD'); if(dd && !dd.contains(e.target)) closeExpMenu(); });
 
@@ -7297,7 +8619,47 @@ async function runSelfTest(){
   // aislamiento: guardar en selftest NO toca localStorage
   const rawAntes=localStorage.getItem('cabida_cad_ws');
   sWs(); sBox(); sNames();
-  T('Aislamiento: ls() bloqueado en selftest', ()=>localStorage.getItem('cabida_cad_ws')===rawAntes);
+  T('Aislamiento: ls() bloqueado en selftest', ()=>{ lsFlush(false); return localStorage.getItem('cabida_cad_ws')===rawAntes; });
+  // El respaldo a archivo NO pasa por ls(): manda _backupPayload() desde memoria.
+  // Sin este guarda, una corrida de selftest pisaba el respaldo real en disco.
+  T('Aislamiento: respaldo a archivo bloqueado en selftest', ()=>{
+    _fbak.timer=null; fbakProgramar();
+    return _fbakOff()===true && _fbak.timer===null;
+  });
+
+  // compresión: ida y vuelta EXACTA sobre el estado real, no sobre un ejemplo
+  T('Compresión: disponible', ()=>LZ_OK===true);
+  T('Compresión: ida y vuelta exacta del estado real', ()=>{
+    for(const st of [nameState,boxState,wsState,floorsDelta]){
+      const j=JSON.stringify(st);
+      if(LZ.desempacar(LZ.empacar(j))!==j) return false;
+    }
+    return true;
+  });
+  T('Compresión: lg() entiende comprimido y sin comprimir', ()=>{
+    const j=JSON.stringify({a:1,b:'ñáé',c:[1,2,3]});
+    // sin tocar localStorage real: se simula la lectura de ambos formatos
+    const leer=s=>{ try{ return JSON.parse(s.slice(0,2)===LZ_MARCA?LZ.desempacar(s.slice(2)):s); }catch(e){ return null; } };
+    return JSON.stringify(leer(j))===j && JSON.stringify(leer(LZ_MARCA+LZ.empacar(j)))===j;
+  });
+  // Testigo de memoria: existe, y sobre todo CAMBIA de color al acercarse al
+  // tope — si se quedara siempre verde no serviría de testigo de nada.
+  T('Testigo de memoria: se dibuja y avisa al llenarse', ()=>{
+    const real=lsUso; let ok=true;
+    try{
+      for(const [mb,esperado] of [[0.4,'rgb(22, 163, 74)'],[3.2,'rgb(245, 158, 11)'],[4.5,'rgb(220, 38, 38)']]){
+        lsUso=()=>({chars:mb*1048576/2, mb:mb});
+        updateMemBar();
+        const f=document.getElementById('memFill');
+        if(!f || f.style.background!==esperado) ok=false;
+      }
+    }finally{ lsUso=real; updateMemBar(); }
+    return ok;
+  });
+  T('Compresión: reduce al menos 3 veces el estado de nombres', ()=>{
+    const j=JSON.stringify(nameState);
+    return j.length/(LZ_MARCA+LZ.empacar(j)).length >= 3;
+  });
 
   // siembra de prueba (solo en memoria)
   const fl=FLOORS[0];
@@ -7388,6 +8750,16 @@ function _stReport(out){
   document.body.appendChild(d);
 }
 if(_SELFTEST) window.addEventListener('load',()=>setTimeout(runSelfTest,700));
+// El selftest desactiva TODO el guardado. Si alguien deja "?selftest=1" en la
+// URL y sigue trabajando, perdería el día entero en silencio: aviso permanente.
+if(_SELFTEST) window.addEventListener('load',()=>{
+  const b=document.createElement('div');
+  b.style.cssText='position:fixed;bottom:0;left:0;right:0;z-index:99999;background:#a16207;color:#fff;'+
+    'font-weight:800;font-size:12px;padding:6px 14px;text-align:center;letter-spacing:.3px';
+  b.innerHTML='🧪 MODO SELFTEST — nada de lo que hagas se guarda. '+
+    '<a href="#" onclick="location.href=location.pathname;return false" style="color:#fff;text-decoration:underline">Salir y trabajar normal</a>';
+  document.body.appendChild(b);
+});
 // ── GUARD MULTI-PESTAÑA ──────────────────────────────────────────────────────
 // Dos pestañas del Atlas editando a la vez se pisan (última escritura gana).
 // Protocolo ping/pong por localStorage: ambas pestañas muestran advertencia.
