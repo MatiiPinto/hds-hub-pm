@@ -130,6 +130,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .dim-btn.dim-rosa:hover:not(.active)    { background:#fdf2f8; color:#db2777; }
 .dim-btn.dim-ambar.active { border-color:#d97706; color:#b45309; }
 .dim-btn.dim-ambar:hover:not(.active) { background:#fffbeb; color:#b45309; }
+.dim-btn.dim-rojo.active { border-color:#b91c1c; color:#991b1b; }
+.dim-btn.dim-rojo:hover:not(.active) { background:#fef2f2; color:#991b1b; }
+/* ── Necesidades no consideradas (ORD SSMO 5040029-154) ── */
+.nec-card { background:#fff; border:1px solid var(--border); border-left:4px solid #b91c1c; border-radius:12px; padding:16px 18px; margin-bottom:12px; }
+.nec-head { display:flex; align-items:flex-start; gap:12px; flex-wrap:wrap; }
+.nec-n { background:#b91c1c; color:#fff; font-weight:800; font-size:12px; border-radius:8px; padding:3px 9px; flex:none; }
+.nec-title { font-size:15.5px; font-weight:800; color:#0f172a; }
+.nec-code { font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:12px; color:#64748b; }
+.nec-qty { background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; border-radius:20px; padding:2px 10px; font-size:11.5px; font-weight:800; }
+.nec-falta { background:#fef2f2; color:#991b1b; border:1px solid #fecaca; border-radius:8px; padding:7px 11px; font-size:13px; font-weight:700; margin:10px 0 8px; }
+.nec-txt { font-size:13.3px; color:#334155; line-height:1.55; }
+.nec-eett { margin-top:9px; font-size:12.5px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:8px 11px; color:#475569; }
+.nec-eett b { color:#0f172a; }
+.nec-ok { color:#15803d; font-weight:800; }
+.nec-no { color:#b45309; font-weight:800; }
 /* ── Pestaña Revisión manual ── */
 .rev-sec{grid-column:1/-1;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:16px 18px;margin-bottom:4px}
 .rev-sec h3{margin:0 0 4px;font-size:14px;color:#0f172a;display:flex;align-items:center;gap:8px}
@@ -147,6 +162,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .dim-divider { display:inline-block; width:1.5px; height:28px; background:#cbd5e1; margin:0 8px 0 4px; border-radius:2px; }
 .subtab-bar.st-violeta { border-top-color:#7c3aed; }
 .subtab-bar.st-rosa    { border-top-color:#db2777; }
+.subtab-bar.st-rojo    { border-top-color:#b91c1c; }
 .filter-tab.active.tab-violeta { background:#7c3aed; border-color:#7c3aed; color:white; }
 .filter-tab.active.tab-rosa    { background:#db2777; border-color:#db2777; color:white; }
 .dim-btn:hover:not(.active) { background:#f0f9ff; color:#1a6b8a; }
@@ -362,6 +378,7 @@ table.excel-tbl tr:nth-child(even) td{background:#f8fafc}
   <button class="dim-btn dim-azul" data-dim="especialidad" data-color="azul" onclick="setDim('especialidad',this)">Especialidad</button>
   <button class="dim-btn dim-naranja" data-dim="apoyo" data-color="naranja" onclick="setDim('apoyo',this)">Apoyo Diag. y Terapéutico</button>
   <button class="dim-btn dim-ambar" data-dim="revision" data-color="ambar" onclick="setDim('revision',this)" title="Casos del cruce con el Excel de despliegue que requieren validación manual">⚠ Revisión <span id="revBadge" style="background:#d97706;color:#fff;border-radius:9px;padding:0 6px;font-size:10px;font-weight:800"></span></button>
+  <button class="dim-btn dim-rojo" data-dim="necesidades" data-color="rojo" onclick="setDim('necesidades',this)" title="ORD. SSMO N° 5040029-154: equipos que no pueden operar por falta de accesorios y/o componentes no considerados en la adquisición">🧩 Necesidades no consideradas <span id="necBadge" style="background:#b91c1c;color:#fff;border-radius:9px;padding:0 6px;font-size:10px;font-weight:800"></span></button>
 </div>
 <div class="subtab-bar" id="subtabBar"></div>
 <div class="cross-bar" id="crossBar"></div>
@@ -386,6 +403,7 @@ table.excel-tbl tr:nth-child(even) td{background:#f8fafc}
 <script src="data/equibox_eett_data.js"></script>
 <script src="data/equibox_accesorios_eett.js"></script>
 <script src="SHARED_DATA/equibox_componentes_defacto.js"></script>
+<script src="SHARED_DATA/necesidades_no_consideradas.js"></script>
 <script src="data/equibox_despliegue.js"></script>
 <script src="data/equibox_icons_map.js"></script>
 <script src="data/equibox_adjudicaciones.js"></script>
@@ -725,7 +743,7 @@ const SUBTYPES = [
 let activeSubtype = null;
 const DIM_COLOR = {
   categoria:'verde', tecnologia:'verde', especialidad:'azul',
-  apoyo:'naranja', camas:'celeste', admin:'gris', traslados:'violeta', comodatos:'rosa',
+  apoyo:'naranja', camas:'celeste', admin:'gris', traslados:'violeta', comodatos:'rosa', necesidades:'rojo',
 };
 const ASSIGNABLE_DIMS = ['especialidad','apoyo','camas','admin'];
 // Conjunto de servicios que constituyen la dimensión "Especialidad"
@@ -896,7 +914,7 @@ const CAMAS_LABELS = {
 // ── BUILD SUB-TABS ────────────────────────────────────────────
 function buildSubtabs() {
   // Tabs with no data yet — show empty bar
-  if (activeDim === 'traslados' || activeDim === 'comodatos' || activeDim === 'revision') {
+  if (activeDim === 'traslados' || activeDim === 'comodatos' || activeDim === 'revision' || activeDim === 'necesidades') {
     document.getElementById('subtabBar').innerHTML = '';
     return;
   }
@@ -988,7 +1006,7 @@ function buildSubcatBar() {
   activeSvcFilter = null;
 
   // For categoria/tecnologia: hide the bar entirely
-  if (activeDim === 'categoria' || activeDim === 'tecnologia' || activeDim === 'traslados' || activeDim === 'comodatos' || activeDim === 'revision') {
+  if (activeDim === 'categoria' || activeDim === 'tecnologia' || activeDim === 'traslados' || activeDim === 'comodatos' || activeDim === 'revision' || activeDim === 'necesidades') {
     bar.style.display = 'none';
     bar.innerHTML = '';
     return;
@@ -1207,6 +1225,10 @@ function updateRevBadge(){
   const el=document.getElementById('revBadge'); if(!el) return;
   const pend=_revItems().filter(i=>!_revChecks[i.key]).length;
   el.textContent=pend||'✓'; el.style.background=pend?'#d97706':'#16a34a';
+  // badge de necesidades no consideradas: N° de tipologías del ORD
+  const ne=document.getElementById('necBadge');
+  const D=window.NECESIDADES_NO_CONSIDERADAS;
+  if(ne) ne.textContent=(D&&D.casos)?D.casos.length:'';
 }
 function renderRevisionTab(){
   const grid=document.getElementById('gridWrap');
@@ -1238,9 +1260,97 @@ function renderRevisionTab(){
   });
   grid.innerHTML=html;
 }
+// ── NECESIDADES NO CONSIDERADAS (ORD. SSMO N° 5040029-154, 11-08-2026) ──────
+// 13 tipologías que no pueden operar por falta de accesorios/componentes que la
+// adquisición no consideró — casi todo mobiliario de posicionamiento que no
+// existe en obra. Se muestran agrupadas por lo que falta, con la cita EETT que
+// respalda (o no) el reclamo, porque eso es lo que define el curso de la
+// solución ante la Inspección Fiscal.
+function renderNecesidadesTab(){
+  const grid=document.getElementById('gridWrap');
+  document.getElementById('noResults').style.display='none';
+  const D=window.NECESIDADES_NO_CONSIDERADAS;
+  if(!D||!D.casos){ grid.innerHTML='<div class="rev-sec"><h3>⚠ Sin datos</h3><div class="rev-desc">No se pudo cargar SHARED_DATA/necesidades_no_consideradas.js</div></div>'; return; }
+  const cs=D.casos;
+  const eq=cs.filter(c=>c.unidad!=='pabellones').reduce((a,c)=>a+(c.cant||0),0);
+  const conE=cs.filter(c=>c.eett_respalda).length;
+  document.getElementById('resultsInfo').textContent=
+    cs.length+' casos de necesidades no consideradas · '+eq+' equipos + 7 pabellones · '
+    +(D.oficios||[]).length+' oficios';
+  const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  let html='<div class="rev-sec" style="background:#fef2f2;border-color:#fecaca">'
+    +'<h3>🧩 Equipos con inconvenientes en su funcionalidad</h3>'
+    +'<div class="rev-desc">'+esc(D.descripcion)+'</div>'
+    // un bloque por oficio: van a seguir llegando y cada caso remite al suyo
+    +(D.oficios||[]).map(function(o){
+       const nc=cs.filter(c=>c.oficio===o.id).length;
+       return '<div style="background:#fff;border:1px solid #fecaca;border-radius:10px;padding:11px 14px;margin-top:10px">'
+        +'<div style="font-weight:800;color:#7f1d1d;font-size:13.5px">'+esc(o.ord)+' · '+esc(o.fecha)
+        +' <span style="background:#fef2f2;border:1px solid #fecaca;border-radius:20px;padding:1px 9px;font-size:11px;margin-left:6px">'+nc+' caso'+(nc===1?'':'s')+'</span></div>'
+        +'<div style="font-size:12.5px;color:#334155;margin-top:3px">'+esc(o.mat)+'</div>'
+        +'<div style="font-size:11.5px;color:#64748b;margin-top:4px">De: '+esc(o.de)+' · Para: '+esc(o.para)
+        +' · Antecedentes: '+(o.antecedentes||[]).length+'</div>'
+        +'<div style="font-size:11.5px;color:#991b1b;margin-top:4px"><b>Estado:</b> '+esc(o.estado)+'</div>'
+        +(o.pdf?'<a href="'+esc(o.pdf)+'" target="_blank" style="display:inline-block;margin-top:7px;font-size:11.5px;font-weight:700;color:#1d4ed8;text-decoration:none;border:1px solid #bfdbfe;background:#eff6ff;border-radius:7px;padding:3px 10px">📄 Ver oficio</a>':'')
+        +'</div>'; }).join('')
+    +'<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">'
+    +[['Casos',cs.length,'#b91c1c'],['Equipos afectados',eq,'#1d4ed8'],
+      ['Oficios',(D.oficios||[]).length,'#7c3aed'],
+      ['Respaldados por EETT',conE,'#15803d'],['Sin mención en EETT',cs.length-conE,'#b45309']]
+      .map(([l,v,c])=>'<div style="background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px 14px;text-align:center;min-width:104px">'
+        +'<div style="font-size:21px;font-weight:800;color:'+c+'">'+v+'</div>'
+        +'<div style="font-size:10.5px;color:#64748b;font-weight:700;text-transform:uppercase;letter-spacing:.3px">'+l+'</div></div>').join('')
+    +'</div></div>';
+
+  // agrupadas por lo que falta: así se ve que es un problema único repetido
+  const GR=[['mobiliario','🪑 Falta mobiliario de posicionamiento (mesón / estación)'],
+            ['soporte','📐 Falta soporte o repisa de fijación'],
+            ['instalacion','🏗 Instalación que no permite la función clínica']];
+  GR.forEach(([k,titulo])=>{
+    const g=cs.filter(c=>c.tipo_falta===k);
+    if(!g.length) return;
+    const gq=g.reduce((a,c)=>a+(c.cant||0),0);
+    html+='<div class="rev-sec"><h3>'+titulo+' <span class="rev-pill">'+g.length+' tipologías · '+gq+' equipos</span></h3>';
+    g.forEach(c=>{
+      const _cods=c.codes||[c.code];
+      const _bs=(typeof BOXES!=='undefined')?_cods.map(cd=>BOXES.find(x=>String(x.code)===String(cd))).filter(Boolean):[];
+      const b=_bs[0]||null;
+      html+='<div class="nec-card">'
+        +'<div class="nec-head"><span class="nec-n">N° '+c.n+'</span>'
+        +'<div style="flex:1;min-width:200px"><div class="nec-title">'+esc(c.nombre)+'</div>'
+        +'<div class="nec-code">'+esc(_cods.join(' + '))+(b&&b.provider?' · '+esc(b.provider):'')
+        +(b&&b.brand?' · '+esc(b.brand):'')
+        +' · <span style="color:#b91c1c;font-weight:700">'+esc((D.oficios||[]).filter(function(o){return o.id===c.oficio;}).map(function(o){return o.ord;})[0]||'')+'</span></div></div>'
+        +'<span class="nec-qty">'+c.cant+' '+(c.unidad==='pabellones'?('pabell'+(c.cant===1?'ón':'ones')):(c.cant===1?'equipo':'equipos'))+'</span>'
+        +_bs.map(function(x){ return '<button onclick="openModal(&quot;'+esc(x.id)+'&quot;)" style="border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;border-radius:8px;padding:4px 11px;font-size:11.5px;font-weight:700;cursor:pointer">'+(_bs.length>1?esc(x.code):'Ver ficha')+' →</button>'; }).join(' ')
+        +'</div>'
+        +'<div class="nec-falta">Falta: '+esc(c.falta)+'</div>'
+        +'<div class="nec-txt">'+esc(c.inconveniente)+'</div>'
+        +(c.detalle_tecnico?('<div style="margin-top:9px;display:flex;gap:8px;flex-wrap:wrap">'
+          +Object.keys(c.detalle_tecnico).map(function(k){
+             return '<span style="background:#f1f5f9;border:1px solid #e2e8f0;border-radius:7px;padding:3px 9px;font-size:11.5px;color:#334155">'
+               +esc(k.replace(/_/g,' '))+': <b>'+esc(c.detalle_tecnico[k])+'</b></span>'; }).join('')
+          +'</div>'):'')
+        +'<div class="nec-eett"><b>Detalle requerido por EETT:</b> '+esc(c.eett)+'<br>'
+        +(c.eett_respalda
+           ? '<span class="nec-ok">✓ La EETT exige que el equipo venga completo y funcional — el reclamo tiene respaldo contractual directo.</span>'
+           : '<span class="nec-no">⚠ La EETT no menciona este accesorio — el caso requiere resolución fuera de la exigencia literal.</span>')
+        +'</div></div>';
+    });
+    html+='</div>';
+  });
+
+  html+='<div class="rev-sec" style="background:#f8fafc"><h3>📤 Lo que se solicita en cada oficio</h3>'
+    +(D.oficios||[]).map(function(o){ return '<div class="rev-desc" style="margin-bottom:9px">'
+      +'<b>'+esc(o.ord)+':</b> '+esc(o.solicitud)+'</div>'; }).join('')+'</div>';
+  grid.innerHTML=html;
+}
+
 function renderGrid(){
   // Pestaña de revisión manual del cruce con el despliegue
   if (activeDim === 'revision') { renderRevisionTab(); return; }
+  if (activeDim === 'necesidades') { renderNecesidadesTab(); return; }
   // Tabs with no data yet — show placeholder, hide grid
   if (activeDim === 'traslados' || activeDim === 'comodatos') {
     const grid = document.getElementById('gridWrap');
@@ -1764,6 +1874,18 @@ function openModal(id){
 
     const _pinsItems = pinsForEquipo(b.name);
     const pinsTabLabel = _pinsItems.length ? `📦 PINS (${_pinsItems.length})` : '📦 PINS';
+    // ORD SSMO 5040029-154: si el equipo está en la lista de necesidades no
+    // consideradas, se avisa en su propia ficha (no solo en la pestaña).
+    const _nec=(((window.NECESIDADES_NO_CONSIDERADAS||{}).casos)||[])
+      .find(c=>(c.codes||[c.code]).some(cd=>String(cd)===String(b.code)));
+    const necAviso=_nec ? ('<div style="background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #b91c1c;'
+      +'border-radius:10px;padding:11px 14px;margin-bottom:14px;font-size:13px;color:#7f1d1d;line-height:1.5">'
+      +'<b>🧩 Necesidad no considerada — '+(((window.NECESIDADES_NO_CONSIDERADAS||{}).oficios||[])
+          .filter(function(o){return o.id===_nec.oficio;}).map(function(o){return o.ord;})[0]||'ORD SSMO')+'</b><br>'
+      +'Falta: <b>'+_nec.falta+'</b>. '+_nec.inconveniente
+      +'<div style="margin-top:6px;font-size:12px;color:#991b1b">'
+      +(_nec.eett_respalda?'✓ Respaldado por EETT: ':'⚠ EETT: ')+_nec.eett+'</div></div>') : '';
+
     document.getElementById('modalBody').innerHTML=`
     <div class="modal-tabs">
       <button class="modal-tab-btn active" onclick="switchModalTab(this,'tab-equip')">Equipamiento</button>
@@ -1773,6 +1895,7 @@ function openModal(id){
       <button class="modal-tab-btn" onclick="switchModalTab(this,'tab-pins')">${pinsTabLabel}</button>
     </div>
     <div class="modal-tab-panel active" id="tab-equip">
+      ${necAviso}
       ${svcDistHtml}
       <div class="section-title">Documentos (${b.docs.length})</div>
       <div class="docs-list">${docsHtml}</div>

@@ -696,8 +696,13 @@ const MARCA_CIRC={
   escalera: {label:'Escalera',             icon:'🪜'},
   escmec:   {label:'Escalera mecánica',    icon:'↗'},
   rampa:    {label:'Rampa',                icon:'◣'},
-  control:  {label:'Control de acceso',    icon:'🔒'}
+  control:  {label:'Control de acceso',    icon:'🔒'},
+  // Reloj biométrico de asistencia: va en la circulación (accesos, vestidores,
+  // pasillos de personal) y no es un control de acceso — marca entrada/salida.
+  reloj:    {label:'Reloj biométrico',     icon:'🕐'}
 };
+// Marcadores que además llevan ficha propia (nombre/observación)
+const MARCA_FICHA={reloj:1};
 let _pmarkTipo='puerta';
 // Ajuste fino por piso del PLANO (matriz CSS): { floorId:[a,b,c,d,e,f] } — calibra
 // la escala/posición del plano de cada piso para que coincida con el Piso 1.
@@ -1145,6 +1150,7 @@ function loadFloor(fId){
   if(typeof sincBotonesCapas==='function') sincBotonesCapas();
   // el botón "Identificar desde P1" depende del piso actual
   if(typeof buildPcircBar==='function' && S.mode==='pcirc') buildPcircBar();
+  if(typeof pcSectorPanel==='function') pcSectorPanel();
 }
 function curDims(){ return SVG_DIMS[S.floorId]||{w:1,h:1}; }
 function fitView(){
@@ -1394,9 +1400,10 @@ window.addEventListener('mouseup',()=>{
   pcHistPush();
   const n=pcCortaLinea(horiz,coord,e0,e1);
   if(!n){ _pcHistU.pop(); toast('🔪 El corte no cruzó ningún tramo.'); return; }
-  saveAll(); renderOverlay(); renderZonaResumen&&renderZonaResumen();
+  const _cs=pcRecalcSectores(S.floorId,true);
+  saveAll(); renderOverlay(); renderZonaResumen&&renderZonaResumen(); pcSectorPanel();
   toast('🔪 '+n+' tramo'+(n===1?'':'s')+' partido'+(n===1?'':'s')
-    +' · doble clic selecciona la sección y 🎨 la reclasifica');
+    +' · '+_cs.length+' sector'+(_cs.length===1?'':'es')+' en el piso · asignales su tipo en 🔤 Sectores');
 });
 
 // ── Sección conectada (doble clic en ✏️ Editar) ────────────────────────────
@@ -1407,22 +1414,223 @@ window.addEventListener('mouseup',()=>{
 function pcSelSeccion(e){
   const c=planCoords(e); if(!c.inside) return;
   const hit=pcHitAt(c.sx,c.sy); if(!hit||esCaja(hit.zona)) return;
-  const arr=_pcArr().filter(b=>!esCaja(b.zona)&&b.zona===hit.zona);
+  const comp=pcComponentes(S.floorId).find(k=>k.some(b=>b.id===hit.id));
+  if(!comp) return;
+  pcSel=new Set(comp.map(b=>b.id)); renderOverlay(); pcToolsRefresh();
+  toast('▣ Sector '+(hit.sec||'sin letra')+': '+comp.length+' tramo'+(comp.length===1?'':'s')
+    +' · elegí la zona arriba y 🎨 para clasificarlo');
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// SECTORES · el verde como UN bloque que los cortes van dividiendo
+// Un SECTOR es una región físicamente conectada de circulación: lo que se puede
+// recorrer sin cruzar un corte. La conectividad es GEOMÉTRICA (no depende del
+// color), porque primero se corta y después se clasifica. Cada sector recibe
+// piso + letra (P1A, P1B…) y esa etiqueta se guarda en cada tramo (campo `sec`)
+// para que no baile entre recálculos.
+// ════════════════════════════════════════════════════════════════════════════
+const _pcTocan=(a,b)=>{
   const T=ADY_TOL;
-  const tocan=(a,b)=>{
-    const ox=Math.min(a.x_m+a.w_m/2,b.x_m+b.w_m/2)-Math.max(a.x_m-a.w_m/2,b.x_m-b.w_m/2);
-    const oy=Math.min(a.y_m+a.h_m/2,b.y_m+b.h_m/2)-Math.max(a.y_m-a.h_m/2,b.y_m-b.h_m/2);
-    // pegados por un LADO (no por una esquina: por ahí no se pasa)
-    return ox>=-T && oy>=-T && (ox>T || oy>T);
-  };
-  const sel=new Set([hit.id]); const cola=[hit];
-  while(cola.length){
-    const a=cola.pop();
-    arr.forEach(b=>{ if(!sel.has(b.id)&&tocan(a,b)){ sel.add(b.id); cola.push(b); } });
+  const ox=Math.min(a.x_m+a.w_m/2,b.x_m+b.w_m/2)-Math.max(a.x_m-a.w_m/2,b.x_m-b.w_m/2);
+  const oy=Math.min(a.y_m+a.h_m/2,b.y_m+b.h_m/2)-Math.max(a.y_m-a.h_m/2,b.y_m-b.h_m/2);
+  // pegados por un LADO (no por una esquina: por ahí no se pasa)
+  return ox>=-T && oy>=-T && (ox>T || oy>T);
+};
+// Componentes conexas de la circulación de un piso (cada una = un sector).
+function pcComponentes(floorId){
+  const arr=((pcircState.floors||{})[floorId||S.floorId]||[]).filter(b=>!esCaja(b.zona));
+  const vis=new Set(), comps=[];
+  arr.forEach(b=>{
+    if(vis.has(b.id)) return;
+    const comp=[b], cola=[b]; vis.add(b.id);
+    while(cola.length){
+      const x=cola.pop();
+      arr.forEach(y=>{ if(!vis.has(y.id)&&_pcTocan(x,y)){ vis.add(y.id); comp.push(y); cola.push(y); } });
+    }
+    comps.push(comp);
+  });
+  return comps;
+}
+const _pcArea=c=>c.reduce((a,b)=>a+b.w_m*b.h_m,0);
+// 0→A … 25→Z, 26→AA (por si un piso pasa de 26 sectores)
+function pcLetra(i){
+  let s='', n=i+1;
+  while(n>0){ const r=(n-1)%26; s=String.fromCharCode(65+r)+s; n=Math.floor((n-1)/26); }
+  return s;
+}
+// Recalcula sectores conservando las letras ya asignadas: al partirse un
+// sector, el trozo MAYOR se queda con la letra y el otro estrena una nueva.
+function pcRecalcSectores(floorId, silencioso){
+  const f=floorId||S.floorId;
+  const comps=pcComponentes(f).sort((a,b)=>_pcArea(b)-_pcArea(a));
+  const usadas=new Set(), pend=[];
+  comps.forEach(c=>{
+    const peso={};
+    c.forEach(b=>{ if(b.sec) peso[b.sec]=(peso[b.sec]||0)+b.w_m*b.h_m; });
+    const heredada=Object.keys(peso).sort((x,y)=>peso[y]-peso[x])[0];
+    if(heredada && !usadas.has(heredada)){ usadas.add(heredada); c._sec=heredada; }
+    else pend.push(c);
+  });
+  let i=0, nuevas=0;
+  pend.forEach(c=>{
+    let l; do{ l=f+pcLetra(i++); }while(usadas.has(l));
+    usadas.add(l); c._sec=l; nuevas++;
+  });
+  comps.forEach(c=>c.forEach(b=>{ b.sec=c._sec; }));
+  saveAll();
+  if(!silencioso) toast('🔤 '+comps.length+' sector'+(comps.length===1?'':'es')+' en '+f
+    +(nuevas?' · '+nuevas+' nuevo'+(nuevas===1?'':'s'):' · sin cambios'));
+  return comps;
+}
+// Resumen por sector para el panel: letra, m², zona dominante y mezcla.
+function pcSectores(floorId){
+  return pcComponentes(floorId).map(c=>{
+    const zc={}; c.forEach(b=>{ zc[b.zona]=(zc[b.zona]||0)+b.w_m*b.h_m; });
+    const zonas=Object.keys(zc).sort((x,y)=>zc[y]-zc[x]);
+    let sx=0, sy=0, sa=0;
+    c.forEach(b=>{ const a=b.w_m*b.h_m; sx+=b.x_m*a; sy+=b.y_m*a; sa+=a; });
+    return {sec:c[0].sec||'', n:c.length, area:sa, zona:zonas[0]||'general',
+            mezcla:zonas.length>1, cx:sa?sx/sa:0, cy:sa?sy/sa:0, ids:c.map(b=>b.id)};
+  }).sort((a,b)=>b.area-a.area);
+}
+
+// ── Fusionar sectores · la operación inversa del corte ─────────────────────
+// Fusionar NO es pintar dos áreas del mismo color: es volver a unirlas. Como
+// lo que las separa es la junta de 4 cm que dejó el corte, fusionar consiste
+// en CERRARLA — se estira el tramo de un lado hasta tocar el del otro y la
+// componente conexa vuelve a ser una sola.
+const FUSION_MAX=0.35;                   // hueco máximo que se considera junta
+function pcFusionarSectores(secs){
+  if(!secs || secs.length<2){ toast('⛓ Elegí al menos dos sectores para fusionar.'); return; }
+  const arr=_pcArr().filter(b=>!esCaja(b.zona));
+  const grupos=secs.map(s=>arr.filter(b=>b.sec===s)).filter(g=>g.length);
+  if(grupos.length<2){ toast('⛓ No encontré esos sectores en este piso.'); return; }
+  // 1º detectar las juntas; solo si hay algo que cerrar se toca el historial
+  const juntas=[];
+  for(let i=0;i<grupos.length;i++) for(let j=i+1;j<grupos.length;j++){
+    grupos[i].forEach(a=>grupos[j].forEach(b=>{
+      const ox=Math.min(a.x_m+a.w_m/2,b.x_m+b.w_m/2)-Math.max(a.x_m-a.w_m/2,b.x_m-b.w_m/2);
+      const oy=Math.min(a.y_m+a.h_m/2,b.y_m+b.h_m/2)-Math.max(a.y_m-a.h_m/2,b.y_m-b.h_m/2);
+      if(ox>ADY_TOL && oy<0 && oy>-FUSION_MAX)      juntas.push({a,b,eje:'y',g:-oy+ADY_TOL});
+      else if(oy>ADY_TOL && ox<0 && ox>-FUSION_MAX) juntas.push({a,b,eje:'x',g:-ox+ADY_TOL});
+    }));
   }
-  pcSel=sel; renderOverlay(); pcToolsRefresh();
-  toast('▣ Sección seleccionada: '+sel.size+' tramo'+(sel.size===1?'':'s')
-    +' · elegí la zona arriba y 🎨 para reclasificar · ⇧ y lazo suman más');
+  if(!juntas.length){
+    toast('⛓ Esos sectores no se tocan: solo se pueden fusionar áreas separadas por un corte '
+      +'(o a menos de '+Math.round(FUSION_MAX*100)+' cm). Para unir áreas lejanas, dibujá el tramo que las conecta.');
+    return;
+  }
+  pcHistPush();
+  juntas.forEach(({a,b,eje,g})=>{
+    if(eje==='y'){ a.h_m+=g; a.y_m += (b.y_m>a.y_m ? g/2 : -g/2); }
+    else         { a.w_m+=g; a.x_m += (b.x_m>a.x_m ? g/2 : -g/2); }
+  });
+  const cerradas=juntas.length;
+  // el sector mayor impone su letra y su zona: queda UN área con UN régimen
+  const mayor=grupos.slice().sort((a,b)=>_pcArea(b)-_pcArea(a))[0];
+  const zonaM=mayor[0].zona, letraM=mayor[0].sec;
+  let recolor=0;
+  grupos.forEach(g=>g.forEach(b=>{ if(b.zona!==zonaM){ b.zona=zonaM; recolor++; } b.sec=letraM; }));
+  const comps=pcRecalcSectores(S.floorId,true);
+  _pcSecSel.clear();
+  saveAll(); renderOverlay(); renderZonaResumen&&renderZonaResumen(); pcSectorPanel(); pcToolsRefresh();
+  toast('⛓ '+grupos.length+' sectores fusionados en '+letraM+' · '+cerradas+' junta'+(cerradas===1?'':'s')+' cerrada'
+    +(cerradas===1?'':'s')+(recolor?' · '+recolor+' tramos pasaron a '+ZONA_CIRC[zonaM].short:'')
+    +' · quedan '+comps.length+' sectores');
+}
+// Reinicia la numeración: borra las letras y reasigna A, B, C… por superficie.
+function pcReiniciarSectores(){
+  if(!confirm('Reiniciar los nombres de los sectores de '+S.floorId+'.\n\n'
+    +'Se reasignan desde la A, ordenados de mayor a menor superficie.\n'
+    +'No cambia la geometría ni los tipos de circulación ya asignados.\n\nSe deshace con ⌘Z.')) return;
+  pcHistPush();
+  _pcArr().forEach(b=>{ if(!esCaja(b.zona)) delete b.sec; });
+  const comps=pcRecalcSectores(S.floorId,true);
+  _pcSecSel.clear();
+  saveAll(); renderOverlay(); pcSectorPanel();
+  toast('↺ Nombres reiniciados: '+comps.length+' sectores desde '+S.floorId+'A');
+}
+
+let _pcSecSel=new Set();                 // sectores marcados en el panel
+function pcSecTick(sec,on){ on?_pcSecSel.add(sec):_pcSecSel.delete(sec); pcSectorPanel(); renderOverlay(); }
+
+let _pcVerSectores=lg('nav_ver_sectores',false);
+function pcToggleSectores(){
+  _pcVerSectores=!_pcVerSectores; ls('nav_ver_sectores',_pcVerSectores);
+  if(_pcVerSectores) pcRecalcSectores(S.floorId,true);
+  renderOverlay(); pcSectorPanel();
+}
+// Asigna una zona a TODO un sector (lo que se hace tras identificarlo).
+function pcZonaSector(sec,z){
+  const arr=_pcArr(); pcHistPush();
+  let n=0; arr.forEach(b=>{ if(b.sec===sec && !esCaja(b.zona) && b.zona!==z){ b.zona=z; n++; } });
+  saveAll(); renderOverlay(); renderZonaResumen&&renderZonaResumen(); pcSectorPanel();
+  toast('🎨 Sector '+sec+' → '+ZONA_CIRC[z].short+' ('+n+' tramo'+(n===1?'':'s')+')');
+}
+function pcIrSector(sec){
+  const s=pcSectores(S.floorId).find(x=>x.sec===sec); if(!s) return;
+  const p=dxfToSvg(S.floorId,s.cx,s.cy); if(!p) return;
+  S.ox=viewer.clientWidth/2-p.x*S.zoom; S.oy=viewer.clientHeight/2-p.y*S.zoom; applyT(true);
+  pcSel=new Set(s.ids); renderOverlay(); pcToolsRefresh();
+}
+function cerrarSectorPanel(){ const p=document.getElementById('secEd'); if(p) p.style.display='none'; }
+function pcSectorPanel(){
+  let box=document.getElementById('secEd');
+  if(!_pcVerSectores || S.mode!=='pcirc'){ if(box) box.style.display='none'; return; }
+  if(!box){
+    box=document.createElement('div'); box.id='secEd';
+    box.style.cssText='position:fixed;left:18px;bottom:18px;z-index:9996;width:310px;max-height:62vh;'
+      +'overflow:auto;background:#0e2233;border:1px solid #29ABE2;border-radius:12px;padding:12px 14px;'
+      +'box-shadow:0 10px 34px rgba(0,0,0,.45);color:#dbeafe;font-size:12px';
+    box.addEventListener('mousedown',e=>e.stopPropagation());
+    document.body.appendChild(box);
+  }
+  box.style.display='block';
+  const secs=pcSectores(S.floorId);
+  const tot=secs.reduce((a,s)=>a+s.area,0);
+  const sinLetra=secs.filter(s=>!s.sec).length;
+  box.innerHTML=
+     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">'
+    +'<strong style="font-size:13px">🔤 Sectores de '+S.floorId+'</strong>'
+    +'<span style="font-size:11px;color:#7fa6bd">'+secs.length+'</span>'
+    +'<button onclick="pcRecalcSectores();pcSectorPanel();renderOverlay()" title="Volver a detectar sectores tras dibujar o borrar"'
+    +' style="margin-left:auto;background:#1c3d55;color:#dbeafe;border:0;border-radius:7px;padding:3px 9px;cursor:pointer">↻</button>'
+    +'<button onclick="pcToggleSectores()" style="background:#1c3d55;color:#dbeafe;border:0;border-radius:7px;padding:3px 9px;cursor:pointer">Cerrar</button></div>'
+    +(sinLetra?'<div style="background:#3f2d0e;border:1px solid #a16207;border-radius:7px;padding:6px 9px;margin-bottom:8px;color:#fde68a;font-size:11px">'
+      +sinLetra+' sector'+(sinLetra===1?'':'es')+' sin letra — apretá ↻</div>':'')
+    +'<div style="display:flex;gap:6px;margin-bottom:9px;flex-wrap:wrap">'
+    +'<button onclick="pcFusionarSectores([..._pcSecSel])"'+(_pcSecSel.size<2?' disabled':'')
+    +' title="Une los sectores marcados cerrando la junta que dejó el corte entre ellos. El mayor impone su letra y su tipo."'
+    +' style="background:'+(_pcSecSel.size>1?'#1c4a68':'#0b1b28')+';color:'+(_pcSecSel.size>1?'#dbeafe':'#4b6b83')
+    +';border:1px solid #23506e;border-radius:7px;padding:5px 11px;font-size:11.5px;font-weight:700;cursor:'
+    +(_pcSecSel.size>1?'pointer':'default')+'">⛓ Fusionar'+(_pcSecSel.size?' ('+_pcSecSel.size+')':'')+'</button>'
+    +'<button onclick="pcReiniciarSectores()" title="Reasigna las letras desde la A, de mayor a menor superficie"'
+    +' style="background:#0b1b28;color:#dbeafe;border:1px solid #23506e;border-radius:7px;padding:5px 11px;font-size:11.5px;font-weight:700;cursor:pointer">↺ Reiniciar nombres</button>'
+    +(_pcSecSel.size?'<button onclick="_pcSecSel.clear();pcSectorPanel();renderOverlay()" style="background:#0b1b28;color:#8fb6cd;border:1px solid #23506e;border-radius:7px;padding:5px 9px;font-size:11.5px;cursor:pointer">✕</button>':'')
+    +'</div>'
+    +secs.map(s=>{
+       const zc=ZONA_CIRC[s.zona]||ZONA_CIRC.general;
+       return '<div style="border:1px solid #1c3d55;border-radius:9px;padding:8px 10px;margin-bottom:7px;background:#0b1b28">'
+        +'<div style="display:flex;align-items:center;gap:8px">'
+        +'<input type="checkbox" '+(_pcSecSel.has(s.sec)?'checked ':'')
+        +'onchange="pcSecTick(\''+s.sec+'\',this.checked)" title="Marcar para fusionar" style="cursor:pointer">'
+        +'<button onclick="pcIrSector(\''+s.sec+'\')" title="Centrar y seleccionar" style="background:'+zc.color
+        +';color:#0b1b28;border:0;border-radius:6px;padding:2px 9px;font-weight:800;font-size:12px;cursor:pointer">'+(s.sec||'—')+'</button>'
+        +'<span style="color:#9fc4db;font-size:11px">'+Math.round(s.area).toLocaleString('es-CL')+' m²'
+        +' · '+s.n+' tramo'+(s.n===1?'':'s')+'</span>'
+        +(s.area<1?'<span title="Astilla: menos de 1 m². Suele ser un resto de un corte — conviene borrarla." style="margin-left:auto;color:#f87171">▫ astilla</span>':'')
+        +(s.mezcla?'<span title="El sector tiene tramos de varias zonas" style="margin-left:auto;color:#fbbf24">⚠</span>':'')
+        +'</div>'
+        +'<div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">'
+        + Object.entries(ZONA_CIRC).map(([k,v])=>
+            '<button onclick="pcZonaSector(\''+s.sec+'\',\''+k+'\')" title="'+v.label+'" style="background:'
+            +(s.zona===k&&!s.mezcla?v.color:'#0e2233')+';color:'+(s.zona===k&&!s.mezcla?'#0b1b28':'#8fb6cd')
+            +';border:1px solid '+v.color+';border-radius:6px;padding:2px 7px;font-size:10.5px;font-weight:700;cursor:pointer">'
+            +v.short+'</button>').join('')
+        +'</div></div>';
+     }).join('')
+    +'<div style="margin-top:6px;color:#7fa6bd;font-size:11px">Total '+Math.round(tot).toLocaleString('es-CL')
+    +' m² · doble clic en el plano selecciona el sector completo.</div>';
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -2075,6 +2283,8 @@ function renderZonaResumen(){
         return Object.keys(ELEM_CIRC).concat(Object.keys(EST_CIRC)).filter(k=>e[k]).map(k=>
           '<span style="display:inline-flex;align-items:center;gap:4px;margin-left:8px" title="'
           +cajaDef(k).label+'">'+cajaDef(k).icon+' <b>'+e[k]+'</b></span>').join(''); })()
+    + (function(){ const rj=((pcircState.markers||{})[S.floorId]||[]).filter(m=>m.tipo==='reloj').length;
+        return rj?'<span style="display:inline-flex;align-items:center;gap:4px;margin-left:8px;color:#b45309" title="Relojes biométricos en este piso">🕐 <b>'+rj+'</b></span>':''; })()
     + '<span style="margin-left:auto;color:#7fa6bd">total <b>'+Math.round(tot).toLocaleString('es-CL')+' m²</b></span>';
 }
 window.addEventListener('load',()=>{ try{ setVista(S.vista); }catch(e){} });
@@ -2174,7 +2384,9 @@ function buildPcircBar(){
   const sep='margin-left:14px;border-left:1px solid rgba(148,163,184,.4);padding-left:14px';
   bar.innerHTML='<span class="lbl">Zona:</span>'+Object.entries(ZONA_CIRC).map(btn).join('')
     +'<button class="pcirc-z" style="background:#0e3a5c;margin-left:6px" onclick="pcUnificarZona()"'
-    +' title="Deja toda la circulación como UN SOLO bloque de la zona elegida — el punto de partida: después se corta en cada puerta y se reclasifica sección por sección">▦ Unificar</button>'
+    +' title="Deja toda la circulación como UN SOLO bloque de la zona elegida — el punto de partida: después se corta en cada puerta y se reclasifica sector por sector">▦ Unificar</button>'
+    +'<button class="pcirc-z" style="background:'+(_pcVerSectores?'#1c4a68':'#0e3a5c')+'" onclick="pcToggleSectores()"'
+    +' title="Detecta las áreas aisladas por los cortes y las identifica con piso + letra (P1A, P1B…). Abre el panel para asignarle su tipo de circulación a cada una.">🔤 Sectores</button>'
     +'<span class="lbl" style="'+sep+'">Elementos:</span>'
     +Object.entries(ELEM_CIRC).map(btn).join('')
     +'<span class="lbl" style="'+sep+'">Estacionamientos:</span>'
@@ -2209,6 +2421,7 @@ function handlePmarkClick(e){
   (pcircState.markers[S.floorId]=pcircState.markers[S.floorId]||[]).push(nuevo);
   saveAll(); renderOverlay();
   if(ES_PUERTA[nuevo.tipo]) editarPuerta(nuevo.id);   // abrir el ajuste al instante
+  else if(MARCA_FICHA[nuevo.tipo]) editarMarcaFicha(nuevo.id);
 }
 
 // ════════════════════════════════════════════════════════════════════════════
@@ -2380,9 +2593,10 @@ function cortarCircEnPuerta(id){
   pcHistPush();
   const n=pcCortaLinea(horiz,coord,e0,e1);
   if(!n){ _pcHistU.pop(); toast('✂ La puerta no cruza ningún tramo de circulación.'); return; }
-  saveAll(); renderOverlay(); updateStats&&updateStats(); renderZonaResumen&&renderZonaResumen();
+  const _cs=pcRecalcSectores(S.floorId,true);
+  saveAll(); renderOverlay(); updateStats&&updateStats(); renderZonaResumen&&renderZonaResumen(); pcSectorPanel();
   toast('✂ Corte a lo ancho del polígono: '+n+' tramo'+(n===1?'':'s')+' partido'+(n===1?'':'s')
-    +' · doble clic en una sección la selecciona entera y 🎨 la reclasifica');
+    +' · '+_cs.length+' sector'+(_cs.length===1?'':'es')+' en el piso · asignales su tipo en 🔤 Sectores');
 }
 
 // Clic DERECHO sobre una puerta o corredera ya colocada: la gira 90°
@@ -2399,7 +2613,45 @@ function girarPuerta90(id){
   toast('↻ '+((MARCA_CIRC[mk.tipo]||{}).label||'Puerta')+' a '+mk.ang+'°');
 }
 
+// ── Ficha de marcadores con datos (hoy: reloj biométrico) ───────────────────
+// Son pocos por piso y hay que poder distinguirlos: nombre corto (el que se
+// usa para referirse a él) y una observación de ubicación.
+function setMarcaFicha(id,campo,valor){
+  const mk=buscarMk(id); if(!mk) return;
+  const v=String(valor||'').trim();
+  v ? mk[campo]=v : delete mk[campo];
+  saveAll(); renderOverlay(); editarMarcaFicha(id,true);
+}
+function cerrarMarcaFicha(){ const p=document.getElementById('marcaEd'); if(p) p.style.display='none'; }
+function editarMarcaFicha(id){
+  const mk=buscarMk(id); if(!mk||!MARCA_FICHA[mk.tipo]) return;
+  const v=MARCA_CIRC[mk.tipo]||{};
+  let box=document.getElementById('marcaEd');
+  if(!box){
+    box=document.createElement('div'); box.id='marcaEd';
+    box.style.cssText='position:fixed;right:18px;bottom:18px;z-index:9997;width:290px;'
+      +'background:#0e2233;border:1px solid #f59e0b;border-radius:12px;padding:12px 14px;'
+      +'box-shadow:0 10px 34px rgba(0,0,0,.45);color:#dbeafe;font-size:12px';
+    box.addEventListener('mousedown',e=>e.stopPropagation());
+    document.body.appendChild(box);
+  }
+  box.style.display='block';
+  const inp='width:100%;margin-top:3px;background:#0b1b28;color:#dbeafe;border:1px solid #23506e;border-radius:6px;padding:4px 6px';
+  box.innerHTML=
+     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">'
+    +'<strong style="font-size:13px">'+v.icon+' '+v.label+'</strong>'
+    +'<button onclick="cerrarMarcaFicha()" style="margin-left:auto;background:#1c3d55;color:#dbeafe;border:0;border-radius:7px;padding:3px 9px;cursor:pointer">Cerrar</button></div>'
+    +'<label style="display:block;margin-bottom:7px">Nombre / N°'
+    +'<input value="'+String(mk.nombre||'').replace(/"/g,'&quot;')+'" placeholder="RB-1, Acceso Personal…"'
+    +' onchange="setMarcaFicha(\''+id+'\',\'nombre\',this.value)" style="'+inp+'"></label>'
+    +'<label style="display:block;margin-bottom:7px">Ubicación / observación'
+    +'<input value="'+String(mk.obs||'').replace(/"/g,'&quot;')+'" placeholder="junto a vestidores, hall de acceso…"'
+    +' onchange="setMarcaFicha(\''+id+'\',\'obs\',this.value)" style="'+inp+'"></label>'
+    +'<div style="margin-top:8px;color:#7fa6bd;font-size:11px">El nombre se dibuja bajo el pin. Para borrarlo: 🗑 Eliminar y clic encima.</div>';
+}
+
 function delPmark(id){
+  cerrarMarcaFicha();
   const arr=(pcircState.markers[S.floorId]||[]);
   pcircState.markers[S.floorId]=arr.filter(m=>m.id!==id);
   saveAll(); renderOverlay();
@@ -3123,6 +3375,29 @@ function renderOverlay(){
         path.setAttribute('stroke-width','3'); path.setAttribute('stroke-linejoin','round');
         path.setAttribute('pointer-events','none'); overlay.appendChild(path); }
     });
+    // Etiqueta de cada sector (P1A, P1B…) en su centroide
+    if(_pcVerSectores && S.mode==='pcirc'){
+      pcSectores(S.floorId).forEach(s=>{
+        if(!s.sec) return;
+        const p=dxfToSvg(S.floorId,s.cx,s.cy); if(!p) return;
+        const zc=ZONA_CIRC[s.zona]||ZONA_CIRC.general;
+        const g=document.createElementNS(SVGNS,'g');
+        g.setAttribute('transform','translate('+p.x+','+p.y+')');
+        g.setAttribute('pointer-events','none');
+        const marc=_pcSecSel.has(s.sec);
+        const w=Math.max(70,s.sec.length*38), h=52;
+        const r=document.createElementNS(SVGNS,'rect');
+        r.setAttribute('x',-w/2); r.setAttribute('y',-h/2);
+        r.setAttribute('width',w); r.setAttribute('height',h); r.setAttribute('rx',10);
+        r.setAttribute('fill',zc.color);
+        r.setAttribute('stroke',marc?'#fbbf24':'#fff'); r.setAttribute('stroke-width',marc?'7':'3');
+        const t=document.createElementNS(SVGNS,'text');
+        t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','central');
+        t.setAttribute('font-size','30'); t.setAttribute('font-weight','800');
+        t.setAttribute('fill',textOn(zc.color)); t.textContent=s.sec;
+        g.appendChild(r); g.appendChild(t); overlay.appendChild(g);
+      });
+    }
     if(S.mode==='del'){ _pcb.forEach(b=>{ const p=dxfToSvg(S.floorId,b.x_m,b.y_m); if(!p) return;
       const c=document.createElementNS(SVGNS,'circle');
       c.setAttribute('cx',p.x);c.setAttribute('cy',p.y);c.setAttribute('r',26);
@@ -3181,13 +3456,31 @@ function renderOverlay(){
       return;
     }
     const g=document.createElementNS(SVGNS,'g'); g.setAttribute('transform',`translate(${p.x},${p.y})`);
+    const esReloj=(mk.tipo==='reloj');
     const c=document.createElementNS(SVGNS,'circle'); c.setAttribute('r',26);
-    c.setAttribute('fill','#0f1e34'); c.setAttribute('stroke',S.mode==='del'?'#ef4444':'#22d3ee'); c.setAttribute('stroke-width','3');
+    c.setAttribute('fill',esReloj?'#3f2d0e':'#0f1e34');
+    c.setAttribute('stroke',S.mode==='del'?'#ef4444':(esReloj?'#f59e0b':'#22d3ee'));
+    c.setAttribute('stroke-width','3');
     const t=document.createElementNS(SVGNS,'text'); t.setAttribute('text-anchor','middle'); t.setAttribute('dominant-baseline','central');
     t.setAttribute('font-size','26'); t.textContent=v.icon;
-    const tt=document.createElementNS(SVGNS,'title'); tt.textContent=v.label;
+    const tt=document.createElementNS(SVGNS,'title');
+    tt.textContent=v.label+(mk.nombre?' · '+mk.nombre:'')+(mk.obs?' · '+mk.obs:'');
     g.appendChild(c); g.appendChild(t); g.appendChild(tt);
-    if(S.mode==='del'){ g.style.cursor='pointer'; g.addEventListener('click',ev=>{ev.stopPropagation(); delPmark(mk.id);}); }
+    // el reloj lleva su nombre bajo el pin (son pocos y hay que distinguirlos)
+    if(esReloj && mk.nombre){
+      const et=document.createElementNS(SVGNS,'text');
+      et.setAttribute('x',0); et.setAttribute('y',46);
+      et.setAttribute('text-anchor','middle'); et.setAttribute('font-size','22');
+      et.setAttribute('font-weight','800'); et.setAttribute('fill','#b45309');
+      et.setAttribute('stroke','#fff'); et.setAttribute('stroke-width','5');
+      et.setAttribute('paint-order','stroke'); et.setAttribute('pointer-events','none');
+      et.textContent=mk.nombre;
+      g.appendChild(et);
+    }
+    g.style.cursor='pointer';
+    g.addEventListener('click',ev=>{ ev.stopPropagation();
+      if(S.mode==='del') delPmark(mk.id);
+      else if(MARCA_FICHA[mk.tipo]) editarMarcaFicha(mk.id); });
     overlay.appendChild(g);
   });
 

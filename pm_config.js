@@ -43,7 +43,9 @@ window.PM_CONFIG = {
     // Renata Vargas · ingeniera biomédica (apoyo Puesta en Marcha) — editora de Navegación
     'rvargas':    'e05cf96e26effda2598f05acb46a87a82bcc631a716a6b8eb77b35b7a069a6a8',
     // Monserrat Rivera · biomédica (apoyo Puesta en Marcha) — mrivera@hsalvador.cl
-    'mrivera':    '330dc6785e48327d41569c8e057c0c2f56d1839800d2967890f9f35cd51551f4'
+    'mrivera':    '330dc6785e48327d41569c8e057c0c2f56d1839800d2967890f9f35cd51551f4',
+    // Costanza Poch Trabucco · profesional de la Unidad de Puesta en Marcha
+    'cpoch':      '31f36f0a477f2876b575feed828316551646baec80e4150d1558878566733de1'
   }
 };
 

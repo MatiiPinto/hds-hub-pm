@@ -35,6 +35,15 @@ button,input,select,textarea{font-family:inherit}
   #navBar .nav-crumb{max-width:130px}
 }
 #hdr{background:#bccede;border-bottom:1px solid #7ca4c0;padding:0 18px;height:48px;display:flex;align-items:center;gap:16px;flex-shrink:0;z-index:10}
+/* Encabezado angosto: primero se aprietan los espacios, después se van las
+   estadísticas (que también están en el panel), y por último la búsqueda.
+   Lo que NUNCA se va son los distintivos de guardado, respaldo y memoria:
+   son los testigos de que el trabajo se está guardando. */
+@media (max-width:1400px){#hdr{gap:10px;padding:0 12px}}
+@media (max-width:1240px){#hdr .hdr-stat,#hdr .hdr-sep{display:none}}
+@media (max-width:1040px){#hdr h1 span{display:none}}
+/* La barra de herramientas se desliza en vez de desbordar la ventana. */
+@media (max-width:1240px){#editBar{overflow-x:auto;scrollbar-width:thin}}
 #hdr h1{font-size:14px;font-weight:800;color:#17456e;letter-spacing:.6px;white-space:nowrap}
 .hdr-stat{font-size:11px;color:#48687e;text-align:center}
 .hdr-stat strong{display:block;font-size:16px;color:#1a3a5c;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
@@ -224,8 +233,9 @@ button,input,select,textarea{font-family:inherit}
 .bedkind.cupo.active{background:#A0522D;border-color:#7a3f1d;color:#fff}
 .bedkind.puesto.active{background:#B8860B;border-color:#8a6508;color:#fff}
 /* Panel derecho */
-#rightPanel{width:232px;background:#bccede;border-left:1px solid #7ca4c0;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;font-family:system-ui,-apple-system,sans-serif;transition:width .18s ease,margin .18s ease}
+#rightPanel{width:464px;background:#bccede;border-left:1px solid #7ca4c0;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;font-family:system-ui,-apple-system,sans-serif;transition:width .18s ease,margin .18s ease}
 #rightPanel.collapsed{width:0;border-left:none;overflow:hidden}
+@media (max-width:1280px){#rightPanel:not(.collapsed){width:300px}}
 #rightPanel.collapsed>*{display:none}
 #rightPanel h2{font-size:10px;font-weight:700;color:#48687e;text-transform:uppercase;letter-spacing:1px;padding:12px 14px 6px;margin:0;display:flex;align-items:center;justify-content:space-between;gap:6px}
 .rp-collapse{background:#94b8d0;border:1px solid #6d93b0;color:#1a3a5c;border-radius:6px;width:22px;height:22px;cursor:pointer;font-size:13px;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
@@ -604,7 +614,9 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <div style="display:flex;gap:4px;margin-bottom:6px">
         <button id="rpTabHerr" class="sb-tab on" onclick="rpShowTab('herr')">🧰 Herramientas</button>
         <button id="rpTabRev" class="sb-tab" onclick="rpShowTab('rev')">🧩 Revisión <span id="sbBimN">0</span></button>
+        <button id="rpTabAv" class="sb-tab" onclick="rpShowTab('av')" title="Cuánto de la dotación está asignada a un recinto, por subdirección y su desglose">📊 Avance <span id="sbAvN">—</span></button>
       </div>
+      <div id="avBody" style="display:none;max-height:58vh;overflow-y:auto"></div>
       <div id="bimList" style="display:none;max-height:58vh;overflow-y:auto"></div>
       <div id="toolsBody" style="display:none">
       <div class="rp-t" style="margin-top:2px">✏️ Nombres de recinto</div>
@@ -1336,6 +1348,13 @@ if(!wsState.beds) wsState.beds={};   // camas: { contenedorId: [{id,x,y,num}] }
 if(!wsState.equip) wsState.equip={}; // equipamiento: { recintoId: { unitKey:{x,y} } } (posición por unidad)
 if(!wsState.equipMoves) wsState.equipMoves=[]; // traslados entre recintos: [{id,srcRoom,key,dstRoom,ts}]
 if(!wsState.dotLinks) wsState.dotLinks=[];   // 4º turno: grupos de puestos unidos [[roomId§dotId,...],...]
+// Limpieza de arrastre: los grupos rotos de antes de este arreglo se van al
+// arrancar (no se pueden dibujar de todas formas). Queda en consola y en el 🩺.
+let _linksHuerfanos=0;
+if(!_SELFTEST) setTimeout(()=>{ try{
+  _linksHuerfanos=_purgarLinks();
+  if(_linksHuerfanos){ sWs(); console.info('Atlas · 4º turno: '+_linksHuerfanos+' grupo(s) huérfano(s) eliminados (apuntaban a puestos que ya no existen)'); }
+}catch(e){} }, 2500);
 let bedCtr      = lg('cabida_bed_counter',{sector:'',prefix:'',next:1,pad:3,kind:'camilla'});
 if(!bedCtr.kind) bedCtr.kind='camilla';   // compat con respaldos previos sin tipo
 let nameState   = lg('cabida_cad_names',{areas:{},rooms:{},types:{},codes:{}});
@@ -1438,7 +1457,28 @@ function _markSaved(ok){
   try{ if(Date.now()-_memUlt>3000) updateMemBar(); }catch{}
 }
 function sBox(){ _codeBoxIndex=null; _areaCol=null; const k=ls('cabida_cad_boxes',boxState); _idbBak('boxes',boxState); _markSaved(k); _undoQueue(); }
-function sWs(){  const k=ls('cabida_cad_ws',wsState);  _idbBak('ws',wsState);    _markSaved(k); _undoQueue(); }
+// ── 4º TURNO: enlaces huérfanos ─────────────────────────────────────────────
+// Un grupo de 4º turno referencia puestos por "recinto§puestoId". Si después se
+// borran los puestos de un recinto y se rehacen desde cero (pasó el 13-ago con
+// P3 y P4), los grupos quedan apuntando a puestos que ya no existen: no se
+// pueden dibujar y estorban. Se limpia en cada guardado, que es el único lugar
+// por el que pasan todos los caminos de borrado.
+function _purgarLinks(){
+  const g=wsState.dotLinks;
+  if(!Array.isArray(g) || !g.length) return 0;
+  const vivos=new Set();
+  for(const rid in (wsState.dots||{})){
+    const arr=wsState.dots[rid];
+    if(Array.isArray(arr)) for(const d of arr) if(d&&d.id) vivos.add(rid+'§'+d.id);
+  }
+  const antes=g.length;
+  wsState.dotLinks=g.map(gr=>Array.isArray(gr)?gr.filter(k=>vivos.has(k)):[])
+                    .filter(gr=>gr.length>1);   // un grupo de 1 ya no es un grupo
+  return antes-wsState.dotLinks.length;
+}
+function sWs(){  _purgarLinks(); const k=ls('cabida_cad_ws',wsState);  _idbBak('ws',wsState);    _markSaved(k); _undoQueue();
+  try{ if(_rpTab==='av') renderAvance(); else _avBadge(); }catch(e){}   // el testigo sigue el trabajo en vivo
+}
 if(!nameState.codes)nameState.codes={};
 function sNames(){ _codeBoxIndex=null; _areaCol=null; const k=ls('cabida_cad_names',nameState); _idbBak('names',nameState); _markSaved(k); _undoQueue(); }
 // Respaldo interno de recuperación: va a IndexedDB (no gasta la cuota de
@@ -1865,7 +1905,73 @@ async function diagGuardado(){
   L.push('');
   L.push(okW && !_SELFTEST && _fbak.vivo ? '✅ Todo en orden.'
     : '⚠ Revisa los puntos marcados arriba.');
-  alert(L.join('\n'));
+  _diagPanel(L.join('\n'));
+}
+/* Panel del diagnóstico. Antes era un alert(): en Safari no se puede copiar
+   texto de un alert, así que el informe no servía para compartirlo. Además
+   incluye lo que hace falta para resolver el problema, no solo verlo: la lista
+   de claves que NO son del Atlas, con su peso, para liberar espacio. */
+function _diagPanel(texto){
+  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  document.getElementById('diagWrap')?.remove();
+  const wrap=document.createElement('div'); wrap.id='diagWrap';
+  wrap.style.cssText='position:fixed;inset:0;z-index:100001;background:rgba(15,30,52,.55);'
+    +'display:flex;align-items:center;justify-content:center;padding:22px';
+  // Claves ajenas al Atlas: son las que se pueden liberar sin tocar tu trabajo.
+  const ajenas=[];
+  try{ for(const k in localStorage) if(Object.prototype.hasOwnProperty.call(localStorage,k) && !/^cabida_/.test(k))
+    ajenas.push([k, (k.length+String(localStorage[k]).length)*2]); }catch(e){}
+  ajenas.sort((a,b)=>b[1]-a[1]);
+  const kb=n=>(n/1024).toFixed(0)+' KB';
+  const filas=ajenas.map(([k,n],i)=>
+    '<label style="display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;'
+    +(i%2?'background:#f1f5f9':'')+'">'
+    +'<input type="checkbox" class="diagK" value="'+esc(k)+'">'
+    +'<span style="flex:1;font-family:ui-monospace,monospace;font-size:11px">'+esc(k)+'</span>'
+    +'<b style="font-size:11px;color:#475569">'+kb(n)+'</b></label>').join('');
+  const totalAjeno=ajenas.reduce((s,x)=>s+x[1],0);
+  wrap.innerHTML='<div style="background:#fff;border-radius:14px;max-width:820px;width:100%;'
+    +'max-height:88vh;display:flex;flex-direction:column;box-shadow:0 18px 60px rgba(0,0,0,.4)">'
+    +'<div style="padding:14px 18px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:10px">'
+    +'<b style="flex:1;font-size:14px">🩺 Diagnóstico de guardado</b>'
+    +'<button id="diagCopy" style="background:#2563eb;color:#fff;border:none;border-radius:8px;padding:6px 14px;font-weight:700;cursor:pointer">📋 Copiar informe</button>'
+    +'<button id="diagX" style="background:#e2e8f0;border:none;border-radius:8px;padding:6px 12px;font-weight:700;cursor:pointer">Cerrar</button></div>'
+    +'<div style="overflow:auto;padding:14px 18px">'
+    +'<pre id="diagTxt" style="margin:0;font-size:11.5px;line-height:1.5;white-space:pre-wrap;'
+    +'user-select:text;font-family:ui-monospace,monospace">'+esc(texto)+'</pre>'
+    +(ajenas.length? '<div style="margin-top:16px;border-top:1px solid #e2e8f0;padding-top:12px">'
+      +'<b style="font-size:12px">🧹 Liberar espacio — datos de OTRAS plataformas ('+kb(totalAjeno)+')</b>'
+      +'<div style="font-size:11px;color:#64748b;margin:4px 0 8px">Nada de esto es del Atlas. Se descarga un respaldo de lo seleccionado ANTES de borrarlo, así se puede reponer.</div>'
+      +filas
+      +'<button id="diagFree" style="margin-top:10px;background:#b91c1c;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-weight:700;cursor:pointer">💾 Respaldar y liberar seleccionadas</button>'
+      +'</div>' : '')
+    +'</div></div>';
+  document.body.appendChild(wrap);
+  wrap.onclick=e=>{ if(e.target===wrap) wrap.remove(); };
+  wrap.querySelector('#diagX').onclick=()=>wrap.remove();
+  wrap.querySelector('#diagCopy').onclick=async()=>{
+    try{ await navigator.clipboard.writeText(texto); }
+    catch(e){ const r=document.createRange(); r.selectNode(document.getElementById('diagTxt'));
+      getSelection().removeAllRanges(); getSelection().addRange(r); document.execCommand('copy'); }
+    const b=wrap.querySelector('#diagCopy'); b.textContent='✓ Copiado'; setTimeout(()=>b.textContent='📋 Copiar informe',1800);
+  };
+  const bf=wrap.querySelector('#diagFree');
+  if(bf) bf.onclick=()=>{
+    const sel=[...wrap.querySelectorAll('.diagK:checked')].map(c=>c.value);
+    if(!sel.length){ alert('Marca primero qué claves liberar.'); return; }
+    const peso=sel.reduce((s,k)=>s+(k.length+String(localStorage[k]||'').length)*2,0);
+    if(!confirm('Se van a liberar '+sel.length+' clave(s) — '+kb(peso)+'.\n\n'
+      +sel.join('\n')+'\n\nPrimero se descarga un respaldo de todas ellas. ¿Continuar?')) return;
+    const copia={}; sel.forEach(k=>{ copia[k]=localStorage.getItem(k); });
+    guardarArchivo(EXP_DIRS.backup, 'localStorage_liberado_'+new Date().toISOString().replace(/[:.]/g,'-').slice(0,19)+'.json',
+      JSON.stringify({_meta:{app:'Atlas HDS',motivo:'liberar espacio',fecha:new Date().toISOString()},claves:copia},null,2),
+      'application/json');
+    let n=0; sel.forEach(k=>{ try{ localStorage.removeItem(k); n++; }catch(e){} });
+    try{ updateMemBar(); }catch(e){}
+    wrap.remove();
+    alert('✓ Liberadas '+n+' clave(s) — '+kb(peso)+'.\n\nSe descargó el respaldo por si hay que reponerlas.\n\n'
+      +'Ahora el navegador usa '+lsUso().mb+' MB.');
+  };
 }
 /* ── RESPALDO AUTOMÁTICO A CARPETA (File System Access API) ─────────────────
    El usuario elige una carpeta una vez (idealmente sincronizada a OneDrive/Drive);
@@ -2015,7 +2121,16 @@ function importBackup(ev){
       if(data.cabida_cad_delta)      ls('cabida_cad_delta',       data.cabida_cad_delta);
       if(data.cabida_cad_structures) ls('cabida_cad_structures',  data.cabida_cad_structures);
       if(data.cabida_cad_dxf_calib)  ls('cabida_cad_dxf_calib',   data.cabida_cad_dxf_calib);
-      lsFlush(false);   // las cuatro claves grandes van en cola: escribir ANTES de recargar
+      // ⚠ CRÍTICO: recargar tira lo que hay en memoria. Si la escritura falló
+      // (cuota llena, que es justo cuando uno necesita restaurar), recargar
+      // borraría el estado restaurado Y el que había. Mejor no recargar.
+      if(lsFlush(false)===false){
+        alert('⛔ NO se pudo escribir el estado restaurado en el navegador.\n\n'
+          +'Casi seguro el almacenamiento está lleno ('+lsUso().mb+' MB).\n'
+          +'NO se recargó la página a propósito: recargar habría borrado todo.\n\n'
+          +'Liberá espacio (Exportar ▾ → 🩺 Diagnóstico dice qué lo ocupa) y volvé a intentar.');
+        return;
+      }
       alert('✓ Respaldo restaurado correctamente.\n\nLa página se recargará para aplicar los cambios.');
       location.reload();
     }catch(err){
@@ -2131,13 +2246,22 @@ function updateMemBar(){
   const col = pct>=80 ? '#dc2626' : pct>=60 ? '#f59e0b' : '#16a34a';
   const fill=document.getElementById('memFill'), txt=document.getElementById('memTxt');
   if(fill){ fill.style.width=Math.max(pct,2)+'%'; fill.style.background=col; }
-  if(txt){ txt.textContent=pct+'%'; txt.style.color=col; }
+  // Los MB van SIEMPRE a la vista: un "100%" solo no dice qué hacer, y el tope
+  // de 5 MB es el de Chrome — Safari puede dar algo distinto, así que el número
+  // absoluto es el dato que no depende de ese supuesto.
+  if(txt){ txt.textContent=u.mb.toFixed(2).replace('.',',')+' MB'; txt.style.color=col; }
   el.style.borderColor = pct>=80 ? '#dc2626' : '#94b8d0';
-  el.title='Memoria del navegador: '+u.mb+' MB de ~'+MEM_CUPO_MB+' MB ('+pct+'%).\n'
-    +(LZ_OK?'El estado se guarda comprimido (~7 veces menos).\n':'⚠ Compresión no disponible en este navegador.\n')
-    +(pct>=80?'⚠ Poco espacio: respalda a archivo y avisá.\n':'')
-    +'Este cupo NO se puede aumentar; se comparte con las demás plataformas del mismo origen.\n'
-    +'Click para el diagnóstico completo.';
+  // Cuánto de lo ocupado NO es del Atlas: es lo primero que hay que saber
+  // cuando esto se llena, porque el cupo se comparte con las demás plataformas.
+  let ajeno=0; try{ for(const k in localStorage)
+    if(Object.prototype.hasOwnProperty.call(localStorage,k) && !/^cabida_/.test(k))
+      ajeno+=k.length+String(localStorage[k]).length; }catch(e){}
+  const ajenoMB=+(ajeno*2/1048576).toFixed(2);
+  el.title='Memoria del navegador: '+u.mb+' MB (~'+pct+'% de los ~5 MB por origen).\n'
+    +'  · Atlas: '+(u.mb-ajenoMB).toFixed(2)+' MB'+(LZ_OK?' (comprimido, ~7 veces menos)':' — SIN comprimir')+'\n'
+    +'  · Otras plataformas del mismo origen: '+ajenoMB+' MB\n'
+    +(pct>=80?'\n⚠ Casi sin espacio: si se llena, el guardado empieza a fallar.\n   Click para ver qué lo está ocupando.\n':'')
+    +'\nEste cupo NO se puede aumentar. Click para el diagnóstico completo.';
   _memUlt=Date.now();
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',updateMemBar);
@@ -2242,7 +2366,16 @@ async function fbakRestaurar(){
     if(d.cabida_cad_delta)      ls('cabida_cad_delta',      d.cabida_cad_delta);
     if(d.cabida_cad_structures) ls('cabida_cad_structures', d.cabida_cad_structures);
     if(d.cabida_cad_dxf_calib)  ls('cabida_cad_dxf_calib',  d.cabida_cad_dxf_calib);
-    lsFlush(false);                                  // escribir ANTES de recargar
+    // ⚠ CRÍTICO: recargar tira lo que hay en memoria. Si la escritura falló
+    // (cuota llena, que es justo cuando uno necesita restaurar), recargar
+    // borraría el estado restaurado Y el que había. Mejor no recargar.
+    if(lsFlush(false)===false){
+      alert('⛔ NO se pudo escribir el estado restaurado en el navegador.\n\n'
+        +'Casi seguro el almacenamiento está lleno ('+lsUso().mb+' MB).\n'
+        +'NO se recargó la página a propósito: recargar habría borrado todo.\n\n'
+        +'Liberá espacio (Exportar ▾ → 🩺 Diagnóstico dice qué lo ocupa) y volvé a intentar.');
+      return;
+    }
     alert('✓ Estado restaurado desde archivo.\n\nLa página se recargará.');
     location.reload();
   }catch(e){ alert('No se pudo restaurar desde archivo:\n'+(e&&e.message||e)); }
@@ -6324,13 +6457,105 @@ function rpToggle(id){ const e=document.getElementById(id); if(e) e.style.displa
 let _revOpen=false, _rpTab='';
 function rpShowTab(tab){
   _rpTab=(_rpTab===tab)?'':tab;              // clic en la activa la colapsa
-  const herr=_rpTab==='herr', rev=_rpTab==='rev';
+  const herr=_rpTab==='herr', rev=_rpTab==='rev', av=_rpTab==='av';
   document.getElementById('rpTabHerr').classList.toggle('on',herr);
   document.getElementById('rpTabRev').classList.toggle('on',rev);
+  document.getElementById('rpTabAv')?.classList.toggle('on',av);
   document.getElementById('toolsBody').style.display=herr?'':'none';
   document.getElementById('bimList').style.display=rev?'':'none';
+  const ab=document.getElementById('avBody'); if(ab) ab.style.display=av?'':'none';
   _revOpen=rev;
   if(rev) renderBimPending();
+  if(av) renderAvance();
+}
+
+/* ── TESTIGO DE AVANCE POR SUBDIRECCIÓN ─────────────────────────────────────
+   Cuánto de la dotación quedó asignada a un recinto, abierto por el árbol
+   oficial: subdirección → departamento/servicio → unidad. Es un TESTIGO de
+   cobertura, no un sugeridor: dice dónde falta, no a quién poner. Cuenta
+   personas de la matriz; la Compra de Servicio se informa aparte porque no
+   forma parte de la dotación pero sí ocupa puesto. */
+let _avAbierto={};
+function _avPct(a,n){ return n? Math.round(a*100/n) : 0; }
+function _avColor(p){ return p>=90?'#16a34a' : p>=60?'#65a30d' : p>=30?'#f59e0b' : '#dc2626'; }
+function _avBarra(a,n,alto){
+  const p=_avPct(a,n);
+  return '<span style="display:inline-block;width:100%;height:'+(alto||6)+'px;border-radius:3px;background:#dde7f0;overflow:hidden;vertical-align:middle">'
+    +'<span style="display:block;height:100%;width:'+p+'%;background:'+_avColor(p)+'"></span></span>';
+}
+// Solo el % global, para el rotulo de la pestaña: no arma el arbol entero.
+function _avBadge(){
+  const b=document.getElementById('sbAvN'); if(!b||!dotDB||!dotDB.staff) return;
+  const asg=_dpAsignados(), all=_dpStaffAll();
+  let a=0; all.forEach(s=>{ if(asg[norm(s.nombre)]) a++; });
+  b.textContent=_avPct(a,all.length)+'%';
+}
+function avToggle(k){ _avAbierto[k]=!_avAbierto[k]; renderAvance(); }
+function renderAvance(){
+  const cont=document.getElementById('avBody'); if(!cont) return;
+  if(!dotDB||!dotDB.staff){ cont.innerHTML='<div style="padding:8px;color:#64748b">La matriz de dotación no está cargada.</div>'; return; }
+  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const corto=s=>String(s||'').replace(/^SUBDIRECCION\s+(DE\s+)?/i,'').replace(/^DEPARTAMENTO\s+/i,'Depto. ').replace(/^SERVICIO\s+(DE\s+)?/i,'');
+  const asg=_dpAsignados();
+  // árbol sd → sv → u, contando personas y cuántas tienen recinto
+  const arbol={};
+  _dpStaffAll().forEach(s=>{
+    const sd=String(s.subdireccion||'(sin subdirección)');
+    const sv=String(s.servicio||'(sin departamento)');
+    const u =String(s.unidad||'');
+    const A=arbol[sd]||(arbol[sd]={n:0,a:0,hijos:{}});
+    const B=A.hijos[sv]||(A.hijos[sv]={n:0,a:0,hijos:{}});
+    const C=u?(B.hijos[u]||(B.hijos[u]={n:0,a:0})):null;
+    const ok=!!asg[norm(s.nombre)];
+    A.n++; B.n++; if(C) C.n++;
+    if(ok){ A.a++; B.a++; if(C) C.a++; }
+  });
+  const tN=Object.values(arbol).reduce((x,v)=>x+v.n,0);
+  const tA=Object.values(arbol).reduce((x,v)=>x+v.a,0);
+  const badge=document.getElementById('sbAvN'); if(badge) badge.textContent=_avPct(tA,tN)+'%';
+  const H=[];
+  H.push('<div style="display:flex;align-items:center;gap:8px;padding:6px 4px 10px">'
+    +'<b style="font-size:12px">Dotación asignada a recinto</b>'
+    +'<b style="margin-left:auto;font-size:15px;color:'+_avColor(_avPct(tA,tN))+'">'+_avPct(tA,tN)+'%</b></div>'
+    +'<div style="padding:0 4px 10px">'+_avBarra(tA,tN,8)
+    +'<div style="font-size:10.5px;color:#64748b;margin-top:3px">'+tA+' de '+tN+' personas · faltan '+(tN-tA)+'</div></div>');
+  const fila=(nivel,nombre,a,n,clave,hayHijos)=>{
+    const p=_avPct(a,n), ab=!!_avAbierto[clave];
+    const pad=[0,12,24][nivel];
+    return '<div style="padding:5px 4px 5px '+(4+pad)+'px;border-top:1px solid #eef2f7;'
+      +(hayHijos?'cursor:pointer':'')+'" '+(hayHijos?'onclick="avToggle(\''+clave.replace(/'/g,"\\'")+'\')"':'')+'>'
+      +'<div style="display:flex;align-items:flex-start;gap:6px;font-size:'+[11.5,11,10.5][nivel]+'px">'
+      +(hayHijos?'<span style="color:#94a3b8;width:9px;display:inline-block">'+(ab?'▾':'▸')+'</span>':'<span style="width:9px;display:inline-block"></span>')
+      // El nombre envuelve en vez de recortarse: en un testigo, un nombre a
+      // medias es peor que una fila un poco más alta.
+      +'<span title="'+esc(nombre)+'" style="flex:1;min-width:0;overflow-wrap:anywhere;line-height:1.25;'
+        +(nivel===0?'font-weight:700':nivel===1?'font-weight:600':'color:#475569')+'">'+esc(corto(nombre))+'</span>'
+      +'<span style="color:#64748b;font-size:10px;white-space:nowrap">'+a+'/'+n+'</span>'
+      +'<b style="width:32px;text-align:right;color:'+_avColor(p)+';font-size:10.5px">'+p+'%</b></div>'
+      +'<div style="margin:3px 0 0 15px">'+_avBarra(a,n,nivel===0?6:4)+'</div></div>';
+  };
+  Object.entries(arbol).sort((x,y)=>y[1].n-x[1].n).forEach(([sd,A])=>{
+    const kA='sd:'+sd, hijosA=Object.entries(A.hijos);
+    H.push(fila(0,sd,A.a,A.n,kA,hijosA.length>0));
+    if(!_avAbierto[kA]) return;
+    hijosA.sort((x,y)=>y[1].n-x[1].n).forEach(([sv,B])=>{
+      const kB=kA+'|sv:'+sv, hijosB=Object.entries(B.hijos);
+      H.push(fila(1,sv,B.a,B.n,kB,hijosB.length>0));
+      if(!_avAbierto[kB]) return;
+      hijosB.sort((x,y)=>y[1].n-x[1].n).forEach(([u,C])=>H.push(fila(2,u,C.a,C.n,kB+'|u:'+u,false)));
+    });
+  });
+  // Compra de Servicio: ocupa puesto pero no es dotación — se informa aparte.
+  let cds=0; for(const rid in (wsState.dots||{})){
+    const arr=wsState.dots[rid]; if(!Array.isArray(arr)) continue;
+    for(const d of arr){
+      if(d.tipo==='dinamico') (d.turnos||[]).forEach(x=>{ if(x.cds&&x.nombre) cds++; });
+      else if(d.cds&&d.nombre) cds++;
+    }
+  }
+  if(cds) H.push('<div style="margin-top:10px;padding:7px 8px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;font-size:10.5px;color:#5b21b6">'
+    +'🛒 <b>'+cds+'</b> puesto(s) de Compra de Servicio. No cuentan en los porcentajes: ocupan recinto pero no son parte de la matriz de dotación.</div>');
+  cont.innerHTML=H.join('');
 }
 // ── RECINTOS POR TIPO DEL SERVICIO (vista 2/3) ──────────────────────────────
 // Al entrar a un servicio, el panel derecho responde de inmediato "de qué está
@@ -8628,6 +8853,24 @@ async function runSelfTest(){
   });
 
   // compresión: ida y vuelta EXACTA sobre el estado real, no sobre un ejemplo
+  // Testigo de avance: el % tiene que salir del árbol real de la dotación y
+  // no contar a la Compra de Servicio (que ocupa recinto pero no es dotación).
+  T('Avance: % por subdirección coherente con la dotación', ()=>{
+    renderAvance();
+    const b=document.getElementById('avBody'); if(!b||!b.innerText.trim()) return false;
+    const asg=_dpAsignados(), all=_dpStaffAll();
+    let a=0; all.forEach(s=>{ if(asg[norm(s.nombre)]) a++; });
+    const esperado=_avPct(a,all.length);
+    return a<=all.length && document.getElementById('sbAvN').textContent===esperado+'%'
+        && /Dotación asignada a recinto/.test(b.innerText);
+  });
+  T('4º turno: no quedan enlaces a puestos inexistentes', ()=>{
+    const vivos=new Set();
+    for(const rid in (wsState.dots||{})){ const arr=wsState.dots[rid];
+      if(Array.isArray(arr)) for(const d of arr) if(d&&d.id) vivos.add(rid+'§'+d.id); }
+    _purgarLinks();
+    return (wsState.dotLinks||[]).every(g=>g.length>1 && g.every(k=>vivos.has(k)));
+  });
   T('Compresión: disponible', ()=>LZ_OK===true);
   T('Compresión: ida y vuelta exacta del estado real', ()=>{
     for(const st of [nameState,boxState,wsState,floorsDelta]){
@@ -8656,8 +8899,15 @@ async function runSelfTest(){
     }finally{ lsUso=real; updateMemBar(); }
     return ok;
   });
-  T('Compresión: reduce al menos 3 veces el estado de nombres', ()=>{
-    const j=JSON.stringify(nameState);
+  // Se mide sobre una carga REPRESENTATIVA: con el estado vacío (198 bytes) el
+  // ratio no significa nada y la invariante fallaba sin que hubiera regresión.
+  T('Compresión: reduce al menos 3 veces una carga real', ()=>{
+    let j=JSON.stringify(nameState);
+    if(j.length<20000){                       // navegador sin datos: carga sintética equivalente
+      const rooms={};
+      for(let i=0;i<600;i++) rooms['P'+(i%5)+'-M17813047318'+i+'-M17816518385'+i]='Est Enfermeria '+'ABCDEF'[i%6];
+      j=JSON.stringify({areas:{},rooms,types:{},codes:rooms});
+    }
     return j.length/(LZ_MARCA+LZ.empacar(j)).length >= 3;
   });
 
@@ -8749,6 +8999,7 @@ function _stReport(out){
     +'<button onclick="location.href=location.pathname" style="margin-top:12px;background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:7px 14px;font-weight:700;cursor:pointer">Salir del selftest (recargar)</button>';
   document.body.appendChild(d);
 }
+window.addEventListener('load',()=>setTimeout(()=>{ try{ _avBadge(); }catch(e){} }, 1200));
 if(_SELFTEST) window.addEventListener('load',()=>setTimeout(runSelfTest,700));
 // El selftest desactiva TODO el guardado. Si alguien deja "?selftest=1" en la
 // URL y sigue trabajando, perdería el día entero en silencio: aviso permanente.
