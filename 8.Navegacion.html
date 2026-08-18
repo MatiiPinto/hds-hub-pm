@@ -331,6 +331,8 @@ body{background:#0c1a2e;color:#cbd5e1;font-family:'Segoe UI',-apple-system,Blink
         <button class="pct-btn" id="pctSplit" onclick="pcSplitSel()" disabled title="Dividir (desfusionar) · corta cada tramo seleccionado en dos">✂️</button>
         <button class="pct-btn" id="pctZona" onclick="pcZonaSel()" disabled title="Fusionar por zona · aplica la zona elegida arriba a la selección">🎨</button>
         <button class="pct-btn warn" id="pctDel" onclick="pcDelSel()" disabled title="Eliminar la selección (Supr)">🗑</button>
+        <div class="pct-sep"></div>
+        <button class="pct-btn" id="pctEst" onclick="estOrdenToggle()" title="Ordenar estacionamientos (5) · toma todas las plazas del piso (o las de un tipo) y las alinea, reparte o enfila en batería · con la selección hecha se mueven todas juntas arrastrando o con las flechas">🅿</button>
       </div>
       <div class="pcirc-bar" id="pmarkBar"></div>
       <div class="measure-readout" id="measureReadout"></div>
@@ -1214,12 +1216,17 @@ function _finishBox(){
     // arrastre o con doble clic (ajuste automático al recinto)
     if(!drag && !b.neg && esElem(_pcircZona)) return;
     // estacionamientos: el clic simple deja una plaza del tamaño estándar del
-    // tipo (2,5×5 m; 3,6 m la accesible; 3,5×7 la de ambulancia)
-    if(!drag && !b.neg && esEst(_pcircZona)){
+    // tipo (2,5×5 m; 3,6 m la accesible; 3,5×7 la de ambulancia).
+    // ORIENTACIÓN POR BOTÓN: clic IZQUIERDO = plaza vertical (en batería),
+    // clic DERECHO = plaza horizontal (en cordón / línea). Mismo criterio que el
+    // giro de puertas y correderas. El clic derecho ARRASTRANDO sigue recortando.
+    if(!drag && esEst(_pcircZona)){
       const d=EST_CIRC[_pcircZona], m0=svgToDxf(S.floorId,cxs,cys); if(!m0) return;
+      const horiz=!!b.neg;
       pcHistPush();
       (pcircState.floors[S.floorId]=pcircState.floors[S.floorId]||[]).push({
-        id:pcNuevoId(), zona:_pcircZona, x_m:m0.cx_m, y_m:m0.cy_m, w_m:d.w, h_m:d.h });
+        id:pcNuevoId(), zona:_pcircZona, x_m:m0.cx_m, y_m:m0.cy_m,
+        w_m: horiz?d.h:d.w, h_m: horiz?d.w:d.h });
       saveAll(); renderOverlay(); updateStats&&updateStats();
       renderSidebar&&renderSidebar(); renderZonaResumen&&renderZonaResumen();
       return;
@@ -1339,7 +1346,9 @@ function pcToolsRefresh(){
   const has=pcSel.size>0;
   ['pctDup','pctSplit','pctZona','pctDel'].forEach(id=>{ if(q(id)) q(id).disabled=!has; });
   q('pctSnap')?.classList.toggle('on',pcSnap);
+  q('pctEst')?.classList.toggle('on',typeof _estPanel!=='undefined'&&_estPanel);
   if(typeof renderCajaPanel==='function') renderCajaPanel();   // ficha de la caja seleccionada
+  if(typeof renderEstPanel==='function') renderEstPanel();     // panel de orden de plazas
 }
 function pcSetTool(t){
   pcTool=t;
@@ -1349,7 +1358,7 @@ function pcSetTool(t){
   viewer.classList.toggle('pc-edit',en&&t==='edit');
   viewer.classList.toggle('pc-fill',en&&t==='fill');
   const hints={
-    draw:'▦ Pintá con clic o arrastre · clic DERECHO recorta · elegí la zona arriba · 2=editar · 3=rellenar · 4=cortar',
+    draw:'▦ Pintá con clic o arrastre · clic DERECHO recorta · elegí la zona arriba · 2=editar · 3=rellenar · 4=cortar · 5=ordenar plazas',
     edit:'✏️ Clic selecciona (Shift suma, ⇧+arrastre = lazo) · DOBLE CLIC selecciona la sección entera para reclasificarla con 🎨 · arrastrá vértices/aristas (⌘ = libre) · Supr borra',
     fill:'🪄 Clic dentro de un pasillo: el área crece sola hasta los muros del plano · si se escapa, deshacé con ⌘Z',
     corte:'🔪 Arrastrá una línea sobre el verde: parte TODOS los tramos que cruza · el eje del arrastre define el corte · ⌘Z deshace'};
@@ -1857,6 +1866,183 @@ function pcNudgeSel(dx_m,dy_m){
   _pcArr().forEach(b=>{ if(!pcSel.has(b.id)) return; const r=_pcRectSvg(b); if(!r) return;
     _pcWriteSvg(b,{x0:r.x0+dx,y0:r.y0+dy,x1:r.x1+dx,y1:r.y1+dy}); });
   saveAll(); renderOverlay();
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// ORDENAR ESTACIONAMIENTOS (🅿)
+// Las plazas se colocan de a una y quedan desparejas. Acá se las toma en
+// conjunto para alinearlas, repartirlas o enfilarlas en batería. Todo se
+// calcula en coordenadas de PANTALLA (svg) para que "izquierda" y "arriba"
+// sean las que se ven, y se vuelca a metros con _pcWriteSvg — el mismo camino
+// que usa el arrastre, así no se introduce otra convención de ejes.
+// El arrastre de la selección ya mueve todo junto: acá solo se suma el orden.
+// ════════════════════════════════════════════════════════════════════════════
+// var (no let): pcToolsRefresh se declara más arriba y puede correr antes de
+// llegar a esta línea; con let quedaría en zona muerta y hasta el typeof tira.
+var _estPanel=false;      // panel abierto
+var estSepM=0;            // separación entre plazas al enfilar (m)
+
+const _estTodas = () => _pcArr().filter(b=>esEst(b.zona));
+const _estSel   = () => _pcArr().filter(b=>esEst(b.zona)&&pcSel.has(b.id));
+const _estRects = arr => arr.map(b=>({b,r:_pcRectSvg(b)})).filter(o=>o.r);
+
+function estSeleccionar(zona){
+  const arr=_estTodas().filter(b=>!zona||b.zona===zona);
+  if(!arr.length){ toast('🅿 No hay plazas'+(zona?' de ese tipo':'')+' en '+S.floorId+'.'); return; }
+  if(pcTool!=='edit') pcSetTool('edit');
+  pcSel=new Set(arr.map(b=>b.id));
+  renderOverlay(); pcToolsRefresh();
+  toast('🅿 '+arr.length+' plaza'+(arr.length===1?'':'s')+' seleccionada'+(arr.length===1?'':'s')
+    +' · arrastrá para moverlas todas juntas, o usá las flechas (⇧ = 1 m)');
+}
+function estDeseleccionar(){ pcSel.clear(); renderOverlay(); pcToolsRefresh(); }
+
+// Envoltorio común: historial + guardado + repintado
+function _estAplica(fn,msg){
+  pcHistPush(); fn();
+  saveAll(); renderOverlay(); renderZonaResumen&&renderZonaResumen(); pcToolsRefresh();
+  if(msg) toast(msg);
+}
+function _estMin(n,msg){
+  const L=_estRects(_estSel());
+  if(L.length<n){ toast('🅿 '+(msg||'Elegí al menos '+n+' plazas')+' — el botón «Todas» las toma de una.'); return null; }
+  return L;
+}
+
+// ── Alinear: izq / centro / der · arriba / medio / abajo ────────────────────
+function estAlinear(modo){
+  const L=_estMin(2); if(!L) return;
+  const x0=Math.min(...L.map(o=>o.r.x0)), x1=Math.max(...L.map(o=>o.r.x1));
+  const y0=Math.min(...L.map(o=>o.r.y0)), y1=Math.max(...L.map(o=>o.r.y1));
+  const cx=(x0+x1)/2, cy=(y0+y1)/2;
+  _estAplica(()=>L.forEach(({b,r})=>{
+    const w=r.x1-r.x0, h=r.y1-r.y0;
+    let nx=r.x0, ny=r.y0;
+    if(modo==='izq') nx=x0;  else if(modo==='der') nx=x1-w;  else if(modo==='cx') nx=cx-w/2;
+    if(modo==='arr') ny=y0;  else if(modo==='aba') ny=y1-h;  else if(modo==='cy') ny=cy-h/2;
+    _pcWriteSvg(b,{x0:nx,y0:ny,x1:nx+w,y1:ny+h});
+  }), '📐 '+L.length+' plazas alineadas');
+}
+
+// ── Repartir: mismo hueco entre plazas, extremos fijos ──────────────────────
+function estDistribuir(eje){
+  const L=_estMin(3,'Para repartir hacen falta al menos 3 plazas'); if(!L) return;
+  const k0=eje==='x'?'x0':'y0', k1=eje==='x'?'x1':'y1';
+  L.sort((a,b)=>a.r[k0]-b.r[k0]);
+  const ini=L[0].r[k0], fin=L[L.length-1].r[k1];
+  const ocupado=L.reduce((a,o)=>a+(o.r[k1]-o.r[k0]),0);
+  const hueco=(fin-ini-ocupado)/(L.length-1);
+  let cur=ini;
+  _estAplica(()=>L.forEach(({b,r})=>{
+    const w=r.x1-r.x0, h=r.y1-r.y0;
+    _pcWriteSvg(b, eje==='x' ? {x0:cur,y0:r.y0,x1:cur+w,y1:r.y0+h}
+                             : {x0:r.x0,y0:cur,x1:r.x0+w,y1:cur+h});
+    cur += (eje==='x'?w:h)+hueco;
+  }), hueco<0 ? '↔ Repartidas, pero no entran sin montarse: quedaron superpuestas'
+              : '↔ '+L.length+' plazas repartidas con separación pareja');
+}
+
+// ── Enfilar: batería contra la primera plaza, pegadas o con separación ──────
+function estEnfilar(eje){
+  const L=_estMin(2); if(!L) return;
+  const k0=eje==='x'?'x0':'y0';
+  L.sort((a,b)=>a.r[k0]-b.r[k0]);
+  const s=dxfSizeToSvg(S.floorId,Math.max(0.001,estSepM),Math.max(0.001,estSepM))||{w:0,h:0};
+  const sep=estSepM>0 ? (eje==='x'?s.w:s.h) : 0;
+  const base=L[0].r;
+  let cur = eje==='x'?base.x0:base.y0;
+  _estAplica(()=>L.forEach(({b,r})=>{
+    const w=r.x1-r.x0, h=r.y1-r.y0;
+    _pcWriteSvg(b, eje==='x' ? {x0:cur,      y0:base.y0, x1:cur+w,      y1:base.y0+h}
+                             : {x0:base.x0,  y0:cur,     x1:base.x0+w,  y1:cur+h});
+    cur += (eje==='x'?w:h)+sep;
+  }), '▤ '+L.length+' plazas enfiladas '+(estSepM>0?('con '+estSepM+' m entre plazas'):'pegadas'));
+}
+
+// ── Orientación y medida de toda la selección ──────────────────────────────
+function estOrientar(horiz){
+  const A=_estSel(); if(!A.length){ toast('🅿 No hay plazas seleccionadas.'); return; }
+  _estAplica(()=>A.forEach(b=>{
+    const lar=Math.max(b.w_m,b.h_m), cor=Math.min(b.w_m,b.h_m);
+    b.w_m = horiz?lar:cor; b.h_m = horiz?cor:lar;
+  }), (horiz?'▭ ':'▯ ')+A.length+' plaza'+(A.length===1?'':'s')+(horiz?' en horizontal':' en vertical'));
+}
+function estMedidaSel(){
+  const A=_estSel(); if(!A.length){ toast('🅿 No hay plazas seleccionadas.'); return; }
+  _estAplica(()=>A.forEach(b=>{
+    const d=EST_CIRC[b.zona]; if(!d) return;
+    const horiz=b.w_m>b.h_m;                       // respeta cómo está puesta
+    b.w_m = horiz?d.h:d.w; b.h_m = horiz?d.w:d.h;
+  }), '📐 Medida estándar en '+A.length+' plaza'+(A.length===1?'':'s'));
+}
+
+// ── Panel ───────────────────────────────────────────────────────────────────
+function estOrdenToggle(){
+  _estPanel=!_estPanel;
+  if(_estPanel && S.mode==='pcirc' && pcTool!=='edit') pcSetTool('edit');
+  renderEstPanel(); pcToolsRefresh();
+}
+function estSetSep(v){ estSepM=Math.max(0,+v||0); }
+function renderEstPanel(){
+  let box=document.getElementById('estOrden');
+  if(!_estPanel || S.mode!=='pcirc'){ if(box) box.style.display='none'; return; }
+  if(!box){
+    box=document.createElement('div'); box.id='estOrden';
+    box.style.cssText='position:fixed;right:18px;z-index:9997;width:308px;'
+      +'background:#0e2233;border:1px solid #38bdf8;border-radius:12px;padding:12px 14px;'
+      +'box-shadow:0 10px 34px rgba(0,0,0,.45);color:#dbeafe;font-size:12px';
+    box.addEventListener('mousedown',e=>e.stopPropagation());
+    document.body.appendChild(box);
+  }
+  box.style.display='block';
+  // la ficha de la caja vive en la misma esquina: apilamos por encima
+  const ce=document.getElementById('cajaEd');
+  const alto=(ce && ce.style.display!=='none') ? ce.getBoundingClientRect().height+10 : 0;
+  box.style.bottom=(18+alto)+'px';
+
+  const tot=_estTodas(), sel=_estSel();
+  const porTipo={}; tot.forEach(b=>porTipo[b.zona]=(porTipo[b.zona]||0)+1);
+  const b1=(onclick,txt,tit,col)=>'<button onclick="'+onclick+'" title="'+(tit||'')+'" style="margin:0 4px 4px 0;'
+    +'background:'+(col||'#0b1b28')+';color:#dbeafe;border:1px solid '+(col?col:'#23506e')
+    +';border-radius:7px;padding:4px 8px;cursor:pointer;font-size:11.5px">'+txt+'</button>';
+  const rot='<div style="margin:9px 0 3px;color:#9fc4db">';
+
+  box.innerHTML=
+     '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">'
+    +'<strong style="font-size:13px">🅿 Ordenar estacionamientos</strong>'
+    +'<button onclick="estOrdenToggle()" style="margin-left:auto;background:#1c3d55;color:#dbeafe;border:0;border-radius:7px;padding:3px 9px;cursor:pointer">Cerrar</button></div>'
+    +'<div style="color:#9fc4db;margin-bottom:6px">'+tot.length+' plaza'+(tot.length===1?'':'s')+' en '+S.floorId
+    +' · <b style="color:#38bdf8">'+sel.length+'</b> seleccionada'+(sel.length===1?'':'s')+'</div>'
+    +'<div>'+b1("estSeleccionar()",'Todas','Selecciona todas las plazas del piso','#0e3a5c')
+    + Object.entries(EST_CIRC).filter(([k])=>porTipo[k])
+        .map(([k,v])=>b1("estSeleccionar('"+k+"')",v.short+' '+porTipo[k],'Solo las de este tipo')).join('')
+    + (sel.length?b1("estDeseleccionar()",'✕','Vaciar la selección'):'')
+    +'</div>'
+    +rot+'Alinear</div><div>'
+    + b1("estAlinear('izq')",'⇤','Alinear a la izquierda') + b1("estAlinear('cx')",'⇔','Centrar en el eje vertical')
+    + b1("estAlinear('der')",'⇥','Alinear a la derecha')
+    + '<span style="display:inline-block;width:8px"></span>'
+    + b1("estAlinear('arr')",'⤒','Alinear arriba') + b1("estAlinear('cy')",'⇕','Centrar en el eje horizontal')
+    + b1("estAlinear('aba')",'⤓','Alinear abajo')
+    +'</div>'
+    +rot+'Repartir (mismo hueco, extremos fijos)</div><div>'
+    + b1("estDistribuir('x')",'↔ En fila','Reparte horizontalmente')
+    + b1("estDistribuir('y')",'↕ En columna','Reparte verticalmente')
+    +'</div>'
+    +rot+'Enfilar en batería</div><div>'
+    + b1("estEnfilar('x')",'▤ Fila','Pega las plazas una al lado de la otra, contra la primera')
+    + b1("estEnfilar('y')",'▥ Columna','Pega las plazas una debajo de la otra, contra la primera')
+    + '<label style="margin-left:4px;color:#9fc4db">sep. <input type="number" step="0.1" min="0" value="'+estSepM
+    + '" onchange="estSetSep(this.value)" style="width:52px;background:#0b1b28;color:#dbeafe;border:1px solid #23506e;border-radius:6px;padding:2px 5px"> m</label>'
+    +'</div>'
+    +rot+'Orientación y medida</div><div>'
+    + b1("estOrientar(false)",'▯ Vertical','Deja todas las seleccionadas en vertical')
+    + b1("estOrientar(true)",'▭ Horizontal','Deja todas las seleccionadas en horizontal')
+    + b1("estMedidaSel()",'📐 Medida estándar','Devuelve cada plaza a la medida de su tipo, respetando cómo está puesta')
+    +'</div>'
+    +'<div style="margin-top:9px;color:#7fa6c4;font-size:11px;line-height:1.45">'
+    +'Al colocarlas: clic <b>izquierdo</b> = vertical, clic <b>derecho</b> = horizontal.<br>'
+    +'Con la selección hecha, arrastrala para moverla entera o usá las flechas (⇧ = 1 m). ⌘Z deshace.</div>';
 }
 
 // ── ⌘+clic: igualar tamaños de cajas ────────────────────────────────────────
@@ -2403,6 +2589,9 @@ function setPcircZona(z){
   if(S.mode==='pcirc' && addHint){
     addHint.textContent = esElem(z)
       ? (ELEM_CIRC[z].icon+' Arrastrá para dibujar cada '+ELEM_CIRC[z].label.toLowerCase()+' · DOBLE CLIC dentro del recinto = caja automática a los muros · ⌘+clic en 2 cajas iguala tamaños · clic derecho recorta')
+      : esEst(z)
+      ? (EST_CIRC[z].icon+' Clic IZQUIERDO = plaza vertical · clic DERECHO = plaza horizontal ('
+         +EST_CIRC[z].w.toFixed(1)+'×'+EST_CIRC[z].h.toFixed(1)+' m) · 🅿 (tecla 5) las ordena y alinea')
       : '▦ Pintá con clic o arrastre · clic DERECHO recorta · los tramos de la misma zona se fusionan';
     addHint.classList.add('show');
   }
@@ -2895,7 +3084,8 @@ function toggleMode(m){
   // Barra de herramientas de circulación (flotante, derecha)
   { const t=document.getElementById('pcTools'); if(t) t.classList.toggle('show',S.mode==='pcirc'); }
   if(S.mode==='pcirc'){ pcSetTool(pcTool||'draw'); }
-  else { pcSel.clear(); _pcDrag=null; _pcMatchRef=null; viewer.classList.remove('pc-edit'); viewer.classList.remove('pc-fill'); }
+  else { pcSel.clear(); _pcDrag=null; _pcMatchRef=null; viewer.classList.remove('pc-edit'); viewer.classList.remove('pc-fill');
+         _estPanel=false; renderEstPanel&&renderEstPanel(); }
   // Al entrar/salir de formas: refrescar overlay (manijas) y limpiar selección al salir
   if(wasShape && S.mode!=='shape'){ S.selectedCircId=null; }
   if(wasShape || S.mode==='shape') renderOverlay();
@@ -2940,6 +3130,8 @@ window.addEventListener('keydown',e=>{
     if(e.key==='1') pcSetTool('draw');
     if(e.key==='2') pcSetTool('edit');
     if(e.key==='3') pcSetTool('fill');
+    if(e.key==='4') pcSetTool('corte');   // la pista ya lo anunciaba
+    if(e.key==='5') estOrdenToggle();
     if((e.key==='Backspace'||e.key==='Delete')&&pcSel.size){ e.preventDefault(); pcDelSel(); }
     if(pcTool==='edit'&&pcSel.size&&['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(e.key)){
       e.preventDefault();
