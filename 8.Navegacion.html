@@ -648,6 +648,13 @@ const ELEM_CIRC={
   escmec:{label:'Escalera mecánica',   color:'#ec4899', short:'⤴ Esc. mecánica',  icon:'⤴'}
 };
 const esElem = z => !!ELEM_CIRC[z];
+// Opacidad del relleno (canal alfa en hexa). Los elementos verticales se pintan
+// MÁS SÓLIDOS que la circulación para que salten dentro del plano: mismo color
+// de la leyenda, más cuerpo. No llegan al color pleno — el plano tiene que
+// seguir leyéndose por debajo de la caja.
+const ALFA_ZONA = '2e';   // ~18% · áreas de circulación (fondo)
+const ALFA_ELEM = '73';   // ~45% · ascensores, escaleras y escaleras mecánicas
+const ALFA_EST  = '2b';   // ~17% · plazas de estacionamiento (quedan como estaban)
 
 // ── TIPOLOGÍA DE ASCENSOR ───────────────────────────────────────────────────
 // Se asigna sobre la caja YA DIBUJADA (el directorio A–Y original traía errores
@@ -3515,9 +3522,13 @@ function renderOverlay(){
           const rc=document.createElementNS(SVGNS,'rect');
           rc.setAttribute('x',p.x-s.w/2); rc.setAttribute('y',p.y-s.h/2);
           rc.setAttribute('width',s.w);   rc.setAttribute('height',s.h);
-          // relleno en tonalidad CLARA del color (nunca sólido) + borde sólido
-          rc.setAttribute('fill',col+'2b'); rc.setAttribute('stroke',col);
-          rc.setAttribute('stroke-width','3'); rc.setAttribute('rx','4');
+          // relleno en la tonalidad del color (nunca sólido) + borde sólido.
+          // Los elementos verticales van más cargados que la circulación para
+          // que se distingan de un vistazo; las plazas se quedan livianas.
+          const elem=esElem(z);
+          rc.setAttribute('fill',col+(elem?ALFA_ELEM:ALFA_EST));
+          rc.setAttribute('stroke',col);
+          rc.setAttribute('stroke-width',elem?'5':'3'); rc.setAttribute('rx','4');
           rc.setAttribute('pointer-events','none');
           overlay.appendChild(rc);
           const tx=document.createElementNS(SVGNS,'text');
@@ -3563,7 +3574,7 @@ function renderOverlay(){
       const dP=unionRectsToPath(rects);
       if(dP){ const path=document.createElementNS(SVGNS,'path');
         path.setAttribute('d',dP); path.setAttribute('class','pcirc-path'); path.setAttribute('fill-rule','evenodd');
-        path.setAttribute('fill',zc.color+'2e'); path.setAttribute('stroke',zc.color);
+        path.setAttribute('fill',zc.color+ALFA_ZONA); path.setAttribute('stroke',zc.color);
         path.setAttribute('stroke-width','3'); path.setAttribute('stroke-linejoin','round');
         path.setAttribute('pointer-events','none'); overlay.appendChild(path); }
     });

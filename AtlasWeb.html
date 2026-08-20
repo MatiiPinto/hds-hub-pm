@@ -3,7 +3,7 @@
 <head>
 <script src="pm_config.js"></script>
 <script src="pm_gate.js"></script>
-<style>/*HUB-PM*/ #expDD, #wsModal { display:none !important; }</style>
+<style>/*HUB-PM*/ #expDD, body:not(.pm-editor) #wsModal { display:none !important; }</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>HDS · Atlas — Consulta Web</title>
@@ -1151,6 +1151,16 @@ function updateFloorDims(floorId){
 const DOT_R = 10, DOT_HOVER = 13;
 const PAN_THRESHOLD = 6; // px movement to distinguish click vs drag
 
+// ── ROL EDITOR ACOTADO DEL 🟡 (PM_CONFIG.EDITORES_ATLAS) ───────────────────
+// Vive dentro del bloque de modo público del archivo fuente, que acá se
+// elimina entero; se re-inyecta porque la versión web SÍ lo necesita.
+function _esEditorAtlas(){
+  try{
+    if(!window.PM_CONFIG || typeof pmSession!=='function') return false;
+    const s=pmSession();
+    return !!(s && (window.PM_CONFIG.EDITORES_ATLAS||[]).indexOf(s.u)!==-1);
+  }catch(e){ return false; }
+}
 // ═══ STATE ══════════════════════════════════════════════════════════════════
 let S = {
   floorId: 'P1', level: 1, areaId: null, roomId: null,
@@ -1159,6 +1169,7 @@ let S = {
   selIds: new Set(), history: [], moveMode: false, bedMode: false, fichaMode: false,
   equipMode: false, equipRoomId: null, auditMode: false, autsanMode: false,
   viewOnly: true,   // versión web: siempre consulta
+  editPM: _esEditorAtlas(),   // 🟡: asignar personas y corregir nombres
   showSen: (function(){try{return localStorage.getItem('cabida_show_sen')==='1';}catch(e){return false;}})(),
   planKind: (function(){try{return localStorage.getItem('cabida_plan_kind')||'mobiliario';}catch(e){return 'mobiliario';}})(),
   boxVis: (function(){try{return localStorage.getItem('cabida_box_vis')||'on';}catch(e){return 'on';}})(),
@@ -1277,10 +1288,21 @@ const LZ_OK=(function(){ try{
   const m='{"a":[1,2,3],"ñ":"áé í","b":{"c":"'+'x'.repeat(300)+'"}}';
   return LZ.desempacar(LZ.empacar(m))===m;
 }catch(e){ return false; } })();
-// VERSIÓN WEB (solo consulta): el estado viene del snapshot publicado
-// (WEB_DATA/atlas_web_data.js) y NUNCA se escribe nada del estado principal.
+// VERSIÓN WEB: el estado viene del snapshot publicado
+// (WEB_DATA/atlas_web_data.js). Nadie escribe el estado principal…
+// …salvo el ROL ACOTADO del 🟡, que trabaja sobre una CAPA PROPIA guardada en
+// su navegador con prefijo pm_. El snapshot queda intacto: su capa se lee
+// encima, y lo que cambió viaja como delta (📤 Enviar mis cambios).
 const _WD=window.ATLAS_WEB_DATA||{};
-function lg(k,d){ if(_WD[k]!==undefined && _WD[k]!==null) return _WD[k]; return d; }
+function lg(k,d){
+  if(_esEditorAtlas()){
+    try{ let s=localStorage.getItem('pm_'+k);
+      if(s!=null){ if(s.slice(0,2)===LZ_MARCA) s=LZ.desempacar(s.slice(2)); return JSON.parse(s)||d; }
+    }catch(e){}
+  }
+  if(_WD[k]!==undefined && _WD[k]!==null) return _WD[k];
+  return d;
+}
 const _SELFTEST=/[?&]selftest/.test(location.search);
 function _lsSet(k,v){ if(!/^cabida_cad/.test(k)) try{localStorage.setItem(k,v);}catch(e){} }
 // ── ALMACENAMIENTO SEGURO ───────────────────────────────────────────────────
@@ -1311,10 +1333,30 @@ function _lsBanner(msg, ok){
   b.innerHTML='⛔ EL TRABAJO NO SE ESTÁ GUARDANDO — '+msg+
     ' <button onclick="exportBackup()" style="margin-left:10px;background:#fff;color:#b91c1c;border:none;border-radius:6px;padding:4px 12px;font-weight:800;cursor:pointer">💾 Respaldar a archivo ahora</button>';
 }
-// VERSIÓN WEB: solo consulta, ninguna escritura del estado principal.
-function ls(k,v){ return true; }
+// VERSIÓN WEB: consulta no escribe nada. El rol acotado del 🟡 guarda su
+// capa propia (prefijo pm_), comprimida, en SU navegador. Sin debounce: son
+// ediciones sueltas, no arrastres.
+function ls(k,v){
+  if(!S.editPM) return true;
+  try{
+    let s=JSON.stringify(v);
+    if(LZ_OK) s=LZ_MARCA+LZ.empacar(s);
+    _lsSet('pm_'+k,s);          // el escritor sancionado: 'pm_…' no es 'cabida_cad…',
+                                // así que pasa el bloqueo del estado principal
+    return true;
+  }catch(e){
+    alert('⚠ No se pudo guardar en este navegador: '+(e&&e.name||e)+
+          '\n\nUsá 📤 Enviar mis cambios para no perder el trabajo.');
+    return false;
+  }
+}
 function lsFlush(rapido){ return true; }
 function _lsRaw(k,valor,comprimir){ return true; }
+// LS_GRANDES vive en el bloque que acá se elimina; lsRecomprimir() la usa y
+// tiraba ReferenceError en cada cambio de visibilidad. En la web no hay nada
+// que recomprimir: la capa del editor ya se guarda comprimida.
+const LS_GRANDES={};
+function lsRecomprimir(){ return 0; }
 let boxState    = lg('cabida_cad_boxes',{areas:{},rooms:{}});
 // ── VERSIONADO DE ESQUEMA ────────────────────────────────────────────────────
 // Todo cambio de estructura de wsState se registra como una migración numerada
@@ -1748,13 +1790,37 @@ function flushAutosave(rapido){
   if(_autosaveDirty) _saveAll();
   lsFlush(rapido===true);
 }
+// Deja el estado guardado COMPRIMIDO si alguna clave quedó en claro. Una
+// escritura rápida (cierre) guarda sin comprimir por seguridad; esto lo repara
+// en cuanto se puede, para que no se quede ocupando 7 veces más.
+function lsRecomprimir(){
+  if(_SELFTEST || !LZ_OK) return 0;
+  let n=0;
+  for(const k in LS_GRANDES){
+    let s; try{ s=localStorage.getItem(k); }catch(e){ continue; }
+    if(s==null || s.slice(0,2)===LZ_MARCA) continue;    // ausente o ya comprimida
+    if(_lsRaw(k, s, true)) n++;
+  }
+  if(n){ try{ updateMemBar(); }catch(e){} }
+  return n;
+}
 // Cuelga listeners de ciclo de vida tan pronto como el DOM exista.
 function _attachLifecycleSave(){
+  // CERRAR de verdad: sin comprimir, que son 4 ms. Ahí lo que importa es no
+  // perder nada, no el tamaño.
   window.addEventListener('beforeunload',()=>flushAutosave(true));
   window.addEventListener('pagehide',()=>flushAutosave(true));
-  document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden') flushAutosave(true); });
-  // Muestra el badge inicial como "Guardado" desde el primer paint.
-  setTimeout(()=>updateSaveBadge('saved'),50);
+  document.addEventListener('visibilitychange',()=>{
+    // OJO: esconder la pestaña NO es cerrar. Se dispara cada vez que cambiás
+    // de pestaña o de app — decenas de veces al día. Si acá se guardara sin
+    // comprimir, el estado pasaría el día ocupando 7 veces más (pasó: 0,89 →
+    // 3,44 MB en una jornada). La página sigue viva y hay tiempo de sobra
+    // para los ~200 ms que cuesta comprimir.
+    if(document.visibilityState==='hidden') flushAutosave(false);
+    lsRecomprimir();   // en ambos sentidos: volcar lo pendiente no alcanza si
+                       // ya había una clave en claro y nada que guardar
+  });
+  setTimeout(()=>{ updateSaveBadge('saved'); lsRecomprimir(); },50);
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',_attachLifecycleSave);
 else _attachLifecycleSave();
@@ -6208,10 +6274,107 @@ function openEstado(){
   document.getElementById('estadoBody').innerHTML=html;
   document.getElementById('estadoModal').classList.add('show');
 }
+/* ── DELTA DEL EDITOR ACOTADO ────────────────────────────────────────────────
+   Lo que edita Carolina en el 🟡 no puede volver como estado completo: el
+   snapshot que ella ve está congelado a la fecha de publicación, y Matías
+   siguió trabajando encima. Mandar el estado entero pisaría ese trabajo (ya
+   pasó una vez y costó dos días). Por eso se manda SOLO lo que ella cambió:
+   nombres tocados y recintos cuya dotación cambió, contra la línea base del
+   snapshot. Eso se puede fusionar sin destruir nada. */
+let _pmBase=null, _pmCambios=[];
+function _pmTomarBase(){
+  if(_pmBase) return _pmBase;
+  // La base es el SNAPSHOT PUBLICADO, no el estado en pantalla: si se tomara
+  // del estado, al recargar la base ya incluiría su capa guardada y el delta
+  // saldría vacío — perdería todo lo acumulado de días anteriores.
+  const W=window.ATLAS_WEB_DATA;
+  const src = W ? {n:(W.cabida_cad_names||{}).rooms||{}, d:(W.cabida_cad_ws||{}).dots||{}}
+                : {n:nameState.rooms||{}, d:wsState.dots||{}};
+  _pmBase={ nombres:JSON.parse(JSON.stringify(src.n)),
+            dots:JSON.parse(JSON.stringify(src.d)) };
+  return _pmBase;
+}
+function _pmTraza(tipo, rid, antes, ahora){
+  _pmCambios.push({tipo, rid, antes, ahora, ts:new Date().toISOString(), por:_pmUsuario()});
+}
+function _pmUsuario(){
+  try{ if(typeof pmSession==='function'){ const s=pmSession(); if(s&&s.u) return s.u; } }catch(e){}
+  return 'desconocido';
+}
+// Arma el delta comparando contra la base: nombres distintos y recintos cuya
+// asignación de personas cambió. Nada más viaja.
+function pmDelta(){
+  const base=_pmTomarBase(), J=x=>JSON.stringify(x);
+  const nombres={};
+  const ids=new Set([...Object.keys(base.nombres), ...Object.keys(nameState.rooms||{})]);
+  ids.forEach(k=>{ const a=base.nombres[k], b=(nameState.rooms||{})[k];
+    if(a!==b) nombres[k]={antes:a===undefined?null:a, ahora:b===undefined?null:b}; });
+  const dots={};
+  const rids=new Set([...Object.keys(base.dots), ...Object.keys(wsState.dots||{})]);
+  rids.forEach(k=>{ if(J(base.dots[k])!==J((wsState.dots||{})[k])) dots[k]=(wsState.dots||{})[k]||[]; });
+  return { _formato:'atlas-delta-pm', _version:1, por:_pmUsuario(),
+           generadoEn:new Date().toISOString(),
+           snapshot:(window.ATLAS_WEB_DATA&&ATLAS_WEB_DATA._meta&&ATLAS_WEB_DATA._meta.exportedAt)||null,
+           nombres, dots, bitacora:_pmCambios };
+}
+function pmResumenDelta(d){
+  const nN=Object.keys(d.nombres).length, nR=Object.keys(d.dots).length;
+  let per=0; for(const k in d.dots) (d.dots[k]||[]).forEach(x=>{ if((x.nombre||'').trim()) per++; });
+  return nN+' nombre(s) · '+nR+' recinto(s) con dotación · '+per+' persona(s) asignada(s)';
+}
+// Descarga el delta y, si hay backend configurado, lo deja también en Drive.
+async function pmEnviarCambios(){
+  if(!S.editPM) return;
+  const d=pmDelta(), res=pmResumenDelta(d);
+  if(!Object.keys(d.nombres).length && !Object.keys(d.dots).length){
+    alert('Todavía no hay cambios que enviar.'); return;
+  }
+  const txt=JSON.stringify(d,null,2);
+  try{
+    const b=new Blob([txt],{type:'application/json'}), a=document.createElement('a');
+    a.href=URL.createObjectURL(b);
+    a.download='Atlas_cambios_'+_pmUsuario()+'_'+new Date().toISOString().replace(/[:.]/g,'-').slice(0,19)+'.json';
+    a.click(); URL.revokeObjectURL(a.href);
+  }catch(e){}
+  let central='';
+  const url=(window.PM_CONFIG&&window.PM_CONFIG.ATLAS_URL)||'';
+  if(url){
+    try{
+      await fetch(url,{method:'POST',mode:'no-cors',keepalive:true,
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:new URLSearchParams({u:_pmUsuario(), delta:txt}).toString()});
+      central='\n\nTambién se envió a la carpeta central.';
+    }catch(e){ central='\n\n(No se pudo enviar al servidor; el archivo igual se descargó.)'; }
+  }
+  alert('✓ Cambios exportados:\n'+res+central+
+        '\n\nEnvíale el archivo a Matías para incorporarlo al Atlas maestro.');
+}
+/* Renombrar un recinto con el rol acotado del 🟡. No usa editBoxName(), que
+   exige S.editMode y arrastra dibujar/mover/borrar: acá solo se cambia el
+   texto del nombre. Deja traza de quién lo hizo para el delta. */
+function pmRenombrarRecinto(roomId){
+  if(!S.editPM) return;
+  const actual=rName(roomId)||'';
+  const v=prompt('Nombre del recinto:\n\n(sin tildes; la ñ se mantiene)', actual);
+  if(v===null) return;                       // canceló
+  const nv=String(v).trim();
+  if(nv===actual) return;
+  if(nv) nameState.rooms[roomId]=nv; else delete nameState.rooms[roomId];
+  _pmTraza('nombre', roomId, actual, nv);
+  sNames();
+  try{ renderSVG(); renderSidebar(); openFichaRecinto(roomId); }catch(e){}
+}
 function openFichaRecinto(roomId){
   const ctx=_findRoom(roomId); if(!ctx) return;
   const code=rCode(roomId), nm=rName(roomId), tp=(ROOM_TYPES[rType(roomId)]||ROOM_TYPES['']).label;
   document.getElementById('fkTitle').textContent=nm||'Recinto';
+  // Rol acotado del 🟡: único punto desde donde se corrige el nombre.
+  { const ft=document.getElementById('fkTitle'); const vj=document.getElementById('fkRename'); if(vj) vj.remove();
+    if(S.editPM && ft){ const b=document.createElement('button'); b.id='fkRename';
+      b.textContent='✏ Nombre'; b.title='Corregir el nombre de este recinto';
+      b.style.cssText='margin-left:10px;background:#eef4fa;border:1px solid #a9c3d6;color:#1d5fa0;'
+        +'border-radius:7px;padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer;vertical-align:middle';
+      b.onclick=()=>pmRenombrarRecinto(roomId); ft.appendChild(b); } }
   const _instN=(typeof codeInstances==='function')?codeInstances(code):1;
   const _m2=roomM2Label(roomId);
   const sub=[code?('Código '+code):'', tp, _m2?('📐 '+_m2):'', ctx.area.name, (curFloor()?curFloor().name:S.floorId), _instN>1?('1 de '+_instN+' instancias del código'):''].filter(Boolean).join(' · ');
@@ -7058,7 +7221,8 @@ function cerrarNombres(){ document.getElementById('nomModal').style.display='non
 // ═══ WS MODAL ═══════════════════════════════════════════════════════════════
 let mCtx={roomId:null,idx:null};
 function openModal(roomId,idx){
-  if(S.viewOnly) return;   // web: información por tooltip, sin editor
+  // Consulta: información por tooltip. El rol acotado del 🟡 sí puede asignar.
+  if(S.viewOnly && !S.editPM) return;
   mCtx={roomId,idx,addingTurno:false};
   const dot=wsState.dots[roomId]?.[idx]; if(!dot)return;
   document.getElementById('mTitle').textContent='Puesto de Trabajo';
@@ -8871,6 +9035,23 @@ async function runSelfTest(){
     _purgarLinks();
     return (wsState.dotLinks||[]).every(g=>g.length>1 && g.every(k=>vivos.has(k)));
   });
+  // Regresión real (15-ago): visibilitychange usaba la escritura RÁPIDA, que
+  // no comprime. Como se dispara al cambiar de pestaña, el estado pasaba el
+  // día ocupando 7 veces más (0,89 → 3,44 MB en una jornada). Solo cerrar de
+  // verdad puede usar el camino sin comprimir.
+  T('Esconder la pestaña NO guarda sin comprimir', ()=>{
+    const src=_attachLifecycleSave.toString();
+    const i=src.indexOf('visibilitychange');
+    if(i<0) return false;
+    const rama=src.slice(i);
+    return rama.includes('flushAutosave(false)') && !rama.includes('flushAutosave(true)')
+        && rama.includes('lsRecomprimir');
+  });
+  T('Recomprimir: existe y no toca nada en selftest', ()=>{
+    const antes=localStorage.getItem('cabida_cad_names');
+    return typeof lsRecomprimir==='function' && lsRecomprimir()===0
+        && localStorage.getItem('cabida_cad_names')===antes;
+  });
   T('Compresión: disponible', ()=>LZ_OK===true);
   T('Compresión: ida y vuelta exacta del estado real', ()=>{
     for(const st of [nameState,boxState,wsState,floorsDelta]){
@@ -9041,6 +9222,33 @@ if(_SELFTEST) window.addEventListener('load',()=>{
 })();
 (function(){ const f=()=>{ const b=document.getElementById('btnDotNames'); if(b)b.classList.toggle('active',!!S.showDotNames); };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',f); else f(); })();
+
+// ── ROL EDITOR ACOTADO: barra propia y línea base del delta ────────────────
+(function(){
+  function armar(){
+    if(!S.editPM) return;
+    _pmTomarBase();                    // base ANTES de que toque nada
+    document.body.classList.add('pm-editor');
+    const b=document.createElement('div');
+    b.id='pmBar';
+    b.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:99998;background:#0f766e;color:#fff;'
+      +'font-size:12px;font-weight:700;padding:7px 14px;display:flex;align-items:center;gap:12px;'
+      +'box-shadow:0 -3px 14px rgba(0,0,0,.25)';
+    b.innerHTML='<span>✏ Modo edición acotada — '+_pmUsuario()+'</span>'
+      +'<span style="font-weight:500;opacity:.9">Podés asignar funcionarios a los recintos y corregir nombres. Nada más.</span>'
+      +'<span id="pmCnt" style="margin-left:auto;font-weight:500;opacity:.9"></span>'
+      +'<button id="pmSend" style="background:#fff;color:#0f766e;border:none;border-radius:7px;'
+      +'padding:5px 14px;font-weight:800;cursor:pointer">📤 Enviar mis cambios</button>';
+    document.body.appendChild(b);
+    document.getElementById('pmSend').onclick=pmEnviarCambios;
+    const refrescar=()=>{ try{ document.getElementById('pmCnt').textContent=pmResumenDelta(pmDelta()); }catch(e){} };
+    refrescar(); setInterval(refrescar, 4000);
+    // que la barra no tape el plano
+    document.body.style.paddingBottom='38px';
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(armar,300));
+  else setTimeout(armar,300);
+})();
 
 // ═══ BOOT VERSIÓN WEB ════════════════════════════════════════════════════════
 (function(){

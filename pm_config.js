@@ -29,6 +29,25 @@ window.PM_CONFIG = {
   // resto del equipo solo consulta). Su trabajo se guarda en el navegador de
   // cada uno: para consolidarlo hay que usar 💾 Respaldar y enviar el JSON.
   EDITORES_NAV: ['mpinto', 'rvargas'],
+  // Atlas (AtlasWeb del 🟡): backend Apps Script propio (ver _setup/Code_atlas.gs).
+  // Recibe el DELTA de quien edita y lo deja en Drive. Vacío = sin envío
+  // automático; el botón 📤 igual descarga el archivo para mandarlo a mano.
+  ATLAS_URL: '', /*__PM_ATLAS_URL__*/
+  // usuarios con rol EDITOR ACOTADO del Atlas: pueden SOLO asignar funcionarios
+  // a los recintos y corregir el nombre de un recinto. Nada de dibujar, mover,
+  // borrar ni exportar. Su trabajo se guarda en una capa propia de SU navegador
+  // (prefijo pm_, el snapshot publicado no se toca) y se consolida mandando el
+  // delta con 📤 Enviar mis cambios.
+  EDITORES_ATLAS: ['mpinto', 'crivera'],
+  // ── ACCESOS TEMPORALES ────────────────────────────────────────────────────
+  // usuario → ÚLTIMO día en que puede entrar (inclusive, hora de Chile).
+  // Pasada esa fecha el login se rechaza y las sesiones ya abiertas dejan de
+  // valer, sin que nadie tenga que acordarse de quitar nada. Sin fecha acá =
+  // acceso permanente. Para cortar antes: poner una fecha pasada, o borrar
+  // al usuario de USERS.
+  VENCEN: {
+    'crivera': '2026-08-20'   // apoyo puntual en una reunión (20-ago-2026)
+  },
   SESSION_HOURS: 12,
   USERS: {
     // usuario : sha256("usuario:clave")
@@ -45,15 +64,33 @@ window.PM_CONFIG = {
     // Monserrat Rivera · biomédica (apoyo Puesta en Marcha) — mrivera@hsalvador.cl
     'mrivera':    '330dc6785e48327d41569c8e057c0c2f56d1839800d2967890f9f35cd51551f4',
     // Costanza Poch Trabucco · profesional de la Unidad de Puesta en Marcha
-    'cpoch':      '31f36f0a477f2876b575feed828316551646baec80e4150d1558878566733de1'
+    'cpoch':      '31f36f0a477f2876b575feed828316551646baec80e4150d1558878566733de1',
+    // Carolina Rivera · arquitecta — editora acotada del Atlas (asignar
+    // funcionarios a recintos y corregir nombres de recinto)
+    'crivera':    '76f87477cabc82337fed39924accb34d3934d33525e497ba3103ebd6ab3c573a'
   }
 };
 
+// ── ¿El acceso de este usuario sigue vigente? ───────────────────────────────
+// Se compara en formato ISO (yyyy-mm-dd), que ordena bien como texto, y con la
+// fecha de Chile: si alguien tiene el equipo en otro huso, la vigencia no cambia.
+function pmVigente(u){
+  try{
+    var hasta = (window.PM_CONFIG.VENCEN || {})[u];
+    if (!hasta) return true;                       // sin fecha = permanente
+    var hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Santiago' });
+    return hoy <= hasta;
+  }catch(e){ return true; }
+}
+
 // ── Sesión (localStorage, expira a las SESSION_HOURS) ───────────────────────
+// La vigencia se chequea ACÁ y no en cada pantalla: por este punto pasan el
+// login, la puerta de cada plataforma y los roles (editor de Atlas/Navegación),
+// así que una fecha vencida los apaga todos a la vez.
 function pmSession(){
   try{
     var s = JSON.parse(localStorage.getItem('pm_session') || 'null');
-    if (s && s.u && s.exp && Date.now() < s.exp) return s;
+    if (s && s.u && s.exp && Date.now() < s.exp && pmVigente(s.u)) return s;
   }catch(e){}
   return null;
 }

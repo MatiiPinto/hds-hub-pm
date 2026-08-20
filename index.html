@@ -219,6 +219,15 @@ async function pmDoLogin(ev){
   var p = document.getElementById('login-p').value;
   var err = document.getElementById('login-err');
   var hash = await pmHash(u, p);
+  // Acceso temporal vencido: la clave es correcta, pero el permiso caducó.
+  // Se dice con todas las letras, para que no parezca un problema de clave.
+  if (window.PM_CONFIG.USERS[u] && window.PM_CONFIG.USERS[u] === hash && !pmVigente(u)){
+    err.textContent = 'Tu acceso era temporal y venció el '
+      + ((window.PM_CONFIG.VENCEN||{})[u] || '') + '. Escribile a Matías si lo necesitás de nuevo.';
+    err.style.display = '';
+    pmLog('login_vencido', 'index');
+    return false;
+  }
   if (window.PM_CONFIG.USERS[u] && window.PM_CONFIG.USERS[u] === hash){
     pmSetSession(u);
     err.style.display = 'none';
