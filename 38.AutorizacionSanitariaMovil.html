@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<script src="pm_config.js"></script>
+<script src="pm_gate.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Autorización Sanitaria · Pautas en Terreno · HDS</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231D2D5B'/><path d='M30 52l14 14 26-30' fill='none' stroke='%2352d68f' stroke-width='11' stroke-linecap='round' stroke-linejoin='round'/></svg>">
+<style>
+/* ════════════════════════════════════════════════════════════════════════════
+   AUTORIZACIÓN SANITARIA · PAUTAS EN TERRENO
+   Versión optimizada para celular (y usable en escritorio). Un solo flujo:
+   acceso por correo → plano o lista → recinto/servicio → pauta → informe.
+   Estado: localStorage SIEMPRE + sincronización al backend central (AS_CENTRAL).
+   ════════════════════════════════════════════════════════════════════════════ */
+:root{
+  --azul:#1D2D5B; --azul2:#2b4180; --cel:#3b82c4; --verde:#15803d; --verdebg:#dcfce7;
+  --rojo:#b91c1c; --rojobg:#fee2e2; --gris:#64748b; --grisbg:#f1f5f9;
+  --bg:#eef2f8; --panel:#ffffff; --bd:#d8e0ec; --tx:#17233b; --tx2:#5b6b85;
+}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent}
+html{color-scheme:light only}
+body{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);
+  font-size:15px;line-height:1.45;min-height:100vh;padding-bottom:64px}
+button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:inherit}
+input,select,textarea{font-family:inherit;font-size:15px;width:100%;padding:11px 12px;
+  border:1.5px solid var(--bd);border-radius:10px;background:#fff;color:var(--tx)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--cel)}
+
+header{background:var(--azul);color:#fff;padding:11px 14px;position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;gap:10px;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+header .back{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.13);color:#fff;
+  font-size:19px;flex:none;display:grid;place-items:center}
+header .t{flex:1;min-width:0}
+header h1{font-size:15px;font-weight:800;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header .s{font-size:10.5px;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sync{width:10px;height:10px;border-radius:50%;flex:none}
+.sync.ok{background:#4ade80}.sync.pend{background:#fbbf24;animation:pu 1.2s infinite}.sync.off{background:#94a3b8}
+@keyframes pu{50%{opacity:.35}}
+
+main{max-width:1100px;margin:0 auto;padding:14px}
+.card{background:var(--panel);border:1px solid var(--bd);border-radius:14px;padding:14px 16px;margin-bottom:11px}
+.card h2{font-size:13px;color:var(--azul);text-transform:uppercase;letter-spacing:.7px;margin-bottom:9px}
+.hint{font-size:12px;color:var(--tx2)}
+.btn{display:block;width:100%;background:var(--azul);color:#fff;font-weight:700;border-radius:11px;
+  padding:13px;text-align:center;font-size:15px}
+.btn.sec{background:#e8eef8;color:var(--azul)}
+.btn:active{transform:scale(.985)}
+.row{display:flex;gap:8px}
+.pill{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:20px;white-space:nowrap}
+
+/* fila de lista */
+.item{display:flex;align-items:center;gap:11px;padding:12px 4px;border-bottom:1px solid #edf1f7;width:100%;text-align:left}
+.item:last-child{border-bottom:none}
+.item .ic{width:38px;height:38px;border-radius:10px;flex:none;display:grid;place-items:center;
+  font-size:17px;background:#e8eef8;color:var(--azul);font-weight:800}
+.item .tt{flex:1;min-width:0}
+.item .tt b{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .tt span{font-size:11.5px;color:var(--tx2);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .fx{flex:none;text-align:right}
+.prog{width:52px;height:7px;border-radius:10px;background:#e2e8f2;overflow:hidden;margin-top:3px}
+.prog i{display:block;height:100%;background:var(--verde)}
+.chev{color:#a9b6cc;font-size:17px;flex:none}
+
+/* tabs de piso */
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:none;background:#fff;border:1.5px solid var(--bd);border-radius:20px;padding:7px 15px;font-weight:700;font-size:13px;color:var(--tx2)}
+.tabs button.on{background:var(--azul);border-color:var(--azul);color:#fff}
+
+/* visor del plano */
+#visor{position:relative;background:#fff;border:1px solid var(--bd);border-radius:14px;overflow:hidden;
+  height:62vh;touch-action:none;cursor:grab}
+#lienzo{position:absolute;left:0;top:0;transform-origin:0 0}
+#lienzo img{display:block;pointer-events:none;-webkit-user-select:none}
+#lienzo svg{position:absolute;left:0;top:0}
+.rec{fill:rgba(59,130,196,.10);stroke:#94a3b8;stroke-width:.6;cursor:pointer}
+.rec.pauta{fill:rgba(21,128,61,.22);stroke:#15803d;stroke-width:1}
+.rec.hecho{fill:rgba(21,128,61,.55)}
+.rec.parcial{fill:rgba(240,180,41,.45);stroke:#b45309}
+.rec.mio{stroke:#1D2D5B;stroke-width:1.4}
+.svcbox{fill:rgba(29,45,91,.07);stroke:#1D2D5B;stroke-width:2.2;stroke-dasharray:8 5;cursor:pointer}
+.svclbl{font-weight:800;fill:#1D2D5B;paint-order:stroke fill;stroke:#fff;stroke-width:4;pointer-events:none}
+#leyplano{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--tx2);padding:8px 2px}
+#leyplano i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+
+/* pauta */
+.req{padding:11px 2px;border-bottom:1px solid #edf1f7}
+.req .g{font-size:11px;font-weight:800;color:var(--azul);background:#e8eef8;border-radius:7px;padding:4px 9px;margin:9px 0 7px}
+.req .tx{font-size:14px;margin-bottom:8px}
+.req .n{color:#93a1b8;font-size:11px;margin-right:5px}
+.est3{display:flex;gap:7px}
+.est3 button{flex:1;padding:9px 4px;border-radius:9px;font-weight:800;font-size:12px;border:1.5px solid var(--bd);color:var(--tx2);background:#fff}
+.est3 .c.on{background:var(--verdebg);border-color:var(--verde);color:var(--verde)}
+.est3 .nc.on{background:var(--rojobg);border-color:var(--rojo);color:var(--rojo)}
+.est3 .na.on{background:var(--grisbg);border-color:var(--gris);color:var(--gris)}
+.req textarea{margin-top:7px;font-size:13px;min-height:44px}
+#barra{position:sticky;top:60px;z-index:40;background:#fff;border:1px solid var(--bd);border-radius:12px;
+  padding:9px 13px;margin-bottom:11px;display:flex;align-items:center;gap:11px;box-shadow:0 3px 12px rgba(23,35,59,.07)}
+#barra .prog{flex:1;width:auto;height:9px}
+#barra b{font-size:14px;min-width:40px;text-align:right}
+
+/* datos conectados */
+.kv{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px dashed #e6ebf3}
+.kv:last-child{border-bottom:none}
+.kv span{color:var(--tx2)} .kv b{font-variant-numeric:tabular-nums}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px}
+.stat{background:#f5f8fc;border:1px solid var(--bd);border-radius:11px;padding:9px;text-align:center}
+.stat b{display:block;font-size:19px;color:var(--azul)}
+.stat span{font-size:10px;color:var(--tx2);text-transform:uppercase;letter-spacing:.4px}
+
+/* navegación inferior */
+#tabbar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--bd);
+  display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+#tabbar button{flex:1;padding:8px 0 7px;font-size:10.5px;font-weight:700;color:var(--tx2);display:flex;flex-direction:column;gap:2px;align-items:center}
+#tabbar button.on{color:var(--azul)}
+#tabbar .i{font-size:19px}
+
+#toast{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);background:#17233b;color:#fff;
+  border-radius:10px;padding:9px 16px;font-size:13px;z-index:99;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center}
+#toast.show{opacity:1}
+.vista{display:none}.vista.on{display:block}
+
+/* escritorio: dos columnas y plano más alto */
+@media(min-width:900px){
+  body{padding-bottom:20px}
+  #tabbar{display:none}
+  main{display:grid;grid-template-columns:390px 1fr;gap:16px;align-items:start}
+  #v-inicio,#v-plano{display:block}
+  #v-inicio{grid-column:1}
+  #v-plano{grid-column:2;position:sticky;top:74px}
+  #v-recinto,#v-servicio,#v-pauta{grid-column:1/-1;max-width:860px;margin:0 auto;width:100%}
+  #visor{height:calc(100vh - 220px)}
+}
+@media print{
+  header,#tabbar,.no-print{display:none!important}
+  body{background:#fff;padding:0}
+}
+</style>
+</head><body>
+
+<header>
+  <button class="back" id="hBack" onclick="atras()" style="display:none">‹</button>
+  <div class="t"><h1 id="hTit">Autorización Sanitaria</h1><div class="s" id="hSub">Pautas en terreno · Nuevo HDS</div></div>
+  <div class="sync off" id="sync" title="Estado de sincronización"></div>
+</header>
+
+<main id="main">
+  <!-- ACCESO -->
+  <section class="vista" id="v-login">
+    <div class="card" style="margin-top:8vh;max-width:420px;margin-left:auto;margin-right:auto">
+      <div style="text-align:center;margin-bottom:14px">
+        <div style="width:64px;height:64px;border-radius:18px;background:var(--azul);margin:0 auto 10px;display:grid;place-items:center">
+          <svg width="34" height="34" viewBox="0 0 100 100"><path d="M30 52l14 14 26-30" fill="none" stroke="#52d68f" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <b style="font-size:17px">Pautas de Autorización Sanitaria</b>
+        <div class="hint">Nuevo Hospital Del Salvador</div>
+      </div>
+      <label class="hint" style="display:block;margin-bottom:5px">Correo institucional</label>
+      <input id="inCorreo" type="email" placeholder="nombre@hsalvador.cl" autocomplete="email" inputmode="email">
+      <div class="hint" id="loginMsg" style="margin:8px 2px;min-height:17px"></div>
+      <button class="btn" onclick="entrar()">Entrar</button>
+      <div class="hint" style="margin-top:12px;text-align:center">El acceso es por servicio, según la nómina de
+      jefaturas y coordinaciones. Supervisión: C. Sepúlveda · M. Canales · M. Pinto.</div>
+    </div>
+  </section>
+
+  <!-- INICIO: mis servicios -->
+  <section class="vista" id="v-inicio">
+    <div class="card">
+      <h2 id="misTit">Mis servicios</h2>
+      <div id="listaServicios"></div>
+    </div>
+    <div class="card no-print">
+      <h2>Avance global</h2>
+      <div class="stats" id="statsGlobal"></div>
+      <div class="hint" id="fuenteNota"></div>
+    </div>
+    <button class="btn sec no-print" onclick="salir()" style="max-width:220px;margin:4px auto">Cerrar sesión</button>
+  </section>
+
+  <!-- PLANO -->
+  <section class="vista" id="v-plano">
+    <div class="tabs" id="tabsPiso"></div>
+    <div id="visor"><div id="lienzo"><img id="plano" alt="Plano"><svg id="capa"></svg></div></div>
+    <div id="leyplano">
+      <span><i style="background:rgba(21,128,61,.55)"></i>Pauta completa</span>
+      <span><i style="background:rgba(240,180,41,.55)"></i>En curso</span>
+      <span><i style="background:rgba(21,128,61,.22);border:1px solid #15803d"></i>Con pauta asignada</span>
+      <span><i style="background:rgba(29,45,91,.12);border:1.5px dashed #1D2D5B"></i>Servicio (vista 1) — tocá el nombre</span>
+    </div>
+  </section>
+
+  <!-- FICHA RECINTO -->
+  <section class="vista" id="v-recinto"></section>
+  <!-- FICHA SERVICIO -->
+  <section class="vista" id="v-servicio"></section>
+  <!-- PAUTA -->
+  <section class="vista" id="v-pauta"></section>
+</main>
+
+<nav id="tabbar" class="no-print">
+  <button id="tb-inicio" onclick="ir('inicio')"><span class="i">🏥</span>Servicios</button>
+  <button id="tb-plano" onclick="ir('plano')"><span class="i">🗺️</span>Plano</button>
+</nav>
+<div id="toast"></div>
+
+<script>document.write('<scr'+'ipt src="SHARED_DATA/as_remote.js?v='+Date.now()+'"></scr'+'ipt>');</script>
+<script>document.write('<scr'+'ipt src="data/as_movil_datos.js?v='+Date.now()+'"></scr'+'ipt>');</script>
+<script>
+'use strict';
+const PUBLIC_BUILD = true; /*__PUBLIC_FLAG__*/
+// (el control de acceso real es por correo contra el backend; el flag solo
+//  distingue la copia publicada de la local)
+const D=window.AS_MOVIL, URLC=(window.AS_CENTRAL||{}).url||'';
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const toast=m=>{const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),2400);};
+const esMovilVista=()=>matchMedia('(max-width:899px)').matches;   // vivo: el layout puede cambiar
+
+/* ── sesión ──────────────────────────────────────────────────────────────── */
+let SES=null; try{SES=JSON.parse(localStorage.getItem('as_ses')||'null');}catch(e){}
+async function entrar(){
+  const c=$('inCorreo').value.trim().toLowerCase();
+  if(!/@/.test(c)){$('loginMsg').textContent='Escribí tu correo institucional.';return;}
+  $('loginMsg').textContent='Verificando…';
+  try{
+    const r=await fetch(URLC+'?acceso='+encodeURIComponent(c)).then(x=>x.json());
+    if(!r.nivel){$('loginMsg').textContent='Ese correo no está en la nómina de accesos. Consultá a las referentes de AS.';return;}
+    SES={correo:c,nivel:r.nivel,nombre:r.nombre||c,servicios:r.servicios||[]};
+    localStorage.setItem('as_ses',JSON.stringify(SES));
+    arranca();
+  }catch(e){$('loginMsg').textContent='Sin conexión con el servidor. Revisá la señal e intentá de nuevo.';}
+}
+function salir(){localStorage.removeItem('as_ses');SES=null;location.reload();}
+const esSup=()=>SES&&SES.nivel==='total';
+const misServicios=()=>esSup()?D.servicios.map(s=>s.n):(SES?SES.servicios:[]);
+const _nrm=s=>String(s||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+// coincidencia flexible: "EMERGENCIA" autoriza recintos del catálogo viejo
+// "Urgencias y Emergencias", "DIALISIS" a "Dialisis", etc.
+const puedoVer=svc=>{
+  if(esSup())return true;
+  const a=_nrm(svc); if(!a)return false;
+  return misServicios().some(m=>{const b=_nrm(m);return a===b||a.includes(b)||b.includes(a);});
+};
+
+/* ── estado de pautas: local + backend ───────────────────────────────────── */
+let EST={}; try{EST=JSON.parse(localStorage.getItem('as_estados')||'{}');}catch(e){}
+let COLA=[]; try{COLA=JSON.parse(localStorage.getItem('as_cola')||'[]');}catch(e){}
+function persist(){localStorage.setItem('as_estados',JSON.stringify(EST));localStorage.setItem('as_cola',JSON.stringify(COLA));}
+function setSync(k){$('sync').className='sync '+k;}
+async function bajarEstados(){
+  if(!URLC) return;
+  try{
+    const r=await fetch(URLC+(esSup()?'':'')).then(x=>x.json());
+    Object.entries(r.estados||{}).forEach(([k,v])=>{
+      if(k.startsWith('__'))return;
+      const loc=EST[k];
+      if(!loc || new Date(v.ts)>new Date(loc.ts||0)) EST[k]=v;
+    });
+    persist(); setSync(COLA.length?'pend':'ok');
+  }catch(e){setSync('off');}
+}
+function guardar(clave,servicio,recinto,pauta,datos){
+  const reqs=reqsDe(pauta).length;
+  const resp=Object.keys(datos).filter(k=>!k.startsWith('obs_')).length;
+  const avance=reqs?Math.round(resp*100/reqs):0;
+  EST[clave]={servicio,recinto,pauta,datos,avance,usuario:SES.correo,ts:new Date().toISOString()};
+  COLA=COLA.filter(c=>c.clave!==clave);
+  COLA.push({accion:'estado',clave,servicio,recinto,pauta,datos,avance,usuario:SES.correo});
+  persist(); setSync('pend'); vaciarCola();
+  if(avance===100) setTimeout(()=>autoArchivar(clave),1200);   // archivado automático
+}
+let _vaciando=false;
+async function vaciarCola(){
+  if(_vaciando||!COLA.length||!URLC){if(!COLA.length)setSync('ok');return;}
+  _vaciando=true;
+  while(COLA.length){
+    // se remueve EL ITEM ENVIADO (por identidad): si mientras viajaba llegó una
+    // versión más nueva de la misma clave, esa queda en cola y sale después
+    const it=COLA[0];
+    try{
+      await fetch(URLC,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(it)});
+      COLA=COLA.filter(x=>x!==it); persist();
+    }catch(e){setSync('off');break;}
+  }
+  _vaciando=false; if(!COLA.length)setSync('ok');
+}
+setInterval(vaciarCola,20000);
+addEventListener('online',vaciarCola);
+
+/* ── normas / pautas ─────────────────────────────────────────────────────── */
+function ambitoDe(id){
+  const nid=D.amb_norma[id]; if(!nid)return null;
+  for(const s of D.normas[nid].secciones){const a=s.ambitos.find(x=>x.id===id);if(a)return {...a,norma:nid,normaNombre:D.normas[nid].nombre,seccion:s.name};}
+  return null;
+}
+const reqsDe=id=>(ambitoDe(id)||{}).reqs||[];
+const claveRec=(rid,amb)=>'rec|'+rid+'|'+amb;
+const claveSvc=(svc,amb)=>'svc|'+svc+'|'+amb;
+function estadoDe(clave){return EST[clave]||null;}
+function avanceDe(clave){const e=estadoDe(clave);return e?e.avance:0;}
+function pautasDeSvc(svc){
+  return Object.keys(EST).filter(k=>k.startsWith('svc|'+svc+'|')).map(k=>k.split('|')[2]);
+}
+
+/* ── navegación ──────────────────────────────────────────────────────────── */
+let PILA=[];
+function muestra(v){
+  document.querySelectorAll('.vista').forEach(x=>x.classList.remove('on'));
+  $('v-'+v).classList.add('on');
+  if(!esMovilVista()&&(v==='inicio'||v==='plano')){$('v-inicio').classList.add('on');$('v-plano').classList.add('on');}
+  ['inicio','plano'].forEach(t=>{const b=$('tb-'+t);if(b)b.classList.toggle('on',v===t);});
+  $('hBack').style.display=PILA.length?'grid':'none';
+  window.scrollTo(0,0);
+}
+function pinta(v,arg){
+  // la vista tiene que estar VISIBLE antes de pintar: el encuadre del plano
+  // mide el visor, y oculto mide 0
+  muestra(v);
+  if(v==='inicio')pintaInicio();
+  if(v==='plano')pintaPlano(arg);
+  if(v==='recinto')pintaRecinto(arg);
+  if(v==='servicio')pintaServicio(arg);
+  if(v==='pauta')pintaPauta(arg);
+}
+function ir(v,arg){ PILA.push({v,arg}); pinta(v,arg); }
+function atras(){
+  PILA.pop();
+  const p=PILA[PILA.length-1]||{v:'inicio'};
+  pinta(p.v,p.arg);
+}
+
+/* ── INICIO ──────────────────────────────────────────────────────────────── */
+function resumenSvc(svc){
+  const claves=Object.keys(EST).filter(k=>{
+    const e=EST[k];return e&&String(e.servicio||'').toUpperCase()===svc.toUpperCase();});
+  if(!claves.length)return {n:0,av:0};
+  const av=Math.round(claves.reduce((a,k)=>a+EST[k].avance,0)/claves.length);
+  return {n:claves.length,av};
+}
+function pintaInicio(){
+  $('hTit').textContent='Autorización Sanitaria';
+  $('hSub').textContent=SES.nombre+(esSup()?' · Supervisión (acceso total)':'');
+  $('misTit').textContent=esSup()?'Todos los servicios ('+D.servicios.length+')':'Mis servicios';
+  const svcs=(esSup()?D.servicios:D.servicios.filter(s=>puedoVer(s.n)))
+    .slice().sort((a,b)=>D.pisos.indexOf(a.piso)-D.pisos.indexOf(b.piso)||a.n.localeCompare(b.n));
+  $('listaServicios').innerHTML=svcs.length?svcs.map(s=>{
+    const r=resumenSvc(s.n);
+    return `<button class="item" onclick="ir('servicio','${esc(s.n)}')">
+      <div class="ic">${esc(s.piso)}</div>
+      <div class="tt"><b>${esc(s.n)}</b><span>${s.eq_total?s.eq_total+' equipos · ':''}${s.cartera?s.cartera+' prestaciones · ':''}${r.n} pauta${r.n===1?'':'s'}</span></div>
+      <div class="fx"><span class="hint">${r.n?r.av+'%':''}</span><div class="prog"><i style="width:${r.av}%"></i></div></div>
+      <span class="chev">›</span></button>`;
+  }).join(''):'<div class="hint">Tu correo no tiene servicios asignados.</div>';
+  const tot=Object.keys(EST).filter(k=>!k.startsWith('__')).length;
+  const done=Object.values(EST).filter(e=>e.avance===100).length;
+  const av=tot?Math.round(Object.values(EST).reduce((a,e)=>a+(e.avance||0),0)/tot):0;
+  $('statsGlobal').innerHTML=
+    `<div class="stat"><b>${tot}</b><span>Pautas iniciadas</span></div>
+     <div class="stat"><b>${done}</b><span>Completas</span></div>
+     <div class="stat"><b>${av}%</b><span>Avance medio</span></div>`;
+  $('fuenteNota').textContent='Equipamiento: matriz EMMC (corte 07-07) · Dotación y Cartera: matrices HDS · Normas MINSAL digitalizadas ('+Object.keys(D.normas).length+').';
+}
+
+/* ── PLANO (pan/zoom táctil + recintos tocables) ─────────────────────────── */
+let PISO=null, Z=1, OX=0, OY=0;
+const d2px=(x,y,pl)=>({x:(x-D.ext.xmin)/(D.ext.xmax-D.ext.xmin)*pl.w, y:(D.ext.ymax-y)/(D.ext.ymax-D.ext.ymin)*pl.h});
+function claseRec(r){
+  const id=r[0], svc=r[9]||r[3];
+  const pautas=D.asign[id]||[];
+  let cls='rec';
+  if(pautas.length){
+    cls+=' pauta';
+    const avs=pautas.map(p=>avanceDe(claveRec(id,p)));
+    if(avs.some(a=>a===100))cls+=' hecho'; else if(avs.some(a=>a>0))cls+=' parcial';
+  }
+  if(puedoVer(svc))cls+=' mio';
+  return cls;
+}
+function pintaPlano(piso){
+  piso=piso||PISO||'P1'; PISO=piso;
+  $('hTit').textContent='Plano · Piso '+piso.replace('P','');
+  $('hSub').textContent='Tocá un recinto (vista 2) o el nombre de un servicio (vista 1)';
+  $('tabsPiso').innerHTML=D.pisos.map(p=>`<button class="${p===piso?'on':''}" onclick="pintaPlano('${p}')">${p.replace('P','Piso ')}</button>`).join('');
+  const pl=D.planos[piso]; if(!pl)return;
+  const img=$('plano'); img.onload=encuadra; img.src=pl.src+'?v='+D.gen; img.width=pl.w; img.height=pl.h;
+  const svg=$('capa'); svg.setAttribute('viewBox','0 0 '+pl.w+' '+pl.h);
+  svg.setAttribute('width',pl.w); svg.setAttribute('height',pl.h);
+  let h='';
+  (D.recintos[piso]||[]).forEach((r,i)=>{
+    const p=d2px(r[4],r[5],pl), w=r[6]/(D.ext.xmax-D.ext.xmin)*pl.w, ht=r[7]/(D.ext.ymax-D.ext.ymin)*pl.h;
+    h+=`<rect class="${claseRec(r)}" x="${(p.x-w/2).toFixed(1)}" y="${(p.y-ht/2).toFixed(1)}" width="${w.toFixed(1)}" height="${ht.toFixed(1)}" data-i="${i}"/>`;
+  });
+  D.servicios.filter(s=>s.piso===piso).forEach(s=>{
+    const k=pl.w/D.png.w, kv=pl.h/D.png.h;
+    s.shapes.forEach(sh=>{h+=`<rect class="svcbox" x="${sh[0]*k}" y="${sh[1]*kv}" width="${sh[2]*k}" height="${sh[3]*kv}" data-svc="${esc(s.n)}"/>`;});
+    const cx=(s.bb[0]+s.bb[2])/2*k, cy=(s.bb[1]+s.bb[3])/2*kv;
+    const fs=Math.max(16,Math.min(34,(s.bb[2]-s.bb[0])*k/(s.n.length*0.62)));
+    h+=`<text class="svclbl" x="${cx}" y="${cy}" font-size="${fs}" text-anchor="middle">${esc(s.n)}</text>`;
+  });
+  svg.innerHTML=h;
+  svg.querySelectorAll('.rec').forEach(el=>el.addEventListener('click',ev=>{
+    if(_moved)return; ev.stopPropagation();
+    ir('recinto',(D.recintos[piso]||[])[+el.dataset.i]);
+  }));
+  svg.querySelectorAll('.svcbox').forEach(el=>el.addEventListener('click',ev=>{
+    if(_moved)return; ev.stopPropagation(); ir('servicio',el.dataset.svc);
+  }));
+  // setTimeout y no rAF: con la pestaña en segundo plano rAF queda congelado
+  setTimeout(encuadra,30);
+}
+function aplica(){$('lienzo').style.transform=`translate(${OX}px,${OY}px) scale(${Z})`;}
+function encuadra(){
+  const v=$('visor'), pl=D.planos[PISO]; if(!pl)return;
+  Z=Math.min(v.clientWidth/pl.w, v.clientHeight/pl.h)*0.98;
+  OX=(v.clientWidth-pl.w*Z)/2; OY=(v.clientHeight-pl.h*Z)/2; aplica();
+}
+let _pt=null,_moved=false,_pinch=null;
+const visor=$('visor');
+visor.addEventListener('pointerdown',e=>{_pt={x:e.clientX,y:e.clientY,ox:OX,oy:OY};_moved=false;});
+visor.addEventListener('pointermove',e=>{
+  if(!_pt)return;
+  const dx=e.clientX-_pt.x,dy=e.clientY-_pt.y;
+  if(Math.abs(dx)+Math.abs(dy)>6)_moved=true;
+  OX=_pt.ox+dx;OY=_pt.oy+dy;aplica();
+});
+addEventListener('pointerup',()=>{_pt=null;setTimeout(()=>_moved=false,50);});
+visor.addEventListener('wheel',e=>{
+  e.preventDefault();
+  const r=visor.getBoundingClientRect(),cx=e.clientX-r.left,cy=e.clientY-r.top;
+  const z2=Math.max(0.05,Math.min(8,Z*Math.pow(0.998,e.deltaY)));
+  OX=cx-(cx-OX)*(z2/Z);OY=cy-(cy-OY)*(z2/Z);Z=z2;aplica();
+},{passive:false});
+visor.addEventListener('touchstart',e=>{
+  if(e.touches.length===2){const[a,b]=e.touches;_pinch={d:Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY),z:Z,ox:OX,oy:OY,cx:(a.clientX+b.clientX)/2,cy:(a.clientY+b.clientY)/2};_pt=null;}
+},{passive:true});
+visor.addEventListener('touchmove',e=>{
+  if(_pinch&&e.touches.length===2){
+    e.preventDefault();
+    const[a,b]=e.touches,r=visor.getBoundingClientRect();
+    const d=Math.hypot(a.clientX-b.clientX,a.clientY-b.clientY);
+    const z2=Math.max(0.05,Math.min(8,_pinch.z*d/_pinch.d));
+    const cx=_pinch.cx-r.left,cy=_pinch.cy-r.top;
+    OX=cx-(cx-_pinch.ox)*(z2/_pinch.z);OY=cy-(cy-_pinch.oy)*(z2/_pinch.z);Z=z2;aplica();_moved=true;
+  }
+},{passive:false});
+visor.addEventListener('touchend',()=>{_pinch=null;});
+addEventListener('resize',()=>{
+  const p=PILA[PILA.length-1]||{v:'inicio'};
+  muestra(p.v);                          // re-evalúa el layout de 1 o 2 columnas
+  if(!esMovilVista()&&!PISO)pintaPlano('P1');
+  if(PISO)setTimeout(encuadra,60);
+});
+
+/* ── FICHA RECINTO ───────────────────────────────────────────────────────── */
+function svcInfo(nombre){return D.servicios.find(s=>s.n.toUpperCase()===String(nombre||'').toUpperCase());}
+function fichaDatos(sv){
+  if(!sv)return '';
+  const eq=sv.eq_top.map(([n,q])=>`<div class="kv"><span>${esc(n)}</span><b>${q}</b></div>`).join('');
+  const dt=Object.entries(sv.dot).map(([k,v])=>`<div class="kv"><span>${esc(k)}</span><b>${v}</b></div>`).join('');
+  return `
+   <div class="card"><h2>Datos conectados · ${esc(sv.n)}</h2>
+    <div class="stats">
+      <div class="stat"><b>${sv.eq_total}</b><span>Equipos EMMC</span></div>
+      <div class="stat"><b>${Object.values(sv.dot).reduce((a,b)=>a+b,0)}</b><span>Dotación</span></div>
+      <div class="stat"><b>${sv.cartera}</b><span>Prestaciones</span></div>
+    </div>
+    ${sv.resp.length?`<div class="hint" style="margin:6px 0">Responsables: ${sv.resp.map(r=>esc(r.nombre)).join(' · ')}</div>`:''}
+    <details><summary class="hint" style="cursor:pointer;padding:6px 0">Equipamiento principal (${sv.eq_top.length})</summary>${eq}</details>
+    ${dt?`<details><summary class="hint" style="cursor:pointer;padding:6px 0">Dotación por estamento</summary>${dt}</details>`:''}
+   </div>`;
+}
+function pintaRecinto(r){
+  const [id,code,name]=r, w=r[6],h=r[7],m2=r[8];
+  const svc=r[9]||r[3];      // servicio de Atlas (permisos); r[3] es el nombre del catálogo viejo
+  $('hTit').textContent=(name||'Recinto')+(code?' · '+code:'');
+  $('hSub').textContent=svc+' · '+PISO;
+  const pautas=D.asign[id]||[];
+  const sv=svcInfo(svc);
+  const lista=pautas.map(pid=>{
+    const a=ambitoDe(pid); if(!a)return '';
+    const av=avanceDe(claveRec(id,pid));
+    return `<button class="item" onclick='ir("pauta",${JSON.stringify({tipo:"rec",rid:id,rnom:name+(code?" · "+code:""),svc:svc,amb:pid})})'>
+      <div class="ic">📋</div>
+      <div class="tt"><b>${esc(a.name.toLowerCase().replace(/^\w/,c=>c.toUpperCase()))}</b><span>${esc(a.normaNombre)} · ${a.reqs.length} requisitos</span></div>
+      <div class="fx"><span class="hint">${av}%</span><div class="prog"><i style="width:${av}%"></i></div></div><span class="chev">›</span></button>`;
+  }).join('');
+  $('v-recinto').innerHTML=`
+    <div class="card">
+      <h2>Recinto</h2>
+      <div class="kv"><span>Código</span><b>${esc(code||'—')}</b></div>
+      <div class="kv"><span>Servicio</span><b>${esc(svc||r[3]||'—')}</b></div>
+      <div class="kv"><span>Superficie</span><b>${m2||'—'} m² (${w}×${h} m)</b></div>
+      ${puedoVer(svc)?'':'<div class="hint" style="margin-top:8px">⚠ Solo lectura: este recinto no pertenece a tus servicios.</div>'}
+    </div>
+    <div class="card"><h2>Pautas de cotejo</h2>
+      ${lista||'<div class="hint">Este recinto aún no tiene pauta asignada.</div>'}
+      ${puedoVer(svc)?`<button class="btn sec" style="margin-top:10px" onclick='asignar("rec","${id}","${esc(svc)}")'>＋ Asignar pauta a este recinto</button>`:''}
+    </div>
+    ${fichaDatos(sv)}`;
+}
+
+/* ── FICHA SERVICIO (vista 1) ────────────────────────────────────────────── */
+function pintaServicio(nombre){
+  const sv=svcInfo(nombre); if(!sv)return;
+  $('hTit').textContent=sv.n; $('hSub').textContent='Servicio · '+sv.piso+' · vista 1';
+  const asigns=pautasDeSvc(sv.n);
+  const lista=asigns.map(pid=>{
+    const a=ambitoDe(pid); if(!a)return '';
+    const av=avanceDe(claveSvc(sv.n,pid));
+    return `<button class="item" onclick='ir("pauta",${JSON.stringify({tipo:"svc",svc:sv.n,amb:pid})})'>
+      <div class="ic">📋</div>
+      <div class="tt"><b>${esc(a.name.toLowerCase().replace(/^\w/,c=>c.toUpperCase()))}</b><span>${esc(a.normaNombre)} · ${a.reqs.length} requisitos</span></div>
+      <div class="fx"><span class="hint">${av}%</span><div class="prog"><i style="width:${av}%"></i></div></div><span class="chev">›</span></button>`;
+  }).join('');
+  const recs=(D.recintos[sv.piso]||[]).filter(r=>String(r[9]||'').toUpperCase()===sv.n.toUpperCase());
+  $('v-servicio').innerHTML=`
+    <div class="card"><h2>Pautas del servicio</h2>
+      ${lista||'<div class="hint">Sin pautas aplicadas a nivel de servicio todavía.</div>'}
+      ${puedoVer(sv.n)?`<button class="btn sec" style="margin-top:10px" onclick='asignar("svc",null,"${esc(sv.n)}")'>＋ Aplicar pauta al servicio</button>`:''}
+    </div>
+    ${fichaDatos(sv)}
+    ${recs.length?`<div class="card"><h2>Recintos del servicio en el plano (${recs.length})</h2>
+      <button class="btn sec" onclick="PISO='${sv.piso}';ir('plano','${sv.piso}')">Ver en el plano · ${sv.piso}</button></div>`:''}`;
+}
+
+/* ── asignación de pautas (desde lo ya trabajado) ────────────────────────── */
+function asignar(tipo,rid,svc){
+  const opciones=[];
+  Object.entries(D.normas).forEach(([nid,n])=>n.secciones.forEach(s=>s.ambitos.forEach(a=>{
+    if(a.reqs.length)opciones.push({id:a.id,txt:n.nombre+' — '+a.name.toLowerCase(),n:a.reqs.length});
+  })));
+  const div=document.createElement('div');
+  div.style.cssText='position:fixed;inset:0;background:rgba(10,18,35,.5);z-index:90;display:flex;align-items:flex-end;justify-content:center';
+  div.innerHTML=`<div style="background:#fff;border-radius:18px 18px 0 0;max-height:78vh;width:100%;max-width:640px;display:flex;flex-direction:column">
+    <div style="padding:14px 16px 8px"><b>Asignar pauta ${tipo==='svc'?'al servicio':'al recinto'}</b>
+      <input id="fPauta" placeholder="Buscar en las normas digitalizadas…" style="margin-top:9px"></div>
+    <div id="lPauta" style="overflow:auto;padding:0 16px 16px"></div></div>`;
+  document.body.appendChild(div);
+  div.addEventListener('click',e=>{if(e.target===div)div.remove();});
+  const pinta=q=>{
+    q=(q||'').toLowerCase();
+    const hits=opciones.filter(o=>o.txt.toLowerCase().includes(q)).slice(0,40);
+    div.querySelector('#lPauta').innerHTML=hits.map(o=>
+      `<button class="item" data-id="${o.id}"><div class="tt"><b style="white-space:normal">${esc(o.txt)}</b><span>${o.n} requisitos</span></div><span class="chev">›</span></button>`).join('')||'<div class="hint" style="padding:12px 0">Sin resultados.</div>';
+    div.querySelectorAll('.item').forEach(b=>b.onclick=()=>{
+      const amb=b.dataset.id;
+      const clave=tipo==='svc'?claveSvc(svc,amb):claveRec(rid,amb);
+      if(!EST[clave])guardar(clave,svc,tipo==='rec'?rid:'',amb,{});
+      div.remove(); toast('Pauta asignada');
+      ir('pauta',tipo==='svc'?{tipo:'svc',svc,amb}:{tipo:'rec',rid,svc,amb,rnom:''});
+    });
+  };
+  div.querySelector('#fPauta').addEventListener('input',e=>pinta(e.target.value));
+  pinta('');
+}
+
+/* ── PAUTA (cotejo C / NC / NA) ──────────────────────────────────────────── */
+let PA=null;
+function pintaPauta(ctx){
+  PA=ctx;
+  const a=ambitoDe(ctx.amb); if(!a)return;
+  const clave=ctx.tipo==='svc'?claveSvc(ctx.svc,ctx.amb):claveRec(ctx.rid,ctx.amb);
+  const est=estadoDe(clave)||{datos:{}};
+  const datos=est.datos||{};
+  const editable=puedoVer(ctx.svc);
+  $('hTit').textContent=a.name.toLowerCase().replace(/^\w/,c=>c.toUpperCase());
+  $('hSub').textContent=(ctx.tipo==='svc'?ctx.svc:(ctx.rnom||ctx.rid))+' · '+a.normaNombre;
+  let g0=null,h='';
+  a.reqs.forEach(q=>{
+    if(q.g&&q.g!==g0){h+=`<div class="g">${esc(q.g)}</div>`;g0=q.g;}
+    const v=datos['r'+q.n]||'';
+    h+=`<div class="req" id="rq${q.n}">
+      <div class="tx"><span class="n">${q.n}</span>${esc(q.t)}</div>
+      <div class="est3">
+        <button class="c ${v==='C'?'on':''}" onclick="marca(${q.n},'C')">CUMPLE</button>
+        <button class="nc ${v==='NC'?'on':''}" onclick="marca(${q.n},'NC')">NO CUMPLE</button>
+        <button class="na ${v==='NA'?'on':''}" onclick="marca(${q.n},'NA')">N/A</button>
+      </div>
+      <textarea id="ob${q.n}" placeholder="Observación…" style="display:${v==='NC'?'block':'none'}"
+        onchange="obs(${q.n},this.value)">${esc(datos['obs_r'+q.n]||'')}</textarea>
+    </div>`;
+  });
+  $('v-pauta').innerHTML=`
+    <div id="barra"><span class="hint">Avance</span><div class="prog"><i id="pgi" style="width:${est.avance||0}%"></i></div><b id="pgt">${est.avance||0}%</b></div>
+    ${editable?'':'<div class="card hint">⚠ Solo lectura: no pertenece a tus servicios.</div>'}
+    <div class="card" ${editable?'':'style="pointer-events:none;opacity:.75"'}>${h}</div>
+    <div class="row no-print" style="margin-bottom:14px">
+      <button class="btn sec" onclick="informe()">📄 Informe</button>
+      <button class="btn" onclick="atras()">Listo</button>
+    </div>`;
+}
+function ctxClave(){return PA.tipo==='svc'?claveSvc(PA.svc,PA.amb):claveRec(PA.rid,PA.amb);}
+function marca(n,v){
+  const clave=ctxClave(), est=estadoDe(clave)||{datos:{}};
+  const datos={...est.datos};
+  if(datos['r'+n]===v){delete datos['r'+n];v='';}else datos['r'+n]=v;
+  guardar(clave,PA.svc,PA.tipo==='rec'?PA.rid:'',PA.amb,datos);
+  const rq=$('rq'+n);
+  rq.querySelectorAll('.est3 button').forEach(b=>b.classList.remove('on'));
+  if(v)rq.querySelector('.est3 .'+(v==='C'?'c':v==='NC'?'nc':'na')).classList.add('on');
+  $('ob'+n).style.display=v==='NC'?'block':'none';
+  const e2=estadoDe(clave); $('pgi').style.width=e2.avance+'%'; $('pgt').textContent=e2.avance+'%';
+}
+function obs(n,txt){
+  const clave=ctxClave(), est=estadoDe(clave)||{datos:{}};
+  const datos={...est.datos}; if(txt)datos['obs_r'+n]=txt; else delete datos['obs_r'+n];
+  guardar(clave,PA.svc,PA.tipo==='rec'?PA.rid:'',PA.amb,datos);
+}
+
+/* ── INFORME (imprimible; el recorte del plano se arma con canvas) ───────── */
+async function recortePlano(){
+  try{
+    let piso,cx,cy,wm,hm;
+    if(PA.tipo==='rec'){
+      for(const p of D.pisos){const r=(D.recintos[p]||[]).find(x=>x[0]===PA.rid);if(r){piso=p;cx=r[4];cy=r[5];wm=r[6];hm=r[7];break;}}
+    }else{
+      const sv=svcInfo(PA.svc); if(!sv)return '';
+      piso=sv.piso;
+      const pl=D.planos[piso];
+      const k=(D.ext.xmax-D.ext.xmin)/D.png.w;
+      cx=D.ext.xmin+((sv.bb[0]+sv.bb[2])/2)*k;
+      cy=D.ext.ymax-((sv.bb[1]+sv.bb[3])/2)*(D.ext.ymax-D.ext.ymin)/D.png.h;
+      wm=(sv.bb[2]-sv.bb[0])*k; hm=(sv.bb[3]-sv.bb[1])*(D.ext.ymax-D.ext.ymin)/D.png.h;
+    }
+    const pl=D.planos[piso]; if(!pl)return '';
+    const img=new Image(); img.src=pl.src;
+    await new Promise((ok,er)=>{img.onload=ok;img.onerror=er;});
+    const R=Math.max(wm,hm)*1.6+8;
+    const px=x=>(x-D.ext.xmin)/(D.ext.xmax-D.ext.xmin)*pl.w;
+    const py=y=>(D.ext.ymax-y)/(D.ext.ymax-D.ext.ymin)*pl.h;
+    const x0=px(cx-R),x1=px(cx+R),y0=py(cy+R),y1=py(cy-R);
+    const cv=document.createElement('canvas'); cv.width=760; cv.height=Math.round(760*(y1-y0)/(x1-x0));
+    const g=cv.getContext('2d');
+    g.drawImage(img,x0,y0,x1-x0,y1-y0,0,0,cv.width,cv.height);
+    const k2=cv.width/(x1-x0);
+    g.strokeStyle='#1D2D5B';g.lineWidth=4;g.fillStyle='rgba(59,130,196,.25)';
+    const rx=(px(cx-wm/2)-x0)*k2, ry=(py(cy+hm/2)-y0)*k2, rw=wm/(D.ext.xmax-D.ext.xmin)*pl.w*k2, rh=hm/(D.ext.ymax-D.ext.ymin)*pl.h*k2;
+    g.fillRect(rx,ry,rw,rh);g.strokeRect(rx,ry,rw,rh);
+    return cv.toDataURL('image/jpeg',0.8);
+  }catch(e){return '';}
+}
+async function construirInforme(){
+  const a=ambitoDe(PA.amb), clave=ctxClave(), est=estadoDe(clave)||{datos:{}};
+  const datos=est.datos||{};
+  const nC=Object.values(datos).filter(v=>v==='C').length;
+  const nNC=Object.values(datos).filter(v=>v==='NC').length;
+  const nNA=Object.values(datos).filter(v=>v==='NA').length;
+  const pct=(nC+nNC)?Math.round(nC*100/(nC+nNC)):0;
+  const sv=svcInfo(PA.svc);
+  toast('Generando informe…');
+  const plano=await recortePlano();
+  const hoy=new Date().toLocaleDateString('es-CL');
+  let g0=null,filas='';
+  a.reqs.forEach(q=>{
+    if(q.g&&q.g!==g0){filas+=`<tr class="grp"><td colspan="3">${esc(q.g)}</td></tr>`;g0=q.g;}
+    const v=datos['r'+q.n]||'';
+    const map={C:['CUMPLE','#15803d','#dcfce7'],NC:['NO CUMPLE','#b91c1c','#fee2e2'],NA:['NO APLICA','#64748b','#f1f5f9']};
+    const m=map[v]||['PENDIENTE','#93a1b8','#f5f7fb'];
+    filas+=`<tr><td class="rn">${q.n}</td><td>${esc(q.t)}</td><td><span class="pl" style="color:${m[1]};background:${m[2]}">${m[0]}</span>${datos['obs_r'+q.n]?`<div class="ob">${esc(datos['obs_r'+q.n])}</div>`:''}</td></tr>`;
+  });
+  const doc=`<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Informe AS · ${esc(PA.tipo==='svc'?PA.svc:PA.rnom||PA.rid)}</title><style>
+  @page{size:A4;margin:14mm} html{color-scheme:light only}
+  body{background:#fff;font-family:-apple-system,'Segoe UI',Roboto,sans-serif;color:#17233b;font-size:11.5px;line-height:1.45;max-width:800px;margin:0 auto;padding:20px}
+  header{display:flex;align-items:center;gap:13px;border-bottom:4px solid #1D2D5B;padding-bottom:11px}
+  .logo{width:50px;height:50px;background:#1D2D5B;color:#fff;border-radius:12px;display:grid;place-items:center;font-weight:900;font-size:14px}
+  h1{font-size:16px;color:#1D2D5B;margin:0}.sub{font-size:10.5px;color:#5b6b85}
+  .folio{margin-left:auto;text-align:right;font-size:10px;color:#5b6b85}
+  h2{font-size:11.5px;color:#1D2D5B;text-transform:uppercase;letter-spacing:.8px;margin:16px 0 6px;border-left:4px solid #3b82c4;padding-left:8px}
+  .kv{display:flex;gap:6px;font-size:11px;margin:2px 0}.kv b{min-width:110px;color:#5b6b85;font-weight:600}
+  table{width:100%;border-collapse:collapse;font-size:10.5px}
+  th{background:#1D2D5B;color:#fff;text-align:left;padding:5px 8px;font-size:9.5px;text-transform:uppercase}
+  td{padding:4.5px 8px;border-bottom:1px solid #e3e9f2;vertical-align:top}
+  tr.grp td{background:#eaf1fb;font-weight:700;color:#1D2D5B;font-size:10px}
+  .rn{color:#8593a9;width:32px}.pl{font-size:9px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .ob{font-size:9.5px;color:#b91c1c;margin-top:2px}
+  .res{display:flex;gap:10px;margin:9px 0}.res>div{flex:1;border:1.5px solid #dbe4f0;border-radius:10px;padding:7px 10px;text-align:center}
+  .res b{display:block;font-size:19px}.res span{font-size:9px;color:#5b6b85;text-transform:uppercase}
+  .plano{border:1.5px solid #dbe4f0;border-radius:10px;overflow:hidden;margin:4px 0}.plano img{width:100%;display:block}
+  .firmas{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:42px;text-align:center;font-size:10px}
+  .firmas div{border-top:1.2px solid #17233b;padding-top:5px}
+  @media print{.np{display:none}}
+  .np{position:fixed;right:14px;top:14px;background:#1D2D5B;color:#fff;border:0;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer}
+  </style></head><body>
+  <button class="np" onclick="print()">🖨 Imprimir / PDF</button>
+  <header><div class="logo">HDS</div><div><h1>Informe de Cotejo · Autorización Sanitaria</h1>
+  <div class="sub">Nuevo Hospital Del Salvador · Servicio de Salud Metropolitano Oriente</div></div>
+  <div class="folio"><b style="display:block;font-size:11px;color:#1D2D5B">AS-${esc((PA.tipo==='svc'?PA.svc:PA.rid).replace(/[^A-Za-z0-9]+/g,'').slice(0,14).toUpperCase())}</b>${hoy}</div></header>
+  <h2>1 · Identificación</h2>
+  <div class="kv"><b>${PA.tipo==='svc'?'Servicio':'Recinto'}</b>${esc(PA.tipo==='svc'?PA.svc:(PA.rnom||PA.rid))}</div>
+  ${PA.tipo==='rec'?`<div class="kv"><b>Servicio</b>${esc(PA.svc)}</div>`:''}
+  <div class="kv"><b>Pauta</b>${esc(a.normaNombre)} — ${esc(a.name)}</div>
+  <div class="kv"><b>Evaluador(a)</b>${esc(SES.nombre)} · ${esc(SES.correo)} · ${hoy}</div>
+  ${plano?`<h2>2 · Ubicación en planta</h2><div class="plano"><img src="${plano}"></div>`:''}
+  <h2>${plano?3:2} · Resultado del cotejo</h2>
+  <div class="res"><div><b style="color:#15803d">${nC}</b><span>Cumple</span></div>
+  <div><b style="color:#b91c1c">${nNC}</b><span>No cumple</span></div>
+  <div><b style="color:#64748b">${nNA}</b><span>No aplica</span></div>
+  <div><b style="color:#1D2D5B">${pct}%</b><span>Cumplimiento</span></div></div>
+  <table><thead><tr><th>N°</th><th>Requisito</th><th>Estado</th></tr></thead><tbody>${filas}</tbody></table>
+  ${sv?`<h2>${plano?4:3} · Contexto del servicio</h2>
+  <div class="kv"><b>Equipamiento</b>${sv.eq_total} unidades (matriz EMMC, corte 07-07-2026)</div>
+  <div class="kv"><b>Dotación</b>${Object.values(sv.dot).reduce((x,y)=>x+y,0)} funcionarios (${Object.entries(sv.dot).map(([k,v])=>k+' '+v).join(' · ')})</div>
+  <div class="kv"><b>Cartera</b>${sv.cartera} prestaciones vigentes</div>`:''}
+  <div class="firmas"><div>Responsable del Servicio</div><div>Referente Autorización Sanitaria<br><b>C. Sepúlveda · M. Canales</b></div></div>
+  </body></html>`;
+  return doc.replace('<button class="np" onclick="print()">🖨 Imprimir / PDF</button>','');
+}
+
+async function informe(){
+  const docLimpio=await construirInforme();
+  // Visor embebido (iframe): los popups se bloquean en el celular
+  const wrap=document.createElement('div');
+  wrap.id='infVista';
+  wrap.style.cssText='position:fixed;inset:0;background:#fff;z-index:95;display:flex;flex-direction:column';
+  wrap.innerHTML='<div class="no-print" style="display:flex;gap:8px;padding:10px 12px;background:#1D2D5B">'
+    +'<button class="btn" style="flex:1;background:#3b82c4" onclick="document.querySelector(\'#infVista iframe\').contentWindow.print()">🖨 PDF</button>'
+    +'<button class="btn" id="btnDrive" style="flex:1;background:#0f766e">☁️ Subir al Drive</button>'
+    +'<button class="btn sec" style="flex:none;width:90px" onclick="document.getElementById(\'infVista\').remove()">Cerrar</button></div>'
+    +'<iframe style="flex:1;border:0;width:100%"></iframe>';
+  document.body.appendChild(wrap);
+  wrap.querySelector('iframe').srcdoc=docLimpio;
+  wrap.querySelector('#btnDrive').onclick=()=>subirDrive(docLimpio);
+}
+
+/* ── ARCHIVADO AUTOMÁTICO ────────────────────────────────────────────────────
+   Al llegar la pauta al 100 %, el informe se genera y se sube SOLO al Drive,
+   una vez por pauta (si después se corrige algo, la subida manual del visor
+   crea la versión nueva). El registro de subidas es local por clave. */
+let SUBIDOS={}; try{SUBIDOS=JSON.parse(localStorage.getItem('as_subidos')||'{}');}catch(e){}
+async function autoArchivar(clave){
+  if(SUBIDOS[clave]) return;
+  if(!PA||ctxClave()!==clave) return;          // solo si la pauta sigue abierta
+  const e=estadoDe(clave); if(!e||e.avance!==100) return;
+  SUBIDOS[clave]=new Date().toISOString();     // se marca ANTES: evita dobles
+  localStorage.setItem('as_subidos',JSON.stringify(SUBIDOS));
+  try{
+    const doc=await construirInforme();
+    await subirDrive(doc,true);
+  }catch(err){ delete SUBIDOS[clave]; localStorage.setItem('as_subidos',JSON.stringify(SUBIDOS)); }
+}
+
+/* ── subida del informe al Drive (el servidor lo convierte a PDF y lo archiva
+      en 01 · Informes por Servicio / <SERVICIO> / <RECINTO>) ─────────────── */
+async function subirDrive(html,auto){
+  const b=document.querySelector('#infVista #btnDrive');
+  if(!auto){ if(!b)return; b.disabled=true; b.textContent='☁️ Subiendo…'; }
+  const hoyISO=new Date().toISOString().slice(0,10);
+  const recNom=PA.tipo==='rec'?(PA.rnom||PA.rid).replace(/[\\/:*?"<>|]+/g,'-'):'';
+  const cuerpo={accion:'informe_html', usuario:SES.correo, servicio:PA.svc,
+    recinto:recNom, pauta:PA.amb, html,
+    nombre:'Informe_AS_'+(recNom||'servicio').replace(/\s+/g,'_')+'_'+hoyISO+'.pdf'};
+  try{
+    const r=await fetch(URLC,{method:'POST',headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify(cuerpo)}).then(x=>x.json());
+    if(r.ok){
+      if(b){b.textContent='✓ En el Drive'; b.style.background='#15803d';}
+      toast(auto?'✓ Pauta al 100 % — informe archivado solo en el Drive':'Informe archivado: '+(r.nombre||''));
+    }else{
+      if(!auto&&b){b.textContent='☁️ Subir al Drive'; b.disabled=false;}
+      toast('No se pudo archivar: '+(r.error||'backend sin v3'));
+      if(auto)throw new Error(r.error||'');
+    }
+  }catch(e){
+    if(auto)throw e;
+    // sin CORS legible el POST puede haber llegado igual: avisar sin asustar
+    if(b){b.textContent='☁️ Enviado'; b.disabled=false;}
+    toast('Enviado — verificá en el Drive (la respuesta no se pudo leer).');
+  }
+}
+
+/* ── arranque ────────────────────────────────────────────────────────────── */
+function arranca(){
+  if(!SES){muestra('login');$('hSub').textContent='Pautas en terreno · Nuevo HDS';return;}
+  bajarEstados().then(()=>{if(PILA.length<=1)pintaInicio();});
+  PILA=[{v:'inicio'}];
+  pintaInicio(); muestra('inicio');
+  if(!esMovilVista()){pintaPlano('P1');}
+  vaciarCola();
+}
+arranca();
+</script>
+</body></html>

@@ -842,6 +842,23 @@
 <script src="SHARED_DATA/pautas_recintos.js"></script>
 <script src="SHARED_DATA/pauta_labels.js"></script>
 <script src="SHARED_DATA/pautas_remote.js"></script>
+<script>
+// Detección de celular → ofrecer la versión de terreno (38), pensada para táctil
+(function(){
+  if(!matchMedia('(max-width:820px) and (pointer:coarse)').matches) return;
+  addEventListener('DOMContentLoaded',function(){
+    var b=document.createElement('div');
+    b.style.cssText='position:fixed;left:10px;right:10px;bottom:12px;z-index:9999;background:#1D2D5B;color:#fff;'
+      +'border-radius:14px;padding:13px 15px;box-shadow:0 8px 30px rgba(0,0,0,.35);font-size:14px;display:flex;gap:10px;align-items:center';
+    b.innerHTML='<span style="flex:1">📱 Hay una versión <b>optimizada para celular</b> con las pautas en terreno.</span>'
+      +'<a href="38.AutorizacionSanitariaMovil.html" style="background:#3b82c4;color:#fff;text-decoration:none;font-weight:700;'
+      +'border-radius:10px;padding:9px 14px;white-space:nowrap">Abrir</a>'
+      +'<button onclick="this.parentNode.remove()" style="background:none;border:0;color:#9fb2d8;font-size:18px">✕</button>';
+    document.body.appendChild(b);
+  });
+})();
+</script>
+
 <script src="SHARED_DATA/recinto_equipamiento.js"></script>
 <script src="SHARED_DATA/recinto_bim.js"></script>
 <script src="SHARED_DATA/recinto_mnc.js"></script>

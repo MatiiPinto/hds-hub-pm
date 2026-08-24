@@ -207,6 +207,9 @@ button,input,select,textarea{font-family:inherit}
 .handle.e,.handle.w{cursor:ew-resize;fill:#fef3c7;stroke:#f59e0b}
 .draw-rect{fill:rgba(250,204,21,.10);stroke:#fbbf24;stroke-width:3;stroke-dasharray:14 7;pointer-events:none}
 .ws-dot{cursor:pointer;pointer-events:all}
+/* Panel 👥 Personas: fila señalable y pulso del marcador en el plano */
+.per-row:hover{background:#fff7ed;box-shadow:inset 3px 0 0 #f59e0b}
+
 .add-zone{fill:rgba(99,102,241,.07);stroke:#6366f1;stroke-width:3;stroke-dasharray:18 8;pointer-events:all}
 /* Delete mode */
 #viewer.del-mode .ws-dot circle{stroke:#ef4444 !important;stroke-width:4 !important}
@@ -569,6 +572,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
           <button class="tb-btn" id="btnSen" onclick="toggleSenaletica()" title="Mostrar el nombre y N° de señalética de cada recinto bajo el código">🪧 Señalética</button>
           <button class="tb-btn" id="btnAudit" onclick="toggleAudit()" title="Colorear cada recinto según la completitud de sus datos: tipo, código, BIM y señalética">✅ Auditoría de datos</button>
           <button class="tb-btn" id="btnMetas" onclick="toggleMetas()" title="Metas oficiales de recintos (Resumen Ejecutivo HDS): asignados vs meta">🎯 Metas</button>
+          <button class="tb-btn" id="btnAsigN" onclick="toggleAsigNum()" title="Mostrar en cada recinto cuántos funcionarios tiene asignados (solo el número, abajo a la derecha)">🧑 N° asignados</button>
         </div>
       </div>
       <button class="tb-btn" id="btnDraw" onclick="toggleDraw()" style="display:none">⬛ Dibujar</button>
@@ -615,8 +619,10 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
         <button id="rpTabHerr" class="sb-tab on" onclick="rpShowTab('herr')">🧰 Herramientas</button>
         <button id="rpTabRev" class="sb-tab" onclick="rpShowTab('rev')">🧩 Revisión <span id="sbBimN">0</span></button>
         <button id="rpTabAv" class="sb-tab" onclick="rpShowTab('av')" title="Cuánto de la dotación está asignada a un recinto, por subdirección y su desglose">📊 Avance <span id="sbAvN">—</span></button>
+        <button id="rpTabPer" class="sb-tab" onclick="rpShowTab('per')" title="Nombres de todas las personas asignadas en este servicio: al pasar el mouse se ilumina su puesto en el plano">👥 Personas <span id="sbPerN">—</span></button>
       </div>
       <div id="avBody" style="display:none;max-height:58vh;overflow-y:auto"></div>
+      <div id="perBody" style="display:none;max-height:58vh;overflow-y:auto"></div>
       <div id="bimList" style="display:none;max-height:58vh;overflow-y:auto"></div>
       <div id="toolsBody" style="display:none">
       <div class="rp-t" style="margin-top:2px">✏️ Nombres de recinto</div>
@@ -1171,6 +1177,7 @@ let S = {
   viewOnly: true,   // versión web: siempre consulta
   editPM: _esEditorAtlas(),   // 🟡: asignar personas y corregir nombres
   showSen: (function(){try{return localStorage.getItem('cabida_show_sen')==='1';}catch(e){return false;}})(),
+  showAsigN: (function(){try{return localStorage.getItem('cabida_show_asign')!=='0';}catch(e){return true;}})(),
   planKind: (function(){try{return localStorage.getItem('cabida_plan_kind')||'mobiliario';}catch(e){return 'mobiliario';}})(),
   boxVis: (function(){try{return localStorage.getItem('cabida_box_vis')||'on';}catch(e){return 'on';}})(),
   showDotNames: (function(){try{return localStorage.getItem('cabida_show_dotnames')==='1';}catch(e){return false;}})(),
@@ -1178,6 +1185,16 @@ let S = {
   // 'prop' = Propuesta de reubicación (aplica los traslados de wsState.equipMoves).
   scenario: (function(){try{return localStorage.getItem('cabida_scenario')||'prop';}catch(e){return 'prop';}})()
 };
+// Cuántos funcionarios tiene asignados cada recinto, en vista 2. Solo el
+// número: los nombres no caben en las cajas chicas y el aforo (👥) ya ocupa
+// la línea del código — por eso este va abajo a la derecha y en verde, el
+// mismo color que "asignados" en la vista de servicios.
+function toggleAsigNum(){
+  S.showAsigN=!S.showAsigN;
+  try{_lsSet('cabida_show_asign',S.showAsigN?'1':'0');}catch(e){}
+  const b=document.getElementById('btnAsigN'); if(b)b.classList.toggle('active',S.showAsigN);
+  renderSVG();
+}
 function toggleSenaletica(){
   S.showSen=!S.showSen;
   try{_lsSet('cabida_show_sen',S.showSen?'1':'0');}catch(e){}
@@ -1317,6 +1334,17 @@ const LS_MUERTAS=['cabida_cad_boxes.bak','cabida_cad_ws.bak','cabida_cad_names.b
   'cabida_cad_ws.day','cabida_cad_ws.day.fecha'];
 function lsPurgar(){ let n=0; try{ LS_MUERTAS.forEach(k=>{ if(localStorage.getItem(k)!==null){ localStorage.removeItem(k); n++; } }); }catch(e){} return n; }
 lsPurgar();                                  // libera la cuota antes de nada
+// ¿Alguna de las claves grandes está guardada SIN comprimir? Es el dato que
+// de verdad importa cuando el espacio aprieta: en claro ocupan ~7 veces más,
+// así que "lleno" casi siempre significa "sin comprimir", no "demasiados datos".
+function lsEnClaro(){
+  const out=[];
+  try{ for(const k in LS_GRANDES){
+    const s=localStorage.getItem(k);
+    if(s!=null && s.slice(0,2)!==LZ_MARCA) out.push({k, kb:Math.round(s.length*2/1024)});
+  } }catch(e){}
+  return out;
+}
 function lsUso(){
   let c=0; try{ for(const k in localStorage) if(Object.prototype.hasOwnProperty.call(localStorage,k)) c+=k.length+String(localStorage[k]).length; }catch(e){}
   return {chars:c, mb:+(c*2/1048576).toFixed(2)};   // Chrome contabiliza UTF-16
@@ -1519,6 +1547,7 @@ function _purgarLinks(){
   return antes-wsState.dotLinks.length;
 }
 function sWs(){  _purgarLinks(); const k=ls('cabida_cad_ws',wsState);  _idbBak('ws',wsState);    _markSaved(k); _undoQueue();
+  try{ if(_rpTab==='per') renderPersonas(); }catch(e){}
   try{ if(_rpTab==='av') renderAvance(); else _avBadge(); }catch(e){}   // el testigo sigue el trabajo en vivo
 }
 if(!nameState.codes)nameState.codes={};
@@ -1915,6 +1944,18 @@ async function diagGuardado(){
     ajeno.sort((a,b)=>b[1]-a[1]).slice(0,5).forEach(f=>L.push('     · '+f[0]+' — '+KB(f[1]*2)));
   }
   L.push('   Compresión del estado: '+(LZ_OK?'activa (ocupa ~7 veces menos)':'NO disponible en este navegador'));
+  // Lo decisivo no es si la compresión "está activa", sino si lo que hay
+  // GUARDADO ahora está comprimido. Eso separa "demasiados datos" de
+  // "los mismos datos ocupando siete veces más".
+  const _claro=lsEnClaro();
+  if(_claro.length){
+    L.push('   ⚠ GUARDADAS EN CLARO ('+_claro.reduce((s,x)=>s+x.kb,0)+' KB, deberían ser ~'
+      +Math.round(_claro.reduce((s,x)=>s+x.kb,0)/7)+' KB):');
+    _claro.forEach(x=>L.push('       · '+x.k+' — '+x.kb+' KB'));
+    L.push('     Se recomprimen solas al abrir el Atlas y al cambiar de pestaña.');
+  }else{
+    L.push('   ✓ Todo el estado está guardado comprimido.');
+  }
   L.push('');
   // 2 · escritura real
   L.push('2) PRUEBA DE ESCRITURA REAL');
@@ -2316,6 +2357,19 @@ function updateMemBar(){
   // de 5 MB es el de Chrome — Safari puede dar algo distinto, así que el número
   // absoluto es el dato que no depende de ese supuesto.
   if(txt){ txt.textContent=u.mb.toFixed(2).replace('.',',')+' MB'; txt.style.color=col; }
+  // Si hay claves en claro, la barra lo avisa y las comprime en el acto: es la
+  // causa habitual de que esto se llene, y arreglarla no requiere decisión.
+  const claro=lsEnClaro();
+  if(claro.length){
+    const ahorro=claro.reduce((s,x)=>s+x.kb,0);
+    txt.textContent=u.mb.toFixed(2).replace('.',',')+' MB ⚠';
+    txt.style.color='#b45309';
+    setTimeout(()=>{ try{ if(lsRecomprimir()) updateMemBar(); }catch(e){} },0);
+    el.title='⚠ '+claro.length+' clave(s) del estado están guardadas SIN comprimir ('+ahorro+' KB).\n'
+      +'Se están recomprimiendo ahora: deberían bajar a ~'+Math.round(ahorro/7)+' KB.\n'
+      +'Si el aviso no se va, avisá — significa que la compresión no está pudiendo escribir.';
+    return;
+  }
   el.style.borderColor = pct>=80 ? '#dc2626' : '#94b8d0';
   // Cuánto de lo ocupado NO es del Atlas: es lo primero que hay que saber
   // cuando esto se llena, porque el cupo se comparte con las demás plataformas.
@@ -3641,6 +3695,19 @@ function renderL2(){
       svg.appendChild(txt(b.x+b.w/2, codeY, `👥 ${cap}`,
         {fill:'#0f172a', stroke:'#ffffff', 'stroke-width':fs*.18, 'paint-order':'stroke fill',
          'font-size':fs*.62, 'pointer-events':'none', 'font-family':'Segoe UI,sans-serif', 'font-weight':'900'}));
+    }
+    // N° de funcionarios asignados: esquina inferior derecha, donde no compite
+    // con el nombre (arriba), el código+aforo (bajo el nombre) ni la tipología
+    // (abajo al centro). Solo el número, y solo si hay alguien.
+    if(S.showAsigN){
+      const _dd=(wsState.dots||{})[room.id]||[];
+      const _na=_dd.filter(isDotAsignado).length;
+      if(_na){
+        svg.appendChild(txt(b.x+b.w-fs*.30, b.y+b.h-fs*.34, String(_na),
+          {fill:'#15803d', stroke:'#ffffff', 'stroke-width':fs*.20, 'paint-order':'stroke fill',
+           'font-size':fs*.78, 'text-anchor':'end', 'pointer-events':'none',
+           'font-family':'Segoe UI,sans-serif', 'font-weight':'900'}));
+      }
     }
     // Código BIM (del plano o manual), visible bajo el código de recinto.
     // Clic sobre la línea = edición en línea del BIM (sin abrir el diálogo completo).
@@ -6620,18 +6687,120 @@ function rpToggle(id){ const e=document.getElementById(id); if(e) e.style.displa
 let _revOpen=false, _rpTab='';
 function rpShowTab(tab){
   _rpTab=(_rpTab===tab)?'':tab;              // clic en la activa la colapsa
-  const herr=_rpTab==='herr', rev=_rpTab==='rev', av=_rpTab==='av';
+  const herr=_rpTab==='herr', rev=_rpTab==='rev', av=_rpTab==='av', per=_rpTab==='per';
   document.getElementById('rpTabHerr').classList.toggle('on',herr);
   document.getElementById('rpTabRev').classList.toggle('on',rev);
   document.getElementById('rpTabAv')?.classList.toggle('on',av);
   document.getElementById('toolsBody').style.display=herr?'':'none';
   document.getElementById('bimList').style.display=rev?'':'none';
   const ab=document.getElementById('avBody'); if(ab) ab.style.display=av?'':'none';
+  document.getElementById('rpTabPer')?.classList.toggle('on',per);
+  const pb=document.getElementById('perBody'); if(pb) pb.style.display=per?'':'none';
+  if(!per) perHiOff();
   _revOpen=rev;
   if(rev) renderBimPending();
   if(av) renderAvance();
+  if(per) renderPersonas();
 }
 
+/* ── PERSONAS DEL SERVICIO (vista 2) ────────────────────────────────────────
+   Lista los nombres asignados en el servicio abierto y, al pasar el mouse por
+   uno, ilumina su puesto sobre el plano. Los puestos guardan coordenadas del
+   plano (las mismas que las cajas), así que el punto se puede marcar sin
+   entrar al recinto. Clic = ir al recinto. */
+let _perFiltro='';
+function _perLista(){
+  if(!S.areaId) return null;
+  const area=FLOORS.flatMap(f=>f.areas).find(a=>a.id===S.areaId);
+  if(!area) return null;
+  const out=[];
+  for(const r of (area.rooms||[])){
+    for(const d of ((wsState.dots||{})[r.id]||[])){
+      const base={rid:r.id, recinto:rName(r.id)||'(sin nombre)', x:d.x, y:d.y};
+      if(d.tipo==='dinamico'){
+        (d.turnos||[]).forEach(x=>{ if((x.nombre||'').trim())
+          out.push({...base, nom:x.nombre, cargo:x.cargo||'', turno:true, cds:!!x.cds}); });
+      }else if((d.nombre||'').trim()){
+        out.push({...base, nom:d.nombre, cargo:d.cargo||'', turno:false, cds:!!d.cds});
+      }
+    }
+  }
+  return {area, gente:out};
+}
+// Marca en el plano dónde está esa persona. Se dibuja en el mismo SVG y con
+// las coordenadas del puesto, así que sirve igual en vista 2 y en vista 3.
+function perHiOff(){ document.getElementById('perHi')?.remove(); }
+function perHi(x,y){
+  perHiOff();
+  const svg=document.getElementById('svgLayer'); if(!svg||x==null||y==null) return;
+  // El marcador se dimensiona en PÍXELES DE PANTALLA, no en unidades del plano:
+  // con el servicio completo a la vista, un radio fijo quedaba de 6 px y no se
+  // veía. k = unidades del plano por píxel, según el viewBox y el ancho real.
+  const vb=(svg.getAttribute('viewBox')||'').split(/\s+/).map(Number);
+  const anchoPx=svg.getBoundingClientRect().width||1;
+  const k=(vb.length===4 && vb[2]) ? (vb[2]/anchoPx) : 1;
+  const R=26*k, r0=7*k, gr=3.5*k;
+  const g=el('g',{id:'perHi',transform:'translate('+x+','+y+')','pointer-events':'none'});
+  g.appendChild(el('circle',{cx:0,cy:0,r:R,fill:'none',stroke:'#f59e0b','stroke-width':gr,opacity:.95}));
+  g.appendChild(el('circle',{cx:0,cy:0,r:r0,fill:'#f59e0b',stroke:'#fff','stroke-width':gr*.8}));
+  // Pulso con SMIL en vez de CSS: los valores se calculan acá, así late igual
+  // de grande con el plano cerca o lejos.
+  const anillo=el('circle',{cx:0,cy:0,r:R,fill:'none',stroke:'#f59e0b','stroke-width':gr*.8});
+  const aR=document.createElementNS('http://www.w3.org/2000/svg','animate');
+  aR.setAttribute('attributeName','r'); aR.setAttribute('from',R); aR.setAttribute('to',R*2.6);
+  aR.setAttribute('dur','1.25s'); aR.setAttribute('repeatCount','indefinite');
+  const aO=document.createElementNS('http://www.w3.org/2000/svg','animate');
+  aO.setAttribute('attributeName','opacity'); aO.setAttribute('from','.85'); aO.setAttribute('to','0');
+  aO.setAttribute('dur','1.25s'); aO.setAttribute('repeatCount','indefinite');
+  anillo.appendChild(aR); anillo.appendChild(aO);
+  g.appendChild(anillo);
+  svg.appendChild(g);
+}
+function perIr(rid){ perHiOff(); didPan=false; goRoom(rid); }
+function perFiltrar(v){ _perFiltro=norm(v||''); renderPersonas(); }
+function renderPersonas(){
+  const cont=document.getElementById('perBody'); if(!cont) return;
+  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  const D=_perLista();
+  const badge=document.getElementById('sbPerN');
+  if(!D){
+    if(badge) badge.textContent='—';
+    cont.innerHTML='<div style="padding:10px;color:#64748b;font-size:11.5px">Entrá a un servicio (vista 2) para ver a su gente.</div>';
+    return;
+  }
+  if(badge) badge.textContent=String(D.gente.length);
+  if(!D.gente.length){
+    cont.innerHTML='<div style="padding:10px;color:#64748b;font-size:11.5px">Este servicio todavía no tiene funcionarios asignados.</div>';
+    return;
+  }
+  // agrupado por recinto: así se lee dónde está cada uno, que es el punto
+  const porRec={};
+  D.gente.forEach(g=>{ if(_perFiltro && !norm(g.nom+' '+g.cargo+' '+g.recinto).includes(_perFiltro)) return;
+    (porRec[g.rid]=porRec[g.rid]||{nom:g.recinto,gente:[]}).gente.push(g); });
+  const recs=Object.entries(porRec).sort((a,b)=>String(a[1].nom).localeCompare(String(b[1].nom),'es'));
+  const vis=recs.reduce((s,[,v])=>s+v.gente.length,0);
+  const H=['<div style="padding:6px 4px 8px">'
+    +'<input id="perQ" placeholder="Buscar persona, cargo o recinto…" value="'+esc(_perFiltro)+'" '
+    +'oninput="perFiltrar(this.value)" style="width:100%;box-sizing:border-box;border:1px solid #a9c3d6;'
+    +'border-radius:8px;padding:6px 9px;font-size:11.5px">'
+    +'<div style="font-size:10.5px;color:#64748b;margin-top:5px">'+vis+' de '+D.gente.length
+    +' persona(s) · pasá el mouse por un nombre para verlo en el plano</div></div>'];
+  recs.forEach(([rid,v])=>{
+    H.push('<div style="padding:5px 6px 3px;border-top:1px solid #eef2f7;display:flex;gap:6px;align-items:center">'
+      +'<b style="font-size:11px;flex:1;min-width:0;overflow-wrap:anywhere">'+esc(v.nom)+'</b>'
+      +'<span style="font-size:10px;color:#64748b">'+v.gente.length+'</span></div>');
+    v.gente.sort((a,b)=>String(a.nom).localeCompare(String(b.nom),'es')).forEach(g=>{
+      H.push('<div class="per-row" onmouseenter="perHi('+g.x+','+g.y+')" onmouseleave="perHiOff()" '
+        +'onclick="perIr(\''+rid.replace(/'/g,"\\'")+'\')" '
+        +'style="padding:4px 8px 4px 14px;cursor:pointer;border-radius:6px;font-size:11px;line-height:1.3">'
+        +'<div style="font-weight:600">'+esc(g.nom)+(g.turno?' <span style="color:#3b82f6;font-size:9.5px">🔄</span>':'')
+        +(g.cds?' <span style="color:#8b5cf6;font-size:9.5px">🛒</span>':'')+'</div>'
+        +(g.cargo?'<div style="color:#64748b;font-size:10px">'+esc(g.cargo)+'</div>':'')
+        +'</div>');
+    });
+  });
+  cont.innerHTML=H.join('');
+}
 /* ── TESTIGO DE AVANCE POR SUBDIRECCIÓN ─────────────────────────────────────
    Cuánto de la dotación quedó asignada a un recinto, abierto por el árbol
    oficial: subdirección → departamento/servicio → unidad. Es un TESTIGO de
@@ -6758,6 +6927,9 @@ function renderSrvTipos(){
 }
 function renderRightPanel(){
   syncBedCtrUI();
+  // Al cambiar de servicio la lista de personas es otra: se rearma y se apaga
+  // cualquier marcador que hubiera quedado encendido en el plano anterior.
+  try{ if(_rpTab==='per'){ perHiOff(); renderPersonas(); } }catch(e){}
   try{ renderWorkpoints(); }catch(e){}
   try{ renderSrvTipos(); }catch(e){}
   // Conteo de TODOS los tipos de recinto dibujados, con desglose por piso
@@ -8960,6 +9132,7 @@ function migrateBedsToArea(){
 function init(){
   migrateBedsToArea();
   if(S.showSen){ const b=document.getElementById('btnSen'); if(b)b.classList.add('active'); }
+  { const b=document.getElementById('btnAsigN'); if(b)b.classList.toggle('active',!!S.showAsigN); }
   { const b=document.getElementById('btnPlanKind'); if(b){ const c=S.planKind==='color'; b.textContent=c?'🗺 Ver mobiliario':'🖌 Ver color'; b.classList.toggle('active',c); } }
   applyBoxVis();
   loadDotDB(); // async pero NO awaiteamos: el plano puede cargar en paralelo. Búsqueda queda lista cuando termine fetch.
@@ -9051,6 +9224,34 @@ async function runSelfTest(){
     const antes=localStorage.getItem('cabida_cad_names');
     return typeof lsRecomprimir==='function' && lsRecomprimir()===0
         && localStorage.getItem('cabida_cad_names')===antes;
+  });
+  // El número por recinto en vista 2 tiene que salir de los mismos datos que
+  // el total del servicio: si no cuadran, uno de los dos miente.
+  T('Vista 2: el N° por recinto cuadra con el total del servicio', ()=>{
+    const fl=FLOORS[0], ar=(fl.areas||[]).find(a=>(a.rooms||[]).length); if(!ar) return true;
+    const porRecinto=(ar.rooms||[]).reduce((s,r)=>
+      s+((wsState.dots[r.id]||[]).filter(isDotAsignado).length),0);
+    return porRecinto===areaWsStats(ar).asig;
+  });
+  // El marcador tiene que caer EXACTAMENTE sobre el puesto de esa persona, y
+  // dentro del mismo SVG que las cajas (si no, no seguiría el zoom).
+  T('Personas: el marcador cae sobre el puesto correcto', ()=>{
+    const D=_perLista(); if(!D||!D.gente.length) return true;
+    const g=D.gente[0];
+    perHi(g.x,g.y);
+    const m=document.getElementById('perHi');
+    const ok = !!m && m.getAttribute('transform')==='translate('+g.x+','+g.y+')'
+            && m.parentNode===document.getElementById('svgLayer');
+    perHiOff();
+    return ok && !document.getElementById('perHi');
+  });
+  T('Detección de estado sin comprimir', ()=>{
+    // lsEnClaro() es lo que hace visible el problema: debe listar exactamente
+    // las claves grandes que NO llevan la marca de comprimido.
+    const l=lsEnClaro();
+    if(!Array.isArray(l)) return false;
+    return l.every(x=>LS_GRANDES[x.k] && typeof x.kb==='number'
+      && (localStorage.getItem(x.k)||'').slice(0,2)!==LZ_MARCA);
   });
   T('Compresión: disponible', ()=>LZ_OK===true);
   T('Compresión: ida y vuelta exacta del estado real', ()=>{
