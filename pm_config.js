@@ -67,7 +67,9 @@ window.PM_CONFIG = {
     'cpoch':      '31f36f0a477f2876b575feed828316551646baec80e4150d1558878566733de1',
     // Carolina Rivera · arquitecta — editora acotada del Atlas (asignar
     // funcionarios a recintos y corregir nombres de recinto)
-    'crivera':    '76f87477cabc82337fed39924accb34d3934d33525e497ba3103ebd6ab3c573a'
+    'crivera':    '76f87477cabc82337fed39924accb34d3934d33525e497ba3103ebd6ab3c573a',
+    // Isabel Rojas Correa · Jefa de la Unidad de Capacitación
+    'irojas':     '01abb8cc8c03fa388bfa0ae87768275cf2edfe49fb9a219823288cd2cbd7d339'
   }
 };
 
