@@ -4072,18 +4072,37 @@ function renderBeds(containerId){
     const sillon=bd.kind==='sillon', cupo=bd.kind==='cupo'||bd.kind==='puesto';
     const g=el('g',{class:'ws-bed'+(sillon?' sillon':'')+(cupo?' cupo':''),transform:`translate(${bd.x},${bd.y})`});
     const tail=String(bd.num||'').split('-').pop();   // muestra "001" / "01" dentro del puesto
+    // Los CUPOS (Recuperación, Pre-Anestesia) se leen de corrido en vista 2
+    // para contar plazas: van MUY por encima del resto (8 -> 32) y el círculo
+    // crece con ellos para seguir encerrándolos. Camillas y sillones quedan en
+    // 8: son 545 contra 90 y a ese tamaño saturarían el plano.
+    const _FS_CUPO = tail.length>3 ? 26 : 32;
+    const _fsNum = cupo ? _FS_CUPO : (tail.length>3?7:8);
     let shape;
     if(cupo){
-      // Cupo: círculo con el color de la tipología del recinto (Recuperación/Pre-Anestesia)
+      // Cupo: círculo con el color de la tipología del recinto (Recuperación/Pre-Anestesia).
+      // El radio se calcula PARA QUE EL NÚMERO QUEPA DENTRO: con el número al
+      // doble, un radio fijo de 10 dejaba las cifras sobresaliendo del círculo.
+      // Los cupos vecinos están a 91 u como mínimo, así que hasta r=45 no se
+      // tocan; acá se llega a ~24.
       const col=(ROOM_TYPES[rType(containerId)]||ROOM_TYPES['']).col;
-      shape=el('circle',{r:DOT_R,fill:col+'2E',stroke:col,'stroke-width':2.5});
+      const _r=Math.min(42, Math.max(DOT_R, tail.length*_FS_CUPO*0.30+5, _FS_CUPO*0.70));
+      shape=el('circle',{r:_r,fill:col+'2E',stroke:col,'stroke-width':Math.max(2.5,_r*0.16)});
     }else{
       // Sillón redondeado (silla); camilla cuadrada (cama).
       shape=el('rect',{x:-DOT_R,y:-DOT_R,width:DOT_R*2,height:DOT_R*2,rx:sillon?DOT_R*0.8:3});
     }
-    const tx=el('text',{'text-anchor':'middle','dominant-baseline':'middle','font-size':tail.length>3?7:8});
+    const tx=el('text',{'text-anchor':'middle','dominant-baseline':'middle','font-size':_fsNum});
     tx.textContent=tail;
-    if(cupo) tx.setAttribute('fill',(ROOM_TYPES[rType(containerId)]||ROOM_TYPES['']).col);
+    if(cupo){
+      const _col=(ROOM_TYPES[rType(containerId)]||ROOM_TYPES['']).col;
+      tx.setAttribute('fill',_col);
+      // Al doble, el número ocupa casi todo el círculo: el halo lo despega del
+      // relleno y del borde para que siga leyéndose.
+      tx.setAttribute('stroke','#ffffff');
+      tx.setAttribute('stroke-width', _fsNum*0.13);
+      tx.setAttribute('paint-order','stroke fill');
+    }
     const ttl=el('title'); ttl.textContent=(bd.kind==='puesto'?'Puesto ':(bd.kind==='cupo'?'Cupo ':(sillon?'Sillón ':'Camilla ')))+(bd.num||'');
     g.appendChild(shape); g.appendChild(tx); g.appendChild(ttl);
     g.addEventListener('click',e=>{ e.stopPropagation(); if(didPan)return; bedClick(containerId,i,e); });
@@ -6709,6 +6728,29 @@ function rpShowTab(tab){
    plano (las mismas que las cajas), así que el punto se puede marcar sin
    entrar al recinto. Clic = ir al recinto. */
 let _perFiltro='';
+/* El campo 'estamento' que quedó guardado en cada puesto viene sucio: 40
+   variantes escritas a mano (tens, TENS, Enfermera, Eu 4to turno, reemplazos…).
+   El estamento OFICIAL está en la matriz de dotación, y resuelve 1.232 de las
+   1.362 asignaciones. Los 130 restantes son gente que no está en la matriz —
+   que es justo lo que la plataforma ya marca aparte. */
+const EST_ORDEN=['MEDICOS','PROFESIONALES','TECNICOS','AUXILIARES','ADMINISTRATIVOS',
+                 'QUIMICOS','BIOQUIMICOS','CARGO EN EXTINCION'];
+const EST_COL={
+  'MEDICOS':'#7c3aed', 'PROFESIONALES':'#0284c7', 'TECNICOS':'#0d9488',
+  'AUXILIARES':'#ca8a04', 'ADMINISTRATIVOS':'#64748b', 'QUIMICOS':'#db2777',
+  'BIOQUIMICOS':'#be123c', 'CARGO EN EXTINCION':'#94a3b8',
+  'FUERA DE LA MATRIZ':'#f59e0b'
+};
+let _estIdx=null;
+function _estDe(nombre){
+  if(!_estIdx){
+    _estIdx={};
+    ((dotDB&&dotDB.staff)||[]).forEach(s=>{ const n=norm(s.nombre); if(n&&!_estIdx[n]) _estIdx[n]=s; });
+  }
+  const s=_estIdx[norm(nombre)];
+  const e=s && String(s.estamento||'').trim().toUpperCase();
+  return e || 'FUERA DE LA MATRIZ';
+}
 function _perLista(){
   if(!S.areaId) return null;
   const area=FLOORS.flatMap(f=>f.areas).find(a=>a.id===S.areaId);
@@ -6719,9 +6761,9 @@ function _perLista(){
       const base={rid:r.id, recinto:rName(r.id)||'(sin nombre)', x:d.x, y:d.y};
       if(d.tipo==='dinamico'){
         (d.turnos||[]).forEach(x=>{ if((x.nombre||'').trim())
-          out.push({...base, nom:x.nombre, cargo:x.cargo||'', turno:true, cds:!!x.cds}); });
+          out.push({...base, nom:x.nombre, cargo:x.cargo||'', turno:true, cds:!!x.cds, est:_estDe(x.nombre)}); });
       }else if((d.nombre||'').trim()){
-        out.push({...base, nom:d.nombre, cargo:d.cargo||'', turno:false, cds:!!d.cds});
+        out.push({...base, nom:d.nombre, cargo:d.cargo||'', turno:false, cds:!!d.cds, est:_estDe(d.nombre)});
       }
     }
   }
@@ -6779,27 +6821,63 @@ function renderPersonas(){
     (porRec[g.rid]=porRec[g.rid]||{nom:g.recinto,gente:[]}).gente.push(g); });
   const recs=Object.entries(porRec).sort((a,b)=>String(a[1].nom).localeCompare(String(b[1].nom),'es'));
   const vis=recs.reduce((s,[,v])=>s+v.gente.length,0);
-  const H=['<div style="padding:6px 4px 8px">'
+  // Encabezado CONGELADO: con 143 personas, el buscador y el contador se
+  // perdían al bajar. #perBody es el contenedor con scroll, así que basta
+  // sticky top:0 (con fondo propio, o el listado se transparenta debajo).
+  const H=['<div style="position:sticky;top:0;z-index:3;background:#fff;'
+    +'padding:6px 4px 8px;box-shadow:0 2px 6px -3px rgba(15,30,52,.35)">'
     +'<input id="perQ" placeholder="Buscar persona, cargo o recinto…" value="'+esc(_perFiltro)+'" '
     +'oninput="perFiltrar(this.value)" style="width:100%;box-sizing:border-box;border:1px solid #a9c3d6;'
     +'border-radius:8px;padding:6px 9px;font-size:11.5px">'
     +'<div style="font-size:10.5px;color:#64748b;margin-top:5px">'+vis+' de '+D.gente.length
     +' persona(s) · pasá el mouse por un nombre para verlo en el plano</div></div>'];
   recs.forEach(([rid,v])=>{
-    H.push('<div style="padding:5px 6px 3px;border-top:1px solid #eef2f7;display:flex;gap:6px;align-items:center">'
-      +'<b style="font-size:11px;flex:1;min-width:0;overflow-wrap:anywhere">'+esc(v.nom)+'</b>'
-      +'<span style="font-size:10px;color:#64748b">'+v.gente.length+'</span></div>');
-    v.gente.sort((a,b)=>String(a.nom).localeCompare(String(b.nom),'es')).forEach(g=>{
-      H.push('<div class="per-row" onmouseenter="perHi('+g.x+','+g.y+')" onmouseleave="perHiOff()" '
-        +'onclick="perIr(\''+rid.replace(/'/g,"\\'")+'\')" '
-        +'style="padding:4px 8px 4px 14px;cursor:pointer;border-radius:6px;font-size:11px;line-height:1.3">'
-        +'<div style="font-weight:600">'+esc(g.nom)+(g.turno?' <span style="color:#3b82f6;font-size:9.5px">🔄</span>':'')
-        +(g.cds?' <span style="color:#8b5cf6;font-size:9.5px">🛒</span>':'')+'</div>'
-        +(g.cargo?'<div style="color:#64748b;font-size:10px">'+esc(g.cargo)+'</div>':'')
-        +'</div>');
+    // Título de RECINTO: barra con fondo y el número en pastilla, para que se
+    // distinga de un plumazo de los nombres (antes ambos eran texto suelto y
+    // el contador en gris claro casi no se veía).
+    H.push('<div class="per-rec" style="position:sticky;top:var(--per-cab,60px);z-index:2;display:flex;gap:8px;align-items:center;'
+      +'background:#dbe7f2;border-top:1px solid #b8cde0;padding:6px 8px;margin-top:8px">'
+      +'<b style="font-size:11.5px;color:#17456e;flex:1;min-width:0;overflow-wrap:anywhere">'+esc(v.nom)+'</b>'
+      +'<span style="background:#17456e;color:#fff;border-radius:9px;padding:1px 8px;'
+      +'font-size:10.5px;font-weight:800">'+v.gente.length+'</span></div>');
+    // Dentro del recinto, agrupado por ESTAMENTO (toda enfermería junta, todos
+    // los TENS juntos…), en el orden del escalafón y alfabético dentro de cada uno.
+    const porEst={};
+    v.gente.forEach(g=>{ (porEst[g.est]=porEst[g.est]||[]).push(g); });
+    const ests=Object.keys(porEst).sort((a,b)=>{
+      const ia=EST_ORDEN.indexOf(a), ib=EST_ORDEN.indexOf(b);
+      return (ia<0?99:ia)-(ib<0?99:ib) || String(a).localeCompare(String(b),'es');
+    });
+    ests.forEach(e=>{
+      const col=EST_COL[e]||'#64748b';
+      H.push('<div style="display:flex;gap:6px;align-items:center;padding:4px 8px 2px 12px">'
+        +'<span style="width:7px;height:7px;border-radius:2px;background:'+col+'"></span>'
+        +'<span style="font-size:9.5px;font-weight:800;letter-spacing:.5px;color:'+col+'">'
+        +esc(e)+'</span>'
+        +'<span style="font-size:9.5px;color:#94a3b8">'+porEst[e].length+'</span></div>');
+      porEst[e].sort((a,b)=>String(a.nom).localeCompare(String(b.nom),'es')).forEach(g=>{
+        H.push('<div class="per-row" onmouseenter="perHi('+g.x+','+g.y+')" onmouseleave="perHiOff()" '
+          +'onclick="perIr(\''+rid.replace(/'/g,"\\'")+'\')" '
+          +'style="padding:3px 8px 3px 26px;cursor:pointer;border-left:3px solid '+col+'33;'
+          +'font-size:11px;line-height:1.3">'
+          +'<div style="font-weight:600;color:#0f172a">'+esc(g.nom)
+          +(g.turno?' <span style="color:#3b82f6;font-size:9.5px">🔄</span>':'')
+          +(g.cds?' <span style="color:#8b5cf6;font-size:9.5px">🛒</span>':'')+'</div>'
+          +(g.cargo?'<div style="color:#64748b;font-size:10px">'+esc(g.cargo)+'</div>':'')
+          +'</div>');
+      });
     });
   });
   cont.innerHTML=H.join('');
+  // El alto de la cabecera depende de la fuente y del ancho del panel (medí 71
+  // px donde había puesto 52 a ojo, y los títulos habrían quedado tapados): se
+  // mide después de pintar y se publica como variable CSS, así los títulos de
+  // recinto se pegan JUSTO debajo.
+  // Medición SÍNCRONA: tras asignar innerHTML el layout ya está disponible, y
+  // requestAnimationFrame no dispara cuando la pestaña no está pintando (ya
+  // nos costó un arreglo antes por lo mismo).
+  { const cab=cont.firstElementChild;
+    if(cab) cont.style.setProperty('--per-cab', Math.round(cab.getBoundingClientRect().height)+'px'); }
 }
 /* ── TESTIGO DE AVANCE POR SUBDIRECCIÓN ─────────────────────────────────────
    Cuánto de la dotación quedó asignada a un recinto, abierto por el árbol

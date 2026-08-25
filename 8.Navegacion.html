@@ -3986,7 +3986,9 @@ function _navRestaurar(d, etiqueta){
                  +'   Las áreas de circulación y marcadores NO se tocarán.\n\n' : '')
       + 'Esto REEMPLAZA el estado actual. Se guarda un respaldo previo en el navegador. ¿Continuar?')) return false;
   try{
-    localStorage.setItem('nav_respaldo_previo', JSON.stringify(_navSnapshot(false)));
+    // Foto de "antes de restaurar", también en IndexedDB (no gasta cuota).
+    _navPrevio=_navSnapshot(false);
+    _navIdbSet('respaldo_previo', _navPrevio).catch(()=>{});
   }catch(e){}
 
   const c = d.circulacion || {groups:d.grupos, nodes:d.nodos};
@@ -4066,24 +4068,68 @@ document.addEventListener('click',e=>{
 
 // ── Red de seguridad: respaldo automático diario en el navegador ──
 // Guarda hasta 3 fotos (sin las áreas de Atlas, que son grandes y reimportables).
-function _navAutoRespaldo(){
+/* ── Los respaldos viven en IndexedDB, no en localStorage ───────────────────
+   Son 3 fotos diarias del trabajo de circulación: en localStorage llegaron a
+   ocupar 1,9 MB de los ~5 MB que TODAS las plataformas comparten en este
+   origen, y dejaban sin aire al Atlas. IndexedDB no tiene ese techo y guarda
+   objetos tal cual, sin serializar a texto. Es exactamente lo que se hizo con
+   las copias internas del Atlas.
+   Las claves viejas de localStorage se migran y se borran la primera vez. */
+const NAV_DB='nav_fs', NAV_ST='kv';
+function _navIdb(){ return new Promise((res,rej)=>{ const r=indexedDB.open(NAV_DB,1);
+  r.onupgradeneeded=()=>r.result.createObjectStore(NAV_ST);
+  r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); }); }
+async function _navIdbSet(k,v){ const db=await _navIdb(); return new Promise((res,rej)=>{
+  const tx=db.transaction(NAV_ST,'readwrite'); tx.objectStore(NAV_ST).put(v,k);
+  tx.oncomplete=res; tx.onerror=()=>rej(tx.error); }); }
+async function _navIdbGet(k){ const db=await _navIdb(); return new Promise((res,rej)=>{
+  const tx=db.transaction(NAV_ST,'readonly'); const g=tx.objectStore(NAV_ST).get(k);
+  g.onsuccess=()=>res(g.result); g.onerror=()=>rej(g.error); }); }
+// Migración de una vez: lo que hubiera en localStorage pasa a IndexedDB y se
+// libera la cuota. Si algo falla, no se borra nada.
+// _navListo: promesa de que la migración terminó. TODO lo que lea o escriba
+// respaldos tiene que esperarla — si no, el autorespaldo del arranque corre
+// con la lista vacía y PISA los respaldos que aún se estaban leyendo. Pasó en
+// la prueba: 3 respaldos reemplazados por uno.
+let _navRespaldos=[], _navPrevio=null;
+const _navListo=(async function _navMigrar(){
   try{
-    const key='nav_respaldo_auto';
-    let arr=[]; try{ arr=JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){ arr=[]; }
+    _navRespaldos = (await _navIdbGet('respaldo_auto')) || [];
+    _navPrevio    = (await _navIdbGet('respaldo_previo')) || null;
+    const viejo=localStorage.getItem('nav_respaldo_auto');
+    if(viejo){
+      const arr=JSON.parse(viejo)||[];
+      if(arr.length && !_navRespaldos.length){ _navRespaldos=arr; await _navIdbSet('respaldo_auto',arr); }
+      localStorage.removeItem('nav_respaldo_auto');
+      console.info('Navegación: respaldos movidos a IndexedDB ('+Math.round(viejo.length*2/1024)+' KB liberados)');
+    }
+    const vp=localStorage.getItem('nav_respaldo_previo');
+    if(vp){
+      if(!_navPrevio){ _navPrevio=JSON.parse(vp); await _navIdbSet('respaldo_previo',_navPrevio); }
+      localStorage.removeItem('nav_respaldo_previo');
+    }
+  }catch(e){ console.warn('Navegación: no se pudo migrar los respaldos', e); }
+})();
+function _navAutoRespaldo(){
+  _navListo.then(_navAutoRespaldoYa).catch(_navAutoRespaldoYa);
+}
+function _navAutoRespaldoYa(){
+  try{
     const hoy=new Date().toISOString().slice(0,10);
     const snap=_navSnapshot(false);
     const r=_navResumen(snap);
     if(r.g===0 && r.pc===0 && r.po===0) return;      // nada que respaldar
-    arr=arr.filter(x=>x.dia!==hoy);
-    arr.push({dia:hoy, ts:Date.now(), resumen:r.txt, data:snap});
-    arr=arr.slice(-3);
-    localStorage.setItem(key, JSON.stringify(arr));
-  }catch(e){ /* cuota llena: no romper la plataforma */ }
+    _navRespaldos=(_navRespaldos||[]).filter(x=>x.dia!==hoy);
+    _navRespaldos.push({dia:hoy, ts:Date.now(), resumen:r.txt, data:snap});
+    _navRespaldos=_navRespaldos.slice(-3);
+    _navIdbSet('respaldo_auto', _navRespaldos).catch(()=>{});
+  }catch(e){ /* no romper la plataforma */ }
 }
 
-function restaurarAuto(){
-  let arr=[]; try{ arr=JSON.parse(localStorage.getItem('nav_respaldo_auto')||'[]'); }catch(e){}
-  const prev=localStorage.getItem('nav_respaldo_previo');
+async function restaurarAuto(){
+  await _navListo.catch(()=>{});      // no ofrecer una lista a medio cargar
+  const arr=_navRespaldos||[];
+  const prev=_navPrevio?JSON.stringify(_navPrevio):null;
   if(!arr.length && !prev){ alert('Todavía no hay respaldos automáticos guardados en este navegador.'); return; }
   let msg='Respaldos automáticos disponibles:\n\n';
   arr.slice().reverse().forEach((x,i)=>{ msg+=(i+1)+') '+x.dia+' — '+x.resumen+'\n'; });
