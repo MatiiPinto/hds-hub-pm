@@ -301,9 +301,29 @@ const claveRec=(rid,amb)=>'rec|'+rid+'|'+amb;
 const claveSvc=(svc,amb)=>'svc|'+svc+'|'+amb;
 function estadoDe(clave){return EST[clave]||null;}
 function avanceDe(clave){const e=estadoDe(clave);return e?e.avance:0;}
+const _borrada=k=>{const e=EST[k];return !!(e&&e.datos&&e.datos._borrada);};
 function pautasDeSvc(svc){
-  return Object.keys(EST).filter(k=>k.startsWith('svc|'+svc+'|')).map(k=>k.split('|')[2]);
+  return Object.keys(EST).filter(k=>k.startsWith('svc|'+svc+'|')&&!_borrada(k)).map(k=>k.split('|')[2]);
 }
+// pautas de un recinto: las de la siembra (D.asign) + las asignadas a mano
+// desde la app (claves rec|id|*), menos las quitadas con 🗑 (_borrada)
+function pautasDeRec(id){
+  const set=new Set((D.asign[id]||[]).filter(a=>!_borrada(claveRec(id,a))));
+  Object.keys(EST).forEach(k=>{
+    if(k.startsWith('rec|'+id+'|')&&!_borrada(k)) set.add(k.split('|')[2]);
+  });
+  return [...set];
+}
+// quitar una pauta asignada por error (solo sin avance): queda marcada como
+// borrada en el backend — no se pierde el historial y deja de listarse
+function quitarPauta(clave,svc,rid,amb){
+  if(avanceDe(clave)>0){toast('La pauta tiene avance: no se quita.');return;}
+  if(!confirm('¿Quitar esta pauta de la lista?'))return;
+  guardar(clave,svc,rid||'',amb,{_borrada:1});
+  toast('Pauta quitada');
+  const p=PILA[PILA.length-1]||{v:'inicio'}; pinta(p.v,p.arg);
+}
+window.quitarPauta=quitarPauta;
 
 /* ── navegación ──────────────────────────────────────────────────────────── */
 let PILA=[];
@@ -335,7 +355,7 @@ function atras(){
 /* ── INICIO ──────────────────────────────────────────────────────────────── */
 function resumenSvc(svc){
   const claves=Object.keys(EST).filter(k=>{
-    const e=EST[k];return e&&String(e.servicio||'').toUpperCase()===svc.toUpperCase();});
+    const e=EST[k];return e&&!_borrada(k)&&String(e.servicio||'').toUpperCase()===svc.toUpperCase();});
   if(!claves.length)return {n:0,av:0};
   const av=Math.round(claves.reduce((a,k)=>a+EST[k].avance,0)/claves.length);
   return {n:claves.length,av};
@@ -369,7 +389,7 @@ let PISO=null, Z=1, OX=0, OY=0;
 const d2px=(x,y,pl)=>({x:(x-D.ext.xmin)/(D.ext.xmax-D.ext.xmin)*pl.w, y:(D.ext.ymax-y)/(D.ext.ymax-D.ext.ymin)*pl.h});
 function claseRec(r){
   const id=r[0], svc=r[9]||r[3];
-  const pautas=D.asign[id]||[];
+  const pautas=pautasDeRec(id);
   let cls='rec';
   if(pautas.length){
     cls+=' pauta';
@@ -477,15 +497,19 @@ function pintaRecinto(r){
   const svc=r[9]||r[3];      // servicio de Atlas (permisos); r[3] es el nombre del catálogo viejo
   $('hTit').textContent=(name||'Recinto')+(code?' · '+code:'');
   $('hSub').textContent=svc+' · '+PISO;
-  const pautas=D.asign[id]||[];
+  const pautas=pautasDeRec(id);
   const sv=svcInfo(svc);
   const lista=pautas.map(pid=>{
     const a=ambitoDe(pid); if(!a)return '';
-    const av=avanceDe(claveRec(id,pid));
-    return `<button class="item" onclick='ir("pauta",${JSON.stringify({tipo:"rec",rid:id,rnom:name+(code?" · "+code:""),svc:svc,amb:pid})})'>
+    const clave=claveRec(id,pid), av=avanceDe(clave);
+    const manual=!(D.asign[id]||[]).includes(pid);
+    const quitar=(puedoVer(svc)&&av===0)
+      ?`<button style="flex:none;padding:6px;color:#b91c1c" title="Quitar pauta"
+          onclick='event.stopPropagation();quitarPauta(${JSON.stringify(clave)},${JSON.stringify(svc)},${JSON.stringify(id)},${JSON.stringify(pid)})'>🗑</button>`:'';
+    return `<div style="display:flex;align-items:center"><button class="item" style="flex:1" onclick='ir("pauta",${JSON.stringify({tipo:"rec",rid:id,rnom:name+(code?" · "+code:""),svc:svc,amb:pid})})'>
       <div class="ic">📋</div>
-      <div class="tt"><b>${esc(a.name.toLowerCase().replace(/^\w/,c=>c.toUpperCase()))}</b><span>${esc(a.normaNombre)} · ${a.reqs.length} requisitos</span></div>
-      <div class="fx"><span class="hint">${av}%</span><div class="prog"><i style="width:${av}%"></i></div></div><span class="chev">›</span></button>`;
+      <div class="tt"><b>${esc(a.name.toLowerCase().replace(/^\w/,c=>c.toUpperCase()))}${manual?' <span class="pill" style="background:#e8eef8;color:#1D2D5B">manual</span>':''}</b><span>${esc(a.normaNombre)} · ${a.reqs.length} requisitos</span></div>
+      <div class="fx"><span class="hint">${av}%</span><div class="prog"><i style="width:${av}%"></i></div></div><span class="chev">›</span></button>${quitar}</div>`;
   }).join('');
   $('v-recinto').innerHTML=`
     <div class="card">
@@ -509,11 +533,14 @@ function pintaServicio(nombre){
   const asigns=pautasDeSvc(sv.n);
   const lista=asigns.map(pid=>{
     const a=ambitoDe(pid); if(!a)return '';
-    const av=avanceDe(claveSvc(sv.n,pid));
-    return `<button class="item" onclick='ir("pauta",${JSON.stringify({tipo:"svc",svc:sv.n,amb:pid})})'>
+    const clave=claveSvc(sv.n,pid), av=avanceDe(clave);
+    const quitar=(puedoVer(sv.n)&&av===0)
+      ?`<button style="flex:none;padding:6px;color:#b91c1c" title="Quitar pauta"
+          onclick='event.stopPropagation();quitarPauta(${JSON.stringify(clave)},${JSON.stringify(sv.n)},null,${JSON.stringify(pid)})'>🗑</button>`:'';
+    return `<div style="display:flex;align-items:center"><button class="item" style="flex:1" onclick='ir("pauta",${JSON.stringify({tipo:"svc",svc:sv.n,amb:pid})})'>
       <div class="ic">📋</div>
       <div class="tt"><b>${esc(a.name.toLowerCase().replace(/^\w/,c=>c.toUpperCase()))}</b><span>${esc(a.normaNombre)} · ${a.reqs.length} requisitos</span></div>
-      <div class="fx"><span class="hint">${av}%</span><div class="prog"><i style="width:${av}%"></i></div></div><span class="chev">›</span></button>`;
+      <div class="fx"><span class="hint">${av}%</span><div class="prog"><i style="width:${av}%"></i></div></div><span class="chev">›</span></button>${quitar}</div>`;
   }).join('');
   const recs=(D.recintos[sv.piso]||[]).filter(r=>String(r[9]||'').toUpperCase()===sv.n.toUpperCase());
   $('v-servicio').innerHTML=`
@@ -548,7 +575,7 @@ function asignar(tipo,rid,svc){
     div.querySelectorAll('.item').forEach(b=>b.onclick=()=>{
       const amb=b.dataset.id;
       const clave=tipo==='svc'?claveSvc(svc,amb):claveRec(rid,amb);
-      if(!EST[clave])guardar(clave,svc,tipo==='rec'?rid:'',amb,{});
+      if(!EST[clave]||_borrada(clave))guardar(clave,svc,tipo==='rec'?rid:'',amb,{});
       div.remove(); toast('Pauta asignada');
       ir('pauta',tipo==='svc'?{tipo:'svc',svc,amb}:{tipo:'rec',rid,svc,amb,rnom:''});
     });
