@@ -627,6 +627,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <div id="toolsBody" style="display:none">
       <div class="rp-t" style="margin-top:2px">✏️ Nombres de recinto</div>
       <button class="rp-bedbtn" style="background:#eef4fa;color:#1d5fa0;border:1px solid #a9c3d6" onclick="revisarNombres()" title="Revisa la ortografía de todos los nombres de recinto y quita las tildes (la Ñ se mantiene). Muestra los cambios antes de aplicarlos.">✏️ Revisar ortografía</button>
+      <button class="rp-bedbtn" style="background:#eef4fa;color:#1d5fa0;border:1px solid #a9c3d6" onclick="revisarCodigos()" title="Busca códigos de recinto mal escritos (puntos dobles, punto final, caracteres raros) y propone la corrección solo cuando el código corregido existe de verdad en el PMA o en el catálogo de equipamiento">🔢 Revisar códigos</button>
       <div class="rp-hint">Corrige erratas detectadas y deja los nombres sin tildes. Muestra la lista de cambios y solo se aplica si lo confirmás.</div>
       <div class="rp-t" style="margin-top:2px">🛏 Numeración de puestos</div>
       <div class="rp-fld"><label>Tipo de puesto</label>
@@ -710,6 +711,19 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button onclick="closeMovesList()" style="background:#e2eaf4;border:none;color:#1a3a5c;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer">Cerrar</button>
     </div>
     <div id="mvlBody" style="overflow-y:auto;margin-top:10px"></div>
+  </div>
+</div>
+<div id="codModal" onclick="if(event.target===this)cerrarCodigos()" style="position:fixed;inset:0;background:rgba(15,30,52,.6);display:none;align-items:center;justify-content:center;z-index:145;padding:20px">
+  <div style="background:#fff;border-radius:14px;width:min(94vw,720px);max-height:84vh;display:flex;flex-direction:column;padding:18px 20px;box-shadow:0 18px 50px rgba(15,30,52,.4)">
+    <div style="display:flex;align-items:center;gap:10px">
+      <div style="flex:1;min-width:0">
+        <div style="font-size:15px;font-weight:800;color:#0f172a">🔢 Códigos de recinto mal formados</div>
+        <div style="font-size:11px;color:#64748b;margin-top:2px" id="codSub"></div>
+      </div>
+      <button id="codOk" onclick="aplicarCodigos()" style="background:#15803d;border:none;color:#fff;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:800;cursor:pointer;flex-shrink:0">Aplicar los seguros</button>
+      <button onclick="cerrarCodigos()" style="background:#e2eaf4;border:none;color:#1a3a5c;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">Cerrar</button>
+    </div>
+    <div id="codBody" style="overflow-y:auto;margin-top:12px"></div>
   </div>
 </div>
 <div id="nomModal" onclick="if(event.target===this)cerrarNombres()" style="position:fixed;inset:0;background:rgba(15,30,52,.6);display:none;align-items:center;justify-content:center;z-index:145;padding:20px">
@@ -7435,6 +7449,78 @@ function _nomCambios(){
   })));
   return out;
 }
+/* ── CÓDIGOS DE RECINTO MAL FORMADOS ────────────────────────────────────────
+   Un código con un punto de más ("12..2.13.5") o un punto final ("15.2.3.")
+   no encuentra NADA: ni equipamiento, ni pauta, ni BIM. Y no se nota, porque
+   la ficha simplemente sale vacía — así apareció el caso del ecógrafo ocular.
+
+   Regla dura: solo se propone la corrección cuando el código corregido EXISTE
+   de verdad (en el mapa PMA o en el catálogo de equipamiento). Si no se puede
+   demostrar cuál es el correcto, se muestra el problema y no se toca nada:
+   inventar un código sería peor que dejarlo roto, porque le atribuiría a ese
+   recinto el equipamiento de otro. */
+function _codSospechoso(c){
+  return /\.\.|\.$|^\.|\s\s|[^0-9A-Za-z._\-\/ ]/.test(String(c||''));
+}
+function _codExiste(c){
+  try{
+    if(typeof PMA_BIM!=='undefined' && PMA_BIM.codeToBim && PMA_BIM.codeToBim[c]) return 'PMA';
+    if(typeof RECINTO_EQUIP!=='undefined' && RECINTO_EQUIP[c]) return 'equipamiento';
+  }catch(e){}
+  return null;
+}
+// Candidatos de corrección, del más conservador al menos: colapsar puntos
+// repetidos, quitar el punto sobrante en los extremos, normalizar espacios.
+function _codCandidatos(c){
+  const s=String(c||'').trim();
+  const out=[ s.replace(/\.{2,}/g,'.'), s.replace(/\.+$/,''), s.replace(/^\.+/,''),
+              s.replace(/\s+/g,' '), s.replace(/\.{2,}/g,'.').replace(/\.+$/,'') ];
+  return [...new Set(out.filter(x=>x && x!==s))];
+}
+function _codCambios(){
+  const seguros=[], dudosos=[];
+  for(const rid in (boxState.rooms||{})){
+    const c=String((nameState.codes||{})[rid]||'').trim();
+    if(!c || !_codSospechoso(c)) continue;
+    let arreglo=null;
+    for(const cand of _codCandidatos(c)){ const d=_codExiste(cand); if(d){ arreglo={a:cand, donde:d}; break; } }
+    const fila={id:rid, de:c, n:rName(rid)||'(sin nombre)'};
+    if(arreglo) seguros.push({...fila, ...arreglo}); else dudosos.push(fila);
+  }
+  return {seguros, dudosos};
+}
+function cerrarCodigos(){ document.getElementById('codModal').style.display='none'; }
+function revisarCodigos(){
+  const {seguros,dudosos}=_codCambios();
+  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  document.getElementById('codSub').textContent = (seguros.length+dudosos.length)
+    ? seguros.length+' con corrección comprobada · '+dudosos.length+' sin equivalente conocido'
+    : 'Todos los códigos tienen formato válido.';
+  document.getElementById('codOk').style.display=seguros.length?'':'none';
+  const fila=(x,ok)=>'<div style="display:flex;align-items:center;gap:8px;padding:6px 2px;border-bottom:1px solid #eef2f7;font-size:12.5px">'
+    +'<span style="color:#b91c1c;text-decoration:line-through;font-family:ui-monospace,monospace">'+esc(x.de)+'</span>'
+    +(ok?('<span style="color:#94a3b8">→</span><b style="color:#15803d;font-family:ui-monospace,monospace">'+esc(x.a)+'</b>'
+          +'<span style="font-size:10px;color:#64748b">existe en '+x.donde+'</span>'):'')
+    +'<span style="flex:1"></span><span style="color:#64748b;font-size:11px">'+esc(x.n)+'</span></div>';
+  let H='';
+  if(seguros.length) H+='<div style="font-size:11px;font-weight:800;color:#15803d;margin:4px 0 6px">✔ Se corrigen (el código corregido existe)</div>'+seguros.map(x=>fila(x,true)).join('');
+  if(dudosos.length) H+='<div style="font-size:11px;font-weight:800;color:#b45309;margin:14px 0 6px">⚠ No se tocan: no hay un código válido equivalente</div>'
+    +dudosos.map(x=>fila(x,false)).join('')
+    +'<div style="font-size:11px;color:#64748b;margin-top:8px">Hay que definirlos con el PMA. Corregirlos a ojo le asignaría a estos recintos el equipamiento de otro.</div>';
+  document.getElementById('codBody').innerHTML = H ||
+    '<div style="padding:22px;text-align:center;color:#15803d;font-size:13px;font-weight:700">✅ Nada que corregir.</div>';
+  document.getElementById('codModal').style.display='flex';
+}
+function aplicarCodigos(){
+  const {seguros}=_codCambios(); if(!seguros.length) return;
+  seguros.forEach(x=>{ nameState.codes[x.id]=x.a; });
+  sNames(); flushAutosave(); renderSVG(); renderSidebar(); updateUI();
+  cerrarCodigos();
+  if(typeof tbInfo!=='undefined'&&tbInfo){
+    tbInfo.textContent='🔢 '+seguros.length+' código(s) corregidos — ahora encuentran su equipamiento';
+    setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },5000);
+  }
+}
 function revisarNombres(){
   const cam=_nomCambios();
   const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
@@ -9330,6 +9416,13 @@ async function runSelfTest(){
     if(!Array.isArray(l)) return false;
     return l.every(x=>LS_GRANDES[x.k] && typeof x.kb==='number'
       && (localStorage.getItem(x.k)||'').slice(0,2)!==LZ_MARCA);
+  });
+  // Lo que NO puede pasar: proponer un código que no existe. Eso le atribuiría
+  // a un recinto el equipamiento de otro, que es peor que dejarlo sin nada.
+  T('Códigos: solo se propone lo que existe de verdad', ()=>{
+    const {seguros,dudosos}=_codCambios();
+    return seguros.every(x=>_codExiste(x.a) && x.a!==x.de && !_codSospechoso(x.a))
+        && dudosos.every(x=>_codCandidatos(x.de).every(c=>!_codExiste(c)));
   });
   T('Compresión: disponible', ()=>LZ_OK===true);
   T('Compresión: ida y vuelta exacta del estado real', ()=>{

@@ -325,6 +325,101 @@ function quitarPauta(clave,svc,rid,amb){
 }
 window.quitarPauta=quitarPauta;
 
+/* ── FICHA COMPLETA del recinto (identificación + contenido editable) ──────
+   Precarga desde las matrices (D.fic por código PMA) y se guarda como clave
+   fic|<recintoId> en el mismo backend. Snapshot resuelto: lo que se ve es lo
+   que queda en el informe. */
+const CAT_LBL={em:'Equipamiento médico',mc:'Mobiliario clínico',nc:'Mobiliario no clínico',ti:'Informática (TI)'};
+function claveFic(rid){return 'fic|'+rid;}
+function fichaDe(rid,cod,svc){
+  const e=estadoDe(claveFic(rid));
+  if(e&&e.datos&&e.datos.v) return JSON.parse(JSON.stringify(e.datos));
+  // precarga desde matrices + responsables del servicio
+  const base=D.fic[cod]||{};
+  const sv=svcInfo(svc);
+  return {v:1,
+    resp:(sv?sv.resp.map(r=>r.nombre):[]),
+    dot:{}, dotL:[],
+    prest:[],
+    em:(base.em||[]).map(x=>x.slice()), mc:(base.mc||[]).map(x=>x.slice()),
+    nc:(base.nc||[]).map(x=>x.slice()), ti:(base.ti||[]).map(x=>x.slice())};
+}
+let FICHA=null, FICHA_CTX=null;   // ficha en edición y su contexto {rid,cod,svc,nom}
+function guardarFicha(){
+  if(!FICHA||!FICHA_CTX)return;
+  const {rid,svc}=FICHA_CTX;
+  const clave=claveFic(rid);
+  EST[clave]={servicio:svc,recinto:rid,pauta:'',datos:FICHA,avance:0,usuario:SES.correo,ts:new Date().toISOString()};
+  COLA=COLA.filter(c=>c.clave!==clave);
+  COLA.push({accion:'estado',clave,servicio:svc,recinto:rid,pauta:'',datos:FICHA,avance:0,usuario:SES.correo});
+  persist(); setSync('pend'); vaciarCola();
+}
+
+/* buscador multimodal: cada palabra de la consulta debe calzar en algún campo,
+   sin importar tildes, orden ni mayúsculas */
+const _plano=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+function coincide(q,campos){
+  const t=_plano(q).split(/\s+/).filter(Boolean);
+  const pajar=_plano(campos.join(' '));
+  return t.every(x=>pajar.includes(x));
+}
+function buscador(titulo,fuente,pinta1,onPick){
+  const div=document.createElement('div');
+  div.style.cssText='position:fixed;inset:0;background:rgba(10,18,35,.5);z-index:96;display:flex;align-items:flex-end;justify-content:center';
+  div.innerHTML=`<div style="background:#fff;border-radius:18px 18px 0 0;max-height:80vh;width:100%;max-width:640px;display:flex;flex-direction:column">
+    <div style="padding:14px 16px 8px"><b>${esc(titulo)}</b>
+      <input id="qBusca" placeholder="Buscar por cualquier palabra…" style="margin-top:9px"></div>
+    <div id="lBusca" style="overflow:auto;padding:0 16px 16px"></div></div>`;
+  document.body.appendChild(div);
+  div.addEventListener('click',e=>{if(e.target===div)div.remove();});
+  const lista=q=>{
+    const hits=(q?fuente.filter(it=>coincide(q,pinta1(it).campos)):fuente).slice(0,40);
+    div.querySelector('#lBusca').innerHTML=hits.map((it,i)=>{
+      const p=pinta1(it);
+      return `<button class="item" data-i="${fuente.indexOf(it)}"><div class="tt"><b style="white-space:normal">${esc(p.t)}</b><span>${esc(p.s)}</span></div><span class="chev">＋</span></button>`;
+    }).join('')||'<div class="hint" style="padding:12px 0">Sin resultados.</div>';
+    div.querySelectorAll('.item').forEach(b=>b.onclick=()=>{onPick(fuente[+b.dataset.i]);div.remove();});
+  };
+  div.querySelector('#qBusca').addEventListener('input',e=>lista(e.target.value));
+  div.querySelector('#qBusca').focus(); lista('');
+}
+
+/* acciones de la ficha (repintan la sección y guardan) */
+function ficRepinta(){ if(FICHA_CTX) pintaRecinto(FICHA_CTX.r); }
+function ficQuitarEq(cat,i){ FICHA[cat].splice(i,1); guardarFicha(); ficRepinta(); }
+function ficCant(cat,i,d){ FICHA[cat][i][1]=Math.max(1,(+FICHA[cat][i][1]||1)+d); guardarFicha(); ficRepinta(); }
+function ficAgregarEq(cat){
+  buscador('Agregar · '+CAT_LBL[cat], D.cat_eq.filter(x=>x[1]===cat).concat(D.cat_eq.filter(x=>x[1]!==cat)),
+    it=>({t:it[0],s:CAT_LBL[it[1]]+(it[2]?' · tip. '+it[2]:''),campos:[it[0],it[2],CAT_LBL[it[1]]]}),
+    it=>{ FICHA[cat].push([it[0],1,it[2]||'']); guardarFicha(); ficRepinta(); });
+}
+function ficDot(est,d){
+  FICHA.dot[est]=Math.max(0,(FICHA.dot[est]||0)+d);
+  if(!FICHA.dot[est])delete FICHA.dot[est];
+  guardarFicha(); ficRepinta();
+}
+function ficDotLibre(){
+  const t=prompt('Estamento / cargo a agregar:'); if(!t||!t.trim())return;
+  FICHA.dotL.push(t.trim()); guardarFicha(); ficRepinta();
+}
+function ficDotLibreDel(i){ FICHA.dotL.splice(i,1); guardarFicha(); ficRepinta(); }
+function ficAgregarPrest(svc){
+  const pref=D.cat_prest.filter(p=>coincide(svc,[p[1]]));
+  const resto=D.cat_prest.filter(p=>!coincide(svc,[p[1]]));
+  buscador('Agregar prestación (cartera de servicios)', pref.concat(resto),
+    p=>({t:p[0],s:(p[1]||'')+(p[2]?' · '+p[2]:''),campos:[p[0],p[1],p[2]]}),
+    p=>{ if(!FICHA.prest.some(x=>x[0]===p[0]&&x[1]===p[1])) FICHA.prest.push([p[0],p[1]]);
+         guardarFicha(); ficRepinta(); });
+}
+function ficQuitarPrest(i){ FICHA.prest.splice(i,1); guardarFicha(); ficRepinta(); }
+function ficResp(){
+  const t=prompt('Agregar responsable (nombre y cargo):'); if(!t||!t.trim())return;
+  FICHA.resp.push(t.trim()); guardarFicha(); ficRepinta();
+}
+function ficRespDel(i){ FICHA.resp.splice(i,1); guardarFicha(); ficRepinta(); }
+['ficQuitarEq','ficCant','ficAgregarEq','ficDot','ficDotLibre','ficDotLibreDel',
+ 'ficAgregarPrest','ficQuitarPrest','ficResp','ficRespDel'].forEach(f=>window[f]=eval(f));
+
 /* ── navegación ──────────────────────────────────────────────────────────── */
 let PILA=[];
 function muestra(v){
@@ -355,27 +450,38 @@ function atras(){
 /* ── INICIO ──────────────────────────────────────────────────────────────── */
 function resumenSvc(svc){
   const claves=Object.keys(EST).filter(k=>{
+    if(k.startsWith('fic|'))return false;
     const e=EST[k];return e&&!_borrada(k)&&String(e.servicio||'').toUpperCase()===svc.toUpperCase();});
   if(!claves.length)return {n:0,av:0};
   const av=Math.round(claves.reduce((a,k)=>a+EST[k].avance,0)/claves.length);
   return {n:claves.length,av};
 }
+let VISTA=null;   // supervisoras: "ver como" un servicio puntual
+function setVista(v){ VISTA=v||null; pintaInicio(); }
+window.setVista=setVista;
 function pintaInicio(){
-  $('hTit').textContent='Autorización Sanitaria';
-  $('hSub').textContent=SES.nombre+(esSup()?' · Supervisión (acceso total)':'');
-  $('misTit').textContent=esSup()?'Todos los servicios ('+D.servicios.length+')':'Mis servicios';
-  const svcs=(esSup()?D.servicios:D.servicios.filter(s=>puedoVer(s.n)))
+  $('hTit').textContent=VISTA?('Vista: '+VISTA):'Autorización Sanitaria';
+  $('hSub').textContent=VISTA?'Modo vista de servicio · lo mismo que ve su responsable'
+    :SES.nombre+(esSup()?' · Supervisión (acceso total)':'');
+  $('misTit').textContent=VISTA?('Servicio: '+VISTA):(esSup()?'Todos los servicios ('+D.servicios.length+')':'Mis servicios');
+  let svcs=(esSup()?D.servicios:D.servicios.filter(s=>puedoVer(s.n)))
     .slice().sort((a,b)=>D.pisos.indexOf(a.piso)-D.pisos.indexOf(b.piso)||a.n.localeCompare(b.n));
-  $('listaServicios').innerHTML=svcs.length?svcs.map(s=>{
+  if(VISTA) svcs=svcs.filter(s=>s.n===VISTA);
+  const selVista=esSup()?`<select onchange="setVista(this.value)" style="margin-bottom:10px">
+      <option value="">👁 Ver como servicio… (todos)</option>
+      ${D.servicios.slice().sort((a,b)=>a.n.localeCompare(b.n)).map(s=>
+        `<option ${VISTA===s.n?'selected':''}>${esc(s.n)}</option>`).join('')}
+    </select>`:'';
+  $('listaServicios').innerHTML=(esSup()?(typeof selVista!=='undefined'?selVista:''):'')+(svcs.length?svcs.map(s=>{
     const r=resumenSvc(s.n);
     return `<button class="item" onclick="ir('servicio','${esc(s.n)}')">
       <div class="ic">${esc(s.piso)}</div>
       <div class="tt"><b>${esc(s.n)}</b><span>${s.eq_total?s.eq_total+' equipos · ':''}${s.cartera?s.cartera+' prestaciones · ':''}${r.n} pauta${r.n===1?'':'s'}</span></div>
       <div class="fx"><span class="hint">${r.n?r.av+'%':''}</span><div class="prog"><i style="width:${r.av}%"></i></div></div>
       <span class="chev">›</span></button>`;
-  }).join(''):'<div class="hint">Tu correo no tiene servicios asignados.</div>';
-  const tot=Object.keys(EST).filter(k=>!k.startsWith('__')).length;
-  const done=Object.values(EST).filter(e=>e.avance===100).length;
+  }).join(''):'<div class="hint">Tu correo no tiene servicios asignados.</div>');
+  const tot=Object.keys(EST).filter(k=>!k.startsWith('__')&&!k.startsWith('fic|')&&!_borrada(k)).length;
+  const done=Object.keys(EST).filter(k=>!k.startsWith('fic|')&&!_borrada(k)&&EST[k].avance===100).length;
   const av=tot?Math.round(Object.values(EST).reduce((a,e)=>a+(e.avance||0),0)/tot):0;
   $('statsGlobal').innerHTML=
     `<div class="stat"><b>${tot}</b><span>Pautas iniciadas</span></div>
@@ -494,16 +600,22 @@ function fichaDatos(sv){
 }
 function pintaRecinto(r){
   const [id,code,name]=r, w=r[6],h=r[7],m2=r[8];
-  const svc=r[9]||r[3];      // servicio de Atlas (permisos); r[3] es el nombre del catálogo viejo
+  const svc=r[9]||r[3];
+  const piso=PISO||D.pisos.find(pz=>(D.recintos[pz]||[]).some(x=>x[0]===id))||'';
   $('hTit').textContent=(name||'Recinto')+(code?' · '+code:'');
-  $('hSub').textContent=svc+' · '+PISO;
+  $('hSub').textContent=svc+(piso?' · Piso '+piso.replace('P',''):'');
   const pautas=pautasDeRec(id);
   const sv=svcInfo(svc);
+  const base=D.fic[code]||{};
+  const editable=puedoVer(svc);
+  FICHA_CTX={rid:id,cod:code,svc,nom:name,r};
+  FICHA=fichaDe(id,code,svc);
+
   const lista=pautas.map(pid=>{
     const a=ambitoDe(pid); if(!a)return '';
     const clave=claveRec(id,pid), av=avanceDe(clave);
     const manual=!(D.asign[id]||[]).includes(pid);
-    const quitar=(puedoVer(svc)&&av===0)
+    const quitar=(editable&&av===0)
       ?`<button style="flex:none;padding:6px;color:#b91c1c" title="Quitar pauta"
           onclick='event.stopPropagation();quitarPauta(${JSON.stringify(clave)},${JSON.stringify(svc)},${JSON.stringify(id)},${JSON.stringify(pid)})'>🗑</button>`:'';
     return `<div style="display:flex;align-items:center"><button class="item" style="flex:1" onclick='ir("pauta",${JSON.stringify({tipo:"rec",rid:id,rnom:name+(code?" · "+code:""),svc:svc,amb:pid})})'>
@@ -511,17 +623,71 @@ function pintaRecinto(r){
       <div class="tt"><b>${esc(a.name.toLowerCase().replace(/^\w/,c=>c.toUpperCase()))}${manual?' <span class="pill" style="background:#e8eef8;color:#1D2D5B">manual</span>':''}</b><span>${esc(a.normaNombre)} · ${a.reqs.length} requisitos</span></div>
       <div class="fx"><span class="hint">${av}%</span><div class="prog"><i style="width:${av}%"></i></div></div><span class="chev">›</span></button>${quitar}</div>`;
   }).join('');
+
+  const ro=!editable;
+  const secEq=cat=>{
+    const items=FICHA[cat]||[];
+    const filas=items.map((x,i)=>`<div class="kv" style="align-items:center">
+      <span style="flex:1">${esc(x[0])}${x[2]?` <span class="hint">· tip. ${esc(x[2])}</span>`:''}</span>
+      ${ro?`<b>${x[1]}</b>`:`<span style="display:flex;gap:4px;align-items:center;flex:none">
+        <button onclick="ficCant('${cat}',${i},-1)" style="padding:2px 9px;border:1px solid var(--bd);border-radius:7px">−</button>
+        <b style="min-width:20px;text-align:center">${x[1]}</b>
+        <button onclick="ficCant('${cat}',${i},1)" style="padding:2px 9px;border:1px solid var(--bd);border-radius:7px">＋</button>
+        <button onclick="ficQuitarEq('${cat}',${i})" style="padding:2px 7px;color:#b91c1c">✕</button></span>`}
+    </div>`).join('');
+    return `<details ${items.length&&cat==='em'?'open':''}><summary class="hint" style="cursor:pointer;padding:7px 0;font-weight:700">${CAT_LBL[cat]} (${items.length})</summary>
+      ${filas||'<div class="hint" style="padding:4px 0">Sin ítems.</div>'}
+      ${ro?'':`<button class="btn sec" style="margin-top:7px;padding:9px" onclick="ficAgregarEq('${cat}')">＋ Agregar con buscador</button>`}
+    </details>`;
+  };
+
+  const dotChips=D.estamentos.map(e=>{
+    const n=FICHA.dot[e]||0;
+    return `<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;border:1.5px solid ${n?'var(--azul)':'var(--bd)'};border-radius:10px;${n?'background:#e8eef8;':''}">
+      <span style="flex:1;font-size:13px">${esc(e)}${n?` <b>× ${n}</b>`:''}</span>
+      ${ro?'':`<button onclick="ficDot('${esc(e)}',-1)" style="padding:1px 8px">−</button><button onclick="ficDot('${esc(e)}',1)" style="padding:1px 8px">＋</button>`}
+    </div>`;
+  }).join('');
+  const dotResumen=Object.entries(FICHA.dot).map(([e,n])=>
+    Array.from({length:n},(_,i)=>`${e} ${n>1?(i+1):''}`.trim()).join(', ')).filter(Boolean).join(', ');
+
   $('v-recinto').innerHTML=`
     <div class="card">
-      <h2>Recinto</h2>
-      <div class="kv"><span>Código</span><b>${esc(code||'—')}</b></div>
+      <h2>Identificación del recinto</h2>
+      <div class="kv"><span>Recinto</span><b>${esc(name||'—')}</b></div>
+      <div class="kv"><span>Código PMA</span><b>${esc(code||'—')}</b></div>
+      <div class="kv"><span>Código BIM</span><b>${esc(base.bim||'—')}</b></div>
+      <div class="kv"><span>Señalética</span><b>${base.sen?esc(base.sen.id+' · '+base.sen.nom):'—'}</b></div>
       <div class="kv"><span>Servicio</span><b>${esc(svc||r[3]||'—')}</b></div>
       <div class="kv"><span>Superficie</span><b>${m2||'—'} m² (${w}×${h} m)</b></div>
-      ${puedoVer(svc)?'':'<div class="hint" style="margin-top:8px">⚠ Solo lectura: este recinto no pertenece a tus servicios.</div>'}
+      ${ro?'<div class="hint" style="margin-top:8px">⚠ Solo lectura: este recinto no pertenece a tus servicios.</div>':''}
     </div>
+
     <div class="card"><h2>Pautas de cotejo</h2>
       ${lista||'<div class="hint">Este recinto aún no tiene pauta asignada.</div>'}
-      ${puedoVer(svc)?`<button class="btn sec" style="margin-top:10px" onclick='asignar("rec","${id}","${esc(svc)}")'>＋ Asignar pauta a este recinto</button>`:''}
+      ${editable?`<button class="btn sec" style="margin-top:10px" onclick='asignar("rec","${id}","${esc(svc)}")'>＋ Asignar pauta a este recinto</button>`:''}
+    </div>
+
+    <div class="card"><h2>Responsables</h2>
+      ${FICHA.resp.map((n,i)=>`<div class="kv"><span style="flex:1">${esc(n)}</span>${ro?'':`<button onclick="ficRespDel(${i})" style="color:#b91c1c;padding:2px 7px">✕</button>`}</div>`).join('')||'<div class="hint">Sin responsables.</div>'}
+      ${ro?'':'<button class="btn sec" style="margin-top:8px;padding:9px" onclick="ficResp()">＋ Agregar responsable</button>'}
+    </div>
+
+    <div class="card"><h2>Dotación del recinto (por estamento)</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${dotChips}</div>
+      ${FICHA.dotL.map((t,i)=>`<div class="kv"><span style="flex:1">${esc(t)}</span>${ro?'':`<button onclick="ficDotLibreDel(${i})" style="color:#b91c1c;padding:2px 7px">✕</button>`}</div>`).join('')}
+      ${ro?'':'<button class="btn sec" style="margin-top:8px;padding:9px" onclick="ficDotLibre()">＋ Otro estamento (texto libre)</button>'}
+      ${dotResumen?`<div class="hint" style="margin-top:7px">Asignados: ${esc(dotResumen)}</div>`:''}
+    </div>
+
+    <div class="card"><h2>Prestaciones del recinto (cartera)</h2>
+      ${FICHA.prest.map((p,i)=>`<div class="kv"><span style="flex:1">${esc(p[0])}<span class="hint"> · ${esc(p[1]||'')}</span></span>${ro?'':`<button onclick="ficQuitarPrest(${i})" style="color:#b91c1c;padding:2px 7px">✕</button>`}</div>`).join('')||'<div class="hint">Sin prestaciones asignadas.</div>'}
+      ${ro?'':`<button class="btn sec" style="margin-top:8px;padding:9px" onclick='ficAgregarPrest(${JSON.stringify(svc)})'>＋ Agregar prestación (buscador)</button>`}
+    </div>
+
+    <div class="card"><h2>Equipamiento del recinto</h2>
+      ${secEq('em')}${secEq('mc')}${secEq('nc')}${secEq('ti')}
+      <div class="hint" style="margin-top:7px">Precargado desde las matrices por código PMA (${esc(code)}). Lo que quites o sumes queda guardado y entra al informe.</div>
     </div>
     ${fichaDatos(sv)}`;
 }
@@ -671,6 +837,14 @@ async function recortePlano(){
 }
 async function construirInforme(){
   const a=ambitoDe(PA.amb), clave=ctxClave(), est=estadoDe(clave)||{datos:{}};
+  // ficha del recinto (identificación + contenido) para el informe
+  let _fi=null,_fb={},_cod='';
+  if(PA.tipo==='rec'){
+    for(const pz of D.pisos){const rr=(D.recintos[pz]||[]).find(x=>x[0]===PA.rid);if(rr){_cod=rr[1];break;}}
+    _fb=D.fic[_cod]||{};
+    const ef=estadoDe('fic|'+PA.rid);
+    _fi=(ef&&ef.datos&&ef.datos.v)?ef.datos:fichaDe(PA.rid,_cod,PA.svc);
+  }
   const datos=est.datos||{};
   const nC=Object.values(datos).filter(v=>v==='C').length;
   const nNC=Object.values(datos).filter(v=>v==='NC').length;
@@ -717,7 +891,9 @@ async function construirInforme(){
   <div class="folio"><b style="display:block;font-size:11px;color:#1D2D5B">AS-${esc((PA.tipo==='svc'?PA.svc:PA.rid).replace(/[^A-Za-z0-9]+/g,'').slice(0,14).toUpperCase())}</b>${hoy}</div></header>
   <h2>1 · Identificación</h2>
   <div class="kv"><b>${PA.tipo==='svc'?'Servicio':'Recinto'}</b>${esc(PA.tipo==='svc'?PA.svc:(PA.rnom||PA.rid))}</div>
-  ${PA.tipo==='rec'?`<div class="kv"><b>Servicio</b>${esc(PA.svc)}</div>`:''}
+  ${PA.tipo==='rec'?`<div class="kv"><b>Servicio</b>${esc(PA.svc)}</div>
+  ${_fi?`<div class="kv"><b>Código BIM</b>${esc(_fb.bim||'—')}</div>
+  <div class="kv"><b>Señalética</b>${_fb.sen?esc(_fb.sen.id+' · '+_fb.sen.nom):'—'}</div>`:''}`:''}
   <div class="kv"><b>Pauta</b>${esc(a.normaNombre)} — ${esc(a.name)}</div>
   <div class="kv"><b>Evaluador(a)</b>${esc(SES.nombre)} · ${esc(SES.correo)} · ${hoy}</div>
   ${plano?`<h2>2 · Ubicación en planta</h2><div class="plano"><img src="${plano}"></div>`:''}
@@ -731,7 +907,19 @@ async function construirInforme(){
   <div class="kv"><b>Equipamiento</b>${sv.eq_total} unidades (matriz EMMC, corte 07-07-2026)</div>
   <div class="kv"><b>Dotación</b>${Object.values(sv.dot).reduce((x,y)=>x+y,0)} funcionarios (${Object.entries(sv.dot).map(([k,v])=>k+' '+v).join(' · ')})</div>
   <div class="kv"><b>Cartera</b>${sv.cartera} prestaciones vigentes</div>`:''}
-  <div class="firmas"><div>Responsable del Servicio</div><div>Referente Autorización Sanitaria<br><b>C. Sepúlveda · M. Canales</b></div></div>
+  ${_fi?`
+  <h2>Ficha del recinto</h2>
+  ${_fi.resp.length?`<div class="kv"><b>Responsables</b>${esc(_fi.resp.join(' · '))}</div>`:''}
+  ${(Object.keys(_fi.dot).length||_fi.dotL.length)?`<div class="kv"><b>Dotación asignada</b>${esc(
+      Object.entries(_fi.dot).map(([e,n])=>Array.from({length:n},(_,i)=>e+(n>1?' '+(i+1):'')).join(', '))
+        .concat(_fi.dotL).filter(Boolean).join(', '))}</div>`:''}
+  ${_fi.prest.length?`<div style="margin:6px 0"><b style="font-size:10.5px;color:#5b6b85">PRESTACIONES (${_fi.prest.length})</b>
+    <table><tbody>${_fi.prest.map(x=>`<tr><td>${esc(x[0])}</td><td style="color:#5b6b85">${esc(x[1]||'')}</td></tr>`).join('')}</tbody></table></div>`:''}
+  ${['em','mc','nc','ti'].filter(c=>(_fi[c]||[]).length).map(c=>`
+    <div style="margin:6px 0"><b style="font-size:10.5px;color:#5b6b85">${{em:'EQUIPAMIENTO MÉDICO',mc:'MOBILIARIO CLÍNICO',nc:'MOBILIARIO NO CLÍNICO',ti:'INFORMÁTICA (TI)'}[c]} (${_fi[c].length})</b>
+    <table><tbody>${_fi[c].map(x=>`<tr><td>${esc(x[0])}${x[2]?` <span style="color:#8593a9">· tip. ${esc(x[2])}</span>`:''}</td><td style="text-align:right;font-weight:700;width:40px">${x[1]}</td></tr>`).join('')}</tbody></table></div>`).join('')}
+  `:''}
+  <div class="firmas"><div>Responsable del Servicio${_fi&&_fi.resp.length?`<br><b>${esc(_fi.resp[0])}</b>`:''}</div><div>Referente Autorización Sanitaria<br><b>C. Sepúlveda · M. Canales</b></div></div>
   </body></html>`;
   return doc.replace('<button class="np" onclick="print()">🖨 Imprimir / PDF</button>','');
 }
