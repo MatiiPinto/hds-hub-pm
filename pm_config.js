@@ -72,7 +72,9 @@ window.PM_CONFIG = {
     'irojas':     '01abb8cc8c03fa388bfa0ae87768275cf2edfe49fb9a219823288cd2cbd7d339',
     // Francisca Cid Cabrera · Jefa de Proyecto NHDS — Servicio de Salud
     // Metropolitano Oriente (contraparte SSMO, externa al HDS)
-    'fcid':       '1340e5ed85a653630ad8c28347e40a92759d5d4108762eaa7dbb5eddc2858dce'
+    'fcid':       '1340e5ed85a653630ad8c28347e40a92759d5d4108762eaa7dbb5eddc2858dce',
+    // Karen González · Ingeniera Biomédica del proyecto — SSMO (externa al HDS)
+    'kgonzalez':  'd51f341099fadc6a8b4f83e85c147da279f2f56d267bb5593520299d1a2053e1'
   }
 };
 
