@@ -69,7 +69,10 @@ window.PM_CONFIG = {
     // funcionarios a recintos y corregir nombres de recinto)
     'crivera':    '76f87477cabc82337fed39924accb34d3934d33525e497ba3103ebd6ab3c573a',
     // Isabel Rojas Correa · Jefa de la Unidad de Capacitación
-    'irojas':     '01abb8cc8c03fa388bfa0ae87768275cf2edfe49fb9a219823288cd2cbd7d339'
+    'irojas':     '01abb8cc8c03fa388bfa0ae87768275cf2edfe49fb9a219823288cd2cbd7d339',
+    // Francisca Cid Cabrera · Jefa de Proyecto NHDS — Servicio de Salud
+    // Metropolitano Oriente (contraparte SSMO, externa al HDS)
+    'fcid':       '1340e5ed85a653630ad8c28347e40a92759d5d4108762eaa7dbb5eddc2858dce'
   }
 };
 
