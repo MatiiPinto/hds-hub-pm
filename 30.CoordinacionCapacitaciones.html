@@ -59,6 +59,8 @@ td.edit input:focus,td.edit textarea:focus{border-color:var(--azul);background:#
 .e-por_entregar{background:#fef3c7;color:#b45309}
 .e-reprogramada{background:#fee2e2;color:#dc2626}
 .e-inst_uso{background:#e0f2fe;color:#0369a1}
+.e-programado{background:#fef9c3;color:#a16207}
+.e-sin_info{background:#eef2f6;color:#64748b}
 .e-no_aplica{background:#ffffff;color:#64748b;border:1px solid #cbd5e1}
 .e-pendiente{background:#eef2f6;color:#64748b}
 .e-en_progreso{background:#ecfccb;color:#4d7c0f}
@@ -68,12 +70,14 @@ tr.row-por_coordinar{background:#f8fafc}
 tr.row-por_entregar{background:#fffdf5}
 tr.row-reprogramada{background:#fff5f5}
 tr.row-inst_uso{background:#f0f9ff}
+tr.row-programado{background:#fffdf2}
+tr.row-sin_info{background:#ffffff}
 tr.row-no_aplica{background:#ffffff}
 tr.row-pendiente{background:#f8fafc}
 tr.row-en_progreso{background:#f7fee7}
 .estbar{width:5px;padding:0!important}
 .eb-ejecutada,.eb-entregado{background:#16a34a}.eb-coordinada{background:#eab308}
-.eb-en_progreso{background:#84cc16}.eb-por_coordinar{background:#94a3b8}.eb-por_entregar{background:#f59e0b}.eb-reprogramada{background:#ef4444}.eb-no_aplica{background:#e2e8f0}.eb-pendiente{background:#94a3b8}.eb-inst_uso{background:#38bdf8}
+.eb-en_progreso{background:#84cc16}.eb-por_coordinar{background:#94a3b8}.eb-por_entregar{background:#f59e0b}.eb-reprogramada{background:#ef4444}.eb-no_aplica{background:#e2e8f0}.eb-pendiente{background:#94a3b8}.eb-inst_uso{background:#38bdf8}.eb-programado{background:#eab308}.eb-sin_info{background:#cbd5e1}
 .muted{color:var(--tx2)}
 .slotcell{min-width:245px}
 .slots{display:flex;flex-direction:column;gap:4px}
@@ -215,15 +219,19 @@ var ST_CAP = [
   {k:"coordinada",lbl:"Coordinada"},{k:"pendiente",lbl:"CSSO"},{k:"reprogramada",lbl:"Reprogramada"},
   {k:"ejecutada",lbl:"Ejecutada"},{k:"en_progreso",lbl:"Ejecución parcial"},{k:"inst_uso",lbl:"Inst de Uso"}
 ];
+var ST_QX = [
+  {k:"programado",lbl:"Programado"},{k:"ejecutada",lbl:"Ejecutado"},
+  {k:"inst_uso",lbl:"Inst de Uso"},{k:"sin_info",lbl:"Sin info"}
+];
 var ESTADOS = {
   capacitaciones: ST_CAP,
-  instrumental:   ST5,
+  instrumental:   ST_QX,
   instructivos:   [{k:"entregado",lbl:"Entregado"},{k:"por_entregar",lbl:"Por entregar"}]
 };
-var DEFAULT_EST={capacitaciones:"pendiente",instrumental:"por_coordinar",instructivos:"por_entregar"};
+var DEFAULT_EST={capacitaciones:"pendiente",instrumental:"sin_info",instructivos:"por_entregar"};
 var DONE={capacitaciones:"ejecutada",instrumental:"ejecutada",instructivos:"entregado"};
 var DONE_WORD={capacitaciones:"ejecutadas",instrumental:"ejecutadas",instructivos:"entregados"};
-var EST_HEX={ejecutada:"#16a34a",en_progreso:"#84cc16",coordinada:"#eab308",por_coordinar:"#94a3b8",reprogramada:"#ef4444",no_aplica:"#cbd5e1",pendiente:"#94a3b8",inst_uso:"#38bdf8",
+var EST_HEX={ejecutada:"#16a34a",en_progreso:"#84cc16",coordinada:"#eab308",programado:"#eab308",por_coordinar:"#94a3b8",reprogramada:"#ef4444",no_aplica:"#cbd5e1",pendiente:"#94a3b8",sin_info:"#94a3b8",inst_uso:"#38bdf8",
              entregado:"#16a34a",por_entregar:"#f59e0b"};
 var EST_LBL={};Object.keys(ESTADOS).forEach(function(a){ESTADOS[a].forEach(function(e){EST_LBL[e.k]=e.lbl;});});
 function validKeys(area){return ESTADOS[area].map(function(e){return e.k;});}
@@ -271,6 +279,9 @@ var overrides = load();
     Object.keys(overrides).forEach(function(id){
       if(id.indexOf("cap-")!==0&&id.indexOf("ins-")!==0&&id.indexOf("instr-")!==0) return;
       var o=overrides[id]||{};
+      // instrumental: Programado / Inst de Uso son estados que la hoja 6 no
+      // puede expresar (solo verde=ejecutado) → sobreviven a los imports
+      if(id.indexOf("instr-")===0 && (o.estado==="programado"||o.estado==="inst_uso")) return;
       if(!o._ts || o._ts<=excelTs) delete overrides[id];   // viejo → el Excel manda
     });
     localStorage.setItem(STORE_KEY, JSON.stringify(overrides));
