@@ -384,14 +384,65 @@ function buscador(titulo,fuente,pinta1,onPick){
   div.querySelector('#qBusca').focus(); lista('');
 }
 
+/* ── control contra lo LICITADO por la CSSO ─────────────────────────────────
+   Total asignado de una tipología = distribución oficial de las matrices
+   MENOS la precarga de los códigos que ya tienen ficha editada MÁS lo que
+   dicen esas fichas. Si al sumar se supera el techo licitado, la app alerta
+   con el detalle de dónde está asignado (no bloquea: deja constancia). */
+function asignadoDe(tip,nombre){
+  const k=tip||String(nombre||'').toLowerCase();
+  const ref=D.tot_eq[k]; if(!ref)return null;
+  let total=ref.tot;
+  const codesEditados={};
+  Object.keys(EST).forEach(kk=>{
+    if(!kk.startsWith('fic|'))return;
+    const e=EST[kk]; if(!e||!e.datos||!e.datos.v)return;
+    const rid=kk.slice(4);
+    let cod=null;
+    for(const pz of D.pisos){const r=(D.recintos[pz]||[]).find(x=>x[0]===rid);if(r){cod=r[1];break;}}
+    if(!cod)return;
+    // la primera ficha editada de un código reemplaza su precarga; las
+    // siguientes del mismo código SUMAN (dos salas reclamando lo mismo)
+    if(!codesEditados[cod]){
+      codesEditados[cod]=1;
+      const pre=D.fic[cod]||{};
+      ['em','mc','nc','ti'].forEach(c=>(pre[c]||[]).forEach(x=>{
+        if((x[2]||x[0].toLowerCase())===k) total-=x[1];
+      }));
+    }
+    ['em','mc','nc','ti'].forEach(c=>(e.datos[c]||[]).forEach(x=>{
+      if((x[2]||x[0].toLowerCase())===k) total+=x[1];
+    }));
+  });
+  return {asignado:total, licitado:ref.tot, ref};
+}
+function alertaStock(tip,nombre){
+  const u=asignadoDe(tip,nombre); if(!u)return;
+  if(u.asignado>u.licitado){
+    const donde=u.ref.recs.map(r=>r[0]+' ×'+r[1]).join(' · ');
+    alert('⚠ SOBRE LO LICITADO\n\n'+(u.ref.n||nombre)+': con este cambio quedan '
+      +u.asignado+' asignados y la CSSO licitó '+u.licitado+'.\n\nDistribución oficial: '+donde
+      +(u.ref.recs.length<12?'':' …')+'\n\nEl cambio queda guardado igual — revisar con las referentes AS.');
+  }
+}
+
 /* acciones de la ficha (repintan la sección y guardan) */
 function ficRepinta(){ if(FICHA_CTX) pintaRecinto(FICHA_CTX.r); }
 function ficQuitarEq(cat,i){ FICHA[cat].splice(i,1); guardarFicha(); ficRepinta(); }
-function ficCant(cat,i,d){ FICHA[cat][i][1]=Math.max(1,(+FICHA[cat][i][1]||1)+d); guardarFicha(); ficRepinta(); }
+function ficCant(cat,i,d){
+  const it=FICHA[cat][i];
+  it[1]=Math.max(1,(+it[1]||1)+d);
+  guardarFicha();
+  if(d>0)alertaStock(it[2],it[0]);
+  ficRepinta();
+}
 function ficAgregarEq(cat){
   buscador('Agregar · '+CAT_LBL[cat], D.cat_eq.filter(x=>x[1]===cat).concat(D.cat_eq.filter(x=>x[1]!==cat)),
-    it=>({t:it[0],s:CAT_LBL[it[1]]+(it[2]?' · tip. '+it[2]:''),campos:[it[0],it[2],CAT_LBL[it[1]]]}),
-    it=>{ FICHA[cat].push([it[0],1,it[2]||'']); guardarFicha(); ficRepinta(); });
+    it=>{const u=asignadoDe(it[2],it[0]);
+      return {t:it[0],s:CAT_LBL[it[1]]+(it[2]?' · tip. '+it[2]:'')
+        +(u?` · ${u.asignado} de ${u.licitado} licitados${u.asignado>=u.licitado?' ⚠':''}`:''),
+        campos:[it[0],it[2],CAT_LBL[it[1]]]};},
+    it=>{ FICHA[cat].push([it[0],1,it[2]||'']); guardarFicha(); alertaStock(it[2],it[0]); ficRepinta(); });
 }
 function ficDot(est,d){
   FICHA.dot[est]=Math.max(0,(FICHA.dot[est]||0)+d);

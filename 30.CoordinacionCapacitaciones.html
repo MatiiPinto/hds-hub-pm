@@ -57,19 +57,23 @@ td.edit input:focus,td.edit textarea:focus{border-color:var(--azul);background:#
 .e-coordinada{background:#fef9c3;color:#a16207}
 .e-por_coordinar{background:#eef2f6;color:#64748b}
 .e-por_entregar{background:#fef3c7;color:#b45309}
-.e-reprogramada{background:#dbeafe;color:#2563eb}
+.e-reprogramada{background:#fee2e2;color:#dc2626}
+.e-inst_uso{background:#e0f2fe;color:#0369a1}
 .e-no_aplica{background:#ffffff;color:#64748b;border:1px solid #cbd5e1}
-.e-pendiente{background:#fee2e2;color:#dc2626}
+.e-pendiente{background:#eef2f6;color:#64748b}
+.e-en_progreso{background:#ecfccb;color:#4d7c0f}
 tr.row-ejecutada,tr.row-entregado{background:#f3fcf6}
 tr.row-coordinada{background:#fffdf2}
 tr.row-por_coordinar{background:#f8fafc}
 tr.row-por_entregar{background:#fffdf5}
-tr.row-reprogramada{background:#f4f8ff}
+tr.row-reprogramada{background:#fff5f5}
+tr.row-inst_uso{background:#f0f9ff}
 tr.row-no_aplica{background:#ffffff}
-tr.row-pendiente{background:#fff5f5}
+tr.row-pendiente{background:#f8fafc}
+tr.row-en_progreso{background:#f7fee7}
 .estbar{width:5px;padding:0!important}
 .eb-ejecutada,.eb-entregado{background:#16a34a}.eb-coordinada{background:#eab308}
-.eb-por_coordinar{background:#94a3b8}.eb-por_entregar{background:#f59e0b}.eb-reprogramada{background:#3b82f6}.eb-no_aplica{background:#e2e8f0}.eb-pendiente{background:#ef4444}
+.eb-en_progreso{background:#84cc16}.eb-por_coordinar{background:#94a3b8}.eb-por_entregar{background:#f59e0b}.eb-reprogramada{background:#ef4444}.eb-no_aplica{background:#e2e8f0}.eb-pendiente{background:#94a3b8}.eb-inst_uso{background:#38bdf8}
 .muted{color:var(--tx2)}
 .slotcell{min-width:245px}
 .slots{display:flex;flex-direction:column;gap:4px}
@@ -142,6 +146,22 @@ th.sortable{cursor:pointer;user-select:none}th.sortable:hover{background:#0a558f
 .eqnew{font-size:11px;font-weight:700;color:#92400e;white-space:nowrap}
 .eqedit{display:inline-flex;gap:4px;align-items:center;flex-wrap:wrap}
 .segtb col.c-eq2{width:46%}
+/* ── Carta Gantt ── */
+.gtt{border-collapse:collapse;font-size:11px;white-space:nowrap}
+.gtt th,.gtt td{border:1px solid #eef2f6;padding:2px 6px}
+.gtt thead th{background:var(--azul);color:#fff;position:sticky;top:0;z-index:6;font-weight:600}
+.gtt th.gd,.gtt td.gd{padding:1px;text-align:center;min-width:20px;max-width:24px}
+.gtt th.gd span{display:block;font-size:8.5px;opacity:.75}
+.gtt th.gfd{background:#64748b}
+.gtt td.gfd{background:#f1f5f9}
+.gtt .gfix{position:sticky;background:#fff;z-index:5}
+.gtt thead .gfix{z-index:7;background:var(--azul)}
+.gtt .g1{left:0;min-width:52px}.gtt .g2{left:52px;min-width:210px;max-width:230px;overflow:hidden;text-overflow:ellipsis}
+.gtt .g3{left:262px;min-width:150px;max-width:170px;overflow:hidden;text-overflow:ellipsis}.gtt .g4{left:412px;min-width:96px}
+.gtt tbody tr:hover td{background:#f8fafc}
+.gtt tbody tr:hover td.gfd{background:#eef2f6}
+.gbar{display:block;height:14px;border-radius:4px;margin:1px 0}
+.gsin{text-align:left!important;color:#dc2626;font-size:10.5px;background:#fff5f5;max-width:none!important}
 </style>
 </head>
 <body>
@@ -152,6 +172,7 @@ th.sortable{cursor:pointer;user-select:none}th.sortable:hover{background:#0a558f
     <div class="htools">
       <span id="capUpdInfo" style="font-size:11px;color:#94a3b8;text-align:right;line-height:1.35"></span>
       <button class="btn" id="btnCapUpd" onclick="actualizarDesdeExcel()" title="Vuelve a leer la hoja '4. Prog Capacitacion HDS' del Excel de Seguimiento y Control (Drive sincronizado) y regenera la reportería. Requiere el servidor local: python3 _DEV/deploy_server.py (o usá Actualizar-Capacitaciones.command).">⟳ Actualizar desde Excel</button>
+      <button class="btn" onclick="gAbrir()" title="Vista cronológica del programa con los colores de estado; exportable a Excel para el Servicio de Salud.">📊 Carta Gantt</button>
       <button class="btn" id="btnSeg" onclick="segAbrir()" title="Jornadas propuestas a la CSSO (89 correos enviados el 20-08-2026): fechas cargadas y registro de ejecución.">🎓 Jornadas CSSO<span class="segbadge" id="segBadge" style="display:none">0</span></button>
       <button class="btn" onclick="exportCSV()">⬇ Exportar CSV</button>
       <button class="btn" onclick="resetEstados()">↺ Reiniciar estados</button>
@@ -191,18 +212,18 @@ var ST5 = [
   {k:"por_coordinar",lbl:"En Coordinación"},{k:"reprogramada",lbl:"Reprogramada"},{k:"no_aplica",lbl:"No aplica"}
 ];
 var ST_CAP = [
-  {k:"ejecutada",lbl:"Ejecutada"},{k:"coordinada",lbl:"Coordinada"},
-  {k:"por_coordinar",lbl:"En Coordinación"},{k:"pendiente",lbl:"En CSSO"},{k:"reprogramada",lbl:"Reprogramada"},{k:"no_aplica",lbl:"No aplica"}
+  {k:"coordinada",lbl:"Coordinada"},{k:"pendiente",lbl:"CSSO"},{k:"reprogramada",lbl:"Reprogramada"},
+  {k:"ejecutada",lbl:"Ejecutada"},{k:"en_progreso",lbl:"Ejecución parcial"},{k:"inst_uso",lbl:"Inst de Uso"}
 ];
 var ESTADOS = {
   capacitaciones: ST_CAP,
   instrumental:   ST5,
   instructivos:   [{k:"entregado",lbl:"Entregado"},{k:"por_entregar",lbl:"Por entregar"}]
 };
-var DEFAULT_EST={capacitaciones:"por_coordinar",instrumental:"por_coordinar",instructivos:"por_entregar"};
+var DEFAULT_EST={capacitaciones:"pendiente",instrumental:"por_coordinar",instructivos:"por_entregar"};
 var DONE={capacitaciones:"ejecutada",instrumental:"ejecutada",instructivos:"entregado"};
 var DONE_WORD={capacitaciones:"ejecutadas",instrumental:"ejecutadas",instructivos:"entregados"};
-var EST_HEX={ejecutada:"#16a34a",coordinada:"#eab308",por_coordinar:"#94a3b8",reprogramada:"#3b82f6",no_aplica:"#cbd5e1",pendiente:"#ef4444",
+var EST_HEX={ejecutada:"#16a34a",en_progreso:"#84cc16",coordinada:"#eab308",por_coordinar:"#94a3b8",reprogramada:"#ef4444",no_aplica:"#cbd5e1",pendiente:"#94a3b8",inst_uso:"#38bdf8",
              entregado:"#16a34a",por_entregar:"#f59e0b"};
 var EST_LBL={};Object.keys(ESTADOS).forEach(function(a){ESTADOS[a].forEach(function(e){EST_LBL[e.k]=e.lbl;});});
 function validKeys(area){return ESTADOS[area].map(function(e){return e.k;});}
@@ -300,8 +321,13 @@ function counts(area){
 // % SIEMPRE sobre el TOTAL del área (criterio Matías jul-2026): los "No
 // aplica" de capacitaciones significan "aún no se puede avanzar" — esas
 // capacitaciones SÍ se harán, así que cuentan en el universo (77/250).
+// Ejecucion parcial (tipologia capacitada en PARTE de sus servicios) pesa 0,5
+function doneArea(area,c){
+  return (c[DONE[area]]||0) + (area==="capacitaciones" ? (c.en_progreso||0)*0.5 : 0);
+}
+function fmtN(x){ return (Math.round(x*10)/10).toString().replace(".",","); }
 function pctArea(area,c){
-  return c.total>0?Math.round((c[DONE[area]]||0)/c.total*100):0;
+  return c.total>0?Math.round(doneArea(area,c)/c.total*100):0;
 }
 function barArea(area,c){
   var t=c.total||1,h='<div class="bar">';
@@ -321,18 +347,18 @@ function cajasCounts(){
 function comboStats(areas){
   // mismo criterio que pctArea: completados sobre el TOTAL (sin excluir No aplica)
   var done=0,total=0;
-  areas.forEach(function(a){var c=counts(a); done+=c[DONE[a]]||0; total+=c.total;});
+  areas.forEach(function(a){var c=counts(a); done+=doneArea(a,c); total+=c.total;});
   return {done:done,total:total,base:total,pct:total>0?Math.round(done/total*100):0};
 }
 function writeSummary(){
   var areas=["capacitaciones","instructivos","instrumental"];
   var gd=0,gt=0;
-  areas.forEach(function(a){ var c=counts(a); gd+=(c[DONE[a]]||0); gt+=c.total; });
+  areas.forEach(function(a){ var c=counts(a); gd+=doneArea(a,c); gt+=c.total; });
   var gpct= gt>0?Math.round(gd/gt*100):0;
   var cc=counts("capacitaciones");
   var sum={ts:Date.now(),
     global:{done:gd,total:gt,pct:gpct},
-    capacitaciones:{done:(cc[DONE.capacitaciones]||0),total:cc.total,pct:pctArea("capacitaciones",cc)}};
+    capacitaciones:{done:doneArea("capacitaciones",cc),total:cc.total,pct:pctArea("capacitaciones",cc)}};
   try{ localStorage.setItem("hds_coordcap_summary", JSON.stringify(sum)); }catch(e){}
 }
 function barDone(p){ return '<div class="bar"><i style="width:'+p.toFixed(2)+'%;background:var(--e-ejec)"></i></div>'; }
@@ -348,13 +374,16 @@ function renderDash(){
          '<div class="sub">'+(c[DONE.instrumental]||0)+' de '+c.total+' tipologías · '+(cw[DONE.instrumental]||0)+'/'+cw.total+' cajas</div>'+barArea("instrumental",c)+'</div>';
       return;
     }
+    var subx=(c[DONE[a[0]]]||0)+' '+DONE_WORD[a[0]]+
+       (a[0]==="capacitaciones"&&c.en_progreso?(' + '+c.en_progreso+' parcial'+(c.en_progreso>1?'es':'')+' (×0,5)'):'')+
+       ' de '+c.total;
     h+='<div class="kpi"><h3>'+a[1]+'</h3><div class="big">'+pctArea(a[0],c)+'%</div>'+
-       '<div class="sub">'+(c[DONE[a[0]]]||0)+' '+DONE_WORD[a[0]]+' de '+c.total+'</div>'+barArea(a[0],c)+'</div>';
+       '<div class="sub">'+subx+'</div>'+barArea(a[0],c)+'</div>';
   });
   // los GLOBALES (tarjetas azules) van primero; después el detalle por área
   var c1=comboStats(["capacitaciones","instructivos"]);
   var c2=comboStats(["capacitaciones","instructivos","instrumental"]);
-  var subCombo=function(c){ return c.done+' completadas de '+c.total; };
+  var subCombo=function(c){ return fmtN(c.done)+' completadas de '+c.total; };
   var combos=
     '<div class="kpi combo"><h3>Combinado · las 3 áreas (+ Instrumental)</h3><div class="big">'+c2.pct+'%</div>'+
     '<div class="sub">'+subCombo(c2)+'</div>'+barDone(c2.pct)+'</div>'+
@@ -401,9 +430,18 @@ function filtered(){
     return true;
   });
 }
+var ORDEN_CAP={coordinada:0,reprogramada:1,pendiente:2,en_progreso:3,ejecutada:4,inst_uso:5};
 function renderTable(){
   var cols=COLS[active];
   var rows=filtered();
+  if(!sortBy.key && active==="capacitaciones"){
+    // vista por defecto: 1.Coordinadas arriba, luego 3.Reprogramadas, el resto despues
+    rows=rows.slice().sort(function(a,b){
+      var ka=estadoOf(active,a), kb=estadoOf(active,b);
+      var d=(ka in ORDEN_CAP?ORDEN_CAP[ka]:9)-(kb in ORDEN_CAP?ORDEN_CAP[kb]:9);
+      return d || String(valOf(a,"fecha")||"9999").localeCompare(String(valOf(b,"fecha")||"9999"));
+    });
+  }
   if(sortBy.key){
     rows=rows.slice().sort(function(a,b){
       var va=sortBy.key==='_estado'?lblOf(active,estadoOf(active,a)):valOf(a,sortBy.key);
@@ -598,7 +636,8 @@ function slotsDe(js,cod){ var v={}, o=[]; js.forEach(function(j){ var k=fEfE(j,c
   var n=0;
   Object.keys(JXROW).forEach(function(id){
     var r=IDX[id], est=estadoOf("capacitaciones", r);
-    if(est==="ejecutada" || est==="coordinada") return;
+    if(est==="ejecutada" || est==="coordinada" || r._estado==="reprogramada"
+       || r._estado==="coordinada" || r._estado==="ejecutada") return;
     var o=ov(id), cod=String(r.codigo).trim();
     o.slots  = slotsDe(JXROW[id], cod);
     o.estado = "pendiente";
@@ -606,20 +645,34 @@ function slotsDe(js,cod){ var v={}, o=[]; js.forEach(function(j){ var k=fEfE(j,c
     if(SEG.lugar) o.fields.lugar = SEG.lugar;
     n++;
   });
+  // limpieza: una tipologia que SALIO del programa (p.ej. quedo para
+  // reprogramacion) no debe conservar las fechas sembradas en una version
+  // anterior — vuelve a lo que diga la hoja oficial (cap_data).
+  D.capacitaciones.forEach(function(r){
+    if(JXROW[r.id]) return;
+    var o=overrides[r.id];
+    if(o && o.slots){ o.slots = (r._slots||[]).map(function(s0){return {f:s0.f,h:s0.h};});
+      if(o.estado==="pendiente") delete o.estado; }
+  });
   S.seed = SEG.version; ssave(); save();
   if(n && window.renderDash){ renderDash(); renderTable(); }
   if(window.console) console.log("[seguimiento CSSO] fechas cargadas en "+n+" tipologias ("+
     SEG.jornadas.length+" jornadas, "+SEG.jornadas.reduce(function(a,j){return a+j.equipos.length;},0)+" pares servicio-jornada)");
 })();
 
-if(MIGRADO) setTimeout(function(){ recalcula(); }, 0);
+if(MIGRADO || Object.keys(S.eq).length) setTimeout(function(){ recalcula(); }, 0);
 
 // ── 2. estados derivados y cola ───────────────────────────────────────────
 // jornada pendiente de registro: algun equipo con fecha vencida y sin si/no
+// filas que la hoja ya cerro (reprogramada/ejecutada/inst_uso) no se preguntan
+function cerradaHoja(cod){
+  var r=BYCOD[cod]; if(!r) return true;
+  var e=r._estado; return e==="reprogramada"||e==="ejecutada"||e==="inst_uso";
+}
 function pendientes(){
   return SEG.jornadas.filter(function(j){
     return j.equipos.some(function(e){
-      var c=eqC(j,e.cod); return c!=="si" && c!=="no" && vencidaPar(j,e.cod);
+      var c=eqC(j,e.cod); return c!=="si" && c!=="no" && !cerradaHoja(e.cod) && vencidaPar(j,e.cod);
     });
   });
 }
@@ -661,7 +714,7 @@ function pinta(){ if(vista==="pend" && cola.length) pintaPregunta(); else pintaL
 function pintaPregunta(){
   var j=cola[iq];
   if(!j){ vista="todas"; pintaLista(); return; }
-  var pend=j.equipos.filter(function(e){ var c=eqC(j,e.cod); return c!=="si"&&c!=="no"&&vencidaPar(j,e.cod); });
+  var pend=j.equipos.filter(function(e){ var c=eqC(j,e.cod); return c!=="si"&&c!=="no"&&!cerradaHoja(e.cod)&&vencidaPar(j,e.cod); });
   tit.textContent="¿Se realizó esta capacitación?";
   sub.textContent="Jornada "+(iq+1)+" de "+cola.length+" por confirmar · el registro es por equipo";
   var h='<div class="segq">'+esc2(j.servicio)+'</div>'+
@@ -702,22 +755,50 @@ window.segResp=segResp;
 
 // ── 4. proyeccion al avance global (por tipologia, sobre TODOS sus pares) ─
 function recalcula(){
+  var HOY=hoy();
   Object.keys(JXROW).forEach(function(id){
     var js=JXROW[id], cod=String(IDX[id].codigo).trim();
-    var st=js.map(function(j){ return eqC(j,cod); });
+    var est0=estadoOf("capacitaciones", IDX[id]);
+    var real=js.map(function(j){ return eqC(j,cod); });
+    // el Excel manda: una tipologia Ejecutada o Coordinada EN LA HOJA no se
+    // toca salvo registro EXPLICITO en la plataforma (la implicita "dia
+    // vencido" no aplica: la hoja ya reprogramo/cerro esa tipologia)
+    var sinExplicito = !real.some(function(c){return c==="si"||c==="no";});
+    var estHoja = IDX[id]._estado;
+    if(sinExplicito && (est0==="ejecutada" || estHoja==="coordinada" || estHoja==="reprogramada" || estHoja==="ejecutada")){
+      var oo=overrides[id];
+      if(oo && oo.estado && oo.estado!==estHoja && est0!=="ejecutada"){ delete oo.estado; }  // vuelve a lo de la hoja
+      // una reprogramada queda SIN fecha hasta nueva propuesta oficial
+      if(estHoja==="reprogramada" && oo && oo.slots){ delete oo.slots; }
+      return;
+    }
+    // a DIA VENCIDO (fecha efectiva < hoy) un par sin registro cuenta como
+    // NO ejecutado -> la tipologia queda reprogramada automaticamente (26-08)
+    var st=real.map(function(c,i){
+      if(!c && fEfE(js[i],cod) < HOY) return "no";
+      return c;
+    });
     var exec=st.filter(function(c){return c==="si"||c==="no";});
-    var o, est0=estadoOf("capacitaciones", IDX[id]);
+    var o;
     if(exec.length){
       o=ov(id);
-      var falla=st.some(function(c){return c==="no";});
+      var nSi=st.filter(function(c){return c==="si";}).length;
       var completo=st.every(function(c){return c==="si";});
-      o.estado = falla ? "reprogramada" : (completo ? "ejecutada" : "pendiente");
+      var expNo=real.some(function(c){return c==="no";});               // "no" EXPLICITO
+      var pendFut=st.some(function(c){return !c;});                     // jornadas futuras sin marca
+      // parte ejecutada -> Ejecucion parcial (0,5) · un "no" explicito -> reprogramada ·
+      // solo vencidas implicitas PERO con jornadas futuras -> sigue CSSO (como el generador)
+      o.estado = completo ? "ejecutada"
+               : nSi ? "en_progreso"
+               : (expNo || !pendFut) ? "reprogramada"
+               : "pendiente";
     }else{
       if(est0==="ejecutada") return;
       o=ov(id);
       if(st.some(function(c){return c==="reprog";})) o.estado="reprogramada";
       else if(st.length && st.every(function(c){return c==="prog";})) o.estado="coordinada";
-      else if(est0==="reprogramada"||est0==="coordinada") o.estado="pendiente";
+      // "se desmarco": solo si la coordinada/reprogramada NO viene del Excel
+      else if((est0==="reprogramada"||est0==="coordinada") && IDX[id]._estado!==est0) o.estado="pendiente";
     }
     o.slots=slotsDe(js,cod);
     var MK={si:"✔",no:"✖",prog:"●",reprog:"↻"};
@@ -838,6 +919,7 @@ function pintaLista(){
       var kk=j.key+"|"+x.cod, m=eqE(j,x.cod), c=m?m.c:"";
       var pill=c?('<span class="segpill sp-mini '+EQLBL[c][1]+'">'+EQLBL[c][0]+'</span>'):"";
       var nueva=(c==="reprog")?('<span class="eqnew">→ '+dmy(m.nf||j.fecha)+' '+esc2(m.nh||j.hora)+'</span>'):"";
+      if(!c && fEfE(j,x.cod) < hoy()) nueva+='<span class="eqnew" style="color:#dc2626">vencida · reprogramada auto</span>';
       var ctl='';
       if(!RO){
         if(editEq===kk){
@@ -877,6 +959,193 @@ function pintaLista(){
 // ── 7. arranque ───────────────────────────────────────────────────────────
 if(!RO) pintaBadge();
 if(!RO && QS.get("seg")!=="0" && porPreguntar().length){ segAbrir("pend"); }
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     CARTA GANTT DEL PROGRAMA DE CAPACITACIONES
+     Vista cronologica por tipologia (colores del esquema v2) + exportacion a
+     Excel con formato (xlsx-js-style, vendorizada) para remitir al Servicio
+     de Salud cuando la soliciten. Lee el MISMO estado que la tabla
+     (estadoOf/slotsOf: hoja oficial + ajustes locales).
+     ══════════════════════════════════════════════════════════════════════ -->
+<div class="segmask" id="gMask"><div class="segbox" style="max-width:96vw">
+  <div class="seghd"><h2>Carta Gantt · Programa de Capacitación EMMC</h2>
+  <button class="x" onclick="gCerrar()" title="Cerrar">×</button>
+  <div class="sub" id="gSub"></div></div>
+  <div class="segbd" id="gBody" style="max-height:70vh"></div>
+  <div class="segft" id="gFoot"></div>
+</div></div>
+<script>
+"use strict";
+(function(){
+var FER={"2026-09-17":1,"2026-09-18":1};
+var ORD={coordinada:0,reprogramada:1,pendiente:2,en_progreso:3,ejecutada:4,inst_uso:5};
+var LBL={coordinada:"Coordinada",pendiente:"CSSO",reprogramada:"Reprogramada",
+         ejecutada:"Ejecutada",en_progreso:"Ejecución parcial",inst_uso:"Inst de Uso"};
+var mask=document.getElementById("gMask"), body=document.getElementById("gBody"),
+    sub=document.getElementById("gSub"), foot=document.getElementById("gFoot");
+var gF="prog";   // prog = programa activo (sin ejecutadas/IU) | todas | ejec
+function p2(n){return (n<10?"0":"")+n;}
+function dmy(f){return f?f.slice(8,10)+"-"+f.slice(5,7):"";}
+function esc3(s){return esc(s);}
+function gRows(){
+  var out=[];
+  D.capacitaciones.forEach(function(r){
+    var est=estadoOf("capacitaciones",r);
+    if(!(est in ORD)) return;                       // legados fuera del esquema
+    if(gF==="prog" && (est==="ejecutada"||est==="inst_uso")) return;
+    if(gF==="ejec" && est!=="ejecutada" && est!=="en_progreso") return;
+    var sl=slotsOf(r).filter(function(s){return s.f;});
+    out.push({cod:String(r.codigo||"").trim(), nom:valOf(r,"equipo"), est:est,
+              serv:valOf(r,"detalle_servicios"), prov:valOf(r,"proveedor"), sl:sl});
+  });
+  out.sort(function(a,b){
+    var d=ORD[a.est]-ORD[b.est]; if(d) return d;
+    var fa=a.sl.length?a.sl[0].f:"9999", fb=b.sl.length?b.sl[0].f:"9999";
+    return fa<fb?-1:fa>fb?1:a.serv.localeCompare(b.serv);
+  });
+  return out;
+}
+function gDias(rows){
+  var fs=[]; rows.forEach(function(r){r.sl.forEach(function(s){fs.push(s.f);});});
+  if(!fs.length) return [];
+  fs.sort();
+  var d0=new Date(fs[0]+"T12:00"), d1=new Date(fs[fs.length-1]+"T12:00");
+  var out=[], d=new Date(d0), n=0;
+  while(d<=d1 && n++<70){
+    out.push(d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate()));
+    d.setDate(d.getDate()+1);
+  }
+  return out;
+}
+function finde(f){ var wd=new Date(f+"T12:00").getDay(); return wd===0||wd===6||FER[f]; }
+function gPinta(){
+  var rows=gRows(), dias=gDias(rows);
+  var cnt={}; rows.forEach(function(r){cnt[r.est]=(cnt[r.est]||0)+1;});
+  sub.textContent=rows.length+" tipologías · "+(dias.length?dmy(dias[0])+" a "+dmy(dias[dias.length-1]):"sin fechas")+
+    " · "+Object.keys(ORD).filter(function(k){return cnt[k];}).map(function(k){return cnt[k]+" "+LBL[k];}).join(" · ");
+  var h='<div class="segtabs">'+
+    [["prog","Programa activo"],["todas","Todas"],["ejec","Ejecutadas"]].map(function(t){
+      return '<button class="'+(gF===t[0]?"on":"")+'" onclick="gVer(\''+t[0]+'\')">'+t[1]+'</button>';
+    }).join("")+'</div>';
+  h+='<div style="overflow:auto"><table class="gtt"><thead><tr>'+
+     '<th class="gfix g1">Código</th><th class="gfix g2">Equipo</th><th class="gfix g3">Servicio</th><th class="gfix g4">Estado</th>';
+  var mesRow='';
+  dias.forEach(function(f){
+    h+='<th class="gd'+(finde(f)?' gfd':'')+'">'+f.slice(8,10)+'<span>'+["D","L","M","X","J","V","S"][new Date(f+"T12:00").getDay()]+'</span></th>';
+  });
+  h+='</tr></thead><tbody>';
+  rows.forEach(function(r){
+    var mapa={}; r.sl.forEach(function(s){mapa[s.f]=s.h||"";});
+    h+='<tr><td class="gfix g1">'+esc3(r.cod)+'</td>'+
+       '<td class="gfix g2" title="'+esc3(r.prov)+'">'+esc3(r.nom)+'</td>'+
+       '<td class="gfix g3">'+esc3(r.serv.split("\n")[0])+(r.serv.indexOf("\n")>0?" +":"")+'</td>'+
+       '<td class="gfix g4"><span class="segpill sp-mini" style="background:'+EST_HEX[r.est]+'22;color:'+EST_HEX[r.est]+'">'+LBL[r.est]+'</span></td>';
+    if(!r.sl.length){
+      h+='<td class="gd gsin" colspan="'+(dias.length||1)+'">sin fecha — a la espera de propuesta oficial del proveedor</td>';
+    }else{
+      dias.forEach(function(f){
+        h+=(f in mapa)
+          ? '<td class="gd'+(finde(f)?' gfd':'')+'"><i class="gbar" style="background:'+EST_HEX[r.est]+'" title="'+esc3(dmy(f)+' '+mapa[f])+'"></i></td>'
+          : '<td class="gd'+(finde(f)?' gfd':'')+'"></td>';
+      });
+    }
+    h+='</tr>';
+  });
+  if(!rows.length) h+='<tr><td colspan="30" style="padding:22px;text-align:center;color:var(--tx2)">Sin tipologías en este filtro.</td></tr>';
+  h+='</tbody></table></div>';
+  body.innerHTML=h;
+  foot.innerHTML='<span class="muted" style="font-size:11.5px;color:var(--tx2)">'+
+    'Fines de semana y feriados (17-18 sep) sombreados. Las Reprogramadas van sin fecha hasta la propuesta oficial.</span>'+
+    '<button class="sbtn sb-si" onclick="gExport()">⬇ Exportar a Excel</button>'+
+    '<button class="sbtn sb-gh" onclick="gCerrar()">Cerrar</button>';
+}
+function gAbrir(){ gPinta(); mask.className="segmask on"; }
+function gCerrar(){ mask.className="segmask"; }
+function gVer(v){ gF=v; gPinta(); }
+window.gAbrir=gAbrir; window.gCerrar=gCerrar; window.gVer=gVer;
+
+// ── exportacion Excel (xlsx-js-style, carga perezosa) ─────────────────────
+function conXLSX(cb){
+  if(window.XLSX && window.XLSX.utils){ cb(); return; }
+  var s=document.createElement("script");
+  s.src="assets/vendor/xlsx-js-style-1.2.0.bundle.js";
+  s.onload=cb;
+  s.onerror=function(){ alert("No pude cargar la librería de Excel (assets/vendor)."); };
+  document.head.appendChild(s);
+}
+function hex(c){ return (c||"#94a3b8").replace("#","").toUpperCase(); }
+function gBuildWb(){
+  var rows=gRows(), dias=gDias(rows);
+  var hoy=new Date(), sello=p2(hoy.getDate())+"-"+p2(hoy.getMonth()+1)+"-"+hoy.getFullYear();
+  var aoa=[["CARTA GANTT · PROGRAMA DE CAPACITACIÓN DE EQUIPAMIENTO MÉDICO Y MOBILIARIO CLÍNICO — NHDS"],
+           ["Hospital del Salvador · generada el "+sello+" desde la plataforma de Coordinación de Capacitaciones"],
+           [],
+           ["Código","Equipo","Servicio Clínico","Proveedor","Estado","Fechas","Horas"].concat(dias.map(dmy))];
+  rows.forEach(function(r){
+    var fila=[r.cod, r.nom, r.serv.replace(/\n/g," · "), r.prov, LBL[r.est],
+              r.sl.map(function(s){return dmy(s.f);}).join("\n")||"sin fecha",
+              r.sl.map(function(s){return s.h||"";}).join("\n")];
+    dias.forEach(function(f){ fila.push(r.sl.some(function(s){return s.f===f;})?"■":""); });
+    aoa.push(fila);
+  });
+  aoa.push([]);
+  aoa.push(["LEYENDA:"].concat(Object.keys(ORD).map(function(k){return LBL[k];})));
+  var ws=XLSX.utils.aoa_to_sheet(aoa);
+  var AZ="073763", BORD={style:"thin",color:{rgb:"BFBFBF"}};
+  function st(c,s){ if(ws[c]) ws[c].s=s; }
+  var ncol=7+dias.length, HDR=3, ley=aoa.length-1;
+  ws["!merges"]=[{s:{r:0,c:0},e:{r:0,c:ncol-1}},{s:{r:1,c:0},e:{r:1,c:ncol-1}}];
+  st("A1",{font:{name:"Verdana",sz:12,bold:true,color:{rgb:AZ}}});
+  st("A2",{font:{name:"Verdana",sz:9,color:{rgb:AZ}}});
+  for(var c=0;c<ncol;c++){
+    var cell=XLSX.utils.encode_cell({r:HDR,c:c});
+    var esFinde=c>=7 && finde(dias[c-7]);
+    st(cell,{font:{name:"Verdana",sz:8.5,bold:true,color:{rgb:"FFFFFF"}},
+             fill:{fgColor:{rgb:esFinde?"64748B":AZ}},
+             alignment:{horizontal:"center",vertical:"center",wrapText:true},
+             border:{top:BORD,bottom:BORD,left:BORD,right:BORD}});
+  }
+  rows.forEach(function(r,i){
+    var R=HDR+1+i;
+    for(var c=0;c<ncol;c++){
+      var cell=XLSX.utils.encode_cell({r:R,c:c});
+      var s={font:{name:"Verdana",sz:8.5,color:{rgb:AZ}},
+             border:{top:BORD,bottom:BORD,left:BORD,right:BORD},
+             alignment:{vertical:"top",wrapText:c<7}};
+      if(c===4) s.fill={fgColor:{rgb:hex(EST_HEX[r.est])}}, s.font={name:"Verdana",sz:8.5,bold:true,color:{rgb:"FFFFFF"}};
+      if(c>=7){
+        var f=dias[c-7];
+        if(r.sl.some(function(x){return x.f===f;})){ s.fill={fgColor:{rgb:hex(EST_HEX[r.est])}}; if(ws[cell]) ws[cell].v=""; }
+        else if(finde(f)) s.fill={fgColor:{rgb:"EEF2F6"}};
+        s.alignment={horizontal:"center"};
+      }
+      if(!ws[cell]) ws[cell]={t:"s",v:""};
+      ws[cell].s=s;
+    }
+  });
+  for(var c2=1;c2<Object.keys(ORD).length+1;c2++){
+    var k=Object.keys(ORD)[c2-1], cel=XLSX.utils.encode_cell({r:ley,c:c2});
+    st(cel,{font:{name:"Verdana",sz:8.5,bold:true,color:{rgb:"FFFFFF"}},fill:{fgColor:{rgb:hex(EST_HEX[k])}},
+            alignment:{horizontal:"center"}});
+  }
+  ws["!cols"]=[{wch:8},{wch:38},{wch:26},{wch:26},{wch:13},{wch:10},{wch:7}]
+      .concat(dias.map(function(){return {wch:3.6};}));
+  ws["!freeze"]={xSplit:5,ySplit:HDR+1};
+  ws["!views"]=[{state:"frozen",xSplit:5,ySplit:HDR+1}];
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Carta Gantt");
+  return wb;
+}
+window.gBuildWb=gBuildWb;
+function gExport(){
+  conXLSX(function(){
+    var hoy=new Date();
+    XLSX.writeFile(gBuildWb(),"Carta_Gantt_Capacitaciones_EMMC_"+hoy.getFullYear()+p2(hoy.getMonth()+1)+p2(hoy.getDate())+".xlsx");
+  });
+}
+window.gExport=gExport;
 })();
 </script>
 <script src="hub-home.js"></script>

@@ -359,6 +359,7 @@ button,input,select,textarea{font-family:inherit}
 .dot-panel .dp-body{overflow-y:auto;padding:4px 0}
 .dp-row{display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;border-bottom:1px solid #f1f5f9}
 .dp-row:hover{background:#eff6ff}
+.dp-row.kb{background:#dbeafe;box-shadow:inset 3px 0 0 #2563eb}
 .dp-row .nm{flex:1;min-width:0;font-size:11.5px;color:#0f172a;font-weight:600;line-height:1.25}
 .dp-row .sub{font-size:9.5px;color:#64748b;font-weight:400;display:block}
 .dp-row .st{font-size:9px;font-weight:800;border-radius:6px;padding:2px 6px;white-space:nowrap;flex-shrink:0}
@@ -866,7 +867,8 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <div class="dp-s" id="dpSub"></div>
       <div style="display:flex;gap:6px;margin-top:7px;align-items:center">
         <input id="dpFiltro" placeholder="Filtrar por nombre o cargo…" spellcheck="false"
-          oninput="renderDotPanel()"
+          oninput="renderDotPanel()" onkeydown="dpTecla(event)"
+          title="↑ ↓ recorren los resultados · Enter asigna al recinto abierto · Espacio marca o desmarca · Esc quita el foco"
           style="flex:1;min-width:0;border:1px solid #cbd5e1;border-radius:7px;padding:5px 8px;font-size:11px;font-family:inherit">
         <label style="display:flex;align-items:center;gap:4px;font-size:10px;color:#b91c1c;font-weight:700;cursor:pointer;white-space:nowrap">
           <input type="checkbox" id="dpSoloLibres" onchange="renderDotPanel()" style="width:auto;margin:0"> por asignar
@@ -874,6 +876,19 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       </div>
     </div>
     <div class="dp-body" id="dpBody"></div>
+    <!-- Barra de asignación múltiple: aparece sola cuando hay algo marcado -->
+    <!-- Barra de asignación múltiple. En DOS filas a propósito: el panel es
+         angosto y en una sola el botón de asignar se salía del cuadro. Arriba
+         el conteo y la selección; abajo la acción principal, a lo ancho. -->
+    <div id="dpBar" style="display:none;flex-direction:column;gap:7px;padding:8px 10px;border-top:1px solid #cfe0ee;background:#eef6ff">
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+        <b id="dpBarN" style="font-size:11.5px;color:#17456e;flex:1;min-width:0"></b>
+        <button onclick="dpSelVisibles(true,true)" style="background:#fff;border:1px solid #86c39b;color:#15803d;border-radius:7px;padding:4px 9px;font-size:10.5px;font-weight:700;cursor:pointer;white-space:nowrap" title="Marca solo a las que AÚN NO tienen puesto en ningún recinto, dentro de lo que muestra el filtro. Después podés desmarcar las que no correspondan.">Todas las disponibles</button>
+        <button onclick="dpSelVisibles(true,false)" style="background:#fff;border:1px solid #a9c3d6;color:#1d5fa0;border-radius:7px;padding:4px 9px;font-size:10.5px;font-weight:700;cursor:pointer;white-space:nowrap" title="Marca a todas las que el filtro está mostrando, incluidas las que ya tienen puesto en otro recinto">Todas</button>
+        <button id="dpBarLimp" onclick="dpSelLimpiar()" style="background:#fff;border:1px solid #a9c3d6;color:#64748b;border-radius:7px;padding:4px 9px;font-size:10.5px;font-weight:700;cursor:pointer;white-space:nowrap">Limpiar</button>
+      </div>
+      <button id="dpBarAsig" onclick="dpAsignarSel()" style="width:100%;background:#15803d;border:none;color:#fff;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer">➕ Asignar al recinto</button>
+    </div>
   </div>
  </div>
 </div>
@@ -7319,6 +7334,10 @@ function buildDotPanel(){
 }
 function renderDotPanel(){
   if(!dotDB||!dotDB.staff) return;
+  // Asignar en bloque solo tiene sentido con un recinto abierto (vista 3) y
+  // en modo edición. En consulta o desde arriba, el panel sigue igual.
+  _dpMulti = (S.level===3 && !!curRoom() && (!S.viewOnly || S.editPM));
+  if(!_dpMulti) _dpSel.clear();
   const asg=_dpAsignados();
   const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
   const q=norm((document.getElementById('dpFiltro')||{}).value||'');
@@ -7351,7 +7370,16 @@ function renderDotPanel(){
       const rid=asg[norm(s.nombre)];
       _dpPeople.push(s.nombre);
       const sub=[s.cargo||s.funcion,s.estamento].filter(Boolean).join(' · ');
-      filas.push('<div class="dp-row '+(rid?'ok':'no')+'" onclick="dpPick('+(_dpPeople.length-1)+')">'
+      const _i=_dpPeople.length-1;
+      // La casilla solo aparece en vista 3: es ahí donde hay un recinto al que
+      // asignar. En vista 1 y 2 el panel sigue siendo de consulta.
+      const _chk = _dpMulti
+        ? '<input type="checkbox" class="dp-chk" data-i="'+_i+'" '+(_dpSel.has(s.nombre)?'checked':'')
+          +' onclick="event.stopPropagation();dpSel(\''+String(s.nombre).replace(/'/g,"\\'")+'\',this.checked)" '
+          +'style="margin:0 7px 0 0;flex-shrink:0;cursor:pointer">'
+        : '';
+      filas.push('<div class="dp-row '+(rid?'ok':'no')+'" onclick="dpPick('+_i+')">'
+        +_chk
         +'<span class="nm">'+esc(s.nombre)+'<span class="sub">'+esc(sub||'—')
         +(rid?(' · en '+esc(rName(rid)||'')):(buscando&&s.servicio?(' · '+esc(corto(s.servicio))):''))+'</span></span>'
         +'<span class="st">'+(rid?'✔':'○')+'</span></div>');
@@ -7381,6 +7409,212 @@ function renderDotPanel(){
   } else personas(base);
   document.getElementById('dpBody').innerHTML = filas.length?filas.join('')
     : '<div style="padding:18px;text-align:center;color:#94a3b8;font-size:11.5px">Sin resultados en este nivel.</div>';
+  // Después de pintar: la barra cuenta las casillas que hay en pantalla.
+  try{ _dpBarra(); }catch(e){}
+  // El listado cambió: el resalte del teclado ya no apunta a lo mismo.
+  _dpKb=-1;
+}
+/* ── TECLADO EN EL BUSCADOR DE PERSONAL ─────────────────────────────────────
+   Escribís el filtro y seguís con las manos en el teclado: ↑ ↓ recorren los
+   resultados, Enter asigna al recinto abierto, Espacio marca o desmarca para
+   la asignación múltiple. Mismo idioma que el buscador de recintos (Ctrl+K).
+
+   Sobre una fila de GRUPO (subdirección, servicio, unidad) Enter entra al
+   nodo, que es lo que hace el clic: así se baja por el árbol sin soltar el
+   teclado. */
+let _dpKb=-1;
+function _dpFilas(){ return [...document.querySelectorAll('#dpBody .dp-row')]; }
+function _dpMarcarKb(){
+  const filas=_dpFilas();
+  filas.forEach((f,i)=>f.classList.toggle('kb', i===_dpKb));
+  if(_dpKb>=0 && filas[_dpKb]) filas[_dpKb].scrollIntoView({block:'nearest'});
+}
+function dpTecla(e){
+  const filas=_dpFilas();
+  if(!filas.length) return;
+  if(e.key==='ArrowDown'){
+    e.preventDefault(); _dpKb=Math.min(_dpKb+1, filas.length-1); _dpMarcarKb();
+  }else if(e.key==='ArrowUp'){
+    e.preventDefault(); _dpKb=Math.max(_dpKb-1, 0); _dpMarcarKb();
+  }else if(e.key==='Escape'){
+    _dpKb=-1; _dpMarcarKb(); e.target.blur();
+  }else if(e.key===' '||e.code==='Space'){
+    // Espacio marca; solo tiene sentido si hay casilla (vista 3)
+    const f=filas[_dpKb]; if(!f) return;
+    const chk=f.querySelector('.dp-chk'); if(!chk) return;
+    e.preventDefault();
+    const nom=_dpPeople[+chk.dataset.i]; if(!nom) return;
+    dpSel(nom, !chk.checked);
+  }else if(e.key==='Enter'){
+    const f=filas[_dpKb]; if(!f) return;
+    e.preventDefault();
+    if(f.classList.contains('grp')){          // fila de grupo: entrar al nodo
+      const m=/dpGoIdx\((\d+)\)/.exec(f.getAttribute('onclick')||'');
+      if(m){ _dpKb=-1; dpGoIdx(+m[1]); setTimeout(()=>{ const i=document.getElementById('dpFiltro'); if(i) i.focus(); },0); }
+      return;
+    }
+    const chk=f.querySelector('.dp-chk');
+    const nom=chk ? _dpPeople[+chk.dataset.i]
+                  : _dpPeople[+((/dpPick\((\d+)\)/.exec(f.getAttribute('onclick')||'')||[])[1])];
+    if(!nom) return;
+    if(_dpMulti && curRoom()){
+      // Asigna SOLO a esta persona, sin tocar lo que hubiera marcado antes.
+      const previa=new Set(_dpSel);
+      _dpSel=new Set([nom]);
+      dpAsignarSel();
+      previa.delete(nom); _dpSel=previa; _dpBarra();
+    }else{
+      dpPick(_dpPeople.indexOf(nom));         // sin recinto abierto: llena el formulario
+    }
+  }
+}
+/* ── UNA PERSONA, UN SOLO PUESTO ────────────────────────────────────────────
+   Al mover a alguien a otro recinto, su puesto anterior se ELIMINA — no queda
+   como vacante. Un dot creado para una persona que se fue no representa nada:
+   inflaría el conteo de puestos del recinto de origen y aparecería como
+   "disponible" un lugar que nadie diseñó.
+   Excepción: si el puesto es DINÁMICO (4º turno) y lo comparten varias
+   personas, solo se saca a esa; el puesto se elimina únicamente si queda sin
+   nadie. Los enlaces de 4º turno que apunten al dot borrado los limpia
+   _purgarLinks() en el siguiente guardado. */
+function _quitarDeSuPuesto(nombre, exceptoRid){
+  const nn=norm(nombre); let quitados=0;
+  for(const rid in (wsState.dots||{})){
+    if(rid===exceptoRid) continue;
+    const arr=wsState.dots[rid]; if(!Array.isArray(arr)) continue;
+    for(let i=arr.length-1;i>=0;i--){
+      const d=arr[i];
+      if(d && d.tipo==='dinamico' && Array.isArray(d.turnos)){
+        const antes=d.turnos.length;
+        d.turnos=d.turnos.filter(x=>norm(x&&x.nombre||'')!==nn);
+        if(d.turnos.length!==antes){
+          quitados++;
+          if(!d.turnos.some(x=>(x&&x.nombre||'').trim())) arr.splice(i,1);  // quedó vacío
+        }
+      }else if(d && norm(d.nombre||'')===nn){
+        arr.splice(i,1); quitados++;
+      }
+    }
+  }
+  return quitados;
+}
+/* ── ASIGNACIÓN MÚLTIPLE (vista 3) ──────────────────────────────────────────
+   Filtrás por lo que sea —equipo, servicio, cargo— marcás a los que quieras
+   (no necesariamente todos) y se crean sus puestos de una vez dentro del
+   recinto abierto. Antes había que ir persona por persona, abriendo el modal
+   para cada una.
+
+   La selección vive por NOMBRE, no por índice: el filtro se puede cambiar
+   entre medio (buscar "cabeza y cuello", marcar tres, buscar otra cosa y
+   marcar dos más) y lo marcado se conserva. */
+let _dpSel=new Set(), _dpMulti=false;
+function dpSel(nombre, on){
+  if(on) _dpSel.add(nombre); else _dpSel.delete(nombre);
+  // Quien tiene dos contratos aparece dos veces en la lista. La selección es
+  // por PERSONA, así que ambas filas tienen que verse igual: si no, marcar una
+  // y desmarcar la otra dejaría a la persona fuera sin que se note.
+  document.querySelectorAll('#dpBody .dp-chk').forEach(c=>{
+    if(_dpPeople[+c.dataset.i]===nombre) c.checked=on;
+  });
+  _dpBarra();
+}
+/* "Todos" = los que el filtro está mostrando AHORA, no toda la dotación.
+   soloLibres=true deja fuera a quienes ya tienen puesto en algún recinto: es
+   el caso normal —marcar todo lo disponible y desmarcar lo que no corresponda—
+   y evita el aviso de "ya están en otro recinto" para gente que no se quería
+   mover. */
+function dpSelVisibles(on, soloLibres){
+  const asg=_dpAsignados();
+  document.querySelectorAll('#dpBody .dp-chk').forEach(c=>{
+    const nom=_dpPeople[+c.dataset.i]; if(!nom) return;
+    if(on && soloLibres && asg[norm(nom)]){ c.checked=false; _dpSel.delete(nom); return; }
+    c.checked=on; if(on) _dpSel.add(nom); else _dpSel.delete(nom);
+  });
+  _dpBarra();
+}
+function dpSelLimpiar(){ _dpSel.clear(); renderDotPanel(); }
+function _dpBarra(){
+  const b=document.getElementById('dpBar'); if(!b) return;
+  const n=_dpSel.size;
+  // La barra se muestra SIEMPRE que se pueda asignar, no solo cuando ya hay
+  // algo marcado: si no, el botón para marcar a todas queda invisible justo
+  // cuando hace falta (hay que marcar una a mano para que aparezca el botón
+  // que sirve para no marcar a mano).
+  b.style.display = _dpMulti ? 'flex' : 'none';
+  const bt=document.getElementById('dpBarAsig'); if(bt) bt.style.display = n?'':'none';
+  const bl=document.getElementById('dpBarLimp'); if(bl) bl.style.display = n?'':'none';
+  const t=document.getElementById('dpBarN'); if(!t) return;
+  if(!n){
+    const asg=_dpAsignados();
+    let libres=0;
+    document.querySelectorAll('#dpBody .dp-chk').forEach(c=>{
+      const nom=_dpPeople[+c.dataset.i]; if(nom && !asg[norm(nom)]) libres++;
+    });
+    t.innerHTML='<span style="font-weight:600;color:#64748b">Marcá personas o usá</span>'
+      + (libres?('<span style="color:#15803d;font-weight:800"> ('+libres+' disponibles)</span>'):'');
+    return;
+  }
+  // Se dice cuántas de las marcadas YA tienen puesto: son las que van a
+  // disparar la pregunta de mover, y conviene saberlo antes de apretar.
+  const asg=_dpAsignados(), aqui=(curRoom()||{}).id;
+  let ubic=0; _dpSel.forEach(nom=>{ const d=asg[norm(nom)]; if(d && d!==aqui) ubic++; });
+  t.innerHTML = n+(n===1?' seleccionada':' seleccionadas')
+    + (ubic?(' <span style="font-weight:600;color:#b45309">· '+ubic+' ya en otro recinto</span>'):'');
+}
+// Crea un puesto por persona seleccionada y los ordena en cuadrícula.
+function dpAsignarSel(){
+  if(S.viewOnly && !S.editPM) return;
+  const room=curRoom(); if(!room){ return; }
+  const nombres=[..._dpSel]; if(!nombres.length) return;
+  const asg=_dpAsignados();
+  const yaAqui=[], movidos=[], nuevos=[];
+  nombres.forEach(n=>{
+    const donde=asg[norm(n)];
+    if(donde===room.id) yaAqui.push(n);
+    else if(donde) movidos.push({n, de:donde});
+    else nuevos.push(n);
+  });
+  // Quien ya está en OTRO recinto no se duplica: se avisa y se decide.
+  let mover=false;
+  if(movidos.length){
+    mover=confirm(movidos.length+' de las seleccionadas ya están asignadas en otro recinto:\n\n'
+      + movidos.slice(0,8).map(m=>'  · '+m.n+'  (en '+(rName(m.de)||'?')+')').join('\n')
+      + (movidos.length>8?('\n  … y '+(movidos.length-8)+' más'):'')
+      + '\n\n¿Moverlas a «'+(rName(room.id)||'este recinto')+'»?\n\n'
+      + 'Aceptar = mover: se ELIMINA su puesto en el recinto de origen, para que\n'
+      + 'cada persona quede en un solo lugar.\n'
+      + 'Cancelar = dejarlas donde están y asignar solo las libres.');
+  }
+  const aponer=nuevos.concat(mover?movidos.map(m=>m.n):[]);
+  if(!aponer.length){
+    if(typeof tbInfo!=='undefined'&&tbInfo){
+      tbInfo.textContent='No había nada que asignar'+(yaAqui.length?(' — '+yaAqui.length+' ya estaban en este recinto'):'')+'.';
+      setTimeout(()=>{ if(tbInfo)tbInfo.textContent=''; },4000);
+    }
+    return;
+  }
+  if(mover) movidos.forEach(m=>_quitarDeSuPuesto(m.n, room.id));
+  if(!wsState.dots[room.id]) wsState.dots[room.id]=[];
+  const sh=rShapes(room), b=sh.length?bounds(sh):{x:0,y:0,w:200,h:200};
+  const base=Date.now();
+  aponer.forEach((nom,k)=>{
+    const s=(dotDB.staff||[]).find(x=>norm(x.nombre)===norm(nom))||{};
+    wsState.dots[room.id].push({
+      id: room.id+'-WS'+String(base+k).slice(-6),
+      x: Math.round(b.x+b.w/2), y: Math.round(b.y+b.h/2),   // ordenarDots() los reparte
+      tipo:'fijo', nombre:nom, cargo:s.cargo||s.funcion||'', estamento:s.estamento||''
+    });
+  });
+  sWs();
+  try{ ordenarDots(); }catch(e){}              // reparte en cuadrícula, sin pisarse
+  flushAutosave(); renderSVG(); updateStats();
+  _dpSel.clear(); renderDotPanel();
+  if(typeof tbInfo!=='undefined'&&tbInfo){
+    tbInfo.textContent='👥 '+aponer.length+' funcionario(s) asignados a '+(rName(room.id)||'el recinto')
+      + (yaAqui.length?(' · '+yaAqui.length+' ya estaban'):'')
+      + (movidos.length&&!mover?(' · '+movidos.length+' quedaron en su recinto'):'');
+    setTimeout(()=>{ if(tbInfo)tbInfo.textContent=''; },6000);
+  }
 }
 function dpPick(i){
   const nombre=_dpPeople[i]; if(!nombre) return;
@@ -7679,8 +7913,22 @@ function saveWs(){
   if(nombre){
     const conflict=findExclusiveConflict(nombre,roomId,idx);
     if(conflict){
-      alert('⚠ "'+nombre+'" ya está asignado en:\n'+conflict.floorLabel+' › '+conflict.areaLabel+' › '+conflict.roomLabel+'\n\nUn puesto fijo sólo puede tener una asignación.');
-      return;
+      // Antes esto era un callejón sin salida: avisaba y no dejaba hacer nada,
+      // así que había que ir al otro recinto a borrarlo a mano. Ahora se ofrece
+      // el movimiento, que es lo que casi siempre se quiere.
+      const mover=confirm('⚠ "'+nombre+'" ya está asignado en:\n'
+        + conflict.floorLabel+' › '+conflict.areaLabel+' › '+conflict.roomLabel
+        + '\n\nCada persona puede estar en un solo puesto.\n\n'
+        + 'Aceptar = MOVERLO acá (se elimina su puesto en '+conflict.roomLabel+')\n'
+        + 'Cancelar = dejarlo donde está');
+      if(!mover) return;
+      _quitarDeSuPuesto(nombre, roomId);
+      // El puesto de origen pudo estar en ESTE recinto: se re-ubica el dot por
+      // identidad, porque el índice pudo correrse al eliminar.
+      if(!wsState.dots[roomId] || wsState.dots[roomId].indexOf(d)<0){
+        alert('El puesto que estabas editando ya no existe. Volvé a abrirlo.');
+        closeModal(); renderSVG(); updateStats(); return;
+      }
     }
   }
   d.nombre=nombre;
@@ -9423,6 +9671,37 @@ async function runSelfTest(){
     const {seguros,dudosos}=_codCambios();
     return seguros.every(x=>_codExiste(x.a) && x.a!==x.de && !_codSospechoso(x.a))
         && dudosos.every(x=>_codCandidatos(x.de).every(c=>!_codExiste(c)));
+  });
+  // Lo que NO puede pasar en la asignación múltiple: duplicar a alguien que ya
+  // tiene puesto en otro recinto, o dejar el modo activo fuera de vista 3.
+  T('Asignación múltiple: solo en vista 3 y sin duplicar personas', ()=>{
+    const nivelPrevio=S.level;
+    S.level=1; renderDotPanel();
+    const off = (_dpMulti===false);
+    S.level=nivelPrevio;
+    // nadie puede figurar en dos recintos a la vez
+    const vistos={}; let dup=0;
+    for(const rid in (wsState.dots||{})){
+      for(const d of (wsState.dots[rid]||[])){
+        const n=(d.nombre||'').trim(); if(!n) continue;
+        const k=norm(n);
+        if(vistos[k] && vistos[k]!==rid) dup++;
+        vistos[k]=rid;
+      }
+    }
+    return off && dup===0;
+  });
+  // El teclado del buscador no puede reventar con la lista vacía ni dejar el
+  // resalte apuntando a una fila que ya no existe tras re-filtrar.
+  T('Teclado del buscador: sin lista y tras re-render', ()=>{
+    const inp=document.getElementById('dpFiltro'); if(!inp) return false;
+    const ev=k=>({key:k, preventDefault(){}, target:inp});
+    const body=document.getElementById('dpBody'); const prev=body.innerHTML;
+    body.innerHTML='';                       // lista vacía
+    try{ dpTecla(ev('ArrowDown')); dpTecla(ev('Enter')); }catch(e){ body.innerHTML=prev; return false; }
+    body.innerHTML=prev;
+    _dpKb=99; renderDotPanel();              // re-render debe reiniciar el resalte
+    return _dpKb===-1 && document.querySelectorAll('#dpBody .dp-row.kb').length===0;
   });
   T('Compresión: disponible', ()=>LZ_OK===true);
   T('Compresión: ida y vuelta exacta del estado real', ()=>{
