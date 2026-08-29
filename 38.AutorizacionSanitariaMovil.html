@@ -127,10 +127,17 @@ main{max-width:1100px;margin:0 auto;padding:14px}
   body{padding-bottom:20px}
   #tabbar{display:none}
   main{display:grid;grid-template-columns:390px 1fr;gap:16px;align-items:start}
-  #v-inicio,#v-plano{display:block}
-  #v-inicio{grid-column:1}
-  #v-plano{grid-column:2;position:sticky;top:74px}
-  #v-recinto,#v-servicio,#v-pauta{grid-column:1/-1;max-width:860px;margin:0 auto;width:100%}
+  /* Al abrir un detalle (servicio/recinto/pauta) éste OCUPA la columna izquierda
+     —la lista de servicios cede su lugar— y el plano se queda a la derecha como
+     contexto. Antes el detalle caía en una fila nueva DEBAJO del plano y parecía
+     que no pasaba nada (hallazgo de M. Canales, 28-08). */
+  body:not(.detalle) #v-inicio{display:block}
+  /* fila 1 explícita: sin esto el auto-placement del grid manda el detalle a
+     una fila nueva (queda DEBAJO del plano, que es justo el bug reportado) */
+  #v-inicio{grid-column:1;grid-row:1}
+  #v-plano{display:block;grid-column:2;grid-row:1;position:sticky;top:74px}
+  body.detalle main{grid-template-columns:minmax(420px,560px) 1fr}
+  #v-recinto,#v-servicio,#v-pauta{grid-column:1;grid-row:1;width:100%;max-width:none;margin:0}
   #visor{height:calc(100vh - 220px)}
 }
 @media print{
@@ -476,6 +483,7 @@ let PILA=[];
 function muestra(v){
   document.querySelectorAll('.vista').forEach(x=>x.classList.remove('on'));
   $('v-'+v).classList.add('on');
+  document.body.classList.toggle('detalle', v==='recinto'||v==='servicio'||v==='pauta');
   if(!esMovilVista()&&(v==='inicio'||v==='plano')){$('v-inicio').classList.add('on');$('v-plano').classList.add('on');}
   ['inicio','plano'].forEach(t=>{const b=$('tb-'+t);if(b)b.classList.toggle('on',v===t);});
   $('hBack').style.display=PILA.length?'grid':'none';
@@ -810,8 +818,11 @@ function pintaPauta(ctx){
   const est=estadoDe(clave)||{datos:{}};
   const datos=est.datos||{};
   const editable=puedoVer(ctx.svc);
-  $('hTit').textContent=a.name.toLowerCase().replace(/^\w/,c=>c.toUpperCase());
-  $('hSub').textContent=(ctx.tipo==='svc'?ctx.svc:(ctx.rnom||ctx.rid))+' · '+a.normaNombre;
+  // El título dice DÓNDE se está aplicando y el subtítulo QUÉ pauta: al revés
+  // se leía como si la app hubiera cambiado de servicio (hallazgo de M. Canales).
+  const _pnom=a.name.toLowerCase().replace(/^\w/,c=>c.toUpperCase());
+  $('hTit').textContent=(ctx.tipo==='svc'?ctx.svc:(ctx.rnom||ctx.rid));
+  $('hSub').textContent=_pnom+' · '+a.normaNombre;
   let g0=null,h='';
   a.reqs.forEach(q=>{
     if(q.g&&q.g!==g0){h+=`<div class="g">${esc(q.g)}</div>`;g0=q.g;}
@@ -828,6 +839,11 @@ function pintaPauta(ctx){
     </div>`;
   });
   $('v-pauta').innerHTML=`
+    <div class="card" style="padding:11px 14px;margin-bottom:10px">
+      <div style="font-size:9.5px;letter-spacing:.7px;color:var(--tx2);text-transform:uppercase;font-weight:800">Pauta aplicada</div>
+      <b style="font-size:15px;display:block;margin:2px 0 1px">${esc(_pnom)}</b>
+      <div class="hint">${esc(a.normaNombre)} · ${a.reqs.length} requisitos · ${ctx.tipo==='svc'?'aplicada al servicio':'aplicada al recinto'}</div>
+    </div>
     <div id="barra"><span class="hint">Avance</span><div class="prog"><i id="pgi" style="width:${est.avance||0}%"></i></div><b id="pgt">${est.avance||0}%</b></div>
     ${editable?'':'<div class="card hint">⚠ Solo lectura: no pertenece a tus servicios.</div>'}
     <div class="card" ${editable?'':'style="pointer-events:none;opacity:.75"'}>${h}</div>
