@@ -82,6 +82,34 @@ main{max-width:1100px;margin:0 auto;padding:14px}
 .rec.mio{stroke:#1D2D5B;stroke-width:1.4}
 .svcbox{fill:rgba(29,45,91,.07);stroke:#1D2D5B;stroke-width:2.2;stroke-dasharray:8 5;cursor:pointer}
 .svclbl{font-weight:800;fill:#1D2D5B;paint-order:stroke fill;stroke:#fff;stroke-width:4;pointer-events:none}
+/* mini-plano dentro de la ficha del servicio */
+.svcplano-wrap{border:1px solid var(--bd);border-radius:12px;overflow:hidden;background:#fff}
+.svcplano{display:block;width:100%;height:auto;max-height:46vh;margin:0 auto}
+.svcplano image{image-rendering:auto}
+/* dentro del mini-plano el contraste manda: los recintos del servicio se leen
+   aunque no tengan pauta todavía; los de al lado quedan de referencia */
+.svcplano .rec{fill:rgba(59,130,196,.24);stroke:#3b82c4;stroke-width:1.1}
+.svcplano .rec.pauta{fill:rgba(21,128,61,.30);stroke:#15803d;stroke-width:1.3}
+.svcplano .rec.parcial{fill:rgba(240,180,41,.55);stroke:#b45309}
+.svcplano .rec.hecho{fill:rgba(21,128,61,.60);stroke:#15803d}
+.svcplano .rec.vecino{fill:rgba(120,132,150,.06);stroke:#d3d9e2;stroke-width:.4;pointer-events:none}
+.reclbl{font-weight:700;fill:#17233b;paint-order:stroke fill;stroke:#fff;stroke-width:2.4;pointer-events:none}
+.leyenda{display:flex;gap:11px;flex-wrap:wrap;font-size:11px;color:var(--tx2);padding:8px 2px 2px}
+.leyenda i.lg{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px;border:1px solid #94a3b8}
+.lg-p{background:#9cc9a9;border-color:#15803d}
+.lg-q{background:#f2ce7a;border-color:#b45309}
+.lg-h{background:#5c9c72;border-color:#15803d}
+.lg-n{background:#b9d0e8;border-color:#3b82c4}
+.lg-v{background:#eceff3;border-color:#c3cbd8}
+/* listas largas dentro de una tarjeta: en el celular NO se encierran en su
+   propio scroll — el dedo termina moviendo la lista en vez de la página.
+   La tarjeta crece y la página fluye; el marco interno es solo de escritorio. */
+.lista-scroll{margin-top:6px}
+@media(min-width:900px){.lista-scroll{max-height:52vh;overflow:auto}}
+.res3{display:flex;gap:8px;margin:2px 0 10px}
+.res3>div{flex:1;border:1px solid var(--bd);border-radius:11px;padding:7px 4px;text-align:center}
+.res3 b{display:block;font-size:18px;color:var(--azul)}
+.res3 span{font-size:10px;color:var(--tx2);text-transform:uppercase;letter-spacing:.03em}
 #leyplano{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--tx2);padding:8px 2px}
 #leyplano i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
 
@@ -584,8 +612,13 @@ function claseRec(r){
 }
 function pintaPlano(piso){
   piso=piso||PISO||'P1'; PISO=piso;
-  $('hTit').textContent='Plano · Piso '+piso.replace('P','');
-  $('hSub').textContent='Tocá un recinto (vista 2) o el nombre de un servicio (vista 1)';
+  // en escritorio el plano vive en la columna derecha mientras la izquierda
+  // muestra un detalle: ahí el encabezado le pertenece al detalle, no al plano
+  const _act=(PILA[PILA.length-1]||{v:'inicio'}).v;
+  if(_act==='plano'||_act==='inicio'){
+    $('hTit').textContent='Plano · Piso '+piso.replace('P','');
+    $('hSub').textContent='Tocá un recinto (vista 2) o el nombre de un servicio (vista 1)';
+  }
   $('tabsPiso').innerHTML=D.pisos.map(p=>`<button class="${p===piso?'on':''}" onclick="pintaPlano('${p}')">${p.replace('P','Piso ')}</button>`).join('');
   const pl=D.planos[piso]; if(!pl)return;
   const img=$('plano'); img.onload=encuadra; img.src=pl.src+'?v='+D.gen; img.width=pl.w; img.height=pl.h;
@@ -770,8 +803,81 @@ function pintaRecinto(r){
 }
 
 /* ── FICHA SERVICIO (vista 1) ────────────────────────────────────────────── */
+/* ── mini-plano del servicio: el plano del piso recortado a su polígono de
+   vista 1, con cada recinto propio dibujado y tocable. Los recintos vecinos
+   quedan en gris para no perder la referencia de dónde está uno parado. ── */
+function planoSvc(sv){
+  const pl=D.planos[sv.piso]; if(!pl||!sv.shapes||!sv.shapes.length)return '';
+  const k=pl.w/D.png.w, kv=pl.h/D.png.h;
+  const bw=(sv.bb[2]-sv.bb[0])*k, bh=(sv.bb[3]-sv.bb[1])*kv;
+  const m=Math.max(bw,bh)*0.05+16;
+  const vx=sv.bb[0]*k-m, vy=sv.bb[1]*kv-m, vw=bw+2*m, vh=bh+2*m;
+  const todos=D.recintos[sv.piso]||[];
+  const esMio=r=>String(r[9]||'').toUpperCase()===sv.n.toUpperCase();
+  let h=`<image href="${pl.src}?v=${D.gen}" x="0" y="0" width="${pl.w}" height="${pl.h}"/>`;
+  sv.shapes.forEach(sh=>{h+=`<rect class="svcbox" style="pointer-events:none" x="${(sh[0]*k).toFixed(1)}" y="${(sh[1]*kv).toFixed(1)}" width="${(sh[2]*k).toFixed(1)}" height="${(sh[3]*kv).toFixed(1)}"/>`;});
+  todos.forEach((r,i)=>{
+    const p=d2px(r[4],r[5],pl);
+    const w=r[6]/(D.ext.xmax-D.ext.xmin)*pl.w, ht=r[7]/(D.ext.ymax-D.ext.ymin)*pl.h;
+    const x=p.x-w/2, y=p.y-ht/2;
+    if(x+w<vx||x>vx+vw||y+ht<vy||y>vy+vh)return;          // fuera del recorte
+    if(!esMio(r)){
+      h+=`<rect class="rec vecino" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${ht.toFixed(1)}"/>`;
+      return;
+    }
+    h+=`<rect class="${claseRec(r)}" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${w.toFixed(1)}" height="${ht.toFixed(1)}" data-i="${i}"><title>${esc((r[2]||r[0])+(r[1]?' · '+r[1]:''))}</title></rect>`;
+    const cod=String(r[1]||'');
+    if(cod){
+      const fs=Math.min(w*0.88/(cod.length*0.58), ht*0.62, vw/26);
+      if(fs>vw/150)h+=`<text class="reclbl" x="${p.x.toFixed(1)}" y="${(p.y+fs*0.35).toFixed(1)}" font-size="${fs.toFixed(1)}" text-anchor="middle">${esc(cod)}</text>`;
+    }
+  });
+  return `<svg class="svcplano" viewBox="${vx.toFixed(1)} ${vy.toFixed(1)} ${vw.toFixed(1)} ${vh.toFixed(1)}" width="${vw.toFixed(0)}" height="${vh.toFixed(0)}" preserveAspectRatio="xMidYMid meet">${h}</svg>`;
+}
+
+/* ── todas las pautas que hay que aplicar en un servicio: las de unidad y las
+   de cada uno de sus recintos, en una sola lista buscable ───────────────── */
+function todasPautasSvc(sv){
+  const out=[];
+  pautasDeSvc(sv.n).forEach(pid=>{
+    const a=ambitoDe(pid); if(!a)return;
+    out.push({pid,a,tipo:'svc',donde:'Todo el servicio',rid:'',
+              av:avanceDe(claveSvc(sv.n,pid))});
+  });
+  (D.recintos[sv.piso]||[]).filter(r=>String(r[9]||'').toUpperCase()===sv.n.toUpperCase())
+   .forEach(r=>pautasDeRec(r[0]).forEach(pid=>{
+     const a=ambitoDe(pid); if(!a)return;
+     out.push({pid,a,tipo:'rec',donde:(r[2]||r[0])+(r[1]?' · '+r[1]:''),rid:r[0],r,
+               av:avanceDe(claveRec(r[0],pid))});
+   }));
+  return out;
+}
+let _QP='';                                   // filtro vivo del buscador de pautas
+function filtraPautas(q){ _QP=q||''; pintaListaPautas(); }
+function pintaListaPautas(){
+  const cont=$('lPautasSvc'); if(!cont||!_SVC)return;
+  const todas=todasPautasSvc(_SVC);
+  const hits=todas.filter(x=>coincide(_QP,[x.a.name,x.a.normaNombre,x.donde,x.rid]));
+  cont.innerHTML=hits.map(x=>{
+    const ctx=x.tipo==='svc'?{tipo:'svc',svc:_SVC.n,amb:x.pid}
+                            :{tipo:'rec',rid:x.rid,svc:_SVC.n,amb:x.pid,rnom:x.donde.split(' · ')[0]};
+    return `<button class="item" onclick='ir("pauta",${esc(JSON.stringify(ctx))})'>
+      <div class="ic">${x.tipo==='svc'?'🏛':'📍'}</div>
+      <div class="tt"><b style="white-space:normal">${esc(nomAmbito(x.a.name))}</b>
+        <span>${esc(x.donde)} · ${esc(x.a.normaNombre)} · ${x.a.reqs.length} req.</span></div>
+      <div class="fx"><span class="hint">${x.av}%</span><div class="prog"><i style="width:${x.av}%"></i></div></div>
+      <span class="chev">›</span></button>`;
+  }).join('')||`<div class="hint" style="padding:10px 2px">${todas.length
+      ?'Sin resultados para esa búsqueda.'
+      :'Este servicio todavía no tiene ninguna pauta asignada.'}</div>`;
+  const n=$('nPautasSvc');
+  if(n)n.textContent=hits.length===todas.length?`${todas.length}`:`${hits.length} de ${todas.length}`;
+}
+
+let _SVC=null;
 function pintaServicio(nombre){
   const sv=svcInfo(nombre); if(!sv)return;
+  _SVC=sv;
   $('hTit').textContent=sv.n; $('hSub').textContent='Servicio · '+sv.piso+' · vista 1';
   const asigns=pautasDeSvc(sv.n);
   const lista=asigns.map(pid=>{
@@ -785,15 +891,66 @@ function pintaServicio(nombre){
       <div class="tt"><b>${esc(nomAmbito(a.name))}</b><span>${esc(a.normaNombre)} · ${a.reqs.length} requisitos</span></div>
       <div class="fx"><span class="hint">${av}%</span><div class="prog"><i style="width:${av}%"></i></div></div><span class="chev">›</span></button>${quitar}</div>`;
   }).join('');
+
   const recs=(D.recintos[sv.piso]||[]).filter(r=>String(r[9]||'').toUpperCase()===sv.n.toUpperCase());
+  const todas=todasPautasSvc(sv);
+  const hechas=todas.filter(x=>x.av===100).length, sinTocar=todas.filter(x=>x.av===0).length;
+  const prom=todas.length?Math.round(todas.reduce((a,b)=>a+b.av,0)/todas.length):0;
+
+  // lo cotejable primero: recintos con pauta pendiente, luego en curso, los
+  // terminados y al final los que no tienen pauta asignada
+  const avRec=r=>{const ps=pautasDeRec(r[0]);return ps.length?Math.round(ps.reduce((a,x)=>a+avanceDe(claveRec(r[0],x)),0)/ps.length):-1;};
+  const orden=r=>{const a=avRec(r);return a<0?3:(a===0?0:(a===100?2:1));};
+  recs.sort((x,y)=>orden(x)-orden(y)||String(x[1]||'').localeCompare(String(y[1]||''),'es',{numeric:true}));
+  const filaRec=recs.map(r=>{
+    const ps=pautasDeRec(r[0]);
+    const av=ps.length?Math.round(ps.reduce((a,p)=>a+avanceDe(claveRec(r[0],p)),0)/ps.length):0;
+    return `<button class="item" onclick='ir("recinto",${esc(JSON.stringify(r))})'>
+      <div class="ic">${ps.length?(av===100?'✅':(av?'🟡':'📋')):'▫️'}</div>
+      <div class="tt"><b style="white-space:normal">${esc(r[2]||r[0])}</b>
+        <span>${esc(r[1]||'sin código')} · ${r[8]||'—'} m² · ${ps.length?ps.length+' pauta'+(ps.length>1?'s':''):'sin pauta'}</span></div>
+      ${ps.length?`<div class="fx"><span class="hint">${av}%</span><div class="prog"><i style="width:${av}%"></i></div></div>`:''}
+      <span class="chev">›</span></button>`;
+  }).join('');
+
   $('v-servicio').innerHTML=`
-    <div class="card"><h2>Pautas del servicio</h2>
+    ${planoSvc(sv)?`<div class="card"><h2>Plano del servicio · ${esc(sv.piso)}</h2>
+      <div class="svcplano-wrap">${planoSvc(sv)}</div>
+      <div class="leyenda">
+        <span><i class="lg lg-p"></i>con pauta</span><span><i class="lg lg-q"></i>en curso</span>
+        <span><i class="lg lg-h"></i>al 100%</span><span><i class="lg lg-n"></i>sin pauta</span>
+        <span><i class="lg lg-v"></i>otro servicio</span></div>
+      <div class="hint">Tocá un recinto para abrir su ficha y su pauta.</div>
+      <button class="btn sec" style="margin-top:9px" onclick="PISO='${sv.piso}';ir('plano','${sv.piso}')">Abrir el plano completo del ${esc(sv.piso)}</button>
+    </div>`:''}
+
+    <div class="card"><h2>Pautas por aplicar <span class="pill" style="background:#e8eef8;color:#1D2D5B" id="nPautasSvc">${todas.length}</span></h2>
+      <div class="res3">
+        <div><b>${prom}%</b><span>avance</span></div>
+        <div><b>${hechas}</b><span>al 100%</span></div>
+        <div><b>${sinTocar}</b><span>sin empezar</span></div>
+      </div>
+      <input id="qPautasSvc" placeholder="Buscar pauta, norma o recinto…" oninput="filtraPautas(this.value)" value="${esc(_QP)}">
+      <div id="lPautasSvc" class="lista-scroll"></div>
+    </div>
+
+    <div class="card"><h2>Pautas de unidad (todo el servicio)</h2>
       ${lista||'<div class="hint">Sin pautas aplicadas a nivel de servicio todavía.</div>'}
       ${puedoVer(sv.n)?`<button class="btn sec" style="margin-top:10px" onclick='asignar("svc",null,"${esc(sv.n)}")'>＋ Aplicar pauta al servicio</button>`:''}
     </div>
-    ${fichaDatos(sv)}
-    ${recs.length?`<div class="card"><h2>Recintos del servicio en el plano (${recs.length})</h2>
-      <button class="btn sec" onclick="PISO='${sv.piso}';ir('plano','${sv.piso}')">Ver en el plano · ${sv.piso}</button></div>`:''}`;
+
+    ${recs.length?`<div class="card"><h2>Recintos del servicio <span class="pill" style="background:#e8eef8;color:#1D2D5B">${recs.length}</span></h2>
+      <div class="lista-scroll">${filaRec}</div></div>`:
+      '<div class="card"><h2>Recintos del servicio</h2><div class="hint">Este servicio no tiene recintos dentro de su área en Atlas vista 1.</div></div>'}
+
+    ${fichaDatos(sv)}`;
+
+  pintaListaPautas();
+  // en escritorio la columna derecha acompaña: si está en otro piso, cambia
+  if(!esMovilVista()&&PISO!==sv.piso)pintaPlano(sv.piso);
+  $('v-servicio').querySelectorAll('.svcplano .rec[data-i]').forEach(el=>{
+    el.addEventListener('click',()=>ir('recinto',(D.recintos[sv.piso]||[])[+el.dataset.i]));
+  });
 }
 
 /* ── asignación de pautas (desde lo ya trabajado) ────────────────────────── */
