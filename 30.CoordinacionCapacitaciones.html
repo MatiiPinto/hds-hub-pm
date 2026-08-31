@@ -421,7 +421,8 @@ function renderLegend(){
   document.getElementById("legend").innerHTML=
     '<span class="muted" style="font-weight:600">'+AREAS.filter(function(a){return a[0]===active;})[0][1]+':</span>'+
     ESTADOS[active].map(function(e){return '<span><i class="dot" style="background:'+EST_HEX[e.k]+'"></i>'+e.lbl+'</span>';}).join("")+
-    '<span class="muted">· El % cuenta '+DONE_WORD[active]+' sobre el TOTAL del área (los "No aplica" aún no gestionables también cuentan)</span>';
+    '<span class="muted">· El % cuenta '+DONE_WORD[active]+' sobre el TOTAL del área; la Ejecución parcial pesa 0,5. '+
+       'El equipamiento que sale de la hoja oficial (descontinuado o reemplazado) sale también del total.</span>';
 }
 function renderTabs(){
   document.getElementById("tabs").innerHTML=AREAS.map(function(a){
