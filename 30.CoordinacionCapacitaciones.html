@@ -993,10 +993,13 @@ function gEntradas(){
       var r=vis[e.cod]; if(!r) return;                       // fuera del filtro
       usados[e.cod]=1;
       var svs=String(r.serv||"").split("\n").filter(function(x){return x.trim();});
-      var propio=(r.sl.length===1 && svs.length<=1);
-      out.push({f: propio?r.sl[0].f:j.fecha,
-                h: propio?(r.sl[0].h||""):(j.hora||""),
-                serv: j.servicio, r:r});
+      // un solo servicio → las fechas de la hoja son inequivocas y mandan, y
+      // cada sesion (varias fechas/horas de una misma tipologia) va aparte.
+      if(svs.length<=1 && r.sl.length){
+        r.sl.forEach(function(sl){ out.push({f:sl.f, h:sl.h||"", serv:j.servicio, r:r}); });
+      }else{
+        out.push({f:j.fecha, h:j.hora||"", serv:j.servicio, r:r});
+      }
     });
   });
   Object.keys(vis).forEach(function(cod){                     // sin jornada propuesta
