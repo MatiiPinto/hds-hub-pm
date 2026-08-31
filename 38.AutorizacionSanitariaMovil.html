@@ -37,6 +37,7 @@ header h1{font-size:15px;font-weight:800;letter-spacing:-.2px;white-space:nowrap
 header .s{font-size:10.5px;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sync{width:10px;height:10px;border-radius:50%;flex:none}
 .sync.ok{background:#4ade80}.sync.pend{background:#fbbf24;animation:pu 1.2s infinite}.sync.off{background:#94a3b8}
+.sync.err{background:#ef4444;animation:pu .9s infinite}
 @keyframes pu{50%{opacity:.35}}
 
 main{max-width:1100px;margin:0 auto;padding:14px}
@@ -283,7 +284,29 @@ const puedoVer=svc=>{
 /* ── estado de pautas: local + backend ───────────────────────────────────── */
 let EST={}; try{EST=JSON.parse(localStorage.getItem('as_estados')||'{}');}catch(e){}
 let COLA=[]; try{COLA=JSON.parse(localStorage.getItem('as_cola')||'[]');}catch(e){}
-function persist(){localStorage.setItem('as_estados',JSON.stringify(EST));localStorage.setItem('as_cola',JSON.stringify(COLA));}
+let FALLIDOS=[]; try{FALLIDOS=JSON.parse(localStorage.getItem('as_fallidos')||'[]');}catch(e){}
+let _sinEspacio=false;
+function persist(){
+  try{
+    localStorage.setItem('as_estados',JSON.stringify(EST));
+    localStorage.setItem('as_cola',JSON.stringify(COLA));
+    localStorage.setItem('as_fallidos',JSON.stringify(FALLIDOS));
+    _sinEspacio=false; return true;
+  }catch(e){
+    // cuota llena (o modo privado). El estado sigue vivo en memoria y la cola
+    // sigue subiendo al backend, pero si se cierra la pestaña se pierde: hay
+    // que decirlo, no fallar en silencio.
+    _sinEspacio=true; setSync('err');
+    toast('⚠ Sin espacio en el navegador: subí lo pendiente antes de cerrar.');
+    try{ localStorage.setItem('as_cola',JSON.stringify(COLA)); }catch(e2){}
+    return false;
+  }
+}
+// aviso temprano: a partir de ~3,5 MB conviene purgar antes de quedarse sin aire
+function espacioUsado(){
+  try{ return (localStorage.getItem('as_estados')||'').length
+             + (localStorage.getItem('as_cola')||'').length; }catch(e){ return 0; }
+}
 function setSync(k){$('sync').className='sync '+k;}
 async function bajarEstados(){
   if(!URLC) return;
@@ -301,6 +324,7 @@ function guardar(clave,servicio,recinto,pauta,datos){
   const reqs=reqsDe(pauta).length;
   const resp=Object.keys(datos).filter(k=>!k.startsWith('obs_')).length;
   const avance=reqs?Math.round(resp*100/reqs):0;
+  if(!SES||!SES.correo){ toast('Tu sesión se cerró: volvé a entrar para no perder esto.'); return; }
   EST[clave]={servicio,recinto,pauta,datos,avance,usuario:SES.correo,ts:new Date().toISOString()};
   COLA=COLA.filter(c=>c.clave!==clave);
   COLA.push({accion:'estado',clave,servicio,recinto,pauta,datos,avance,usuario:SES.correo});
@@ -316,7 +340,19 @@ async function vaciarCola(){
     // versión más nueva de la misma clave, esa queda en cola y sale después
     const it=COLA[0];
     try{
-      await fetch(URLC,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(it)});
+      const rr=await fetch(URLC,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(it)});
+      // el backend puede responder 200 con {ok:false}: descartarlo ahí sería
+      // perder el cotejo en el servidor mostrando la app en verde
+      let ok=true;
+      try{ const j=await rr.clone().json(); if(j && j.ok===false) ok=false; }
+      catch(e2){ /* respuesta no legible (CORS): el POST igual llegó */ }
+      if(!ok){
+        it._int=(it._int||0)+1;
+        if(it._int<3){ persist(); setSync('pend'); break; }   // reintenta al próximo ciclo
+        FALLIDOS.push(it); COLA=COLA.filter(x=>x!==it); persist(); setSync('err');
+        toast('⚠ El servidor rechazó un guardado. Quedó en «pendientes por revisar».');
+        continue;
+      }
       COLA=COLA.filter(x=>x!==it); persist();
     }catch(e){setSync('off');break;}
   }
@@ -1228,8 +1264,143 @@ async function subirDrive(html,auto){
   }
 }
 
+/* ── arnés · ?selftest=1 ─────────────────────────────────────────────────
+   Prueba en vivo lo que un dato roto haría desaparecer en silencio: una pauta
+   que ya no se puede abrir, un plano que no dibuja, un informe que no arma.
+   No deja rastro: guarda el estado, corre sobre claves __selftest__ y restaura.
+   ──────────────────────────────────────────────────────────────────────── */
+async function selftest(){
+  const T=[]; let n=0;
+  const chk=(nom,cond,det)=>{n++;T.push({nom,ok:!!cond,det:det==null?'':String(det)});};
+  const intenta=async(nom,fn)=>{try{const d=await fn();chk(nom,true,d);}catch(e){chk(nom,false,e.message);}};
+  const _est=JSON.stringify(EST), _cola=JSON.stringify(COLA), _ses=SES, _pila=PILA.slice(), _piso=PISO;
+  const t0=performance.now();
+  try{
+    SES={correo:'selftest@hsalvador.cl',nivel:'total',nombre:'Arnés',servicios:[]};
+
+    /* 1 · los datos llegaron completos */
+    chk('datos cargados', D&&D.normas&&D.recintos&&D.servicios&&D.asign);
+    chk('14 normas con ámbitos', Object.keys(D.normas||{}).length>=14, Object.keys(D.normas||{}).length+' normas');
+    chk('pautas de unidad publicadas', Object.keys(D.asign_svc||{}).length>0,
+        Object.keys(D.asign_svc||{}).length+' servicios');
+    chk('planos de todos los pisos', (D.pisos||[]).every(p=>D.planos&&D.planos[p]));
+
+    /* 2 · toda pauta asignada se puede abrir de verdad */
+    let rotas=0, total=0;
+    Object.values(D.asign).forEach(v=>v.forEach(a=>{total++;if(!ambitoDe(a))rotas++;}));
+    Object.values(D.asign_svc||{}).forEach(v=>v.forEach(a=>{total++;if(!ambitoDe(a))rotas++;}));
+    chk('toda pauta asignada existe en las normas', rotas===0, rotas+' rotas de '+total);
+    chk('toda asignación apunta a un recinto real',
+        Object.keys(D.asign).every(id=>D.pisos.some(p=>(D.recintos[p]||[]).some(r=>r[0]===id))));
+
+    /* 3 · los requisitos no se pisan entre sí (misma n = misma marca) */
+    let colisiones=0;
+    Object.values(D.normas).forEach(nm=>nm.secciones.forEach(se=>se.ambitos.forEach(a=>{
+      const ns=a.reqs.map(q=>q.n); if(new Set(ns).size!==ns.length)colisiones++;
+    })));
+    chk('sin números de requisito repetidos', colisiones===0, colisiones+' ámbitos');
+
+    /* 4 · el cálculo de avance responde a lo que se marca */
+    const svP=D.servicios.find(x=>(D.asign_svc||{})[x.n.toUpperCase()]);
+    if(svP){
+      const amb=D.asign_svc[svP.n.toUpperCase()][0], cl='svc|__selftest__|'+amb;
+      const nq=reqsDe(amb).length;
+      guardar(cl,'__selftest__','',amb,{}); chk('pauta vacía = 0 %', avanceDe(cl)===0, avanceDe(cl)+'%');
+      const d={}; reqsDe(amb).forEach(q=>d['r'+q.n]='C');
+      guardar(cl,'__selftest__','',amb,d);
+      chk('pauta completa = 100 %', avanceDe(cl)===100, avanceDe(cl)+'% con '+nq+' requisitos');
+      const mitad={}; reqsDe(amb).slice(0,Math.ceil(nq/2)).forEach(q=>mitad['r'+q.n]='NC');
+      guardar(cl,'__selftest__','',amb,mitad);
+      chk('avance parcial coherente', avanceDe(cl)>0&&avanceDe(cl)<100, avanceDe(cl)+'%');
+      chk('las observaciones no cuentan como respuesta',
+          (()=>{guardar(cl,'__selftest__','',amb,{obs_1:'x'});return avanceDe(cl)===0;})());
+      chk('la cola no duplica la misma clave',
+          COLA.filter(c=>c.clave===cl).length<=1, COLA.filter(c=>c.clave===cl).length+' en cola');
+      guardar(cl,'__selftest__','',amb,{_borrada:1});
+      chk('quitar una pauta la saca de la lista', !pautasDeSvc('__selftest__').includes(amb));
+      delete EST[cl]; COLA=COLA.filter(c=>c.clave!==cl);
+    }
+
+    /* 5 · las tres vistas se pintan para una muestra de todo el hospital */
+    const muestra=D.servicios.slice(0,60);
+    await intenta('la ficha de servicio se pinta en los '+muestra.length+' servicios',()=>{
+      muestra.forEach(sv=>pintaServicio(sv.n)); return 'sin excepciones';});
+    await intenta('el plano del servicio genera SVG válido',()=>{
+      let sin=0; muestra.forEach(sv=>{const h=planoSvc(sv); if(!h||h.indexOf('<svg')!==0)sin++;});
+      if(sin>4)throw new Error(sin+' servicios sin plano');
+      return sin+' sin polígono en Atlas (esperable)';});
+    const recs=[]; D.pisos.forEach(p=>(D.recintos[p]||[]).forEach(r=>{if(D.asign[r[0]])recs.push(r);}));
+    await intenta('la ficha de recinto se pinta ('+Math.min(80,recs.length)+' con pauta)',()=>{
+      recs.slice(0,80).forEach(r=>pintaRecinto(r)); return 'sin excepciones';});
+    await intenta('la pauta se abre y se puede cotejar',()=>{
+      const r=recs[0], amb=D.asign[r[0]][0];
+      pintaPauta({tipo:'rec',rid:r[0],svc:r[9]||r[3],amb,rnom:r[2]});
+      const b=document.querySelectorAll('#v-pauta .req').length;
+      if(!b)throw new Error('no se pintó ningún requisito');
+      return b+' requisitos en pantalla';});
+
+    /* 6 · el informe se arma completo */
+    await intenta('el informe se genera con plano y firmas',async()=>{
+      const h=await construirInforme();
+      if(h.indexOf('Informe de Cotejo')<0)throw new Error('sin encabezado');
+      if(h.indexOf('data:image')<0)throw new Error('sin recorte de plano');
+      return Math.round(h.length/1024)+' KB';});
+
+    /* 7 · el buscador encuentra por norma, artículo, recinto y código */
+    const svB=D.servicios.find(x=>(D.asign_svc||{})[x.n.toUpperCase()]);
+    if(svB){ pintaServicio(svB.n);
+      const todas=todasPautasSvc(svB);
+      chk('el buscador lista unidad + recinto', todas.length>0, todas.length+' pautas');
+      const q=todas[0].a.normaNombre.split(' ')[0];
+      chk('filtra por norma', todas.filter(x=>coincide(q,[x.a.name,x.a.normaNombre,x.donde,x.rid])).length>0, q);
+      chk('el filtro sin coincidencias no revienta',
+          todas.filter(x=>coincide('zzqx',[x.a.name,x.a.normaNombre,x.donde,x.rid])).length===0);
+    }
+
+    /* 8 · los permisos no se desbordan */
+    SES={correo:'x@hsalvador.cl',nivel:'servicio',nombre:'x',servicios:['OFTALMOLOGIA']};
+    chk('ve su propio servicio', puedoVer('OFTALMOLOGIA'));
+    chk('no ve un servicio ajeno', !puedoVer('PABELLONES')&&!puedoVer('UCI')&&!puedoVer('RRHH'));
+    chk('sin servicio no ve nada', !puedoVer(''));
+    SES={correo:'selftest@hsalvador.cl',nivel:'total',nombre:'Arnés',servicios:[]};
+    chk('la supervisión ve todo', D.servicios.every(x=>puedoVer(x.n)));
+
+    /* 9 · los nombres de las normas se muestran como fueron escritos */
+    chk('desgrita solo lo que viene en mayúsculas',
+        nomAmbito('SALA DE PROCEDIMIENTOS')==='Sala de procedimientos' &&
+        nomAmbito('Artículo 11 · Todo laboratorio')==='Artículo 11 · Todo laboratorio');
+
+    /* 10 · el almacenamiento del navegador aguanta */
+    chk('localStorage disponible', (()=>{try{localStorage.setItem('__st','1');localStorage.removeItem('__st');return true;}catch(e){return false;}})());
+    chk('espacio usado razonable', espacioUsado()<3_500_000, (espacioUsado()/1024).toFixed(0)+' KB');
+    chk('backend configurado', !!URLC, URLC?'sí':'FALTA as_remote.js');
+
+  }finally{
+    EST=JSON.parse(_est); COLA=JSON.parse(_cola); SES=_ses; PILA=_pila.length?_pila:[{v:'inicio'}];
+    Object.keys(EST).forEach(k=>{if(k.indexOf('__selftest__')>=0)delete EST[k];});
+    COLA=COLA.filter(c=>String(c.clave||'').indexOf('__selftest__')<0);
+    persist();
+  }
+  const mal=T.filter(x=>!x.ok), ms=Math.round(performance.now()-t0);
+  document.body.innerHTML=`<div style="font:14px/1.5 -apple-system,system-ui;padding:22px;max-width:900px;margin:0 auto;color:#17233b">
+    <h1 style="font-size:20px;color:#1D2D5B;margin:0 0 4px">Arnés · Autorización Sanitaria</h1>
+    <p style="color:#5b6b85;margin:0 0 16px">${T.length} comprobaciones en ${ms} ms ·
+      <b style="color:${mal.length?'#b91c1c':'#15803d'}">${mal.length?mal.length+' FALLAN':'todo pasa'}</b></p>
+    <table style="border-collapse:collapse;width:100%;font-size:13px">${T.map(x=>
+      `<tr style="border-bottom:1px solid #edf1f7">
+        <td style="padding:7px 8px;width:26px">${x.ok?'✔':'✘'}</td>
+        <td style="padding:7px 8px;${x.ok?'':'color:#b91c1c;font-weight:700'}">${esc(x.nom)}</td>
+        <td style="padding:7px 8px;color:#8593a9;text-align:right;white-space:nowrap">${esc(x.det)}</td>
+      </tr>`).join('')}</table>
+    <p style="margin-top:18px;color:#8593a9;font-size:12px">Sin rastro: el estado real quedó como estaba.
+      Volver a <a href="?">la plataforma</a>.</p></div>`;
+  document.title=(mal.length?'✘ '+mal.length+' FALLAN':'✔ arnés OK')+' · AS';
+  return {total:T.length,fallan:mal.length,ms};
+}
+
 /* ── arranque ────────────────────────────────────────────────────────────── */
 function arranca(){
+  if(/[?&]selftest=1/.test(location.search)){ setTimeout(selftest,60); return; }
   if(!SES){muestra('login');$('hSub').textContent='Pautas en terreno · Nuevo HDS';return;}
   bajarEstados().then(()=>{if(PILA.length<=1)pintaInicio();});
   PILA=[{v:'inicio'}];
