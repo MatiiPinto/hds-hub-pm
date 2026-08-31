@@ -309,8 +309,26 @@ const claveSvc=(svc,amb)=>'svc|'+svc+'|'+amb;
 function estadoDe(clave){return EST[clave]||null;}
 function avanceDe(clave){const e=estadoDe(clave);return e?e.avance:0;}
 const _borrada=k=>{const e=EST[k];return !!(e&&e.datos&&e.datos._borrada);};
+// pautas de un servicio: las de unidad sembradas (D.asign_svc — normas que
+// autorizan al servicio completo: laboratorio, imagenología, psiquiatría…)
+// + las aplicadas a mano, menos las quitadas con 🗑
+// las normas AC/CM traen los ámbitos GRITADOS EN MAYÚSCULAS; las demás vienen
+// ya redactadas. Solo se desgrita la primera clase, o se pierden los nombres
+// propios ("Artículo 1 · Laboratorio Clínico…" → "…laboratorio clínico…").
+function nomAmbito(t){
+  t=String(t||'');
+  const letras=t.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/g,'');
+  if(!letras) return t;
+  const may=(letras.match(/[A-ZÁÉÍÓÚÜÑ]/g)||[]).length/letras.length;
+  return may>0.8 ? t.toLowerCase().replace(/^\w/,c=>c.toUpperCase()) : t;
+}
 function pautasDeSvc(svc){
-  return Object.keys(EST).filter(k=>k.startsWith('svc|'+svc+'|')&&!_borrada(k)).map(k=>k.split('|')[2]);
+  const k0=String(svc||'').toUpperCase();
+  const set=new Set(((D.asign_svc||{})[k0]||[]).filter(a=>!_borrada(claveSvc(svc,a))));
+  Object.keys(EST).forEach(k=>{
+    if(k.startsWith('svc|'+svc+'|')&&!_borrada(k)) set.add(k.split('|')[2]);
+  });
+  return [...set];
 }
 // pautas de un recinto: las de la siembra (D.asign) + las asignadas a mano
 // desde la app (claves rec|id|*), menos las quitadas con 🗑 (_borrada)
@@ -679,7 +697,7 @@ function pintaRecinto(r){
           onclick='event.stopPropagation();quitarPauta(${JSON.stringify(clave)},${JSON.stringify(svc)},${JSON.stringify(id)},${JSON.stringify(pid)})'>🗑</button>`:'';
     return `<div style="display:flex;align-items:center"><button class="item" style="flex:1" onclick='ir("pauta",${JSON.stringify({tipo:"rec",rid:id,rnom:name+(code?" · "+code:""),svc:svc,amb:pid})})'>
       <div class="ic">📋</div>
-      <div class="tt"><b>${esc(a.name.toLowerCase().replace(/^\w/,c=>c.toUpperCase()))}${manual?' <span class="pill" style="background:#e8eef8;color:#1D2D5B">manual</span>':''}</b><span>${esc(a.normaNombre)} · ${a.reqs.length} requisitos</span></div>
+      <div class="tt"><b>${esc(nomAmbito(a.name))}${manual?' <span class="pill" style="background:#e8eef8;color:#1D2D5B">manual</span>':''}</b><span>${esc(a.normaNombre)} · ${a.reqs.length} requisitos</span></div>
       <div class="fx"><span class="hint">${av}%</span><div class="prog"><i style="width:${av}%"></i></div></div><span class="chev">›</span></button>${quitar}</div>`;
   }).join('');
 
@@ -764,7 +782,7 @@ function pintaServicio(nombre){
           onclick='event.stopPropagation();quitarPauta(${JSON.stringify(clave)},${JSON.stringify(sv.n)},null,${JSON.stringify(pid)})'>🗑</button>`:'';
     return `<div style="display:flex;align-items:center"><button class="item" style="flex:1" onclick='ir("pauta",${JSON.stringify({tipo:"svc",svc:sv.n,amb:pid})})'>
       <div class="ic">📋</div>
-      <div class="tt"><b>${esc(a.name.toLowerCase().replace(/^\w/,c=>c.toUpperCase()))}</b><span>${esc(a.normaNombre)} · ${a.reqs.length} requisitos</span></div>
+      <div class="tt"><b>${esc(nomAmbito(a.name))}</b><span>${esc(a.normaNombre)} · ${a.reqs.length} requisitos</span></div>
       <div class="fx"><span class="hint">${av}%</span><div class="prog"><i style="width:${av}%"></i></div></div><span class="chev">›</span></button>${quitar}</div>`;
   }).join('');
   const recs=(D.recintos[sv.piso]||[]).filter(r=>String(r[9]||'').toUpperCase()===sv.n.toUpperCase());
@@ -820,7 +838,7 @@ function pintaPauta(ctx){
   const editable=puedoVer(ctx.svc);
   // El título dice DÓNDE se está aplicando y el subtítulo QUÉ pauta: al revés
   // se leía como si la app hubiera cambiado de servicio (hallazgo de M. Canales).
-  const _pnom=a.name.toLowerCase().replace(/^\w/,c=>c.toUpperCase());
+  const _pnom=nomAmbito(a.name);
   $('hTit').textContent=(ctx.tipo==='svc'?ctx.svc:(ctx.rnom||ctx.rid));
   $('hSub').textContent=_pnom+' · '+a.normaNombre;
   let g0=null,h='';

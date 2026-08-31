@@ -177,7 +177,7 @@ th.sortable{cursor:pointer;user-select:none}th.sortable:hover{background:#0a558f
       <span id="capUpdInfo" style="font-size:11px;color:#94a3b8;text-align:right;line-height:1.35"></span>
       <button class="btn" id="btnCapUpd" onclick="actualizarDesdeExcel()" title="Vuelve a leer la hoja '4. Prog Capacitacion HDS' del Excel de Seguimiento y Control (Drive sincronizado) y regenera la reportería. Requiere el servidor local: python3 _DEV/deploy_server.py (o usá Actualizar-Capacitaciones.command).">⟳ Actualizar desde Excel</button>
       <button class="btn" onclick="gAbrir()" title="Vista cronológica del programa con los colores de estado; exportable a Excel para el Servicio de Salud.">📊 Carta Gantt</button>
-      <button class="btn" id="btnSeg" onclick="segAbrir()" title="Jornadas propuestas a la CSSO (89 correos enviados el 20-08-2026): fechas cargadas y registro de ejecución.">🎓 Jornadas CSSO<span class="segbadge" id="segBadge" style="display:none">0</span></button>
+      <button class="btn" id="btnSeg" onclick="segAbrir()" title="Jornadas propuestas a la CSSO (89 correos enviados el 20-08-2026): solo consulta. El estado oficial se corrige en la hoja 4 del Excel.">🎓 Jornadas CSSO</button>
       <button class="btn" onclick="exportCSV()">⬇ Exportar CSV</button>
       <button class="btn" onclick="resetEstados()">↺ Reiniciar estados</button>
     </div>
@@ -562,43 +562,34 @@ function actualizarDesdeExcel(){
 <!-- ══════════════════════════════════════════════════════════════════════════
      SEGUIMIENTO DE JORNADAS PROPUESTAS A LA CSSO
      Fuente: SHARED_DATA/cap_seguimiento.js (propuestas enviadas a la CSSO).
-     v3 (25-08): el registro es POR EQUIPO — cada tipologia de una jornada se
-     confirma, reprograma o ejecuta por separado (la CSSO responde por equipo).
+     v4 (30-08): SOLO CONSULTA. Se elimino el registro desde la plataforma
+     (el pop-up "¿se realizo?" y las marcas por equipo): la HOJA 4 del Excel
+     oficial es la unica fuente de verdad. Cualquier correccion se hace alli
+     y se regenera cap_data.js con _DEV/build_capacitaciones_from_xlsx.py.
        1) SIEMBRA: carga en cada tipologia la fecha/hora propuesta y la deja
-          "En CSSO" (sin pisar lo ya ejecutado/coordinado). Una vez por version.
-       2) POP-UP: al entrar, si hay jornadas cuya fecha ya paso y no estan
-          respondidas, pregunta si se realizaron. La respuesta escribe el
-          estado de cada tipologia -> y con eso se recalcula el avance global.
-     Estado local propio en localStorage "hds_coordcap_seg_v1" (respuestas y
-     postergaciones); los estados viven donde siempre (hds_coordcap_v1).
-     Debug: ?hoy=YYYY-MM-DD simula la fecha; ?seg=0 desactiva el pop-up.
+          "En CSSO", solo si la hoja no la cerro ya. Una vez por version.
+       2) PANEL: lista de referencia de lo propuesto a la CSSO, mostrando el
+          estado oficial de cada equipo. Sin controles de edicion.
+     Estado local propio en localStorage "hds_coordcap_seg_v1" (solo la marca
+     de siembra); los estados viven donde siempre (hds_coordcap_v1).
      ══════════════════════════════════════════════════════════════════════ -->
 <script>
 "use strict";
 (function(){
 var SEG = window.CAP_SEG;
 if(!SEG || !SEG.jornadas || !SEG.jornadas.length) return;
-var QS = new URLSearchParams(location.search);
-// En las copias de consulta (HUB PM / publico) las fechas se ven, pero el
-// registro NO: la respuesta la lleva Matias en su plataforma.
-var RO = !!window.PUBLIC;
+// v4: el panel es identico en la plataforma local y en las copias de consulta
+// (HUB PM / publico): en todas es solo lectura.
 var SKEY = "hds_coordcap_seg_v1";
 var S; try{ S = JSON.parse(localStorage.getItem(SKEY)||"{}"); }catch(e){ S = {}; }
-// v3: el registro es POR EQUIPO. S.eq["Jkey|cod"] = {c, nf, nh, nota, ts, dia}
-//   c: "prog" (CSSO confirmo) | "reprog" (nueva fecha/hora nf/nh) |
-//      "si" (ejecutado) | "no" (no ejecutado)   · ausente = sin respuesta
+// S.eq / S.snooze: marcas del registro v1-v3, hoy en desuso. Se leen una sola
+// vez en la migracion v4 para revertir lo que habian escrito, y se borran.
 S.eq = S.eq || {}; S.snooze = S.snooze || {};
 function ssave(){ try{ localStorage.setItem(SKEY, JSON.stringify(S)); }catch(e){} }
-function p2(n){ return (n<10?"0":"")+n; }
-function hoy(){ var f=QS.get("hoy"); if(f && /^\d{4}-\d{2}-\d{2}$/.test(f)) return f;
-  var d=new Date(); return d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate()); }
-function ahora(){ if(QS.get("hoy")) return "23:59"; var d=new Date(); return p2(d.getHours())+":"+p2(d.getMinutes()); }
 function dmy(f){ return f?f.slice(8,10)+"-"+f.slice(5,7)+"-"+f.slice(0,4):""; }
-function _min(h){ var m=/^(\d{1,2}):(\d{2})$/.exec(h||""); return m?(+m[1])*60+(+m[2]):null; }
-function _hhmm(m){ m=((m%1440)+1440)%1440; return p2(Math.floor(m/60))+":"+p2(m%60); }
 
 // ── migracion v1/v2 (marcas por jornada) → v3 (marcas por equipo) ─────────
-var MIGRADO=false;
+// se conserva solo para que la migracion v4 sepa que tipologias tocar.
 if(!S.v3){
   SEG.jornadas.forEach(function(j){
     var r=(S.resp||{})[j.key], c=(S.conf||{})[j.key];
@@ -611,7 +602,6 @@ if(!S.v3){
     });
   });
   delete S.resp; delete S.conf; S.v3=1; ssave();
-  MIGRADO=true;
 }
 
 // codigo -> fila de capacitaciones
@@ -626,20 +616,29 @@ SEG.jornadas.forEach(function(j){
 });
 var NOTA_PFX = "Jornada CSSO: ";
 
-// ── helpers POR PAR (jornada, equipo) ─────────────────────────────────────
-function eqE(j,cod){ return S.eq[j.key+"|"+cod]||null; }
-function eqC(j,cod){ var m=eqE(j,cod); return m?m.c:""; }
-function fEfE(j,cod){ var m=eqE(j,cod); return (m&&m.c==="reprog"&&m.nf)?m.nf:j.fecha; }
-function hEfE(j,cod){ var m=eqE(j,cod); return (m&&m.c==="reprog"&&m.nh)?m.nh:j.hora; }
-function finEfE(j,cod){
-  var h=hEfE(j,cod); if(h===j.hora) return j.fin;
-  var dur=(_min(j.fin)!=null&&_min(j.hora)!=null)?(_min(j.fin)-_min(j.hora)):null;
-  return (dur!=null&&_min(h)!=null)?_hhmm(_min(h)+dur):j.fin;
+// ── migracion v3 → v4: se elimina el registro desde la plataforma ────────
+// Todo lo que el pop-up habia escrito sobre una tipologia se devuelve a lo
+// que diga la hoja oficial; desde ahora las correcciones se hacen en el Excel.
+if(!S.v4){
+  var _limp=0;
+  Object.keys(JXROW).forEach(function(id){
+    var cod=String(IDX[id].codigo).trim();
+    var tocada=JXROW[id].some(function(j){ return !!S.eq[j.key+"|"+cod]; });
+    if(!tocada) return;
+    var o=overrides[id]; if(!o) return;
+    if(o.estado){ delete o.estado; _limp++; }
+    if(o.notas && o.notas.indexOf(NOTA_PFX)===0) delete o.notas;
+  });
+  S.eq={}; S.snooze={}; delete S.resp; delete S.conf; delete S.seed;
+  S.v4=1; ssave(); save();
+  if(_limp && window.console)
+    console.log("[seguimiento CSSO] v4: "+_limp+" tipologías vuelven al estado de la hoja oficial");
 }
-function vencidaPar(j,cod){ var h=hoy(), f=fEfE(j,cod);
-  return f < h || (f===h && ahora() >= finEfE(j,cod)); }
-function slotsDe(js,cod){ var v={}, o=[]; js.forEach(function(j){ var k=fEfE(j,cod)+" "+hEfE(j,cod);
-  if(!v[k]){ v[k]=1; o.push({f:fEfE(j,cod), h:hEfE(j,cod)}); } }); return o; }
+
+// ── helpers por par (jornada, equipo) ─────────────────────────────────────
+// v4: ya no hay marcas locales, la fecha efectiva es siempre la propuesta.
+function slotsDe(js){ var v={}, o=[]; js.forEach(function(j){ var k=j.fecha+" "+j.hora;
+  if(!v[k]){ v[k]=1; o.push({f:j.fecha, h:j.hora}); } }); return o; }
 
 // ── 1. SIEMBRA de fechas propuestas ───────────────────────────────────────
 (function siembra(){
@@ -647,10 +646,11 @@ function slotsDe(js,cod){ var v={}, o=[]; js.forEach(function(j){ var k=fEfE(j,c
   var n=0;
   Object.keys(JXROW).forEach(function(id){
     var r=IDX[id], est=estadoOf("capacitaciones", r);
-    if(est==="ejecutada" || est==="coordinada" || r._estado==="reprogramada"
-       || r._estado==="coordinada" || r._estado==="ejecutada") return;
-    var o=ov(id), cod=String(r.codigo).trim();
-    o.slots  = slotsDe(JXROW[id], cod);
+    // la hoja manda: solo se siembran fechas en lo que sigue "En CSSO"
+    if(r._estado && r._estado!=="pendiente") return;
+    if(est!=="pendiente") return;
+    var o=ov(id);
+    o.slots  = slotsDe(JXROW[id]);
     o.estado = "pendiente";
     if(!o.fields) o.fields={};
     if(SEG.lugar) o.fields.lugar = SEG.lugar;
@@ -671,305 +671,89 @@ function slotsDe(js,cod){ var v={}, o=[]; js.forEach(function(j){ var k=fEfE(j,c
     SEG.jornadas.length+" jornadas, "+SEG.jornadas.reduce(function(a,j){return a+j.equipos.length;},0)+" pares servicio-jornada)");
 })();
 
-if(MIGRADO || Object.keys(S.eq).length) setTimeout(function(){ recalcula(); }, 0);
-
-// ── 2. estados derivados y cola ───────────────────────────────────────────
-// jornada pendiente de registro: algun equipo con fecha vencida y sin si/no
-// filas que la hoja ya cerro (reprogramada/ejecutada/inst_uso) no se preguntan
-function cerradaHoja(cod){
-  var r=BYCOD[cod]; if(!r) return true;
-  var e=r._estado; return e==="reprogramada"||e==="ejecutada"||e==="inst_uso";
-}
-function pendientes(){
-  return SEG.jornadas.filter(function(j){
-    return j.equipos.some(function(e){
-      var c=eqC(j,e.cod); return c!=="si" && c!=="no" && !cerradaHoja(e.cod) && vencidaPar(j,e.cod);
-    });
-  });
-}
-function porPreguntar(){
-  var h=hoy();
-  return pendientes().filter(function(j){ return S.snooze[j.key] !== h; });
-}
-// estado de la jornada = resumen de sus equipos (la ejecucion manda)
+// ── 2. estado por equipo/jornada: SIEMPRE desde la hoja oficial ───────────
+// v4: la plataforma ya no registra ejecuciones. El estado de cada tipologia
+// sale de cap_data.js (hoja 4 del Excel) y aqui solo se proyecta sobre las
+// jornadas que en su momento se propusieron a la CSSO.
+function estEq(cod){ var r=BYCOD[cod]; return r ? estadoOf("capacitaciones", r) : "pendiente"; }
 function estadoJor(j){
-  var st=j.equipos.map(function(e){ return eqC(j,e.cod); });
-  var nSi=st.filter(function(c){return c==="si";}).length;
-  var nNo=st.filter(function(c){return c==="no";}).length;
-  if(nSi===st.length) return "si";
-  if(nSi||nNo) return nSi?"parcial":"no";
-  if(st.some(function(c){return c==="reprog";})) return "reprog";
-  if(st.length && st.every(function(c){return c==="prog";})) return "prog";
-  if(st.some(function(c){return c==="prog";})) return "prog";
-  return j.equipos.some(function(e){return vencidaPar(j,e.cod);}) ? "esp" : "sin";
+  var st=j.equipos.map(function(e){ return estEq(e.cod); });
+  if(!st.length) return "sin";
+  var fin=st.filter(function(v){ return v==="ejecutada"||v==="inst_uso"; }).length;
+  if(fin===st.length) return "si";
+  if(fin || st.some(function(v){return v==="en_progreso";})) return "parcial";
+  if(st.some(function(v){return v==="reprogramada";})) return "reprog";
+  if(st.some(function(v){return v==="coordinada";})) return "prog";
+  return "sin";
 }
 
-// ── 3. modal ──────────────────────────────────────────────────────────────
+// ── 3. panel (SOLO CONSULTA) ──────────────────────────────────────────────
 var mask=document.getElementById("segMask"), tit=document.getElementById("segTit"),
     sub=document.getElementById("segSub"), body=document.getElementById("segBody"),
     foot=document.getElementById("segFoot");
-var cola=[], iq=0, vista="pend";
-
-function segCerrar(){ mask.className="segmask"; pintaBadge(); }
-function segAbrir(v){ cola=porPreguntar(); iq=0; vista = RO ? "todas" : (v || (cola.length?"pend":"todas")); pinta(); mask.className="segmask on"; }
+function segCerrar(){ mask.className="segmask"; }
+function segAbrir(){ pintaLista(); mask.className="segmask on"; }
 window.segAbrir=segAbrir; window.segCerrar=segCerrar;
-
-function pintaBadge(){
-  var b=document.getElementById("segBadge"); if(!b) return;
-  var n=pendientes().length;
-  b.textContent=n; b.style.display = n ? "inline-block" : "none";
-}
-function pinta(){ if(vista==="pend" && cola.length) pintaPregunta(); else pintaLista(); }
-
-// pop-up de ejecucion: pregunta por los equipos VENCIDOS y sin registro
-function pintaPregunta(){
-  var j=cola[iq];
-  if(!j){ vista="todas"; pintaLista(); return; }
-  var pend=j.equipos.filter(function(e){ var c=eqC(j,e.cod); return c!=="si"&&c!=="no"&&!cerradaHoja(e.cod)&&vencidaPar(j,e.cod); });
-  tit.textContent="¿Se realizó esta capacitación?";
-  sub.textContent="Jornada "+(iq+1)+" de "+cola.length+" por confirmar · el registro es por equipo";
-  var h='<div class="segq">'+esc2(j.servicio)+'</div>'+
-        '<div class="segmeta">'+esc2(j.fecha_larga)+' · '+esc2(j.bloque_nom)+' · '+esc2(SEG.lugar)+'</div>'+
-        '<div class="segmeta" style="margin-top:-8px">Destildá el equipo que <b>no</b> se alcanzó a capacitar; queda como no ejecutado (reprogramado).</div>'+
-        '<div class="segeq">';
-  pend.forEach(function(e){
-    var row=BYCOD[e.cod], otras=(row?(JXROW[row.id]||[]):[]).filter(function(x){return x.key!==j.key;});
-    var av = otras.length ? '<span class="prov">También se capacita en: '+
-             esc2(otras.map(function(x){return x.servicio+" ("+dmy(fEfE(x,e.cod))+")";}).join(", "))+'</span>' : '';
-    var rep=(eqC(j,e.cod)==="reprog")?'<span class="prov">Reprogramado al '+dmy(fEfE(j,e.cod))+' '+hEfE(j,e.cod)+'</span>':'';
-    h+='<label><input type="checkbox" class="segchk" value="'+esc2(e.cod)+'" checked>'+
-       '<span><span class="cod">['+esc2(e.cod)+']</span> '+esc2(e.nom)+
-       '<span class="prov">'+esc2(e.prov)+'</span>'+rep+av+'</span></label>';
-  });
-  h+='</div><input type="text" class="segnota" id="segNota" placeholder="Observación (opcional): asistentes, motivo, nueva fecha…">';
-  body.innerHTML=h;
-  foot.innerHTML='<span class="muted" style="font-size:11.5px;color:var(--tx2)">Planilla: '+esc2(j.planilla||"—")+'</span>'+
-    '<button class="sbtn sb-si" onclick="segResp(\'si\')">✔ Sí, se realizó</button>'+
-    '<button class="sbtn sb-no" onclick="segResp(\'no\')">✖ No se realizó</button>'+
-    '<button class="sbtn sb-lat" onclick="segLuego()">⏰ Más tarde</button>'+
-    '<button class="sbtn sb-gh" onclick="segVer(\'todas\')">Ver todas</button>';
-}
-
-function segResp(r){
-  var j=cola[iq]; if(!j) return;
-  var nota=(document.getElementById("segNota")||{}).value||"";
-  Array.prototype.forEach.call(body.querySelectorAll(".segchk"), function(c){
-    var ok=(r==="si"&&c.checked);
-    S.eq[j.key+"|"+c.value]={c:ok?"si":"no", nota:nota, ts:Date.now(), dia:hoy()};
-  });
-  delete S.snooze[j.key];
-  ssave(); recalcula(); pintaBadge();
-  cola.splice(iq,1); if(iq>=cola.length) iq=Math.max(0,cola.length-1);
-  if(cola.length) pintaPregunta(); else { vista="todas"; pintaLista(); }
-}
-window.segResp=segResp;
-
-// ── 4. proyeccion al avance global (por tipologia, sobre TODOS sus pares) ─
-function recalcula(){
-  var HOY=hoy();
-  Object.keys(JXROW).forEach(function(id){
-    var js=JXROW[id], cod=String(IDX[id].codigo).trim();
-    var est0=estadoOf("capacitaciones", IDX[id]);
-    var real=js.map(function(j){ return eqC(j,cod); });
-    // el Excel manda: una tipologia Ejecutada o Coordinada EN LA HOJA no se
-    // toca salvo registro EXPLICITO en la plataforma (la implicita "dia
-    // vencido" no aplica: la hoja ya reprogramo/cerro esa tipologia)
-    var sinExplicito = !real.some(function(c){return c==="si"||c==="no";});
-    var estHoja = IDX[id]._estado;
-    if(sinExplicito && (est0==="ejecutada" || estHoja==="coordinada" || estHoja==="reprogramada" || estHoja==="ejecutada")){
-      var oo=overrides[id];
-      if(oo && oo.estado && oo.estado!==estHoja && est0!=="ejecutada"){ delete oo.estado; }  // vuelve a lo de la hoja
-      // una reprogramada queda SIN fecha hasta nueva propuesta oficial
-      if(estHoja==="reprogramada" && oo && oo.slots){ delete oo.slots; }
-      return;
-    }
-    // a DIA VENCIDO (fecha efectiva < hoy) un par sin registro cuenta como
-    // NO ejecutado -> la tipologia queda reprogramada automaticamente (26-08)
-    var st=real.map(function(c,i){
-      if(!c && fEfE(js[i],cod) < HOY) return "no";
-      return c;
-    });
-    var exec=st.filter(function(c){return c==="si"||c==="no";});
-    var o;
-    if(exec.length){
-      o=ov(id);
-      var nSi=st.filter(function(c){return c==="si";}).length;
-      var completo=st.every(function(c){return c==="si";});
-      var expNo=real.some(function(c){return c==="no";});               // "no" EXPLICITO
-      var pendFut=st.some(function(c){return !c;});                     // jornadas futuras sin marca
-      // parte ejecutada -> Ejecucion parcial (0,5) · un "no" explicito -> reprogramada ·
-      // solo vencidas implicitas PERO con jornadas futuras -> sigue CSSO (como el generador)
-      o.estado = completo ? "ejecutada"
-               : nSi ? "en_progreso"
-               : (expNo || !pendFut) ? "reprogramada"
-               : "pendiente";
-    }else{
-      if(est0==="ejecutada") return;
-      o=ov(id);
-      if(st.some(function(c){return c==="reprog";})) o.estado="reprogramada";
-      else if(st.length && st.every(function(c){return c==="prog";})) o.estado="coordinada";
-      // "se desmarco": solo si la coordinada/reprogramada NO viene del Excel
-      else if((est0==="reprogramada"||est0==="coordinada") && IDX[id]._estado!==est0) o.estado="pendiente";
-    }
-    o.slots=slotsDe(js,cod);
-    var MK={si:"✔",no:"✖",prog:"●",reprog:"↻"};
-    var det=js.map(function(j){
-      return (MK[eqC(j,cod)]||"·")+" "+j.servicio+" "+dmy(fEfE(j,cod));
-    }).join(" | ");
-    if(!o.notas || o.notas.indexOf(NOTA_PFX)===0) o.notas = NOTA_PFX+det;
-  });
-  save(); renderDash(); renderTable();
-}
-
-function segLuego(){
-  var j=cola[iq]; if(!j) return;
-  S.snooze[j.key]=hoy(); ssave();
-  cola.splice(iq,1); if(iq>=cola.length) iq=Math.max(0,cola.length-1);
-  if(cola.length) pintaPregunta(); else { vista="todas"; pintaLista(); }
-}
-window.segLuego=segLuego;
-
-// ── 5. marcas POR EQUIPO desde la lista ───────────────────────────────────
-var editEq=null;   // "Jkey|cod" en edicion de reprogramacion
-function eqSet(k,cod,v){
-  var kk=k+"|"+cod;
-  if(v==="reprog"){ editEq=kk; pintaLista(); return; }
-  if(!v) delete S.eq[kk];
-  else S.eq[kk]={c:v, ts:Date.now(), dia:hoy()};
-  if(v==="si"||v==="no") delete S.snooze[k];
-  editEq=null; ssave(); recalcula(); pintaBadge(); pintaLista();
-}
-window.eqSet=eqSet;
-function eqReprogOK(k,cod){
-  var j=SEG.jornadas.filter(function(x){return x.key===k;})[0]; if(!j) return;
-  var nf=(document.getElementById("eqNF")||{}).value||"";
-  var nh=(document.getElementById("eqNH")||{}).value||"";
-  if(!/^\d{4}-\d{2}-\d{2}$/.test(nf)) nf=j.fecha;
-  if(!/^\d{1,2}:\d{2}$/.test(nh)) nh=j.hora;
-  S.eq[k+"|"+cod]={c:"reprog", nf:nf, nh:nh, ts:Date.now(), dia:hoy()};
-  editEq=null; ssave(); recalcula(); pintaBadge(); pintaLista();
-}
-window.eqReprogOK=eqReprogOK;
-function eqReprogCancel(){ editEq=null; pintaLista(); }
-window.eqReprogCancel=eqReprogCancel;
-
-// acciones rapidas a nivel jornada (aplican a TODOS sus equipos)
-function segConf(k,v){
-  var j=SEG.jornadas.filter(function(x){return x.key===k;})[0]; if(!j) return;
-  if(v==="si"){ cola=[j]; iq=0; vista="pend"; pintaPregunta(); return; }
-  j.equipos.forEach(function(e){
-    var kk=k+"|"+e.cod;
-    if(!v) delete S.eq[kk];
-    else S.eq[kk]={c:v, ts:Date.now(), dia:hoy()};
-  });
-  ssave(); recalcula(); pintaBadge(); pintaLista();
-}
-window.segConf=segConf;
-function segDeshacer(k){ segConf(k,""); }
-window.segDeshacer=segDeshacer;
-function segVer(v){ vista=v; if(v==="pend"){ cola=porPreguntar(); iq=0; } pinta(); }
-window.segVer=segVer;
-
-function segMasivo(r){
-  var js=pendientes();
-  if(!js.length) return;
-  var q="¿Confirmar que TODO el equipamiento vencido de "+js.length+" jornadas se realizó?";
-  if(!confirm(q+"\n\nSe puede corregir equipo por equipo desde la lista.")) return;
-  js.forEach(function(j){ j.equipos.forEach(function(e){
-    var c=eqC(j,e.cod);
-    if(c!=="si"&&c!=="no"&&vencidaPar(j,e.cod))
-      S.eq[j.key+"|"+e.cod]={c:"si", nota:"registro masivo", ts:Date.now(), dia:hoy()};
-  }); delete S.snooze[j.key]; });
-  ssave(); recalcula(); pintaBadge(); pintaLista();
-}
-window.segMasivo=segMasivo;
 
 var fJor="todas";
 function setFJor(v){ fJor=v; pintaLista(); }
 window.setFJor=setFJor;
 
-// ── 6. lista: jornadas por dia/servicio, control POR EQUIPO ───────────────
-var EQLBL={prog:["Confirmada","sp-prog"],reprog:["Reprogramada","sp-reprog"],
-           si:["Ejecutada","sp-si"],no:["No ejecutada","sp-no"]};
+// ── 4. lista: lo propuesto a la CSSO con el estado oficial de cada equipo ─
+var JLBL={si:["Ejecutada","sp-si"],parcial:["Parcial","sp-si"],
+          reprog:["Reprogramada","sp-reprog"],prog:["Coordinada","sp-prog"],
+          sin:["En CSSO","sp-fut"]};
 function pintaLista(){
   tit.textContent="Jornadas propuestas a la CSSO";
-  var pend=pendientes().length;
   var vt={}; SEG.jornadas.forEach(function(j){ j.equipos.forEach(function(e){ vt[e.cod]=1; }); });
   sub.textContent=SEG.jornadas.length+" jornadas · "+Object.keys(vt).length+" tipologías ("+
     SEG.jornadas.reduce(function(a,j){return a+j.equipos.length;},0)+" pares servicio-jornada) · "+
     dmy(SEG.jornadas[0].fecha)+" a "+dmy(SEG.jornadas[SEG.jornadas.length-1].fecha)+
-    (pend?(" · "+pend+" por confirmar"):" · sin jornadas por confirmar");
-  var LBL={si:["Realizada","sp-si"],parcial:["Parcial","sp-si"],no:["No realizada","sp-no"],
-           esp:["Por confirmar","sp-esp"],prog:["Programada","sp-prog"],
-           reprog:["Reprogramada","sp-reprog"],sin:["Sin respuesta","sp-fut"]};
+    " · estado según la hoja oficial";
   var rows=SEG.jornadas.filter(function(j){
     var e=estadoJor(j);
-    if(fJor==="pend") return e==="esp";
+    if(fJor==="todas")  return true;
     if(fJor==="hechas") return e==="si"||e==="parcial";
-    if(fJor==="no") return e==="no";
-    if(fJor==="prog") return e==="prog";
-    if(fJor==="reprog") return e==="reprog";
-    if(fJor==="sin") return e==="sin";
-    return true;
+    return e===fJor;
   });
-  var cnt={si:0,parcial:0,no:0,esp:0,prog:0,reprog:0,sin:0};
+  var cnt={si:0,parcial:0,reprog:0,prog:0,sin:0};
   SEG.jornadas.forEach(function(j){ cnt[estadoJor(j)]++; });
   var h='<div class="segtabs">'+
-    [["todas","Todas ("+SEG.jornadas.length+")"],["pend","Por confirmar ("+cnt.esp+")"],
-     ["hechas","Realizadas ("+(cnt.si+cnt.parcial)+")"],["prog","Programadas ("+cnt.prog+")"],
-     ["reprog","Reprogramadas ("+cnt.reprog+")"],["sin","Sin respuesta ("+cnt.sin+")"],
-     ["no","No realizadas ("+cnt.no+")"]].map(function(t){
+    [["todas","Todas ("+SEG.jornadas.length+")"],
+     ["hechas","Ejecutadas ("+(cnt.si+cnt.parcial)+")"],
+     ["prog","Coordinadas ("+cnt.prog+")"],
+     ["reprog","Reprogramadas ("+cnt.reprog+")"],
+     ["sin","En CSSO ("+cnt.sin+")"]].map(function(t){
        return '<button class="'+(fJor===t[0]?"on":"")+'" onclick="setFJor(\''+t[0]+'\')">'+t[1]+'</button>';
      }).join("")+'</div>';
   h+='<table class="segtb"><colgroup><col class="c-n"><col class="c-f"><col class="c-h"><col class="c-sv"><col class="c-eq2"><col class="c-e"></colgroup>'+
-     '<thead><tr><th>#</th><th>Fecha</th><th>Hora</th><th>Servicio clínico</th>'+
-     '<th>Equipamiento · estado por equipo</th><th>Jornada</th></tr></thead><tbody>';
+     '<thead><tr><th>#</th><th>Fecha propuesta</th><th>Hora</th><th>Servicio clínico</th>'+
+     '<th>Equipamiento · estado oficial (hoja 4)</th><th>Jornada</th></tr></thead><tbody>';
   rows.forEach(function(j){
-    var e=estadoJor(j), l=LBL[e];
+    var e=estadoJor(j), l=JLBL[e];
     var eqh=j.equipos.map(function(x){
-      var kk=j.key+"|"+x.cod, m=eqE(j,x.cod), c=m?m.c:"";
-      var pill=c?('<span class="segpill sp-mini '+EQLBL[c][1]+'">'+EQLBL[c][0]+'</span>'):"";
-      var nueva=(c==="reprog")?('<span class="eqnew">→ '+dmy(m.nf||j.fecha)+' '+esc2(m.nh||j.hora)+'</span>'):"";
-      if(!c && fEfE(j,x.cod) < hoy()) nueva+='<span class="eqnew" style="color:#dc2626">vencida · reprogramada auto</span>';
-      var ctl='';
-      if(!RO){
-        if(editEq===kk){
-          ctl='<span class="eqedit"><input type="date" id="eqNF" class="segsel" value="'+esc2((m&&m.nf)||j.fecha)+'">'+
-              '<input type="time" id="eqNH" class="segsel" value="'+esc2((m&&m.nh)||j.hora)+'">'+
-              '<button class="lnk" onclick="eqReprogOK(\''+j.key+'\',\''+x.cod+'\')">✔</button>'+
-              '<button class="lnk" onclick="eqReprogCancel()">✕</button></span>';
-        }else{
-          var op=[["","—"],["prog","Confirmada"],["reprog","Reprogramada…"],["si","Ejecutada"],["no","No ejecutada"]];
-          ctl='<select class="segsel eqsel" onchange="eqSet(\''+j.key+'\',\''+x.cod+'\',this.value)">'+
-            op.map(function(o){ return '<option value="'+o[0]+'"'+(c===o[0]?" selected":"")+'>'+o[1]+'</option>'; }).join("")+'</select>'+
-            ((c==="reprog")?'<button class="lnk" style="font-size:10.5px" onclick="eqSet(\''+j.key+'\',\''+x.cod+'\',\'reprog\')">✎</button>':'');
-        }
-      }
-      return '<div class="eqrow"><span class="eqnom">['+esc2(x.cod)+'] '+esc2(x.nom)+'</span>'+pill+nueva+ctl+'</div>';
+      var st=estEq(x.cod), hx=EST_HEX[st]||"#94a3b8";
+      var pill='<span class="segpill sp-mini" style="background:'+hx+'1a;color:'+hx+';border-color:'+hx+'55">'+
+               esc2(EST_LBL[st]||st)+'</span>';
+      var r=BYCOD[x.cod], sl=r?slotsOf(r).filter(function(s){return s.f;}):[];
+      var fec=sl.length?('<span class="eqnew">'+esc2(sl.map(function(s){
+                return dmy(s.f)+(s.h?(" "+s.h):"");}).join(" · "))+'</span>'):'';
+      return '<div class="eqrow"><span class="eqnom">['+esc2(x.cod)+'] '+esc2(x.nom)+'</span>'+pill+fec+'</div>';
     }).join("");
-    var acc='<span class="segpill '+l[1]+'">'+l[0]+'</span>';
-    if(!RO){
-      acc+='<br><select class="segsel" style="margin-top:5px" onchange="segConf(\''+j.key+'\',this.value);this.value=\'~\'">'+
-        '<option value="~" selected>todos…</option><option value="prog">Confirmada</option>'+
-        '<option value="si">Ejecutada…</option><option value="">Limpiar</option></select>';
-    }
     h+='<tr><td>'+j.n+'</td><td>'+dmy(j.fecha)+'</td><td>'+esc2(j.hora)+'</td><td>'+esc2(j.servicio)+'</td>'+
-       '<td class="eqcell">'+eqh+'</td><td>'+acc+'</td></tr>';
+       '<td class="eqcell">'+eqh+'</td><td><span class="segpill '+l[1]+'">'+l[0]+'</span></td></tr>';
   });
   if(!rows.length) h+='<tr><td colspan="6" style="padding:22px;text-align:center;color:var(--tx2)">Sin jornadas en este filtro.</td></tr>';
   h+='</tbody></table>';
   body.innerHTML=h;
   foot.innerHTML='<span class="muted" style="font-size:11.5px;color:var(--tx2)">'+
-    (RO ? 'Fechas propuestas a la CSSO. El registro se lleva en la plataforma de coordinación.'
-        : 'Cada equipo se confirma, reprograma o ejecuta por separado; el avance global se recalcula solo.')+'</span>'+
-    (!RO&&porPreguntar().length?'<button class="sbtn sb-si" onclick="segVer(\'pend\')">✔ Confirmar una por una ('+porPreguntar().length+')</button>':'')+
-    (!RO&&pendientes().length>1?'<button class="sbtn sb-lat" onclick="segMasivo(\'si\')">✔✔ Todo lo vencido realizado</button>':'')+
+    'Solo consulta: el estado de cada tipología se corrige en la <b>hoja 4 del Excel oficial</b> '+
+    'y se refleja aquí al regenerar los datos.</span>'+
     '<button class="sbtn sb-gh" onclick="segCerrar()">Cerrar</button>';
 }
 
-// ── 7. arranque ───────────────────────────────────────────────────────────
-if(!RO) pintaBadge();
-if(!RO && QS.get("seg")!=="0" && porPreguntar().length){ segAbrir("pend"); }
+// ── 5. arranque ───────────────────────────────────────────────────────────
+// v4 (30-08): sin pop-up. El panel se abre solo cuando el usuario lo pide.
 })();
 </script>
 
