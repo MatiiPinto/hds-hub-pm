@@ -974,8 +974,10 @@ window.gExport=gExport;
 var DSEM=["DOMINGO","LUNES","MARTES","MIÉRCOLES","JUEVES","VIERNES","SÁBADO"];
 var MESES=["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO",
            "SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
+// el año va SIEMPRE: el programa arrastra jornadas de 2025 y sin el año dos
+// bandas de distinto año se leen identicas.
 function diaLargo(f){ var d=new Date(f+"T12:00");
-  return DSEM[d.getDay()]+" "+d.getDate()+" DE "+MESES[d.getMonth()]; }
+  return DSEM[d.getDay()]+" "+d.getDate()+" DE "+MESES[d.getMonth()]+" DE "+d.getFullYear(); }
 function LBLU(e){ return (LBL[e]||e).toUpperCase(); }
 
 // Esqueleto = las jornadas realmente propuestas a la CSSO (día · servicio ·
