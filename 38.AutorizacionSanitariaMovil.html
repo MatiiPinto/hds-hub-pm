@@ -128,6 +128,13 @@ main{max-width:1100px;margin:0 auto;padding:14px}
   max-height:calc(100% - 28px);object-fit:contain;z-index:99;background:#0b1426;cursor:zoom-out;padding:8px}
 .evi button{color:#b91c1c;padding:3px 8px;font-size:13px}
 .req textarea.falta{border-color:#f0a441;background:#fffaf0}
+.card.aviso{background:#fff8ec;border-color:#f0d5a8;font-size:13px;line-height:1.45}
+.valit{padding:11px 2px;border-bottom:1px solid #edf1f7}
+.valit.ok{background:#f6fbf7}.valit.no{background:#fdf6f6}
+.valhd{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}
+.valpa{font-size:13.5px;font-weight:600;margin:3px 0 2px}
+.valfu{font-size:11.5px;color:var(--tx2);line-height:1.4;background:#f5f7fb;border-radius:8px;padding:6px 9px;margin-top:4px}
+.valfu.sinf{background:#fff4e6;color:#8a5a12}
 .est3{display:flex;gap:7px}
 .est3 button{flex:1;padding:9px 4px;border-radius:9px;font-weight:800;font-size:12px;border:1.5px solid var(--bd);color:var(--tx2);background:#fff}
 .est3 .c.on{background:var(--verdebg);border-color:var(--verde);color:var(--verde)}
@@ -222,6 +229,7 @@ main{max-width:1100px;margin:0 auto;padding:14px}
       <div class="stats" id="statsGlobal"></div>
       <div class="hint" id="fuenteNota"></div>
     </div>
+    <div id="mantenimiento"></div>
     <button class="btn sec no-print" onclick="salir()" style="max-width:220px;margin:4px auto">Cerrar sesión</button>
   </section>
 
@@ -243,11 +251,17 @@ main{max-width:1100px;margin:0 auto;padding:14px}
   <section class="vista" id="v-servicio"></section>
   <!-- PAUTA -->
   <section class="vista" id="v-pauta"></section>
+  <!-- REVISIÓN (Catherine y Meylin) -->
+  <section class="vista" id="v-validacion"></section>
+  <!-- TABLERO -->
+  <section class="vista" id="v-tablero"></section>
 </main>
 
 <nav id="tabbar" class="no-print">
   <button id="tb-inicio" onclick="ir('inicio')"><span class="i">🏥</span>Servicios</button>
   <button id="tb-plano" onclick="ir('plano')"><span class="i">🗺️</span>Plano</button>
+  <button id="tb-validacion" onclick="ir('validacion')" style="display:none"><span class="i">🔍</span>Revisión</button>
+  <button id="tb-tablero" onclick="ir('tablero')" style="display:none"><span class="i">📊</span>Avance</button>
 </nav>
 <div id="toast"></div>
 
@@ -294,6 +308,7 @@ const puedoVer=svc=>{
 let EST={}; try{EST=JSON.parse(localStorage.getItem('as_estados')||'{}');}catch(e){}
 let COLA=[]; try{COLA=JSON.parse(localStorage.getItem('as_cola')||'[]');}catch(e){}
 let FALLIDOS=[]; try{FALLIDOS=JSON.parse(localStorage.getItem('as_fallidos')||'[]');}catch(e){}
+let CONFLICTOS=[];   // pautas que otra persona editó mientras las tenías sin subir
 let _sinEspacio=false;
 function persist(){
   try{
@@ -321,17 +336,43 @@ async function bajarEstados(){
   if(!URLC) return;
   try{
     const r=await fetch(URLC+(esSup()?'':'')).then(x=>x.json());
+    let remap=0, pisados=[];
     Object.entries(r.estados||{}).forEach(([k,v])=>{
       if(k.startsWith('__'))return;
+      // clave de un servicio que cambió de nombre → se trae al nombre vigente
+      if(k.startsWith('svc|')){
+        const p=k.split('|'), can=svcCanon(p[1]);
+        if(can && can!==p[1]){ k='svc|'+can+'|'+p.slice(2).join('|'); v={...v,servicio:can}; remap++; }
+      }
       const loc=EST[k];
-      if(!loc || new Date(v.ts)>new Date(loc.ts||0)) EST[k]=v;
+      if(!loc || new Date(v.ts)>new Date(loc.ts||0)){
+        // si lo local todavía no se ha subido, lo remoto lo estaría pisando:
+        // se conserva lo propio y se avisa quién más está en la misma pauta
+        const enCola=COLA.some(c=>c.clave===k);
+        if(loc && enCola && v.usuario && v.usuario!==(SES&&SES.correo)){
+          pisados.push({k,quien:v.usuario,ts:v.ts}); return;
+        }
+        EST[k]=v;
+      }
     });
+    if(remap) console.info('AS · '+remap+' clave(s) traídas desde un nombre de servicio anterior');
+    CONFLICTOS=pisados;
+    if(pisados.length) toast('⚠ '+pisados.length+' pauta(s) las editó otra persona: revisá antes de cerrar.');
     persist(); setSync(COLA.length?'pend':'ok');
   }catch(e){setSync('off');}
 }
+// guarda un registro que no es un cotejo (validación, ficha): mismo camino a
+// la cola y al backend, pero el avance lo fija quien llama
+function guardarCrudo(clave,servicio,recinto,pauta,datos,avance){
+  if(!SES||!SES.correo){ toast('Tu sesión se cerró: volvé a entrar.'); return; }
+  EST[clave]={servicio,recinto,pauta,datos,avance:avance||0,usuario:SES.correo,ts:new Date().toISOString()};
+  COLA=COLA.filter(c=>c.clave!==clave);
+  COLA.push({accion:'estado',clave,servicio,recinto,pauta,datos,avance:avance||0,usuario:SES.correo});
+  persist(); setSync('pend'); vaciarCola();
+}
 function guardar(clave,servicio,recinto,pauta,datos){
   const reqs=reqsDe(pauta).length;
-  const resp=Object.keys(datos).filter(k=>!k.startsWith('obs_')).length;
+  const resp=Object.keys(datos).filter(k=>!k.startsWith('obs_')&&!k.startsWith('foto_')&&k[0]!=='_').length;
   const avance=reqs?Math.round(resp*100/reqs):0;
   if(!SES||!SES.correo){ toast('Tu sesión se cerró: volvé a entrar para no perder esto.'); return; }
   EST[clave]={servicio,recinto,pauta,datos,avance,usuario:SES.correo,ts:new Date().toISOString()};
@@ -378,10 +419,28 @@ function ambitoDe(id){
 }
 const reqsDe=id=>(ambitoDe(id)||{}).reqs||[];
 const claveRec=(rid,amb)=>'rec|'+rid+'|'+amb;
-const claveSvc=(svc,amb)=>'svc|'+svc+'|'+amb;
+// La clave de una pauta de unidad lleva el NOMBRE del servicio. Si Atlas
+// renombra un área — ya pasó con OTORRINO — todo lo cotejado queda huérfano.
+// svcCanon() resuelve el nombre vigente contra la tabla de alias; bajarEstados()
+// remapea las claves viejas que llegan del backend.
+function svcCanon(n){
+  const k=String(n||'').toUpperCase();
+  const a=(D.alias||{})[k];
+  if(a){ const sv=D.servicios.find(x=>x.n.toUpperCase()===a); if(sv)return sv.n; }
+  const ex=D.servicios.find(x=>x.n.toUpperCase()===k);
+  return ex?ex.n:String(n||'');
+}
+const claveSvc=(svc,amb)=>'svc|'+svcCanon(svc)+'|'+amb;
 function estadoDe(clave){return EST[clave]||null;}
 function avanceDe(clave){const e=estadoDe(clave);return e?e.avance:0;}
-const _borrada=k=>{const e=EST[k];return !!(e&&e.datos&&e.datos._borrada);};
+const _borrada=k=>{
+  const e=EST[k];
+  if(e&&e.datos&&e.datos._borrada)return true;
+  // lo que las referentes marcaron "no corresponde" en la revisión sale de la
+  // plataforma igual que si se hubiera quitado con 🗑
+  const v=EST['val|'+k];
+  return !!(v&&v.datos&&v.datos.v==='no');
+};
 // pautas de un servicio: las de unidad sembradas (D.asign_svc — normas que
 // autorizan al servicio completo: laboratorio, imagenología, psiquiatría…)
 // + las aplicadas a mano, menos las quitadas con 🗑
@@ -574,9 +633,11 @@ let PILA=[];
 function muestra(v){
   document.querySelectorAll('.vista').forEach(x=>x.classList.remove('on'));
   $('v-'+v).classList.add('on');
-  document.body.classList.toggle('detalle', v==='recinto'||v==='servicio'||v==='pauta');
+  document.body.classList.toggle('detalle', v==='recinto'||v==='servicio'||v==='pauta'||v==='validacion'||v==='tablero');
   if(!esMovilVista()&&(v==='inicio'||v==='plano')){$('v-inicio').classList.add('on');$('v-plano').classList.add('on');}
-  ['inicio','plano'].forEach(t=>{const b=$('tb-'+t);if(b)b.classList.toggle('on',v===t);});
+  ['inicio','plano','validacion','tablero'].forEach(t=>{const b=$('tb-'+t);if(b)b.classList.toggle('on',v===t);});
+  const _sup=esSup()||esReferente();
+  ['tb-validacion','tb-tablero'].forEach(id=>{const b=$(id);if(b)b.style.display=_sup?'flex':'none';});
   $('hBack').style.display=PILA.length?'grid':'none';
   window.scrollTo(0,0);
 }
@@ -589,6 +650,8 @@ function pinta(v,arg){
   if(v==='recinto')pintaRecinto(arg);
   if(v==='servicio')pintaServicio(arg);
   if(v==='pauta')pintaPauta(arg);
+  if(v==='validacion')pintaValidacion();
+  if(v==='tablero')pintaTablero();
 }
 function ir(v,arg){ PILA.push({v,arg}); pinta(v,arg); }
 function atras(){
@@ -637,6 +700,7 @@ function pintaInicio(){
     `<div class="stat"><b>${tot}</b><span>Pautas iniciadas</span></div>
      <div class="stat"><b>${done}</b><span>Completas</span></div>
      <div class="stat"><b>${av}%</b><span>Avance medio</span></div>`;
+  $('mantenimiento').innerHTML=pintaMantenimiento();
   $('fuenteNota').textContent='Equipamiento: matriz EMMC (corte 07-07) · Dotación y Cartera: matrices HDS · Normas MINSAL digitalizadas ('+Object.keys(D.normas).length+').';
 }
 
@@ -1038,6 +1102,12 @@ function pintaPauta(ctx){
   const est=estadoDe(clave)||{datos:{}};
   const datos=est.datos||{};
   const editable=puedoVer(ctx.svc);
+  // dos personas por servicio (jefatura y coordinación): si la última mano no
+  // fue la mía, decirlo antes de que escriba encima sin enterarse
+  const coautor=(est.usuario && SES && est.usuario!==SES.correo)
+    ? {quien:est.usuario, cuando:est.ts?('el '+new Date(est.ts).toLocaleDateString('es-CL')+
+        ' a las '+new Date(est.ts).toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'})):'antes'}
+    : null;
   // El título dice DÓNDE se está aplicando y el subtítulo QUÉ pauta: al revés
   // se leía como si la app hubiera cambiado de servicio (hallazgo de M. Canales).
   const _pnom=nomAmbito(a.name);
@@ -1071,7 +1141,18 @@ function pintaPauta(ctx){
     </div>
     <div id="barra"><span class="hint">Avance</span><div class="prog"><i id="pgi" style="width:${est.avance||0}%"></i></div><b id="pgt">${est.avance||0}%</b></div>
     ${editable?'':'<div class="card hint">⚠ Solo lectura: no pertenece a tus servicios.</div>'}
+    ${coautor?`<div class="card aviso">👥 <b>${esc(coautor.quien)}</b> trabajó en esta pauta
+       ${esc(coautor.cuando)}. Lo que marques se guarda encima: coordinate antes de seguir.</div>`:''}
     <div class="card" ${editable?'':'style="pointer-events:none;opacity:.75"'}>${h}</div>
+    ${editable?`<div class="card no-print" style="padding:12px 14px">
+      <h2 style="margin-bottom:6px">Declaración del responsable</h2>
+      ${datos._firma?`<div class="hint">✔ Firmada por <b>${esc(datos._firma.nombre)}</b>
+         el ${new Date(datos._firma.ts).toLocaleString('es-CL')}.
+         <button style="color:#b91c1c;padding:2px 6px" onclick="desfirmar()">Quitar</button></div>`
+        :`<div class="hint" style="margin-bottom:7px">Al firmar declarás haber verificado en terreno
+          los ${a.reqs.length} requisitos. Queda impreso en el informe.</div>
+          <button class="btn sec" onclick="firmar()">✍ Firmar esta pauta</button>`}
+    </div>`:''}
     <div class="row no-print" style="margin-bottom:14px">
       <button class="btn sec" onclick="informe()">📄 Informe</button>
       <button class="btn" onclick="atras()">Listo</button>
@@ -1094,6 +1175,26 @@ function marca(n,v){
   ta.classList.toggle('falta', v==='NA' && !(estadoDe(clave)||{datos:{}}).datos['obs_r'+n]);
   if(v==='NA')setTimeout(()=>ta.focus(),60);
   const e2=estadoDe(clave); $('pgi').style.width=e2.avance+'%'; $('pgt').textContent=e2.avance+'%';
+}
+// la firma es una declaración, no un dibujo: nombre, RUT opcional y fecha,
+// impresos en el informe que se archiva en el Drive
+function firmar(){
+  const clave=ctxClave(), est=estadoDe(clave)||{datos:{}};
+  const pend=reqsDe(PA.amb).filter(q=>!(est.datos||{})['r'+q.n]).length;
+  if(pend && !confirm('Quedan '+pend+' requisito(s) sin marcar. ¿Firmar igual?'))return;
+  const nombre=prompt('Nombre completo de quien declara:', (SES&&SES.nombre)||'');
+  if(!nombre||!nombre.trim())return;
+  const rut=prompt('RUT (opcional, para el informe):','')||'';
+  const datos={...est.datos,_firma:{nombre:nombre.trim(),rut:rut.trim(),
+    correo:SES.correo, ts:new Date().toISOString()}};
+  guardar(clave,PA.svc,PA.tipo==='rec'?PA.rid:'',PA.amb,datos);
+  pintaPauta(PA); toast('Pauta firmada.');
+}
+function desfirmar(){
+  const clave=ctxClave(), est=estadoDe(clave)||{datos:{}};
+  const datos={...est.datos}; delete datos._firma;
+  guardar(clave,PA.svc,PA.tipo==='rec'?PA.rid:'',PA.amb,datos);
+  pintaPauta(PA);
 }
 function obs(n,txt){
   const clave=ctxClave(), est=estadoDe(clave)||{datos:{}};
@@ -1258,6 +1359,7 @@ async function construirInforme(){
   // la evidencia va al final, en su propia sección: es lo que la autoridad
   // sanitaria mira primero y lo único que no vive fuera de este PDF
   const _fotos=await fotosDePauta(clave,a.reqs);
+  const _firma=datos._firma||null;
   const doc=`<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Informe AS · ${esc(PA.tipo==='svc'?PA.svc:PA.rnom||PA.rid)}</title><style>
   @page{size:A4;margin:14mm} html{color-scheme:light only}
   body{background:#fff;font-family:-apple-system,'Segoe UI',Roboto,sans-serif;color:#17233b;font-size:11.5px;line-height:1.45;max-width:800px;margin:0 auto;padding:20px}
@@ -1325,7 +1427,10 @@ async function construirInforme(){
   <div class="evid">${_fotos.map(f=>`<figure><img src="${f.d}">
     <figcaption><b>Requisito ${f.n}</b> · ${esc(f.t).slice(0,150)}<br>
       <span>Registrada el ${new Date(f.ts).toLocaleString('es-CL')}</span></figcaption></figure>`).join('')}</div>`:''}
-  <div class="firmas"><div>Responsable del Servicio${_fi&&_fi.resp.length?`<br><b>${esc(_fi.resp[0])}</b>`:''}</div><div>Referente Autorización Sanitaria<br><b>C. Sepúlveda · M. Canales</b></div></div>
+  ${_firma?`<div class="kv" style="margin-top:14px;background:#f6fbf7;border-color:#bfe0c9"><b>Declaración</b>
+    ${esc(_firma.nombre)} declara haber verificado en terreno los ${a.reqs.length} requisitos de esta
+    pauta el ${new Date(_firma.ts).toLocaleString('es-CL')}${_firma.rut?' · RUT '+esc(_firma.rut):''}.</div>`:''}
+  <div class="firmas"><div>Responsable del Servicio${_firma?`<br><b>${esc(_firma.nombre)}</b>`:(_fi&&_fi.resp.length?`<br><b>${esc(_fi.resp[0])}</b>`:'')}</div><div>Referente Autorización Sanitaria<br><b>C. Sepúlveda · M. Canales</b></div></div>
   </body></html>`;
   return doc.replace('<button class="np" onclick="print()">🖨 Imprimir / PDF</button>','');
 }
@@ -1390,6 +1495,324 @@ async function subirDrive(html,auto){
     if(b){b.textContent='☁️ Enviado'; b.disabled=false;}
     toast('Enviado — verificá en el Drive (la respuesta no se pudo leer).');
   }
+}
+
+/* ── tablero de avance ───────────────────────────────────────────────────
+   Hasta ahora el avance real solo existía en el Excel que se genera fuera de
+   la plataforma. Las referentes necesitan verlo aquí: qué servicio va, cuál no
+   arrancó y qué norma está frenada.
+   ──────────────────────────────────────────────────────────────────────── */
+function avanceServicio(sv){
+  const ambs=pautasDeSvc(sv.n).map(a=>({clave:claveSvc(sv.n,a),amb:a}));
+  (D.recintos[sv.piso]||[]).filter(r=>String(r[9]||'').toUpperCase()===sv.n.toUpperCase())
+    .forEach(r=>pautasDeRec(r[0]).forEach(a=>ambs.push({clave:claveRec(r[0],a),amb:a})));
+  const av=ambs.map(x=>avanceDe(x.clave));
+  return {n:ambs.length, hechas:av.filter(x=>x===100).length,
+          curso:av.filter(x=>x>0&&x<100).length, sin:av.filter(x=>x===0).length,
+          pct:ambs.length?Math.round(av.reduce((a,b)=>a+b,0)/ambs.length):0,
+          req:ambs.reduce((a,x)=>a+reqsDe(x.amb).length,0), ambs};
+}
+let _FT='servicio';
+function modoTablero(m){ _FT=m; pintaTablero(); }
+function pintaTablero(){
+  $('hTit').textContent='Avance de la autorización sanitaria';
+  $('hSub').textContent='Nuevo Hospital Del Salvador · corte '+new Date().toLocaleDateString('es-CL');
+  const svs=D.servicios.slice().sort((a,b)=>D.pisos.indexOf(a.piso)-D.pisos.indexOf(b.piso)||a.n.localeCompare(b.n));
+  const filas=svs.map(sv=>({sv,a:avanceServicio(sv)})).filter(x=>x.a.n);
+  const totP=filas.reduce((a,x)=>a+x.a.n,0), totH=filas.reduce((a,x)=>a+x.a.hechas,0);
+  const totR=filas.reduce((a,x)=>a+x.a.req,0);
+  const glob=totP?Math.round(filas.reduce((a,x)=>a+x.a.pct*x.a.n,0)/totP):0;
+  const sinArrancar=filas.filter(x=>x.a.pct===0).length;
+
+  // por piso
+  const porPiso={}; filas.forEach(x=>{const p=x.sv.piso;
+    porPiso[p]=porPiso[p]||{n:0,h:0,s:0}; porPiso[p].n+=x.a.n; porPiso[p].h+=x.a.hechas; porPiso[p].s+=x.a.pct*x.a.n;});
+  // por norma
+  const porNorma={};
+  filas.forEach(x=>x.a.ambs.forEach(y=>{
+    const nid=D.amb_norma[y.amb]; if(!nid)return;
+    porNorma[nid]=porNorma[nid]||{n:0,s:0,h:0};
+    porNorma[nid].n++; porNorma[nid].s+=avanceDe(y.clave); if(avanceDe(y.clave)===100)porNorma[nid].h++;}));
+
+  const barra=(pct,col)=>`<div class="prog" style="height:8px"><i style="width:${pct}%;background:${col||'var(--verde)'}"></i></div>`;
+  let cuerpo='';
+  if(_FT==='servicio'){
+    cuerpo=filas.slice().sort((a,b)=>a.a.pct-b.a.pct).map(x=>
+      `<button class="item" onclick="ir('servicio','${esc(x.sv.n)}')">
+        <div class="ic">${esc(x.sv.piso)}</div>
+        <div class="tt"><b>${esc(x.sv.n)}</b>
+          <span>${x.a.n} pauta${x.a.n===1?'':'s'} · ${x.a.req} req.${x.a.hechas?' · '+x.a.hechas+' listas':''}${x.a.curso?' · '+x.a.curso+' en curso':''}</span></div>
+        <div class="fx"><span class="hint">${x.a.pct}%</span>${barra(x.a.pct,x.a.pct===0?'#cbd5e1':null)}</div>
+        <span class="chev">›</span></button>`).join('');
+  }else if(_FT==='piso'){
+    cuerpo=Object.entries(porPiso).sort((a,b)=>D.pisos.indexOf(a[0])-D.pisos.indexOf(b[0])).map(([p,v])=>{
+      const pct=v.n?Math.round(v.s/v.n):0;
+      return `<button class="item" onclick="PISO='${p}';ir('plano','${p}')">
+        <div class="ic">${esc(p)}</div>
+        <div class="tt"><b>Piso ${esc(p.replace('P',''))}</b><span>${v.n} pauta${v.n===1?'':'s'} · ${v.h} listas</span></div>
+        <div class="fx"><span class="hint">${pct}%</span>${barra(pct,pct?null:'#cbd5e1')}</div>
+        <span class="chev">›</span></button>`;}).join('');
+  }else{
+    cuerpo=Object.entries(porNorma).sort((a,b)=>b[1].n-a[1].n).map(([nid,v])=>{
+      const pct=v.n?Math.round(v.s/v.n):0;
+      return `<div class="item" style="cursor:default">
+        <div class="ic">📕</div>
+        <div class="tt"><b style="white-space:normal">${esc(D.normas[nid].nombre)}</b>
+          <span>${v.n} aplicada${v.n===1?'':'s'} · ${v.h} lista${v.h===1?'':'s'}</span></div>
+        <div class="fx"><span class="hint">${pct}%</span>${barra(pct,pct?null:'#cbd5e1')}</div></div>`;}).join('');
+  }
+  $('v-tablero').innerHTML=`
+    <div class="card"><h2>Estado general</h2>
+      <div class="res3">
+        <div><b>${glob}%</b><span>avance</span></div>
+        <div><b>${totH}</b><span>pautas al 100%</span></div>
+        <div><b>${totP}</b><span>pautas totales</span></div>
+      </div>
+      <div class="res3" style="margin-top:0">
+        <div><b>${filas.length}</b><span>servicios con pauta</span></div>
+        <div><b>${sinArrancar}</b><span>sin arrancar</span></div>
+        <div><b>${totR.toLocaleString('es-CL')}</b><span>requisitos</span></div>
+      </div>
+      <div class="tabs" style="margin-top:4px">
+        <button class="${_FT==='servicio'?'on':''}" onclick="modoTablero('servicio')">Por servicio</button>
+        <button class="${_FT==='piso'?'on':''}" onclick="modoTablero('piso')">Por piso</button>
+        <button class="${_FT==='norma'?'on':''}" onclick="modoTablero('norma')">Por norma</button>
+      </div>
+      <div class="hint">Ordenado por lo que menos ha avanzado.</div>
+    </div>
+    <div class="card">${cuerpo||'<div class="hint">Sin pautas aplicadas todavía.</div>'}</div>`;
+}
+
+/* ── revisión de Catherine y Meylin ──────────────────────────────────────
+   Dos cosas necesitan ojo de referente antes de que 74 personas coteje:
+   (1) las 343 pautas de unidad que se sembraron por fundamento normativo, y
+   (2) las pautas que alguien aplicó a mano, que es por donde ya se colaron dos
+       errores (Alimentación en Oftalmología, Alimentación en Diálisis).
+   Cada una se marca correcta o no corresponde, con comentario.
+   ──────────────────────────────────────────────────────────────────────── */
+const claveVal=k=>'val|'+k;
+const REFERENTES=['csepulvedar@hsalvador.cl','mcanales@hsalvador.cl','mpinto@hsalvador.cl'];
+const esReferente=()=>SES&&REFERENTES.includes(String(SES.correo||'').toLowerCase());
+
+function fundamentoDe(svc,amb){
+  const f=(D.fund||{})[String(svc||'').toUpperCase()]||[];
+  const nid=D.amb_norma[amb];
+  const hit=f.find(x=>x.indexOf(nid+' · ')===0);
+  return hit?hit.slice(nid.length+3):'';
+}
+function paraValidar(){
+  const out=[];
+  // (1) lo sembrado por fundamento normativo
+  Object.entries(D.asign_svc||{}).forEach(([k,ambs])=>{
+    const sv=D.servicios.find(x=>x.n.toUpperCase()===k); if(!sv)return;
+    ambs.forEach(amb=>{
+      const a=ambitoDe(amb); if(!a)return;
+      const cl=claveSvc(sv.n,amb);
+      if(_borrada(cl))return;
+      out.push({origen:'siembra',svc:sv.n,piso:sv.piso,amb,a,clave:cl,
+                fund:fundamentoDe(sv.n,amb),rid:'',donde:'Todo el servicio'});
+    });
+  });
+  // (2) lo que alguien aplicó a mano desde la app
+  Object.keys(EST).forEach(k=>{
+    if(_borrada(k))return;
+    const p=k.split('|');
+    if(p[0]==='svc'){
+      const sembrada=((D.asign_svc||{})[String(p[1]).toUpperCase()]||[]).includes(p[2]);
+      if(sembrada)return;
+      const a=ambitoDe(p[2]); if(!a)return;
+      const sv=D.servicios.find(x=>x.n.toUpperCase()===String(p[1]).toUpperCase());
+      out.push({origen:'manual',svc:p[1],piso:sv?sv.piso:'',amb:p[2],a,clave:k,
+                fund:'',rid:'',donde:'Todo el servicio',
+                por:EST[k].usuario,av:EST[k].avance||0});
+    }else if(p[0]==='rec'){
+      const sembrada=(D.asign[p[1]]||[]).includes(p[2]);
+      if(sembrada)return;
+      const a=ambitoDe(p[2]); if(!a)return;
+      let rnom=p[1],piso='';
+      D.pisos.forEach(pz=>(D.recintos[pz]||[]).forEach(r=>{if(r[0]===p[1]){rnom=r[2]||r[0];piso=pz;}}));
+      out.push({origen:'manual',svc:EST[k].servicio||'',piso,amb:p[2],a,clave:k,
+                fund:'',rid:p[1],donde:rnom,por:EST[k].usuario,av:EST[k].avance||0});
+    }
+  });
+  return out;
+}
+function valEstado(clave){
+  const e=EST[claveVal(clave)];
+  return e&&e.datos?e.datos:null;
+}
+function validar(clave,v){
+  const it=paraValidar().find(x=>x.clave===clave); if(!it)return;
+  const prev=valEstado(clave)||{};
+  const datos={...prev, v, por:SES.correo, ts:new Date().toISOString()};
+  if(v===prev.v){ delete datos.v; }
+  guardarCrudo(claveVal(clave),it.svc,it.rid,it.amb,datos,datos.v?100:0);
+  pintaValidacion();
+}
+function valComentario(clave,txt){
+  const it=paraValidar().find(x=>x.clave===clave); if(!it)return;
+  const datos={...(valEstado(clave)||{}), c:txt, por:SES.correo, ts:new Date().toISOString()};
+  if(!txt)delete datos.c;
+  guardarCrudo(claveVal(clave),it.svc,it.rid,it.amb,datos,datos.v?100:0);
+}
+let _QV='', _FV='pendientes';
+function filtraVal(q){ _QV=q||''; pintaValidacion(); }
+function modoVal(m){ _FV=m; pintaValidacion(); }
+
+function pintaValidacion(){
+  const todas=paraValidar();
+  $('hTit').textContent='Revisión de pautas';
+  $('hSub').textContent='Catherine Sepúlveda · Meylin Canales — validación de lo asignado';
+  const est=x=>(valEstado(x.clave)||{}).v||'';
+  const ok=todas.filter(x=>est(x)==='ok').length;
+  const no=todas.filter(x=>est(x)==='no').length;
+  const pend=todas.length-ok-no;
+  const manual=todas.filter(x=>x.origen==='manual');
+  let lista=todas;
+  if(_FV==='pendientes')lista=todas.filter(x=>!est(x));
+  else if(_FV==='manual')lista=manual;
+  else if(_FV==='no')lista=todas.filter(x=>est(x)==='no');
+  if(_QV)lista=lista.filter(x=>coincide(_QV,[x.svc,x.a.name,x.a.normaNombre,x.donde,x.fund]));
+  lista=lista.slice().sort((a,b)=>(a.origen===b.origen?0:(a.origen==='manual'?-1:1))
+    ||D.pisos.indexOf(a.piso)-D.pisos.indexOf(b.piso)||a.svc.localeCompare(b.svc));
+
+  const puede=esReferente();
+  const filas=lista.slice(0,300).map(x=>{
+    const e=valEstado(x.clave)||{}, v=e.v||'';
+    return `<div class="valit ${v}">
+      <div class="valhd">
+        <div style="flex:1">
+          <b>${esc(x.svc)}</b> <span class="hint">· ${esc(x.piso)} · ${esc(x.donde)}</span>
+          ${x.origen==='manual'?`<span class="pill" style="background:#fff1e0;color:#b45309">aplicada a mano${x.por?' · '+esc(x.por.split('@')[0]):''}${x.av?' · '+x.av+'%':''}</span>`:''}
+        </div>
+        ${v?`<span class="pill" style="background:${v==='ok'?'#dcfce7':'#fee2e2'};color:${v==='ok'?'#15803d':'#b91c1c'}">${v==='ok'?'✔ correcta':'✘ no corresponde'}</span>`:''}
+      </div>
+      <div class="valpa">${esc(nomAmbito(x.a.name))}
+        <span class="hint">· ${esc(x.a.normaNombre)} · ${x.a.reqs.length} req.</span></div>
+      ${x.fund?`<div class="valfu">Fundamento: ${esc(x.fund)}</div>`
+              :'<div class="valfu sinf">Sin fundamento registrado: alguien la aplicó desde la app.</div>'}
+      ${puede?`<div class="est3" style="margin-top:7px">
+        <button class="c ${v==='ok'?'on':''}" onclick="validar(${JSON.stringify(x.clave)},'ok')">✔ CORRECTA</button>
+        <button class="nc ${v==='no'?'on':''}" onclick="validar(${JSON.stringify(x.clave)},'no')">✘ NO CORRESPONDE</button>
+      </div>
+      <textarea placeholder="Comentario para el equipo…" style="display:${v==='no'?'block':'none'}"
+        onchange="valComentario(${JSON.stringify(x.clave)},this.value)">${esc(e.c||'')}</textarea>`:''}
+      ${e.c&&!puede?`<div class="valfu">💬 ${esc(e.c)}</div>`:''}
+      ${e.por?`<div class="hint" style="margin-top:4px">Revisada por ${esc(e.por.split('@')[0])}
+        · ${e.ts?new Date(e.ts).toLocaleDateString('es-CL'):''}</div>`:''}
+    </div>`;
+  }).join('');
+
+  $('v-validacion').innerHTML=`
+    <div class="card"><h2>Qué hay que revisar</h2>
+      <div class="hint" style="margin-bottom:9px">Las pautas de unidad se sembraron por fundamento
+      normativo y las que alguien aplicó desde la app no tienen ninguno. Marcá cada una como correcta
+      o como no correspondiente: lo marcado <b>no corresponde</b> se saca de la plataforma.</div>
+      <div class="res3">
+        <div><b>${ok}</b><span>correctas</span></div>
+        <div><b>${no}</b><span>no corresponden</span></div>
+        <div><b>${pend}</b><span>por revisar</span></div>
+      </div>
+      <div class="tabs" style="margin:2px 0 9px">
+        <button class="${_FV==='pendientes'?'on':''}" onclick="modoVal('pendientes')">Por revisar ${pend}</button>
+        <button class="${_FV==='manual'?'on':''}" onclick="modoVal('manual')">A mano ${manual.length}</button>
+        <button class="${_FV==='no'?'on':''}" onclick="modoVal('no')">No corresponden ${no}</button>
+        <button class="${_FV==='todas'?'on':''}" onclick="modoVal('todas')">Todas ${todas.length}</button>
+      </div>
+      <input placeholder="Buscar servicio, norma o pauta…" oninput="filtraVal(this.value)" value="${esc(_QV)}">
+      ${puede?'':'<div class="card aviso" style="margin-top:9px">Solo Catherine, Meylin y Matías pueden validar. Podés mirar lo revisado.</div>'}
+    </div>
+    <div class="card">${filas||'<div class="hint">Nada que mostrar con ese filtro.</div>'}</div>
+    ${lista.length>300?`<div class="hint" style="text-align:center">Se muestran 300 de ${lista.length}. Usá el buscador.</div>`:''}`;
+}
+
+/* ── respaldo y mantenimiento ────────────────────────────────────────────
+   El cotejo vive en el teléfono hasta que la cola lo sube. Si alguien pierde
+   el equipo, limpia el navegador o queda sin señal y cierra la pestaña, se
+   pierde. El respaldo es un archivo que se puede mandar por correo y volver a
+   cargar en otro dispositivo — fotos incluidas.
+   ──────────────────────────────────────────────────────────────────────── */
+async function respaldoExportar(){
+  toast('Armando el respaldo…');
+  const fotos={};
+  try{
+    const db=await fotoDB();
+    const claves=await new Promise(ok=>{const t=db.transaction('fotos','readonly');
+      const r=t.objectStore('fotos').getAllKeys(); r.onsuccess=()=>ok(r.result||[]); r.onerror=()=>ok([]);});
+    for(const k of claves){ const v=await fotoGet(k); if(v)fotos[k]=v; }
+  }catch(e){}
+  const pack={_:'respaldo Autorización Sanitaria · Nuevo HDS', v:1,
+    generado:new Date().toISOString(), por:SES?SES.correo:'', estados:EST, cola:COLA,
+    fallidos:FALLIDOS, fotos};
+  const txt=JSON.stringify(pack);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([txt],{type:'application/json'}));
+  a.download='Respaldo_AS_'+(SES?SES.correo.split('@')[0]:'hds')+'_'+
+    new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  toast('Respaldo listo: '+Object.keys(EST).length+' pautas · '+
+        Object.keys(fotos).length+' fotos · '+Math.round(txt.length/1024)+' KB');
+}
+async function respaldoImportar(input){
+  const f=input.files&&input.files[0]; input.value=''; if(!f)return;
+  try{
+    const pack=JSON.parse(await f.text());
+    if(!pack||!pack.estados)throw new Error('el archivo no es un respaldo de AS');
+    let nuevas=0, mas=0;
+    Object.entries(pack.estados).forEach(([k,v])=>{
+      const loc=EST[k];
+      if(!loc){EST[k]=v;nuevas++;}
+      else if(new Date(v.ts||0)>new Date(loc.ts||0)){EST[k]=v;mas++;}
+    });
+    for(const [k,v] of Object.entries(pack.fotos||{})){ if(!await fotoGet(k)) await fotoSet(k,v); }
+    (pack.cola||[]).forEach(c=>{ if(!COLA.some(x=>x.clave===c.clave)) COLA.push(c); });
+    persist(); vaciarCola(); pintaInicio();
+    toast('Respaldo cargado: '+nuevas+' pautas nuevas, '+mas+' actualizadas.');
+  }catch(e){ toast('No se pudo cargar: '+e.message); }
+}
+// libera las fotos de las pautas que ya están archivadas en el Drive: el PDF
+// es la copia oficial, el teléfono no tiene por qué seguir cargándolas
+async function purgarEvidencia(){
+  const archivadas=Object.keys(SUBIDOS||{});
+  if(!archivadas.length){toast('Todavía no hay pautas archivadas en el Drive.');return;}
+  if(!confirm('Liberar las fotos de '+archivadas.length+' pauta(s) ya archivadas en el Drive?\n'+
+              'El PDF del Drive conserva la evidencia; en el teléfono se borra.'))return;
+  let n=0;
+  for(const clave of archivadas){
+    const e=EST[clave]; if(!e||!e.datos)continue;
+    for(const kk of Object.keys(e.datos)){
+      if(kk.startsWith('foto_r')){ await fotoDel(clave+'|f'+kk.slice(6)); n++; }
+    }
+  }
+  toast(n?('Liberadas '+n+' fotos. El Drive las conserva.'):'No había fotos que liberar.');
+  pintaInicio();
+}
+function pintaMantenimiento(){
+  const kb=Math.round(espacioUsado()/1024);
+  const pend=COLA.length, fall=FALLIDOS.length, arch=Object.keys(SUBIDOS||{}).length;
+  return `<div class="card no-print"><h2>Respaldo y mantenimiento</h2>
+    <div class="res3">
+      <div><b>${kb}</b><span>KB en el equipo</span></div>
+      <div><b>${pend}</b><span>por subir</span></div>
+      <div><b>${arch}</b><span>en el Drive</span></div>
+    </div>
+    ${fall?`<div class="card aviso" style="margin:0 0 9px">⚠ ${fall} guardado(s) que el servidor
+      rechazó. Exportá el respaldo y avisá a la referente de AS antes de seguir.</div>`:''}
+    ${kb>3000?`<div class="card aviso" style="margin:0 0 9px">⚠ El equipo va lleno.
+      Subí lo pendiente y liberá la evidencia ya archivada.</div>`:''}
+    <div class="row" style="flex-wrap:wrap;gap:7px">
+      <button class="btn sec" onclick="respaldoExportar()">⬇ Exportar respaldo</button>
+      <label class="btn sec" style="text-align:center;cursor:pointer">⬆ Cargar respaldo
+        <input type="file" accept="application/json,.json" style="display:none" onchange="respaldoImportar(this)"></label>
+    </div>
+    <div class="row" style="flex-wrap:wrap;gap:7px;margin-top:7px">
+      <button class="btn sec" onclick="vaciarCola();toast('Reintentando la subida…')">☁ Reintentar subida</button>
+      <button class="btn sec" onclick="purgarEvidencia()">🧹 Liberar evidencia archivada</button>
+    </div>
+    <div class="hint" style="margin-top:8px">El respaldo incluye las fotos y se puede cargar en otro
+      equipo. Lo que ya subió al servidor no se pierde aunque borres este navegador.</div>
+  </div>`;
 }
 
 /* ── arnés · ?selftest=1 ─────────────────────────────────────────────────
@@ -1498,6 +1921,41 @@ async function selftest(){
         nomAmbito('SALA DE PROCEDIMIENTOS')==='Sala de procedimientos' &&
         nomAmbito('Artículo 11 · Todo laboratorio')==='Artículo 11 · Todo laboratorio');
 
+    /* 8b · el nombre del servicio cambia y el avance no se pierde */
+    chk('los alias resuelven al nombre vigente',
+        svcCanon('OTORRINO')==='OTORRINOLARINGOLOGIA' && svcCanon('OFTALMOLOGIA')==='OFTALMOLOGIA',
+        Object.keys(D.alias||{}).length+' alias');
+    chk('la clave de unidad se arma con el nombre canónico',
+        claveSvc('OTORRINO','x')==='svc|OTORRINOLARINGOLOGIA|x');
+
+    /* 8c · la revisión de las referentes y el tablero */
+    await intenta('la revisión lista lo sembrado y lo aplicado a mano',()=>{
+      const v=paraValidar();
+      if(!v.length)throw new Error('no hay nada que revisar');
+      const sin=v.filter(x=>x.origen==='siembra'&&!x.fund).length;
+      if(sin)throw new Error(sin+' siembras sin fundamento');
+      return v.length+' pautas ('+v.filter(x=>x.origen==='manual').length+' a mano)';});
+    await intenta('el tablero calcula el avance de los 53 servicios',()=>{
+      let n=0; D.servicios.forEach(sv=>{const a=avanceServicio(sv); n+=a.n;});
+      pintaTablero(); return n+' pautas contadas';});
+    chk('rechazar una pauta en la revisión la saca de la plataforma',(()=>{
+      const svq=D.servicios.find(x=>(D.asign_svc||{})[x.n.toUpperCase()]);
+      if(!svq)return true;
+      const amb=D.asign_svc[svq.n.toUpperCase()][0], cl=claveSvc(svq.n,amb);
+      const antes=pautasDeSvc(svq.n).includes(amb);
+      EST['val|'+cl]={datos:{v:'no'},avance:100,ts:new Date().toISOString()};
+      const dsp=pautasDeSvc(svq.n).includes(amb);
+      delete EST['val|'+cl];
+      return antes && !dsp;})());
+
+    /* 9 · la firma y la evidencia no inflan el avance */
+    if(svP){
+      const amb=D.asign_svc[svP.n.toUpperCase()][0], cl='svc|__selftest__|'+amb;
+      guardar(cl,'__selftest__','',amb,{foto_r1:50,_firma:{nombre:'x',ts:'2026-01-01'}});
+      chk('foto y firma no cuentan como requisito respondido', avanceDe(cl)===0, avanceDe(cl)+'%');
+      delete EST[cl]; COLA=COLA.filter(c=>c.clave!==cl);
+    }
+
     /* 9b · la evidencia fotográfica sobrevive al ciclo completo */
     await intenta('IndexedDB guarda y devuelve una evidencia',async()=>{
       const px='data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAP//////'+
@@ -1520,6 +1978,7 @@ async function selftest(){
     chk('localStorage disponible', (()=>{try{localStorage.setItem('__st','1');localStorage.removeItem('__st');return true;}catch(e){return false;}})());
     chk('espacio usado razonable', espacioUsado()<3_500_000, (espacioUsado()/1024).toFixed(0)+' KB');
     chk('backend configurado', !!URLC, URLC?'sí':'FALTA as_remote.js');
+    chk('el panel de respaldo se arma', pintaMantenimiento().indexOf('Exportar respaldo')>0);
 
   }finally{
     EST=JSON.parse(_est); COLA=JSON.parse(_cola); SES=_ses; PILA=_pila.length?_pila:[{v:'inicio'}];
