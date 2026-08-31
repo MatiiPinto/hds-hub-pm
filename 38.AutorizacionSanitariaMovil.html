@@ -135,6 +135,9 @@ main{max-width:1100px;margin:0 auto;padding:14px}
 .valpa{font-size:13.5px;font-weight:600;margin:3px 0 2px}
 .valfu{font-size:11.5px;color:var(--tx2);line-height:1.4;background:#f5f7fb;border-radius:8px;padding:6px 9px;margin-top:4px}
 .valfu.sinf{background:#fff4e6;color:#8a5a12}
+.asg-sep{font-size:11px;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.04em;
+  padding:12px 2px 5px;position:sticky;top:0;background:#fff}
+.item.ajena{opacity:.62}.item.ajena .tt b{font-weight:600}
 .est3{display:flex;gap:7px}
 .est3 button{flex:1;padding:9px 4px;border-radius:9px;font-weight:800;font-size:12px;border:1.5px solid var(--bd);color:var(--tx2);background:#fff}
 .est3 .c.on{background:var(--verdebg);border-color:var(--verde);color:var(--verde)}
@@ -689,7 +692,7 @@ function pintaInicio(){
     const r=resumenSvc(s.n);
     return `<button class="item" onclick="ir('servicio','${esc(s.n)}')">
       <div class="ic">${esc(s.piso)}</div>
-      <div class="tt"><b>${esc(s.n)}</b><span>${s.eq_total?s.eq_total+' equipos · ':''}${s.cartera?s.cartera+' prestaciones · ':''}${r.n} pauta${r.n===1?'':'s'}</span></div>
+      <div class="tt"><b>${esc(s.n)}${congelado(s.n)?' ❄️':''}</b><span>${congelado(s.n)?'Congelado · ':''}${s.eq_total?s.eq_total+' equipos · ':''}${s.cartera?s.cartera+' prestaciones · ':''}${r.n} pauta${r.n===1?'':'s'}</span></div>
       <div class="fx"><span class="hint">${r.n?r.av+'%':''}</span><div class="prog"><i style="width:${r.av}%"></i></div></div>
       <span class="chev">›</span></button>`;
   }).join(''):'<div class="hint">Tu correo no tiene servicios asignados.</div>');
@@ -987,7 +990,9 @@ let _SVC=null;
 function pintaServicio(nombre){
   const sv=svcInfo(nombre); if(!sv)return;
   _SVC=sv;
-  $('hTit').textContent=sv.n; $('hSub').textContent='Servicio · '+sv.piso+' · vista 1';
+  const _cong=congelado(sv.n);
+  $('hTit').textContent=sv.n;
+  $('hSub').textContent=(_cong?'❄️ Congelado · ':'Servicio · ')+sv.piso+' · vista 1';
   const asigns=pautasDeSvc(sv.n);
   const lista=asigns.map(pid=>{
     const a=ambitoDe(pid); if(!a)return '';
@@ -1023,6 +1028,8 @@ function pintaServicio(nombre){
   }).join('');
 
   $('v-servicio').innerHTML=`
+    ${_cong?`<div class="card aviso">❄️ <b>Fuera del alcance vigente</b> desde el ${esc(_cong.desde||'')}.
+      ${esc(_cong.motivo||'')} Las pautas siguen aquí y no cuentan en el avance del hospital.</div>`:''}
     ${planoSvc(sv)?`<div class="card"><h2>Plano del servicio · ${esc(sv.piso)}</h2>
       <div class="svcplano-wrap">${planoSvc(sv)}</div>
       <div class="leyenda">
@@ -1064,25 +1071,67 @@ function pintaServicio(nombre){
 
 /* ── asignación de pautas (desde lo ya trabajado) ────────────────────────── */
 function asignar(tipo,rid,svc){
+  // Por aquí se colaron los dos errores conocidos (la pauta de Alimentación en
+  // Oftalmología y en Diálisis): la lista ofrecía los 329 ámbitos de las 14
+  // normas, planos, sin decir cuáles tienen que ver con el servicio. Ahora las
+  // normas que ya autorizan a este servicio van primero y marcadas, y elegir
+  // una de otra norma pide confirmación explícita.
+  const sv=svcInfo(svc);
+  const propias=new Set();
+  ((D.asign_svc||{})[String(svc||'').toUpperCase()]||[]).forEach(a=>{
+    const n=D.amb_norma[a]; if(n)propias.add(n);
+  });
+  if(sv)(D.recintos[sv.piso]||[]).filter(r=>String(r[9]||'').toUpperCase()===String(svc||'').toUpperCase())
+    .forEach(r=>(D.asign[r[0]]||[]).forEach(a=>{const n=D.amb_norma[a]; if(n)propias.add(n);}));
+
   const opciones=[];
-  Object.entries(D.normas).forEach(([nid,n])=>n.secciones.forEach(s=>s.ambitos.forEach(a=>{
-    if(a.reqs.length)opciones.push({id:a.id,txt:n.nombre+' — '+a.name.toLowerCase(),n:a.reqs.length});
+  Object.entries(D.normas).forEach(([nid,n])=>n.secciones.forEach(se=>se.ambitos.forEach(a=>{
+    if(!a.reqs.length)return;
+    opciones.push({id:a.id, nid, norma:n.nombre, nom:nomAmbito(a.name), n:a.reqs.length,
+                   propia:propias.has(nid),
+                   txt:(n.nombre+' — '+a.name).toLowerCase()});
   })));
+  opciones.sort((a,b)=>(b.propia-a.propia)||a.norma.localeCompare(b.norma)||a.nom.localeCompare(b.nom));
+  const nProp=opciones.filter(o=>o.propia).length;
+
   const div=document.createElement('div');
   div.style.cssText='position:fixed;inset:0;background:rgba(10,18,35,.5);z-index:90;display:flex;align-items:flex-end;justify-content:center';
-  div.innerHTML=`<div style="background:#fff;border-radius:18px 18px 0 0;max-height:78vh;width:100%;max-width:640px;display:flex;flex-direction:column">
-    <div style="padding:14px 16px 8px"><b>Asignar pauta ${tipo==='svc'?'al servicio':'al recinto'}</b>
-      <input id="fPauta" placeholder="Buscar en las normas digitalizadas…" style="margin-top:9px"></div>
+  div.innerHTML=`<div style="background:#fff;border-radius:18px 18px 0 0;max-height:80vh;width:100%;max-width:640px;display:flex;flex-direction:column">
+    <div style="padding:14px 16px 8px">
+      <b>Asignar pauta ${tipo==='svc'?'al servicio':'al recinto'}</b>
+      <div class="hint" style="margin-top:3px">${nProp
+        ? nProp+' pauta'+(nProp===1?'':'s')+' de las normas que ya autorizan a '+esc(svc)+', primero.'
+        : 'Este servicio todavía no tiene ninguna norma propia asignada.'}</div>
+      <input id="fPauta" placeholder="Buscar en las 14 normas digitalizadas…" style="margin-top:9px"></div>
     <div id="lPauta" style="overflow:auto;padding:0 16px 16px"></div></div>`;
   document.body.appendChild(div);
   div.addEventListener('click',e=>{if(e.target===div)div.remove();});
+
   const pinta=q=>{
-    q=(q||'').toLowerCase();
-    const hits=opciones.filter(o=>o.txt.toLowerCase().includes(q)).slice(0,40);
-    div.querySelector('#lPauta').innerHTML=hits.map(o=>
-      `<button class="item" data-id="${o.id}"><div class="tt"><b style="white-space:normal">${esc(o.txt)}</b><span>${o.n} requisitos</span></div><span class="chev">›</span></button>`).join('')||'<div class="hint" style="padding:12px 0">Sin resultados.</div>';
+    const hits=(q?opciones.filter(o=>coincide(q,[o.norma,o.nom])):opciones).slice(0,60);
+    let h='', grupo=null;
+    hits.forEach(o=>{
+      const g=o.propia?'propia':'otra';
+      if(g!==grupo){
+        h+=`<div class="asg-sep">${o.propia
+          ? '✔ Normas de este servicio'
+          : '⚠ Otras normas — sólo si de verdad corresponde'}</div>`;
+        grupo=g;
+      }
+      h+=`<button class="item ${o.propia?'':'ajena'}" data-id="${o.id}" data-prop="${o.propia?1:0}"
+            data-nom="${esc(o.norma)}">
+        <div class="ic">${o.propia?'📋':'⚠️'}</div>
+        <div class="tt"><b style="white-space:normal">${esc(o.nom)}</b>
+          <span>${esc(o.norma)} · ${o.n} requisito${o.n===1?'':'s'}</span></div>
+        <span class="chev">›</span></button>`;
+    });
+    div.querySelector('#lPauta').innerHTML=h||'<div class="hint" style="padding:12px 0">Sin resultados.</div>';
     div.querySelectorAll('.item').forEach(b=>b.onclick=()=>{
       const amb=b.dataset.id;
+      if(b.dataset.prop!=='1' &&
+         !confirm('«'+b.dataset.nom+'» no es una de las normas que autorizan a '+svc+'.\n\n'+
+                  '¿Seguro que corresponde? Queda registrada a tu nombre y las referentes la van a revisar.'))
+        return;
       const clave=tipo==='svc'?claveSvc(svc,amb):claveRec(rid,amb);
       if(!EST[clave]||_borrada(clave))guardar(clave,svc,tipo==='rec'?rid:'',amb,{});
       div.remove(); toast('Pauta asignada');
@@ -1518,7 +1567,9 @@ function pintaTablero(){
   $('hTit').textContent='Avance de la autorización sanitaria';
   $('hSub').textContent='Nuevo Hospital Del Salvador · corte '+new Date().toLocaleDateString('es-CL');
   const svs=D.servicios.slice().sort((a,b)=>D.pisos.indexOf(a.piso)-D.pisos.indexOf(b.piso)||a.n.localeCompare(b.n));
-  const filas=svs.map(sv=>({sv,a:avanceServicio(sv)})).filter(x=>x.a.n);
+  const todos=svs.map(sv=>({sv,a:avanceServicio(sv),cong:congelado(sv.n)})).filter(x=>x.a.n);
+  const filas=todos.filter(x=>!x.cong);
+  const frios=todos.filter(x=>x.cong);
   const totP=filas.reduce((a,x)=>a+x.a.n,0), totH=filas.reduce((a,x)=>a+x.a.hechas,0);
   const totR=filas.reduce((a,x)=>a+x.a.req,0);
   const glob=totP?Math.round(filas.reduce((a,x)=>a+x.a.pct*x.a.n,0)/totP):0;
@@ -1580,7 +1631,15 @@ function pintaTablero(){
       </div>
       <div class="hint">Ordenado por lo que menos ha avanzado.</div>
     </div>
-    <div class="card">${cuerpo||'<div class="hint">Sin pautas aplicadas todavía.</div>'}</div>`;
+    <div class="card">${cuerpo||'<div class="hint">Sin pautas aplicadas todavía.</div>'}</div>
+    ${frios.length?`<div class="card"><h2>Congelados · fuera del alcance vigente</h2>
+      <div class="hint" style="margin-bottom:7px">Conservan sus pautas y no entran en el avance de
+      arriba. Se retoman cuando se decida.</div>
+      ${frios.map(x=>`<div class="item" style="cursor:default;opacity:.72">
+        <div class="ic">❄️</div>
+        <div class="tt"><b>${esc(x.sv.n)}</b><span>${x.a.n} pauta${x.a.n===1?'':'s'} ·
+          ${x.a.req} req. · congelado el ${esc(x.cong.desde||'')}</span></div></div>`).join('')}
+    </div>`:''}`;
 }
 
 /* ── revisión de Catherine y Meylin ──────────────────────────────────────
@@ -1593,6 +1652,9 @@ function pintaTablero(){
 const claveVal=k=>'val|'+k;
 const REFERENTES=['csepulvedar@hsalvador.cl','mcanales@hsalvador.cl','mpinto@hsalvador.cl'];
 const esReferente=()=>SES&&REFERENTES.includes(String(SES.correo||'').toLowerCase());
+// servicios fuera del alcance vigente: conservan sus pautas pero no se cotejan
+// ni entran en el avance, y se marcan para que nadie los tome por error
+const congelado=n=>(D.congelados||{})[String(n||'').toUpperCase()]||null;
 
 function fundamentoDe(svc,amb){
   const f=(D.fund||{})[String(svc||'').toUpperCase()]||[];
@@ -1605,6 +1667,7 @@ function paraValidar(){
   // (1) lo sembrado por fundamento normativo
   Object.entries(D.asign_svc||{}).forEach(([k,ambs])=>{
     const sv=D.servicios.find(x=>x.n.toUpperCase()===k); if(!sv)return;
+    if(congelado(sv.n))return;
     ambs.forEach(amb=>{
       const a=ambitoDe(amb); if(!a)return;
       const cl=claveSvc(sv.n,amb);
@@ -1979,6 +2042,15 @@ async function selftest(){
     chk('espacio usado razonable', espacioUsado()<3_500_000, (espacioUsado()/1024).toFixed(0)+' KB');
     chk('backend configurado', !!URLC, URLC?'sí':'FALTA as_remote.js');
     chk('el panel de respaldo se arma', pintaMantenimiento().indexOf('Exportar respaldo')>0);
+
+    /* 11 · alcance: lo congelado no cuenta ni se pide validar */
+    const cong=Object.keys(D.congelados||{});
+    chk('los servicios congelados están declarados', true, cong.length?cong.join(', '):'ninguno');
+    if(cong.length){
+      chk('lo congelado no entra en la revisión de las referentes',
+          !paraValidar().some(x=>cong.includes(String(x.svc).toUpperCase())&&x.origen==='siembra'));
+      chk('congelado() los reconoce', cong.every(c=>!!congelado(c)));
+    }
 
   }finally{
     EST=JSON.parse(_est); COLA=JSON.parse(_cola); SES=_ses; PILA=_pila.length?_pila:[{v:'inicio'}];
