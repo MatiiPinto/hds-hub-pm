@@ -166,6 +166,20 @@ th.sortable{cursor:pointer;user-select:none}th.sortable:hover{background:#0a558f
 .gtt tbody tr:hover td.gfd{background:#eef2f6}
 .gbar{display:block;height:14px;border-radius:4px;margin:1px 0}
 .gsin{text-align:left!important;color:#dc2626;font-size:10.5px;background:#fff5f5;max-width:none!important}
+/* vista "Por día y servicio": misma lectura del reporte semanal al SSMO */
+.gvsw{margin-bottom:2px}
+.grep{font-size:12.5px;line-height:1.5}
+.grep-dia{margin:16px 0 6px;padding:6px 10px;border-radius:6px;background:#334155;color:#fff;
+  font-weight:700;font-size:11.5px;letter-spacing:.03em}
+.grep-dia:first-child{margin-top:2px}
+.grep-sv{margin:9px 0 3px;font-weight:700;color:var(--azul);font-size:12px}
+.grep-sv span{font-weight:500;color:var(--tx2);font-size:11px}
+.grep-eq{list-style:none;margin:0 0 0 4px;padding:0}
+.grep-eq li{padding:3px 0 3px 18px;position:relative;border-bottom:1px solid #f1f5f9}
+.grep-dot{position:absolute;left:2px;top:9px;width:8px;height:8px;border-radius:50%}
+.grep-cod{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:var(--tx2)}
+.grep-eq li b{margin-left:6px;font-size:11px;letter-spacing:.03em}
+.grep-obs{display:block;margin-left:0;color:var(--tx2);font-size:11px;font-style:italic}
 </style>
 </head>
 <body>
@@ -781,6 +795,7 @@ var LBL={coordinada:"Coordinada",pendiente:"CSSO",reprogramada:"Reprogramada",
 var mask=document.getElementById("gMask"), body=document.getElementById("gBody"),
     sub=document.getElementById("gSub"), foot=document.getElementById("gFoot");
 var gF="prog";   // prog = programa activo (sin ejecutadas/IU) | todas | ejec
+var gV="gantt";  // gantt = cronograma · reporte = por dia y servicio (como el correo)
 function p2(n){return (n<10?"0":"")+n;}
 function dmy(f){return f?f.slice(8,10)+"-"+f.slice(5,7):"";}
 function esc3(s){return esc(s);}
@@ -793,7 +808,8 @@ function gRows(){
     if(gF==="ejec" && est!=="ejecutada" && est!=="en_progreso") return;
     var sl=slotsOf(r).filter(function(s){return s.f;});
     out.push({cod:String(r.codigo||"").trim(), nom:valOf(r,"equipo"), est:est,
-              serv:valOf(r,"detalle_servicios"), prov:valOf(r,"proveedor"), sl:sl});
+              serv:valOf(r,"detalle_servicios"), prov:valOf(r,"proveedor"), sl:sl,
+              obs:valOf(r,"observaciones")});
   });
   out.sort(function(a,b){
     var d=ORD[a.est]-ORD[b.est]; if(d) return d;
@@ -820,10 +836,7 @@ function gPinta(){
   var cnt={}; rows.forEach(function(r){cnt[r.est]=(cnt[r.est]||0)+1;});
   sub.textContent=rows.length+" tipologías · "+(dias.length?dmy(dias[0])+" a "+dmy(dias[dias.length-1]):"sin fechas")+
     " · "+Object.keys(ORD).filter(function(k){return cnt[k];}).map(function(k){return cnt[k]+" "+LBL[k];}).join(" · ");
-  var h='<div class="segtabs">'+
-    [["prog","Programa activo"],["todas","Todas"],["ejec","Ejecutadas"]].map(function(t){
-      return '<button class="'+(gF===t[0]?"on":"")+'" onclick="gVer(\''+t[0]+'\')">'+t[1]+'</button>';
-    }).join("")+'</div>';
+  var h=gTabs();
   h+='<div style="overflow:auto"><table class="gtt"><thead><tr>'+
      '<th class="gfix g1">Código</th><th class="gfix g2">Equipo</th><th class="gfix g3">Servicio</th><th class="gfix g4">Estado</th>';
   var mesRow='';
@@ -856,10 +869,21 @@ function gPinta(){
     '<button class="sbtn sb-si" onclick="gExport()">⬇ Exportar a Excel</button>'+
     '<button class="sbtn sb-gh" onclick="gCerrar()">Cerrar</button>';
 }
-function gAbrir(){ gPinta(); mask.className="segmask on"; }
+function gTabs(){
+  return '<div class="segtabs gvsw">'+
+    [["gantt","▦ Cronograma"],["reporte","▤ Por día y servicio"]].map(function(t){
+      return '<button class="'+(gV===t[0]?"on":"")+'" onclick="gVista(\''+t[0]+'\')">'+t[1]+'</button>';
+    }).join("")+'</div><div class="segtabs">'+
+    [["prog","Programa activo"],["todas","Todas"],["ejec","Ejecutadas"]].map(function(t){
+      return '<button class="'+(gF===t[0]?"on":"")+'" onclick="gVer(\''+t[0]+'\')">'+t[1]+'</button>';
+    }).join("")+'</div>';
+}
+function gRender(){ if(gV==="reporte") gPintaReporte(); else gPinta(); }
+function gAbrir(){ gRender(); mask.className="segmask on"; }
 function gCerrar(){ mask.className="segmask"; }
-function gVer(v){ gF=v; gPinta(); }
-window.gAbrir=gAbrir; window.gCerrar=gCerrar; window.gVer=gVer;
+function gVer(v){ gF=v; gRender(); }
+function gVista(v){ gV=v; gRender(); }
+window.gAbrir=gAbrir; window.gCerrar=gCerrar; window.gVer=gVer; window.gVista=gVista;
 
 // ── exportacion Excel (xlsx-js-style, carga perezosa) ─────────────────────
 function conXLSX(cb){
@@ -877,11 +901,11 @@ function gBuildWb(){
   var aoa=[["CARTA GANTT · PROGRAMA DE CAPACITACIÓN DE EQUIPAMIENTO MÉDICO Y MOBILIARIO CLÍNICO — NHDS"],
            ["Hospital del Salvador · generada el "+sello+" desde la plataforma de Coordinación de Capacitaciones"],
            [],
-           ["Código","Equipo","Servicio Clínico","Proveedor","Estado","Fechas","Horas"].concat(dias.map(dmy))];
+           ["Código","Equipo","Servicio Clínico","Proveedor","Estado","Fechas","Horas","Observación"].concat(dias.map(dmy))];
   rows.forEach(function(r){
     var fila=[r.cod, r.nom, r.serv.replace(/\n/g," · "), r.prov, LBL[r.est],
               r.sl.map(function(s){return dmy(s.f);}).join("\n")||"sin fecha",
-              r.sl.map(function(s){return s.h||"";}).join("\n")];
+              r.sl.map(function(s){return s.h||"";}).join("\n"), r.obs];
     dias.forEach(function(f){ fila.push(r.sl.some(function(s){return s.f===f;})?"■":""); });
     aoa.push(fila);
   });
@@ -890,13 +914,13 @@ function gBuildWb(){
   var ws=XLSX.utils.aoa_to_sheet(aoa);
   var AZ="073763", BORD={style:"thin",color:{rgb:"BFBFBF"}};
   function st(c,s){ if(ws[c]) ws[c].s=s; }
-  var ncol=7+dias.length, HDR=3, ley=aoa.length-1;
+  var ncol=8+dias.length, HDR=3, ley=aoa.length-1, FIJ=8;
   ws["!merges"]=[{s:{r:0,c:0},e:{r:0,c:ncol-1}},{s:{r:1,c:0},e:{r:1,c:ncol-1}}];
   st("A1",{font:{name:"Verdana",sz:12,bold:true,color:{rgb:AZ}}});
   st("A2",{font:{name:"Verdana",sz:9,color:{rgb:AZ}}});
   for(var c=0;c<ncol;c++){
     var cell=XLSX.utils.encode_cell({r:HDR,c:c});
-    var esFinde=c>=7 && finde(dias[c-7]);
+    var esFinde=c>=FIJ && finde(dias[c-FIJ]);
     st(cell,{font:{name:"Verdana",sz:8.5,bold:true,color:{rgb:"FFFFFF"}},
              fill:{fgColor:{rgb:esFinde?"64748B":AZ}},
              alignment:{horizontal:"center",vertical:"center",wrapText:true},
@@ -908,10 +932,10 @@ function gBuildWb(){
       var cell=XLSX.utils.encode_cell({r:R,c:c});
       var s={font:{name:"Verdana",sz:8.5,color:{rgb:AZ}},
              border:{top:BORD,bottom:BORD,left:BORD,right:BORD},
-             alignment:{vertical:"top",wrapText:c<7}};
+             alignment:{vertical:"top",wrapText:c<FIJ}};
       if(c===4) s.fill={fgColor:{rgb:hex(EST_HEX[r.est])}}, s.font={name:"Verdana",sz:8.5,bold:true,color:{rgb:"FFFFFF"}};
-      if(c>=7){
-        var f=dias[c-7];
+      if(c>=FIJ){
+        var f=dias[c-FIJ];
         if(r.sl.some(function(x){return x.f===f;})){ s.fill={fgColor:{rgb:hex(EST_HEX[r.est])}}; if(ws[cell]) ws[cell].v=""; }
         else if(finde(f)) s.fill={fgColor:{rgb:"EEF2F6"}};
         s.alignment={horizontal:"center"};
@@ -925,12 +949,13 @@ function gBuildWb(){
     st(cel,{font:{name:"Verdana",sz:8.5,bold:true,color:{rgb:"FFFFFF"}},fill:{fgColor:{rgb:hex(EST_HEX[k])}},
             alignment:{horizontal:"center"}});
   }
-  ws["!cols"]=[{wch:8},{wch:38},{wch:26},{wch:26},{wch:13},{wch:10},{wch:7}]
+  ws["!cols"]=[{wch:8},{wch:38},{wch:26},{wch:26},{wch:13},{wch:10},{wch:7},{wch:50}]
       .concat(dias.map(function(){return {wch:3.6};}));
   ws["!freeze"]={xSplit:5,ySplit:HDR+1};
   ws["!views"]=[{state:"frozen",xSplit:5,ySplit:HDR+1}];
   var wb=XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb,ws,"Carta Gantt");
+  XLSX.utils.book_append_sheet(wb,gBuildWsReporte(sello),"Reporte por día");
   return wb;
 }
 window.gBuildWb=gBuildWb;
@@ -941,6 +966,166 @@ function gExport(){
   });
 }
 window.gExport=gExport;
+
+// ── vista REPORTE POR DÍA Y SERVICIO (la misma lectura del correo) ────────
+// Agrupa día → servicio clínico → equipo, con el estado en mayúscula y su
+// color. Es lo que se remite al Servicio de Salud como evidencia del avance.
+var DSEM=["DOMINGO","LUNES","MARTES","MIÉRCOLES","JUEVES","VIERNES","SÁBADO"];
+var MESES=["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO",
+           "SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
+function diaLargo(f){ var d=new Date(f+"T12:00");
+  return DSEM[d.getDay()]+" "+d.getDate()+" DE "+MESES[d.getMonth()]; }
+function LBLU(e){ return (LBL[e]||e).toUpperCase(); }
+
+// Esqueleto = las jornadas realmente propuestas a la CSSO (día · servicio ·
+// equipamiento), igual que el reporte semanal al SSMO; el ESTADO y la
+// observación salen siempre de la hoja oficial. Lo que no está en ninguna
+// jornada (ejecutado antes del programa, Inst de Uso) entra por la hoja.
+// Fecha del renglón: la de la hoja cuando es inequívoca (un solo servicio y
+// una sola fecha); si no, la fecha propuesta de esa jornada.
+function gEntradas(){
+  var vis={}, out=[];
+  gRows().forEach(function(r){ vis[r.cod]=r; });
+  var usados={}, SEG=window.CAP_SEG;
+  if(SEG && SEG.jornadas) SEG.jornadas.forEach(function(j){
+    j.equipos.forEach(function(e){
+      var r=vis[e.cod]; if(!r) return;                       // fuera del filtro
+      usados[e.cod]=1;
+      var svs=String(r.serv||"").split("\n").filter(function(x){return x.trim();});
+      var propio=(r.sl.length===1 && svs.length<=1);
+      out.push({f: propio?r.sl[0].f:j.fecha,
+                h: propio?(r.sl[0].h||""):(j.hora||""),
+                serv: j.servicio, r:r});
+    });
+  });
+  Object.keys(vis).forEach(function(cod){                     // sin jornada propuesta
+    if(usados[cod]) return;
+    var r=vis[cod];
+    var svs=String(r.serv||"").split("\n").map(function(x){return x.trim();}).filter(Boolean);
+    if(!r.sl.length){ out.push({f:"",h:"",serv:svs.join(" · ")||"—",r:r}); return; }
+    r.sl.forEach(function(s,i){
+      out.push({f:s.f, h:s.h||"", r:r,
+                serv:(svs.length===r.sl.length ? svs[i] : (svs.join(" · ")||"—"))});
+    });
+  });
+  out.sort(function(a,b){
+    if(!a.f!==!b.f) return a.f?-1:1;                          // las sin fecha, al final
+    if(a.f!==b.f) return a.f<b.f?-1:1;
+    if(a.h!==b.h) return a.h<b.h?-1:1;
+    if(a.serv!==b.serv) return a.serv.localeCompare(b.serv);
+    return a.r.cod.localeCompare(b.r.cod);
+  });
+  return out;
+}
+
+// agrupa en [{dia, grupos:[{serv, hora, items:[entrada]}]}]
+function gAgrupa(ent){
+  var dias=[], dcur=null, gcur=null;
+  ent.forEach(function(e){
+    if(!dcur || dcur.f!==e.f){ dcur={f:e.f, grupos:[]}; dias.push(dcur); gcur=null; }
+    if(!gcur || gcur.serv!==e.serv || gcur.hora!==e.h){
+      gcur={serv:e.serv, hora:e.h, items:[]}; dcur.grupos.push(gcur);
+    }
+    gcur.items.push(e);
+  });
+  return dias;
+}
+
+function gPintaReporte(){
+  var ent=gEntradas(), dias=gAgrupa(ent);
+  var cnt={}; ent.forEach(function(e){cnt[e.r.est]=(cnt[e.r.est]||0)+1;});
+  sub.textContent=ent.length+" capacitaciones por servicio · "+
+    Object.keys(ORD).filter(function(k){return cnt[k];})
+      .map(function(k){return cnt[k]+" "+LBL[k];}).join(" · ");
+  var h=gTabs();
+  h+='<div class="grep">';
+  dias.forEach(function(d){
+    h+='<div class="grep-dia">'+(d.f?esc3(diaLargo(d.f)):"SIN FECHA — a la espera de propuesta oficial del proveedor")+'</div>';
+    d.grupos.forEach(function(g){
+      h+='<div class="grep-sv">'+esc3(g.serv)+(g.hora?(' <span>'+esc3(g.hora)+' hrs</span>'):'')+'</div><ul class="grep-eq">';
+      g.items.forEach(function(e){
+        var hx=EST_HEX[e.r.est]||"#94a3b8", obs=e.r.obs;
+        h+='<li><span class="grep-dot" style="background:'+hx+'"></span>'+
+           '<span class="grep-cod">['+esc3(e.r.cod)+']</span> '+esc3(e.r.nom)+
+           ' <b style="color:'+hx+'">'+esc3(LBLU(e.r.est))+'</b>'+
+           (obs?'<span class="grep-obs">'+esc3(obs)+'</span>':'')+'</li>';
+      });
+      h+='</ul>';
+    });
+  });
+  h+='</div>';
+  body.innerHTML=h;
+  foot.innerHTML='<span class="muted" style="font-size:11.5px;color:var(--tx2)">'+
+    'Misma lectura que el reporte semanal al SSMO: día → servicio clínico → equipo, con su estado oficial. '+
+    'Las reprogramadas sin fecha nueva se muestran en el día en que fueron propuestas.</span>'+
+    '<button class="sbtn sb-si" onclick="gExport()">⬇ Exportar a Excel</button>'+
+    '<button class="sbtn sb-gh" onclick="gCerrar()">Cerrar</button>';
+}
+
+// ── hoja "Reporte por día" del libro exportado ───────────────────────────
+function gBuildWsReporte(sello){
+  var dias=gAgrupa(gEntradas());
+  var HEAD=["Servicio Clínico","Hora","Código","Equipo","Proveedor","Estado","Observación"];
+  var NC=HEAD.length;
+  var aoa=[["REPORTE POR DÍA Y SERVICIO CLÍNICO · PROGRAMA DE CAPACITACIÓN DE EQUIPAMIENTO MÉDICO Y MOBILIARIO CLÍNICO — NHDS"],
+           ["Hospital del Salvador · generado el "+sello+" desde la plataforma de Coordinación de Capacitaciones"],
+           [], HEAD];
+  var bandas=[], filas=[], cnt={};
+  dias.forEach(function(d){
+    bandas.push(aoa.length);
+    aoa.push([d.f?diaLargo(d.f):"SIN FECHA — A LA ESPERA DE PROPUESTA OFICIAL DEL PROVEEDOR"]);
+    d.grupos.forEach(function(g){
+      g.items.forEach(function(e,i){
+        cnt[e.r.est]=(cnt[e.r.est]||0)+1;
+        filas.push({r:aoa.length, est:e.r.est});
+        aoa.push([i?"":g.serv, g.hora||"", e.r.cod, e.r.nom, e.r.prov, LBLU(e.r.est), e.r.obs]);
+      });
+    });
+  });
+  aoa.push([]);
+  var rLey=aoa.length;
+  aoa.push(["RESUMEN:"].concat(Object.keys(ORD).filter(function(k){return cnt[k];})
+    .map(function(k){return cnt[k]+" "+LBL[k];})));
+
+  var ws=XLSX.utils.aoa_to_sheet(aoa), AZ="073763";
+  var BORD={style:"thin",color:{rgb:"BFBFBF"}};
+  ws["!merges"]=[{s:{r:0,c:0},e:{r:0,c:NC-1}},{s:{r:1,c:0},e:{r:1,c:NC-1}}]
+    .concat(bandas.map(function(R){return {s:{r:R,c:0},e:{r:R,c:NC-1}};}));
+  function st(c,s){ if(!ws[c]) ws[c]={t:"s",v:""}; ws[c].s=s; }
+  st("A1",{font:{name:"Verdana",sz:12,bold:true,color:{rgb:AZ}}});
+  st("A2",{font:{name:"Verdana",sz:9,color:{rgb:AZ}}});
+  for(var c=0;c<NC;c++) st(XLSX.utils.encode_cell({r:3,c:c}),
+    {font:{name:"Verdana",sz:8.5,bold:true,color:{rgb:"FFFFFF"}},fill:{fgColor:{rgb:AZ}},
+     alignment:{horizontal:"center",vertical:"center",wrapText:true},
+     border:{top:BORD,bottom:BORD,left:BORD,right:BORD}});
+  bandas.forEach(function(R){
+    for(var c=0;c<NC;c++) st(XLSX.utils.encode_cell({r:R,c:c}),
+      {font:{name:"Verdana",sz:9,bold:true,color:{rgb:"FFFFFF"}},fill:{fgColor:{rgb:"334155"}},
+       alignment:{horizontal:"left",vertical:"center"}});
+  });
+  filas.forEach(function(f){
+    for(var c=0;c<NC;c++){
+      var s={font:{name:"Verdana",sz:8.5,color:{rgb:AZ}},
+             border:{top:BORD,bottom:BORD,left:BORD,right:BORD},
+             alignment:{vertical:"top",wrapText:c===3||c===6}};
+      if(c===5) s={font:{name:"Verdana",sz:8.5,bold:true,color:{rgb:"FFFFFF"}},
+                   fill:{fgColor:{rgb:hex(EST_HEX[f.est])}},
+                   alignment:{horizontal:"center",vertical:"center"},
+                   border:{top:BORD,bottom:BORD,left:BORD,right:BORD}};
+      if(c===1||c===2) s.alignment={horizontal:"center",vertical:"top"};
+      st(XLSX.utils.encode_cell({r:f.r,c:c}),s);
+    }
+  });
+  var kk=Object.keys(ORD).filter(function(k){return cnt[k];});
+  st(XLSX.utils.encode_cell({r:rLey,c:0}),{font:{name:"Verdana",sz:8.5,bold:true,color:{rgb:AZ}}});
+  kk.forEach(function(k,i){ st(XLSX.utils.encode_cell({r:rLey,c:i+1}),
+    {font:{name:"Verdana",sz:8.5,bold:true,color:{rgb:"FFFFFF"}},
+     fill:{fgColor:{rgb:hex(EST_HEX[k])}},alignment:{horizontal:"center"}}); });
+  ws["!cols"]=[{wch:30},{wch:8},{wch:9},{wch:42},{wch:26},{wch:17},{wch:56}];
+  ws["!views"]=[{state:"frozen",ySplit:4}];
+  ws["!autofilter"]={ref:XLSX.utils.encode_range({s:{r:3,c:0},e:{r:aoa.length-2,c:NC-1}})};
+  return ws;
+}
 })();
 </script>
 <script src="hub-home.js"></script>
