@@ -994,7 +994,7 @@ function gEntradas(){
     j.equipos.forEach(function(e){
       var r=vis[e.cod]; if(!r) return;                       // fuera del filtro
       usados[e.cod]=1;
-      var svs=String(r.serv||"").split("\n").filter(function(x){return x.trim();});
+      var svs=String(r.serv||"").split(/[\n;]+/).filter(function(x){return x.trim();});
       // un solo servicio → las fechas de la hoja son inequivocas y mandan, y
       // cada sesion (varias fechas/horas de una misma tipologia) va aparte.
       if(svs.length<=1 && r.sl.length){
@@ -1007,7 +1007,7 @@ function gEntradas(){
   Object.keys(vis).forEach(function(cod){                     // sin jornada propuesta
     if(usados[cod]) return;
     var r=vis[cod];
-    var svs=String(r.serv||"").split("\n").map(function(x){return x.trim();}).filter(Boolean);
+    var svs=String(r.serv||"").split(/[\n;]+/).map(function(x){return x.trim();}).filter(Boolean);
     if(!r.sl.length){ out.push({f:"",h:"",serv:svs.join(" · ")||"—",r:r}); return; }
     r.sl.forEach(function(s,i){
       out.push({f:s.f, h:s.h||"", r:r,
