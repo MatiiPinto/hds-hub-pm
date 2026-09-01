@@ -2,7 +2,7 @@
 // BORRADOR Fase 1 · asignación automática por tipo de recinto — pendiente validación
 // Consumir con: window.SHARED_PAUTAS_RECINTOS · asignaciones[recintoId] = {p:[ambitoIds], regla}
 window.SHARED_PAUTAS_RECINTOS = {
-  "version": "2026-06-05 · Fase 1 borrador para validación · fase2 2026-09-01 (41 ámbitos de servicio)",
+  "version": "2026-06-05 · Fase 1 borrador para validación · fase2 2026-09-01 (1 ámbitos de servicio)",
   "fuente": "SHARED_DATA/recintos.js (2228 recintos) × normas AC/CM/FA/DI",
   "total_recintos": 2359,
   "total_asignados": 693,
@@ -4974,6 +4974,15 @@ window.SHARED_PAUTAS_RECINTOS = {
       ]
     },
     "UTI": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "UTO": {
       "p": [
         "re_reas__org__reglamento"
       ],
