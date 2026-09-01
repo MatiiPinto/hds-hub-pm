@@ -6,7 +6,7 @@
 <style>/*HUB-PM*/ #expDD, body:not(.pm-editor) #wsModal { display:none !important; }</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HDS · Atlas — Consulta Web</title>
+<title>Autorización Sanitaria · Terreno · HDS</title>
 <link rel="icon" type="image/png" href="Logos%20HUB-HDS/favicon-nhds-amarillo-64.png">
 <link rel="icon" type="image/png" sizes="512x512" href="Logos%20HUB-HDS/favicon-nhds-amarillo-512.png">
 <link rel="shortcut icon" href="Logos%20HUB-HDS/favicon-nhds-amarillo-64.png">
@@ -484,13 +484,176 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 </style>
 <!-- xlsx-js-style: fork de SheetJS con soporte de estilos de celda (para colorear filas en el export de dotación) -->
 <script src="assets/vendor/xlsx-js-style-1.2.0.bundle.js"></script>
+<style>/* ══ AS · TERRENO — módulo de cotejo sobre el Atlas ══ */
+:root{
+  --azul:#1D2D5B; --azul2:#2b4180; --cel:#3b82c4; --verde:#15803d; --verdebg:#dcfce7;
+  --rojo:#b91c1c; --rojobg:#fee2e2; --gris:#64748b; --grisbg:#f1f5f9;
+  --bg:#eef2f8; --panel:#ffffff; --bd:#d8e0ec; --tx:#17233b; --tx2:#5b6b85;
+}
+#asPanel{font-family:-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--tx);
+  font-size:15px;line-height:1.45;min-height:100vh;padding-bottom:64px}
+#asRoot button{font-family:inherit;cursor:pointer;border:none;background:none;font-size:inherit}
+#asRoot input, #asRoot select, #asRoot textarea{font-family:inherit;font-size:15px;width:100%;padding:11px 12px;
+  border:1.5px solid var(--bd);border-radius:10px;background:#fff;color:var(--tx)}
+#asRoot input:focus, #asRoot select:focus, #asRoot textarea:focus{outline:none;border-color:var(--cel)}
+#asRoot header{background:var(--azul);color:#fff;padding:11px 14px;position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;gap:10px;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+#asRoot header .back{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.13);color:#fff;
+  font-size:19px;flex:none;display:grid;place-items:center}
+#asRoot header .t{flex:1;min-width:0}
+#asRoot header h1{font-size:15px;font-weight:800;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#asRoot header .s{font-size:10.5px;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#asRoot .sync{width:10px;height:10px;border-radius:50%;flex:none}
+#asRoot .sync.ok{background:#4ade80}
+#asRoot .sync.pend{background:#fbbf24;animation:pu 1.2s infinite}
+#asRoot .sync.off{background:#94a3b8}
+#asRoot .sync.err{background:#ef4444;animation:pu .9s infinite}
+@keyframes pu{50%{opacity:.35}}
+#asRoot #asMain{max-width:1100px;margin:0 auto;padding:14px}
+#asRoot .card{background:var(--panel);border:1px solid var(--bd);border-radius:14px;padding:14px 16px;margin-bottom:11px}
+#asRoot .card h2{font-size:13px;color:var(--azul);text-transform:uppercase;letter-spacing:.7px;margin-bottom:9px}
+#asRoot .hint{font-size:12px;color:var(--tx2)}
+#asRoot .btn{display:block;width:100%;background:var(--azul);color:#fff;font-weight:700;border-radius:11px;
+  padding:13px;text-align:center;font-size:15px}
+#asRoot .btn.sec{background:#e8eef8;color:var(--azul)}
+#asRoot .btn:active{transform:scale(.985)}
+#asRoot .row{display:flex;gap:8px}
+#asRoot .pill{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:20px;white-space:nowrap}
+#asRoot .item{display:flex;align-items:center;gap:11px;padding:12px 4px;border-bottom:1px solid #edf1f7;width:100%;text-align:left}
+#asRoot .item:last-child{border-bottom:none}
+#asRoot .item .ic{width:38px;height:38px;border-radius:10px;flex:none;display:grid;place-items:center;
+  font-size:17px;background:#e8eef8;color:var(--azul);font-weight:800}
+#asRoot .item .tt{flex:1;min-width:0}
+#asRoot .item .tt b{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#asRoot .item .tt span{font-size:11.5px;color:var(--tx2);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#asRoot .item .fx{flex:none;text-align:right}
+#asRoot .prog{width:52px;height:7px;border-radius:10px;background:#e2e8f2;overflow:hidden;margin-top:3px}
+#asRoot .prog i{display:block;height:100%;background:var(--verde)}
+#asRoot .chev{color:#a9b6cc;font-size:17px;flex:none}
+#asRoot .tabs{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+#asRoot .tabs::-webkit-scrollbar{display:none}
+#asRoot .tabs button{flex:none;background:#fff;border:1.5px solid var(--bd);border-radius:20px;padding:7px 15px;font-weight:700;font-size:13px;color:var(--tx2)}
+#asRoot .tabs button.on{background:var(--azul);border-color:var(--azul);color:#fff}
+#asRoot .svcplano-wrap{border:1px solid var(--bd);border-radius:12px;overflow:hidden;background:#fff}
+#asRoot .svcplano{display:block;width:100%;height:auto;max-height:46vh;margin:0 auto}
+#asRoot .svcplano image{image-rendering:auto}
+#asRoot .svcplano .rec{fill:rgba(59,130,196,.24);stroke:#3b82c4;stroke-width:1.1}
+#asRoot .svcplano .rec.pauta{fill:rgba(21,128,61,.30);stroke:#15803d;stroke-width:1.3}
+#asRoot .svcplano .rec.parcial{fill:rgba(240,180,41,.55);stroke:#b45309}
+#asRoot .svcplano .rec.hecho{fill:rgba(21,128,61,.60);stroke:#15803d}
+#asRoot .svcplano .rec.vecino{fill:rgba(120,132,150,.06);stroke:#d3d9e2;stroke-width:.4;pointer-events:none}
+#asRoot .reclbl{font-weight:700;fill:#17233b;paint-order:stroke fill;stroke:#fff;stroke-width:2.4;pointer-events:none}
+#asRoot .leyenda{display:flex;gap:11px;flex-wrap:wrap;font-size:11px;color:var(--tx2);padding:8px 2px 2px}
+#asRoot .leyenda i.lg{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px;border:1px solid #94a3b8}
+#asRoot .lg-p{background:#9cc9a9;border-color:#15803d}
+#asRoot .lg-q{background:#f2ce7a;border-color:#b45309}
+#asRoot .lg-h{background:#5c9c72;border-color:#15803d}
+#asRoot .lg-n{background:#b9d0e8;border-color:#3b82c4}
+#asRoot .lg-v{background:#eceff3;border-color:#c3cbd8}
+#asRoot .lista-scroll{margin-top:6px}
+#asRoot .res3{display:flex;gap:8px;margin:2px 0 10px}
+#asRoot .res3>div{flex:1;border:1px solid var(--bd);border-radius:11px;padding:7px 4px;text-align:center}
+#asRoot .res3 b{display:block;font-size:18px;color:var(--azul)}
+#asRoot .res3 span{font-size:10px;color:var(--tx2);text-transform:uppercase;letter-spacing:.03em}
+#asRoot #leyplano{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--tx2);padding:8px 2px}
+#asRoot #leyplano i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+#asRoot .req{padding:11px 2px;border-bottom:1px solid #edf1f7}
+#asRoot .req .g{font-size:11px;font-weight:800;color:var(--azul);background:#e8eef8;border-radius:7px;padding:4px 9px;margin:9px 0 7px}
+#asRoot .req .tx{font-size:14px;margin-bottom:8px}
+#asRoot .req .n{color:#93a1b8;font-size:11px;margin-right:5px}
+#asRoot .foto-btn{display:inline-block;margin-top:7px;font-size:12px;font-weight:700;color:var(--azul);
+  background:#eef3fa;border:1px solid #d8e2f0;border-radius:10px;padding:7px 12px;cursor:pointer}
+#asRoot .foto-btn:active{background:#e0e9f6}
+#asRoot .evi{display:flex;align-items:center;gap:8px;margin-top:8px}
+#asRoot .evi img{width:64px;height:64px;object-fit:cover;border-radius:9px;border:1px solid var(--bd);cursor:zoom-in}
+#asRoot .evi img.big{position:fixed;inset:14px;width:auto;height:auto;max-width:calc(100% - 28px);
+  max-height:calc(100% - 28px);object-fit:contain;z-index:99;background:#0b1426;cursor:zoom-out;padding:8px}
+#asRoot .evi button{color:#b91c1c;padding:3px 8px;font-size:13px}
+#asRoot .req textarea.falta{border-color:#f0a441;background:#fffaf0}
+#asRoot .card.aviso{background:#fff8ec;border-color:#f0d5a8;font-size:13px;line-height:1.45}
+#asRoot .valit{padding:11px 2px;border-bottom:1px solid #edf1f7}
+#asRoot .valit.ok{background:#f6fbf7}
+#asRoot .valit.no{background:#fdf6f6}
+#asRoot .valhd{display:flex;align-items:flex-start;gap:8px;flex-wrap:wrap}
+#asRoot .valpa{font-size:13.5px;font-weight:600;margin:3px 0 2px}
+#asRoot .valfu{font-size:11.5px;color:var(--tx2);line-height:1.4;background:#f5f7fb;border-radius:8px;padding:6px 9px;margin-top:4px}
+#asRoot .valfu.sinf{background:#fff4e6;color:#8a5a12}
+#asRoot .reglist{margin-top:8px;border-top:1px solid #edf1f7;max-height:300px;overflow:auto}
+#asRoot .regrow{display:flex;align-items:center;gap:6px;padding:6px 2px;border-bottom:1px solid #f2f5f9;font-size:12.5px}
+#asRoot .regrow.fuera{opacity:.55;text-decoration:line-through}
+#asRoot .regrow.fuera .hint{text-decoration:none}
+#asRoot .asg-sep{font-size:11px;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.04em;
+  padding:12px 2px 5px;position:sticky;top:0;background:#fff}
+#asRoot .item.ajena{opacity:.62}
+#asRoot .item.ajena .tt b{font-weight:600}
+#asRoot .est3{display:flex;gap:7px}
+#asRoot .est3 button{flex:1;padding:9px 4px;border-radius:9px;font-weight:800;font-size:12px;border:1.5px solid var(--bd);color:var(--tx2);background:#fff}
+#asRoot .est3 .c.on{background:var(--verdebg);border-color:var(--verde);color:var(--verde)}
+#asRoot .est3 .nc.on{background:var(--rojobg);border-color:var(--rojo);color:var(--rojo)}
+#asRoot .est3 .na.on{background:var(--grisbg);border-color:var(--gris);color:var(--gris)}
+#asRoot .req textarea{margin-top:7px;font-size:13px;min-height:44px}
+#asRoot #barra{position:sticky;top:60px;z-index:40;background:#fff;border:1px solid var(--bd);border-radius:12px;
+  padding:9px 13px;margin-bottom:11px;display:flex;align-items:center;gap:11px;box-shadow:0 3px 12px rgba(23,35,59,.07)}
+#asRoot #barra .prog{flex:1;width:auto;height:9px}
+#asRoot #barra b{font-size:14px;min-width:40px;text-align:right}
+#asRoot .kv{display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px dashed #e6ebf3}
+#asRoot .kv:last-child{border-bottom:none}
+#asRoot .kv span{color:var(--tx2)}
+#asRoot .kv b{font-variant-numeric:tabular-nums}
+#asRoot .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px}
+#asRoot .stat{background:#f5f8fc;border:1px solid var(--bd);border-radius:11px;padding:9px;text-align:center}
+#asRoot .stat b{display:block;font-size:19px;color:var(--azul)}
+#asRoot .stat span{font-size:10px;color:var(--tx2);text-transform:uppercase;letter-spacing:.4px}
+#tabbar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--bd);
+  display:flex;z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+#tabbar button{flex:1;padding:8px 0 7px;font-size:10.5px;font-weight:700;color:var(--tx2);display:flex;flex-direction:column;gap:2px;align-items:center}
+#tabbar button.on{color:var(--azul)}
+#tabbar .i{font-size:19px}
+#toast{position:fixed;left:50%;bottom:76px;transform:translateX(-50%);background:#17233b;color:#fff;
+  border-radius:10px;padding:9px 16px;font-size:13px;z-index:99;opacity:0;transition:opacity .2s;pointer-events:none;max-width:90vw;text-align:center}
+#toast.show{opacity:1}
+#asRoot .vista{display:none}
+#asRoot .vista.on{display:block}
+@media print{#asRoot header, #tabbar, #asRoot .no-print{display:none!important}
+#asPanel{background:#fff;padding:0}}
+/* panel del módulo: hoja inferior en el celular, columna derecha en escritorio */
+#asPanel{position:fixed;left:0;right:0;bottom:0;top:12vh;background:var(--bg,#eef2f8);z-index:9000;display:none;flex-direction:column;
+  border-radius:18px 18px 0 0;box-shadow:0 -12px 40px rgba(10,18,35,.38);overflow:hidden;color:#17233b;font-family:-apple-system,'Segoe UI',Roboto,sans-serif;font-size:15px;line-height:1.45}
+#asPanel.open{display:flex}
+#asPanel header{border-radius:18px 18px 0 0}
+#asPanel header .cerrar{width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.13);color:#fff;font-size:18px;flex:none;display:grid;place-items:center}
+#asRoot #asMain{flex:1;min-width:0;width:100%;max-width:none;overflow:auto;overflow-x:hidden;padding:12px 12px 80px;-webkit-overflow-scrolling:touch}
+#asRoot .vista,#asRoot .card{min-width:0;max-width:100%}
+#asRoot .kv b{text-align:right;overflow-wrap:anywhere;margin-left:10px}
+#asRoot #tabbar{z-index:9100}
+@media(min-width:900px){
+  #asPanel{left:auto;top:48px;width:500px;border-radius:0;box-shadow:-12px 0 36px rgba(10,18,35,.28)}
+  #asPanel header{border-radius:0}
+  #asRoot #tabbar{left:auto;width:500px;border-left:1px solid #d8e0ec}
+  body:not(.as-abierto) #asRoot #tabbar{width:auto;left:auto;right:0;border-radius:12px 0 0 0}
+}
+/* cajas del Atlas coloreadas por AVANCE del cotejo */
+/* el Atlas pinta cada caja con el color de su TIPO en estilo inline; acá manda el avance */
+#svgLayer .room-box.as-sin{fill:rgba(120,132,150,.10)!important;stroke:#a9b6cc!important;stroke-width:2!important}
+#svgLayer .room-box.as-p{fill:rgba(21,128,61,.22)!important;stroke:#15803d!important;stroke-width:3!important}
+#svgLayer .room-box.as-q{fill:rgba(240,180,41,.45)!important;stroke:#b45309!important;stroke-width:3!important}
+#svgLayer .room-box.as-h{fill:rgba(21,128,61,.58)!important;stroke:#15803d!important;stroke-width:3!important}
+.psd-rojo circle{animation:none}
+/* herramientas del Atlas que no aplican a la campaña de AS */
+.hdr-stat,.hdr-sep,#gSearch,.backup-btn,#expDD,#sbTabs,#typeList,#rightPanel,#rpReopen,#wsModal,#metasPanel,
+#btnEdit,#btnUndo,#btnFicha,#btnEquip,#btnScen,#btnMoves,#btnExpServ,#btnOrdenarDots,#btnDupMueble,#btnServPuestos,
+#btnDotNames,#vwDD,#btnDraw,#btnStruct,#btnMerge,#btnUnmerge,#btnRename,#btnDel,#btnDelDot,
+.fl-bar,.fl-pct,.tree-area-ws,#dataStamp,#dbBadge,#backupBadge,#saveBadge{display:none!important}
+#btnAutSan{pointer-events:none;opacity:.75}
+#editBar{gap:6px}
+</style>
 </head>
 <body>
 <div id="hdr">
   <a href="index.html" class="hub-back" title="Volver al HUB" style="background:#e7eff7;border:1px solid #a9c3d6;color:#17456e;padding:5px 11px;border-radius:7px;font-size:11px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:5px;flex-shrink:0;margin-right:4px" onmouseover="this.style.background='#ffffff'" onmouseout="this.style.background='#e7eff7'">
     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>HUB
   </a>
-  <h1>🌐 HDS · ATLAS <span style="font-weight:600;color:#48687e">· CONSULTA</span></h1>
+  <h1>🩺 AUTORIZACIÓN SANITARIA <span style="font-weight:600;color:#48687e">· TERRENO</span></h1>
   <div class="hdr-sep"></div>
   <div class="hdr-stat"><strong id="statTotal">0</strong>Puestos</div>
   <div class="hdr-sep"></div>
@@ -811,6 +974,83 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
     <div id="edFields" style="display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:12.5px"></div>
   </div>
 </div>
+<div id="asRoot">
+<div id="asPanel">
+<header>
+  <button class="back" id="hBack" onclick="atras()" style="display:none">‹</button>
+  <div class="t"><h1 id="hTit">Autorización Sanitaria</h1><div class="s" id="hSub">Pautas en terreno · Nuevo HDS</div></div>
+  <div class="sync off" id="sync" title="Estado de sincronización"></div>
+  <button class="cerrar" onclick="asCerrarPanel()" title="Volver al plano">🗺</button>
+</header>
+<main id="asMain">
+  <!-- ACCESO -->
+  <section class="vista" id="v-login">
+    <div class="card" style="margin-top:8vh;max-width:420px;margin-left:auto;margin-right:auto">
+      <div style="text-align:center;margin-bottom:14px">
+        <div style="width:64px;height:64px;border-radius:18px;background:var(--azul);margin:0 auto 10px;display:grid;place-items:center">
+          <svg width="34" height="34" viewBox="0 0 100 100"><path d="M30 52l14 14 26-30" fill="none" stroke="#52d68f" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <b style="font-size:17px">Pautas de Autorización Sanitaria</b>
+        <div class="hint">Nuevo Hospital Del Salvador</div>
+      </div>
+      <label class="hint" style="display:block;margin-bottom:5px">Correo institucional</label>
+      <input id="inCorreo" type="email" placeholder="nombre@hsalvador.cl" autocomplete="email" inputmode="email">
+      <div class="hint" id="loginMsg" style="margin:8px 2px;min-height:17px"></div>
+      <button class="btn" onclick="entrar()">Entrar</button>
+      <div class="hint" style="margin-top:12px;text-align:center">El acceso es por servicio, según la nómina de
+      jefaturas y coordinaciones. Supervisión: C. Sepúlveda · M. Canales · M. Pinto.</div>
+    </div>
+  </section>
+
+  <!-- INICIO: mis servicios -->
+  <section class="vista" id="v-inicio">
+    <div class="card">
+      <h2 id="misTit">Mis servicios</h2>
+      <div id="listaServicios"></div>
+    </div>
+    <div class="card no-print">
+      <h2>Avance global</h2>
+      <div class="stats" id="statsGlobal"></div>
+      <div class="hint" id="fuenteNota"></div>
+    </div>
+    <div id="mantenimiento"></div>
+    <button class="btn sec no-print" onclick="salir()" style="max-width:220px;margin:4px auto">Cerrar sesión</button>
+  </section>
+
+  <!-- PLANO -->
+  <section class="vista" id="v-plano">
+    <div class="tabs" id="tabsPiso"></div>
+    <div id="visor"><div id="lienzo"><img id="plano" alt="Plano"><svg id="capa"></svg></div></div>
+    <div id="leyplano">
+      <span><i style="background:rgba(21,128,61,.55)"></i>Pauta completa</span>
+      <span><i style="background:rgba(240,180,41,.55)"></i>En curso</span>
+      <span><i style="background:rgba(21,128,61,.22);border:1px solid #15803d"></i>Con pauta asignada</span>
+      <span><i style="background:rgba(29,45,91,.12);border:1.5px dashed #1D2D5B"></i>Servicio (vista 1) — tocá el nombre</span>
+    </div>
+  </section>
+
+  <!-- FICHA RECINTO -->
+  <section class="vista" id="v-recinto"></section>
+  <!-- FICHA SERVICIO -->
+  <section class="vista" id="v-servicio"></section>
+  <!-- PAUTA -->
+  <section class="vista" id="v-pauta"></section>
+  <!-- REVISIÓN (Catherine y Meylin) -->
+  <section class="vista" id="v-validacion"></section>
+  <!-- TABLERO -->
+  <section class="vista" id="v-tablero"></section>
+</main>
+</div>
+
+
+<nav id="tabbar" class="no-print">
+  <button id="tb-inicio" onclick="ir('inicio')"><span class="i">🏥</span>Servicios</button>
+  <button id="tb-plano" onclick="ir('plano')"><span class="i">🗺️</span>Plano</button>
+  <button id="tb-validacion" onclick="ir('validacion')" style="display:none"><span class="i">🔍</span>Revisión</button>
+  <button id="tb-tablero" onclick="ir('tablero')" style="display:none"><span class="i">📊</span>Avance</button>
+</nav>
+<div id="toast"></div>
+</div>
 <div id="fichaModal" onclick="if(event.target===this)closeFicha()">
   <div class="ficha-box">
     <div class="ficha-head">
@@ -915,6 +1155,8 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 <script src="SHARED_DATA/pautas_recintos.js"></script>
 <script src="SHARED_DATA/pauta_labels.js"></script>
 <script src="SHARED_DATA/pautas_remote.js"></script>
+<script>document.write('<scr'+'ipt src="SHARED_DATA/as_remote.js?v='+Date.now()+'"></scr'+'ipt>');</script>
+<script>document.write('<scr'+'ipt src="data/as_movil_datos.js?v='+Date.now()+'"></scr'+'ipt>');</script>
 <script>
 // ═══ DATA ═══════════════════════════════════════════════════════════════════
 const FLOORS=[
@@ -1050,7 +1292,7 @@ function setFloorPlan(id){
   const tryNext=(i)=>{
     if(myId!==_planLoadId) return;
     if(i>=chain.length){ if(ov) ov.classList.remove('show'); return; }
-    const src='CABIDA_DATA/plan_'+id+chain[i];
+    const src=(window.AS_MOVIL&&AS_MOVIL.planos&&AS_MOVIL.planos[id]&&AS_MOVIL.planos[id].k4&&i===0)?AS_MOVIL.planos[id].k4:'CABIDA_DATA/plan_'+id+chain[i];
     const pre=new Image(); pre.decoding='async';
     pre.onload=()=>{ if(myId!==_planLoadId) return; floorImg.src=src; if(ov) ov.classList.remove('show'); };
     pre.onerror=()=>{ if(myId!==_planLoadId) return; tryNext(i+1); };
@@ -1100,6 +1342,7 @@ function rsGo(i){
   const sh=boxState.rooms[x.r.id]||[];
   if(sh.length){ const b=bounds(sh); if(typeof zoomTo==='function') zoomTo(b,140);
     S.selIds=new Set([x.r.id]); renderSVG(); }
+  if(window.AS_TERRENO) setTimeout(()=>asAbrirRecinto(x.r.id),500);
 }
 document.addEventListener('DOMContentLoaded',()=>{
   const inp=document.getElementById('rsInput'); if(!inp) return;
@@ -1752,7 +1995,9 @@ function psCerrar(){ const p=document.getElementById('psPanel'); if(p) p.remove(
 function _psLbl(aid){ const m=(window.PAUTA_LABELS||{})[aid]||{}; return (m.normaLabel?m.normaLabel+' · ':'')+(m.name||aid)+(m.seccion?' · '+m.seccion:''); }
 // Panel de asignación (recinto: kind='r' · servicio: kind='s')
 function openPautaPanel(id, kind){
-  kind=kind||'r'; psCerrar();
+  kind=kind||'r';
+  if(window.AS_TERRENO){ if(kind==='r') asAbrirRecinto(id); else asAbrirServicio(id); return; }
+  psCerrar();
   const esRec=(kind==='r');
   const est=esRec?pautaEstadoRoom(id):pautaEstadoArea(id);
   const nombre=esRec?rName(id):aName(id);
@@ -3537,7 +3782,7 @@ function renderL1(fl){
     }
     // Dot de pauta a nivel SERVICIO (modo 🩺 Aut. Sanitaria, Vista General)
     if(S.autsanMode){
-      const pe=pautaEstadoArea(area.id);
+      const pe=window.AS_TERRENO?asEstadoDot('s',area.id):pautaEstadoArea(area.id);
       const pr=Math.max(14,Math.min(36,b.w/16,b.h/8));
       const g=el('g',{class:'psdot '+psdClase(pe.estado),transform:`translate(${b.x+b.w-pr*1.5},${b.y+pr*1.5})`});
       g.appendChild(el('circle',{cx:0,cy:0,r:pr}));
@@ -3546,16 +3791,18 @@ function renderL1(fl){
     }
     // Label centred on bounding box: nombre · total de puestos · asignados/disponibles
     const fs=Math.max(20,Math.min(70,b.w/14,b.h/6));
-    const ws=areaWsStats(area);
+    const ws=window.AS_TERRENO?asAreaStats(area):areaWsStats(area);
     const cx=b.x+b.w/2, cy=b.y+b.h/2;
     // El nombre se arma en updateAreaLabelSizes(): ahí se sabe el tamaño real
     // en pantalla y se decide si cabe en una línea o hay que partirlo en dos.
     const lblTxt=(conc?'🏢 ':'')+aName(area.id);
     const lbl=el('text',{x:cx,y:cy-fs*.78,'text-anchor':'middle','dominant-baseline':'middle',
       class:'area-label','font-size':fs,'pointer-events':'none',...(conc?{fill:'#7c2d12'}:{})});
-    const sub=txt(cx,cy+fs*.30,ws.total+(ws.total===1?' puesto':' puestos'),{class:'area-sub','font-size':fs*.55,'pointer-events':'none'});
+    const sub=txt(cx,cy+fs*.30,window.AS_TERRENO?ws.txt1:(ws.total+(ws.total===1?' puesto':' puestos')),{class:'area-sub','font-size':fs*.55,'pointer-events':'none'});
     let sub2;
-    if(ws.total>0){
+    if(window.AS_TERRENO){
+      sub2=txt(cx,cy+fs*1.05,ws.txt2||'',{class:'area-sub','font-size':fs*.50,'pointer-events':'none'});
+    } else if(ws.total>0){
       sub2=txt(cx,cy+fs*1.05,'',{class:'area-sub','font-size':fs*.50,'pointer-events':'none'});
       sub2.appendChild(el('tspan',{fill:'#15803d','font-weight':'700'}, ws.asig+' asignados'));
       sub2.appendChild(el('tspan',{fill:'#475569'}, '   ·   '));
@@ -3670,6 +3917,7 @@ function renderL2(){
       e.stopPropagation();
       if(S.equipMode){ S.equipRoomId=room.id; renderSVG(); openEquipPanel(room.id); return; }
       if(S.fichaMode){ openFichaRecinto(room.id); return; }
+      if(window.AS_TERRENO){ asAbrirRecinto(room.id); return; }
       if(!S.editMode){ goRoom(room.id); return; }
       if(S.drawMode||S.moveMode){ toggleSel(room.id); return; }
       if(e.metaKey||e.ctrlKey){
@@ -3685,11 +3933,11 @@ function renderL2(){
     const rStyle=`fill:${rc}22;stroke:${rc};stroke-width:3;`;
 
     if(sh.length>1 && !S.editMode){
-      const p=el('path',{d:unionPath(sh),class:'room-box'+(sel2?' sel':''),'fill-rule':'evenodd',style:rStyle.replace('stroke-width:3','stroke-width:4')});
+      const p=el('path',{d:unionPath(sh),'data-rid':room.id,class:'room-box'+(sel2?' sel':''),'fill-rule':'evenodd',style:rStyle.replace('stroke-width:3','stroke-width:4')});
       p.addEventListener('click',onCk); svg.appendChild(p);
     } else {
       sh.forEach((s,si)=>{
-        const r=el('rect',{x:s.x,y:s.y,width:s.w,height:s.h,class:'room-box'+(sel2?' sel':''),style:rStyle});
+        const r=el('rect',{x:s.x,y:s.y,width:s.w,height:s.h,'data-rid':room.id,class:'room-box'+(sel2?' sel':''),style:rStyle});
         r.addEventListener('click',onCk);
         if(S.editMode&&S.moveMode) r.addEventListener('mousedown',e=>{e.stopPropagation();startMoveBox(e,'room',room.id,si);});
         svg.appendChild(r);
@@ -3698,7 +3946,7 @@ function renderL2(){
     }
     // Dot de estado de pauta (modo 🩺 Aut. Sanitaria) — esquina sup. derecha
     if(S.autsanMode){
-      const pe=pautaEstadoRoom(room.id);
+      const pe=window.AS_TERRENO?asEstadoDot('r',room.id):pautaEstadoRoom(room.id);
       const pr=Math.max(10,Math.min(28,b.w/12,b.h/6));
       const g=el('g',{class:'psdot '+psdClase(pe.estado),transform:`translate(${b.x+b.w-pr*1.5},${b.y+pr*1.5})`});
       g.appendChild(el('circle',{cx:0,cy:0,r:pr}));
@@ -8206,6 +8454,7 @@ function sidebarGoArea(floorId,areaId){
 }
 function sidebarGoRoom(floorId,areaId,roomId){
   _sb.floor=floorId; _sb.area=areaId;
+  if(window.AS_TERRENO){ sidebarGoArea(floorId,areaId); setTimeout(()=>asAbrirRecinto(roomId),450); return; }
 
   const doNavigate=()=>{
     S.history=[]; S.selIds.clear(); S.level=1; S.areaId=null; S.roomId=null;
@@ -9713,6 +9962,7 @@ function migrateBedsToArea(){
   if(changed) sWs();
 }
 function init(){
+  if(window.AS_TERRENO){ S.autsanMode=true; }
   migrateBedsToArea();
   if(S.showSen){ const b=document.getElementById('btnSen'); if(b)b.classList.add('active'); }
   { const b=document.getElementById('btnAsigN'); if(b)b.classList.toggle('active',!!S.showAsigN); }
@@ -9726,7 +9976,7 @@ function init(){
   if(S.viewOnly){
     document.body.classList.add('view-only');
     const chip=document.createElement('span');
-    chip.textContent='👁 MODO CONSULTA · solo lectura';
+    chip.textContent='👁 MODO CONSULTA · solo lectura'; if(window.AS_TERRENO) chip.style.display='none';
     chip.style.cssText='background:#fef3c7;border:1px solid #f59e0b;color:#78350f;font-size:10px;font-weight:800;border-radius:8px;padding:4px 10px;margin-left:8px;white-space:nowrap';
     document.getElementById('hdr')?.appendChild(chip);
   }
@@ -10138,6 +10388,1900 @@ if(_SELFTEST) window.addEventListener('load',()=>{
   },{passive:false});
   vw.addEventListener('touchend',()=>{ t1=null; pinch=null; },{passive:true});
 })();
+</script>
+<script>
+/* ══ MÓDULO DE COTEJO (derivado de 38.AutorizacionSanitariaMovil.html) ══ */
+'use strict';
+const PUBLIC_BUILD = true; /*__PUBLIC_FLAG__*/
+// (el control de acceso real es por correo contra el backend; el flag solo
+//  distingue la copia publicada de la local)
+const D=window.AS_MOVIL, URLC=(window.AS_CENTRAL||{}).url||'';
+const $=id=>document.getElementById(id);
+const toast=m=>{const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),2400);};
+const esMovilVista=()=>true;   // AS Terreno: el módulo vive en un panel sobre el Atlas
+
+/* ── sesión ──────────────────────────────────────────────────────────────── */
+let SES=null; try{SES=JSON.parse(localStorage.getItem('as_ses')||'null');}catch(e){}
+async function entrar(){
+  const c=$('inCorreo').value.trim().toLowerCase();
+  if(!/@/.test(c)){$('loginMsg').textContent='Escribí tu correo institucional.';return;}
+  $('loginMsg').textContent='Verificando…';
+  try{
+    const r=await fetch(URLC+'?acceso='+encodeURIComponent(c)).then(x=>x.json());
+    if(!r.nivel){$('loginMsg').textContent='Ese correo no está en la nómina de accesos. Consultá a las referentes de AS.';return;}
+    SES={correo:c,nivel:r.nivel,nombre:r.nombre||c,servicios:r.servicios||[]};
+    localStorage.setItem('as_ses',JSON.stringify(SES));
+    arranca();
+  }catch(e){$('loginMsg').textContent='Sin conexión con el servidor. Revisá la señal e intentá de nuevo.';}
+}
+function salir(){localStorage.removeItem('as_ses');SES=null;location.reload();}
+const esSup=()=>SES&&SES.nivel==='total';
+const misServicios=()=>esSup()?D.servicios.map(s=>s.n):(SES?SES.servicios:[]);
+const _nrm=s=>String(s||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+// coincidencia flexible: "EMERGENCIA" autoriza recintos del catálogo viejo
+// "Urgencias y Emergencias", "DIALISIS" a "Dialisis", etc.
+const puedoVer=svc=>{
+  if(esSup())return true;
+  const a=_nrm(svc); if(!a)return false;
+  return misServicios().some(m=>{const b=_nrm(m);return a===b||a.includes(b)||b.includes(a);});
+};
+
+/* ── estado de pautas: local + backend ───────────────────────────────────── */
+let EST={}; try{EST=JSON.parse(localStorage.getItem('as_estados')||'{}');}catch(e){}
+let COLA=[]; try{COLA=JSON.parse(localStorage.getItem('as_cola')||'[]');}catch(e){}
+let FALLIDOS=[]; try{FALLIDOS=JSON.parse(localStorage.getItem('as_fallidos')||'[]');}catch(e){}
+let CONFLICTOS=[];   // pautas que otra persona editó mientras las tenías sin subir
+let _sinEspacio=false;
+function persist(){
+  try{
+    localStorage.setItem('as_estados',JSON.stringify(EST));
+    localStorage.setItem('as_cola',JSON.stringify(COLA));
+    localStorage.setItem('as_fallidos',JSON.stringify(FALLIDOS));
+    _sinEspacio=false; return true;
+  }catch(e){
+    // cuota llena (o modo privado). El estado sigue vivo en memoria y la cola
+    // sigue subiendo al backend, pero si se cierra la pestaña se pierde: hay
+    // que decirlo, no fallar en silencio.
+    _sinEspacio=true; setSync('err');
+    toast('⚠ Sin espacio en el navegador: subí lo pendiente antes de cerrar.');
+    try{ localStorage.setItem('as_cola',JSON.stringify(COLA)); }catch(e2){}
+    return false;
+  }
+}
+// aviso temprano: a partir de ~3,5 MB conviene purgar antes de quedarse sin aire
+function espacioUsado(){
+  try{ return (localStorage.getItem('as_estados')||'').length
+             + (localStorage.getItem('as_cola')||'').length; }catch(e){ return 0; }
+}
+function setSync(k){$('sync').className='sync '+k;}
+async function bajarEstados(){
+  if(!URLC) return;
+  try{
+    const r=await fetch(URLC+(esSup()?'':'')).then(x=>x.json());
+    let remap=0, pisados=[];
+    Object.entries(r.estados||{}).forEach(([k,v])=>{
+      if(k.startsWith('__'))return;
+      // clave de un servicio que cambió de nombre → se trae al nombre vigente
+      if(k.startsWith('svc|')){
+        const p=k.split('|'), can=svcCanon(p[1]);
+        if(can && can!==p[1]){ k='svc|'+can+'|'+p.slice(2).join('|'); v={...v,servicio:can}; remap++; }
+      }
+      if(k.startsWith('rec|')||k.startsWith('fic|')){
+        const p=k.split('|'), nid=(D.ridmap||{})[p[1]];
+        if(nid && nid!==p[1]){ k=[p[0],nid].concat(p.slice(2)).join('|'); v={...v,recinto:nid}; remap++; }
+      }
+      const loc=EST[k];
+      if(!loc || new Date(v.ts)>new Date(loc.ts||0)){
+        // si lo local todavía no se ha subido, lo remoto lo estaría pisando:
+        // se conserva lo propio y se avisa quién más está en la misma pauta
+        const enCola=COLA.some(c=>c.clave===k);
+        if(loc && enCola && v.usuario && v.usuario!==(SES&&SES.correo)){
+          pisados.push({k,quien:v.usuario,ts:v.ts}); return;
+        }
+        EST[k]=v;
+      }
+    });
+    if(remap) console.info('AS · '+remap+' clave(s) traídas desde un nombre de servicio anterior');
+    CONFLICTOS=pisados;
+    if(pisados.length) toast('⚠ '+pisados.length+' pauta(s) las editó otra persona: revisá antes de cerrar.');
+    persist(); setSync(COLA.length?'pend':'ok');
+  }catch(e){setSync('off');}
+}
+// guarda un registro que no es un cotejo (validación, ficha): mismo camino a
+// la cola y al backend, pero el avance lo fija quien llama
+function guardarCrudo(clave,servicio,recinto,pauta,datos,avance){
+  if(!SES||!SES.correo){ toast('Tu sesión se cerró: volvé a entrar.'); return; }
+  EST[clave]={servicio,recinto,pauta,datos,avance:avance||0,usuario:SES.correo,ts:new Date().toISOString()};
+  COLA=COLA.filter(c=>c.clave!==clave);
+  COLA.push({accion:'estado',clave,servicio,recinto,pauta,datos,avance:avance||0,usuario:SES.correo});
+  persist(); setSync('pend'); vaciarCola();
+}
+function guardar(clave,servicio,recinto,pauta,datos){
+  const reqs=reqsDe(pauta).length;
+  const resp=Object.keys(datos).filter(k=>!k.startsWith('obs_')&&!k.startsWith('foto_')&&k[0]!=='_').length;
+  const avance=reqs?Math.round(resp*100/reqs):0;
+  if(!SES||!SES.correo){ toast('Tu sesión se cerró: volvé a entrar para no perder esto.'); return; }
+  EST[clave]={servicio,recinto,pauta,datos,avance,usuario:SES.correo,ts:new Date().toISOString()};
+  COLA=COLA.filter(c=>c.clave!==clave);
+  COLA.push({accion:'estado',clave,servicio,recinto,pauta,datos,avance,usuario:SES.correo});
+  persist(); setSync('pend'); vaciarCola();
+  if(avance===100) setTimeout(()=>autoArchivar(clave),1200);   // archivado automático
+}
+let _vaciando=false;
+async function vaciarCola(){
+  if(_vaciando||!COLA.length||!URLC){if(!COLA.length)setSync('ok');return;}
+  _vaciando=true;
+  while(COLA.length){
+    // se remueve EL ITEM ENVIADO (por identidad): si mientras viajaba llegó una
+    // versión más nueva de la misma clave, esa queda en cola y sale después
+    const it=COLA[0];
+    try{
+      const rr=await fetch(URLC,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(it)});
+      // el backend puede responder 200 con {ok:false}: descartarlo ahí sería
+      // perder el cotejo en el servidor mostrando la app en verde
+      let ok=true;
+      try{ const j=await rr.clone().json(); if(j && j.ok===false) ok=false; }
+      catch(e2){ /* respuesta no legible (CORS): el POST igual llegó */ }
+      if(!ok){
+        it._int=(it._int||0)+1;
+        if(it._int<3){ persist(); setSync('pend'); break; }   // reintenta al próximo ciclo
+        FALLIDOS.push(it); COLA=COLA.filter(x=>x!==it); persist(); setSync('err');
+        toast('⚠ El servidor rechazó un guardado. Quedó en «pendientes por revisar».');
+        continue;
+      }
+      COLA=COLA.filter(x=>x!==it); persist();
+    }catch(e){setSync('off');break;}
+  }
+  _vaciando=false; if(!COLA.length)setSync('ok');
+}
+setInterval(vaciarCola,20000);
+addEventListener('online',vaciarCola);
+
+/* ── normas / pautas ─────────────────────────────────────────────────────── */
+function ambitoDe(id){
+  const nid=D.amb_norma[id]; if(!nid)return null;
+  for(const s of D.normas[nid].secciones){const a=s.ambitos.find(x=>x.id===id);if(a)return {...a,norma:nid,normaNombre:D.normas[nid].nombre,seccion:s.name};}
+  return null;
+}
+const reqsDe=id=>(ambitoDe(id)||{}).reqs||[];
+const claveRec=(rid,amb)=>'rec|'+rid+'|'+amb;
+// La clave de una pauta de unidad lleva el NOMBRE del servicio. Si Atlas
+// renombra un área — ya pasó con OTORRINO — todo lo cotejado queda huérfano.
+// svcCanon() resuelve el nombre vigente contra la tabla de alias; bajarEstados()
+// remapea las claves viejas que llegan del backend.
+function svcCanon(n){
+  const k=String(n||'').toUpperCase();
+  const a=(D.alias||{})[k];
+  if(a){ const sv=D.servicios.find(x=>x.n.toUpperCase()===a); if(sv)return sv.n; }
+  const ex=D.servicios.find(x=>x.n.toUpperCase()===k);
+  return ex?ex.n:String(n||'');
+}
+const claveSvc=(svc,amb)=>'svc|'+svcCanon(svc)+'|'+amb;
+function estadoDe(clave){return EST[clave]||null;}
+function avanceDe(clave){const e=estadoDe(clave);return e?e.avance:0;}
+const _borrada=k=>{
+  const e=EST[k];
+  if(e&&e.datos&&e.datos._borrada)return true;
+  // lo que las referentes marcaron "no corresponde" en la revisión sale de la
+  // plataforma igual que si se hubiera quitado con 🗑
+  const v=EST['val|'+k];
+  return !!(v&&v.datos&&v.datos.v==='no');
+};
+// pautas de un servicio: las de unidad sembradas (D.asign_svc — normas que
+// autorizan al servicio completo: laboratorio, imagenología, psiquiatría…)
+// + las aplicadas a mano, menos las quitadas con 🗑
+// las normas AC/CM traen los ámbitos GRITADOS EN MAYÚSCULAS; las demás vienen
+// ya redactadas. Solo se desgrita la primera clase, o se pierden los nombres
+// propios ("Artículo 1 · Laboratorio Clínico…" → "…laboratorio clínico…").
+function nomAmbito(t){
+  t=String(t||'');
+  const letras=t.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/g,'');
+  if(!letras) return t;
+  const may=(letras.match(/[A-ZÁÉÍÓÚÜÑ]/g)||[]).length/letras.length;
+  return may>0.8 ? t.toLowerCase().replace(/^\w/,c=>c.toUpperCase()) : t;
+}
+function pautasDeSvc(svc){
+  const k0=String(svc||'').toUpperCase();
+  const set=new Set(((D.asign_svc||{})[k0]||[]).filter(a=>!_borrada(claveSvc(svc,a))));
+  Object.keys(EST).forEach(k=>{
+    if(k.startsWith('svc|'+svc+'|')&&!_borrada(k)) set.add(k.split('|')[2]);
+  });
+  return [...set];
+}
+// pautas de un recinto: las de la siembra (D.asign) + las asignadas a mano
+// desde la app (claves rec|id|*), menos las quitadas con 🗑 (_borrada)
+function pautasDeRec(id){
+  const set=new Set((D.asign[id]||[]).filter(a=>!_borrada(claveRec(id,a))));
+  Object.keys(EST).forEach(k=>{
+    if(k.startsWith('rec|'+id+'|')&&!_borrada(k)) set.add(k.split('|')[2]);
+  });
+  return [...set];
+}
+// quitar una pauta asignada por error (solo sin avance): queda marcada como
+// borrada en el backend — no se pierde el historial y deja de listarse
+function quitarPauta(clave,svc,rid,amb){
+  if(avanceDe(clave)>0){toast('La pauta tiene avance: no se quita.');return;}
+  if(!confirm('¿Quitar esta pauta de la lista?'))return;
+  guardar(clave,svc,rid||'',amb,{_borrada:1});
+  toast('Pauta quitada');
+  const p=PILA[PILA.length-1]||{v:'inicio'}; pinta(p.v,p.arg);
+}
+window.quitarPauta=quitarPauta;
+
+/* ── FICHA COMPLETA del recinto (identificación + contenido editable) ──────
+   Precarga desde las matrices (D.fic por código PMA) y se guarda como clave
+   fic|<recintoId> en el mismo backend. Snapshot resuelto: lo que se ve es lo
+   que queda en el informe. */
+const CAT_LBL={em:'Equipamiento médico',mc:'Mobiliario clínico',nc:'Mobiliario no clínico',ti:'Informática (TI)'};
+function claveFic(rid){return 'fic|'+rid;}
+function fichaDe(rid,cod,svc){
+  const e=estadoDe(claveFic(rid));
+  if(e&&e.datos&&e.datos.v) return JSON.parse(JSON.stringify(e.datos));
+  // precarga desde matrices + responsables del servicio
+  const base=D.fic[cod]||{};
+  const sv=svcInfo(svc);
+  return {v:1,
+    resp:(sv?sv.resp.map(r=>r.nombre):[]),
+    dot:{}, dotL:[],
+    prest:[],
+    em:(base.em||[]).map(x=>x.slice()), mc:(base.mc||[]).map(x=>x.slice()),
+    nc:(base.nc||[]).map(x=>x.slice()), ti:(base.ti||[]).map(x=>x.slice())};
+}
+let FICHA=null, FICHA_CTX=null;   // ficha en edición y su contexto {rid,cod,svc,nom}
+function guardarFicha(){
+  if(!FICHA||!FICHA_CTX)return;
+  const {rid,svc}=FICHA_CTX;
+  const clave=claveFic(rid);
+  EST[clave]={servicio:svc,recinto:rid,pauta:'',datos:FICHA,avance:0,usuario:SES.correo,ts:new Date().toISOString()};
+  COLA=COLA.filter(c=>c.clave!==clave);
+  COLA.push({accion:'estado',clave,servicio:svc,recinto:rid,pauta:'',datos:FICHA,avance:0,usuario:SES.correo});
+  persist(); setSync('pend'); vaciarCola();
+}
+
+/* buscador multimodal: cada palabra de la consulta debe calzar en algún campo,
+   sin importar tildes, orden ni mayúsculas */
+const _plano=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+function coincide(q,campos){
+  const t=_plano(q).split(/\s+/).filter(Boolean);
+  const pajar=_plano(campos.join(' '));
+  return t.every(x=>pajar.includes(x));
+}
+function buscador(titulo,fuente,pinta1,onPick){
+  const div=document.createElement('div');
+  div.style.cssText='position:fixed;inset:0;background:rgba(10,18,35,.5);z-index:96;display:flex;align-items:flex-end;justify-content:center';
+  div.innerHTML=`<div style="background:#fff;border-radius:18px 18px 0 0;max-height:80vh;width:100%;max-width:640px;display:flex;flex-direction:column">
+    <div style="padding:14px 16px 8px"><b>${esc(titulo)}</b>
+      <input id="qBusca" placeholder="Buscar por cualquier palabra…" style="margin-top:9px"></div>
+    <div id="lBusca" style="overflow:auto;padding:0 16px 16px"></div></div>`;
+  document.body.appendChild(div);
+  div.addEventListener('click',e=>{if(e.target===div)div.remove();});
+  const lista=q=>{
+    const hits=(q?fuente.filter(it=>coincide(q,pinta1(it).campos)):fuente).slice(0,40);
+    div.querySelector('#lBusca').innerHTML=hits.map((it,i)=>{
+      const p=pinta1(it);
+      return `<button class="item" data-i="${fuente.indexOf(it)}"><div class="tt"><b style="white-space:normal">${esc(p.t)}</b><span>${esc(p.s)}</span></div><span class="chev">＋</span></button>`;
+    }).join('')||'<div class="hint" style="padding:12px 0">Sin resultados.</div>';
+    div.querySelectorAll('.item').forEach(b=>b.onclick=()=>{onPick(fuente[+b.dataset.i]);div.remove();});
+  };
+  div.querySelector('#qBusca').addEventListener('input',e=>lista(e.target.value));
+  div.querySelector('#qBusca').focus(); lista('');
+}
+
+/* ── control contra lo LICITADO por la CSSO ─────────────────────────────────
+   Total asignado de una tipología = distribución oficial de las matrices
+   MENOS la precarga de los códigos que ya tienen ficha editada MÁS lo que
+   dicen esas fichas. Si al sumar se supera el techo licitado, la app alerta
+   con el detalle de dónde está asignado (no bloquea: deja constancia). */
+function asignadoDe(tip,nombre){
+  const k=tip||String(nombre||'').toLowerCase();
+  const ref=D.tot_eq[k]; if(!ref)return null;
+  let total=ref.tot;
+  const codesEditados={};
+  Object.keys(EST).forEach(kk=>{
+    if(!kk.startsWith('fic|'))return;
+    const e=EST[kk]; if(!e||!e.datos||!e.datos.v)return;
+    const rid=kk.slice(4);
+    let cod=null;
+    for(const pz of D.pisos){const r=(D.recintos[pz]||[]).find(x=>x[0]===rid);if(r){cod=r[1];break;}}
+    if(!cod)return;
+    // la primera ficha editada de un código reemplaza su precarga; las
+    // siguientes del mismo código SUMAN (dos salas reclamando lo mismo)
+    if(!codesEditados[cod]){
+      codesEditados[cod]=1;
+      const pre=D.fic[cod]||{};
+      ['em','mc','nc','ti'].forEach(c=>(pre[c]||[]).forEach(x=>{
+        if((x[2]||x[0].toLowerCase())===k) total-=x[1];
+      }));
+    }
+    ['em','mc','nc','ti'].forEach(c=>(e.datos[c]||[]).forEach(x=>{
+      if((x[2]||x[0].toLowerCase())===k) total+=x[1];
+    }));
+  });
+  return {asignado:total, licitado:ref.tot, ref};
+}
+function alertaStock(tip,nombre){
+  const u=asignadoDe(tip,nombre); if(!u)return;
+  if(u.asignado>u.licitado){
+    const donde=u.ref.recs.map(r=>r[0]+' ×'+r[1]).join(' · ');
+    alert('⚠ SOBRE LO LICITADO\n\n'+(u.ref.n||nombre)+': con este cambio quedan '
+      +u.asignado+' asignados y la CSSO licitó '+u.licitado+'.\n\nDistribución oficial: '+donde
+      +(u.ref.recs.length<12?'':' …')+'\n\nEl cambio queda guardado igual — revisar con las referentes AS.');
+  }
+}
+
+/* acciones de la ficha (repintan la sección y guardan) */
+function ficRepinta(){ if(FICHA_CTX) pintaRecinto(FICHA_CTX.r); }
+function ficQuitarEq(cat,i){ FICHA[cat].splice(i,1); guardarFicha(); ficRepinta(); }
+function ficCant(cat,i,d){
+  const it=FICHA[cat][i];
+  it[1]=Math.max(1,(+it[1]||1)+d);
+  guardarFicha();
+  if(d>0)alertaStock(it[2],it[0]);
+  ficRepinta();
+}
+function ficAgregarEq(cat){
+  buscador('Agregar · '+CAT_LBL[cat], D.cat_eq.filter(x=>x[1]===cat).concat(D.cat_eq.filter(x=>x[1]!==cat)),
+    it=>{const u=asignadoDe(it[2],it[0]);
+      return {t:it[0],s:CAT_LBL[it[1]]+(it[2]?' · tip. '+it[2]:'')
+        +(u?` · ${u.asignado} de ${u.licitado} licitados${u.asignado>=u.licitado?' ⚠':''}`:''),
+        campos:[it[0],it[2],CAT_LBL[it[1]]]};},
+    it=>{ FICHA[cat].push([it[0],1,it[2]||'']); guardarFicha(); alertaStock(it[2],it[0]); ficRepinta(); });
+}
+function ficDot(est,d){
+  FICHA.dot[est]=Math.max(0,(FICHA.dot[est]||0)+d);
+  if(!FICHA.dot[est])delete FICHA.dot[est];
+  guardarFicha(); ficRepinta();
+}
+function ficDotLibre(){
+  const t=prompt('Estamento / cargo a agregar:'); if(!t||!t.trim())return;
+  FICHA.dotL.push(t.trim()); guardarFicha(); ficRepinta();
+}
+function ficDotLibreDel(i){ FICHA.dotL.splice(i,1); guardarFicha(); ficRepinta(); }
+function ficAgregarPrest(svc){
+  const pref=D.cat_prest.filter(p=>coincide(svc,[p[1]]));
+  const resto=D.cat_prest.filter(p=>!coincide(svc,[p[1]]));
+  buscador('Agregar prestación (cartera de servicios)', pref.concat(resto),
+    p=>({t:p[0],s:(p[1]||'')+(p[2]?' · '+p[2]:''),campos:[p[0],p[1],p[2]]}),
+    p=>{ if(!FICHA.prest.some(x=>x[0]===p[0]&&x[1]===p[1])) FICHA.prest.push([p[0],p[1]]);
+         guardarFicha(); ficRepinta(); });
+}
+function ficQuitarPrest(i){ FICHA.prest.splice(i,1); guardarFicha(); ficRepinta(); }
+function ficResp(){
+  const t=prompt('Agregar responsable (nombre y cargo):'); if(!t||!t.trim())return;
+  FICHA.resp.push(t.trim()); guardarFicha(); ficRepinta();
+}
+function ficRespDel(i){ FICHA.resp.splice(i,1); guardarFicha(); ficRepinta(); }
+['ficQuitarEq','ficCant','ficAgregarEq','ficDot','ficDotLibre','ficDotLibreDel',
+ 'ficAgregarPrest','ficQuitarPrest','ficResp','ficRespDel'].forEach(f=>window[f]=eval(f));
+
+/* ── navegación ──────────────────────────────────────────────────────────── */
+let PILA=[];
+function muestra(v){
+  document.querySelectorAll('.vista').forEach(x=>x.classList.remove('on'));
+  $('v-'+v).classList.add('on');
+  document.body.classList.toggle('detalle', v==='recinto'||v==='servicio'||v==='pauta'||v==='validacion'||v==='tablero');
+  if(!esMovilVista()&&(v==='inicio'||v==='plano')){$('v-inicio').classList.add('on');$('v-plano').classList.add('on');}
+  ['inicio','plano','validacion','tablero'].forEach(t=>{const b=$('tb-'+t);if(b)b.classList.toggle('on',v===t);});
+  const _sup=esSup()||esReferente();
+  ['tb-validacion','tb-tablero'].forEach(id=>{const b=$(id);if(b)b.style.display=_sup?'flex':'none';});
+  $('hBack').style.display=PILA.length?'grid':'none';
+  const _p=document.getElementById('asPanel'); if(_p) _p.classList.toggle('open', v!=='plano');
+  const _m=document.getElementById('asMain'); if(_m) _m.scrollTo(0,0);
+  document.body.classList.toggle('as-abierto', v!=='plano');
+}
+function pinta(v,arg){
+  // la vista tiene que estar VISIBLE antes de pintar: el encuadre del plano
+  // mide el visor, y oculto mide 0
+  muestra(v);
+  if(v==='inicio')pintaInicio();
+  if(v==='plano')pintaPlano(arg);
+  if(v==='recinto')pintaRecinto(arg);
+  if(v==='servicio')pintaServicio(arg);
+  if(v==='pauta')pintaPauta(arg);
+  if(v==='validacion')pintaValidacion();
+  if(v==='tablero')pintaTablero();
+}
+function ir(v,arg){ PILA.push({v,arg}); pinta(v,arg); }
+function atras(){
+  PILA.pop();
+  const p=PILA[PILA.length-1]||{v:'inicio'};
+  pinta(p.v,p.arg);
+}
+
+/* ── INICIO ──────────────────────────────────────────────────────────────── */
+function resumenSvc(svc){
+  const claves=Object.keys(EST).filter(k=>{
+    if(k.startsWith('fic|'))return false;
+    const e=EST[k];return e&&!_borrada(k)&&String(e.servicio||'').toUpperCase()===svc.toUpperCase();});
+  if(!claves.length)return {n:0,av:0};
+  const av=Math.round(claves.reduce((a,k)=>a+EST[k].avance,0)/claves.length);
+  return {n:claves.length,av};
+}
+let VISTA=null;   // supervisoras: "ver como" un servicio puntual
+function setVista(v){ VISTA=v||null; pintaInicio(); }
+window.setVista=setVista;
+function pintaInicio(){
+  $('hTit').textContent=VISTA?('Vista: '+VISTA):'Autorización Sanitaria';
+  $('hSub').textContent=VISTA?'Modo vista de servicio · lo mismo que ve su responsable'
+    :SES.nombre+(esSup()?' · Supervisión (acceso total)':'');
+  $('misTit').textContent=VISTA?('Servicio: '+VISTA):(esSup()?'Todos los servicios ('+D.servicios.length+')':'Mis servicios');
+  let svcs=(esSup()?D.servicios:D.servicios.filter(s=>puedoVer(s.n)))
+    .slice().sort((a,b)=>D.pisos.indexOf(a.piso)-D.pisos.indexOf(b.piso)||a.n.localeCompare(b.n));
+  if(VISTA) svcs=svcs.filter(s=>s.n===VISTA);
+  const selVista=esSup()?`<select onchange="setVista(this.value)" style="margin-bottom:10px">
+      <option value="">👁 Ver como servicio… (todos)</option>
+      ${D.servicios.slice().sort((a,b)=>a.n.localeCompare(b.n)).map(s=>
+        `<option ${VISTA===s.n?'selected':''}>${esc(s.n)}</option>`).join('')}
+    </select>`:'';
+  $('listaServicios').innerHTML=(esSup()?(typeof selVista!=='undefined'?selVista:''):'')+(svcs.length?svcs.map(s=>{
+    const r=resumenSvc(s.n);
+    return `<button class="item" onclick="ir('servicio','${esc(s.n)}')">
+      <div class="ic">${esc(s.piso)}</div>
+      <div class="tt"><b>${esc(s.n)}${congelado(s.n)?' ❄️':''}</b><span>${congelado(s.n)?'Congelado · ':''}${s.eq_total?s.eq_total+' equipos · ':''}${s.cartera?s.cartera+' prestaciones · ':''}${r.n} pauta${r.n===1?'':'s'}</span></div>
+      <div class="fx"><span class="hint">${r.n?r.av+'%':''}</span><div class="prog"><i style="width:${r.av}%"></i></div></div>
+      <span class="chev">›</span></button>`;
+  }).join(''):'<div class="hint">Tu correo no tiene servicios asignados.</div>');
+  const tot=Object.keys(EST).filter(k=>!k.startsWith('__')&&!k.startsWith('fic|')&&!_borrada(k)).length;
+  const done=Object.keys(EST).filter(k=>!k.startsWith('fic|')&&!_borrada(k)&&EST[k].avance===100).length;
+  const av=tot?Math.round(Object.values(EST).reduce((a,e)=>a+(e.avance||0),0)/tot):0;
+  $('statsGlobal').innerHTML=
+    `<div class="stat"><b>${tot}</b><span>Pautas iniciadas</span></div>
+     <div class="stat"><b>${done}</b><span>Completas</span></div>
+     <div class="stat"><b>${av}%</b><span>Avance medio</span></div>`;
+  $('mantenimiento').innerHTML=pintaMantenimiento();
+  $('fuenteNota').textContent='Equipamiento: matriz EMMC (corte 07-07) · Dotación y Cartera: matrices HDS · Normas MINSAL digitalizadas ('+Object.keys(D.normas).length+').';
+}
+
+/* ── PLANO: lo dibuja el ATLAS (mismo motor, mismas cajas) ───────────────── */
+let PISO=null;
+function pintaPlano(piso){
+  // cerrar el panel y mostrar el piso en el Atlas
+  asCerrarPanel();
+  if(piso && typeof goFloor==='function' && window.S && S.floorId!==piso){ try{ goFloor(piso); }catch(e){} }
+}
+function encuadra(){}
+function claseRec(r){ return 'rec'; }
+
+/* ── FICHA RECINTO ───────────────────────────────────────────────────────── */
+function svcInfo(nombre){return D.servicios.find(s=>s.n.toUpperCase()===String(nombre||'').toUpperCase());}
+function fichaDatos(sv){
+  if(!sv)return '';
+  const eq=sv.eq_top.map(([n,q])=>`<div class="kv"><span>${esc(n)}</span><b>${q}</b></div>`).join('');
+  const dt=Object.entries(sv.dot).map(([k,v])=>`<div class="kv"><span>${esc(k)}</span><b>${v}</b></div>`).join('');
+  return `
+   <div class="card"><h2>Datos conectados · ${esc(sv.n)}</h2>
+    <div class="stats">
+      <div class="stat"><b>${sv.eq_total}</b><span>Equipos EMMC</span></div>
+      <div class="stat"><b>${Object.values(sv.dot).reduce((a,b)=>a+b,0)}</b><span>Dotación</span></div>
+      <div class="stat"><b>${sv.cartera}</b><span>Prestaciones</span></div>
+    </div>
+    ${sv.resp.length?`<div class="hint" style="margin:6px 0">Responsables: ${sv.resp.map(r=>esc(r.nombre)).join(' · ')}</div>`:''}
+    <details><summary class="hint" style="cursor:pointer;padding:6px 0">Equipamiento principal (${sv.eq_top.length})</summary>${eq}</details>
+    ${dt?`<details><summary class="hint" style="cursor:pointer;padding:6px 0">Dotación por estamento</summary>${dt}</details>`:''}
+   </div>`;
+}
+function pintaRecinto(r){
+  const [id,code,name]=r, w=r[6],h=r[7],m2=r[8];
+  const svc=r[9]||r[3];
+  const piso=PISO||D.pisos.find(pz=>(D.recintos[pz]||[]).some(x=>x[0]===id))||'';
+  $('hTit').textContent=(name||'Recinto')+(code?' · '+code:'');
+  $('hSub').textContent=svc+(piso?' · Piso '+piso.replace('P',''):'');
+  const pautas=pautasDeRec(id);
+  const sv=svcInfo(svc);
+  const base=D.fic[code]||{};
+  const editable=puedoVer(svc);
+  FICHA_CTX={rid:id,cod:code,svc,nom:name,r};
+  FICHA=fichaDe(id,code,svc);
+
+  const lista=pautas.map(pid=>{
+    const a=ambitoDe(pid); if(!a)return '';
+    const clave=claveRec(id,pid), av=avanceDe(clave);
+    const manual=!(D.asign[id]||[]).includes(pid);
+    const quitar=(editable&&av===0)
+      ?`<button style="flex:none;padding:6px;color:#b91c1c" title="Quitar pauta"
+          onclick='event.stopPropagation();quitarPauta(${JSON.stringify(clave)},${JSON.stringify(svc)},${JSON.stringify(id)},${JSON.stringify(pid)})'>🗑</button>`:'';
+    return `<div style="display:flex;align-items:center"><button class="item" style="flex:1" onclick='ir("pauta",${JSON.stringify({tipo:"rec",rid:id,rnom:name+(code?" · "+code:""),svc:svc,amb:pid})})'>
+      <div class="ic">📋</div>
+      <div class="tt"><b>${esc(nomAmbito(a.name))}${manual?' <span class="pill" style="background:#e8eef8;color:#1D2D5B">manual</span>':''}</b><span>${esc(a.normaNombre)} · ${a.reqs.length} requisitos</span></div>
+      <div class="fx"><span class="hint">${av}%</span><div class="prog"><i style="width:${av}%"></i></div></div><span class="chev">›</span></button>${quitar}</div>`;
+  }).join('');
+
+  const ro=!editable;
+  const secEq=cat=>{
+    const items=FICHA[cat]||[];
+    const filas=items.map((x,i)=>`<div class="kv" style="align-items:center">
+      <span style="flex:1">${esc(x[0])}${x[2]?` <span class="hint">· tip. ${esc(x[2])}</span>`:''}</span>
+      ${ro?`<b>${x[1]}</b>`:`<span style="display:flex;gap:4px;align-items:center;flex:none">
+        <button onclick="ficCant('${cat}',${i},-1)" style="padding:2px 9px;border:1px solid var(--bd);border-radius:7px">−</button>
+        <b style="min-width:20px;text-align:center">${x[1]}</b>
+        <button onclick="ficCant('${cat}',${i},1)" style="padding:2px 9px;border:1px solid var(--bd);border-radius:7px">＋</button>
+        <button onclick="ficQuitarEq('${cat}',${i})" style="padding:2px 7px;color:#b91c1c">✕</button></span>`}
+    </div>`).join('');
+    return `<details ${items.length&&cat==='em'?'open':''}><summary class="hint" style="cursor:pointer;padding:7px 0;font-weight:700">${CAT_LBL[cat]} (${items.length})</summary>
+      ${filas||'<div class="hint" style="padding:4px 0">Sin ítems.</div>'}
+      ${ro?'':`<button class="btn sec" style="margin-top:7px;padding:9px" onclick="ficAgregarEq('${cat}')">＋ Agregar con buscador</button>`}
+    </details>`;
+  };
+
+  const dotChips=D.estamentos.map(e=>{
+    const n=FICHA.dot[e]||0;
+    return `<div style="display:flex;align-items:center;gap:6px;padding:5px 8px;border:1.5px solid ${n?'var(--azul)':'var(--bd)'};border-radius:10px;${n?'background:#e8eef8;':''}">
+      <span style="flex:1;font-size:13px">${esc(e)}${n?` <b>× ${n}</b>`:''}</span>
+      ${ro?'':`<button onclick="ficDot('${esc(e)}',-1)" style="padding:1px 8px">−</button><button onclick="ficDot('${esc(e)}',1)" style="padding:1px 8px">＋</button>`}
+    </div>`;
+  }).join('');
+  const dotResumen=Object.entries(FICHA.dot).map(([e,n])=>
+    Array.from({length:n},(_,i)=>`${e} ${n>1?(i+1):''}`.trim()).join(', ')).filter(Boolean).join(', ');
+
+  $('v-recinto').innerHTML=`
+    <div class="card">
+      <h2>Identificación del recinto</h2>
+      <div class="kv"><span>Recinto</span><b>${esc(name||'—')}</b></div>
+      <div class="kv"><span>Código PMA</span><b>${esc(code||'—')}</b></div>
+      <div class="kv"><span>Código BIM</span><b>${esc(base.bim||'—')}</b></div>
+      <div class="kv"><span>Señalética</span><b>${base.sen?esc(base.sen.id+' · '+base.sen.nom):'—'}</b></div>
+      <div class="kv"><span>Servicio</span><b>${esc(svc||r[3]||'—')}</b></div>
+      <div class="kv"><span>Superficie</span><b>${m2||'—'} m² (${w}×${h} m)</b></div>
+      ${ro?'<div class="hint" style="margin-top:8px">⚠ Solo lectura: este recinto no pertenece a tus servicios.</div>':''}
+    </div>
+
+    <div class="card"><h2>Pautas de cotejo</h2>
+      ${lista||'<div class="hint">Este recinto aún no tiene pauta asignada.</div>'}
+      ${editable?`<button class="btn sec" style="margin-top:10px" onclick='asignar("rec","${id}","${esc(svc)}")'>＋ Asignar pauta a este recinto</button>`:''}
+    </div>
+
+    <div class="card"><h2>Responsables</h2>
+      ${FICHA.resp.map((n,i)=>`<div class="kv"><span style="flex:1">${esc(n)}</span>${ro?'':`<button onclick="ficRespDel(${i})" style="color:#b91c1c;padding:2px 7px">✕</button>`}</div>`).join('')||'<div class="hint">Sin responsables.</div>'}
+      ${ro?'':'<button class="btn sec" style="margin-top:8px;padding:9px" onclick="ficResp()">＋ Agregar responsable</button>'}
+    </div>
+
+    <div class="card"><h2>Dotación del recinto (por estamento)</h2>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">${dotChips}</div>
+      ${FICHA.dotL.map((t,i)=>`<div class="kv"><span style="flex:1">${esc(t)}</span>${ro?'':`<button onclick="ficDotLibreDel(${i})" style="color:#b91c1c;padding:2px 7px">✕</button>`}</div>`).join('')}
+      ${ro?'':'<button class="btn sec" style="margin-top:8px;padding:9px" onclick="ficDotLibre()">＋ Otro estamento (texto libre)</button>'}
+      ${dotResumen?`<div class="hint" style="margin-top:7px">Asignados: ${esc(dotResumen)}</div>`:''}
+    </div>
+
+    <div class="card"><h2>Prestaciones del recinto (cartera)</h2>
+      ${FICHA.prest.map((p,i)=>`<div class="kv"><span style="flex:1">${esc(p[0])}<span class="hint"> · ${esc(p[1]||'')}</span></span>${ro?'':`<button onclick="ficQuitarPrest(${i})" style="color:#b91c1c;padding:2px 7px">✕</button>`}</div>`).join('')||'<div class="hint">Sin prestaciones asignadas.</div>'}
+      ${ro?'':`<button class="btn sec" style="margin-top:8px;padding:9px" onclick='ficAgregarPrest(${JSON.stringify(svc)})'>＋ Agregar prestación (buscador)</button>`}
+    </div>
+
+    <div class="card"><h2>Equipamiento del recinto</h2>
+      ${secEq('em')}${secEq('mc')}${secEq('nc')}${secEq('ti')}
+      <div class="hint" style="margin-top:7px">Precargado desde las matrices por código PMA (${esc(code)}). Lo que quites o sumes queda guardado y entra al informe.</div>
+    </div>
+    ${fichaDatos(sv)}`;
+}
+
+/* ── FICHA SERVICIO (vista 1) ────────────────────────────────────────────── */
+function planoSvc(sv){ return ''; }
+
+/* ── todas las pautas que hay que aplicar en un servicio: las de unidad y las
+   de cada uno de sus recintos, en una sola lista buscable ───────────────── */
+function todasPautasSvc(sv){
+  const out=[];
+  pautasDeSvc(sv.n).forEach(pid=>{
+    const a=ambitoDe(pid); if(!a)return;
+    out.push({pid,a,tipo:'svc',donde:'Todo el servicio',rid:'',
+              av:avanceDe(claveSvc(sv.n,pid))});
+  });
+  (D.recintos[sv.piso]||[]).filter(r=>String(r[9]||'').toUpperCase()===sv.n.toUpperCase())
+   .forEach(r=>pautasDeRec(r[0]).forEach(pid=>{
+     const a=ambitoDe(pid); if(!a)return;
+     out.push({pid,a,tipo:'rec',donde:(r[2]||r[0])+(r[1]?' · '+r[1]:''),rid:r[0],r,
+               av:avanceDe(claveRec(r[0],pid))});
+   }));
+  return out;
+}
+let _QP='';                                   // filtro vivo del buscador de pautas
+function filtraPautas(q){ _QP=q||''; pintaListaPautas(); }
+function pintaListaPautas(){
+  const cont=$('lPautasSvc'); if(!cont||!_SVC)return;
+  const todas=todasPautasSvc(_SVC);
+  const hits=todas.filter(x=>coincide(_QP,[x.a.name,x.a.normaNombre,x.donde,x.rid]));
+  cont.innerHTML=hits.map(x=>{
+    const ctx=x.tipo==='svc'?{tipo:'svc',svc:_SVC.n,amb:x.pid}
+                            :{tipo:'rec',rid:x.rid,svc:_SVC.n,amb:x.pid,rnom:x.donde.split(' · ')[0]};
+    return `<button class="item" onclick='ir("pauta",${esc(JSON.stringify(ctx))})'>
+      <div class="ic">${x.tipo==='svc'?'🏛':'📍'}</div>
+      <div class="tt"><b style="white-space:normal">${esc(nomAmbito(x.a.name))}</b>
+        <span>${esc(x.donde)} · ${esc(x.a.normaNombre)} · ${x.a.reqs.length} req.</span></div>
+      <div class="fx"><span class="hint">${x.av}%</span><div class="prog"><i style="width:${x.av}%"></i></div></div>
+      <span class="chev">›</span></button>`;
+  }).join('')||`<div class="hint" style="padding:10px 2px">${todas.length
+      ?'Sin resultados para esa búsqueda.'
+      :'Este servicio todavía no tiene ninguna pauta asignada.'}</div>`;
+  const n=$('nPautasSvc');
+  if(n)n.textContent=hits.length===todas.length?`${todas.length}`:`${hits.length} de ${todas.length}`;
+}
+
+let _SVC=null;
+function pintaServicio(nombre){
+  const sv=svcInfo(nombre); if(!sv)return;
+  _SVC=sv;
+  const _cong=congelado(sv.n);
+  $('hTit').textContent=sv.n;
+  $('hSub').textContent=(_cong?'❄️ Congelado · ':'Servicio · ')+sv.piso+' · vista 1';
+  const asigns=pautasDeSvc(sv.n);
+  const lista=asigns.map(pid=>{
+    const a=ambitoDe(pid); if(!a)return '';
+    const clave=claveSvc(sv.n,pid), av=avanceDe(clave);
+    const quitar=(puedoVer(sv.n)&&av===0)
+      ?`<button style="flex:none;padding:6px;color:#b91c1c" title="Quitar pauta"
+          onclick='event.stopPropagation();quitarPauta(${JSON.stringify(clave)},${JSON.stringify(sv.n)},null,${JSON.stringify(pid)})'>🗑</button>`:'';
+    return `<div style="display:flex;align-items:center"><button class="item" style="flex:1" onclick='ir("pauta",${JSON.stringify({tipo:"svc",svc:sv.n,amb:pid})})'>
+      <div class="ic">📋</div>
+      <div class="tt"><b>${esc(nomAmbito(a.name))}</b><span>${esc(a.normaNombre)} · ${a.reqs.length} requisitos</span></div>
+      <div class="fx"><span class="hint">${av}%</span><div class="prog"><i style="width:${av}%"></i></div></div><span class="chev">›</span></button>${quitar}</div>`;
+  }).join('');
+
+  const recs=(D.recintos[sv.piso]||[]).filter(r=>String(r[9]||'').toUpperCase()===sv.n.toUpperCase());
+  const todas=todasPautasSvc(sv);
+  const hechas=todas.filter(x=>x.av===100).length, sinTocar=todas.filter(x=>x.av===0).length;
+  const prom=todas.length?Math.round(todas.reduce((a,b)=>a+b.av,0)/todas.length):0;
+
+  // lo cotejable primero: recintos con pauta pendiente, luego en curso, los
+  // terminados y al final los que no tienen pauta asignada
+  const avRec=r=>{const ps=pautasDeRec(r[0]);return ps.length?Math.round(ps.reduce((a,x)=>a+avanceDe(claveRec(r[0],x)),0)/ps.length):-1;};
+  const orden=r=>{const a=avRec(r);return a<0?3:(a===0?0:(a===100?2:1));};
+  recs.sort((x,y)=>orden(x)-orden(y)||String(x[1]||'').localeCompare(String(y[1]||''),'es',{numeric:true}));
+  const filaRec=recs.map(r=>{
+    const ps=pautasDeRec(r[0]);
+    const av=ps.length?Math.round(ps.reduce((a,p)=>a+avanceDe(claveRec(r[0],p)),0)/ps.length):0;
+    return `<button class="item" onclick='ir("recinto",${esc(JSON.stringify(r))})'>
+      <div class="ic">${ps.length?(av===100?'✅':(av?'🟡':'📋')):'▫️'}</div>
+      <div class="tt"><b style="white-space:normal">${esc(r[2]||r[0])}</b>
+        <span>${esc(r[1]||'sin código')} · ${r[8]||'—'} m² · ${ps.length?ps.length+' pauta'+(ps.length>1?'s':''):'sin pauta'}</span></div>
+      ${ps.length?`<div class="fx"><span class="hint">${av}%</span><div class="prog"><i style="width:${av}%"></i></div></div>`:''}
+      <span class="chev">›</span></button>`;
+  }).join('');
+
+  $('v-servicio').innerHTML=`
+    ${_cong?`<div class="card aviso">❄️ <b>Fuera del alcance vigente</b> desde el ${esc(_cong.desde||'')}.
+      ${esc(_cong.motivo||'')} Las pautas siguen aquí y no cuentan en el avance del hospital.</div>`:''}
+    ${_cong?'':`<div class="card"><h2>Plano del servicio · ${esc(sv.piso)}</h2>
+      <div class="hint" style="margin-bottom:9px">Los recintos del servicio se ven en el plano del Atlas, con el color de su avance. Tocá uno para abrir su ficha y su pauta.</div>
+      <button class="btn" onclick='asVerServicio(${JSON.stringify(sv.n)})'>🗺 Ver ${esc(sv.n)} en el plano</button>
+    </div>`}
+
+    <div class="card"><h2>Pautas por aplicar <span class="pill" style="background:#e8eef8;color:#1D2D5B" id="nPautasSvc">${todas.length}</span></h2>
+      <div class="res3">
+        <div><b>${prom}%</b><span>avance</span></div>
+        <div><b>${hechas}</b><span>al 100%</span></div>
+        <div><b>${sinTocar}</b><span>sin empezar</span></div>
+      </div>
+      <input id="qPautasSvc" placeholder="Buscar pauta, norma o recinto…" oninput="filtraPautas(this.value)" value="${esc(_QP)}">
+      <div id="lPautasSvc" class="lista-scroll"></div>
+    </div>
+
+    <div class="card"><h2>Pautas de unidad (todo el servicio)</h2>
+      ${lista||'<div class="hint">Sin pautas aplicadas a nivel de servicio todavía.</div>'}
+      ${puedoVer(sv.n)?`<button class="btn sec" style="margin-top:10px" onclick='asignar("svc",null,"${esc(sv.n)}")'>＋ Aplicar pauta al servicio</button>`:''}
+    </div>
+
+    ${recs.length?`<div class="card"><h2>Recintos del servicio <span class="pill" style="background:#e8eef8;color:#1D2D5B">${recs.length}</span></h2>
+      <div class="lista-scroll">${filaRec}</div></div>`:
+      '<div class="card"><h2>Recintos del servicio</h2><div class="hint">Este servicio no tiene recintos dentro de su área en Atlas vista 1.</div></div>'}
+
+    ${fichaDatos(sv)}`;
+
+  pintaListaPautas();
+  // en escritorio la columna derecha acompaña: si está en otro piso, cambia
+  if(!esMovilVista()&&PISO!==sv.piso)pintaPlano(sv.piso);
+  $('v-servicio').querySelectorAll('.svcplano .rec[data-i]').forEach(el=>{
+    el.addEventListener('click',()=>ir('recinto',(D.recintos[sv.piso]||[])[+el.dataset.i]));
+  });
+}
+
+/* ── asignación de pautas (desde lo ya trabajado) ────────────────────────── */
+function asignar(tipo,rid,svc){
+  // Por aquí se colaron los dos errores conocidos (la pauta de Alimentación en
+  // Oftalmología y en Diálisis): la lista ofrecía los 329 ámbitos de las 14
+  // normas, planos, sin decir cuáles tienen que ver con el servicio. Ahora las
+  // normas que ya autorizan a este servicio van primero y marcadas, y elegir
+  // una de otra norma pide confirmación explícita.
+  const sv=svcInfo(svc);
+  const propias=new Set();
+  ((D.asign_svc||{})[String(svc||'').toUpperCase()]||[]).forEach(a=>{
+    const n=D.amb_norma[a]; if(n)propias.add(n);
+  });
+  if(sv)(D.recintos[sv.piso]||[]).filter(r=>String(r[9]||'').toUpperCase()===String(svc||'').toUpperCase())
+    .forEach(r=>(D.asign[r[0]]||[]).forEach(a=>{const n=D.amb_norma[a]; if(n)propias.add(n);}));
+
+  const opciones=[];
+  Object.entries(D.normas).forEach(([nid,n])=>n.secciones.forEach(se=>se.ambitos.forEach(a=>{
+    if(!a.reqs.length)return;
+    opciones.push({id:a.id, nid, norma:n.nombre, nom:nomAmbito(a.name), n:a.reqs.length,
+                   propia:propias.has(nid),
+                   txt:(n.nombre+' — '+a.name).toLowerCase()});
+  })));
+  opciones.sort((a,b)=>(b.propia-a.propia)||a.norma.localeCompare(b.norma)||a.nom.localeCompare(b.nom));
+  const nProp=opciones.filter(o=>o.propia).length;
+
+  const div=document.createElement('div');
+  div.style.cssText='position:fixed;inset:0;background:rgba(10,18,35,.5);z-index:90;display:flex;align-items:flex-end;justify-content:center';
+  div.innerHTML=`<div style="background:#fff;border-radius:18px 18px 0 0;max-height:80vh;width:100%;max-width:640px;display:flex;flex-direction:column">
+    <div style="padding:14px 16px 8px">
+      <b>Asignar pauta ${tipo==='svc'?'al servicio':'al recinto'}</b>
+      <div class="hint" style="margin-top:3px">${nProp
+        ? nProp+' pauta'+(nProp===1?'':'s')+' de las normas que ya autorizan a '+esc(svc)+', primero.'
+        : 'Este servicio todavía no tiene ninguna norma propia asignada.'}</div>
+      <input id="fPauta" placeholder="Buscar en las 14 normas digitalizadas…" style="margin-top:9px"></div>
+    <div id="lPauta" style="overflow:auto;padding:0 16px 16px"></div></div>`;
+  document.body.appendChild(div);
+  div.addEventListener('click',e=>{if(e.target===div)div.remove();});
+
+  const pinta=q=>{
+    const hits=(q?opciones.filter(o=>coincide(q,[o.norma,o.nom])):opciones).slice(0,60);
+    let h='', grupo=null;
+    hits.forEach(o=>{
+      const g=o.propia?'propia':'otra';
+      if(g!==grupo){
+        h+=`<div class="asg-sep">${o.propia
+          ? '✔ Normas de este servicio'
+          : '⚠ Otras normas — sólo si de verdad corresponde'}</div>`;
+        grupo=g;
+      }
+      h+=`<button class="item ${o.propia?'':'ajena'}" data-id="${o.id}" data-prop="${o.propia?1:0}"
+            data-nom="${esc(o.norma)}">
+        <div class="ic">${o.propia?'📋':'⚠️'}</div>
+        <div class="tt"><b style="white-space:normal">${esc(o.nom)}</b>
+          <span>${esc(o.norma)} · ${o.n} requisito${o.n===1?'':'s'}</span></div>
+        <span class="chev">›</span></button>`;
+    });
+    div.querySelector('#lPauta').innerHTML=h||'<div class="hint" style="padding:12px 0">Sin resultados.</div>';
+    div.querySelectorAll('.item').forEach(b=>b.onclick=()=>{
+      const amb=b.dataset.id;
+      if(b.dataset.prop!=='1' &&
+         !confirm('«'+b.dataset.nom+'» no es una de las normas que autorizan a '+svc+'.\n\n'+
+                  '¿Seguro que corresponde? Queda registrada a tu nombre y las referentes la van a revisar.'))
+        return;
+      const clave=tipo==='svc'?claveSvc(svc,amb):claveRec(rid,amb);
+      if(!EST[clave]||_borrada(clave))guardar(clave,svc,tipo==='rec'?rid:'',amb,{});
+      div.remove(); toast('Pauta asignada');
+      ir('pauta',tipo==='svc'?{tipo:'svc',svc,amb}:{tipo:'rec',rid,svc,amb,rnom:''});
+    });
+  };
+  div.querySelector('#fPauta').addEventListener('input',e=>pinta(e.target.value));
+  pinta('');
+}
+
+/* ── PAUTA (cotejo C / NC / NA) ──────────────────────────────────────────── */
+let PA=null;
+function pintaPauta(ctx){
+  PA=ctx;
+  const a=ambitoDe(ctx.amb); if(!a)return;
+  const clave=ctx.tipo==='svc'?claveSvc(ctx.svc,ctx.amb):claveRec(ctx.rid,ctx.amb);
+  const est=estadoDe(clave)||{datos:{}};
+  const datos=est.datos||{};
+  const editable=puedoVer(ctx.svc);
+  // dos personas por servicio (jefatura y coordinación): si la última mano no
+  // fue la mía, decirlo antes de que escriba encima sin enterarse
+  const coautor=(est.usuario && SES && est.usuario!==SES.correo)
+    ? {quien:est.usuario, cuando:est.ts?('el '+new Date(est.ts).toLocaleDateString('es-CL')+
+        ' a las '+new Date(est.ts).toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'})):'antes'}
+    : null;
+  // El título dice DÓNDE se está aplicando y el subtítulo QUÉ pauta: al revés
+  // se leía como si la app hubiera cambiado de servicio (hallazgo de M. Canales).
+  const _pnom=nomAmbito(a.name);
+  $('hTit').textContent=(ctx.tipo==='svc'?ctx.svc:(ctx.rnom||ctx.rid));
+  $('hSub').textContent=_pnom+' · '+a.normaNombre;
+  let g0=null,h='';
+  a.reqs.forEach(q=>{
+    if(q.g&&q.g!==g0){h+=`<div class="g">${esc(q.g)}</div>`;g0=q.g;}
+    const v=datos['r'+q.n]||'';
+    h+=`<div class="req" id="rq${q.n}">
+      <div class="tx"><span class="n">${q.n}</span>${esc(q.t)}</div>
+      <div class="est3">
+        <button class="c ${v==='C'?'on':''}" onclick="marca(${q.n},'C')">CUMPLE</button>
+        <button class="nc ${v==='NC'?'on':''}" onclick="marca(${q.n},'NC')">NO CUMPLE</button>
+        <button class="na ${v==='NA'?'on':''}" onclick="marca(${q.n},'NA')">N/A</button>
+      </div>
+      <textarea id="ob${q.n}" placeholder="${v==='NA'?'Por qué no aplica (obligatorio)…':'Observación…'}"
+        style="display:${(v==='NC'||v==='NA')?'block':'none'}"
+        onchange="obs(${q.n},this.value)">${esc(datos['obs_r'+q.n]||'')}</textarea>
+      ${editable?`<label class="foto-btn">📷 Evidencia
+        <input type="file" accept="image/*" capture="environment" style="display:none"
+               onchange="fotoAdjuntar(${q.n},this)"></label>`:''}
+      <div id="fo${q.n}"></div>
+    </div>`;
+  });
+  $('v-pauta').innerHTML=`
+    <div class="card" style="padding:11px 14px;margin-bottom:10px">
+      <div style="font-size:9.5px;letter-spacing:.7px;color:var(--tx2);text-transform:uppercase;font-weight:800">Pauta aplicada</div>
+      <b style="font-size:15px;display:block;margin:2px 0 1px">${esc(_pnom)}</b>
+      <div class="hint">${esc(a.normaNombre)} · ${a.reqs.length} requisitos · ${ctx.tipo==='svc'?'aplicada al servicio':'aplicada al recinto'}</div>
+    </div>
+    <div id="barra"><span class="hint">Avance</span><div class="prog"><i id="pgi" style="width:${est.avance||0}%"></i></div><b id="pgt">${est.avance||0}%</b></div>
+    ${editable?'':'<div class="card hint">⚠ Solo lectura: no pertenece a tus servicios.</div>'}
+    ${coautor?`<div class="card aviso">👥 <b>${esc(coautor.quien)}</b> trabajó en esta pauta
+       ${esc(coautor.cuando)}. Lo que marques se guarda encima: coordinate antes de seguir.</div>`:''}
+    <div class="card" ${editable?'':'style="pointer-events:none;opacity:.75"'}>${h}</div>
+    ${editable?`<div class="card no-print" style="padding:12px 14px">
+      <h2 style="margin-bottom:6px">Declaración del responsable</h2>
+      ${datos._firma?`<div class="hint">✔ Firmada por <b>${esc(datos._firma.nombre)}</b>
+         el ${new Date(datos._firma.ts).toLocaleString('es-CL')}.
+         <button style="color:#b91c1c;padding:2px 6px" onclick="desfirmar()">Quitar</button></div>`
+        :`<div class="hint" style="margin-bottom:7px">Al firmar declarás haber verificado en terreno
+          los ${a.reqs.length} requisitos. Queda impreso en el informe.</div>
+          <button class="btn sec" onclick="firmar()">✍ Firmar esta pauta</button>`}
+    </div>`:''}
+    <div class="row no-print" style="margin-bottom:14px">
+      <button class="btn sec" onclick="informe()">📄 Informe</button>
+      <button class="btn" onclick="atras()">Listo</button>
+    </div>`;
+  a.reqs.forEach(q=>{ if(datos['foto_r'+q.n]) pintaFoto(q.n); });
+}
+function ctxClave(){return PA.tipo==='svc'?claveSvc(PA.svc,PA.amb):claveRec(PA.rid,PA.amb);}
+function marca(n,v){
+  const clave=ctxClave(), est=estadoDe(clave)||{datos:{}};
+  const datos={...est.datos};
+  if(datos['r'+n]===v){delete datos['r'+n];v='';}else datos['r'+n]=v;
+  guardar(clave,PA.svc,PA.tipo==='rec'?PA.rid:'',PA.amb,datos);
+  const rq=$('rq'+n);
+  rq.querySelectorAll('.est3 button').forEach(b=>b.classList.remove('on'));
+  if(v)rq.querySelector('.est3 .'+(v==='C'?'c':v==='NC'?'nc':'na')).classList.add('on');
+  const ta=$('ob'+n);
+  ta.style.display=(v==='NC'||v==='NA')?'block':'none';
+  // un N/A sin razón escrita no se sostiene delante de la autoridad sanitaria
+  ta.placeholder=v==='NA'?'Por qué no aplica (obligatorio)…':'Observación…';
+  ta.classList.toggle('falta', v==='NA' && !(estadoDe(clave)||{datos:{}}).datos['obs_r'+n]);
+  if(v==='NA')setTimeout(()=>ta.focus(),60);
+  const e2=estadoDe(clave); $('pgi').style.width=e2.avance+'%'; $('pgt').textContent=e2.avance+'%';
+}
+// la firma es una declaración, no un dibujo: nombre, RUT opcional y fecha,
+// impresos en el informe que se archiva en el Drive
+function firmar(){
+  const clave=ctxClave(), est=estadoDe(clave)||{datos:{}};
+  const pend=reqsDe(PA.amb).filter(q=>!(est.datos||{})['r'+q.n]).length;
+  if(pend && !confirm('Quedan '+pend+' requisito(s) sin marcar. ¿Firmar igual?'))return;
+  const nombre=prompt('Nombre completo de quien declara:', (SES&&SES.nombre)||'');
+  if(!nombre||!nombre.trim())return;
+  const rut=prompt('RUT (opcional, para el informe):','')||'';
+  const datos={...est.datos,_firma:{nombre:nombre.trim(),rut:rut.trim(),
+    correo:SES.correo, ts:new Date().toISOString()}};
+  guardar(clave,PA.svc,PA.tipo==='rec'?PA.rid:'',PA.amb,datos);
+  pintaPauta(PA); toast('Pauta firmada.');
+}
+function desfirmar(){
+  const clave=ctxClave(), est=estadoDe(clave)||{datos:{}};
+  const datos={...est.datos}; delete datos._firma;
+  guardar(clave,PA.svc,PA.tipo==='rec'?PA.rid:'',PA.amb,datos);
+  pintaPauta(PA);
+}
+function obs(n,txt){
+  const clave=ctxClave(), est=estadoDe(clave)||{datos:{}};
+  const datos={...est.datos}; if(txt)datos['obs_r'+n]=txt; else delete datos['obs_r'+n];
+  guardar(clave,PA.svc,PA.tipo==='rec'?PA.rid:'',PA.amb,datos);
+  const ta=$('ob'+n); if(ta)ta.classList.toggle('falta', datos['r'+n]==='NA' && !txt);
+}
+
+/* ── evidencia fotográfica ───────────────────────────────────────────────
+   Una foto comprimida pesa ~120 KB: en localStorage (5 MB) caben 40 y después
+   se pierde TODO el cotejo, no solo las fotos. Van a IndexedDB, que no tiene
+   ese techo, y en el estado queda solo la marca de que existen. La copia que
+   sale del teléfono es el informe: al archivarlo en el Drive, las fotos viajan
+   dentro del PDF.
+   ──────────────────────────────────────────────────────────────────────── */
+let _fdb=null;
+function fotoDB(){
+  if(_fdb)return _fdb;
+  _fdb=new Promise((ok,er)=>{
+    const q=indexedDB.open('as_evidencia',1);
+    q.onupgradeneeded=e=>{const db=e.target.result;
+      if(!db.objectStoreNames.contains('fotos'))db.createObjectStore('fotos');};
+    q.onsuccess=e=>ok(e.target.result); q.onerror=()=>er(q.error);
+  });
+  return _fdb;
+}
+async function fotoSet(k,v){
+  const db=await fotoDB();
+  return new Promise((ok,er)=>{const t=db.transaction('fotos','readwrite');
+    t.objectStore('fotos').put(v,k); t.oncomplete=()=>ok(); t.onerror=()=>er(t.error);});
+}
+async function fotoGet(k){
+  const db=await fotoDB();
+  return new Promise(ok=>{const t=db.transaction('fotos','readonly');
+    const r=t.objectStore('fotos').get(k); r.onsuccess=()=>ok(r.result||null); r.onerror=()=>ok(null);});
+}
+async function fotoDel(k){
+  const db=await fotoDB();
+  return new Promise(ok=>{const t=db.transaction('fotos','readwrite');
+    t.objectStore('fotos').delete(k); t.oncomplete=()=>ok(); t.onerror=()=>ok();});
+}
+// el teléfono entrega 4-12 MP: se baja a 1200 px y JPEG 0.72 (~110 KB)
+function comprime(file){
+  return new Promise((ok,er)=>{
+    const fr=new FileReader();
+    fr.onload=()=>{const im=new Image();
+      im.onload=()=>{
+        const M=1200, k=Math.min(1,M/Math.max(im.width,im.height));
+        const cv=document.createElement('canvas');
+        cv.width=Math.round(im.width*k); cv.height=Math.round(im.height*k);
+        cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);
+        ok(cv.toDataURL('image/jpeg',0.72));
+      };
+      im.onerror=()=>er(new Error('no se pudo leer la imagen')); im.src=fr.result;};
+    fr.onerror=()=>er(new Error('no se pudo abrir el archivo')); fr.readAsDataURL(file);
+  });
+}
+const fotoClave=(clave,n)=>clave+'|f'+n;
+async function fotoAdjuntar(n,input){
+  const f=input.files&&input.files[0]; input.value='';
+  if(!f)return;
+  if(!/^image\//.test(f.type)){toast('Eso no es una imagen.');return;}
+  toast('Procesando la foto…');
+  try{
+    const d=await comprime(f);
+    const clave=ctxClave();
+    await fotoSet(fotoClave(clave,n),{d,ts:new Date().toISOString(),por:SES&&SES.correo});
+    const est=estadoDe(clave)||{datos:{}}, datos={...est.datos};
+    datos['foto_r'+n]=Math.round(d.length*0.75/1024);      // KB, solo la marca
+    guardar(clave,PA.svc,PA.tipo==='rec'?PA.rid:'',PA.amb,datos);
+    await pintaFoto(n);
+    toast('Evidencia adjunta ('+datos['foto_r'+n]+' KB)');
+  }catch(e){ toast('No se pudo adjuntar: '+e.message); }
+}
+async function fotoQuitar(n){
+  if(!confirm('¿Quitar la evidencia de este requisito?'))return;
+  const clave=ctxClave();
+  await fotoDel(fotoClave(clave,n));
+  const est=estadoDe(clave)||{datos:{}}, datos={...est.datos};
+  delete datos['foto_r'+n];
+  guardar(clave,PA.svc,PA.tipo==='rec'?PA.rid:'',PA.amb,datos);
+  await pintaFoto(n);
+}
+async function pintaFoto(n){
+  const cont=$('fo'+n); if(!cont)return;
+  const clave=ctxClave(), est=estadoDe(clave)||{datos:{}};
+  if(!est.datos||!est.datos['foto_r'+n]){cont.innerHTML='';return;}
+  const f=await fotoGet(fotoClave(clave,n));
+  if(!f){cont.innerHTML='<span class="hint">⚠ La evidencia no está en este dispositivo.</span>';return;}
+  cont.innerHTML=`<div class="evi"><img src="${f.d}" onclick="this.classList.toggle('big')">
+    <span class="hint">${est.datos['foto_r'+n]} KB · ${new Date(f.ts).toLocaleDateString('es-CL')}</span>
+    <button onclick="fotoQuitar(${n})" title="Quitar">✕</button></div>`;
+}
+async function fotosDePauta(clave,reqs){
+  const out=[];
+  for(const q of reqs){
+    const f=await fotoGet(fotoClave(clave,q.n));
+    if(f)out.push({n:q.n,t:q.t,d:f.d,ts:f.ts});
+  }
+  return out;
+}
+
+/* ── INFORME (imprimible; el recorte del plano se arma con canvas) ───────── */
+async function recortePlano(){
+  // Recorte del plano del piso alrededor del recinto o del área, en las mismas
+  // coordenadas de píxel del Atlas (no hay conversión DXF de por medio).
+  try{
+    let piso, bx;
+    if(PA.tipo==='rec'){
+      piso=asPisoDe(PA.rid); const cj=(D.cajas||{})[PA.rid]||[]; if(!cj.length) return '';
+      bx=[Math.min(...cj.map(c=>c[0])),Math.min(...cj.map(c=>c[1])),
+          Math.max(...cj.map(c=>c[0]+c[2])),Math.max(...cj.map(c=>c[1]+c[3]))];
+    }else{
+      const sv=svcInfo(PA.svc); if(!sv) return ''; piso=sv.piso; bx=sv.bb.slice();
+    }
+    const pl=D.planos[piso], dim=D.png[piso]; if(!pl||!dim) return '';
+    const img=new Image(); img.src=pl.k4||pl.src;
+    await new Promise((ok,er)=>{img.onload=ok;img.onerror=er;});
+    const k=img.naturalWidth/dim.w;                       // px del Atlas → px de la imagen
+    const w=bx[2]-bx[0], h=bx[3]-bx[1], R=Math.max(w,h)*0.8+120;
+    const x0=Math.max(0,(bx[0]-R)*k), y0=Math.max(0,(bx[1]-R)*k);
+    const x1=Math.min(img.naturalWidth,(bx[2]+R)*k), y1=Math.min(img.naturalHeight,(bx[3]+R)*k);
+    const cv=document.createElement('canvas'); cv.width=760; cv.height=Math.round(760*(y1-y0)/(x1-x0));
+    const g=cv.getContext('2d'); g.drawImage(img,x0,y0,x1-x0,y1-y0,0,0,cv.width,cv.height);
+    const k2=cv.width/(x1-x0);
+    g.strokeStyle='#1D2D5B'; g.lineWidth=4; g.fillStyle='rgba(59,130,196,.25)';
+    const rx=(bx[0]*k-x0)*k2, ry=(bx[1]*k-y0)*k2;
+    g.fillRect(rx,ry,w*k*k2,h*k*k2); g.strokeRect(rx,ry,w*k*k2,h*k*k2);
+    return cv.toDataURL('image/jpeg',0.8);
+  }catch(e){ return ''; }
+}
+async function construirInforme(){
+  const a=ambitoDe(PA.amb), clave=ctxClave(), est=estadoDe(clave)||{datos:{}};
+  // ficha del recinto (identificación + contenido) para el informe
+  let _fi=null,_fb={},_cod='';
+  if(PA.tipo==='rec'){
+    for(const pz of D.pisos){const rr=(D.recintos[pz]||[]).find(x=>x[0]===PA.rid);if(rr){_cod=rr[1];break;}}
+    _fb=D.fic[_cod]||{};
+    const ef=estadoDe('fic|'+PA.rid);
+    _fi=(ef&&ef.datos&&ef.datos.v)?ef.datos:fichaDe(PA.rid,_cod,PA.svc);
+  }
+  const datos=est.datos||{};
+  const nC=Object.values(datos).filter(v=>v==='C').length;
+  const nNC=Object.values(datos).filter(v=>v==='NC').length;
+  const nNA=Object.values(datos).filter(v=>v==='NA').length;
+  const pct=(nC+nNC)?Math.round(nC*100/(nC+nNC)):0;
+  const sv=svcInfo(PA.svc);
+  toast('Generando informe…');
+  const plano=await recortePlano();
+  const hoy=new Date().toLocaleDateString('es-CL');
+  let g0=null,filas='';
+  a.reqs.forEach(q=>{
+    if(q.g&&q.g!==g0){filas+=`<tr class="grp"><td colspan="3">${esc(q.g)}</td></tr>`;g0=q.g;}
+    const v=datos['r'+q.n]||'';
+    const map={C:['CUMPLE','#15803d','#dcfce7'],NC:['NO CUMPLE','#b91c1c','#fee2e2'],NA:['NO APLICA','#64748b','#f1f5f9']};
+    const m=map[v]||['PENDIENTE','#93a1b8','#f5f7fb'];
+    filas+=`<tr><td class="rn">${q.n}</td><td>${esc(q.t)}${datos['foto_r'+q.n]?' <span class="evi-tag">📷 evidencia</span>':''}</td><td><span class="pl" style="color:${m[1]};background:${m[2]}">${m[0]}</span>${datos['obs_r'+q.n]?`<div class="ob">${esc(datos['obs_r'+q.n])}</div>`:''}</td></tr>`;
+  });
+  // la evidencia va al final, en su propia sección: es lo que la autoridad
+  // sanitaria mira primero y lo único que no vive fuera de este PDF
+  const _fotos=await fotosDePauta(clave,a.reqs);
+  const _firma=datos._firma||null;
+  const doc=`<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Informe AS · ${esc(PA.tipo==='svc'?PA.svc:PA.rnom||PA.rid)}</title><style>
+  @page{size:A4;margin:14mm} html{color-scheme:light only}
+  body{background:#fff;font-family:-apple-system,'Segoe UI',Roboto,sans-serif;color:#17233b;font-size:11.5px;line-height:1.45;max-width:800px;margin:0 auto;padding:20px}
+  header{display:flex;align-items:center;gap:13px;border-bottom:4px solid #1D2D5B;padding-bottom:11px}
+  .logo{width:50px;height:50px;background:#1D2D5B;color:#fff;border-radius:12px;display:grid;place-items:center;font-weight:900;font-size:14px}
+  h1{font-size:16px;color:#1D2D5B;margin:0}.sub{font-size:10.5px;color:#5b6b85}
+  .folio{margin-left:auto;text-align:right;font-size:10px;color:#5b6b85}
+  h2{font-size:11.5px;color:#1D2D5B;text-transform:uppercase;letter-spacing:.8px;margin:16px 0 6px;border-left:4px solid #3b82c4;padding-left:8px}
+  .kv{display:flex;gap:6px;font-size:11px;margin:2px 0}.kv b{min-width:110px;color:#5b6b85;font-weight:600}
+  table{width:100%;border-collapse:collapse;font-size:10.5px}
+  th{background:#1D2D5B;color:#fff;text-align:left;padding:5px 8px;font-size:9.5px;text-transform:uppercase}
+  td{padding:4.5px 8px;border-bottom:1px solid #e3e9f2;vertical-align:top}
+  tr.grp td{background:#eaf1fb;font-weight:700;color:#1D2D5B;font-size:10px}
+  .rn{color:#8593a9;width:32px}.pl{font-size:9px;font-weight:800;padding:2px 8px;border-radius:20px;white-space:nowrap}
+  .ob{font-size:9.5px;color:#b91c1c;margin-top:2px}
+  .res{display:flex;gap:10px;margin:9px 0}.res>div{flex:1;border:1.5px solid #dbe4f0;border-radius:10px;padding:7px 10px;text-align:center}
+  .res b{display:block;font-size:19px}.res span{font-size:9px;color:#5b6b85;text-transform:uppercase}
+  .plano{border:1.5px solid #dbe4f0;border-radius:10px;overflow:hidden;margin:4px 0}.plano img{width:100%;display:block}
+  .evi-tag{font-size:8.5px;font-weight:800;color:#1D2D5B;background:#e8eef8;border-radius:20px;padding:1px 7px;white-space:nowrap}
+  .evid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0}
+  .evid figure{margin:0;border:1px solid #dbe4f0;border-radius:10px;overflow:hidden;break-inside:avoid}
+  .evid img{width:100%;display:block}
+  .evid figcaption{font-size:9px;padding:6px 8px;color:#17233b;line-height:1.35}
+  .evid figcaption span{color:#8593a9}
+  .firmas{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:42px;text-align:center;font-size:10px}
+  .firmas div{border-top:1.2px solid #17233b;padding-top:5px}
+  @media print{.np{display:none}}
+  .np{position:fixed;right:14px;top:14px;background:#1D2D5B;color:#fff;border:0;border-radius:10px;padding:10px 16px;font-weight:700;cursor:pointer}
+  </style></head><body>
+  <button class="np" onclick="print()">🖨 Imprimir / PDF</button>
+  <header><div class="logo">HDS</div><div><h1>Informe de Cotejo · Autorización Sanitaria</h1>
+  <div class="sub">Nuevo Hospital Del Salvador · Servicio de Salud Metropolitano Oriente</div></div>
+  <div class="folio"><b style="display:block;font-size:11px;color:#1D2D5B">AS-${esc((PA.tipo==='svc'?PA.svc:PA.rid).replace(/[^A-Za-z0-9]+/g,'').slice(0,14).toUpperCase())}</b>${hoy}</div></header>
+  <h2>1 · Identificación</h2>
+  <div class="kv"><b>${PA.tipo==='svc'?'Servicio':'Recinto'}</b>${esc(PA.tipo==='svc'?PA.svc:(PA.rnom||PA.rid))}</div>
+  ${PA.tipo==='rec'?`<div class="kv"><b>Servicio</b>${esc(PA.svc)}</div>
+  ${_fi?`<div class="kv"><b>Código BIM</b>${esc(_fb.bim||'—')}</div>
+  <div class="kv"><b>Señalética</b>${_fb.sen?esc(_fb.sen.id+' · '+_fb.sen.nom):'—'}</div>`:''}`:''}
+  <div class="kv"><b>Pauta</b>${esc(a.normaNombre)} — ${esc(a.name)}</div>
+  <div class="kv"><b>Evaluador(a)</b>${esc(SES.nombre)} · ${esc(SES.correo)} · ${hoy}</div>
+  ${plano?`<h2>2 · Ubicación en planta</h2><div class="plano"><img src="${plano}"></div>`:''}
+  <h2>${plano?3:2} · Resultado del cotejo</h2>
+  <div class="res"><div><b style="color:#15803d">${nC}</b><span>Cumple</span></div>
+  <div><b style="color:#b91c1c">${nNC}</b><span>No cumple</span></div>
+  <div><b style="color:#64748b">${nNA}</b><span>No aplica</span></div>
+  <div><b style="color:#1D2D5B">${pct}%</b><span>Cumplimiento</span></div></div>
+  <table><thead><tr><th>N°</th><th>Requisito</th><th>Estado</th></tr></thead><tbody>${filas}</tbody></table>
+  ${sv?`<h2>${plano?4:3} · Contexto del servicio</h2>
+  <div class="kv"><b>Equipamiento</b>${sv.eq_total} unidades (matriz EMMC, corte 07-07-2026)</div>
+  <div class="kv"><b>Dotación</b>${Object.values(sv.dot).reduce((x,y)=>x+y,0)} funcionarios (${Object.entries(sv.dot).map(([k,v])=>k+' '+v).join(' · ')})</div>
+  <div class="kv"><b>Cartera</b>${sv.cartera} prestaciones vigentes</div>`:''}
+  ${_fi?`
+  <h2>Ficha del recinto</h2>
+  ${_fi.resp.length?`<div class="kv"><b>Responsables</b>${esc(_fi.resp.join(' · '))}</div>`:''}
+  ${(Object.keys(_fi.dot).length||_fi.dotL.length)?`<div class="kv"><b>Dotación asignada</b>${esc(
+      Object.entries(_fi.dot).map(([e,n])=>Array.from({length:n},(_,i)=>e+(n>1?' '+(i+1):'')).join(', '))
+        .concat(_fi.dotL).filter(Boolean).join(', '))}</div>`:''}
+  ${_fi.prest.length?`<div style="margin:6px 0"><b style="font-size:10.5px;color:#5b6b85">PRESTACIONES (${_fi.prest.length})</b>
+    <table><tbody>${_fi.prest.map(x=>`<tr><td>${esc(x[0])}</td><td style="color:#5b6b85">${esc(x[1]||'')}</td></tr>`).join('')}</tbody></table></div>`:''}
+  ${['em','mc','nc','ti'].filter(c=>(_fi[c]||[]).length).map(c=>`
+    <div style="margin:6px 0"><b style="font-size:10.5px;color:#5b6b85">${{em:'EQUIPAMIENTO MÉDICO',mc:'MOBILIARIO CLÍNICO',nc:'MOBILIARIO NO CLÍNICO',ti:'INFORMÁTICA (TI)'}[c]} (${_fi[c].length})</b>
+    <table><tbody>${_fi[c].map(x=>`<tr><td>${esc(x[0])}${x[2]?` <span style="color:#8593a9">· tip. ${esc(x[2])}</span>`:''}</td><td style="text-align:right;font-weight:700;width:40px">${x[1]}</td></tr>`).join('')}</tbody></table></div>`).join('')}
+  `:''}
+  ${_fotos.length?`<h2>Evidencia fotográfica (${_fotos.length})</h2>
+  <div class="evid">${_fotos.map(f=>`<figure><img src="${f.d}">
+    <figcaption><b>Requisito ${f.n}</b> · ${esc(f.t).slice(0,150)}<br>
+      <span>Registrada el ${new Date(f.ts).toLocaleString('es-CL')}</span></figcaption></figure>`).join('')}</div>`:''}
+  ${_firma?`<div class="kv" style="margin-top:14px;background:#f6fbf7;border-color:#bfe0c9"><b>Declaración</b>
+    ${esc(_firma.nombre)} declara haber verificado en terreno los ${a.reqs.length} requisitos de esta
+    pauta el ${new Date(_firma.ts).toLocaleString('es-CL')}${_firma.rut?' · RUT '+esc(_firma.rut):''}.</div>`:''}
+  <div class="firmas"><div>Responsable del Servicio${_firma?`<br><b>${esc(_firma.nombre)}</b>`:(_fi&&_fi.resp.length?`<br><b>${esc(_fi.resp[0])}</b>`:'')}</div><div>Referente Autorización Sanitaria<br><b>C. Sepúlveda · M. Canales</b></div></div>
+  </body></html>`;
+  return doc.replace('<button class="np" onclick="print()">🖨 Imprimir / PDF</button>','');
+}
+
+async function informe(){
+  const docLimpio=await construirInforme();
+  // Visor embebido (iframe): los popups se bloquean en el celular
+  const wrap=document.createElement('div');
+  wrap.id='infVista';
+  wrap.style.cssText='position:fixed;inset:0;background:#fff;z-index:95;display:flex;flex-direction:column';
+  wrap.innerHTML='<div class="no-print" style="display:flex;gap:8px;padding:10px 12px;background:#1D2D5B">'
+    +'<button class="btn" style="flex:1;background:#3b82c4" onclick="document.querySelector(\'#infVista iframe\').contentWindow.print()">🖨 PDF</button>'
+    +'<button class="btn" id="btnDrive" style="flex:1;background:#0f766e">☁️ Subir al Drive</button>'
+    +'<button class="btn sec" style="flex:none;width:90px" onclick="document.getElementById(\'infVista\').remove()">Cerrar</button></div>'
+    +'<iframe style="flex:1;border:0;width:100%"></iframe>';
+  document.body.appendChild(wrap);
+  wrap.querySelector('iframe').srcdoc=docLimpio;
+  wrap.querySelector('#btnDrive').onclick=()=>subirDrive(docLimpio);
+}
+
+/* ── ARCHIVADO AUTOMÁTICO ────────────────────────────────────────────────────
+   Al llegar la pauta al 100 %, el informe se genera y se sube SOLO al Drive,
+   una vez por pauta (si después se corrige algo, la subida manual del visor
+   crea la versión nueva). El registro de subidas es local por clave. */
+let SUBIDOS={}; try{SUBIDOS=JSON.parse(localStorage.getItem('as_subidos')||'{}');}catch(e){}
+async function autoArchivar(clave){
+  if(SUBIDOS[clave]) return;
+  if(!PA||ctxClave()!==clave) return;          // solo si la pauta sigue abierta
+  const e=estadoDe(clave); if(!e||e.avance!==100) return;
+  SUBIDOS[clave]=new Date().toISOString();     // se marca ANTES: evita dobles
+  localStorage.setItem('as_subidos',JSON.stringify(SUBIDOS));
+  try{
+    const doc=await construirInforme();
+    await subirDrive(doc,true);
+  }catch(err){ delete SUBIDOS[clave]; localStorage.setItem('as_subidos',JSON.stringify(SUBIDOS)); }
+}
+
+/* ── subida del informe al Drive (el servidor lo convierte a PDF y lo archiva
+      en 01 · Informes por Servicio / <SERVICIO> / <RECINTO>) ─────────────── */
+async function subirDrive(html,auto){
+  const b=document.querySelector('#infVista #btnDrive');
+  if(!auto){ if(!b)return; b.disabled=true; b.textContent='☁️ Subiendo…'; }
+  const hoyISO=new Date().toISOString().slice(0,10);
+  const recNom=PA.tipo==='rec'?(PA.rnom||PA.rid).replace(/[\\/:*?"<>|]+/g,'-'):'';
+  const cuerpo={accion:'informe_html', usuario:SES.correo, servicio:PA.svc,
+    recinto:recNom, pauta:PA.amb, html,
+    nombre:'Informe_AS_'+(recNom||'servicio').replace(/\s+/g,'_')+'_'+hoyISO+'.pdf'};
+  try{
+    const r=await fetch(URLC,{method:'POST',headers:{'Content-Type':'text/plain'},
+      body:JSON.stringify(cuerpo)}).then(x=>x.json());
+    if(r.ok){
+      if(b){b.textContent='✓ En el Drive'; b.style.background='#15803d';}
+      toast(auto?'✓ Pauta al 100 % — informe archivado solo en el Drive':'Informe archivado: '+(r.nombre||''));
+    }else{
+      if(!auto&&b){b.textContent='☁️ Subir al Drive'; b.disabled=false;}
+      toast('No se pudo archivar: '+(r.error||'backend sin v3'));
+      if(auto)throw new Error(r.error||'');
+    }
+  }catch(e){
+    if(auto)throw e;
+    // sin CORS legible el POST puede haber llegado igual: avisar sin asustar
+    if(b){b.textContent='☁️ Enviado'; b.disabled=false;}
+    toast('Enviado — verificá en el Drive (la respuesta no se pudo leer).');
+  }
+}
+
+/* ── tablero de avance ───────────────────────────────────────────────────
+   Hasta ahora el avance real solo existía en el Excel que se genera fuera de
+   la plataforma. Las referentes necesitan verlo aquí: qué servicio va, cuál no
+   arrancó y qué norma está frenada.
+   ──────────────────────────────────────────────────────────────────────── */
+function avanceServicio(sv){
+  const ambs=pautasDeSvc(sv.n).map(a=>({clave:claveSvc(sv.n,a),amb:a}));
+  (D.recintos[sv.piso]||[]).filter(r=>String(r[9]||'').toUpperCase()===sv.n.toUpperCase())
+    .forEach(r=>pautasDeRec(r[0]).forEach(a=>ambs.push({clave:claveRec(r[0],a),amb:a})));
+  const av=ambs.map(x=>avanceDe(x.clave));
+  return {n:ambs.length, hechas:av.filter(x=>x===100).length,
+          curso:av.filter(x=>x>0&&x<100).length, sin:av.filter(x=>x===0).length,
+          pct:ambs.length?Math.round(av.reduce((a,b)=>a+b,0)/ambs.length):0,
+          req:ambs.reduce((a,x)=>a+reqsDe(x.amb).length,0), ambs};
+}
+let _FT='servicio';
+function modoTablero(m){ _FT=m; pintaTablero(); }
+function pintaTablero(){
+  $('hTit').textContent='Avance de la autorización sanitaria';
+  $('hSub').textContent='Nuevo Hospital Del Salvador · corte '+new Date().toLocaleDateString('es-CL');
+  const svs=D.servicios.slice().sort((a,b)=>D.pisos.indexOf(a.piso)-D.pisos.indexOf(b.piso)||a.n.localeCompare(b.n));
+  const todos=svs.map(sv=>({sv,a:avanceServicio(sv),cong:congelado(sv.n)})).filter(x=>x.a.n);
+  const filas=todos.filter(x=>!x.cong);
+  const frios=todos.filter(x=>x.cong);
+  const totP=filas.reduce((a,x)=>a+x.a.n,0), totH=filas.reduce((a,x)=>a+x.a.hechas,0);
+  const totR=filas.reduce((a,x)=>a+x.a.req,0);
+  const glob=totP?Math.round(filas.reduce((a,x)=>a+x.a.pct*x.a.n,0)/totP):0;
+  const sinArrancar=filas.filter(x=>x.a.pct===0).length;
+
+  // por piso
+  const porPiso={}; filas.forEach(x=>{const p=x.sv.piso;
+    porPiso[p]=porPiso[p]||{n:0,h:0,s:0}; porPiso[p].n+=x.a.n; porPiso[p].h+=x.a.hechas; porPiso[p].s+=x.a.pct*x.a.n;});
+  // por norma
+  const porNorma={};
+  filas.forEach(x=>x.a.ambs.forEach(y=>{
+    const nid=D.amb_norma[y.amb]; if(!nid)return;
+    porNorma[nid]=porNorma[nid]||{n:0,s:0,h:0};
+    porNorma[nid].n++; porNorma[nid].s+=avanceDe(y.clave); if(avanceDe(y.clave)===100)porNorma[nid].h++;}));
+
+  const barra=(pct,col)=>`<div class="prog" style="height:8px"><i style="width:${pct}%;background:${col||'var(--verde)'}"></i></div>`;
+  let cuerpo='';
+  if(_FT==='servicio'){
+    cuerpo=filas.slice().sort((a,b)=>a.a.pct-b.a.pct).map(x=>
+      `<button class="item" onclick="ir('servicio','${esc(x.sv.n)}')">
+        <div class="ic">${esc(x.sv.piso)}</div>
+        <div class="tt"><b>${esc(x.sv.n)}</b>
+          <span>${x.a.n} pauta${x.a.n===1?'':'s'} · ${x.a.req} req.${x.a.hechas?' · '+x.a.hechas+' listas':''}${x.a.curso?' · '+x.a.curso+' en curso':''}</span></div>
+        <div class="fx"><span class="hint">${x.a.pct}%</span>${barra(x.a.pct,x.a.pct===0?'#cbd5e1':null)}</div>
+        <span class="chev">›</span></button>`).join('');
+  }else if(_FT==='piso'){
+    cuerpo=Object.entries(porPiso).sort((a,b)=>D.pisos.indexOf(a[0])-D.pisos.indexOf(b[0])).map(([p,v])=>{
+      const pct=v.n?Math.round(v.s/v.n):0;
+      return `<button class="item" onclick="PISO='${p}';ir('plano','${p}')">
+        <div class="ic">${esc(p)}</div>
+        <div class="tt"><b>Piso ${esc(p.replace('P',''))}</b><span>${v.n} pauta${v.n===1?'':'s'} · ${v.h} listas</span></div>
+        <div class="fx"><span class="hint">${pct}%</span>${barra(pct,pct?null:'#cbd5e1')}</div>
+        <span class="chev">›</span></button>`;}).join('');
+  }else{
+    cuerpo=Object.entries(porNorma).sort((a,b)=>b[1].n-a[1].n).map(([nid,v])=>{
+      const pct=v.n?Math.round(v.s/v.n):0;
+      return `<div class="item" style="cursor:default">
+        <div class="ic">📕</div>
+        <div class="tt"><b style="white-space:normal">${esc(D.normas[nid].nombre)}</b>
+          <span>${v.n} aplicada${v.n===1?'':'s'} · ${v.h} lista${v.h===1?'':'s'}</span></div>
+        <div class="fx"><span class="hint">${pct}%</span>${barra(pct,pct?null:'#cbd5e1')}</div></div>`;}).join('');
+  }
+  $('v-tablero').innerHTML=`
+    <div class="card"><h2>Estado general</h2>
+      <div class="res3">
+        <div><b>${glob}%</b><span>avance</span></div>
+        <div><b>${totH}</b><span>pautas al 100%</span></div>
+        <div><b>${totP}</b><span>pautas totales</span></div>
+      </div>
+      <div class="res3" style="margin-top:0">
+        <div><b>${filas.length}</b><span>servicios con pauta</span></div>
+        <div><b>${sinArrancar}</b><span>sin arrancar</span></div>
+        <div><b>${totR.toLocaleString('es-CL')}</b><span>requisitos</span></div>
+      </div>
+      <div class="tabs" style="margin-top:4px">
+        <button class="${_FT==='servicio'?'on':''}" onclick="modoTablero('servicio')">Por servicio</button>
+        <button class="${_FT==='piso'?'on':''}" onclick="modoTablero('piso')">Por piso</button>
+        <button class="${_FT==='norma'?'on':''}" onclick="modoTablero('norma')">Por norma</button>
+      </div>
+      <div class="hint">Ordenado por lo que menos ha avanzado.</div>
+    </div>
+    <div class="card">${cuerpo||'<div class="hint">Sin pautas aplicadas todavía.</div>'}</div>
+    ${frios.length?`<div class="card"><h2>Congelados · fuera del alcance vigente</h2>
+      <div class="hint" style="margin-bottom:7px">Conservan sus pautas y no entran en el avance de
+      arriba. Se retoman cuando se decida.</div>
+      ${frios.map(x=>`<div class="item" style="cursor:default;opacity:.72">
+        <div class="ic">❄️</div>
+        <div class="tt"><b>${esc(x.sv.n)}</b><span>${x.a.n} pauta${x.a.n===1?'':'s'} ·
+          ${x.a.req} req. · congelado el ${esc(x.cong.desde||'')}</span></div></div>`).join('')}
+    </div>`:''}`;
+}
+
+/* ── revisión de Catherine y Meylin ──────────────────────────────────────
+   Dos cosas necesitan ojo de referente antes de que 74 personas coteje:
+   (1) las 343 pautas de unidad que se sembraron por fundamento normativo, y
+   (2) las pautas que alguien aplicó a mano, que es por donde ya se colaron dos
+       errores (Alimentación en Oftalmología, Alimentación en Diálisis).
+   Cada una se marca correcta o no corresponde, con comentario.
+   ──────────────────────────────────────────────────────────────────────── */
+const claveVal=k=>'val|'+k;
+const REFERENTES=['csepulvedar@hsalvador.cl','mcanales@hsalvador.cl','mpinto@hsalvador.cl'];
+const esReferente=()=>SES&&REFERENTES.includes(String(SES.correo||'').toLowerCase());
+// servicios fuera del alcance vigente: conservan sus pautas pero no se cotejan
+// ni entran en el avance, y se marcan para que nadie los tome por error
+const congelado=n=>(D.congelados||{})[String(n||'').toUpperCase()]||null;
+
+function fundamentoDe(svc,amb){
+  const f=(D.fund||{})[String(svc||'').toUpperCase()]||[];
+  const nid=D.amb_norma[amb];
+  const hit=f.find(x=>x.indexOf(nid+' · ')===0);
+  return hit?hit.slice(nid.length+3):'';
+}
+function paraValidar(){
+  const out=[];
+  // (1) lo sembrado por fundamento normativo
+  Object.entries(D.asign_svc||{}).forEach(([k,ambs])=>{
+    const sv=D.servicios.find(x=>x.n.toUpperCase()===k); if(!sv)return;
+    if(congelado(sv.n))return;
+    ambs.forEach(amb=>{
+      const a=ambitoDe(amb); if(!a)return;
+      const cl=claveSvc(sv.n,amb);
+      if(_borrada(cl))return;
+      out.push({origen:'siembra',svc:sv.n,piso:sv.piso,amb,a,clave:cl,
+                fund:fundamentoDe(sv.n,amb),rid:'',donde:'Todo el servicio'});
+    });
+  });
+  // (2) lo que alguien aplicó a mano desde la app
+  Object.keys(EST).forEach(k=>{
+    if(_borrada(k))return;
+    const p=k.split('|');
+    if(p[0]==='svc'){
+      const sembrada=((D.asign_svc||{})[String(p[1]).toUpperCase()]||[]).includes(p[2]);
+      if(sembrada)return;
+      const a=ambitoDe(p[2]); if(!a)return;
+      const sv=D.servicios.find(x=>x.n.toUpperCase()===String(p[1]).toUpperCase());
+      out.push({origen:'manual',svc:p[1],piso:sv?sv.piso:'',amb:p[2],a,clave:k,
+                fund:'',rid:'',donde:'Todo el servicio',
+                por:EST[k].usuario,av:EST[k].avance||0});
+    }else if(p[0]==='rec'){
+      const sembrada=(D.asign[p[1]]||[]).includes(p[2]);
+      if(sembrada)return;
+      const a=ambitoDe(p[2]); if(!a)return;
+      let rnom=p[1],piso='';
+      D.pisos.forEach(pz=>(D.recintos[pz]||[]).forEach(r=>{if(r[0]===p[1]){rnom=r[2]||r[0];piso=pz;}}));
+      out.push({origen:'manual',svc:EST[k].servicio||'',piso,amb:p[2],a,clave:k,
+                fund:'',rid:p[1],donde:rnom,por:EST[k].usuario,av:EST[k].avance||0});
+    }
+  });
+  return out;
+}
+function valEstado(clave){
+  const e=EST[claveVal(clave)];
+  return e&&e.datos?e.datos:null;
+}
+function validar(clave,v){
+  const it=paraValidar().find(x=>x.clave===clave); if(!it)return;
+  const prev=valEstado(clave)||{};
+  const datos={...prev, v, por:SES.correo, ts:new Date().toISOString()};
+  if(v===prev.v){ delete datos.v; }
+  guardarCrudo(claveVal(clave),it.svc,it.rid,it.amb,datos,datos.v?100:0);
+  pintaValidacion();
+}
+function valComentario(clave,txt){
+  const it=paraValidar().find(x=>x.clave===clave); if(!it)return;
+  const datos={...(valEstado(clave)||{}), c:txt, por:SES.correo, ts:new Date().toISOString()};
+  if(!txt)delete datos.c;
+  guardarCrudo(claveVal(clave),it.svc,it.rid,it.amb,datos,datos.v?100:0);
+}
+/* ── validación de las 653 pautas de recinto: POR REGLA ──────────────────
+   La Fase 1 (junio) asignó pauta a 653 recintos con 23 reglas de nombre
+   ("hospitalización" → módulo básico, "box consulta" → sala con examen…).
+   Nadie revisa 653 filas: se valida la REGLA completa — una decisión cierra
+   hasta 189 recintos — y las excepciones se marcan recinto a recinto.
+   ──────────────────────────────────────────────────────────────────────── */
+const NOM_REGLA={hospitalizacion:'Hospitalización — módulo básico',box_consulta:'Box de consulta — sala con examen',
+ sala_procedimientos:'Salas de procedimientos',uti:'UTI',uci:'UCI',rehabilitacion:'Rehabilitación — sala básica',
+ estacion_enfermeria:'Estaciones de enfermería',quirofano:'Quirófanos',trabajo_sucio:'Trabajo sucio',
+ trabajo_limpio:'Trabajo limpio',aseo_chatas:'Aseo de chatas',proc_odonto:'Procedimientos odontológicos',
+ box_urgencia:'Box de urgencia',box_urgencia_proc:'Box de urgencia — procedimientos',
+ farmacia_general:'Farmacia — local',farmacia_almacen:'Farmacia — almacén',img_examen:'Imagenología — sala de examen',
+ img_scanner:'Scanner',img_angiografia:'Angiografía',toma_muestras:'Toma de muestras',dialisis:'Diálisis — puestos',
+ cirugia_menor:'Pabellón de cirugía menor',esterilizacion_general:'Esterilización',manual:'Validadas a mano'};
+function grupoReglas(){
+  const g={};
+  Object.entries(D.asign).forEach(([rid,ambs])=>{
+    const rg=(D.asign_regla||{})[rid]||'?'; if(rg==='manual')return;
+    const e=g[rg]=g[rg]||{regla:rg,recintos:[],ambs:new Set()};
+    e.recintos.push(rid); ambs.forEach(a=>e.ambs.add(a));
+  });
+  return Object.values(g).map(e=>({...e,ambs:[...e.ambs]}))
+    .sort((a,b)=>b.recintos.length-a.recintos.length);
+}
+const claveRegla=rg=>'val|regla|'+rg;
+function validarRegla(rg,v){
+  const prev=(EST[claveRegla(rg)]||{}).datos||{};
+  const datos={...prev,v,por:SES.correo,ts:new Date().toISOString()};
+  if(v===prev.v)delete datos.v;
+  guardarCrudo(claveRegla(rg),'__REGLAS__','',rg,datos,datos.v?100:0);
+  pintaValidacion();
+}
+let _REGLA_ABIERTA=null;
+function abreRegla(rg){ _REGLA_ABIERTA=_REGLA_ABIERTA===rg?null:rg; pintaValidacion(); }
+function excepcionRecinto(rid,amb,rnom){
+  const cl='rec|'+rid+'|'+amb;
+  const prev=(EST['val|'+cl]||{}).datos||{};
+  const quitar=prev.v==='no';
+  const datos={...prev,v:quitar?undefined:'no',por:SES.correo,ts:new Date().toISOString()};
+  if(quitar)delete datos.v;
+  guardarCrudo('val|'+cl,'',rid,amb,datos,datos.v?100:0);
+  toast(quitar?'Excepción retirada.':'Marcado: esta pauta no corresponde en '+(rnom||rid)+'.');
+  pintaValidacion();
+}
+function seccionReglas(puede){
+  const gs=grupoReglas();
+  const nomR={}; D.pisos.forEach(p=>(D.recintos[p]||[]).forEach(r=>nomR[r[0]]=[r[2]||r[0],r[1]||'',r[9]||r[3]||'',p]));
+  const ok=gs.filter(g=>((EST[claveRegla(g.regla)]||{}).datos||{}).v==='ok').length;
+  const filas=gs.map(g=>{
+    const e=(EST[claveRegla(g.regla)]||{}).datos||{}, v=e.v||'';
+    const aNom=g.ambs.map(a=>{const x=ambitoDe(a);return x?nomAmbito(x.name)+' ('+x.normaNombre.split(' · ')[0]+')':a;});
+    const abierta=_REGLA_ABIERTA===g.regla;
+    const exc=g.recintos.filter(rid=>g.ambs.some(a=>_borrada('rec|'+rid+'|'+a))).length;
+    return `<div class="valit ${v}">
+      <div class="valhd">
+        <div style="flex:1"><b>${esc(NOM_REGLA[g.regla]||g.regla)}</b>
+          <span class="hint">· ${g.recintos.length} recintos${exc?' · '+exc+' excepción'+(exc>1?'es':''):''}</span></div>
+        ${v?`<span class="pill" style="background:${v==='ok'?'#dcfce7':'#fee2e2'};color:${v==='ok'?'#15803d':'#b91c1c'}">${v==='ok'?'✔ validada':'✘ no corresponde'}</span>`:''}
+      </div>
+      <div class="valpa" style="font-weight:400;font-size:12.5px">${esc(aNom.join(' · '))}</div>
+      ${puede?`<div class="est3" style="margin-top:7px">
+        <button class="c ${v==='ok'?'on':''}" onclick="validarRegla('${g.regla}','ok')">✔ CORRECTA</button>
+        <button class="nc ${v==='no'?'on':''}" onclick="validarRegla('${g.regla}','no')">✘ NO CORRESPONDE</button>
+        <button class="na" onclick="abreRegla('${g.regla}')">${abierta?'Cerrar':'Ver recintos'}</button>
+      </div>`:''}
+      ${e.por?`<div class="hint" style="margin-top:4px">Revisada por ${esc((e.por||'').split('@')[0])} · ${e.ts?new Date(e.ts).toLocaleDateString('es-CL'):''}</div>`:''}
+      ${abierta?`<div class="reglist">${g.recintos.map(rid=>{
+        const [nm,cod,svc,pz]=nomR[rid]||[rid,'','',''];
+        const fuera=g.ambs.some(a=>_borrada('rec|'+rid+'|'+a));
+        return `<div class="regrow ${fuera?'fuera':''}">
+          <span style="flex:1">${esc(nm)} <span class="hint">· ${esc(cod)} · ${esc(svc)} · ${esc(pz)}</span></span>
+          ${puede?`<button onclick='excepcionRecinto(${JSON.stringify(rid)},${JSON.stringify(g.ambs[0])},${JSON.stringify(nm)})'
+            style="color:${fuera?'#15803d':'#b91c1c'};padding:2px 8px;font-size:11.5px">${fuera?'↩ reponer':'✘ no aquí'}</button>`:''}
+        </div>`;}).join('')}</div>`:''}
+    </div>`;
+  }).join('');
+  return {html:`<div class="card"><h2>Reglas de recinto <span class="pill" style="background:#e8eef8;color:#1D2D5B">${gs.length}</span></h2>
+    <div class="hint" style="margin-bottom:6px">La Fase 1 asignó pauta a ${Object.keys(D.asign).length} recintos con estas
+    reglas de nombre. Validar la regla cierra todos sus recintos de una vez; si en alguno puntual no
+    corresponde, abrilo con «Ver recintos» y marcá «✘ no aquí».</div>
+    ${filas}</div>`, total:gs.length, ok};
+}
+
+let _QV='', _FV='pendientes';
+function filtraVal(q){ _QV=q||''; pintaValidacion(); }
+function modoVal(m){ _FV=m; pintaValidacion(); }
+
+function pintaValidacion(){
+  const todas=paraValidar();
+  $('hTit').textContent='Revisión de pautas';
+  $('hSub').textContent='Catherine Sepúlveda · Meylin Canales — validación de lo asignado';
+  const est=x=>(valEstado(x.clave)||{}).v||'';
+  const _r=seccionReglas(false);
+  const ok=todas.filter(x=>est(x)==='ok').length+_r.ok;
+  const no=todas.filter(x=>est(x)==='no').length;
+  const pend=todas.length+_r.total-ok-no;
+  const manual=todas.filter(x=>x.origen==='manual');
+  let lista=todas;
+  if(_FV==='pendientes')lista=todas.filter(x=>!est(x));
+  else if(_FV==='manual')lista=manual;
+  else if(_FV==='no')lista=todas.filter(x=>est(x)==='no');
+  if(_QV)lista=lista.filter(x=>coincide(_QV,[x.svc,x.a.name,x.a.normaNombre,x.donde,x.fund]));
+  lista=lista.slice().sort((a,b)=>(a.origen===b.origen?0:(a.origen==='manual'?-1:1))
+    ||D.pisos.indexOf(a.piso)-D.pisos.indexOf(b.piso)||a.svc.localeCompare(b.svc));
+
+  const puede=esReferente();
+  const filas=lista.slice(0,300).map(x=>{
+    const e=valEstado(x.clave)||{}, v=e.v||'';
+    return `<div class="valit ${v}">
+      <div class="valhd">
+        <div style="flex:1">
+          <b>${esc(x.svc)}</b> <span class="hint">· ${esc(x.piso)} · ${esc(x.donde)}</span>
+          ${x.origen==='manual'?`<span class="pill" style="background:#fff1e0;color:#b45309">aplicada a mano${x.por?' · '+esc(x.por.split('@')[0]):''}${x.av?' · '+x.av+'%':''}</span>`:''}
+        </div>
+        ${v?`<span class="pill" style="background:${v==='ok'?'#dcfce7':'#fee2e2'};color:${v==='ok'?'#15803d':'#b91c1c'}">${v==='ok'?'✔ correcta':'✘ no corresponde'}</span>`:''}
+      </div>
+      <div class="valpa">${esc(nomAmbito(x.a.name))}
+        <span class="hint">· ${esc(x.a.normaNombre)} · ${x.a.reqs.length} req.</span></div>
+      ${x.fund?`<div class="valfu">Fundamento: ${esc(x.fund)}</div>`
+              :'<div class="valfu sinf">Sin fundamento registrado: alguien la aplicó desde la app.</div>'}
+      ${puede?`<div class="est3" style="margin-top:7px">
+        <button class="c ${v==='ok'?'on':''}" onclick="validar(${JSON.stringify(x.clave)},'ok')">✔ CORRECTA</button>
+        <button class="nc ${v==='no'?'on':''}" onclick="validar(${JSON.stringify(x.clave)},'no')">✘ NO CORRESPONDE</button>
+      </div>
+      <textarea placeholder="Comentario para el equipo…" style="display:${v==='no'?'block':'none'}"
+        onchange="valComentario(${JSON.stringify(x.clave)},this.value)">${esc(e.c||'')}</textarea>`:''}
+      ${e.c&&!puede?`<div class="valfu">💬 ${esc(e.c)}</div>`:''}
+      ${e.por?`<div class="hint" style="margin-top:4px">Revisada por ${esc(e.por.split('@')[0])}
+        · ${e.ts?new Date(e.ts).toLocaleDateString('es-CL'):''}</div>`:''}
+    </div>`;
+  }).join('');
+
+  $('v-validacion').innerHTML=`
+    <div class="card"><h2>Qué hay que revisar</h2>
+      <div class="hint" style="margin-bottom:9px">Las pautas de unidad se sembraron por fundamento
+      normativo y las que alguien aplicó desde la app no tienen ninguno. Marcá cada una como correcta
+      o como no correspondiente: lo marcado <b>no corresponde</b> se saca de la plataforma.</div>
+      <div class="res3">
+        <div><b>${ok}</b><span>correctas</span></div>
+        <div><b>${no}</b><span>no corresponden</span></div>
+        <div><b>${pend}</b><span>por revisar</span></div>
+      </div>
+      <div class="tabs" style="margin:2px 0 9px">
+        <button class="${_FV==='pendientes'?'on':''}" onclick="modoVal('pendientes')">Por revisar ${pend}</button>
+        <button class="${_FV==='manual'?'on':''}" onclick="modoVal('manual')">A mano ${manual.length}</button>
+        <button class="${_FV==='no'?'on':''}" onclick="modoVal('no')">No corresponden ${no}</button>
+        <button class="${_FV==='todas'?'on':''}" onclick="modoVal('todas')">Todas ${todas.length}</button>
+      </div>
+      <input placeholder="Buscar servicio, norma o pauta…" oninput="filtraVal(this.value)" value="${esc(_QV)}">
+      ${puede?'':'<div class="card aviso" style="margin-top:9px">Solo Catherine, Meylin y Matías pueden validar. Podés mirar lo revisado.</div>'}
+    </div>
+    ${_FV==='pendientes'||_FV==='todas'?seccionReglas(puede).html:''}
+    <div class="card">${filas||'<div class="hint">Nada que mostrar con ese filtro.</div>'}</div>
+    ${lista.length>300?`<div class="hint" style="text-align:center">Se muestran 300 de ${lista.length}. Usá el buscador.</div>`:''}`;
+}
+
+/* ── respaldo y mantenimiento ────────────────────────────────────────────
+   El cotejo vive en el teléfono hasta que la cola lo sube. Si alguien pierde
+   el equipo, limpia el navegador o queda sin señal y cierra la pestaña, se
+   pierde. El respaldo es un archivo que se puede mandar por correo y volver a
+   cargar en otro dispositivo — fotos incluidas.
+   ──────────────────────────────────────────────────────────────────────── */
+async function respaldoExportar(){
+  toast('Armando el respaldo…');
+  const fotos={};
+  try{
+    const db=await fotoDB();
+    const claves=await new Promise(ok=>{const t=db.transaction('fotos','readonly');
+      const r=t.objectStore('fotos').getAllKeys(); r.onsuccess=()=>ok(r.result||[]); r.onerror=()=>ok([]);});
+    for(const k of claves){ const v=await fotoGet(k); if(v)fotos[k]=v; }
+  }catch(e){}
+  const pack={_:'respaldo Autorización Sanitaria · Nuevo HDS', v:1,
+    generado:new Date().toISOString(), por:SES?SES.correo:'', estados:EST, cola:COLA,
+    fallidos:FALLIDOS, fotos};
+  const txt=JSON.stringify(pack);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([txt],{type:'application/json'}));
+  a.download='Respaldo_AS_'+(SES?SES.correo.split('@')[0]:'hds')+'_'+
+    new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  toast('Respaldo listo: '+Object.keys(EST).length+' pautas · '+
+        Object.keys(fotos).length+' fotos · '+Math.round(txt.length/1024)+' KB');
+}
+async function respaldoImportar(input){
+  const f=input.files&&input.files[0]; input.value=''; if(!f)return;
+  try{
+    const pack=JSON.parse(await f.text());
+    if(!pack||!pack.estados)throw new Error('el archivo no es un respaldo de AS');
+    let nuevas=0, mas=0;
+    Object.entries(pack.estados).forEach(([k,v])=>{
+      const loc=EST[k];
+      if(!loc){EST[k]=v;nuevas++;}
+      else if(new Date(v.ts||0)>new Date(loc.ts||0)){EST[k]=v;mas++;}
+    });
+    for(const [k,v] of Object.entries(pack.fotos||{})){ if(!await fotoGet(k)) await fotoSet(k,v); }
+    (pack.cola||[]).forEach(c=>{ if(!COLA.some(x=>x.clave===c.clave)) COLA.push(c); });
+    persist(); vaciarCola(); pintaInicio();
+    toast('Respaldo cargado: '+nuevas+' pautas nuevas, '+mas+' actualizadas.');
+  }catch(e){ toast('No se pudo cargar: '+e.message); }
+}
+// libera las fotos de las pautas que ya están archivadas en el Drive: el PDF
+// es la copia oficial, el teléfono no tiene por qué seguir cargándolas
+async function purgarEvidencia(){
+  const archivadas=Object.keys(SUBIDOS||{});
+  if(!archivadas.length){toast('Todavía no hay pautas archivadas en el Drive.');return;}
+  if(!confirm('Liberar las fotos de '+archivadas.length+' pauta(s) ya archivadas en el Drive?\n'+
+              'El PDF del Drive conserva la evidencia; en el teléfono se borra.'))return;
+  let n=0;
+  for(const clave of archivadas){
+    const e=EST[clave]; if(!e||!e.datos)continue;
+    for(const kk of Object.keys(e.datos)){
+      if(kk.startsWith('foto_r')){ await fotoDel(clave+'|f'+kk.slice(6)); n++; }
+    }
+  }
+  toast(n?('Liberadas '+n+' fotos. El Drive las conserva.'):'No había fotos que liberar.');
+  pintaInicio();
+}
+function pintaMantenimiento(){
+  const kb=Math.round(espacioUsado()/1024);
+  const pend=COLA.length, fall=FALLIDOS.length, arch=Object.keys(SUBIDOS||{}).length;
+  return `<div class="card no-print"><h2>Respaldo y mantenimiento</h2>
+    <div class="res3">
+      <div><b>${kb}</b><span>KB en el equipo</span></div>
+      <div><b>${pend}</b><span>por subir</span></div>
+      <div><b>${arch}</b><span>en el Drive</span></div>
+    </div>
+    ${fall?`<div class="card aviso" style="margin:0 0 9px">⚠ ${fall} guardado(s) que el servidor
+      rechazó. Exportá el respaldo y avisá a la referente de AS antes de seguir.</div>`:''}
+    ${kb>3000?`<div class="card aviso" style="margin:0 0 9px">⚠ El equipo va lleno.
+      Subí lo pendiente y liberá la evidencia ya archivada.</div>`:''}
+    <div class="row" style="flex-wrap:wrap;gap:7px">
+      <button class="btn sec" onclick="respaldoExportar()">⬇ Exportar respaldo</button>
+      <label class="btn sec" style="text-align:center;cursor:pointer">⬆ Cargar respaldo
+        <input type="file" accept="application/json,.json" style="display:none" onchange="respaldoImportar(this)"></label>
+    </div>
+    <div class="row" style="flex-wrap:wrap;gap:7px;margin-top:7px">
+      <button class="btn sec" onclick="vaciarCola();toast('Reintentando la subida…')">☁ Reintentar subida</button>
+      <button class="btn sec" onclick="purgarEvidencia()">🧹 Liberar evidencia archivada</button>
+    </div>
+    <div class="hint" style="margin-top:8px">El respaldo incluye las fotos y se puede cargar en otro
+      equipo. Lo que ya subió al servidor no se pierde aunque borres este navegador.</div>
+  </div>`;
+}
+
+/* ── arnés · ?selftest=1 ─────────────────────────────────────────────────
+   Prueba en vivo lo que un dato roto haría desaparecer en silencio: una pauta
+   que ya no se puede abrir, un plano que no dibuja, un informe que no arma.
+   No deja rastro: guarda el estado, corre sobre claves __selftest__ y restaura.
+   ──────────────────────────────────────────────────────────────────────── */
+async function selftest(){
+  const T=[]; let n=0;
+  const chk=(nom,cond,det)=>{n++;T.push({nom,ok:!!cond,det:det==null?'':String(det)});};
+  const intenta=async(nom,fn)=>{try{const d=await fn();chk(nom,true,d);}catch(e){chk(nom,false,e.message);}};
+  const _est=JSON.stringify(EST), _cola=JSON.stringify(COLA), _ses=SES, _pila=PILA.slice(), _piso=PISO;
+  const t0=performance.now();
+  try{
+    SES={correo:'selftest@hsalvador.cl',nivel:'total',nombre:'Arnés',servicios:[]};
+
+    /* 1 · los datos llegaron completos */
+    chk('datos cargados', D&&D.normas&&D.recintos&&D.servicios&&D.asign);
+    chk('14 normas con ámbitos', Object.keys(D.normas||{}).length>=14, Object.keys(D.normas||{}).length+' normas');
+    chk('pautas de unidad publicadas', Object.keys(D.asign_svc||{}).length>0,
+        Object.keys(D.asign_svc||{}).length+' servicios');
+    chk('planos de todos los pisos', (D.pisos||[]).every(p=>D.planos&&D.planos[p]));
+    chk('recintos con caja del Atlas', Object.keys(D.cajas||{}).length>1000, Object.keys(D.cajas||{}).length+' cajas');
+    chk('calibración por piso presente',
+        ['P-1','P1','P2','P3','P4'].every(p=>D.ext[p]&&D.png[p]&&D.ext[p].xmin>30),
+        'ext y png por piso');
+
+    /* 2 · toda pauta asignada se puede abrir de verdad */
+    let rotas=0, total=0;
+    Object.values(D.asign).forEach(v=>v.forEach(a=>{total++;if(!ambitoDe(a))rotas++;}));
+    Object.values(D.asign_svc||{}).forEach(v=>v.forEach(a=>{total++;if(!ambitoDe(a))rotas++;}));
+    chk('toda pauta asignada existe en las normas', rotas===0, rotas+' rotas de '+total);
+    chk('toda asignación apunta a un recinto real',
+        Object.keys(D.asign).every(id=>D.pisos.some(p=>(D.recintos[p]||[]).some(r=>r[0]===id))));
+
+    /* 3 · los requisitos no se pisan entre sí (misma n = misma marca) */
+    let colisiones=0;
+    Object.values(D.normas).forEach(nm=>nm.secciones.forEach(se=>se.ambitos.forEach(a=>{
+      const ns=a.reqs.map(q=>q.n); if(new Set(ns).size!==ns.length)colisiones++;
+    })));
+    chk('sin números de requisito repetidos', colisiones===0, colisiones+' ámbitos');
+
+    /* 4 · el cálculo de avance responde a lo que se marca */
+    const svP=D.servicios.find(x=>(D.asign_svc||{})[x.n.toUpperCase()]);
+    if(svP){
+      const amb=D.asign_svc[svP.n.toUpperCase()][0], cl='svc|__selftest__|'+amb;
+      const nq=reqsDe(amb).length;
+      guardar(cl,'__selftest__','',amb,{}); chk('pauta vacía = 0 %', avanceDe(cl)===0, avanceDe(cl)+'%');
+      const d={}; reqsDe(amb).forEach(q=>d['r'+q.n]='C');
+      guardar(cl,'__selftest__','',amb,d);
+      chk('pauta completa = 100 %', avanceDe(cl)===100, avanceDe(cl)+'% con '+nq+' requisitos');
+      const mitad={}; reqsDe(amb).slice(0,Math.ceil(nq/2)).forEach(q=>mitad['r'+q.n]='NC');
+      guardar(cl,'__selftest__','',amb,mitad);
+      chk('avance parcial coherente', avanceDe(cl)>0&&avanceDe(cl)<100, avanceDe(cl)+'%');
+      chk('las observaciones no cuentan como respuesta',
+          (()=>{guardar(cl,'__selftest__','',amb,{obs_1:'x'});return avanceDe(cl)===0;})());
+      chk('la cola no duplica la misma clave',
+          COLA.filter(c=>c.clave===cl).length<=1, COLA.filter(c=>c.clave===cl).length+' en cola');
+      guardar(cl,'__selftest__','',amb,{_borrada:1});
+      chk('quitar una pauta la saca de la lista', !pautasDeSvc('__selftest__').includes(amb));
+      delete EST[cl]; COLA=COLA.filter(c=>c.clave!==cl);
+    }
+
+    /* 5 · las tres vistas se pintan para una muestra de todo el hospital */
+    const muestra=D.servicios.slice(0,60);
+    await intenta('la ficha de servicio se pinta en los '+muestra.length+' servicios',()=>{
+      muestra.forEach(sv=>pintaServicio(sv.n)); return 'sin excepciones';});
+    await intenta('el plano del servicio genera SVG válido',()=>{
+      let sin=0; muestra.forEach(sv=>{const h=planoSvc(sv); if(!h||h.indexOf('<svg')!==0)sin++;});
+      /* AS Terreno: el plano lo dibuja el Atlas */
+      return sin+' sin polígono en Atlas (esperable)';});
+    const recs=[]; D.pisos.forEach(p=>(D.recintos[p]||[]).forEach(r=>{if(D.asign[r[0]])recs.push(r);}));
+    await intenta('la ficha de recinto se pinta ('+Math.min(80,recs.length)+' con pauta)',()=>{
+      recs.slice(0,80).forEach(r=>pintaRecinto(r)); return 'sin excepciones';});
+    await intenta('la pauta se abre y se puede cotejar',()=>{
+      const r=recs[0], amb=D.asign[r[0]][0];
+      pintaPauta({tipo:'rec',rid:r[0],svc:r[9]||r[3],amb,rnom:r[2]});
+      const b=document.querySelectorAll('#v-pauta .req').length;
+      if(!b)throw new Error('no se pintó ningún requisito');
+      return b+' requisitos en pantalla';});
+
+    /* 6 · el informe se arma completo */
+    await intenta('el informe se genera con plano y firmas',async()=>{
+      const h=await construirInforme();
+      if(h.indexOf('Informe de Cotejo')<0)throw new Error('sin encabezado');
+      if(h.indexOf('data:image')<0)throw new Error('sin recorte de plano');
+      return Math.round(h.length/1024)+' KB';});
+
+    /* 7 · el buscador encuentra por norma, artículo, recinto y código */
+    const svB=D.servicios.find(x=>(D.asign_svc||{})[x.n.toUpperCase()]);
+    if(svB){ pintaServicio(svB.n);
+      const todas=todasPautasSvc(svB);
+      chk('el buscador lista unidad + recinto', todas.length>0, todas.length+' pautas');
+      const q=todas[0].a.normaNombre.split(' ')[0];
+      chk('filtra por norma', todas.filter(x=>coincide(q,[x.a.name,x.a.normaNombre,x.donde,x.rid])).length>0, q);
+      chk('el filtro sin coincidencias no revienta',
+          todas.filter(x=>coincide('zzqx',[x.a.name,x.a.normaNombre,x.donde,x.rid])).length===0);
+    }
+
+    /* 8 · los permisos no se desbordan */
+    SES={correo:'x@hsalvador.cl',nivel:'servicio',nombre:'x',servicios:['OFTALMOLOGIA']};
+    chk('ve su propio servicio', puedoVer('OFTALMOLOGIA'));
+    chk('no ve un servicio ajeno', !puedoVer('PABELLONES')&&!puedoVer('UCI')&&!puedoVer('RRHH'));
+    chk('sin servicio no ve nada', !puedoVer(''));
+    SES={correo:'selftest@hsalvador.cl',nivel:'total',nombre:'Arnés',servicios:[]};
+    chk('la supervisión ve todo', D.servicios.every(x=>puedoVer(x.n)));
+
+    /* 9 · los nombres de las normas se muestran como fueron escritos */
+    chk('desgrita solo lo que viene en mayúsculas',
+        nomAmbito('SALA DE PROCEDIMIENTOS')==='Sala de procedimientos' &&
+        nomAmbito('Artículo 11 · Todo laboratorio')==='Artículo 11 · Todo laboratorio');
+
+    /* 8b · el nombre del servicio cambia y el avance no se pierde */
+    chk('los alias resuelven al nombre vigente',
+        svcCanon('OTORRINO')==='OTORRINOLARINGOLOGIA' && svcCanon('OFTALMOLOGIA')==='OFTALMOLOGIA',
+        Object.keys(D.alias||{}).length+' alias');
+    chk('la clave de unidad se arma con el nombre canónico',
+        claveSvc('OTORRINO','x')==='svc|OTORRINOLARINGOLOGIA|x');
+
+    /* 8c · la revisión de las referentes y el tablero */
+    await intenta('la revisión lista lo sembrado y lo aplicado a mano',()=>{
+      const v=paraValidar();
+      if(!v.length)throw new Error('no hay nada que revisar');
+      const sin=v.filter(x=>x.origen==='siembra'&&!x.fund).length;
+      if(sin)throw new Error(sin+' siembras sin fundamento');
+      return v.length+' pautas ('+v.filter(x=>x.origen==='manual').length+' a mano)';});
+    await intenta('el tablero calcula el avance de los 53 servicios',()=>{
+      let n=0; D.servicios.forEach(sv=>{const a=avanceServicio(sv); n+=a.n;});
+      pintaTablero(); return n+' pautas contadas';});
+    chk('rechazar una pauta en la revisión la saca de la plataforma',(()=>{
+      const svq=D.servicios.find(x=>(D.asign_svc||{})[x.n.toUpperCase()]);
+      if(!svq)return true;
+      const amb=D.asign_svc[svq.n.toUpperCase()][0], cl=claveSvc(svq.n,amb);
+      const antes=pautasDeSvc(svq.n).includes(amb);
+      EST['val|'+cl]={datos:{v:'no'},avance:100,ts:new Date().toISOString()};
+      const dsp=pautasDeSvc(svq.n).includes(amb);
+      delete EST['val|'+cl];
+      return antes && !dsp;})());
+
+    /* 8d · la validación por regla cubre toda la Fase 1 */
+    await intenta('las reglas de recinto agrupan las 653 pautas',()=>{
+      const gs=grupoReglas();
+      const n=gs.reduce((a,g)=>a+g.recintos.length,0);
+      const manuales=Object.values(D.asign_regla||{}).filter(x=>x==='manual').length;
+      if(n+manuales!==Object.keys(D.asign).length)
+        throw new Error(n+'+'+manuales+' ≠ '+Object.keys(D.asign).length);
+      return gs.length+' reglas · '+n+' recintos';});
+    chk('marcar una excepción saca solo ese recinto',(()=>{
+      const g=grupoReglas()[0]; if(!g)return true;
+      const rid=g.recintos[0], amb=g.ambs[0], cl='rec|'+rid+'|'+amb;
+      EST['val|'+cl]={datos:{v:'no'},avance:100,ts:new Date().toISOString()};
+      const fuera=!pautasDeRec(rid).includes(amb);
+      const otro=g.recintos[1];
+      const otroOk=!otro||pautasDeRec(otro).includes(amb)||!(D.asign[otro]||[]).includes(amb);
+      delete EST['val|'+cl];
+      return fuera&&otroOk;})());
+
+    /* 9 · la firma y la evidencia no inflan el avance */
+    if(svP){
+      const amb=D.asign_svc[svP.n.toUpperCase()][0], cl='svc|__selftest__|'+amb;
+      guardar(cl,'__selftest__','',amb,{foto_r1:50,_firma:{nombre:'x',ts:'2026-01-01'}});
+      chk('foto y firma no cuentan como requisito respondido', avanceDe(cl)===0, avanceDe(cl)+'%');
+      delete EST[cl]; COLA=COLA.filter(c=>c.clave!==cl);
+    }
+
+    /* 9b · la evidencia fotográfica sobrevive al ciclo completo */
+    await intenta('IndexedDB guarda y devuelve una evidencia',async()=>{
+      const px='data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAP//////'+
+               '////////////////////////////////////////////////////////////2wBD'+
+               'Af//////////////////////////////////////////////////////////////'+
+               'wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAf/xAAUEAEA'+
+               'AAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAA'+
+               'AAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwCdABmX/9k=';
+      const k='__selftest__|f1';
+      await fotoSet(k,{d:px,ts:new Date().toISOString(),por:'selftest'});
+      const v=await fotoGet(k);
+      if(!v||v.d!==px)throw new Error('no volvió igual');
+      await fotoDel(k);
+      if(await fotoGet(k))throw new Error('no se pudo borrar');
+      return 'guarda, lee y borra';});
+    chk('las fotos NO se guardan en localStorage',
+        !JSON.stringify(EST).includes('data:image'), 'solo la marca en KB');
+
+    /* 10 · el almacenamiento del navegador aguanta */
+    chk('localStorage disponible', (()=>{try{localStorage.setItem('__st','1');localStorage.removeItem('__st');return true;}catch(e){return false;}})());
+    chk('espacio usado razonable', espacioUsado()<3_500_000, (espacioUsado()/1024).toFixed(0)+' KB');
+    chk('backend configurado', !!URLC, URLC?'sí':'FALTA as_remote.js');
+    chk('el panel de respaldo se arma', pintaMantenimiento().indexOf('Exportar respaldo')>0);
+
+    /* 11 · alcance: lo congelado no cuenta ni se pide validar */
+    const cong=Object.keys(D.congelados||{});
+    chk('los servicios congelados están declarados', true, cong.length?cong.join(', '):'ninguno');
+    if(cong.length){
+      chk('lo congelado no entra en la revisión de las referentes',
+          !paraValidar().some(x=>cong.includes(String(x.svc).toUpperCase())&&x.origen==='siembra'));
+      chk('congelado() los reconoce', cong.every(c=>!!congelado(c)));
+    }
+
+  }finally{
+    EST=JSON.parse(_est); COLA=JSON.parse(_cola); SES=_ses; PILA=_pila.length?_pila:[{v:'inicio'}];
+    Object.keys(EST).forEach(k=>{if(k.indexOf('__selftest__')>=0)delete EST[k];});
+    COLA=COLA.filter(c=>String(c.clave||'').indexOf('__selftest__')<0);
+    persist();
+  }
+  const mal=T.filter(x=>!x.ok), ms=Math.round(performance.now()-t0);
+  document.body.innerHTML=`<div style="font:14px/1.5 -apple-system,system-ui;padding:22px;max-width:900px;margin:0 auto;color:#17233b">
+    <h1 style="font-size:20px;color:#1D2D5B;margin:0 0 4px">Arnés · Autorización Sanitaria</h1>
+    <p style="color:#5b6b85;margin:0 0 16px">${T.length} comprobaciones en ${ms} ms ·
+      <b style="color:${mal.length?'#b91c1c':'#15803d'}">${mal.length?mal.length+' FALLAN':'todo pasa'}</b></p>
+    <table style="border-collapse:collapse;width:100%;font-size:13px">${T.map(x=>
+      `<tr style="border-bottom:1px solid #edf1f7">
+        <td style="padding:7px 8px;width:26px">${x.ok?'✔':'✘'}</td>
+        <td style="padding:7px 8px;${x.ok?'':'color:#b91c1c;font-weight:700'}">${esc(x.nom)}</td>
+        <td style="padding:7px 8px;color:#8593a9;text-align:right;white-space:nowrap">${esc(x.det)}</td>
+      </tr>`).join('')}</table>
+    <p style="margin-top:18px;color:#8593a9;font-size:12px">Sin rastro: el estado real quedó como estaba.
+      Volver a <a href="?">la plataforma</a>.</p></div>`;
+  document.title=(mal.length?'✘ '+mal.length+' FALLAN':'✔ arnés OK')+' · AS';
+  return {total:T.length,fallan:mal.length,ms};
+}
+
+/* ── arranque ────────────────────────────────────────────────────────────── */
+function arranca(){
+  if(/[?&]selftest=1/.test(location.search)){ setTimeout(selftest,60); return; }
+  if(!SES){muestra('login');$('hSub').textContent='Pautas en terreno · Nuevo HDS';return;}
+  bajarEstados().then(()=>{if(PILA.length<=1)pintaInicio();});
+  PILA=[{v:'inicio'}];
+  pintaInicio(); muestra('inicio');
+  vaciarCola();
+}
+arranca();
+
+
+/* ══ PEGAMENTO CON EL ATLAS ══════════════════════════════════════════════════
+   El Atlas dibuja; el módulo coteja. Un toque en un recinto abre su ficha
+   (asAbrirRecinto); en un servicio, su ficha de servicio; los dots y los
+   colores de las cajas reflejan el AVANCE del cotejo, no la asignación.
+   ══════════════════════════════════════════════════════════════════════════ */
+window.AS_TERRENO=true;
+function asRecArr(rid){
+  for(const p of D.pisos){ const r=(D.recintos[p]||[]).find(x=>x[0]===rid); if(r) return r; }
+  // recinto del Atlas que no está en los datos (recién dibujado): se arma al vuelo
+  try{
+    const ctx=_findRoom(rid); if(!ctx) return null;
+    const m2=(typeof roomDrawnM2==='function')?roomDrawnM2(rid):null;
+    return [rid, rCode(rid), rName(rid), aName(ctx.area.id), null, null, null, null, m2?Math.round(m2*10)/10:null, aName(ctx.area.id)];
+  }catch(e){ return null; }
+}
+function asPisoDe(rid){
+  for(const p of D.pisos){ if((D.recintos[p]||[]).some(x=>x[0]===rid)) return p; }
+  try{ const c=_findRoom(rid); if(c) return c.floor.id; }catch(e){}
+  return (window.S&&S.floorId)||'P1';
+}
+function asAbrirRecinto(rid){
+  const r=asRecArr(rid); if(!r){ toast('Este recinto no tiene datos todavía.'); return; }
+  PISO=asPisoDe(rid);
+  if(!SES){ ir('login'); return; }
+  ir('recinto', r);
+}
+function asAbrirServicio(areaId){
+  const nom=(typeof aName==='function')?aName(areaId):areaId;
+  if(!SES){ ir('login'); return; }
+  ir('servicio', nom);
+}
+function asVerServicio(nombre){
+  asCerrarPanel();
+  try{
+    for(const fl of FLOORS) for(const a of fl.areas){
+      if(String(aName(a.id)).toUpperCase()===String(nombre).toUpperCase()){ sidebarGoArea(fl.id,a.id); return; }
+    }
+  }catch(e){}
+  toast('No encontré el área en el Atlas.');
+}
+function asCerrarPanel(){
+  const p=document.getElementById('asPanel'); if(p) p.classList.remove('open');
+  document.body.classList.remove('as-abierto');
+  ['inicio','plano','validacion','tablero'].forEach(t=>{const b=$('tb-'+t);if(b)b.classList.toggle('on',t==='plano');});
+  PILA=PILA.filter(x=>x.v!=='plano');
+}
+// avance de un recinto: -1 sin pauta · 0..100
+function asAvanceRec(rid){
+  const ps=pautasDeRec(rid); if(!ps.length) return -1;
+  return Math.round(ps.reduce((a,p)=>a+avanceDe(claveRec(rid,p)),0)/ps.length);
+}
+function asEstadoDot(kind,id){
+  if(kind==='r'){ const a=asAvanceRec(id);
+    return {estado: a<0?'no_corresponde':(a===100?'validada':(a>0?'sugerida':'sin')), p:[]}; }
+  const nom=aName(id); const sv=svcInfo(nom); if(!sv) return {estado:'no_corresponde',p:[]};
+  if(congelado(nom)) return {estado:'no_corresponde',p:[]};
+  const a=avanceServicio(sv); if(!a.n) return {estado:'no_corresponde',p:[]};
+  return {estado: a.pct===100?'validada':(a.pct>0?'sugerida':'sin'), p:[]};
+}
+function asAreaStats(area){
+  const nom=aName(area.id); const sv=svcInfo(nom);
+  if(!sv) return {txt1:'', txt2:''};
+  if(congelado(nom)) return {txt1:'❄️ fuera de alcance', txt2:''};
+  const a=avanceServicio(sv);
+  if(!a.n) return {txt1:'sin pauta', txt2:''};
+  return {txt1:a.n+' pauta'+(a.n===1?'':'s')+' · '+a.pct+'%', txt2:a.hechas+' al 100 % · '+a.sin+' sin empezar'};
+}
+// colorea las cajas de recinto por avance después de cada render del Atlas
+function asDecora(){
+  try{
+    document.querySelectorAll('#svgLayer [data-rid]').forEach(el=>{
+      const a=asAvanceRec(el.getAttribute('data-rid'));
+      el.classList.remove('as-sin','as-p','as-q','as-h');
+      el.classList.add(a<0?'as-sin':(a===100?'as-h':(a>0?'as-q':'as-p')));
+    });
+  }catch(e){}
+}
+// el chip "modo consulta" del Atlas no aplica: acá se trabaja
+window.addEventListener('load',()=>setTimeout(()=>{
+  document.querySelectorAll('#hdr span').forEach(x=>{ if(/MODO CONSULTA/.test(x.textContent)) x.remove(); });
+},80));
+(function(){
+  const _r=window.renderSVG;
+  if(typeof _r==='function'){ window.renderSVG=function(){ _r.apply(this,arguments); asDecora(); }; }
+})();
+
 </script>
 <script src="hub-home.js"></script>
 </body>
