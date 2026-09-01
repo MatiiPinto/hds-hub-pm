@@ -709,7 +709,15 @@ function pintaInicio(){
 
 /* ── PLANO (pan/zoom táctil + recintos tocables) ─────────────────────────── */
 let PISO=null, Z=1, OX=0, OY=0;
-const d2px=(x,y,pl)=>({x:(x-D.ext.xmin)/(D.ext.xmax-D.ext.xmin)*pl.w, y:(D.ext.ymax-y)/(D.ext.ymax-D.ext.ymin)*pl.h});
+// Geometría POR PISO: D.ext y D.png traen la calibración del Atlas para cada
+// piso (regresión, residuos 0-1 px). El extent único que se usaba antes corría
+// los recintos ~10 m respecto del plano — el desalineamiento que reportó Matías.
+const extDe=piso=>D.ext[piso];
+const pngDe=piso=>D.png[piso];
+const d2px=(x,y,pl,piso)=>{const e=extDe(piso);
+  return {x:(x-e.xmin)/(e.xmax-e.xmin)*pl.w, y:(e.ymax-y)/(e.ymax-e.ymin)*pl.h};};
+const m2px=(m,pl,piso,vert)=>{const e=extDe(piso);
+  return vert? m/(e.ymax-e.ymin)*pl.h : m/(e.xmax-e.xmin)*pl.w;};
 function claseRec(r){
   const id=r[0], svc=r[9]||r[3];
   const pautas=pautasDeRec(id);
@@ -738,11 +746,11 @@ function pintaPlano(piso){
   svg.setAttribute('width',pl.w); svg.setAttribute('height',pl.h);
   let h='';
   (D.recintos[piso]||[]).forEach((r,i)=>{
-    const p=d2px(r[4],r[5],pl), w=r[6]/(D.ext.xmax-D.ext.xmin)*pl.w, ht=r[7]/(D.ext.ymax-D.ext.ymin)*pl.h;
+    const p=d2px(r[4],r[5],pl,piso), w=m2px(r[6],pl,piso), ht=m2px(r[7],pl,piso,1);
     h+=`<rect class="${claseRec(r)}" x="${(p.x-w/2).toFixed(1)}" y="${(p.y-ht/2).toFixed(1)}" width="${w.toFixed(1)}" height="${ht.toFixed(1)}" data-i="${i}"/>`;
   });
   D.servicios.filter(s=>s.piso===piso).forEach(s=>{
-    const k=pl.w/D.png.w, kv=pl.h/D.png.h;
+    const k=pl.w/pngDe(piso).w, kv=pl.h/pngDe(piso).h;
     s.shapes.forEach(sh=>{h+=`<rect class="svcbox" x="${sh[0]*k}" y="${sh[1]*kv}" width="${sh[2]*k}" height="${sh[3]*kv}" data-svc="${esc(s.n)}"/>`;});
     const cx=(s.bb[0]+s.bb[2])/2*k, cy=(s.bb[1]+s.bb[3])/2*kv;
     const fs=Math.max(16,Math.min(34,(s.bb[2]-s.bb[0])*k/(s.n.length*0.62)));
@@ -920,7 +928,7 @@ function pintaRecinto(r){
    quedan en gris para no perder la referencia de dónde está uno parado. ── */
 function planoSvc(sv){
   const pl=D.planos[sv.piso]; if(!pl||!sv.shapes||!sv.shapes.length)return '';
-  const k=pl.w/D.png.w, kv=pl.h/D.png.h;
+  const k=pl.w/pngDe(sv.piso).w, kv=pl.h/pngDe(sv.piso).h;
   const bw=(sv.bb[2]-sv.bb[0])*k, bh=(sv.bb[3]-sv.bb[1])*kv;
   const m=Math.max(bw,bh)*0.05+16;
   const vx=sv.bb[0]*k-m, vy=sv.bb[1]*kv-m, vw=bw+2*m, vh=bh+2*m;
@@ -929,8 +937,8 @@ function planoSvc(sv){
   let h=`<image href="${pl.src}?v=${D.gen}" x="0" y="0" width="${pl.w}" height="${pl.h}"/>`;
   sv.shapes.forEach(sh=>{h+=`<rect class="svcbox" style="pointer-events:none" x="${(sh[0]*k).toFixed(1)}" y="${(sh[1]*kv).toFixed(1)}" width="${(sh[2]*k).toFixed(1)}" height="${(sh[3]*kv).toFixed(1)}"/>`;});
   todos.forEach((r,i)=>{
-    const p=d2px(r[4],r[5],pl);
-    const w=r[6]/(D.ext.xmax-D.ext.xmin)*pl.w, ht=r[7]/(D.ext.ymax-D.ext.ymin)*pl.h;
+    const p=d2px(r[4],r[5],pl,sv.piso);
+    const w=m2px(r[6],pl,sv.piso), ht=m2px(r[7],pl,sv.piso,1);
     const x=p.x-w/2, y=p.y-ht/2;
     if(x+w<vx||x>vx+vw||y+ht<vy||y>vy+vh)return;          // fuera del recorte
     if(!esMio(r)){
@@ -1356,24 +1364,26 @@ async function recortePlano(){
       const sv=svcInfo(PA.svc); if(!sv)return '';
       piso=sv.piso;
       const pl=D.planos[piso];
-      const k=(D.ext.xmax-D.ext.xmin)/D.png.w;
-      cx=D.ext.xmin+((sv.bb[0]+sv.bb[2])/2)*k;
-      cy=D.ext.ymax-((sv.bb[1]+sv.bb[3])/2)*(D.ext.ymax-D.ext.ymin)/D.png.h;
-      wm=(sv.bb[2]-sv.bb[0])*k; hm=(sv.bb[3]-sv.bb[1])*(D.ext.ymax-D.ext.ymin)/D.png.h;
+      const e=extDe(sv.piso), dpx=pngDe(sv.piso);
+      const k=(e.xmax-e.xmin)/dpx.w;
+      cx=e.xmin+((sv.bb[0]+sv.bb[2])/2)*k;
+      cy=e.ymax-((sv.bb[1]+sv.bb[3])/2)*(e.ymax-e.ymin)/dpx.h;
+      wm=(sv.bb[2]-sv.bb[0])*k; hm=(sv.bb[3]-sv.bb[1])*(e.ymax-e.ymin)/dpx.h;
     }
     const pl=D.planos[piso]; if(!pl)return '';
     const img=new Image(); img.src=pl.src;
     await new Promise((ok,er)=>{img.onload=ok;img.onerror=er;});
     const R=Math.max(wm,hm)*1.6+8;
-    const px=x=>(x-D.ext.xmin)/(D.ext.xmax-D.ext.xmin)*pl.w;
-    const py=y=>(D.ext.ymax-y)/(D.ext.ymax-D.ext.ymin)*pl.h;
+    const _e=extDe(piso);
+    const px=x=>(x-_e.xmin)/(_e.xmax-_e.xmin)*pl.w;
+    const py=y=>(_e.ymax-y)/(_e.ymax-_e.ymin)*pl.h;
     const x0=px(cx-R),x1=px(cx+R),y0=py(cy+R),y1=py(cy-R);
     const cv=document.createElement('canvas'); cv.width=760; cv.height=Math.round(760*(y1-y0)/(x1-x0));
     const g=cv.getContext('2d');
     g.drawImage(img,x0,y0,x1-x0,y1-y0,0,0,cv.width,cv.height);
     const k2=cv.width/(x1-x0);
     g.strokeStyle='#1D2D5B';g.lineWidth=4;g.fillStyle='rgba(59,130,196,.25)';
-    const rx=(px(cx-wm/2)-x0)*k2, ry=(py(cy+hm/2)-y0)*k2, rw=wm/(D.ext.xmax-D.ext.xmin)*pl.w*k2, rh=hm/(D.ext.ymax-D.ext.ymin)*pl.h*k2;
+    const rx=(px(cx-wm/2)-x0)*k2, ry=(py(cy+hm/2)-y0)*k2, rw=wm/(_e.xmax-_e.xmin)*pl.w*k2, rh=hm/(_e.ymax-_e.ymin)*pl.h*k2;
     g.fillRect(rx,ry,rw,rh);g.strokeRect(rx,ry,rw,rh);
     return cv.toDataURL('image/jpeg',0.8);
   }catch(e){return '';}
@@ -1898,6 +1908,9 @@ async function selftest(){
     chk('pautas de unidad publicadas', Object.keys(D.asign_svc||{}).length>0,
         Object.keys(D.asign_svc||{}).length+' servicios');
     chk('planos de todos los pisos', (D.pisos||[]).every(p=>D.planos&&D.planos[p]));
+    chk('calibración por piso presente',
+        ['P-1','P1','P2','P3','P4'].every(p=>D.ext[p]&&D.png[p]&&D.ext[p].xmin>30),
+        'ext y png por piso');
 
     /* 2 · toda pauta asignada se puede abrir de verdad */
     let rotas=0, total=0;
