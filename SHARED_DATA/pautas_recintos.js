@@ -2,7 +2,7 @@
 // BORRADOR Fase 1 · asignación automática por tipo de recinto — pendiente validación
 // Consumir con: window.SHARED_PAUTAS_RECINTOS · asignaciones[recintoId] = {p:[ambitoIds], regla}
 window.SHARED_PAUTAS_RECINTOS = {
-  "version": "2026-06-05 · Fase 1 borrador para validación · fase2 2026-09-01 (1 ámbitos de servicio)",
+  "version": "2026-06-05 · Fase 1 borrador para validación · fase2 2026-09-01 (15 ámbitos de servicio)",
   "fuente": "SHARED_DATA/recintos.js (2228 recintos) × normas AC/CM/FA/DI",
   "total_recintos": 2359,
   "total_asignados": 693,
@@ -4989,6 +4989,29 @@ window.SHARED_PAUTAS_RECINTOS = {
       "regla": "fase2",
       "fund": [
         "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "PLANTA AGUA DIALISIS": {
+      "p": [
+        "di_instalaciones__art16",
+        "di_instalaciones__art17",
+        "di_calidad-agua-funcionamiento__art19",
+        "di_calidad-agua-funcionamiento__art20",
+        "di_calidad-agua-funcionamiento__art21",
+        "di_calidad-agua-funcionamiento__art22",
+        "di_calidad-agua-funcionamiento__art23",
+        "di_calidad-agua-funcionamiento__art24",
+        "di_calidad-agua-funcionamiento__art25",
+        "di_calidad-agua-funcionamiento__art26",
+        "di_calidad-agua-funcionamiento__art27",
+        "di_calidad-agua-funcionamiento__art28",
+        "di_calidad-agua-funcionamiento__art29",
+        "di_calidad-agua-funcionamiento__art30",
+        "di_calidad-agua-funcionamiento__art31"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "dialisis · D. 45/2016 arts. 16-17 y 19-23 · sala y planta de tratamiento de agua, calidad del agua para hemodiálisis (área propia en el Atlas desde sep-2026, la presenta Diálisis)"
       ]
     }
   },
