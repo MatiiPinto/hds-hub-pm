@@ -2,7 +2,7 @@
 // BORRADOR Fase 1 · asignación automática por tipo de recinto — pendiente validación
 // Consumir con: window.SHARED_PAUTAS_RECINTOS · asignaciones[recintoId] = {p:[ambitoIds], regla}
 window.SHARED_PAUTAS_RECINTOS = {
-  "version": "2026-06-05 · Fase 1 borrador para validación · fase2 2026-09-01 (23 ámbitos de servicio)",
+  "version": "2026-06-05 · Fase 1 borrador para validación · fase2 2026-09-01 (0 ámbitos de servicio)",
   "fuente": "SHARED_DATA/recintos.js (2228 recintos) × normas AC/CM/FA/DI",
   "total_recintos": 2359,
   "total_asignados": 693,
@@ -4714,46 +4714,6 @@ window.SHARED_PAUTAS_RECINTOS = {
       "regla": "fase2",
       "fund": [
         "dr · D.S. 466/84 Título III · área DROGUERIA propia en el Atlas desde sep-2026"
-      ]
-    },
-    "FARMACIA CERRADA": {
-      "p": [
-        "fa_funcionamiento__i-senaleticas",
-        "fa_funcionamiento__ii-oficina-quimico-farmaceutico",
-        "fa_funcionamiento__iii-condiciones-de-almacenamiento-de-med",
-        "fa_funcionamiento__iv-condiciones-sanitarias-y-ambientales-",
-        "fa_funcionamiento__v-reglamentos-y-material-de-consulta-pub",
-        "fa_funcionamiento__vi-ley-de-farmacos",
-        "fa_funcionamiento__viia-listado-de-precios-caracteristicas",
-        "fa_funcionamiento__viib-listado-de-precios-requisitos-art-4",
-        "fa_instalacion__ii-requerimientos-minimos-del-local-dest",
-        "fa_instalacion__iii-condiciones-sanitarias-y-ambientales",
-        "dr_drogueria__org__titulo-iii"
-      ],
-      "regla": "fase2",
-      "fund": [
-        "farmacia · Checklist Farmacia ISP · farmacia de establecimiento asistencial",
-        "dr · D.S. 466/84 Título III · droguería / almacén de medicamentos"
-      ]
-    },
-    "FARMACIA MAGISTRAL": {
-      "p": [
-        "fa_funcionamiento__i-senaleticas",
-        "fa_funcionamiento__ii-oficina-quimico-farmaceutico",
-        "fa_funcionamiento__iii-condiciones-de-almacenamiento-de-med",
-        "fa_funcionamiento__iv-condiciones-sanitarias-y-ambientales-",
-        "fa_funcionamiento__v-reglamentos-y-material-de-consulta-pub",
-        "fa_funcionamiento__vi-ley-de-farmacos",
-        "fa_funcionamiento__viia-listado-de-precios-caracteristicas",
-        "fa_funcionamiento__viib-listado-de-precios-requisitos-art-4",
-        "fa_instalacion__ii-requerimientos-minimos-del-local-dest",
-        "fa_instalacion__iii-condiciones-sanitarias-y-ambientales",
-        "cz_mezclas__org__ngt25"
-      ],
-      "regla": "fase2",
-      "fund": [
-        "farmacia · Checklist Farmacia ISP · recetario magistral",
-        "cz · NGT 25 · central de mezclas, preparación de antineoplásicos"
       ]
     },
     "REAS": {
