@@ -750,6 +750,7 @@ function pintaPlano(piso){
   svg.setAttribute('width',pl.w); svg.setAttribute('height',pl.h);
   let h='';
   (D.recintos[piso]||[]).forEach((r,i)=>{
+    if(r[4]==null||r[6]==null)return;   // familia 37 (PMA-BIM): sin posición DXF
     const p=d2px(r[4],r[5],pl,piso), w=m2px(r[6],pl,piso), ht=m2px(r[7],pl,piso,1);
     h+=`<rect class="${claseRec(r)}" x="${(p.x-w/2).toFixed(1)}" y="${(p.y-ht/2).toFixed(1)}" width="${w.toFixed(1)}" height="${ht.toFixed(1)}" data-i="${i}"/>`;
   });
@@ -941,6 +942,7 @@ function planoSvc(sv){
   let h=`<image href="${pl.src}?v=${D.gen}" x="0" y="0" width="${pl.w}" height="${pl.h}"/>`;
   sv.shapes.forEach(sh=>{h+=`<rect class="svcbox" style="pointer-events:none" x="${(sh[0]*k).toFixed(1)}" y="${(sh[1]*kv).toFixed(1)}" width="${(sh[2]*k).toFixed(1)}" height="${(sh[3]*kv).toFixed(1)}"/>`;});
   todos.forEach((r,i)=>{
+    if(r[4]==null||r[6]==null)return;
     const p=d2px(r[4],r[5],pl,sv.piso);
     const w=m2px(r[6],pl,sv.piso), ht=m2px(r[7],pl,sv.piso,1);
     const x=p.x-w/2, y=p.y-ht/2;
@@ -1049,6 +1051,9 @@ function pintaServicio(nombre){
         <span><i class="lg lg-h"></i>al 100%</span><span><i class="lg lg-n"></i>sin pauta</span>
         <span><i class="lg lg-v"></i>otro servicio</span></div>
       <div class="hint">Tocá un recinto para abrir su ficha y su pauta.</div>
+      ${(()=>{const sp=recs.filter(r=>r[4]==null).length;
+        return sp?`<div class="hint">📍 ${sp} recinto${sp>1?'s':''} de este servicio aún no tiene posición
+        en el plano (catálogo PMA-BIM): están en la lista de abajo.</div>`:'';})()}
       <button class="btn sec" style="margin-top:9px" onclick="PISO='${sv.piso}';ir('plano','${sv.piso}')">Abrir el plano completo del ${esc(sv.piso)}</button>
     </div>`:''}
 

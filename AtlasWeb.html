@@ -980,6 +980,10 @@ const DXF_ROOMS = (function(){
 })();
 
 function dxfToImg(floorId,cx_m,cy_m){
+  // Hay recintos de catálogo sin geometría CAD (familia 37 · UHI/UIH, cargada
+  // desde el mapa PMA-BIM, que no trae coordenadas). Sin esta guarda devolvían
+  // {x:NaN,y:NaN} y el overlay de diagnóstico intentaba pintarlos.
+  if(!Number.isFinite(cx_m)||!Number.isFinite(cy_m)) return null;
   const ext=DXF_EXT[floorId]; if(!ext) return null;
   const d=FLOOR_DIMS[floorId]; if(!d) return null;
   const px=(cx_m-ext.xmin)/(ext.xmax-ext.xmin)*d.w;

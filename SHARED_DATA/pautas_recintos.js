@@ -2,34 +2,34 @@
 // BORRADOR Fase 1 · asignación automática por tipo de recinto — pendiente validación
 // Consumir con: window.SHARED_PAUTAS_RECINTOS · asignaciones[recintoId] = {p:[ambitoIds], regla}
 window.SHARED_PAUTAS_RECINTOS = {
-  "version": "2026-06-05 · Fase 1 borrador para validación · fase2 2026-08-30 (343 ámbitos de servicio)",
+  "version": "2026-06-05 · Fase 1 borrador para validación · fase2 2026-09-01 (23 ámbitos de servicio)",
   "fuente": "SHARED_DATA/recintos.js (2228 recintos) × normas AC/CM/FA/DI",
-  "total_recintos": 2228,
-  "total_asignados": 653,
+  "total_recintos": 2359,
+  "total_asignados": 693,
   "resumen_reglas": {
+    "aseo_chatas": 24,
+    "box_consulta": 110,
     "box_urgencia": 8,
     "box_urgencia_proc": 3,
-    "sala_procedimientos": 100,
-    "box_consulta": 110,
-    "rehabilitacion": 30,
-    "estacion_enfermeria": 27,
-    "trabajo_sucio": 24,
-    "farmacia_general": 7,
-    "farmacia_almacen": 1,
-    "toma_muestras": 4,
-    "img_examen": 7,
-    "aseo_chatas": 22,
-    "hospitalizacion": 189,
-    "trabajo_limpio": 18,
-    "img_scanner": 3,
-    "quirofano": 27,
-    "img_angiografia": 2,
-    "uti": 38,
-    "uci": 17,
-    "proc_odonto": 10,
     "cirugia_menor": 1,
     "dialisis": 4,
-    "esterilizacion_general": 1
+    "estacion_enfermeria": 29,
+    "esterilizacion_general": 1,
+    "farmacia_almacen": 1,
+    "farmacia_general": 7,
+    "hospitalizacion": 189,
+    "img_angiografia": 2,
+    "img_examen": 7,
+    "img_scanner": 3,
+    "proc_odonto": 10,
+    "quirofano": 27,
+    "rehabilitacion": 30,
+    "sala_procedimientos": 101,
+    "toma_muestras": 4,
+    "trabajo_limpio": 21,
+    "trabajo_sucio": 26,
+    "uci": 29,
+    "uti": 56
   },
   "asignaciones": {
     "P1-CAD-1-R0": {
@@ -3984,6 +3984,246 @@ window.SHARED_PAUTAS_RECINTOS = {
         "fa_instalacion__ii-requerimientos-minimos-del-local-dest"
       ],
       "regla": "farmacia_general"
+    },
+    "P2-CAD-37.1-R12": {
+      "p": [
+        "ac_hospitalizacion__inf__estaci-n-enfermer-a"
+      ],
+      "regla": "estacion_enfermeria"
+    },
+    "P2-CAD-37.1-R13": {
+      "p": [
+        "ac_hospitalizacion__inf__trabajo-limpio"
+      ],
+      "regla": "trabajo_limpio"
+    },
+    "P2-CAD-37.1-R14": {
+      "p": [
+        "ac_hospitalizacion__inf__trabajo-sucio"
+      ],
+      "regla": "trabajo_sucio"
+    },
+    "P2-CAD-37.1-R19": {
+      "p": [
+        "cm_infraestructura__inf__sala-de-procedimientos"
+      ],
+      "regla": "sala_procedimientos"
+    },
+    "P2-CAD-37.1-R22": {
+      "p": [
+        "ac_hospitalizacion__inf__aseo-de-chatas"
+      ],
+      "regla": "aseo_chatas"
+    },
+    "P2-CAD-37.1-R28": {
+      "p": [
+        "ac_tratamiento-intermedio__inf__modulo-hospitalizacion"
+      ],
+      "regla": "uti"
+    },
+    "P2-CAD-37.1-R29": {
+      "p": [
+        "ac_tratamiento-intermedio__inf__modulo-hospitalizacion"
+      ],
+      "regla": "uti"
+    },
+    "P2-CAD-37.1-R30": {
+      "p": [
+        "ac_tratamiento-intermedio__inf__modulo-hospitalizacion"
+      ],
+      "regla": "uti"
+    },
+    "P2-CAD-37.1-R31": {
+      "p": [
+        "ac_tratamiento-intermedio__inf__modulo-hospitalizacion"
+      ],
+      "regla": "uti"
+    },
+    "P2-CAD-37.1-R32": {
+      "p": [
+        "ac_tratamiento-intermedio__inf__modulo-hospitalizacion"
+      ],
+      "regla": "uti"
+    },
+    "P2-CAD-37.1-R33": {
+      "p": [
+        "ac_tratamiento-intermedio__inf__modulo-hospitalizacion"
+      ],
+      "regla": "uti"
+    },
+    "P2-CAD-37.1-R34": {
+      "p": [
+        "ac_tratamiento-intermedio__inf__modulo-hospitalizacion"
+      ],
+      "regla": "uti"
+    },
+    "P2-CAD-37.1-R35": {
+      "p": [
+        "ac_tratamiento-intermedio__inf__modulo-hospitalizacion"
+      ],
+      "regla": "uti"
+    },
+    "P2-CAD-37.1-R36": {
+      "p": [
+        "ac_tratamiento-intermedio__inf__modulo-hospitalizacion"
+      ],
+      "regla": "uti"
+    },
+    "P2-CAD-37.1-R37": {
+      "p": [
+        "ac_tratamiento-intermedio__inf__modulo-hospitalizacion"
+      ],
+      "regla": "uti"
+    },
+    "P2-CAD-37.1-R38": {
+      "p": [
+        "ac_tratamiento-intermedio__inf__modulo-hospitalizacion"
+      ],
+      "regla": "uti"
+    },
+    "P2-CAD-37.1-R39": {
+      "p": [
+        "ac_tratamiento-intermedio__inf__modulo-hospitalizacion"
+      ],
+      "regla": "uti"
+    },
+    "P2-CAD-37.1-R40": {
+      "p": [
+        "ac_tratamiento-intermedio__inf__modulo-hospitalizacion"
+      ],
+      "regla": "uti"
+    },
+    "P2-CAD-37.1-R41": {
+      "p": [
+        "ac_tratamiento-intermedio__inf__modulo-hospitalizacion"
+      ],
+      "regla": "uti"
+    },
+    "P2-CAD-37.1-R42": {
+      "p": [
+        "ac_tratamiento-intermedio__inf__modulo-hospitalizacion"
+      ],
+      "regla": "uti"
+    },
+    "P2-CAD-37.1-R43": {
+      "p": [
+        "ac_tratamiento-intermedio__inf__modulo-hospitalizacion"
+      ],
+      "regla": "uti"
+    },
+    "P2-CAD-37.1-R44": {
+      "p": [
+        "ac_tratamiento-intermedio__inf__modulo-hospitalizacion"
+      ],
+      "regla": "uti"
+    },
+    "P2-CAD-37.1-R45": {
+      "p": [
+        "ac_tratamiento-intermedio__inf__modulo-hospitalizacion"
+      ],
+      "regla": "uti"
+    },
+    "P2-CAD-37.2-R18": {
+      "p": [
+        "ac_hospitalizacion__inf__aseo-de-chatas"
+      ],
+      "regla": "aseo_chatas"
+    },
+    "P2-CAD-37.2-R22": {
+      "p": [
+        "ac_hospitalizacion__inf__estaci-n-enfermer-a"
+      ],
+      "regla": "estacion_enfermeria"
+    },
+    "P2-CAD-37.2-R23": {
+      "p": [
+        "ac_hospitalizacion__inf__trabajo-limpio"
+      ],
+      "regla": "trabajo_limpio"
+    },
+    "P2-CAD-37.2-R24": {
+      "p": [
+        "ac_hospitalizacion__inf__trabajo-limpio"
+      ],
+      "regla": "trabajo_limpio"
+    },
+    "P2-CAD-37.2-R25": {
+      "p": [
+        "ac_hospitalizacion__inf__trabajo-sucio"
+      ],
+      "regla": "trabajo_sucio"
+    },
+    "P2-CAD-37.2-R33": {
+      "p": [
+        "ac_cuidados-intensivos__inf__modulo-de-hospitalizacion"
+      ],
+      "regla": "uci"
+    },
+    "P2-CAD-37.2-R34": {
+      "p": [
+        "ac_cuidados-intensivos__inf__modulo-de-hospitalizacion"
+      ],
+      "regla": "uci"
+    },
+    "P2-CAD-37.2-R35": {
+      "p": [
+        "ac_cuidados-intensivos__inf__modulo-de-hospitalizacion"
+      ],
+      "regla": "uci"
+    },
+    "P2-CAD-37.2-R36": {
+      "p": [
+        "ac_cuidados-intensivos__inf__modulo-de-hospitalizacion"
+      ],
+      "regla": "uci"
+    },
+    "P2-CAD-37.2-R37": {
+      "p": [
+        "ac_cuidados-intensivos__inf__modulo-de-hospitalizacion"
+      ],
+      "regla": "uci"
+    },
+    "P2-CAD-37.2-R38": {
+      "p": [
+        "ac_cuidados-intensivos__inf__modulo-de-hospitalizacion"
+      ],
+      "regla": "uci"
+    },
+    "P2-CAD-37.2-R39": {
+      "p": [
+        "ac_cuidados-intensivos__inf__modulo-de-hospitalizacion"
+      ],
+      "regla": "uci"
+    },
+    "P2-CAD-37.2-R40": {
+      "p": [
+        "ac_cuidados-intensivos__inf__modulo-de-hospitalizacion"
+      ],
+      "regla": "uci"
+    },
+    "P2-CAD-37.2-R41": {
+      "p": [
+        "ac_cuidados-intensivos__inf__modulo-de-hospitalizacion"
+      ],
+      "regla": "uci"
+    },
+    "P2-CAD-37.2-R42": {
+      "p": [
+        "ac_cuidados-intensivos__inf__modulo-de-hospitalizacion"
+      ],
+      "regla": "uci"
+    },
+    "P2-CAD-37.2-R43": {
+      "p": [
+        "ac_cuidados-intensivos__inf__modulo-de-hospitalizacion"
+      ],
+      "regla": "uci"
+    },
+    "P2-CAD-37.2-R44": {
+      "p": [
+        "ac_cuidados-intensivos__inf__modulo-de-hospitalizacion"
+      ],
+      "regla": "uci"
     }
   },
   "asignaciones_servicio": {
@@ -4338,26 +4578,6 @@ window.SHARED_PAUTAS_RECINTOS = {
         "hospitalizacion_psiquiatrica · D. 9/2024 · unidad ambulatoria: establecimiento, derechos y notificaciones (sin el capítulo de infraestructura UHCIP)"
       ]
     },
-    "FARMACIA CERRADA": {
-      "p": [
-        "fa_funcionamiento__i-senaleticas",
-        "fa_funcionamiento__ii-oficina-quimico-farmaceutico",
-        "fa_funcionamiento__iii-condiciones-de-almacenamiento-de-med",
-        "fa_funcionamiento__iv-condiciones-sanitarias-y-ambientales-",
-        "fa_funcionamiento__v-reglamentos-y-material-de-consulta-pub",
-        "fa_funcionamiento__vi-ley-de-farmacos",
-        "fa_funcionamiento__viia-listado-de-precios-caracteristicas",
-        "fa_funcionamiento__viib-listado-de-precios-requisitos-art-4",
-        "fa_instalacion__ii-requerimientos-minimos-del-local-dest",
-        "fa_instalacion__iii-condiciones-sanitarias-y-ambientales",
-        "dr_drogueria__org__titulo-iii"
-      ],
-      "regla": "fase2",
-      "fund": [
-        "farmacia · Checklist Farmacia ISP · farmacia de establecimiento asistencial",
-        "dr · D.S. 466/84 Título III · droguería / almacén de medicamentos"
-      ]
-    },
     "FARMACIA ABIERTA": {
       "p": [
         "fa_funcionamiento__i-senaleticas",
@@ -4374,26 +4594,6 @@ window.SHARED_PAUTAS_RECINTOS = {
       "regla": "fase2",
       "fund": [
         "farmacia · Checklist Farmacia ISP · farmacia de atención directa a público"
-      ]
-    },
-    "FARMACIA MAGISTRAL": {
-      "p": [
-        "fa_funcionamiento__i-senaleticas",
-        "fa_funcionamiento__ii-oficina-quimico-farmaceutico",
-        "fa_funcionamiento__iii-condiciones-de-almacenamiento-de-med",
-        "fa_funcionamiento__iv-condiciones-sanitarias-y-ambientales-",
-        "fa_funcionamiento__v-reglamentos-y-material-de-consulta-pub",
-        "fa_funcionamiento__vi-ley-de-farmacos",
-        "fa_funcionamiento__viia-listado-de-precios-caracteristicas",
-        "fa_funcionamiento__viib-listado-de-precios-requisitos-art-4",
-        "fa_instalacion__ii-requerimientos-minimos-del-local-dest",
-        "fa_instalacion__iii-condiciones-sanitarias-y-ambientales",
-        "cz_mezclas__org__ngt25"
-      ],
-      "regla": "fase2",
-      "fund": [
-        "farmacia · Checklist Farmacia ISP · recetario magistral",
-        "cz · NGT 25 · central de mezclas, preparación de antineoplásicos"
       ]
     },
     "DIALISIS": {
@@ -4468,12 +4668,108 @@ window.SHARED_PAUTAS_RECINTOS = {
       "fund": [
         "cp · D.S. 10/2013 · autoclaves de esterilización (equipos a presión)"
       ]
+    },
+    "FARMACIA HOSPITALIZADOS": {
+      "p": [
+        "fa_funcionamiento__i-senaleticas",
+        "fa_funcionamiento__ii-oficina-quimico-farmaceutico",
+        "fa_funcionamiento__iii-condiciones-de-almacenamiento-de-med",
+        "fa_funcionamiento__iv-condiciones-sanitarias-y-ambientales-",
+        "fa_funcionamiento__v-reglamentos-y-material-de-consulta-pub",
+        "fa_funcionamiento__vi-ley-de-farmacos",
+        "fa_funcionamiento__viia-listado-de-precios-caracteristicas",
+        "fa_funcionamiento__viib-listado-de-precios-requisitos-art-4",
+        "fa_instalacion__ii-requerimientos-minimos-del-local-dest",
+        "fa_instalacion__iii-condiciones-sanitarias-y-ambientales"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "farmacia · Checklist Farmacia ISP · farmacia de establecimiento asistencial"
+      ]
+    },
+    "FARMACIA RECETARIO MAGISTRAL IV": {
+      "p": [
+        "fa_funcionamiento__i-senaleticas",
+        "fa_funcionamiento__ii-oficina-quimico-farmaceutico",
+        "fa_funcionamiento__iii-condiciones-de-almacenamiento-de-med",
+        "fa_funcionamiento__iv-condiciones-sanitarias-y-ambientales-",
+        "fa_funcionamiento__v-reglamentos-y-material-de-consulta-pub",
+        "fa_funcionamiento__vi-ley-de-farmacos",
+        "fa_funcionamiento__viia-listado-de-precios-caracteristicas",
+        "fa_funcionamiento__viib-listado-de-precios-requisitos-art-4",
+        "fa_instalacion__ii-requerimientos-minimos-del-local-dest",
+        "fa_instalacion__iii-condiciones-sanitarias-y-ambientales",
+        "cz_mezclas__org__ngt25"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "farmacia · Checklist Farmacia ISP · recetario magistral",
+        "cz · NGT 25 · central de mezclas, preparación de antineoplásicos"
+      ]
+    },
+    "DROGUERIA": {
+      "p": [
+        "dr_drogueria__org__titulo-iii"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "dr · D.S. 466/84 Título III · área DROGUERIA propia en el Atlas desde sep-2026"
+      ]
+    },
+    "FARMACIA CERRADA": {
+      "p": [
+        "fa_funcionamiento__i-senaleticas",
+        "fa_funcionamiento__ii-oficina-quimico-farmaceutico",
+        "fa_funcionamiento__iii-condiciones-de-almacenamiento-de-med",
+        "fa_funcionamiento__iv-condiciones-sanitarias-y-ambientales-",
+        "fa_funcionamiento__v-reglamentos-y-material-de-consulta-pub",
+        "fa_funcionamiento__vi-ley-de-farmacos",
+        "fa_funcionamiento__viia-listado-de-precios-caracteristicas",
+        "fa_funcionamiento__viib-listado-de-precios-requisitos-art-4",
+        "fa_instalacion__ii-requerimientos-minimos-del-local-dest",
+        "fa_instalacion__iii-condiciones-sanitarias-y-ambientales",
+        "dr_drogueria__org__titulo-iii"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "farmacia · Checklist Farmacia ISP · farmacia de establecimiento asistencial",
+        "dr · D.S. 466/84 Título III · droguería / almacén de medicamentos"
+      ]
+    },
+    "FARMACIA MAGISTRAL": {
+      "p": [
+        "fa_funcionamiento__i-senaleticas",
+        "fa_funcionamiento__ii-oficina-quimico-farmaceutico",
+        "fa_funcionamiento__iii-condiciones-de-almacenamiento-de-med",
+        "fa_funcionamiento__iv-condiciones-sanitarias-y-ambientales-",
+        "fa_funcionamiento__v-reglamentos-y-material-de-consulta-pub",
+        "fa_funcionamiento__vi-ley-de-farmacos",
+        "fa_funcionamiento__viia-listado-de-precios-caracteristicas",
+        "fa_funcionamiento__viib-listado-de-precios-requisitos-art-4",
+        "fa_instalacion__ii-requerimientos-minimos-del-local-dest",
+        "fa_instalacion__iii-condiciones-sanitarias-y-ambientales",
+        "cz_mezclas__org__ngt25"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "farmacia · Checklist Farmacia ISP · recetario magistral",
+        "cz · NGT 25 · central de mezclas, preparación de antineoplásicos"
+      ]
+    },
+    "REAS": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · el Atlas (sep-2026) declara el área REAS propia: la sala de residuos del establecimiento es el dueño natural de la norma"
+      ]
     }
   },
   "brechas_fase2": [
     {
       "item": "re · D.S. 6/2009 REAS",
-      "motivo": "Sin servicio dueño en Atlas vista 1. Es una norma de ESTABLECIMIENTO (manejo de residuos de todo el hospital). Requiere decidir si se aplica una sola vez a nivel hospital o por servicio generador."
+      "motivo": "RESUELTO sep-2026: el Atlas declaró el área REAS y la norma se sembró ahí. Queda a validación de las referentes en la Revisión."
     },
     {
       "item": "cp · D.S. 10/2013 calderas",
@@ -4484,8 +4780,8 @@ window.SHARED_PAUTAS_RECINTOS = {
       "motivo": "Unidad de Trasplante/Tejido Ocular: 1 recinto, sin norma específica digitalizada en la plataforma. No se siembra para no asignar una pauta que no corresponde."
     },
     {
-      "item": "UHI · UIH · Hospitalización Medicina Sur",
-      "motivo": "0 recintos dentro de su polígono de Atlas vista 1: la pauta de recinto no tiene dónde apoyarse. Corregir el área en Atlas antes de sembrar."
+      "item": "Hospitalización Medicina Sur",
+      "motivo": "El área existe en Atlas vista 1 pero con 0 cajas dibujadas (2 cáscaras vacías en P3): la resolución de permisos por polígono no tiene dónde apoyarse. 19 de sus 68 recintos ya tienen pauta Fase 1 por nombre. Dibujar el área en Atlas para completar."
     },
     {
       "item": "ARCHIVOS · AUDITORIOS · ADMINISTRACION · DIRECCION · JEFES MEDICOS · RRHH",
