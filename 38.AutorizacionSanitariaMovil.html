@@ -135,6 +135,10 @@ main{max-width:1100px;margin:0 auto;padding:14px}
 .valpa{font-size:13.5px;font-weight:600;margin:3px 0 2px}
 .valfu{font-size:11.5px;color:var(--tx2);line-height:1.4;background:#f5f7fb;border-radius:8px;padding:6px 9px;margin-top:4px}
 .valfu.sinf{background:#fff4e6;color:#8a5a12}
+.reglist{margin-top:8px;border-top:1px solid #edf1f7;max-height:300px;overflow:auto}
+.regrow{display:flex;align-items:center;gap:6px;padding:6px 2px;border-bottom:1px solid #f2f5f9;font-size:12.5px}
+.regrow.fuera{opacity:.55;text-decoration:line-through}
+.regrow.fuera .hint{text-decoration:none}
 .asg-sep{font-size:11px;font-weight:800;color:var(--tx2);text-transform:uppercase;letter-spacing:.04em;
   padding:12px 2px 5px;position:sticky;top:0;background:#fff}
 .item.ajena{opacity:.62}.item.ajena .tt b{font-weight:600}
@@ -1728,6 +1732,89 @@ function valComentario(clave,txt){
   if(!txt)delete datos.c;
   guardarCrudo(claveVal(clave),it.svc,it.rid,it.amb,datos,datos.v?100:0);
 }
+/* ── validación de las 653 pautas de recinto: POR REGLA ──────────────────
+   La Fase 1 (junio) asignó pauta a 653 recintos con 23 reglas de nombre
+   ("hospitalización" → módulo básico, "box consulta" → sala con examen…).
+   Nadie revisa 653 filas: se valida la REGLA completa — una decisión cierra
+   hasta 189 recintos — y las excepciones se marcan recinto a recinto.
+   ──────────────────────────────────────────────────────────────────────── */
+const NOM_REGLA={hospitalizacion:'Hospitalización — módulo básico',box_consulta:'Box de consulta — sala con examen',
+ sala_procedimientos:'Salas de procedimientos',uti:'UTI',uci:'UCI',rehabilitacion:'Rehabilitación — sala básica',
+ estacion_enfermeria:'Estaciones de enfermería',quirofano:'Quirófanos',trabajo_sucio:'Trabajo sucio',
+ trabajo_limpio:'Trabajo limpio',aseo_chatas:'Aseo de chatas',proc_odonto:'Procedimientos odontológicos',
+ box_urgencia:'Box de urgencia',box_urgencia_proc:'Box de urgencia — procedimientos',
+ farmacia_general:'Farmacia — local',farmacia_almacen:'Farmacia — almacén',img_examen:'Imagenología — sala de examen',
+ img_scanner:'Scanner',img_angiografia:'Angiografía',toma_muestras:'Toma de muestras',dialisis:'Diálisis — puestos',
+ cirugia_menor:'Pabellón de cirugía menor',esterilizacion_general:'Esterilización',manual:'Validadas a mano'};
+function grupoReglas(){
+  const g={};
+  Object.entries(D.asign).forEach(([rid,ambs])=>{
+    const rg=(D.asign_regla||{})[rid]||'?'; if(rg==='manual')return;
+    const e=g[rg]=g[rg]||{regla:rg,recintos:[],ambs:new Set()};
+    e.recintos.push(rid); ambs.forEach(a=>e.ambs.add(a));
+  });
+  return Object.values(g).map(e=>({...e,ambs:[...e.ambs]}))
+    .sort((a,b)=>b.recintos.length-a.recintos.length);
+}
+const claveRegla=rg=>'val|regla|'+rg;
+function validarRegla(rg,v){
+  const prev=(EST[claveRegla(rg)]||{}).datos||{};
+  const datos={...prev,v,por:SES.correo,ts:new Date().toISOString()};
+  if(v===prev.v)delete datos.v;
+  guardarCrudo(claveRegla(rg),'__REGLAS__','',rg,datos,datos.v?100:0);
+  pintaValidacion();
+}
+let _REGLA_ABIERTA=null;
+function abreRegla(rg){ _REGLA_ABIERTA=_REGLA_ABIERTA===rg?null:rg; pintaValidacion(); }
+function excepcionRecinto(rid,amb,rnom){
+  const cl='rec|'+rid+'|'+amb;
+  const prev=(EST['val|'+cl]||{}).datos||{};
+  const quitar=prev.v==='no';
+  const datos={...prev,v:quitar?undefined:'no',por:SES.correo,ts:new Date().toISOString()};
+  if(quitar)delete datos.v;
+  guardarCrudo('val|'+cl,'',rid,amb,datos,datos.v?100:0);
+  toast(quitar?'Excepción retirada.':'Marcado: esta pauta no corresponde en '+(rnom||rid)+'.');
+  pintaValidacion();
+}
+function seccionReglas(puede){
+  const gs=grupoReglas();
+  const nomR={}; D.pisos.forEach(p=>(D.recintos[p]||[]).forEach(r=>nomR[r[0]]=[r[2]||r[0],r[1]||'',r[9]||r[3]||'',p]));
+  const ok=gs.filter(g=>((EST[claveRegla(g.regla)]||{}).datos||{}).v==='ok').length;
+  const filas=gs.map(g=>{
+    const e=(EST[claveRegla(g.regla)]||{}).datos||{}, v=e.v||'';
+    const aNom=g.ambs.map(a=>{const x=ambitoDe(a);return x?nomAmbito(x.name)+' ('+x.normaNombre.split(' · ')[0]+')':a;});
+    const abierta=_REGLA_ABIERTA===g.regla;
+    const exc=g.recintos.filter(rid=>g.ambs.some(a=>_borrada('rec|'+rid+'|'+a))).length;
+    return `<div class="valit ${v}">
+      <div class="valhd">
+        <div style="flex:1"><b>${esc(NOM_REGLA[g.regla]||g.regla)}</b>
+          <span class="hint">· ${g.recintos.length} recintos${exc?' · '+exc+' excepción'+(exc>1?'es':''):''}</span></div>
+        ${v?`<span class="pill" style="background:${v==='ok'?'#dcfce7':'#fee2e2'};color:${v==='ok'?'#15803d':'#b91c1c'}">${v==='ok'?'✔ validada':'✘ no corresponde'}</span>`:''}
+      </div>
+      <div class="valpa" style="font-weight:400;font-size:12.5px">${esc(aNom.join(' · '))}</div>
+      ${puede?`<div class="est3" style="margin-top:7px">
+        <button class="c ${v==='ok'?'on':''}" onclick="validarRegla('${g.regla}','ok')">✔ CORRECTA</button>
+        <button class="nc ${v==='no'?'on':''}" onclick="validarRegla('${g.regla}','no')">✘ NO CORRESPONDE</button>
+        <button class="na" onclick="abreRegla('${g.regla}')">${abierta?'Cerrar':'Ver recintos'}</button>
+      </div>`:''}
+      ${e.por?`<div class="hint" style="margin-top:4px">Revisada por ${esc((e.por||'').split('@')[0])} · ${e.ts?new Date(e.ts).toLocaleDateString('es-CL'):''}</div>`:''}
+      ${abierta?`<div class="reglist">${g.recintos.map(rid=>{
+        const [nm,cod,svc,pz]=nomR[rid]||[rid,'','',''];
+        const fuera=g.ambs.some(a=>_borrada('rec|'+rid+'|'+a));
+        return `<div class="regrow ${fuera?'fuera':''}">
+          <span style="flex:1">${esc(nm)} <span class="hint">· ${esc(cod)} · ${esc(svc)} · ${esc(pz)}</span></span>
+          ${puede?`<button onclick='excepcionRecinto(${JSON.stringify(rid)},${JSON.stringify(g.ambs[0])},${JSON.stringify(nm)})'
+            style="color:${fuera?'#15803d':'#b91c1c'};padding:2px 8px;font-size:11.5px">${fuera?'↩ reponer':'✘ no aquí'}</button>`:''}
+        </div>`;}).join('')}</div>`:''}
+    </div>`;
+  }).join('');
+  return {html:`<div class="card"><h2>Reglas de recinto <span class="pill" style="background:#e8eef8;color:#1D2D5B">${gs.length}</span></h2>
+    <div class="hint" style="margin-bottom:6px">La Fase 1 asignó pauta a ${Object.keys(D.asign).length} recintos con estas
+    reglas de nombre. Validar la regla cierra todos sus recintos de una vez; si en alguno puntual no
+    corresponde, abrilo con «Ver recintos» y marcá «✘ no aquí».</div>
+    ${filas}</div>`, total:gs.length, ok};
+}
+
 let _QV='', _FV='pendientes';
 function filtraVal(q){ _QV=q||''; pintaValidacion(); }
 function modoVal(m){ _FV=m; pintaValidacion(); }
@@ -1737,9 +1824,10 @@ function pintaValidacion(){
   $('hTit').textContent='Revisión de pautas';
   $('hSub').textContent='Catherine Sepúlveda · Meylin Canales — validación de lo asignado';
   const est=x=>(valEstado(x.clave)||{}).v||'';
-  const ok=todas.filter(x=>est(x)==='ok').length;
+  const _r=seccionReglas(false);
+  const ok=todas.filter(x=>est(x)==='ok').length+_r.ok;
   const no=todas.filter(x=>est(x)==='no').length;
-  const pend=todas.length-ok-no;
+  const pend=todas.length+_r.total-ok-no;
   const manual=todas.filter(x=>x.origen==='manual');
   let lista=todas;
   if(_FV==='pendientes')lista=todas.filter(x=>!est(x));
@@ -1795,6 +1883,7 @@ function pintaValidacion(){
       <input placeholder="Buscar servicio, norma o pauta…" oninput="filtraVal(this.value)" value="${esc(_QV)}">
       ${puede?'':'<div class="card aviso" style="margin-top:9px">Solo Catherine, Meylin y Matías pueden validar. Podés mirar lo revisado.</div>'}
     </div>
+    ${_FV==='pendientes'||_FV==='todas'?seccionReglas(puede).html:''}
     <div class="card">${filas||'<div class="hint">Nada que mostrar con ese filtro.</div>'}</div>
     ${lista.length>300?`<div class="hint" style="text-align:center">Se muestran 300 de ${lista.length}. Usá el buscador.</div>`:''}`;
 }
@@ -2023,6 +2112,24 @@ async function selftest(){
       const dsp=pautasDeSvc(svq.n).includes(amb);
       delete EST['val|'+cl];
       return antes && !dsp;})());
+
+    /* 8d · la validación por regla cubre toda la Fase 1 */
+    await intenta('las reglas de recinto agrupan las 653 pautas',()=>{
+      const gs=grupoReglas();
+      const n=gs.reduce((a,g)=>a+g.recintos.length,0);
+      const manuales=Object.values(D.asign_regla||{}).filter(x=>x==='manual').length;
+      if(n+manuales!==Object.keys(D.asign).length)
+        throw new Error(n+'+'+manuales+' ≠ '+Object.keys(D.asign).length);
+      return gs.length+' reglas · '+n+' recintos';});
+    chk('marcar una excepción saca solo ese recinto',(()=>{
+      const g=grupoReglas()[0]; if(!g)return true;
+      const rid=g.recintos[0], amb=g.ambs[0], cl='rec|'+rid+'|'+amb;
+      EST['val|'+cl]={datos:{v:'no'},avance:100,ts:new Date().toISOString()};
+      const fuera=!pautasDeRec(rid).includes(amb);
+      const otro=g.recintos[1];
+      const otroOk=!otro||pautasDeRec(otro).includes(amb)||!(D.asign[otro]||[]).includes(amb);
+      delete EST['val|'+cl];
+      return fuera&&otroOk;})());
 
     /* 9 · la firma y la evidencia no inflan el avance */
     if(svP){
