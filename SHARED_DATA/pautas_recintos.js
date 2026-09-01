@@ -2,7 +2,7 @@
 // BORRADOR Fase 1 · asignación automática por tipo de recinto — pendiente validación
 // Consumir con: window.SHARED_PAUTAS_RECINTOS · asignaciones[recintoId] = {p:[ambitoIds], regla}
 window.SHARED_PAUTAS_RECINTOS = {
-  "version": "2026-06-05 · Fase 1 borrador para validación · fase2 2026-09-01 (0 ámbitos de servicio)",
+  "version": "2026-06-05 · Fase 1 borrador para validación · fase2 2026-09-01 (41 ámbitos de servicio)",
   "fuente": "SHARED_DATA/recintos.js (2228 recintos) × normas AC/CM/FA/DI",
   "total_recintos": 2359,
   "total_asignados": 693,
@@ -4256,11 +4256,13 @@ window.SHARED_PAUTAS_RECINTOS = {
         "lc_salas-toma-muestras__art25",
         "lc_salas-toma-muestras__art26",
         "lc_salas-toma-muestras__art27",
-        "lc_salas-toma-muestras__art28"
+        "lc_salas-toma-muestras__art28",
+        "re_reas__org__reglamento"
       ],
       "regla": "fase2",
       "fund": [
-        "laboratorio · D.S. 20/2011 · autorización del laboratorio clínico como unidad"
+        "laboratorio · D.S. 20/2011 · autorización del laboratorio clínico como unidad",
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
       ]
     },
     "ANATOMIA PATOLOGICA": {
@@ -4292,11 +4294,13 @@ window.SHARED_PAUTAS_RECINTOS = {
         "lc_salas-toma-muestras__art25",
         "lc_salas-toma-muestras__art26",
         "lc_salas-toma-muestras__art27",
-        "lc_salas-toma-muestras__art28"
+        "lc_salas-toma-muestras__art28",
+        "re_reas__org__reglamento"
       ],
       "regla": "fase2",
       "fund": [
-        "laboratorio · D.S. 20/2011 art.1 · el laboratorio de anatomía patológica queda comprendido"
+        "laboratorio · D.S. 20/2011 art.1 · el laboratorio de anatomía patológica queda comprendido",
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
       ]
     },
     "UMT": {
@@ -4328,11 +4332,13 @@ window.SHARED_PAUTAS_RECINTOS = {
         "lc_salas-toma-muestras__art25",
         "lc_salas-toma-muestras__art26",
         "lc_salas-toma-muestras__art27",
-        "lc_salas-toma-muestras__art28"
+        "lc_salas-toma-muestras__art28",
+        "re_reas__org__reglamento"
       ],
       "regla": "fase2",
       "fund": [
-        "laboratorio · D.S. 20/2011 · medicina transfusional se autoriza como laboratorio"
+        "laboratorio · D.S. 20/2011 · medicina transfusional se autoriza como laboratorio",
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
       ]
     },
     "PROCEDIMIENTOS UMT": {
@@ -4341,11 +4347,13 @@ window.SHARED_PAUTAS_RECINTOS = {
         "lc_salas-toma-muestras__art25",
         "lc_salas-toma-muestras__art26",
         "lc_salas-toma-muestras__art27",
-        "lc_salas-toma-muestras__art28"
+        "lc_salas-toma-muestras__art28",
+        "re_reas__org__reglamento"
       ],
       "regla": "fase2",
       "fund": [
-        "laboratorio · D.S. 20/2011 arts. 24-28 · sala de toma de muestras"
+        "laboratorio · D.S. 20/2011 arts. 24-28 · sala de toma de muestras",
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
       ]
     },
     "TOMA DE MUESTRA": {
@@ -4354,11 +4362,13 @@ window.SHARED_PAUTAS_RECINTOS = {
         "lc_salas-toma-muestras__art25",
         "lc_salas-toma-muestras__art26",
         "lc_salas-toma-muestras__art27",
-        "lc_salas-toma-muestras__art28"
+        "lc_salas-toma-muestras__art28",
+        "re_reas__org__reglamento"
       ],
       "regla": "fase2",
       "fund": [
-        "laboratorio · D.S. 20/2011 arts. 24-28 · sala externa de toma de muestras"
+        "laboratorio · D.S. 20/2011 arts. 24-28 · sala externa de toma de muestras",
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
       ]
     },
     "IMAGENOLOGIA": {
@@ -4380,11 +4390,13 @@ window.SHARED_PAUTAS_RECINTOS = {
         "im_personal__art16",
         "im_personal__art17",
         "im_personal__art18",
-        "im_personal__art19"
+        "im_personal__art19",
+        "re_reas__org__reglamento"
       ],
       "regla": "fase2",
       "fund": [
-        "imagenologia · D.S. 133/1984 · instalación radiactiva de 2ª categoría y personal expuesto"
+        "imagenologia · D.S. 133/1984 · instalación radiactiva de 2ª categoría y personal expuesto",
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
       ]
     },
     "MED NUCLEAR": {
@@ -4425,12 +4437,14 @@ window.SHARED_PAUTAS_RECINTOS = {
         "mn_control-calidad__sec5_2_5",
         "mn_control-calidad__sec5_2_6",
         "mn_personal__sec6_1",
-        "mn_personal__sec6_2"
+        "mn_personal__sec6_2",
+        "re_reas__org__reglamento"
       ],
       "regla": "fase2",
       "fund": [
         "imagenologia · D.S. 133/1984 · instalación radiactiva de 1ª categoría",
-        "medicina_nuclear · NT 223 / D.E. 48/2022 · norma técnica específica de medicina nuclear"
+        "medicina_nuclear · NT 223 / D.E. 48/2022 · norma técnica específica de medicina nuclear",
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
       ]
     },
     "QUIMIO AMBULATORIA": {
@@ -4438,11 +4452,13 @@ window.SHARED_PAUTAS_RECINTOS = {
         "qmt_revision-documental__main",
         "qmt_organizacion__main",
         "qmt_rrhh__main",
-        "qmt_infraestructura__main"
+        "qmt_infraestructura__main",
+        "re_reas__org__reglamento"
       ],
       "regla": "fase2",
       "fund": [
-        "quimioterapia · D. Afecto 74/2015 · pauta AS de quimioterapia oncológica"
+        "quimioterapia · D. Afecto 74/2015 · pauta AS de quimioterapia oncológica",
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
       ]
     },
     "HOSP PSIQUIATRIA": {
@@ -4522,11 +4538,13 @@ window.SHARED_PAUTAS_RECINTOS = {
         "hp_uhcip-instalaciones__red-humeda-seca",
         "hp_uhcip-instalaciones__extintores",
         "hp_uhcip-instalaciones__aguas-lluvias",
-        "hp_uhcip-instalaciones__quincalleria"
+        "hp_uhcip-instalaciones__quincalleria",
+        "re_reas__org__reglamento"
       ],
       "regla": "fase2",
       "fund": [
-        "hospitalizacion_psiquiatrica · D. 9/2024 · hospitalización psiquiátrica, norma completa (incluye UHCIP)"
+        "hospitalizacion_psiquiatrica · D. 9/2024 · hospitalización psiquiátrica, norma completa (incluye UHCIP)",
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
       ]
     },
     "PSIQUIATRIA": {
@@ -4571,11 +4589,13 @@ window.SHARED_PAUTAS_RECINTOS = {
         "hp_ninos-adolescentes__art83",
         "hp_ninos-adolescentes__art84",
         "hp_comunicacion__art95",
-        "hp_comunicacion__art96__header"
+        "hp_comunicacion__art96__header",
+        "re_reas__org__reglamento"
       ],
       "regla": "fase2",
       "fund": [
-        "hospitalizacion_psiquiatrica · D. 9/2024 · unidad ambulatoria: establecimiento, derechos y notificaciones (sin el capítulo de infraestructura UHCIP)"
+        "hospitalizacion_psiquiatrica · D. 9/2024 · unidad ambulatoria: establecimiento, derechos y notificaciones (sin el capítulo de infraestructura UHCIP)",
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
       ]
     },
     "FARMACIA ABIERTA": {
@@ -4589,11 +4609,13 @@ window.SHARED_PAUTAS_RECINTOS = {
         "fa_funcionamiento__viia-listado-de-precios-caracteristicas",
         "fa_funcionamiento__viib-listado-de-precios-requisitos-art-4",
         "fa_instalacion__ii-requerimientos-minimos-del-local-dest",
-        "fa_instalacion__iii-condiciones-sanitarias-y-ambientales"
+        "fa_instalacion__iii-condiciones-sanitarias-y-ambientales",
+        "re_reas__org__reglamento"
       ],
       "regla": "fase2",
       "fund": [
-        "farmacia · Checklist Farmacia ISP · farmacia de atención directa a público"
+        "farmacia · Checklist Farmacia ISP · farmacia de atención directa a público",
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
       ]
     },
     "DIALISIS": {
@@ -4635,11 +4657,13 @@ window.SHARED_PAUTAS_RECINTOS = {
         "di_equipamiento__art37",
         "di_registros__art38",
         "di_registros__art39",
-        "di_registros__art40"
+        "di_registros__art40",
+        "re_reas__org__reglamento"
       ],
       "regla": "fase2",
       "fund": [
-        "dialisis · D. 45/2016 · centro de diálisis, norma completa"
+        "dialisis · D. 45/2016 · centro de diálisis, norma completa",
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
       ]
     },
     "CASINO GENERAL": {
@@ -4662,11 +4686,13 @@ window.SHARED_PAUTAS_RECINTOS = {
     },
     "ESTERILIZACION": {
       "p": [
-        "cp_calderas__equ__reglamento"
+        "cp_calderas__equ__reglamento",
+        "re_reas__org__reglamento"
       ],
       "regla": "fase2",
       "fund": [
-        "cp · D.S. 10/2013 · autoclaves de esterilización (equipos a presión)"
+        "cp · D.S. 10/2013 · autoclaves de esterilización (equipos a presión)",
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
       ]
     },
     "FARMACIA HOSPITALIZADOS": {
@@ -4680,11 +4706,13 @@ window.SHARED_PAUTAS_RECINTOS = {
         "fa_funcionamiento__viia-listado-de-precios-caracteristicas",
         "fa_funcionamiento__viib-listado-de-precios-requisitos-art-4",
         "fa_instalacion__ii-requerimientos-minimos-del-local-dest",
-        "fa_instalacion__iii-condiciones-sanitarias-y-ambientales"
+        "fa_instalacion__iii-condiciones-sanitarias-y-ambientales",
+        "re_reas__org__reglamento"
       ],
       "regla": "fase2",
       "fund": [
-        "farmacia · Checklist Farmacia ISP · farmacia de establecimiento asistencial"
+        "farmacia · Checklist Farmacia ISP · farmacia de establecimiento asistencial",
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
       ]
     },
     "FARMACIA RECETARIO MAGISTRAL IV": {
@@ -4699,21 +4727,25 @@ window.SHARED_PAUTAS_RECINTOS = {
         "fa_funcionamiento__viib-listado-de-precios-requisitos-art-4",
         "fa_instalacion__ii-requerimientos-minimos-del-local-dest",
         "fa_instalacion__iii-condiciones-sanitarias-y-ambientales",
-        "cz_mezclas__org__ngt25"
+        "cz_mezclas__org__ngt25",
+        "re_reas__org__reglamento"
       ],
       "regla": "fase2",
       "fund": [
         "farmacia · Checklist Farmacia ISP · recetario magistral",
-        "cz · NGT 25 · central de mezclas, preparación de antineoplásicos"
+        "cz · NGT 25 · central de mezclas, preparación de antineoplásicos",
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
       ]
     },
     "DROGUERIA": {
       "p": [
-        "dr_drogueria__org__titulo-iii"
+        "dr_drogueria__org__titulo-iii",
+        "re_reas__org__reglamento"
       ],
       "regla": "fase2",
       "fund": [
-        "dr · D.S. 466/84 Título III · área DROGUERIA propia en el Atlas desde sep-2026"
+        "dr · D.S. 466/84 Título III · área DROGUERIA propia en el Atlas desde sep-2026",
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
       ]
     },
     "REAS": {
@@ -4723,6 +4755,231 @@ window.SHARED_PAUTAS_RECINTOS = {
       "regla": "fase2",
       "fund": [
         "re · D.S. 6/2009 · el Atlas (sep-2026) declara el área REAS propia: la sala de residuos del establecimiento es el dueño natural de la norma"
+      ]
+    },
+    "ALIVIO DEL DOLOR": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "ATENCION USUARIO": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "CARDIOLOGIA": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "CONSULTAS ESPECIALIDADES QUIRURGICAS": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "CONSULTAS PROCEDIMIENTO QUIRURGICOS": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "CONSULTAS Y PROCEDIMIENTOS ESPECIALIDADES MEDICAS": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "DERMATOLOGIA": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "EMERGENCIA": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "ENDOSCOPIA": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "HOSPITALIZACION MQ 3": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "HOSPITALIZACION MQ 4": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "INFECTOLOGIA": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "MED FISICA Y REHABILITACION": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "NEUROLOGIA": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "ODONTOLOGIA": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "OFTALMOLOGIA": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "OIRS": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "OTORRINOLARINGOLOGIA": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "PABELLONES": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "PROCURAMIENTO": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "TRASPLANTES": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "UCI": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "UHI": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "UIH": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
+      ]
+    },
+    "UTI": {
+      "p": [
+        "re_reas__org__reglamento"
+      ],
+      "regla": "fase2",
+      "fund": [
+        "re · D.S. 6/2009 · REAS de la unidad generadora: lo presenta el responsable del servicio"
       ]
     }
   },

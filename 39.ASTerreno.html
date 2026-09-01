@@ -71,6 +71,12 @@ button,input,select,textarea{font-family:inherit}
 .bim-ok{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:17px;height:17px;line-height:15px;text-align:center;border-radius:5px;background:#dcfce7;border:1px solid #059669;color:#065f46;font-size:11px;font-weight:800;cursor:pointer}
 .bim-ok:hover{background:#059669;color:#fff}
 .bim-x:hover{background:#dc2626;color:#fff}
+.bim-no{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:17px;height:17px;line-height:15px;text-align:center;border-radius:5px;background:#f1f5f9;border:1px solid #64748b;color:#475569;font-size:10px;font-weight:800;cursor:pointer}
+.bim-no:hover{background:#475569;color:#fff}
+.bim-row.has-xx{padding-right:46px}
+.bim-desc{display:block;width:100%;background:#f8fafc;border:1px dashed #94a3b8;border-radius:7px;padding:4px 7px 4px 26px;text-align:left;margin-bottom:1px;position:relative;opacity:.8}
+.bim-undo{position:absolute;left:5px;top:50%;transform:translateY(-50%);width:17px;height:17px;line-height:15px;text-align:center;border-radius:5px;background:#e0f2fe;border:1px solid #0369a1;color:#0369a1;font-size:11px;font-weight:800;cursor:pointer}
+.bim-undo:hover{background:#0369a1;color:#fff}
 .bim-nm{font-size:11px;font-weight:600;color:#1a3a5c;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .bim-sub{font-size:9px;color:#48687e;display:block;margin-top:1px}
 .wp-row{display:flex;justify-content:space-between;padding:2px 4px;border-radius:5px;transition:background .12s}
@@ -1783,6 +1789,8 @@ if(!nameState.bimMultiRev) nameState.bimMultiRev={}; // multi-BIM revisados (pes
 if(!nameState.bimRepRev) nameState.bimRepRev={};     // BIM repetidos revisados: guarda el valor BIM al revisar
 if(!nameState.repartoRev) nameState.repartoRev={};   // repartos EMMC desparejos revisados (firma por código)
 if(!nameState.comisionRev) nameState.comisionRev={};  // coincidencias comisión de servicio revisadas (por RUT)
+if(!nameState.revDesc) nameState.revDesc={};          // sugerencias de Revisión rechazadas ("queda como está"), clave check|item
+if(!nameState.corrDesc) nameState.corrDesc={};        // correcciones de ortografía/códigos descartadas de forma permanente
 if(!nameState.pabellon) nameState.pabellon={};       // tipo de pabellón: 'mayor' | 'menor'
 if(!nameState.procKind) nameState.procKind={};       // sala procedimiento: 'generica' | 'dedicada' ('' = auto)
 if(!nameState.labtoma) nameState.labtoma={};         // laboratorio: nº de puestos de toma
@@ -8052,6 +8060,7 @@ function _nomCambios(){
   const out=[];
   FLOORS.forEach(fl=>fl.areas.forEach(a=>(a.rooms||[]).forEach(r=>{
     const act=nameState.rooms[r.id]; if(!act) return;
+    if(nameState.corrDesc['nom|'+act]) return;         // descartada: queda como está
     const nue=_nomNormalizado(act);
     if(nue && nue!==act) out.push({id:r.id, de:act, a:nue, fl:fl.label, area:aName(a.id)});
   })));
@@ -8090,6 +8099,7 @@ function _codCambios(){
   for(const rid in (boxState.rooms||{})){
     const c=String((nameState.codes||{})[rid]||'').trim();
     if(!c || !_codSospechoso(c)) continue;
+    if(nameState.corrDesc['cod|'+rid+'|'+c]) continue;  // descartada: queda como está
     let arreglo=null;
     for(const cand of _codCandidatos(c)){ const d=_codExiste(cand); if(d){ arreglo={a:cand, donde:d}; break; } }
     const fila={id:rid, de:c, n:rName(rid)||'(sin nombre)'};
@@ -8109,15 +8119,42 @@ function revisarCodigos(){
     +'<span style="color:#b91c1c;text-decoration:line-through;font-family:ui-monospace,monospace">'+esc(x.de)+'</span>'
     +(ok?('<span style="color:#94a3b8">→</span><b style="color:#15803d;font-family:ui-monospace,monospace">'+esc(x.a)+'</b>'
           +'<span style="font-size:10px;color:#64748b">existe en '+x.donde+'</span>'):'')
-    +'<span style="flex:1"></span><span style="color:#64748b;font-size:11px">'+esc(x.n)+'</span></div>';
+    +'<span style="flex:1"></span><span style="color:#64748b;font-size:11px">'+esc(x.n)+'</span>'
+    +(ok?('<span onclick="codAceptarUno(\''+encodeURIComponent(x.id)+'\')" title="Aceptar SOLO esta corrección" style="width:20px;height:20px;line-height:19px;text-align:center;border-radius:5px;background:#dcfce7;border:1px solid #059669;color:#065f46;font-weight:800;cursor:pointer;flex-shrink:0">✓</span>'):'')
+    +'<span onclick="codDescartar(\''+encodeURIComponent(x.id)+'\')" title="Descartar de forma permanente: este código queda como está y no se vuelve a proponer" style="width:20px;height:20px;line-height:19px;text-align:center;border-radius:5px;background:#f1f5f9;border:1px solid #64748b;color:#475569;font-weight:800;cursor:pointer;flex-shrink:0;font-size:10px">🚫</span>'
+    +'</div>';
   let H='';
   if(seguros.length) H+='<div style="font-size:11px;font-weight:800;color:#15803d;margin:4px 0 6px">✔ Se corrigen (el código corregido existe)</div>'+seguros.map(x=>fila(x,true)).join('');
   if(dudosos.length) H+='<div style="font-size:11px;font-weight:800;color:#b45309;margin:14px 0 6px">⚠ No se tocan: no hay un código válido equivalente</div>'
     +dudosos.map(x=>fila(x,false)).join('')
     +'<div style="font-size:11px;color:#64748b;margin-top:8px">Hay que definirlos con el PMA. Corregirlos a ojo le asignaría a estos recintos el equipamiento de otro.</div>';
+  const nDesc=Object.keys(nameState.corrDesc).filter(k=>k.startsWith('cod|')).length;
+  if(nDesc) H+='<div style="margin-top:12px;padding:7px;border:1px dashed #94a3b8;border-radius:7px;background:#f8fafc;font-size:11px;color:#475569;display:flex;align-items:center;gap:8px">🚫 '+nDesc+(nDesc===1?' código descartado':' códigos descartados')+' de forma permanente (quedan como están)<span style="flex:1"></span><span onclick="corrRestaurar(\'cod\')" style="color:#0369a1;font-weight:800;cursor:pointer;text-decoration:underline">restaurar</span></div>';
   document.getElementById('codBody').innerHTML = H ||
     '<div style="padding:22px;text-align:center;color:#15803d;font-size:13px;font-weight:700">✅ Nada que corregir.</div>';
   document.getElementById('codModal').style.display='flex';
+}
+// Aceptar SOLO una corrección de código (el resto queda para decidir una a una).
+function codAceptarUno(ridEnc){
+  const rid=decodeURIComponent(ridEnc);
+  const x=_codCambios().seguros.find(s=>s.id===rid); if(!x) return;
+  nameState.codes[rid]=x.a; _codeBoxIndex=null;
+  sNames(); flushAutosave(); renderSVG(); renderSidebar(); updateUI();
+  revisarCodigos();
+}
+// Descartar de forma permanente: el código queda como está y no se vuelve a
+// proponer (clave recinto+texto: si el código cambia a mano, se re-evalúa).
+function codDescartar(ridEnc){
+  const rid=decodeURIComponent(ridEnc);
+  const c=String((nameState.codes||{})[rid]||'').trim(); if(!c) return;
+  nameState.corrDesc['cod|'+rid+'|'+c]={ts:Date.now()};
+  sNames(); flushAutosave();
+  revisarCodigos();
+}
+function corrRestaurar(pref){
+  for(const k of Object.keys(nameState.corrDesc)) if(k.startsWith(pref+'|')) delete nameState.corrDesc[k];
+  sNames(); flushAutosave();
+  if(pref==='cod') revisarCodigos(); else revisarNombres();
 }
 function aplicarCodigos(){
   const {seguros}=_codCambios(); if(!seguros.length) return;
@@ -8146,8 +8183,13 @@ function revisarNombres(){
           +'<span style="color:#b91c1c;text-decoration:line-through">'+esc(de)+'</span>'
           +'<span style="color:#94a3b8">→</span>'
           +'<b style="color:#15803d;flex:1">'+esc(a)+'</b>'
-          +'<span style="color:#64748b;font-size:11px">'+v.length+(v.length===1?' recinto':' recintos')+'</span></div>';
+          +'<span style="color:#64748b;font-size:11px">'+v.length+(v.length===1?' recinto':' recintos')+'</span>'
+          +'<span onclick="nomAceptarGrupo(\''+encodeURIComponent(de)+'\')" title="Aceptar SOLO esta corrección (en sus '+v.length+' recinto'+(v.length===1?'':'s')+')" style="width:20px;height:20px;line-height:19px;text-align:center;border-radius:5px;background:#dcfce7;border:1px solid #059669;color:#065f46;font-weight:800;cursor:pointer;flex-shrink:0">✓</span>'
+          +'<span onclick="nomDescartar(\''+encodeURIComponent(de)+'\')" title="Descartar de forma permanente: este nombre queda como está y no se vuelve a proponer" style="width:20px;height:20px;line-height:19px;text-align:center;border-radius:5px;background:#f1f5f9;border:1px solid #64748b;color:#475569;font-weight:800;cursor:pointer;flex-shrink:0;font-size:10px">🚫</span>'
+          +'</div>';
       }).join('')
+      +(function(){ const n=Object.keys(nameState.corrDesc).filter(k=>k.startsWith('nom|')).length;
+        return n?'<div style="margin-top:12px;padding:7px;border:1px dashed #94a3b8;border-radius:7px;background:#f8fafc;font-size:11px;color:#475569;display:flex;align-items:center;gap:8px">🚫 '+n+(n===1?' nombre descartado':' nombres descartados')+' de forma permanente (quedan como están)<span style="flex:1"></span><span onclick="corrRestaurar(\'nom\')" style="color:#0369a1;font-weight:800;cursor:pointer;text-decoration:underline">restaurar</span></div>':''; })()
     : '<div style="padding:22px;text-align:center;color:#15803d;font-size:13px;font-weight:700">✅ Nada que corregir.</div>';
   document.getElementById('nomModal').style.display='flex';
 }
@@ -8162,6 +8204,20 @@ function aplicarNombres(){
   }
 }
 function cerrarNombres(){ document.getElementById('nomModal').style.display='none'; }
+// Aceptar SOLO un grupo de ortografía (mismo texto original en N recintos).
+function nomAceptarGrupo(deEnc){
+  const de=decodeURIComponent(deEnc);
+  const cam=_nomCambios().filter(c=>c.de===de); if(!cam.length) return;
+  cam.forEach(c=>{ nameState.rooms[c.id]=c.a; });
+  sNames(); flushAutosave(); renderSVG(); renderSidebar(); updateUI();
+  revisarNombres();
+}
+function nomDescartar(deEnc){
+  const de=decodeURIComponent(deEnc);
+  nameState.corrDesc['nom|'+de]={ts:Date.now()};
+  sNames(); flushAutosave();
+  revisarNombres();
+}
 // ═══ WS MODAL ═══════════════════════════════════════════════════════════════
 let mCtx={roomId:null,idx:null};
 function openModal(roomId,idx){
@@ -8835,7 +8891,15 @@ const REV_CHECKS={
     subText:p=>'BIM '+rBim(p.r.id),
     done:'No quedan recintos multi-BIM por revisar (baños excluidos).'}
 };
-function _revPend(check){
+// Clave estable de una sugerencia (para poder rechazarla y que no vuelva):
+// prioriza el identificador natural de cada chequeo (RUT, código, recinto).
+function _revKey(check,p){
+  const id = p.rut || p.code
+    || (p.r && p.r.id && (p.r.id + (p.idx!=null?('#'+p.idx):'') + (p.repBim?('#'+p.repBim):'')))
+    || p.repBim || p.title || '';
+  return check+'|'+id;
+}
+function _revRaw(check){
   if(REV_CHECKS[check].find) return REV_CHECKS[check].find();
   const T=REV_CHECKS[check].test, out=[];
   FLOORS.forEach(fl=>fl.areas.forEach(a=>(a.rooms||[]).forEach(r=>{
@@ -8844,6 +8908,29 @@ function _revPend(check){
   })));
   return out;
 }
+// Pendientes = crudos MENOS los rechazados ("queda como está"). Las filas
+// informativas (noNav) no se pueden rechazar y siempre se muestran.
+function _revPend(check){
+  return _revRaw(check).filter(p=>p.noNav || !nameState.revDesc[_revKey(check,p)]);
+}
+function _revDescartadas(check){
+  return _revRaw(check).filter(p=>!p.noNav && nameState.revDesc[_revKey(check,p)]);
+}
+// Rechazar una sugerencia: este caso queda como está. Sale de la lista y del
+// contador, pero se puede restaurar desde el pie "descartadas" de la pestaña.
+function revReject(i){
+  const p=(document.getElementById('bimList')._pend||[])[i]; if(!p||S.viewOnly) return;
+  nameState.revDesc[_revKey(_revCheck,p)]={c:_revCheck,ts:Date.now()};
+  sNames(); flushAutosave(); renderBimPending();
+  if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🚫 Sugerencia rechazada — queda como está (restaurable al pie de la pestaña)'; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},3600); }
+}
+function revRestore(keyEnc){
+  if(S.viewOnly) return;
+  delete nameState.revDesc[decodeURIComponent(keyEnc)];
+  sNames(); flushAutosave(); renderBimPending();
+}
+let _revShowDesc=false;
+function revToggleDesc(){ _revShowDesc=!_revShowDesc; renderBimPending(); }
 function revSetCheck(c){ _revCheck=c; renderBimPending(); }
 // Eliminar un recinto desde la pestaña Revisión (independiente de la vista actual).
 function revDeleteRoom(rid){
@@ -8894,15 +8981,30 @@ function renderBimPending(){
         html+= gOf ? '<div class="bim-fl">'+esc(g)+'</div>'
                    : '<div class="bim-fl">'+esc(p.fl.label)+' · '+pend.filter(x=>x.fl.id===g).length+'</div>'; }
     }
+    const noBtn=(!S.viewOnly)
+      ?'<span class="bim-no" title="Rechazar la sugerencia: este caso queda como está. Sale de la lista y del contador; se puede restaurar desde «descartadas» al pie." onclick="event.stopPropagation();revReject('+i+')">🚫</span>':'';
+    const off2=noBtn?'style="right:26px"':'';
     const xBtn=(REV_CHECKS[_revCheck].del&&!S.viewOnly)
-      ?'<span class="bim-x" title="Eliminar este recinto duplicado" onclick="event.stopPropagation();revDeleteRoom(\''+p.r.id+'\')">✕</span>':'';
+      ?'<span class="bim-x" '+off2+' title="Eliminar este recinto duplicado" onclick="event.stopPropagation();revDeleteRoom(\''+p.r.id+'\')">✕</span>':'';
     const okBtn=(REV_CHECKS[_revCheck].approve&&!S.viewOnly)
-      ?'<span class="bim-ok" title="'+(REV_CHECKS[_revCheck].okTitle||'Aprobar: escribir el BIM oficial')+'" onclick="event.stopPropagation();revApprove('+i+')">✓</span>':'';
-    html+='<button class="bim-row'+((xBtn||okBtn)?' has-x':'')+'" onclick="bimGo('+i+')">'+xBtn+okBtn
+      ?'<span class="bim-ok" '+off2+' title="'+(REV_CHECKS[_revCheck].okTitle||'Aceptar: aplicar el cambio propuesto')+'" onclick="event.stopPropagation();revApprove('+i+')">✓</span>':'';
+    html+='<button class="bim-row'+((xBtn||okBtn)&&noBtn?' has-xx':((xBtn||okBtn||noBtn)?' has-x':''))+'" onclick="bimGo('+i+')">'+xBtn+okBtn+noBtn
       +'<span class="bim-nm">'+esc(p.nombre||(p.r&&(rName(p.r.id)||p.r.id))||'')+(p.nombre&&p.r?(' <span style=\'color:#7d97ad;font-weight:400\'>· '+esc(rName(p.r.id)||'')+'</span>'):'')+'</span>'
       +'<span class="bim-sub">'+esc([REV_CHECKS[_revCheck].subText(p), p.area?aName(p.area.id):''].filter(Boolean).join(' · '))+'</span>'
       +'</button>';
   });
+  // ── Pie: sugerencias rechazadas de este chequeo (restaurables) ──
+  const desc=_revDescartadas(_revCheck);
+  if(desc.length){
+    html+='<button onclick="revToggleDesc()" style="width:100%;margin-top:6px;background:#f1f5f9;border:1px dashed #94a3b8;color:#475569;border-radius:7px;padding:5px;font-size:10px;font-weight:800;cursor:pointer">🚫 '+desc.length+' descartada'+(desc.length===1?'':'s')+' — queda'+(desc.length===1?'':'n')+' como está'+(desc.length===1?'':'n')+' · '+(_revShowDesc?'ocultar':'ver')+'</button>';
+    if(_revShowDesc) desc.forEach(p=>{
+      const k=encodeURIComponent(_revKey(_revCheck,p));
+      html+='<div class="bim-desc">'
+        +(!S.viewOnly?('<span class="bim-undo" title="Restaurar la sugerencia a la lista" onclick="revRestore(\''+k+'\')">↩</span>'):'')
+        +'<span class="bim-nm">'+esc(p.nombre||(p.r&&(rName(p.r.id)||p.r.id))||'')+'</span>'
+        +'<span class="bim-sub">'+esc(REV_CHECKS[_revCheck].subText(p))+'</span></div>';
+    });
+  }
   box.innerHTML=html;
   box._pend=pend;
 }
@@ -10181,6 +10283,35 @@ async function runSelfTest(){
   T('Navegación L1→L2→L3', ()=>{ didPan=false; goFloor(fl.id); didPan=false; goArea('st_a'); didPan=false; goRoom('st_r1'); return S.level===3; });
   await sleep(60);
   T('Vista 3: dots renderizados', ()=>svg.querySelectorAll('.ws-dot').length===3);
+  T('Correcciones: descartar es permanente y restaurable', ()=>{
+    const prevCod=nameState.codes['st_r2'], prevNom=nameState.rooms['st_r2'];
+    nameState.codes['st_r2']='15.2.3.'; _codeBoxIndex=null;      // punto final → sospechoso
+    nameState.rooms['st_r2']='Recinto Prueba Á';                  // tilde → corrección
+    const c0=_codCambios(), t0=c0.seguros.length+c0.dudosos.length;
+    const enCod=[...c0.seguros,...c0.dudosos].some(x=>x.id==='st_r2');
+    const enNom=_nomCambios().some(x=>x.id==='st_r2');
+    nameState.corrDesc['cod|st_r2|15.2.3.']={ts:1};
+    nameState.corrDesc['nom|Recinto Prueba Á']={ts:1};
+    const c1=_codCambios(), t1=c1.seguros.length+c1.dudosos.length;
+    const fueraCod=t1===t0-1 && ![...c1.seguros,...c1.dudosos].some(x=>x.id==='st_r2');
+    const fueraNom=!_nomCambios().some(x=>x.id==='st_r2');
+    delete nameState.corrDesc['cod|st_r2|15.2.3.'];
+    delete nameState.corrDesc['nom|Recinto Prueba Á'];
+    const volvio=[..._codCambios().seguros,..._codCambios().dudosos].some(x=>x.id==='st_r2');
+    if(prevCod===undefined) delete nameState.codes['st_r2']; else nameState.codes['st_r2']=prevCod;
+    if(prevNom===undefined) delete nameState.rooms['st_r2']; else nameState.rooms['st_r2']=prevNom;
+    _codeBoxIndex=null;
+    return enCod && enNom && fueraCod && fueraNom && volvio;
+  });
+  T('Revisión: rechazar saca del contador y restaurar la devuelve', ()=>{
+    const antes=_revPend('sinbim').length;
+    const item=_revPend('sinbim').find(p=>p.r&&p.r.id==='st_r1'); if(!item) return false;
+    const k=_revKey('sinbim',item);
+    nameState.revDesc[k]={c:'sinbim',ts:Date.now()};
+    const menos=_revPend('sinbim').length===antes-1 && _revDescartadas('sinbim').length>=1;
+    delete nameState.revDesc[k];
+    return menos && _revPend('sinbim').length===antes;
+  });
   T('Duplicar mueble: estampa, se mueve y se elimina', ()=>{
     stampState['st_r1']=[{sx:100,sy:100,w:200,h:150,x:400,y:300}];
     renderSVG();
@@ -10578,7 +10709,10 @@ function nomAmbito(t){
   const letras=t.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ]/g,'');
   if(!letras) return t;
   const may=(letras.match(/[A-ZÁÉÍÓÚÜÑ]/g)||[]).length/letras.length;
-  return may>0.8 ? t.toLowerCase().replace(/^\w/,c=>c.toUpperCase()) : t;
+  if(may<=0.8) return t;
+  // las siglas se quedan en mayúscula ("Reglamento REAS", no "Reglamento reas")
+  const SIGLAS=/^(REAS|UHCIP|UCI|UTI|ISP|PET|CT|SPECT|TAC|RM|NGT|RSA|BIM|PMA|TI|EMMC|MNC|HDS)$/i;
+  return t.toLowerCase().replace(/^\w/,c=>c.toUpperCase()).replace(/\b([a-záéíóú]+)\b/g,w=>SIGLAS.test(w)?w.toUpperCase():w);
 }
 function pautasDeSvc(svc){
   const k0=String(svc||'').toUpperCase();
@@ -11733,7 +11867,11 @@ const NOM_REGLA={hospitalizacion:'Hospitalización — módulo básico',box_cons
  box_urgencia:'Box de urgencia',box_urgencia_proc:'Box de urgencia — procedimientos',
  farmacia_general:'Farmacia — local',farmacia_almacen:'Farmacia — almacén',img_examen:'Imagenología — sala de examen',
  img_scanner:'Scanner',img_angiografia:'Angiografía',toma_muestras:'Toma de muestras',dialisis:'Diálisis — puestos',
- cirugia_menor:'Pabellón de cirugía menor',esterilizacion_general:'Esterilización',manual:'Validadas a mano'};
+ cirugia_menor:'Pabellón de cirugía menor',esterilizacion_general:'Esterilización',manual:'Validadas a mano',
+ tipo_habitacion:'Por tipo del Atlas · habitación → módulo básico de hospitalización',
+ tipo_box:'Por tipo del Atlas · box → sala de consulta con examen',
+ tipo_proced:'Por tipo del Atlas · sala de procedimiento → sala de procedimientos',
+ tipo_pabellon:'Por tipo del Atlas · pabellón → quirófano'};
 function grupoReglas(){
   const g={};
   Object.entries(D.asign).forEach(([rid,ambs])=>{

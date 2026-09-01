@@ -1547,6 +1547,7 @@ if(!nameState.bimRepRev) nameState.bimRepRev={};     // BIM repetidos revisados:
 if(!nameState.repartoRev) nameState.repartoRev={};   // repartos EMMC desparejos revisados (firma por código)
 if(!nameState.comisionRev) nameState.comisionRev={};  // coincidencias comisión de servicio revisadas (por RUT)
 if(!nameState.revDesc) nameState.revDesc={};          // sugerencias de Revisión rechazadas ("queda como está"), clave check|item
+if(!nameState.corrDesc) nameState.corrDesc={};        // correcciones de ortografía/códigos descartadas de forma permanente
 if(!nameState.pabellon) nameState.pabellon={};       // tipo de pabellón: 'mayor' | 'menor'
 if(!nameState.procKind) nameState.procKind={};       // sala procedimiento: 'generica' | 'dedicada' ('' = auto)
 if(!nameState.labtoma) nameState.labtoma={};         // laboratorio: nº de puestos de toma
@@ -7811,6 +7812,7 @@ function _nomCambios(){
   const out=[];
   FLOORS.forEach(fl=>fl.areas.forEach(a=>(a.rooms||[]).forEach(r=>{
     const act=nameState.rooms[r.id]; if(!act) return;
+    if(nameState.corrDesc['nom|'+act]) return;         // descartada: queda como está
     const nue=_nomNormalizado(act);
     if(nue && nue!==act) out.push({id:r.id, de:act, a:nue, fl:fl.label, area:aName(a.id)});
   })));
@@ -7849,6 +7851,7 @@ function _codCambios(){
   for(const rid in (boxState.rooms||{})){
     const c=String((nameState.codes||{})[rid]||'').trim();
     if(!c || !_codSospechoso(c)) continue;
+    if(nameState.corrDesc['cod|'+rid+'|'+c]) continue;  // descartada: queda como está
     let arreglo=null;
     for(const cand of _codCandidatos(c)){ const d=_codExiste(cand); if(d){ arreglo={a:cand, donde:d}; break; } }
     const fila={id:rid, de:c, n:rName(rid)||'(sin nombre)'};
@@ -7868,15 +7871,42 @@ function revisarCodigos(){
     +'<span style="color:#b91c1c;text-decoration:line-through;font-family:ui-monospace,monospace">'+esc(x.de)+'</span>'
     +(ok?('<span style="color:#94a3b8">→</span><b style="color:#15803d;font-family:ui-monospace,monospace">'+esc(x.a)+'</b>'
           +'<span style="font-size:10px;color:#64748b">existe en '+x.donde+'</span>'):'')
-    +'<span style="flex:1"></span><span style="color:#64748b;font-size:11px">'+esc(x.n)+'</span></div>';
+    +'<span style="flex:1"></span><span style="color:#64748b;font-size:11px">'+esc(x.n)+'</span>'
+    +(ok?('<span onclick="codAceptarUno(\''+encodeURIComponent(x.id)+'\')" title="Aceptar SOLO esta corrección" style="width:20px;height:20px;line-height:19px;text-align:center;border-radius:5px;background:#dcfce7;border:1px solid #059669;color:#065f46;font-weight:800;cursor:pointer;flex-shrink:0">✓</span>'):'')
+    +'<span onclick="codDescartar(\''+encodeURIComponent(x.id)+'\')" title="Descartar de forma permanente: este código queda como está y no se vuelve a proponer" style="width:20px;height:20px;line-height:19px;text-align:center;border-radius:5px;background:#f1f5f9;border:1px solid #64748b;color:#475569;font-weight:800;cursor:pointer;flex-shrink:0;font-size:10px">🚫</span>'
+    +'</div>';
   let H='';
   if(seguros.length) H+='<div style="font-size:11px;font-weight:800;color:#15803d;margin:4px 0 6px">✔ Se corrigen (el código corregido existe)</div>'+seguros.map(x=>fila(x,true)).join('');
   if(dudosos.length) H+='<div style="font-size:11px;font-weight:800;color:#b45309;margin:14px 0 6px">⚠ No se tocan: no hay un código válido equivalente</div>'
     +dudosos.map(x=>fila(x,false)).join('')
     +'<div style="font-size:11px;color:#64748b;margin-top:8px">Hay que definirlos con el PMA. Corregirlos a ojo le asignaría a estos recintos el equipamiento de otro.</div>';
+  const nDesc=Object.keys(nameState.corrDesc).filter(k=>k.startsWith('cod|')).length;
+  if(nDesc) H+='<div style="margin-top:12px;padding:7px;border:1px dashed #94a3b8;border-radius:7px;background:#f8fafc;font-size:11px;color:#475569;display:flex;align-items:center;gap:8px">🚫 '+nDesc+(nDesc===1?' código descartado':' códigos descartados')+' de forma permanente (quedan como están)<span style="flex:1"></span><span onclick="corrRestaurar(\'cod\')" style="color:#0369a1;font-weight:800;cursor:pointer;text-decoration:underline">restaurar</span></div>';
   document.getElementById('codBody').innerHTML = H ||
     '<div style="padding:22px;text-align:center;color:#15803d;font-size:13px;font-weight:700">✅ Nada que corregir.</div>';
   document.getElementById('codModal').style.display='flex';
+}
+// Aceptar SOLO una corrección de código (el resto queda para decidir una a una).
+function codAceptarUno(ridEnc){
+  const rid=decodeURIComponent(ridEnc);
+  const x=_codCambios().seguros.find(s=>s.id===rid); if(!x) return;
+  nameState.codes[rid]=x.a; _codeBoxIndex=null;
+  sNames(); flushAutosave(); renderSVG(); renderSidebar(); updateUI();
+  revisarCodigos();
+}
+// Descartar de forma permanente: el código queda como está y no se vuelve a
+// proponer (clave recinto+texto: si el código cambia a mano, se re-evalúa).
+function codDescartar(ridEnc){
+  const rid=decodeURIComponent(ridEnc);
+  const c=String((nameState.codes||{})[rid]||'').trim(); if(!c) return;
+  nameState.corrDesc['cod|'+rid+'|'+c]={ts:Date.now()};
+  sNames(); flushAutosave();
+  revisarCodigos();
+}
+function corrRestaurar(pref){
+  for(const k of Object.keys(nameState.corrDesc)) if(k.startsWith(pref+'|')) delete nameState.corrDesc[k];
+  sNames(); flushAutosave();
+  if(pref==='cod') revisarCodigos(); else revisarNombres();
 }
 function aplicarCodigos(){
   const {seguros}=_codCambios(); if(!seguros.length) return;
@@ -7905,8 +7935,13 @@ function revisarNombres(){
           +'<span style="color:#b91c1c;text-decoration:line-through">'+esc(de)+'</span>'
           +'<span style="color:#94a3b8">→</span>'
           +'<b style="color:#15803d;flex:1">'+esc(a)+'</b>'
-          +'<span style="color:#64748b;font-size:11px">'+v.length+(v.length===1?' recinto':' recintos')+'</span></div>';
+          +'<span style="color:#64748b;font-size:11px">'+v.length+(v.length===1?' recinto':' recintos')+'</span>'
+          +'<span onclick="nomAceptarGrupo(\''+encodeURIComponent(de)+'\')" title="Aceptar SOLO esta corrección (en sus '+v.length+' recinto'+(v.length===1?'':'s')+')" style="width:20px;height:20px;line-height:19px;text-align:center;border-radius:5px;background:#dcfce7;border:1px solid #059669;color:#065f46;font-weight:800;cursor:pointer;flex-shrink:0">✓</span>'
+          +'<span onclick="nomDescartar(\''+encodeURIComponent(de)+'\')" title="Descartar de forma permanente: este nombre queda como está y no se vuelve a proponer" style="width:20px;height:20px;line-height:19px;text-align:center;border-radius:5px;background:#f1f5f9;border:1px solid #64748b;color:#475569;font-weight:800;cursor:pointer;flex-shrink:0;font-size:10px">🚫</span>'
+          +'</div>';
       }).join('')
+      +(function(){ const n=Object.keys(nameState.corrDesc).filter(k=>k.startsWith('nom|')).length;
+        return n?'<div style="margin-top:12px;padding:7px;border:1px dashed #94a3b8;border-radius:7px;background:#f8fafc;font-size:11px;color:#475569;display:flex;align-items:center;gap:8px">🚫 '+n+(n===1?' nombre descartado':' nombres descartados')+' de forma permanente (quedan como están)<span style="flex:1"></span><span onclick="corrRestaurar(\'nom\')" style="color:#0369a1;font-weight:800;cursor:pointer;text-decoration:underline">restaurar</span></div>':''; })()
     : '<div style="padding:22px;text-align:center;color:#15803d;font-size:13px;font-weight:700">✅ Nada que corregir.</div>';
   document.getElementById('nomModal').style.display='flex';
 }
@@ -7921,6 +7956,20 @@ function aplicarNombres(){
   }
 }
 function cerrarNombres(){ document.getElementById('nomModal').style.display='none'; }
+// Aceptar SOLO un grupo de ortografía (mismo texto original en N recintos).
+function nomAceptarGrupo(deEnc){
+  const de=decodeURIComponent(deEnc);
+  const cam=_nomCambios().filter(c=>c.de===de); if(!cam.length) return;
+  cam.forEach(c=>{ nameState.rooms[c.id]=c.a; });
+  sNames(); flushAutosave(); renderSVG(); renderSidebar(); updateUI();
+  revisarNombres();
+}
+function nomDescartar(deEnc){
+  const de=decodeURIComponent(deEnc);
+  nameState.corrDesc['nom|'+de]={ts:Date.now()};
+  sNames(); flushAutosave();
+  revisarNombres();
+}
 // ═══ WS MODAL ═══════════════════════════════════════════════════════════════
 let mCtx={roomId:null,idx:null};
 function openModal(roomId,idx){
@@ -9984,6 +10033,26 @@ async function runSelfTest(){
   T('Navegación L1→L2→L3', ()=>{ didPan=false; goFloor(fl.id); didPan=false; goArea('st_a'); didPan=false; goRoom('st_r1'); return S.level===3; });
   await sleep(60);
   T('Vista 3: dots renderizados', ()=>svg.querySelectorAll('.ws-dot').length===3);
+  T('Correcciones: descartar es permanente y restaurable', ()=>{
+    const prevCod=nameState.codes['st_r2'], prevNom=nameState.rooms['st_r2'];
+    nameState.codes['st_r2']='15.2.3.'; _codeBoxIndex=null;      // punto final → sospechoso
+    nameState.rooms['st_r2']='Recinto Prueba Á';                  // tilde → corrección
+    const c0=_codCambios(), t0=c0.seguros.length+c0.dudosos.length;
+    const enCod=[...c0.seguros,...c0.dudosos].some(x=>x.id==='st_r2');
+    const enNom=_nomCambios().some(x=>x.id==='st_r2');
+    nameState.corrDesc['cod|st_r2|15.2.3.']={ts:1};
+    nameState.corrDesc['nom|Recinto Prueba Á']={ts:1};
+    const c1=_codCambios(), t1=c1.seguros.length+c1.dudosos.length;
+    const fueraCod=t1===t0-1 && ![...c1.seguros,...c1.dudosos].some(x=>x.id==='st_r2');
+    const fueraNom=!_nomCambios().some(x=>x.id==='st_r2');
+    delete nameState.corrDesc['cod|st_r2|15.2.3.'];
+    delete nameState.corrDesc['nom|Recinto Prueba Á'];
+    const volvio=[..._codCambios().seguros,..._codCambios().dudosos].some(x=>x.id==='st_r2');
+    if(prevCod===undefined) delete nameState.codes['st_r2']; else nameState.codes['st_r2']=prevCod;
+    if(prevNom===undefined) delete nameState.rooms['st_r2']; else nameState.rooms['st_r2']=prevNom;
+    _codeBoxIndex=null;
+    return enCod && enNom && fueraCod && fueraNom && volvio;
+  });
   T('Revisión: rechazar saca del contador y restaurar la devuelve', ()=>{
     const antes=_revPend('sinbim').length;
     const item=_revPend('sinbim').find(p=>p.r&&p.r.id==='st_r1'); if(!item) return false;
