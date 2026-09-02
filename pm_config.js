@@ -74,7 +74,11 @@ window.PM_CONFIG = {
     // Metropolitano Oriente (contraparte SSMO, externa al HDS)
     'fcid':       '1340e5ed85a653630ad8c28347e40a92759d5d4108762eaa7dbb5eddc2858dce',
     // Karen González · Ingeniera Biomédica del proyecto — SSMO (externa al HDS)
-    'kgonzalez':  'd51f341099fadc6a8b4f83e85c147da279f2f56d267bb5593520299d1a2053e1'
+    'kgonzalez':  'd51f341099fadc6a8b4f83e85c147da279f2f56d267bb5593520299d1a2053e1',
+    // Pablo Silva Pereira · Encargado EMMC de la Asesoría a la Inspección Fiscal
+    // (AIF · MOP) — psilva@cydingenieria.cl. Contraparte de FISCALIZACIÓN,
+    // externa al HDS y al SSMO.
+    'psilva':     'fffc0cb70c2ea2847b29f4f3f8febb34a6f813d99b87dcbdc5fc992f7ca19fac'
   }
 };
 
