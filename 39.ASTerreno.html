@@ -1018,6 +1018,13 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <div class="stats" id="statsGlobal"></div>
       <div class="hint" id="fuenteNota"></div>
     </div>
+    <div class="card no-print"><h2>Drive de Autorización Sanitaria</h2>
+      <div class="hint" style="margin-bottom:8px">Los informes se archivan solos al llegar al 100 %: carpeta por servicio y por recinto.</div>
+      <div class="row" style="flex-wrap:wrap;gap:7px">
+        <a class="btn sec" href="https://drive.google.com/drive/folders/1eks9a8WNZLTOr0uibXzpNYw5DNaDMO7t" target="_blank" rel="noopener" style="text-decoration:none;flex:1">📁 Drive de las pautas</a>
+        <a class="btn sec" href="https://drive.google.com/drive/folders/1Uf4yrlSsfnIGtsFmm6mHUDk63_29-p56" target="_blank" rel="noopener" style="text-decoration:none;flex:1">📄 Informes por servicio</a>
+      </div>
+    </div>
     <div id="mantenimiento"></div>
     <button class="btn sec no-print" onclick="salir()" style="max-width:220px;margin:4px auto">Cerrar sesión</button>
   </section>
@@ -3325,12 +3332,29 @@ const AREA_TONES = [
 // SERVICIOS CONCESIONADOS: único tono CÁLIDO + borde segmentado. Al ser el
 // único cálido de la paleta se reconocen de un vistazo entre los clínicos.
 const AREA_TONE_CONC = {fill:'rgba(217,119,6,.20)', stroke:'#b45309', dash:'30 14'};
+// LOCALES COMERCIALES (parte de la concesión): fucsia con borde segmentado —
+// el segundo tono cálido reservado de la paleta, distinguible de un vistazo
+// tanto de los servicios clínicos (fríos) como del ámbar concesionado.
+const AREA_TONE_LOCAL = {fill:'rgba(219,39,119,.18)', stroke:'#be185d', dash:'16 10'};
+const LOCAL_PAT=/local(es)?\s*comercial|kiosco|quiosco|cajero|banco|peluquer|barber|tienda|minimarket|m[aá]quinas?\s*(expendedora|de\s*caf[eé])|fotocopiado|cafeter[ií]a\s*comercial/i;
 const CONC_PAT=/\(\s*sc\s*\)|casino|alimentac|aseo\b|lavander|roper[ií]a|seguridad|vigilanc|estacionam|residuo|\breas\b|cafeter|jard[ií]n infantil|sala cuna|mantenci[oó]n|mantenimiento/i;
 // Marca de concesionado: override explícito del usuario > heurística por nombre.
 function esConcesionado(areaId){
   const f=(nameState.conc||{})[areaId];
   if(f!==undefined) return !!f;
-  return CONC_PAT.test(aName(areaId)||'');
+  // Los locales comerciales son parte de los servicios concesionados.
+  return CONC_PAT.test(aName(areaId)||'') || esLocalComercial(areaId);
+}
+// Marca de LOCAL COMERCIAL: override explícito > heurística por nombre.
+function esLocalComercial(areaId){
+  const f=(nameState.localCom||{})[areaId];
+  if(f!==undefined) return !!f;
+  return LOCAL_PAT.test(aName(areaId)||'');
+}
+function setLocalComercial(areaId,val,nombre){
+  if(!nameState.localCom) nameState.localCom={};
+  const auto=LOCAL_PAT.test(nombre||aName(areaId)||'');
+  if(!!val===auto) delete nameState.localCom[areaId]; else nameState.localCom[areaId]=val?1:0;
 }
 function setConcesionado(areaId,val,nombre){
   if(!nameState.conc) nameState.conc={};
@@ -3726,8 +3750,11 @@ function renderSVG(){
   if(S.level===1) renderL1(fl);
   else if(S.level===2) renderL2();
   else { renderL3(); _stampLayer(); }
-  // Capa de Estructura (ascensores, escaleras, circulaciones) — solo en vista 1
-  if(S.level===1) paintStructures();
+  // Capa de Estructura (ascensores, escaleras, circulaciones): visible en
+  // TODAS las vistas como punto de referencia de la circulación del edificio;
+  // interactiva solo en vista 1 (en 2 y 3 no captura clics, para no tapar
+  // recintos ni puestos).
+  paintStructures();
   // Overlay de diagnóstico DXF (siempre encima de todo, no interactivo)
   if(_dxfOverlayOn && S.level<=2) paintDxfOverlay();
 }
@@ -3744,7 +3771,8 @@ function renderL1(fl){
     const sh=aShapes(area), sel=S.selIds.has(area.id);
     const cls='area-box'+(sel?' sel':'');
     const conc=esConcesionado(area.id);
-    const t=conc?AREA_TONE_CONC:AREA_TONES[(CM[area.id]!==undefined?CM[area.id]:aIdx)%AREA_TONES.length];
+    const loc=esLocalComercial(area.id);
+    const t=loc?AREA_TONE_LOCAL:(conc?AREA_TONE_CONC:AREA_TONES[(CM[area.id]!==undefined?CM[area.id]:aIdx)%AREA_TONES.length]);
     const stl=`fill:${t.fill};stroke:${t.stroke};stroke-width:4`+(t.dash?`;stroke-dasharray:${t.dash}`:'');
     // 2026-05-21 · Comportamiento clic en modo edición:
     //   • Clic simple → abre directamente el modal de info del área
@@ -3802,9 +3830,9 @@ function renderL1(fl){
     const cx=b.x+b.w/2, cy=b.y+b.h/2;
     // El nombre se arma en updateAreaLabelSizes(): ahí se sabe el tamaño real
     // en pantalla y se decide si cabe en una línea o hay que partirlo en dos.
-    const lblTxt=(conc?'🏢 ':'')+aName(area.id);
+    const lblTxt=(loc?'🛍 ':conc?'🏢 ':'')+aName(area.id);
     const lbl=el('text',{x:cx,y:cy-fs*.78,'text-anchor':'middle','dominant-baseline':'middle',
-      class:'area-label','font-size':fs,'pointer-events':'none',...(conc?{fill:'#7c2d12'}:{})});
+      class:'area-label','font-size':fs,'pointer-events':'none',...(loc?{fill:'#9d174d'}:conc?{fill:'#7c2d12'}:{})});
     const sub=txt(cx,cy+fs*.30,window.AS_TERRENO?ws.txt1:(ws.total+(ws.total===1?' puesto':' puestos')),{class:'area-sub','font-size':fs*.55,'pointer-events':'none'});
     let sub2;
     if(window.AS_TERRENO){
@@ -5023,7 +5051,8 @@ function deleteStruct(id){
 function paintStructures(){
   const items = structsOf(S.floorId);
   if(!items.length && !_structLine) return;
-  const g = el('g', {class:'structures-layer'});
+  const g = el('g', {class:'structures-layer',
+    ...(S.level>1?{'pointer-events':'none'}:{})});
   // Renderizar todos los elementos persistidos
   items.forEach(it => {
     const tdef = STRUCT_TYPES[it.kind]; if(!tdef) return;
@@ -5417,7 +5446,7 @@ function editBoxName(){
 
   // Marca de SERVICIO CONCESIONADO (solo áreas): la vista general los pinta
   // en el tono cálido para diferenciarlos de los servicios del hospital.
-  let concChk=null;
+  let concChk=null, locChk=null;
   if(isArea){
     const cw=document.createElement('label');
     cw.style.cssText='display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#92400e;cursor:pointer;';
@@ -5426,6 +5455,15 @@ function editBoxName(){
     concChk.style.cssText='width:auto;margin:0';
     cw.append(concChk, document.createTextNode('🏢 Servicio concesionado'));
     box.append(cw);
+    const lw=document.createElement('label');
+    lw.style.cssText='display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#9d174d;cursor:pointer;';
+    locChk=document.createElement('input');
+    locChk.type='checkbox'; locChk.checked=esLocalComercial(id);
+    locChk.style.cssText='width:auto;margin:0';
+    lw.append(locChk, document.createTextNode('🛍 Local comercial (concesión) — tono fucsia en vista 1'));
+    box.append(lw);
+    // marcar local comercial implica concesionado
+    locChk.addEventListener('change',()=>{ if(locChk.checked) concChk.checked=true; });
   }
 
   // ── Barra superior para tomar y desplazar el cuadro ────────────────────────
@@ -5706,6 +5744,7 @@ function editBoxName(){
     const v=inp.value.trim();
     const codVal=codeInp?codeInp.value.trim():'';
     if(isArea && concChk) setConcesionado(id, concChk.checked, v);
+    if(isArea && locChk)  setLocalComercial(id, locChk.checked, v);
     // FIX: antes TODO el guardado colgaba de `if(v)`, así que en un recinto
     // SIN NOMBRE no se guardaba nada —ni tipo, ni código, ni BIM, ni
     // señalética— y el cuadro se cerraba como si hubiera guardado. El nombre
@@ -10282,6 +10321,30 @@ async function runSelfTest(){
   T('Navegación L1→L2→L3', ()=>{ didPan=false; goFloor(fl.id); didPan=false; goArea('st_a'); didPan=false; goRoom('st_r1'); return S.level===3; });
   await sleep(60);
   T('Vista 3: dots renderizados', ()=>svg.querySelectorAll('.ws-dot').length===3);
+  T('Estructuras: visibles en vista 2 y 3 sin capturar clics', ()=>{
+    structuresState[fl.id]=[{id:'st_s1',kind:'stair',x:1500,y:900}];
+    renderSVG();                                      // estamos en vista 3
+    const g3=svg.querySelector('.structures-layer');
+    const ok3=!!g3 && g3.getAttribute('pointer-events')==='none' && !!g3.querySelector('.struct-marker');
+    const nivel=S.level;
+    S.level=2; renderSVG();
+    const g2=svg.querySelector('.structures-layer');
+    const ok2=!!g2 && g2.getAttribute('pointer-events')==='none';
+    S.level=nivel; delete structuresState[fl.id]; renderSVG();
+    return ok3 && ok2;
+  });
+  T('Local comercial: heurística, override y prioridad de tono', ()=>{
+    const a=fl.areas[0], prev=nameState.areas[a.id];
+    nameState.areas[a.id]='Local Comercial 1';
+    const auto=esLocalComercial(a.id) && esConcesionado(a.id);
+    setLocalComercial(a.id,false);                     // override apaga
+    const off=!esLocalComercial(a.id);
+    setLocalComercial(a.id,true,'Local Comercial 1');  // vuelve al auto (borra override)
+    const on=esLocalComercial(a.id) && !(nameState.localCom||{})[a.id+'_x'];
+    if(prev===undefined) delete nameState.areas[a.id]; else nameState.areas[a.id]=prev;
+    delete (nameState.localCom||{})[a.id];
+    return auto && off && on;
+  });
   T('Correcciones: descartar es permanente y restaurable', ()=>{
     const prevCod=nameState.codes['st_r2'], prevNom=nameState.rooms['st_r2'];
     nameState.codes['st_r2']='15.2.3.'; _codeBoxIndex=null;      // punto final → sospechoso
@@ -10526,6 +10589,10 @@ const PUBLIC_BUILD = true; /*__PUBLIC_FLAG__*/
 // (el control de acceso real es por correo contra el backend; el flag solo
 //  distingue la copia publicada de la local)
 const D=window.AS_MOVIL, URLC=(window.AS_CENTRAL||{}).url||'';
+// Carpetas del Drive de Autorización Sanitaria (las mismas del Apps Script)
+const AS_DRIVE='https://drive.google.com/drive/folders/1eks9a8WNZLTOr0uibXzpNYw5DNaDMO7t';           // Autorizacion Sanitaria NHDS
+const AS_DRIVE_INF='https://drive.google.com/drive/folders/1Uf4yrlSsfnIGtsFmm6mHUDk63_29-p56';       // 01 · Informes por Servicio
+const btnDrive=(url,txt)=>`<a class="btn sec" href="${url}" target="_blank" rel="noopener" style="text-decoration:none">📁 ${txt}</a>`;
 const $=id=>document.getElementById(id);
 const toast=m=>{const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._x);t._x=setTimeout(()=>t.classList.remove('show'),2400);};
 const esMovilVista=()=>true;   // AS Terreno: el módulo vive en un panel sobre el Atlas
@@ -11197,7 +11264,8 @@ function pintaServicio(nombre){
       <div class="lista-scroll">${filaRec}</div></div>`:
       '<div class="card"><h2>Recintos del servicio</h2><div class="hint">Este servicio no tiene recintos dentro de su área en Atlas vista 1.</div></div>'}
 
-    ${fichaDatos(sv)}`;
+    ${fichaDatos(sv)}
+    <div class="card no-print">${btnDrive(AS_DRIVE_INF,'Informes de este servicio en el Drive')}</div>`;
 
   pintaListaPautas();
   // en escritorio la columna derecha acompaña: si está en otro piso, cambia
@@ -11342,6 +11410,7 @@ function pintaPauta(ctx){
     </div>`:''}
     <div class="row no-print" style="margin-bottom:14px">
       <button class="btn sec" onclick="informe()">📄 Informe</button>
+      ${btnDrive(AS_DRIVE_INF,'Drive')}
       <button class="btn" onclick="atras()">Listo</button>
     </div>`;
   a.reqs.forEach(q=>{ if(datos['foto_r'+q.n]) pintaFoto(q.n); });
