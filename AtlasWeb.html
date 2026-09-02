@@ -73,7 +73,7 @@ button,input,select,textarea{font-family:inherit}
 .bim-x:hover{background:#dc2626;color:#fff}
 .bim-no{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:17px;height:17px;line-height:15px;text-align:center;border-radius:5px;background:#f1f5f9;border:1px solid #64748b;color:#475569;font-size:10px;font-weight:800;cursor:pointer}
 .bim-no:hover{background:#475569;color:#fff}
-.bim-row.has-xx{padding-right:46px}
+.bim-row.has-xx{position:relative;padding-right:46px}
 .bim-desc{display:block;width:100%;background:#f8fafc;border:1px dashed #94a3b8;border-radius:7px;padding:4px 7px 4px 26px;text-align:left;margin-bottom:1px;position:relative;opacity:.8}
 .bim-undo{position:absolute;left:5px;top:50%;transform:translateY(-50%);width:17px;height:17px;line-height:15px;text-align:center;border-radius:5px;background:#e0f2fe;border:1px solid #0369a1;color:#0369a1;font-size:11px;font-weight:800;cursor:pointer}
 .bim-undo:hover{background:#0369a1;color:#fff}
@@ -10108,6 +10108,18 @@ async function runSelfTest(){
     if(prevNom===undefined) delete nameState.rooms['st_r2']; else nameState.rooms['st_r2']=prevNom;
     _codeBoxIndex=null;
     return enCod && enNom && fueraCod && fueraNom && volvio;
+  });
+  T('Revisión: los botones ✓/🚫 quedan DENTRO de su fila (has-x y has-xx)', ()=>{
+    const box=document.getElementById('bimList'); if(!box) return false;
+    const probe=document.createElement('button');
+    box.appendChild(probe);
+    let ok=true;
+    for(const cls of ['bim-row has-x','bim-row has-xx']){
+      probe.className=cls;
+      if(getComputedStyle(probe).position!=='relative') ok=false;
+    }
+    probe.remove();
+    return ok;
   });
   T('Revisión: rechazar saca del contador y restaurar la devuelve', ()=>{
     const antes=_revPend('sinbim').length;
