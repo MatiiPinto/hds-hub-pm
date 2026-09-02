@@ -72,7 +72,7 @@ button,input,select,textarea{font-family:inherit}
 .bim-x:hover{background:#dc2626;color:#fff}
 .bim-no{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:17px;height:17px;line-height:15px;text-align:center;border-radius:5px;background:#f1f5f9;border:1px solid #64748b;color:#475569;font-size:10px;font-weight:800;cursor:pointer}
 .bim-no:hover{background:#475569;color:#fff}
-.bim-row.has-xx{padding-right:46px}
+.bim-row.has-xx{position:relative;padding-right:46px}
 .bim-desc{display:block;width:100%;background:#f8fafc;border:1px dashed #94a3b8;border-radius:7px;padding:4px 7px 4px 26px;text-align:left;margin-bottom:1px;position:relative;opacity:.8}
 .bim-undo{position:absolute;left:5px;top:50%;transform:translateY(-50%);width:17px;height:17px;line-height:15px;text-align:center;border-radius:5px;background:#e0f2fe;border:1px solid #0369a1;color:#0369a1;font-size:11px;font-weight:800;cursor:pointer}
 .bim-undo:hover{background:#0369a1;color:#fff}
@@ -8969,6 +8969,23 @@ function revRestore(keyEnc){
 }
 let _revShowDesc=false;
 function revToggleDesc(){ _revShowDesc=!_revShowDesc; renderBimPending(); }
+// Pie de la pestaña: sugerencias rechazadas del chequeo activo (restaurables).
+// Se pinta también con 0 pendientes — si no, rechazar la última dejaba las
+// descartadas sin camino de vuelta.
+function _revPieDesc(){
+  const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const desc=_revDescartadas(_revCheck);
+  if(!desc.length) return '';
+  let h='<button onclick="revToggleDesc()" style="width:100%;margin-top:6px;background:#f1f5f9;border:1px dashed #94a3b8;color:#475569;border-radius:7px;padding:5px;font-size:10px;font-weight:800;cursor:pointer">🚫 '+desc.length+' descartada'+(desc.length===1?'':'s')+' — queda'+(desc.length===1?'':'n')+' como está'+(desc.length===1?'':'n')+' · '+(_revShowDesc?'ocultar':'ver')+'</button>';
+  if(_revShowDesc) desc.forEach(p=>{
+    const k=encodeURIComponent(_revKey(_revCheck,p));
+    h+='<div class="bim-desc">'
+      +(!S.viewOnly?('<span class="bim-undo" title="Restaurar la sugerencia a la lista" onclick="revRestore(\''+k+'\')">↩</span>'):'')
+      +'<span class="bim-nm">'+esc(p.nombre||(p.r&&(rName(p.r.id)||p.r.id))||'')+'</span>'
+      +'<span class="bim-sub">'+esc(REV_CHECKS[_revCheck].subText(p))+'</span></div>';
+  });
+  return h;
+}
 function revSetCheck(c){ _revCheck=c; renderBimPending(); }
 // Eliminar un recinto desde la pestaña Revisión (independiente de la vista actual).
 function revDeleteRoom(rid){
@@ -9004,6 +9021,7 @@ function renderBimPending(){
   }
   if(!pend.length){
     html+='<div style="padding:20px 8px;text-align:center;color:#1d5fa0;font-size:11px;font-weight:700">✅ 0 pendientes<br><span style="font-weight:400;color:#48687e">'+REV_CHECKS[_revCheck].done+'</span></div>';
+    html+=_revPieDesc();
     box.innerHTML=html; box._pend=[]; return;
   }
   const gOf=REV_CHECKS[_revCheck].groupOf, flat=REV_CHECKS[_revCheck].flat;
@@ -9031,18 +9049,7 @@ function renderBimPending(){
       +'<span class="bim-sub">'+esc([REV_CHECKS[_revCheck].subText(p), p.area?aName(p.area.id):''].filter(Boolean).join(' · '))+'</span>'
       +'</button>';
   });
-  // ── Pie: sugerencias rechazadas de este chequeo (restaurables) ──
-  const desc=_revDescartadas(_revCheck);
-  if(desc.length){
-    html+='<button onclick="revToggleDesc()" style="width:100%;margin-top:6px;background:#f1f5f9;border:1px dashed #94a3b8;color:#475569;border-radius:7px;padding:5px;font-size:10px;font-weight:800;cursor:pointer">🚫 '+desc.length+' descartada'+(desc.length===1?'':'s')+' — queda'+(desc.length===1?'':'n')+' como está'+(desc.length===1?'':'n')+' · '+(_revShowDesc?'ocultar':'ver')+'</button>';
-    if(_revShowDesc) desc.forEach(p=>{
-      const k=encodeURIComponent(_revKey(_revCheck,p));
-      html+='<div class="bim-desc">'
-        +(!S.viewOnly?('<span class="bim-undo" title="Restaurar la sugerencia a la lista" onclick="revRestore(\''+k+'\')">↩</span>'):'')
-        +'<span class="bim-nm">'+esc(p.nombre||(p.r&&(rName(p.r.id)||p.r.id))||'')+'</span>'
-        +'<span class="bim-sub">'+esc(REV_CHECKS[_revCheck].subText(p))+'</span></div>';
-    });
-  }
+  html+=_revPieDesc();
   box.innerHTML=html;
   box._pend=pend;
 }
@@ -10364,6 +10371,18 @@ async function runSelfTest(){
     if(prevNom===undefined) delete nameState.rooms['st_r2']; else nameState.rooms['st_r2']=prevNom;
     _codeBoxIndex=null;
     return enCod && enNom && fueraCod && fueraNom && volvio;
+  });
+  T('Revisión: los botones ✓/🚫 quedan DENTRO de su fila (has-x y has-xx)', ()=>{
+    const box=document.getElementById('bimList'); if(!box) return false;
+    const probe=document.createElement('button');
+    box.appendChild(probe);
+    let ok=true;
+    for(const cls of ['bim-row has-x','bim-row has-xx']){
+      probe.className=cls;
+      if(getComputedStyle(probe).position!=='relative') ok=false;
+    }
+    probe.remove();
+    return ok;
   });
   T('Revisión: rechazar saca del contador y restaurar la devuelve', ()=>{
     const antes=_revPend('sinbim').length;
