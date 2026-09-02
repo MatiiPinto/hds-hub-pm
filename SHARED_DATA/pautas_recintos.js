@@ -2,32 +2,32 @@
 // BORRADOR Fase 1 · asignación automática por tipo de recinto — pendiente validación
 // Consumir con: window.SHARED_PAUTAS_RECINTOS · asignaciones[recintoId] = {p:[ambitoIds], regla}
 window.SHARED_PAUTAS_RECINTOS = {
-  "version": "2026-06-05 · Fase 1 borrador para validación · fase2 2026-09-01 (15 ámbitos de servicio)",
+  "version": "2026-06-05 · Fase 1 borrador para validación · fase2 2026-09-01 (15 ámbitos de servicio) · siembra por nombre 2026-09-01 (62 recintos)",
   "fuente": "SHARED_DATA/recintos.js (2228 recintos) × normas AC/CM/FA/DI",
-  "total_recintos": 2359,
-  "total_asignados": 693,
+  "total_recintos": 2872,
+  "total_asignados": 755,
   "resumen_reglas": {
-    "aseo_chatas": 24,
+    "aseo_chatas": 28,
     "box_consulta": 110,
     "box_urgencia": 8,
     "box_urgencia_proc": 3,
     "cirugia_menor": 1,
     "dialisis": 4,
-    "estacion_enfermeria": 29,
+    "estacion_enfermeria": 31,
     "esterilizacion_general": 1,
     "farmacia_almacen": 1,
     "farmacia_general": 7,
-    "hospitalizacion": 189,
+    "hospitalizacion": 232,
     "img_angiografia": 2,
     "img_examen": 7,
     "img_scanner": 3,
-    "proc_odonto": 10,
+    "proc_odonto": 11,
     "quirofano": 27,
     "rehabilitacion": 30,
-    "sala_procedimientos": 101,
+    "sala_procedimientos": 108,
     "toma_muestras": 4,
-    "trabajo_limpio": 21,
-    "trabajo_sucio": 26,
+    "trabajo_limpio": 23,
+    "trabajo_sucio": 29,
     "uci": 29,
     "uti": 56
   },
@@ -4224,6 +4224,378 @@ window.SHARED_PAUTAS_RECINTOS = {
         "ac_cuidados-intensivos__inf__modulo-de-hospitalizacion"
       ],
       "regla": "uci"
+    },
+    "P2-CAD-22-R24": {
+      "p": [
+        "ac_hospitalizacion__inf__trabajo-limpio"
+      ],
+      "regla": "trabajo_limpio"
+    },
+    "P2-CAD-22-R25": {
+      "p": [
+        "ac_hospitalizacion__inf__trabajo-sucio"
+      ],
+      "regla": "trabajo_sucio"
+    },
+    "P2-CAD-22-R26": {
+      "p": [
+        "ac_hospitalizacion__inf__estaci-n-enfermer-a"
+      ],
+      "regla": "estacion_enfermeria"
+    },
+    "P2-CAD-27-R67": {
+      "p": [
+        "ac_hospitalizacion__inf__aseo-de-chatas"
+      ],
+      "regla": "aseo_chatas"
+    },
+    "P2-CAD-29-R14": {
+      "p": [
+        "ac_hospitalizacion__inf__trabajo-sucio"
+      ],
+      "regla": "trabajo_sucio"
+    },
+    "P2-CAD-38-R49": {
+      "p": [
+        "ac_hospitalizacion__inf__aseo-de-chatas"
+      ],
+      "regla": "aseo_chatas"
+    },
+    "P2-CAD-41-R43": {
+      "p": [
+        "ac_hospitalizacion__inf__aseo-de-chatas"
+      ],
+      "regla": "aseo_chatas"
+    },
+    "P3-CAD-4-R56": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R57": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R58": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R59": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R60": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R61": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R62": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R63": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R64": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R65": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R66": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R67": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R68": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R69": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R70": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R71": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R72": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R73": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R74": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R75": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R76": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R77": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R78": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R79": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R80": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R81": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R82": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R83": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-4-R84": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-5-R29": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-5-R30": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-5-R31": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-5-R32": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-5-R33": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-5-R34": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-5-R35": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-5-R36": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-5-R37": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-5-R38": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-5-R39": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-5-R40": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-5-R41": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-5-R42": {
+      "p": [
+        "ac_hospitalizacion__inf__modulo-basico-de-hospitalizacion"
+      ],
+      "regla": "hospitalizacion"
+    },
+    "P3-CAD-12-R37": {
+      "p": [
+        "ac_hospitalizacion__inf__trabajo-limpio"
+      ],
+      "regla": "trabajo_limpio"
+    },
+    "P3-CAD-12-R38": {
+      "p": [
+        "ac_hospitalizacion__inf__trabajo-sucio"
+      ],
+      "regla": "trabajo_sucio"
+    },
+    "P3-CAD-12-R39": {
+      "p": [
+        "cm_infraestructura__inf__sala-procedimientos-odontol-gicos"
+      ],
+      "regla": "proc_odonto"
+    },
+    "P3-CAD-12-R40": {
+      "p": [
+        "cm_infraestructura__inf__sala-de-procedimientos"
+      ],
+      "regla": "sala_procedimientos"
+    },
+    "P3-CAD-12-R41": {
+      "p": [
+        "cm_infraestructura__inf__sala-de-procedimientos"
+      ],
+      "regla": "sala_procedimientos"
+    },
+    "P3-CAD-14-R27": {
+      "p": [
+        "cm_infraestructura__inf__sala-de-procedimientos"
+      ],
+      "regla": "sala_procedimientos"
+    },
+    "P-1-CAD-19-R29": {
+      "p": [
+        "ac_hospitalizacion__inf__aseo-de-chatas"
+      ],
+      "regla": "aseo_chatas"
+    },
+    "P-1-CAD-23-R13": {
+      "p": [
+        "ac_hospitalizacion__inf__estaci-n-enfermer-a"
+      ],
+      "regla": "estacion_enfermeria"
+    },
+    "P-1-CAD-23-R14": {
+      "p": [
+        "cm_infraestructura__inf__sala-de-procedimientos"
+      ],
+      "regla": "sala_procedimientos"
+    },
+    "P-1-CAD-23-R15": {
+      "p": [
+        "cm_infraestructura__inf__sala-de-procedimientos"
+      ],
+      "regla": "sala_procedimientos"
+    },
+    "P-1-CAD-48-R29": {
+      "p": [
+        "cm_infraestructura__inf__sala-de-procedimientos"
+      ],
+      "regla": "sala_procedimientos"
+    },
+    "P-1-CAD-48-R30": {
+      "p": [
+        "cm_infraestructura__inf__sala-de-procedimientos"
+      ],
+      "regla": "sala_procedimientos"
     }
   },
   "asignaciones_servicio": {
