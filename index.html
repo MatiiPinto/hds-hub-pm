@@ -226,6 +226,19 @@ function pmUnlock(){
   document.body.classList.remove('locked');
   document.getElementById('login-ov').style.display = 'none';
   document.getElementById('pm-user-chip').textContent = '👤 ' + (s ? s.u : '');
+  pmFiltrarRestringidas(s);
+}
+// Oculta del index las tarjetas de plataformas restringidas a otros usuarios.
+// La puerta real la aplica pm_gate.js al abrir cada plataforma; esto es para
+// que nadie vea un acceso que no le corresponde.
+function pmFiltrarRestringidas(s){
+  var R = (window.PM_CONFIG && window.PM_CONFIG.RESTRINGIDAS) || {};
+  Object.keys(R).forEach(function(archivo){
+    if (!s || R[archivo].indexOf(s.u) !== -1) return;   // tiene acceso: no tocar
+    document.querySelectorAll('[data-plat="' + archivo + '"]').forEach(function(el){
+      el.style.display = 'none';
+    });
+  });
 }
 async function pmDoLogin(ev){
   ev.preventDefault();

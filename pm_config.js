@@ -48,6 +48,15 @@ window.PM_CONFIG = {
   VENCEN: {
     'crivera': '2026-08-20'   // apoyo puntual en una reunión (20-ago-2026)
   },
+  // ── PLATAFORMAS RESTRINGIDAS ──────────────────────────────────────────────
+  // archivo → usuarios que pueden abrirlo. Lo que NO figure acá lo ve todo el
+  // padrón. pm_gate.js lo verifica al abrir y el index oculta la tarjeta.
+  // ⚠ Es control de INTERFAZ, no seguridad de servidor: en un repo público el
+  // archivo sigue siendo descargable por URL directa para quien conozca la ruta.
+  RESTRINGIDAS: {
+    // Protección Radiológica: solo la OPR y quienes la acompañan
+    '37.ProteccionRadiologica.html': ['mpinto', 'csepulveda', 'mcanales', 'adavis']
+  },
   SESSION_HOURS: 12,
   USERS: {
     // usuario : sha256("usuario:clave")

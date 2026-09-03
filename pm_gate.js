@@ -12,6 +12,15 @@
     location.replace('index.html?next=' + encodeURIComponent(here + location.search));
     return;
   }
+  // ¿Plataforma restringida a ciertos usuarios?
+  var permitidos = ((window.PM_CONFIG && window.PM_CONFIG.RESTRINGIDAS) || {})[here];
+  if (permitidos && permitidos.indexOf(s.u) === -1){
+    try { pmLog('denegado', here); } catch(e){}
+    alert('Esta plataforma está restringida y tu usuario no tiene acceso.\n\n'
+        + 'Si necesitas entrar, escríbele a Matías Pinto (mpinto@hsalvador.cl).');
+    location.replace('index.html');
+    return;
+  }
   // Registrar el acceso a esta plataforma cuando el DOM esté listo
   var log = function(){ try { pmLog('abre', here); } catch(e){} };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', log);
