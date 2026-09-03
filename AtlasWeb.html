@@ -583,6 +583,8 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
         <button class="tb-btn" id="ptSelC" onclick="setPuertaTipo('c')" title="Colocar puertas de CAMILLA · 120 cm">120</button>
         <button class="tb-btn" id="ptSelP" onclick="setPuertaTipo('p')" title="Colocar puertas de PABELLÓN · 200 cm">200</button>
       </span>
+      <button class="tb-btn danger" id="btnPuertaDel" onclick="togglePuertaBorrar()" style="display:none" title="Borrar puertas UNA A UNA: con este modo activo, un clic sobre cualquier puerta la elimina. Vuelve a apretar para salir.">✕ Borrar 1 a 1</button>
+      <button class="tb-btn danger" id="btnPuertaDelAll" onclick="puertasBorrarTodas()" style="display:none" title="Borrar TODAS las puertas del servicio/área en que estás trabajando (en vista 3, las del recinto abierto). Pide confirmación.">🗑 Todas</button>
       <button class="tb-btn" id="btnPuertasAuto" onclick="puertasAutoClick()" style="display:none" title="Asignación automática: coloca una flecha de salida en cada recinto dibujado del área que aún no tiene puerta, sobre el lado más despejado (el que no colinda con otros recintos). Tipo pabellón (200) para pabellones/quirófanos; camilla (120) para habitaciones, recuperación, urgencia y recintos con camillas; normal (90) para el resto.">⚡ Auto puertas</button>
       <button class="tb-btn" id="btnDupMueble" onclick="toggleStampMode()" style="display:none" title="Duplicar mobiliario: recorta un trozo del plano (como una captura de pantalla) y lo estampa como copia dentro del recinto, para proponer más puestos con el mismo mueble. La copia se mueve arrastrándola y se elimina con doble clic.">🪑 Duplicar mueble</button>
       <button class="tb-btn" id="btnServPuestos" onclick="openServPuestos()" style="display:none" title="Ver todos los puestos asignados del servicio: en cantidad o con el nombre de cada funcionario">👥 Puestos del servicio</button>
@@ -625,7 +627,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       </div>
       <div class="float-hint" id="mergeHint"></div>
       <div class="float-hint" id="delHint">Modo eliminar — clic en dot para eliminar · ESC para salir</div>
-      <div class="float-hint" id="puertaHint">🚪 Puertas — elige el tipo en la barra (90 · 120 · 200) y haz clic en el borde del recinto · atajos: Alt+clic=120, Shift+clic=200 · ⌘+clic sobre una puerta rota el tipo · arrastrar mueve · doble clic elimina · ⚡ Auto completa el área y ↩ lo deshace · ESC sale</div>
+      <div class="float-hint" id="puertaHint">🚪 Puertas — elige el tipo en la barra (90 · 120 · 200) y haz clic en el borde del recinto · atajos: Alt+clic=120, Shift+clic=200 · ⌘+clic sobre una puerta rota el tipo · arrastrar mueve · doble clic elimina · ⚡ Auto completa el área y ↩ lo deshace · ✕ borra 1 a 1 · 🗑 borra todas las del servicio · ESC sale</div>
       <div class="float-hint" id="stampHint">🪑 Duplicar mueble — arrastra un rectángulo sobre el mueble a copiar (como una captura de pantalla); al soltar, la copia queda junto al original · muévela arrastrándola · doble clic la elimina · ESC para salir</div>
       <div class="float-hint" id="bedHint" style="border-color:#0284c7;color:#0369a1">🛏 Modo puestos — en vista 2, clic DENTRO de un recinto: camillas/sillones en Recuperación, Habitación o Clínica; cupos (⭕) en Recuperación, Pre-Anestesia, Box Urgencia, Reanimador y Sala de Procedimiento; puestos de toma (🧪) solo en Laboratorio · ESC para salir</div>
       <div id="planLoading"><span class="pl-spin"></span> Cargando plano…</div>
@@ -4309,14 +4311,40 @@ function setPuertaTipo(t){
       : 'background:#fff;border-color:'+D.col+';color:'+D.col+';font-weight:700';
   });
 }
+function togglePuertaBorrar(){
+  S.puertaBorrar=!S.puertaBorrar;
+  const b=document.getElementById('btnPuertaDel'); if(b)b.classList.toggle('active',S.puertaBorrar);
+  if(typeof tbInfo!=='undefined'&&tbInfo){
+    tbInfo.textContent=S.puertaBorrar?'✕ Modo borrar — clic sobre una puerta la elimina':'';
+    if(!S.puertaBorrar) tbInfo.textContent='';
+  }
+}
+// Borra TODAS las puertas del contexto actual: en vista 2, el servicio/área
+// completo; en vista 3, el recinto abierto. Confirmación previa con conteo.
+function puertasBorrarTodas(sinConfirmar){
+  if(S.viewOnly && !S.editPM) return;
+  const rooms=_puertaCtxRooms();
+  const con=rooms.filter(r=>(puertaState[r.id]||[]).length);
+  const n=con.reduce((a,r)=>a+puertaState[r.id].length,0);
+  if(!n){ if(typeof tbInfo!=='undefined'&&tbInfo){tbInfo.textContent='🚪 No hay puertas en '+(S.level===3?'este recinto':'esta área');setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},3000);} return; }
+  const donde=S.level===3?('el recinto «'+(rName(S.roomId)||'')+'»'):('el área «'+(aName(S.areaId)||'')+'» ('+con.length+' recintos)');
+  if(!sinConfirmar && !confirm('¿Borrar las '+n+' puertas de '+donde+'?\n\nEsto no se puede deshacer (salvo volver a colocarlas o restaurar un respaldo).')) return;
+  con.forEach(r=>{ delete puertaState[r.id]; });
+  _puertasAutoUndo=null; _puertasAutoBtn();
+  sPuertas(); renderSVG();
+  if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🗑 '+n+' puertas borradas de '+donde; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},4000); }
+}
 function togglePuertaMode(){
   if(S.viewOnly && !S.editPM) return;
   S.puertaMode=!S.puertaMode;
+  if(!S.puertaMode && S.puertaBorrar) togglePuertaBorrar();
   if(!S.puertaTipo) S.puertaTipo='n';
   const b=document.getElementById('btnPuertas'); if(b)b.classList.toggle('active',S.puertaMode);
   const h=document.getElementById('puertaHint'); if(h)h.classList.toggle('show',S.puertaMode);
   const ba=document.getElementById('btnPuertasAuto'); if(ba)ba.style.display=S.puertaMode?'':'none';
   const sel=document.getElementById('puertaTipoSel'); if(sel)sel.style.display=S.puertaMode?'inline-flex':'none';
+  const bd1=document.getElementById('btnPuertaDel'); if(bd1)bd1.style.display=S.puertaMode?'':'none';
+  const bdA=document.getElementById('btnPuertaDelAll'); if(bdA)bdA.style.display=S.puertaMode?'':'none';
   if(S.puertaMode) setPuertaTipo(S.puertaTipo);
   svg.style.cursor=S.puertaMode?'crosshair':'';
   renderSVG();
@@ -4340,6 +4368,11 @@ function _puertasLayer(){
         pg.addEventListener('mousedown',e=>_startPuertaDrag(e,r.id,i));
         pg.addEventListener('click',e=>{ e.stopPropagation();
           if(_puertaMoved){_puertaMoved=false;return;}
+          if(S.puertaBorrar){
+            puertaState[r.id].splice(i,1);
+            if(!puertaState[r.id].length) delete puertaState[r.id];
+            sPuertas(); renderSVG(); return;
+          }
           if(e.metaKey||e.ctrlKey){ pt.t={n:'c',c:'p',p:'n'}[pt.t]||'n'; sPuertas(); renderSVG(); return; }
           if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🚪 ⌘+clic rota el tipo (90→120→200) · arrastrar mueve · doble clic elimina'; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},3000); } });
         pg.addEventListener('dblclick',e=>{ e.stopPropagation();
@@ -9305,6 +9338,8 @@ function updateUI(){
     const bpu=document.getElementById('btnPuertas'); if(bpu) bpu.style.display=(S.level>1&&(!S.viewOnly||S.editPM))?'':'none';
     const bpa=document.getElementById('btnPuertasAuto'); if(bpa) bpa.style.display=(S.level>1&&S.puertaMode&&(!S.viewOnly||S.editPM))?'':'none';
     const pts=document.getElementById('puertaTipoSel'); if(pts) pts.style.display=(S.level>1&&S.puertaMode&&(!S.viewOnly||S.editPM))?'inline-flex':'none';
+    const pd1=document.getElementById('btnPuertaDel'); if(pd1) pd1.style.display=(S.level>1&&S.puertaMode&&(!S.viewOnly||S.editPM))?'':'none';
+    const pdA=document.getElementById('btnPuertaDelAll'); if(pdA) pdA.style.display=(S.level>1&&S.puertaMode&&(!S.viewOnly||S.editPM))?'':'none';
     if(S.level<2&&S.puertaMode){ S.puertaMode=false; if(bpu)bpu.classList.remove('active'); const ph=document.getElementById('puertaHint'); if(ph)ph.classList.remove('show'); svg.style.cursor=''; }
     if(S.level!==3&&S.stampMode){ S.stampMode=false; if(bdm)bdm.classList.remove('active'); const sh=document.getElementById('stampHint'); if(sh)sh.classList.remove('show'); svg.style.cursor=''; }
     const bxs=document.getElementById('btnExpServ'); if(bxs) bxs.style.display=(S.level===2)?'':'none'; }
@@ -10518,12 +10553,14 @@ async function runSelfTest(){
     const undoOK=_puertasAutoUndo===null
       && (puertaState['st_r1']||[]).includes(manual)
       && (puertaState['st_r1']||[]).length===antesUndo-((ps&&ps.length)?1:0);
-    puertaState['st_r1']=(puertaState['st_r1']||[]).filter(q=>q!==manual);
-    if(!puertaState['st_r1'].length) delete puertaState['st_r1'];
+    // borrar todas: limpia el contexto completo sin confirmación
+    (puertaState['st_r2']=puertaState['st_r2']||[]).push({x:2,y:2,ang:0,t:'n'});
+    puertasBorrarTodas(true);
+    const todasOK=!puertaState['st_r1'] && !puertaState['st_r2'];
     delete puertaState['st_r1']; delete puertaState['st_r2']; delete puertaState['st_r3'];
     Object.keys(puertaState).filter(k=>k.startsWith('st_')).forEach(k=>delete puertaState[k]);
     S.level=3; renderSVG();
-    return dib && cambiado && p200 && undoOK;
+    return dib && cambiado && p200 && undoOK && todasOK;
   });
   T('Duplicar mueble: estampa, se mueve y se elimina', ()=>{
     stampState['st_r1']=[{sx:100,sy:100,w:200,h:150,x:400,y:300}];
