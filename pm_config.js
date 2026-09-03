@@ -78,7 +78,11 @@ window.PM_CONFIG = {
     // Pablo Silva Pereira · Encargado EMMC de la Asesoría a la Inspección Fiscal
     // (AIF · MOP) — psilva@cydingenieria.cl. Contraparte de FISCALIZACIÓN,
     // externa al HDS y al SSMO.
-    'psilva':     'fffc0cb70c2ea2847b29f4f3f8febb34a6f813d99b87dcbdc5fc992f7ca19fac'
+    'psilva':     'fffc0cb70c2ea2847b29f4f3f8febb34a6f813d99b87dcbdc5fc992f7ca19fac',
+    // Constanza Ortiz · ingeniera de la Asesoría a la Inspección Fiscal
+    // (AIF · MOP) — constanza.ortiz@cydingenieria.com. Contraparte de
+    // FISCALIZACIÓN, externa al HDS y al SSMO. Solo consulta.
+    'cortiz':     '04f4ea706c4dae3e865e5eb3d0d699db20c7df21a3e91d4ea0fc154820f8013f'
   }
 };
 
