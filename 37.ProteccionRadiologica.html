@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<script src="pm_config.js"></script>
+<script src="pm_gate.js"></script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Protección Radiológica · Oficial de PR · HDS</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23111827'/><circle cx='50' cy='50' r='9' fill='%23FACC15'/><g fill='%23FACC15'><path d='M50 12a38 38 0 0 1 33 19l-16 9A19 19 0 0 0 50 31z'/><path d='M83 69a38 38 0 0 1-33 19V69a19 19 0 0 0 17-9z'/><path d='M17 69a38 38 0 0 1 0-38l16 9a19 19 0 0 0 0 20z'/></g></svg>">
+<style>
+/* ══ Protección Radiológica · HDS ═══════════════════════════════════════════
+   Herramienta de trabajo del Oficial de Protección Radiológica (TM). Cubre las
+   funciones que las bases del cargo le encomiendan: dosimetría trimestral,
+   elementos de protección, vigilancia de instalaciones y personal expuesto.
+   ⚠ USO INTERNO: la nómina de POE y las lecturas viven SOLO en este navegador
+   (localStorage) y se respaldan a archivo. No se publican en ningún HUB.      */
+:root{
+  --bg:#0B1220; --panel:#111C2E; --panel2:#0E1727; --bd:#1E3350;
+  --tx:#E6EDF7; --tx2:#8AA2C0; --am:#FACC15; --am2:#B45309;
+  --ok:#22C55E; --warn:#F59E0B; --bad:#EF4444; --info:#38BDF8; --vio:#A78BFA;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg);color:var(--tx);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+
+header{background:linear-gradient(120deg,#0A1526,#132444 60%,#1B2E52);padding:13px 22px;
+  position:sticky;top:0;z-index:40;border-bottom:1px solid var(--bd)}
+.hrow{display:flex;align-items:center;gap:14px;max-width:1240px;margin:0 auto;flex-wrap:wrap}
+.logo{width:44px;height:44px;border-radius:12px;background:rgba(250,204,21,.14);border:1px solid rgba(250,204,21,.4);
+  display:grid;place-items:center;font-size:23px;flex:none}
+h1{font-size:17.5px;font-weight:800;letter-spacing:-.2px}
+.sub{font-size:11.5px;color:var(--tx2);margin-top:1px}
+.hstats{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.hstat{background:rgba(255,255,255,.05);border:1px solid var(--bd);border-radius:10px;padding:6px 12px;text-align:center;min-width:70px}
+.hstat b{display:block;font-size:17px;font-weight:800;line-height:1.15}
+.hstat span{font-size:9.5px;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px}
+
+nav{background:var(--panel2);border-bottom:1px solid var(--bd);position:sticky;top:71px;z-index:35}
+.navin{max-width:1240px;margin:0 auto;display:flex;gap:2px;padding:0 14px;overflow-x:auto;scrollbar-width:none}
+.navin::-webkit-scrollbar{display:none}
+.tab{border:0;background:none;padding:12px 15px;font-size:13px;font-weight:700;color:var(--tx2);
+  cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;font-family:inherit;display:flex;gap:7px;align-items:center}
+.tab:hover{color:var(--tx)}
+.tab.on{color:var(--am);border-bottom-color:var(--am)}
+.tab .bdg{background:var(--bd);color:var(--tx2);font-size:10px;font-weight:800;border-radius:20px;padding:1px 7px}
+.tab.on .bdg{background:var(--am);color:#111}
+
+main{max-width:1240px;margin:0 auto;padding:18px 22px 60px}
+.pane{display:none}.pane.on{display:block}
+
+.card{background:var(--panel);border:1px solid var(--bd);border-radius:14px;padding:16px 18px;margin-bottom:12px}
+.card h2{font-size:14.5px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.card .d{font-size:12.5px;color:var(--tx2);line-height:1.5}
+.grid{display:grid;gap:11px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(158px,1fr))}
+
+.kpi{background:var(--panel);border:1px solid var(--bd);border-radius:13px;padding:14px 16px}
+.kpi .n{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1}
+.kpi .l{font-size:11.5px;color:var(--tx2);margin-top:4px;line-height:1.35}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--tx2);
+  font-weight:800;padding:8px 10px;border-bottom:1px solid var(--bd);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid rgba(30,51,80,.5);vertical-align:top}
+tr:hover td{background:rgba(255,255,255,.02)}
+.tw{overflow-x:auto;border:1px solid var(--bd);border-radius:12px;background:var(--panel)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+
+.pill{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:20px;white-space:nowrap}
+.p-ok{background:rgba(34,197,94,.15);color:#4ADE80;border:1px solid rgba(34,197,94,.4)}
+.p-warn{background:rgba(245,158,11,.15);color:#FBBF24;border:1px solid rgba(245,158,11,.4)}
+.p-bad{background:rgba(239,68,68,.15);color:#F87171;border:1px solid rgba(239,68,68,.4)}
+.p-info{background:rgba(56,189,248,.14);color:#7DD3FC;border:1px solid rgba(56,189,248,.35)}
+.p-mute{background:rgba(138,162,192,.12);color:var(--tx2);border:1px solid var(--bd)}
+
+.btn{border:1px solid var(--bd);background:var(--panel2);color:var(--tx);border-radius:9px;
+  padding:8px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn:hover{border-color:var(--am);color:var(--am)}
+.btn.pri{background:var(--am);color:#1A1205;border-color:var(--am)}
+.btn.pri:hover{filter:brightness(1.08);color:#1A1205}
+.btn.danger:hover{border-color:var(--bad);color:var(--bad)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input,select,textarea{background:var(--panel2);border:1px solid var(--bd);color:var(--tx);
+  border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--am)}
+label{display:block;font-size:11px;color:var(--tx2);font-weight:700;margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px}
+.field{margin-bottom:9px}
+
+.aviso{border-radius:11px;padding:11px 14px;font-size:12.5px;line-height:1.5;margin-bottom:12px}
+.a-warn{background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.35);color:#FCD34D}
+.a-info{background:rgba(56,189,248,.09);border:1px solid rgba(56,189,248,.3);color:#7DD3FC}
+.a-bad{background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.35);color:#FCA5A5}
+
+.bar{height:8px;background:var(--bd);border-radius:20px;overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.empty{text-align:center;color:var(--tx2);padding:26px;font-size:13px}
+footer{border-top:1px solid var(--bd);color:var(--tx2);font-size:11.5px;padding:16px 22px;text-align:center;line-height:1.6}
+@media(max-width:640px){nav{top:76px}main{padding:14px 13px 40px}.hstats{width:100%;margin-left:0}}
+</style>
+</head><body>
+
+<header><div class="hrow">
+  <div class="logo">☢️</div>
+  <div>
+    <h1>Protección Radiológica</h1>
+    <div class="sub">Oficial de Protección Radiológica · Hospital del Salvador</div>
+  </div>
+  <div class="hstats" id="hstats"></div>
+</div></header>
+
+<nav><div class="navin" id="tabs"></div></nav>
+
+<main>
+  <section class="pane on" id="p-panel"></section>
+  <section class="pane" id="p-poe"></section>
+  <section class="pane" id="p-dosi"></section>
+  <section class="pane" id="p-inst"></section>
+  <section class="pane" id="p-epp"></section>
+  <section class="pane" id="p-doc"></section>
+  <section class="pane" id="p-cargo"></section>
+</main>
+
+<footer>
+  <b>Uso interno.</b> La nómina de personal expuesto y las lecturas dosimétricas se guardan solo en este
+  navegador. Respaldá con <b>💾 Exportar</b> — no se publican en ningún HUB.<br>
+  Equipos emisores y elementos de protección: catastro EMMC (EquiBox). Funciones del cargo: bases del
+  concurso interno TM Oficial de Protección Radiológica, SSMO · HDS.
+</footer>
+
+<script src="SHARED_DATA/proteccion_radiologica.js"></script>
+<script>
+/* ════════════════════════════════════════════════════════════════════════════
+   Estructura según lo que las BASES DEL CARGO encomiendan al OPR:
+     · distribuir dosímetros y remitirlos cada 3 meses al servicio de dosimetría
+     · definir y solicitar los elementos de seguridad del personal expuesto
+     · mantener el sistema de vigilancia radiológica de todo el hospital
+     · cumplir las normas de PR en salas con fuentes emisoras
+     · coordinar con Prevención de Riesgos las resoluciones sanitarias vigentes
+     · informar cambios en instalaciones y la nómina anual de expuestos
+   ════════════════════════════════════════════════════════════════════════════ */
+const D = window.PROTECCION_RADIOLOGICA || {};
+const LS = 'hds_opr_v1';
+let E = { poe:[], lecturas:[], epp:[], inst:{}, docs:[], cfg:{limite_anual:20, limite_inv:6} };
+try{ const g=JSON.parse(localStorage.getItem(LS)||'null'); if(g) E=Object.assign(E,g); }catch(e){}
+function save(){ try{ localStorage.setItem(LS,JSON.stringify(E)); }catch(e){} }
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const hoy = () => new Date().toISOString().slice(0,10);
+/* Date.now() se repite si se agregan varios registros dentro del mismo milisegundo
+   (carga masiva): las lecturas quedarían colgando del id equivocado. */
+function nuevoId(){
+  const usados = E.poe.map(p=>p.id).concat(E.docs.map(d=>d.id));
+  let id = Date.now(); while(usados.includes(id)) id++;
+  return id;
+}
+const nfmt = n => (Math.round(n*100)/100).toLocaleString('es-CL');
+
+/* ── Trimestres: el ciclo que fija el cargo (remitir cada 3 meses) ─────────── */
+function trimestreDe(f){ const d=new Date(f+'T00:00:00'); return d.getFullYear()+'-T'+(Math.floor(d.getMonth()/3)+1); }
+function trimestreActual(){ return trimestreDe(hoy()); }
+function trimestresRecientes(n){
+  const out=[]; let d=new Date();
+  for(let i=0;i<n;i++){ out.push(d.getFullYear()+'-T'+(Math.floor(d.getMonth()/3)+1)); d.setMonth(d.getMonth()-3); }
+  return out;
+}
+/* Dosis acumulada de los últimos 4 trimestres = dosis anual del POE */
+function dosisAnual(poeId){
+  const t=new Set(trimestresRecientes(4));
+  return E.lecturas.filter(l=>l.poe===poeId && t.has(l.trim)).reduce((a,l)=>a+(+l.hp10||0),0);
+}
+function estadoDosis(mSv){
+  const L=E.cfg.limite_anual||20;
+  if(mSv>=L)      return {p:'p-bad',  t:'Supera límite anual'};
+  if(mSv>=L*0.75) return {p:'p-warn', t:'Sobre 75% del límite'};
+  if(mSv>=L*0.30) return {p:'p-info', t:'En seguimiento'};
+  return {p:'p-ok', t:'Dentro de rango'};
+}
+
+/* ── Navegación ───────────────────────────────────────────────────────────── */
+const PANES=[
+  {id:'panel', ic:'📊', t:'Panel'},
+  {id:'poe',   ic:'👷', t:'Personal expuesto'},
+  {id:'dosi',  ic:'🎫', t:'Dosimetría'},
+  {id:'inst',  ic:'🏥', t:'Instalaciones y equipos'},
+  {id:'epp',   ic:'🦺', t:'Elementos de protección'},
+  {id:'doc',   ic:'📁', t:'Documentación'},
+  {id:'cargo', ic:'📋', t:'Funciones del cargo'},
+];
+function pintaTabs(){
+  document.getElementById('tabs').innerHTML=PANES.map(p=>{
+    let b='';
+    if(p.id==='poe')  b=String(E.poe.length);
+    if(p.id==='dosi') b=String(pendientesTrim().length);
+    if(p.id==='inst') b=String((D.instalaciones||[]).length);
+    if(p.id==='epp')  b=String((D.epp||[]).reduce((a,x)=>a+x.cant,0));
+    return '<button class="tab" id="tb-'+p.id+'" onclick="irA(\''+p.id+'\')">'+p.ic+' '+p.t
+      +(b&&b!=='0'?' <span class="bdg">'+b+'</span>':'')+'</button>';
+  }).join('');
+}
+function irA(id){
+  PANES.forEach(p=>{ document.getElementById('p-'+p.id).classList.toggle('on',p.id===id);
+    const t=document.getElementById('tb-'+p.id); if(t) t.classList.toggle('on',p.id===id); });
+  ({panel:vPanel,poe:vPoe,dosi:vDosi,inst:vInst,epp:vEpp,doc:vDoc,cargo:vCargo})[id]();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ── PANEL ────────────────────────────────────────────────────────────────── */
+function pendientesTrim(){
+  const t=trimestreActual();
+  return E.poe.filter(p=>p.activo!==false && !E.lecturas.some(l=>l.poe===p.id && l.trim===t));
+}
+function vPanel(){
+  const T=D.totales||{}, t=trimestreActual();
+  const pend=pendientesTrim(), sobre=E.poe.filter(p=>dosisAnual(p.id)>=(E.cfg.limite_anual||20)*0.75);
+  const vencidas=(D.instalaciones||[]).filter(i=>{
+    const x=E.inst[i.id]||{}; return x.res_vence && x.res_vence < hoy(); });
+  const porVencer=(D.instalaciones||[]).filter(i=>{
+    const x=E.inst[i.id]||{}; if(!x.res_vence||x.res_vence<hoy()) return false;
+    return (new Date(x.res_vence)-new Date())/86400000 <= 90; });
+  document.getElementById('p-panel').innerHTML=
+    (E.poe.length===0 ? '<div class="aviso a-info"><b>Primer uso.</b> Cargá la nómina de personal '
+      +'ocupacionalmente expuesto en <b>👷 Personal expuesto</b>. Con eso la plataforma empieza a '
+      +'controlar el ciclo trimestral de dosimetría que exigen las bases del cargo.</div>' : '')
+    +(vencidas.length ? '<div class="aviso a-bad"><b>⚠ '+vencidas.length+' instalación(es) con autorización '
+      +'sanitaria vencida:</b> '+vencidas.map(i=>esc(i.nombre)).join(' · ')+'. Coordinar con Prevención de Riesgos.</div>':'')
+    +(porVencer.length ? '<div class="aviso a-warn"><b>'+porVencer.length+' autorización(es) vencen dentro de 90 días:</b> '
+      +porVencer.map(i=>esc(i.nombre)+' ('+(E.inst[i.id].res_vence)+')').join(' · ')+'</div>':'')
+    +'<div class="grid g4" style="margin-bottom:12px">'
+    +[['POE vigentes',E.poe.filter(p=>p.activo!==false).length,'var(--info)'],
+      ['Dosímetros pendientes '+t,pend.length,pend.length?'var(--warn)':'var(--ok)'],
+      ['POE sobre 75% del límite',sobre.length,sobre.length?'var(--bad)':'var(--ok)'],
+      ['Equipos emisores',T.equipos_emisores||0,'var(--vio)'],
+      ['Instalaciones',T.instalaciones||0,'var(--tx)'],
+      ['Elementos de protección',T.elementos_proteccion||0,'var(--tx)'],
+      ['Lecturas registradas',E.lecturas.length,'var(--tx)'],
+      ['Documentos',E.docs.length,'var(--tx)']]
+      .map(([l,v,c])=>'<div class="kpi"><div class="n" style="color:'+c+'">'+v+'</div><div class="l">'+l+'</div></div>').join('')
+    +'</div>'
+    +'<div class="card"><h2>🎫 Ciclo trimestral de dosimetría</h2>'
+    +'<div class="d">Las bases del cargo fijan el ciclo: los dosímetros personales se distribuyen a todo '
+    +'funcionario expuesto y <b>cada tres meses</b> se remiten al Servicio de Dosimetría contratado. '
+    +'Este es el estado del trimestre en curso ('+t+').</div>'
+    +(E.poe.length ? (function(){
+        const act=E.poe.filter(p=>p.activo!==false).length, con=act-pend.length;
+        const pc=act?Math.round(con*100/act):0;
+        return '<div style="margin-top:12px"><div class="bar"><i style="width:'+pc+'%;background:var(--ok)"></i>'
+          +'<i style="width:'+(100-pc)+'%;background:var(--warn)"></i></div>'
+          +'<div style="margin-top:6px;font-size:12.5px;color:var(--tx2)">'+con+' de '+act
+          +' con lectura registrada ('+pc+'%)'+(pend.length?' · faltan '+pend.length:' · trimestre completo')+'</div></div>'
+          +(pend.length?'<div style="margin-top:10px;font-size:12.5px">Pendientes: '
+            +pend.slice(0,14).map(p=>'<span class="pill p-warn" style="margin:2px">'+esc(p.nombre)+'</span>').join('')
+            +(pend.length>14?' <span class="pill p-mute">+'+(pend.length-14)+'</span>':'')+'</div>':'');
+      })() : '<div class="empty">Sin personal cargado todavía.</div>')
+    +'</div>'
+    +'<div class="card"><h2>📌 Qué controla esta plataforma</h2>'
+    +'<div class="d">Cada pestaña corresponde a una función que las bases encomiendan al Oficial de '
+    +'Protección Radiológica. La pestaña <b>📋 Funciones del cargo</b> tiene el detalle y el estado de cada una.</div></div>';
+}
+
+/* ── PERSONAL OCUPACIONALMENTE EXPUESTO ───────────────────────────────────── */
+function vPoe(){
+  const rows=E.poe.map(p=>{
+    const d=dosisAnual(p.id), st=estadoDosis(d);
+    return '<tr><td><b>'+esc(p.nombre)+'</b>'+(p.activo===false?' <span class="pill p-mute">inactivo</span>':'')+'</td>'
+      +'<td class="mono">'+esc(p.rut||'—')+'</td><td>'+esc(p.estamento||'—')+'</td>'
+      +'<td>'+esc(p.servicio||'—')+'</td><td class="mono">'+esc(p.dosimetro||'—')+'</td>'
+      +'<td style="text-align:right"><b>'+nfmt(d)+'</b> mSv</td>'
+      +'<td><span class="pill '+st.p+'">'+st.t+'</span></td>'
+      +'<td style="white-space:nowrap"><button class="btn" style="padding:4px 9px" onclick="poeToggle('+p.id+')">'
+      +(p.activo===false?'Reactivar':'Desactivar')+'</button> '
+      +'<button class="btn danger" style="padding:4px 9px" onclick="poeDel('+p.id+')">✕</button></td></tr>';
+  }).join('');
+  document.getElementById('p-poe').innerHTML=
+     '<div class="aviso a-warn"><b>Dato sensible.</b> Esta nómina incluye nombre y RUT: vive solo en este '
+    +'navegador y nunca se publica. Es la base de la <b>nómina anual de funcionarios expuestos</b> que el '
+    +'cargo debe enviar a Dirección, Calidad y Prevención de Riesgos.</div>'
+    +'<div class="card"><h2>➕ Agregar personal expuesto</h2>'
+    +'<div class="grid g3" style="margin-top:10px">'
+    +'<div class="field"><label>Nombre</label><input id="po-n" placeholder="Apellido Nombre"></div>'
+    +'<div class="field"><label>RUT</label><input id="po-r" placeholder="12.345.678-9"></div>'
+    +'<div class="field"><label>Estamento</label><input id="po-e" placeholder="Tecnólogo Médico"></div>'
+    +'<div class="field"><label>Servicio / unidad</label><input id="po-s" placeholder="Imagenología"></div>'
+    +'<div class="field"><label>N° dosímetro</label><input id="po-d" placeholder="DOS-001"></div>'
+    +'<div class="field"><label>&nbsp;</label><button class="btn pri" onclick="poeAdd()" style="width:100%">Agregar</button></div>'
+    +'</div></div>'
+    +'<div class="row" style="margin-bottom:10px"><button class="btn" onclick="expJSON()">💾 Exportar respaldo</button>'
+    +'<button class="btn" onclick="document.getElementById(\'impf\').click()">⬆ Restaurar</button>'
+    +'<input type="file" id="impf" accept=".json" style="display:none" onchange="impJSON(event)">'
+    +'<button class="btn" onclick="expNomina()">📄 Nómina anual (CSV)</button></div>'
+    +(E.poe.length
+      ? '<div class="tw"><table><thead><tr><th>Nombre</th><th>RUT</th><th>Estamento</th><th>Servicio</th>'
+        +'<th>Dosímetro</th><th style="text-align:right">Dosis 12 meses</th><th>Estado</th><th></th></tr></thead>'
+        +'<tbody>'+rows+'</tbody></table></div>'
+      : '<div class="card"><div class="empty">Todavía no hay personal cargado.</div></div>');
+}
+function poeAdd(){
+  const n=document.getElementById('po-n').value.trim();
+  if(!n){ alert('El nombre es obligatorio.'); return; }
+  E.poe.push({id:nuevoId(), nombre:n, rut:document.getElementById('po-r').value.trim(),
+    estamento:document.getElementById('po-e').value.trim(), servicio:document.getElementById('po-s').value.trim(),
+    dosimetro:document.getElementById('po-d').value.trim(), activo:true, alta:hoy()});
+  save(); pintaTabs(); vPoe(); document.getElementById('tb-poe').classList.add('on');
+}
+function poeToggle(id){ const p=E.poe.find(x=>x.id===id); if(!p) return; p.activo=(p.activo===false); save(); vPoe(); }
+function poeDel(id){
+  const p=E.poe.find(x=>x.id===id); if(!p) return;
+  if(!confirm('Eliminar a '+p.nombre+' y sus lecturas dosimétricas?')) return;
+  E.poe=E.poe.filter(x=>x.id!==id); E.lecturas=E.lecturas.filter(l=>l.poe!==id);
+  save(); pintaTabs(); vPoe();
+}
+
+/* ── DOSIMETRÍA ───────────────────────────────────────────────────────────── */
+function vDosi(){
+  const trims=trimestresRecientes(6), t=trimestreActual();
+  const act=E.poe.filter(p=>p.activo!==false);
+  const filas=act.map(p=>{
+    const cel=trims.map(tr=>{
+      const l=E.lecturas.find(x=>x.poe===p.id && x.trim===tr);
+      return '<td style="text-align:center">'+(l
+        ? '<b>'+nfmt(l.hp10)+'</b>'
+        : (tr===t?'<span class="pill p-warn">pend.</span>':'<span style="color:var(--tx2)">—</span>'))+'</td>';
+    }).join('');
+    const d=dosisAnual(p.id), st=estadoDosis(d);
+    return '<tr><td><b>'+esc(p.nombre)+'</b><div style="font-size:11px;color:var(--tx2)">'+esc(p.servicio||'')+'</div></td>'
+      +cel+'<td style="text-align:right"><b>'+nfmt(d)+'</b></td><td><span class="pill '+st.p+'">'+st.t+'</span></td></tr>';
+  }).join('');
+  document.getElementById('p-dosi').innerHTML=
+     '<div class="aviso a-info"><b>Ciclo trimestral.</b> Se registra la dosis <b>Hp(10)</b> en mSv que informa '
+    +'el Servicio de Dosimetría al devolver los dosímetros. El límite anual configurado es de '
+    +'<b>'+(E.cfg.limite_anual||20)+' mSv</b> (dosis efectiva, cuerpo entero); la columna final acumula los '
+    +'últimos cuatro trimestres.</div>'
+    +'<div class="card"><h2>➕ Registrar lectura</h2>'
+    +'<div class="grid g4" style="margin-top:10px">'
+    +'<div class="field"><label>Funcionario</label><select id="ls-p">'
+      +act.map(p=>'<option value="'+p.id+'">'+esc(p.nombre)+'</option>').join('')+'</select></div>'
+    +'<div class="field"><label>Trimestre</label><select id="ls-t">'
+      +trims.map(x=>'<option'+(x===t?' selected':'')+'>'+x+'</option>').join('')+'</select></div>'
+    +'<div class="field"><label>Hp(10) mSv</label><input id="ls-d" type="number" step="0.01" min="0" placeholder="0,12"></div>'
+    +'<div class="field"><label>&nbsp;</label><button class="btn pri" onclick="lecAdd()" style="width:100%">Registrar</button></div>'
+    +'</div>'
+    +'<div style="font-size:11.5px;color:var(--tx2)">Registrar la lectura equivale a dejar constancia de que ese '
+    +'dosímetro volvió del servicio con su informe.</div></div>'
+    +(act.length
+      ? '<div class="tw"><table><thead><tr><th>Funcionario</th>'
+        +trims.map(x=>'<th style="text-align:center">'+x+'</th>').join('')
+        +'<th style="text-align:right">12 meses</th><th>Estado</th></tr></thead><tbody>'+filas+'</tbody></table></div>'
+      : '<div class="card"><div class="empty">Cargá primero el personal expuesto.</div></div>');
+}
+function lecAdd(){
+  const p=+document.getElementById('ls-p').value, tr=document.getElementById('ls-t').value;
+  const v=parseFloat(document.getElementById('ls-d').value);
+  if(!p || isNaN(v)){ alert('Elegí un funcionario e ingresá la dosis.'); return; }
+  const ex=E.lecturas.find(l=>l.poe===p && l.trim===tr);
+  if(ex){ if(!confirm('Ya hay una lectura de ese trimestre ('+ex.hp10+' mSv). ¿Reemplazarla?')) return;
+          ex.hp10=v; ex.fecha=hoy(); }
+  else E.lecturas.push({poe:p, trim:tr, hp10:v, fecha:hoy()});
+  save(); pintaTabs(); vDosi();
+}
+
+/* ── INSTALACIONES Y EQUIPOS ──────────────────────────────────────────────── */
+function vInst(){
+  const eq=D.equipos||[];
+  const cards=(D.instalaciones||[]).map(i=>{
+    const x=E.inst[i.id]||{};
+    const mios=eq.filter(e=>(e.inst||[]).includes(i.id));           // asignación explícita del JSON
+    const nEpp=(D.epp||[]).filter(y=>y.inst===i.id).reduce((a,y)=>a+y.cant,0);
+    let est='<span class="pill p-mute">sin registrar</span>';
+    if(x.res_vence){ est = x.res_vence<hoy() ? '<span class="pill p-bad">vencida</span>'
+      : ((new Date(x.res_vence)-new Date())/86400000<=90 ? '<span class="pill p-warn">por vencer</span>'
+      : '<span class="pill p-ok">vigente</span>'); }
+    return '<div class="card"><h2>'+esc(i.nombre)+' '+est+'</h2>'
+      +'<div class="d">'+esc(i.desc)+' · <b>'+i.piso+'</b> · edificio '+i.edificio
+      +' · <span class="pill p-mute">'+esc(i.categoria||'')+'</span></div>'
+      +(mios.length && !nEpp ? '<div class="aviso a-warn" style="margin:10px 0 0">⚠ '+mios.reduce((a,e)=>a+e.cant,0)
+        +' equipos emisores y <b>ningún elemento de protección registrado</b> en el catastro para esta '
+        +'instalación. Verificar y, si corresponde, solicitarlos.</div>' : '')
+      +'<div class="grid g3" style="margin-top:11px">'
+      +'<div class="field"><label>N° autorización sanitaria</label>'
+        +'<input value="'+esc(x.res_num||'')+'" onchange="instSet(\''+i.id+'\',\'res_num\',this.value)" placeholder="Res. Ex. N°…"></div>'
+      +'<div class="field"><label>Vence</label>'
+        +'<input type="date" value="'+esc(x.res_vence||'')+'" onchange="instSet(\''+i.id+'\',\'res_vence\',this.value)"></div>'
+      +'<div class="field"><label>Última verificación de blindaje</label>'
+        +'<input type="date" value="'+esc(x.blindaje||'')+'" onchange="instSet(\''+i.id+'\',\'blindaje\',this.value)"></div>'
+      +'</div>'
+      +'<div class="field"><label>Observaciones</label><textarea rows="2" onchange="instSet(\''+i.id+'\',\'obs\',this.value)" '
+      +'placeholder="Señalización, monitoreo de área, cambios informados a Dirección…">'+esc(x.obs||'')+'</textarea></div>'
+      +(mios.length?'<div style="margin-top:6px"><label>Equipos emisores ('+mios.length+' tipologías · '
+        +mios.reduce((a,e)=>a+e.cant,0)+' equipos)</label>'
+        +'<div class="tw" style="margin-top:5px"><table><thead><tr><th>Código</th><th>Equipo</th>'
+        +'<th style="text-align:center">Cant.</th><th>Marca</th></tr></thead><tbody>'
+        +mios.map(e=>'<tr><td class="mono">'+esc(e.code)+'</td><td>'+esc(e.nombre)+'</td>'
+          +'<td style="text-align:center"><b>'+e.cant+'</b></td><td>'+esc(e.marca||'—')+'</td></tr>').join('')
+        +'</tbody></table></div></div>':'')
+      +'</div>';
+  }).join('');
+  document.getElementById('p-inst').innerHTML=
+     '<div class="aviso a-info"><b>Vigilancia radiológica.</b> Los equipos emisores salen del catastro EMMC '
+    +'(EquiBox). Las autorizaciones sanitarias y verificaciones de blindaje se registran acá: la plataforma '
+    +'avisa en el panel cuando una vence o está por vencer, que es lo que hay que coordinar con Prevención '
+    +'de Riesgos.</div>'+cards;
+}
+function instSet(id,k,v){ (E.inst[id]=E.inst[id]||{})[k]=v; save(); vInst(); vPanel(); }
+
+/* ── ELEMENTOS DE PROTECCIÓN ──────────────────────────────────────────────── */
+function vEpp(){
+  const base=D.epp||[];
+  const rows=base.map((x,i)=>{
+    const k=x.recinto+'|'+x.elemento, c=(E.epp.find(y=>y.k===k)||{});
+    const est=c.rev ? ((new Date()-new Date(c.rev))/86400000>365
+      ? '<span class="pill p-warn">revisión vencida</span>' : '<span class="pill p-ok">revisado</span>')
+      : '<span class="pill p-mute">sin revisar</span>';
+    return '<tr><td>'+esc(x.recinto)+'</td><td>'+esc(x.elemento)+'</td>'
+      +'<td style="text-align:center"><b>'+x.cant+'</b></td>'
+      +'<td><input type="date" value="'+esc(c.rev||'')+'" onchange="eppSet(\''+esc(k)+'\',\'rev\',this.value)" style="max-width:150px"></td>'
+      +'<td>'+est+'</td>'
+      +'<td><input value="'+esc(c.obs||'')+'" onchange="eppSet(\''+esc(k)+'\',\'obs\',this.value)" placeholder="grietas, plomo dañado…"></td></tr>';
+  }).join('');
+  /* cobertura por instalación: deja a la vista dónde hay emisores sin plomada registrada */
+  const cob=(D.instalaciones||[]).map(i=>{
+    const n=base.filter(y=>y.inst===i.id).reduce((a,y)=>a+y.cant,0);
+    const e=(D.equipos||[]).filter(q=>(q.inst||[]).includes(i.id)).reduce((a,q)=>a+q.cant,0);
+    return '<div class="kpi"><div class="n" style="color:'+(n?'var(--tx)':'var(--bad)')+'">'+n+'</div>'
+      +'<div class="l">'+esc(i.nombre)+'<br><span style="color:var(--tx2)">'+e+' equipos emisores</span></div></div>';
+  }).join('');
+  document.getElementById('p-epp').innerHTML=
+     '<div class="aviso a-info"><b>Elementos de seguridad del personal expuesto.</b> Definir y solicitarlos es '
+    +'función del cargo. El inventario viene del catastro EMMC; acá se registra la <b>revisión anual de '
+    +'integridad</b> del plomo (grietas, delaminación) que condiciona su uso.</div>'
+    +'<div class="grid g3" style="margin-bottom:12px">'+cob+'</div>'
+    +'<div class="tw"><table><thead><tr><th>Recinto</th><th>Elemento</th><th style="text-align:center">Cant.</th>'
+    +'<th>Última revisión</th><th>Estado</th><th>Observación</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+}
+function eppSet(k,campo,v){
+  let c=E.epp.find(y=>y.k===k); if(!c){ c={k}; E.epp.push(c); }
+  c[campo]=v; save(); vEpp();
+}
+
+/* ── DOCUMENTACIÓN ────────────────────────────────────────────────────────── */
+const DOC_TIPOS=['Autorización sanitaria','Informe dosimétrico','Nómina anual de expuestos',
+  'Verificación de blindaje','Capacitación','Procedimiento / norma','Informe a Dirección','Otro'];
+function vDoc(){
+  const rows=E.docs.map(d=>'<tr><td>'+esc(d.fecha)+'</td><td><span class="pill p-info">'+esc(d.tipo)+'</span></td>'
+    +'<td><b>'+esc(d.titulo)+'</b></td><td>'+esc(d.dest||'—')+'</td><td>'+esc(d.obs||'')+'</td>'
+    +'<td><button class="btn danger" style="padding:4px 9px" onclick="docDel('+d.id+')">✕</button></td></tr>').join('');
+  document.getElementById('p-doc').innerHTML=
+     '<div class="aviso a-info"><b>Registro documental.</b> Bitácora de lo que el cargo debe emitir y mantener: '
+    +'resoluciones, informes dosimétricos, la nómina anual y los avisos a Dirección, Unidad de Calidad y '
+    +'Prevención de Riesgos ante cualquier cambio en las instalaciones radiactivas.</div>'
+    +'<div class="card"><h2>➕ Registrar documento</h2><div class="grid g3" style="margin-top:10px">'
+    +'<div class="field"><label>Fecha</label><input type="date" id="dc-f" value="'+hoy()+'"></div>'
+    +'<div class="field"><label>Tipo</label><select id="dc-t">'+DOC_TIPOS.map(t=>'<option>'+t+'</option>').join('')+'</select></div>'
+    +'<div class="field"><label>Título / N°</label><input id="dc-n" placeholder="Res. Ex. N° 1234 / Informe 3T"></div>'
+    +'<div class="field"><label>Destinatario</label><input id="dc-d" placeholder="Dirección · Calidad · Prev. de Riesgos"></div>'
+    +'<div class="field"><label>Observación</label><input id="dc-o"></div>'
+    +'<div class="field"><label>&nbsp;</label><button class="btn pri" style="width:100%" onclick="docAdd()">Registrar</button></div>'
+    +'</div></div>'
+    +(E.docs.length?'<div class="tw"><table><thead><tr><th>Fecha</th><th>Tipo</th><th>Título</th>'
+      +'<th>Destinatario</th><th>Observación</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>'
+      :'<div class="card"><div class="empty">Sin documentos registrados.</div></div>');
+}
+function docAdd(){
+  const t=document.getElementById('dc-n').value.trim();
+  if(!t){ alert('Poné al menos el título o número.'); return; }
+  E.docs.unshift({id:nuevoId(), fecha:document.getElementById('dc-f').value,
+    tipo:document.getElementById('dc-t').value, titulo:t,
+    dest:document.getElementById('dc-d').value.trim(), obs:document.getElementById('dc-o').value.trim()});
+  save(); pintaTabs(); vDoc();
+}
+function docDel(id){ E.docs=E.docs.filter(d=>d.id!==id); save(); pintaTabs(); vDoc(); }
+
+/* ── FUNCIONES DEL CARGO ──────────────────────────────────────────────────── */
+const FUNCIONES=[
+ {f:'Distribuir los dosímetros personales a todo funcionario expuesto y remitirlos cada tres meses al Servicio de Dosimetría contratado.',
+  d:'dosi', como:'Pestaña 🎫 Dosimetría: matriz por trimestre y aviso de pendientes en el panel.'},
+ {f:'Definir y solicitar los elementos de seguridad para el personal expuesto en el Hospital.',
+  d:'epp', como:'Pestaña 🦺 Elementos de protección: inventario del catastro EMMC y revisión anual de integridad.'},
+ {f:'Mantener un sistema de vigilancia radiológica en todo el Hospital.',
+  d:'inst', como:'Pestaña 🏥 Instalaciones y equipos: recintos, equipos emisores y verificaciones.'},
+ {f:'Mantener y cumplir las normas de Protección Radiológica para las salas con fuentes emisoras de radiación.',
+  d:'inst', como:'Autorizaciones sanitarias, blindajes y observaciones por instalación.'},
+ {f:'Trabajar en coordinación con Prevención de Riesgos para mantener las resoluciones sanitarias actualizadas.',
+  d:'inst', como:'Alertas automáticas de autorizaciones vencidas o por vencer (90 días).'},
+ {f:'Informar a la Dirección, Unidad de Calidad y Prevención de Riesgos cualquier cambio en las instalaciones radiactivas, y enviar la nómina anual de funcionarios expuestos.',
+  d:'doc', como:'Pestaña 📁 Documentación (bitácora de envíos) y exportación de la nómina anual en CSV.'},
+];
+function vCargo(){
+  document.getElementById('p-cargo').innerHTML=
+     '<div class="card"><h2>📋 Objetivo del cargo</h2>'
+    +'<div class="d">«Supervisar y mantener vigilancia radiológica en instalaciones radiactivas como también '
+    +'vigilancia ocupacional de los trabajadores expuestos a radiaciones ionizantes.»<br>'
+    +'<span style="color:var(--tx2)">Bases del concurso interno · Tecnólogo Médico Oficial de Protección '
+    +'Radiológica, grado 9° diurno · SSMO / Hospital del Salvador.</span></div></div>'
+    +'<div class="card"><h2>Funciones y dónde se gestionan</h2>'
+    +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>Función encomendada</th><th>En la plataforma</th><th></th></tr></thead><tbody>'
+    +FUNCIONES.map(x=>'<tr><td>'+esc(x.f)+'</td><td style="color:var(--tx2)">'+esc(x.como)+'</td>'
+      +'<td><button class="btn" style="padding:4px 10px" onclick="irA(\''+x.d+'\')">Ir →</button></td></tr>').join('')
+    +'</tbody></table></div></div>'
+    +'<div class="card"><h2>Perfil exigido</h2><div class="d">'
+    +'Título de Tecnólogo(a) Médico(a) con mención en radiología y Registro SIS · Diplomado en Protección '
+    +'Radiológica · desde 3 años de experiencia profesional en Protección Radiológica en Servicios de '
+    +'Imagenología.</div></div>'
+    +'<div class="card"><h2>⚙️ Configuración</h2>'
+    +'<div class="grid g3" style="margin-top:10px">'
+    +'<div class="field"><label>Límite de dosis anual (mSv)</label>'
+      +'<input type="number" step="1" min="1" value="'+(E.cfg.limite_anual||20)+'" onchange="cfgSet(\'limite_anual\',+this.value)"></div>'
+    +'<div class="field"><label>Servicio de dosimetría</label>'
+      +'<input value="'+esc(E.cfg.servicio_dosi||'')+'" onchange="cfgSet(\'servicio_dosi\',this.value)" placeholder="Nombre del servicio contratado"></div>'
+    +'<div class="field"><label>Oficial de PR</label>'
+      +'<input value="'+esc(E.cfg.opr||'')+'" onchange="cfgSet(\'opr\',this.value)" placeholder="Nombre del TM a cargo"></div>'
+    +'</div>'
+    +'<div style="font-size:11.5px;color:var(--tx2)">El límite por defecto (20 mSv/año) es el de dosis efectiva '
+    +'para trabajadores expuestos; ajustalo si la normativa aplicable a tu instalación define otro.</div></div>';
+}
+function cfgSet(k,v){ E.cfg[k]=v; save(); vPanel(); }
+
+/* ── Respaldo ─────────────────────────────────────────────────────────────── */
+function bajar(nombre,contenido,tipo){
+  const b=new Blob([contenido],{type:tipo}), a=document.createElement('a');
+  a.href=URL.createObjectURL(b); a.download=nombre; a.click(); URL.revokeObjectURL(a.href);
+}
+function expJSON(){ bajar('proteccion_radiologica_'+hoy()+'.json', JSON.stringify(E,null,1), 'application/json'); }
+function impJSON(ev){
+  const f=ev.target.files&&ev.target.files[0]; ev.target.value=''; if(!f) return;
+  if(!confirm('Restaurar el respaldo REEMPLAZA los datos actuales. ¿Continuar?')) return;
+  const r=new FileReader();
+  r.onload=e=>{ try{ const d=JSON.parse(e.target.result); E=Object.assign(E,d); save();
+      pintaTabs(); irA('panel'); alert('✓ Respaldo restaurado.'); }
+    catch(err){ alert('No se pudo leer: '+err.message); } };
+  r.readAsText(f);
+}
+function expNomina(){
+  const cab='Nombre;RUT;Estamento;Servicio;Dosimetro;Dosis 12 meses (mSv);Estado\n';
+  const cu=s=>'"'+String(s==null?'':s).replace(/"/g,'""')+'"';
+  const cuerpo=E.poe.filter(p=>p.activo!==false).map(p=>{
+    const d=dosisAnual(p.id);
+    return [p.nombre,p.rut,p.estamento,p.servicio,p.dosimetro,nfmt(d),estadoDosis(d).t].map(cu).join(';');
+  }).join('\n');
+  bajar('nomina_anual_expuestos_'+hoy()+'.csv','﻿'+cab+cuerpo,'text/csv;charset=utf-8');
+}
+
+/* ── Arranque ─────────────────────────────────────────────────────────────── */
+function pintaHstats(){
+  const T=D.totales||{};
+  document.getElementById('hstats').innerHTML=
+    [[T.equipos_emisores||0,'Emisores'],[T.instalaciones||0,'Instalac.'],
+     [E.poe.filter(p=>p.activo!==false).length,'POE'],[pendientesTrim().length,'Pend.']]
+    .map(([v,l])=>'<div class="hstat"><b>'+v+'</b><span>'+l+'</span></div>').join('');
+}
+pintaTabs(); pintaHstats(); vPanel();
+document.getElementById('tb-panel').classList.add('on');
+const _save=save; save=function(){ _save(); pintaHstats(); };
+</script>
+<script src="hub-home.js"></script>
+</body></html>

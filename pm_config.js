@@ -79,6 +79,9 @@ window.PM_CONFIG = {
     // (AIF · MOP) — psilva@cydingenieria.cl. Contraparte de FISCALIZACIÓN,
     // externa al HDS y al SSMO.
     'psilva':     'fffc0cb70c2ea2847b29f4f3f8febb34a6f813d99b87dcbdc5fc992f7ca19fac',
+    // Allyson Davis Zubiri · Tecnóloga Médica, Oficial de Protección
+    // Radiológica (OPR) del HDS — asume el 04-09-2026
+    'adavis':     '5e6f457b13191210fe60149d02ff6a2a0581dad0eea972f0fb0c2f42e7597198',
     // Constanza Ortiz · ingeniera de la Asesoría a la Inspección Fiscal
     // (AIF · MOP) — constanza.ortiz@cydingenieria.com. Contraparte de
     // FISCALIZACIÓN, externa al HDS y al SSMO. Solo consulta.
