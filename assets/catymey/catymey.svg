@@ -1,0 +1,18 @@
+<svg viewBox="0 0 120 120" role="img" aria-label="CATYMEY" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="ctyDisc" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2A3F7A"/>
+      <stop offset="1" stop-color="#202945"/>
+    </linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="60" fill="url(#ctyDisc)"/>
+  <g fill="none" stroke-width="13" stroke-linecap="round">
+    <path d="M36 53 C36 31 70 25 79 41 C86 52 72 60 60 60" stroke="#FFFFFF"/>
+    <path d="M84 67 C84 89 50 95 41 79 C34 68 48 60 60 60" stroke="#00A1E1"/>
+  </g>
+  <g id="cty-badge">
+    <circle cx="94" cy="94" r="20" fill="#68D1BF" stroke="#202945" stroke-width="6"/>
+    <path d="M84 94 L91 101 L104 86" fill="none" stroke="#202945" stroke-width="6"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>

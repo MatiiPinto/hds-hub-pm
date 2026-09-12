@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<script src="pm_config.js"></script>
+<script src="pm_gate.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CATYMEY · Agente digital de Autorización Sanitaria · HDS</title>
+<link rel="icon" href="assets/catymey/catymey.svg">
+<style>
+  :root{--inst:#1D2D5B;--inst2:#2a3f7a;--cyan:#29AAE2;--cyan2:#1e7fc2;--verde:#0E7C66;--amb:#B45309;--rojo:#b91c1c;--bg:#eef2f8;--panel:#fff;--bd:#d8e0ec;--tx:#0f172a;--mut:#5b6b85}
+  *{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:var(--bg);color:var(--tx);font-size:13.5px;line-height:1.45}
+  header{background:linear-gradient(135deg,var(--inst),var(--inst2));color:#fff;padding:16px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  header img{width:64px;height:64px;border-radius:50%;box-shadow:0 6px 18px rgba(0,0,0,.3)}
+  header h1{margin:0;font-size:22px;letter-spacing:.5px}header h1 small{font-size:12px;font-weight:600;opacity:.8;letter-spacing:1.5px;display:block;text-transform:uppercase}
+  header .sub{font-size:12.5px;opacity:.85;margin-top:3px}
+  header .acts{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+  .hbtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:#fff;text-decoration:none;padding:8px 12px;border-radius:9px;font-size:12px;font-weight:700}
+  .hbtn:hover{background:rgba(255,255,255,.22)}.hbtn.p{background:var(--cyan);border-color:var(--cyan)}
+  .wrap{max-width:1380px;margin:0 auto;padding:16px 18px 60px}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+  .tab{padding:9px 15px;border-radius:10px;font-weight:800;font-size:13px;cursor:pointer;border:1px solid var(--bd);background:#fff;color:var(--mut)}
+  .tab.on{background:var(--inst);color:#fff;border-color:var(--inst)}
+  .panel{display:none}.panel.on{display:block}
+  .card{background:var(--panel);border:1px solid var(--bd);border-radius:14px;padding:16px 18px;margin-bottom:14px}
+  .card h2{margin:0 0 8px;font-size:15px;color:var(--inst)} .card h3{margin:14px 0 6px;font-size:13px;color:#0f2942;text-transform:uppercase;letter-spacing:.4px}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:8px 0 14px}
+  .kpi{background:#f8fafc;border:1px solid var(--bd);border-radius:12px;padding:10px 12px}.kpi b{display:block;font-size:22px;color:var(--verde)}.kpi span{font-size:11px;color:var(--mut)}
+  .kpi.n b{color:var(--inst)}.kpi.w b{color:var(--amb)}.kpi.r b{color:var(--rojo)}
+  .tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px;font-size:12px}
+  .tools select,.tools input{border:1px solid #cbd5e1;border-radius:8px;padding:6px 9px;font-size:12px;background:#fff}.tools input{min-width:240px}
+  .btn{border:1px solid #cbd5e1;background:#fff;border-radius:8px;padding:6px 11px;font-size:12px;font-weight:700;cursor:pointer}.btn.p{background:var(--inst);color:#fff;border-color:var(--inst)}
+  .seg{display:flex;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden}.seg button{border:0;background:#fff;padding:6px 12px;font-size:12px;font-weight:700;color:#475569;cursor:pointer}.seg button.on{background:var(--inst);color:#fff}
+  .cnt{margin-left:auto;color:var(--mut);font-size:11.5px}
+  .tw{overflow:auto;max-height:70vh;border:1px solid var(--bd);border-radius:10px}
+  table.x{border-collapse:collapse;width:100%;font-size:12px}
+  table.x th{position:sticky;top:0;background:#e8eef7;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;padding:7px 8px;border:1px solid #cbd5e1;text-align:left;white-space:nowrap;z-index:1}
+  table.x td{border:1px solid #e3e9f1;padding:4px 8px;vertical-align:top}table.x tr:nth-child(even) td{background:#fafcff}table.x tr:hover td{background:#eef6ff}
+  td.n{font-family:ui-monospace,Menlo,monospace;font-size:11px;color:#475569;white-space:nowrap}
+  .chip{display:inline-block;border:1px solid #bfd7ea;background:#eaf4fb;border-radius:6px;padding:1px 6px;margin:1px 2px;font-size:11px;max-width:340px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle}
+  .chip small{color:#5b7590}.chip.new{border-color:#86efac;background:#ecfdf3}.chip.old{border-style:dashed;background:#fff}
+  .cb{display:inline-block;border-radius:6px;padding:1px 7px;font-size:10.5px;font-weight:800}
+  .cb.igual{background:#e2e8f0;color:#334155}.cb.amplia{background:#dcfce7;color:#166534}.cb.nueva{background:#dbeafe;color:#1e40af}.cb.distinta{background:#fef3c7;color:#92400e}.cb.mantiene{background:#f1f5f9;color:#475569}.cb.evidencia{background:#f5f3ff;color:#5b21b6}.cb.sin_pauta{background:#f8fafc;color:#94a3b8}.cb.congelado{background:#e0f2fe;color:#0c4a6e}
+  .bar{display:flex;height:9px;border-radius:5px;overflow:hidden;background:#e2e8f0;min-width:120px}.bar i{display:block;height:100%}
+  .ok{background:#0E7C66}.fa{background:#b91c1c}.co{background:#f59e0b}.ge{background:#6366f1}.te{background:#94a3b8}.cd{background:#cbd5e1}
+  .leg{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--mut);margin:6px 0}.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:middle}
+  .note{font-size:11.5px;color:var(--mut);line-height:1.5}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+  pre.code{background:#0f172a;color:#e2e8f0;padding:12px 14px;border-radius:10px;font-size:11.5px;overflow:auto}
+  .tema{border-left:4px solid var(--cyan);padding:8px 12px;margin:8px 0;background:#f8fafc;border-radius:0 10px 10px 0}
+  .tema b{display:block;color:var(--inst)}.tema small{color:var(--mut)}
+  .dbtn{border:1px solid #cbd5e1;background:#fff;border-radius:6px;padding:1px 7px;font-size:11px;cursor:pointer}.dbtn:hover{background:#eef6ff}
+  .ov{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:9300;display:none;align-items:center;justify-content:center;padding:20px}.ov.open{display:flex}
+  .ov .bx{background:#fff;border-radius:14px;width:min(1000px,100%);max-height:88vh;display:flex;flex-direction:column;overflow:hidden}.ov .bh{padding:12px 16px;background:var(--inst);color:#fff;display:flex;align-items:center;gap:10px}.ov .bh b{font-size:14px}.ov .bh .x{margin-left:auto;background:rgba(255,255,255,.15);border:0;color:#fff;width:30px;height:30px;border-radius:8px;font-size:17px;cursor:pointer}.ov .bb{overflow:auto;padding:12px 16px}
+  .est{display:inline-block;border-radius:6px;padding:1px 7px;font-size:10.5px;font-weight:800}.est.documental_ok{background:#dcfce7;color:#166534}.est.falta_en_despliegue{background:#fee2e2;color:#b91c1c}.est.concesionaria{background:#fef3c7;color:#92400e}.est.gestion{background:#e0e7ff;color:#3730a3}.est.terreno{background:#f1f5f9;color:#475569}.est.condicional{background:#f8fafc;color:#94a3b8}
+  ul.tight{margin:4px 0;padding-left:18px}ul.tight li{margin:2px 0}
+</style>
+</head>
+<body>
+<header>
+  <a class="hub-back" href="index.html" title="Volver al HUB">← HUB</a>
+  <img src="assets/catymey/catymey.svg" alt="CATYMEY">
+  <div><h1><small>Agente digital de Autorización Sanitaria</small>CATYMEY</h1><div class="sub">CATY (Catherine) · MEY (Meylin) — sabe qué pauta lleva cada recinto del Nuevo Hospital Del Salvador, qué exige cada requisito y qué falta para autorizarlo.</div></div>
+  <div class="acts"><button class="hbtn p" onclick="CATYMEY.abrir()">💬 Preguntar a CATYMEY</button><a class="hbtn" href="16.AutorizacionSanitaria.html">📚 Plataforma de información</a><a class="hbtn" href="39.ASTerreno.html">🗺 AS · Terreno</a><a class="hbtn" href="16.AutorizacionSanitaria.html#guia">📘 Guía rápida</a></div>
+</header>
+<div class="wrap">
+  <div class="tabs">
+    <div class="tab on" data-p="res" onclick="tab(this)">Resumen</div>
+    <div class="tab" data-p="asg" onclick="tab(this)">🧩 Asignación propuesta</div>
+    <div class="tab" data-p="reg" onclick="tab(this)">Reglas</div>
+    <div class="tab" data-p="pre" onclick="tab(this)">🔎 Precotejo documental</div>
+    <div class="tab" data-p="con" onclick="tab(this)">🏗 Solicitud a la Concesionaria</div>
+    <div class="tab" data-p="hos" onclick="tab(this)">Hospital y edificio AA</div>
+    <div class="tab" data-p="ins" onclick="tab(this)">Insertar en las plataformas</div>
+  </div>
+
+  <div class="panel on" id="p-res"></div>
+  <div class="panel" id="p-asg">
+    <div class="card">
+      <div class="tools">
+        <div class="seg"><button id="v2" class="on" onclick="vista('rec')">Vista 2 · Recintos</button><button id="v1" onclick="vista('svc')">Vista 1 · Servicios</button></div>
+        <select id="fPiso" onchange="render()"><option value="">Todos los pisos</option></select>
+        <select id="fSvc" onchange="render()"><option value="">Todos los servicios</option></select>
+        <select id="fCambio" onchange="render()"><option value="">Todos los cambios</option></select>
+        <select id="fRegla" onchange="render()"><option value="">Todas las reglas</option></select>
+        <input id="fQ" placeholder="Buscar recinto, código, servicio, pauta…" oninput="render()">
+        <button class="btn" onclick="csv()">⬇ CSV</button><span class="cnt" id="cnt"></span>
+      </div>
+      <div class="leg"><span class="cb igual">igual</span> a la vigente · <span class="cb amplia">amplía</span> agrega pautas · <span class="cb distinta">distinta</span> difiere: decidir · <span class="cb nueva">nueva</span> no tenía · <span class="cb mantiene">mantiene</span> sin regla nueva · <span class="cb evidencia">evidencia</span> sin pauta propia, respalda requisitos generales · <span class="cb sin_pauta">sin pauta</span> · <span class="cb congelado">congelado</span></div>
+      <div class="tw" id="tbl"></div>
+      <p class="note">Solo lectura. La asignación vigente no se modificó: esta es la propuesta de CATYMEY con regla, fundamento y confianza por recinto. Lo que se apruebe se aplica desde 🧩 Asignación de la plataforma de información (queda en el backend y en terreno al instante).</p>
+    </div>
+  </div>
+  <div class="panel" id="p-reg"></div>
+  <div class="panel" id="p-pre"></div>
+  <div class="panel" id="p-con"></div>
+  <div class="panel" id="p-hos"></div>
+  <div class="panel" id="p-ins"></div>
+</div>
+<div class="ov" id="detOv" onclick="if(event.target===this)this.classList.remove('open')"><div class="bx"><div class="bh"><b id="detTit"></b><button class="x" onclick="detOv.classList.remove('open')">×</button></div><div class="bb" id="detBody"></div></div></div>
+
+<script>document.write('<scr'+'ipt src="SHARED_DATA/catymey_kb.js?v='+Date.now()+'"></scr'+'ipt>');</script>
+<script src="SHARED_DATA/catymey_asignacion.js"></script>
+<script src="SHARED_DATA/catymey_precotejo.js"></script>
+<script>window.CATYMEY_CONFIG={lado:'right'};</script>
+<script>document.write('<scr'+'ipt src="SHARED_DATA/catymey.js?v='+Date.now()+'"></scr'+'ipt>');</script>
+<script>
+const KB=window.CATYMEY_KB, AS=window.CATYMEY_ASIGNACION, PR=window.CATYMEY_PRECOTEJO;
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nrm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+const AMB=AS.ambitos; const CORTO={al:'Alimentación',atencion_cerrada:'Anexo 1',cirugia_menor:'Anexo 2',cp:'Calderas',cz:'NGT 25',dialisis:'Diálisis',dr:'Droguería',farmacia:'Farmacia ISP',hospitalizacion_psiquiatrica:'Hosp. Psiq.',imagenologia:'Imagenología',laboratorio:'Laboratorio',medicina_nuclear:'Med. Nuclear',quimioterapia:'Quimioterapia',re:'REAS'};
+const chip=(a,cls)=>{const m=AMB[a]||{};let t=(m.name||a).replace(/^(Artículo|Art\.)\s*\d+\s*·\s*/i,'');if(t.length>60)t=t.slice(0,58)+'…';return `<span class="chip ${cls||''}" title="${esc((m.norma||'')+' · '+(m.sec||'')+' · '+(m.name||a))}"><small>${esc(CORTO[m.norma]||m.norma||'')}</small> ${esc(t)}</span>`;};
+const PISOS=['P-2','P-1','P1','P2','P3','P4','P5'];
+let VISTA='rec';
+function tab(el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));document.getElementById('p-'+el.dataset.p).classList.add('on');}
+function vista(v){VISTA=v;document.getElementById('v2').classList.toggle('on',v==='rec');document.getElementById('v1').classList.toggle('on',v==='svc');render();}
+/* ── Resumen ── */
+(function(){
+  const r=AS.resumen, c=r.cambios, p=PR.resumen;
+  document.getElementById('p-res').innerHTML=`
+  <div class="card"><h2>▶ Cápsula de 1 minuto · cómo se automatizan las pautas</h2>
+    <p class="note">Del papel al cotejo digital: los tres estados, la observación y la firma que archiva el informe. Vertical, para verla en el celular. CATYMEY también la ofrece dentro de la conversación.</p>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
+      <video controls playsinline preload="none" poster="assets/catymey/catymey_capsula_poster.webp" src="assets/catymey/catymey_capsula.mp4" style="width:280px;max-width:100%;border-radius:14px;background:var(--inst);display:block"></video>
+      <div style="flex:1;min-width:260px">
+        <ul class="tight">
+          <li><b>0:00</b> El problema: la pauta en papel, con anotaciones cruzadas y hojas sueltas.</li>
+          <li><b>0:30</b> La pauta digital: cada requisito con CUMPLE, NO CUMPLE o N/A y su observación.</li>
+          <li><b>1:00</b> La firma cierra el cotejo y el informe se archiva solo en PDF.</li>
+        </ul>
+        <p class="note">Complementa a CATYMEY: el video explica el proceso completo; el agente responde las dudas puntuales de cada recinto. Guion en <code>Capsula_Video_Aplicacion_Pauta_AS.md</code>.</p>
+      </div>
+    </div></div>
+    <div class="card"><h2>Qué hizo CATYMEY esta noche</h2>
+    <p>Leyó los ${r.recintos.toLocaleString('es-CL')} recintos del Atlas con su tipo, su código PMA y su servicio; las 14 normas digitalizadas (${Object.keys(AMB).length} ámbitos); la asignación vigente de terreno; el despliegue de equipamiento, mobiliario y TI por recinto, y las superficies del PMA. Con eso propuso la pauta de cada recinto, unidad, edificio y del hospital, y precotejó cada requisito contra lo que ya existe en papel. <b>No borró ni modificó nada</b>: todo está en archivos nuevos y en esta plataforma.</p>
+    <div class="kpis"><div class="kpi n"><b>${r.recintos.toLocaleString('es-CL')}</b><span>recintos del Atlas</span></div><div class="kpi"><b>${r.con_pauta_propuesta.toLocaleString('es-CL')}</b><span>con pauta propuesta (antes ${r.con_pauta_actual})</span></div><div class="kpi"><b>${c.igual||0}</b><span>igual a la vigente</span></div><div class="kpi"><b>${c.nueva||0}</b><span>nuevas</span></div><div class="kpi w"><b>${c.distinta||0}</b><span>distintas · por decidir</span></div><div class="kpi n"><b>${c.evidencia||0}</b><span>respaldan requisitos generales</span></div><div class="kpi n"><b>${r.reglas}</b><span>reglas con fundamento</span></div><div class="kpi"><b>${r.pautas_unidad_nuevas}</b><span>pautas de unidad propuestas (${r.unidades_con_nuevas} servicios)</span></div></div>
+    <h3>Precotejo documental</h3>
+    <div class="kpis"><div class="kpi n"><b>${p.requisitos_evaluados.toLocaleString('es-CL')}</b><span>requisitos evaluados</span></div><div class="kpi"><b>${p.documental_ok.toLocaleString('es-CL')}</b><span>respaldados por el despliegue</span></div><div class="kpi r"><b>${p.falta_en_despliegue.toLocaleString('es-CL')}</b><span>sin evidencia de equipamiento</span></div><div class="kpi w"><b>${p.concesionaria.toLocaleString('es-CL')}</b><span>dependen de la Concesionaria</span></div><div class="kpi n"><b>${p.gestion.toLocaleString('es-CL')}</b><span>documentos de gestión</span></div><div class="kpi n"><b>${p.terreno.toLocaleString('es-CL')}</b><span>solo en terreno</span></div><div class="kpi n"><b>${p.condicional.toLocaleString('es-CL')}</b><span>condicionales (N/A si no aplica)</span></div><div class="kpi w"><b>${p.recintos_sin_despliegue}</b><span>recintos con pauta sin despliegue EMMC</span></div></div>
+    <div class="grid2">
+      <div><h3>Cómo leer la asignación</h3><ul class="tight"><li><b>Vista 2 · recintos:</b> la pauta de cada box, sala, habitación, pabellón, laboratorio, con la <i>regla</i> que la eligió (tipo del Atlas, nombre del recinto, servicio) y su fundamento normativo.</li><li><b>Vista 1 · servicios:</b> lo que se autoriza como unidad completa (D.S. 20/2011 al laboratorio, D. 45/2016 a diálisis, planta física y equipamiento de cada unidad del Anexo 1, equipamiento básico y carro de RCP de cada unidad ambulatoria).</li><li><b>Edificio AA:</b> el Anexo 2 como establecimiento de atención abierta (organización, RRHH, accesibilidad, seguridad, recintos generales).</li><li><b>Hospital:</b> los requisitos generales del Anexo 1, el REAS del establecimiento y las calderas de la central térmica.</li></ul></div>
+      <div><h3>Qué decidir en la mañana</h3><ul class="tight"><li>Las <b>${c.distinta||0} pautas distintas</b>: CATYMEY propone una pauta más específica que la vigente (UCI/UTI en vez de módulo básico, box de emergencia en vez de consulta, radiología en vez de procedimientos…). Se ven en 🧩 Asignación filtrando «distinta».</li><li>Las <b>${c.nueva||0} nuevas</b>: recintos que hoy no tienen pauta (aseos, salas REAS de cada unidad, estaciones y trabajos limpios/sucios, laboratorios por sección, farmacia, esterilización).</li><li>Las <b>${r.pautas_unidad_nuevas} pautas de unidad</b> nuevas y los dos niveles nuevos (edificio AA y hospital).</li><li>La <b>solicitud a la Concesionaria</b>: ${PR.solicitud_concesionaria.length} temas de obra e instalaciones que ningún cotejo en terreno puede resolver sin planos y certificados.</li></ul></div>
+    </div>
+    <p class="note">Fuentes: Atlas HDS (cabida_web_snapshot), mapa PMA-BIM, normas MINSAL digitalizadas (16.AutorizacionSanitaria), asignación vigente (as_movil_datos), despliegue EMMC por recinto, superficies del PMA 2026. Motor: _DEV/catymey/asigna_pautas.py · precoteja.py · build_kb.py. Versión ${esc(AS.version)}.</p>
+  </div>`;
+})();
+/* ── Asignación ── */
+const REC=Object.entries(AS.recintos).map(([id,e])=>({id,...e}));
+(function(){
+  const P=document.getElementById('fPiso');[...new Set(REC.map(r=>r.piso))].sort((a,b)=>PISOS.indexOf(a)-PISOS.indexOf(b)).forEach(p=>P.add(new Option(p.replace('P','Piso '),p)));
+  const S=document.getElementById('fSvc');[...new Set(REC.map(r=>r.svc))].sort().forEach(s=>S.add(new Option(s,s)));
+  const C=document.getElementById('fCambio');['igual','amplia','distinta','nueva','mantiene','evidencia','sin_pauta','congelado'].forEach(c=>C.add(new Option(c,c)));
+  const R=document.getElementById('fRegla');Object.keys(AS.reglas).sort().forEach(k=>R.add(new Option(k+' ('+AS.reglas[k].n+')',k)));
+})();
+function filas(){
+  const piso=fPiso.value,svc=fSvc.value,cam=fCambio.value,reg=fRegla.value,q=nrm(fQ.value);
+  if(VISTA==='svc'){
+    return Object.entries(AS.unidades).filter(([n,u])=>(!piso||u.piso===piso)&&(!svc||n===svc)&&(!q||nrm(n+' '+u.propuesta.map(a=>(AMB[a]||{}).name).join(' ')).includes(q))).map(([n,u])=>({n,...u})).sort((a,b)=>PISOS.indexOf(a.piso)-PISOS.indexOf(b.piso)||a.n.localeCompare(b.n));
+  }
+  return REC.filter(r=>(!piso||r.piso===piso)&&(!svc||r.svc===svc)&&(!cam||r.cambio===cam)&&(!reg||r.regla===reg)&&(!q||nrm(r.code+' '+r.name+' '+r.svc+' '+r.regla+' '+r.propuesta.map(a=>(AMB[a]||{}).name).join(' ')).includes(q)))
+    .sort((a,b)=>PISOS.indexOf(a.piso)-PISOS.indexOf(b.piso)||a.svc.localeCompare(b.svc)||a.code.localeCompare(b.code,undefined,{numeric:true}));
+}
+function render(){
+  const f=filas(),MAX=600,v=f.slice(0,MAX);
+  document.getElementById('cnt').textContent=(f.length>MAX?`mostrando ${MAX} de `:'')+f.length+(VISTA==='svc'?' servicios':' recintos');
+  let h;
+  if(VISTA==='svc'){
+    h='<table class="x"><thead><tr><th>Piso</th><th>Servicio / unidad</th><th>Recintos</th><th>Pautas vigentes</th><th>Propuestas por CATYMEY</th><th>Responsables</th><th>Precotejo</th></tr></thead><tbody>'+v.map(u=>`<tr><td class="n">${esc(u.piso)}</td><td><b>${esc(u.n)}</b>${u.congelado?' ❄':''}</td><td class="n">${u.n_recintos}</td><td>${u.actual.length?u.actual.length+' pautas · '+(u.fundamento_actual||[]).map(esc).join(' · '):'<span class="note">—</span>'}</td><td>${u.nuevas.map(x=>chip(x.amb,'new')+` <small class="note">${esc(x.fundamento)}</small><br>`).join('')||'<span class="note">—</span>'}</td><td>${(u.responsables||[]).map(esc).join('<br>')}</td><td>${PR.unidades[u.n]?`<button class="dbtn" onclick="detalle('svc','${esc(u.n)}')">🔎</button>`:''}</td></tr>`).join('')+'</tbody></table>';
+  } else {
+    h='<table class="x"><thead><tr><th>Piso</th><th>Servicio</th><th>Código</th><th>Recinto</th><th>Tipo Atlas</th><th>Tipología PMA</th><th>m²</th><th>Vigente</th><th>Propuesta CATYMEY</th><th>Cambio</th><th>Regla · fundamento</th><th>Precotejo</th></tr></thead><tbody>'+v.map(r=>`<tr><td class="n">${esc(r.piso)}</td><td>${esc(r.svc)}</td><td class="n">${esc(r.code)}</td><td><b>${esc(r.name)}</b></td><td>${esc(r.tipo_atlas)}</td><td>${esc(r.tipologia_pma)}${r.subtipo_pma?' · '+esc(r.subtipo_pma):''}</td><td class="n">${r.m2?Math.round(r.m2):''}</td><td>${r.actual.map(a=>chip(a,'old')).join('')||'<span class="note">—</span>'}</td><td>${r.propuesta.map(a=>chip(a,r.actual.includes(a)?'':'new')).join('')||(r.cambio==='evidencia'?'<span class="note">'+r.evidencia_para.map(x=>esc(x.que)).join('; ')+'</span>':'<span class="note">—</span>')}</td><td><span class="cb ${esc(r.cambio)}">${esc(r.cambio.replace('_',' '))}</span></td><td><small>${r.regla?'<b>'+esc(r.regla)+'</b> ('+esc(r.confianza)+') · '+esc(r.fundamento):''}</small></td><td>${r.propuesta.length&&PR.recintos[r.id]?`<button class="dbtn" onclick="detalle('rec','${esc(r.id)}')">🔎</button>`:''}</td></tr>`).join('')+'</tbody></table>';
+  }
+  document.getElementById('tbl').innerHTML=h;
+}
+function csv(){
+  const f=filas(); const lines=[];
+  if(VISTA==='svc'){lines.push(['Piso','Servicio','Recintos','Pautas vigentes','Pautas propuestas','Fundamento','Responsables'].join(';'));f.forEach(u=>lines.push([u.piso,u.n,u.n_recintos,u.actual.length,u.nuevas.map(x=>(AMB[x.amb]||{}).name).join(' | '),u.nuevas.map(x=>x.fundamento).join(' | '),(u.responsables||[]).join(' | ')].map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')));}
+  else{lines.push(['Piso','Servicio','Código','Recinto','Tipo Atlas','Tipología PMA','m2','Vigente','Propuesta','Cambio','Regla','Confianza','Fundamento'].join(';'));f.forEach(r=>lines.push([r.piso,r.svc,r.code,r.name,r.tipo_atlas,r.tipologia_pma,r.m2?Math.round(r.m2):'',r.actual.map(a=>(AMB[a]||{}).name).join(' | '),r.propuesta.map(a=>(AMB[a]||{}).name).join(' | '),r.cambio,r.regla,r.confianza,r.fundamento].map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(';')));}
+  const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,﻿'+encodeURIComponent(lines.join('\n'));a.download='CATYMEY_asignacion_'+VISTA+'.csv';document.body.appendChild(a);a.click();a.remove();
+}
+render();
+/* ── Reglas ── */
+document.getElementById('p-reg').innerHTML=`<div class="card"><h2>Reglas de asignación · ${Object.keys(AS.reglas).length}</h2><p class="note">Cada regla nace del tipo del recinto en el Atlas, de su nombre y del servicio al que pertenece. Validar una regla cierra todos sus recintos; los casos puntuales se corrigen en 🧩 Asignación.</p><div class="tw"><table class="x"><thead><tr><th>Regla</th><th>Recintos</th><th>Confianza</th><th>Pauta(s) que aplica</th><th>Fundamento</th><th>Ejemplos</th></tr></thead><tbody>${Object.entries(AS.reglas).sort((a,b)=>b[1].n-a[1].n).map(([k,g])=>`<tr><td><b>${esc(k)}</b></td><td class="n">${g.n}</td><td>${esc(g.confianza)}</td><td>${Object.entries(g.pautas).map(([a,n])=>chip(a)+(n<g.n?` <small class="note">${n}</small>`:'')).join('')}</td><td><small>${esc(g.fundamento)}</small></td><td><small>${g.ejemplos.map(esc).join('<br>')}</small></td></tr>`).join('')}</tbody></table></div></div>`;
+/* ── Precotejo ── */
+(function(){
+  const p=PR.resumen; const tot=p.requisitos_evaluados||1;
+  const bar=o=>{const t=o.total||1;return `<div class="bar" title="${o.documental_ok} respaldados · ${o.falta_en_despliegue} sin evidencia · ${o.concesionaria} Concesionaria · ${o.gestion} gestión · ${o.terreno} terreno · ${o.condicional||0} condicional"><i class="ok" style="width:${o.documental_ok/t*100}%"></i><i class="fa" style="width:${o.falta_en_despliegue/t*100}%"></i><i class="co" style="width:${o.concesionaria/t*100}%"></i><i class="ge" style="width:${o.gestion/t*100}%"></i><i class="te" style="width:${o.terreno/t*100}%"></i><i class="cd" style="width:${(o.condicional||0)/t*100}%"></i></div>`;};
+  const sum=objs=>objs.reduce((a,o)=>{['total','documental_ok','falta_en_despliegue','concesionaria','gestion','terreno','condicional'].forEach(k=>a[k]=(a[k]||0)+(o[k]||0));return a;},{});
+  const porSvc={};Object.values(PR.recintos).forEach(r=>{(porSvc[r.svc]=porSvc[r.svc]||[]).push(...Object.values(r.pautas));});Object.entries(PR.unidades).forEach(([s,u])=>{(porSvc[s]=porSvc[s]||[]).push(...Object.values(u.pautas));});
+  const filasSvc=Object.entries(porSvc).map(([s,arr])=>[s,sum(arr)]).sort((a,b)=>b[1].falta_en_despliegue-a[1].falta_en_despliegue);
+  document.getElementById('p-pre').innerHTML=`<div class="card"><h2>Precotejo documental · ${tot.toLocaleString('es-CL')} requisitos</h2>
+    <p>Cada requisito de cada pauta propuesta se contrastó con el despliegue de equipamiento médico, mobiliario clínico y no clínico y TI por recinto (matriz EMMC), y con la información de obra. Es el punto de partida del cotejo, no su resultado.</p>
+    <div class="leg"><i class="ok"></i>respaldado por el despliegue <i class="fa"></i>sin evidencia de equipamiento <i class="co"></i>depende de la Concesionaria <i class="ge"></i>documento de gestión <i class="te"></i>solo en terreno <i class="cd"></i>condicional</div>
+    ${bar(p)}
+    <h3>Por servicio</h3><div class="tw" style="max-height:52vh"><table class="x"><thead><tr><th>Servicio</th><th>Requisitos</th><th>Respaldados</th><th>Sin evidencia</th><th>Concesionaria</th><th>Gestión</th><th>Terreno</th><th>Perfil</th></tr></thead><tbody>${filasSvc.map(([s,o])=>`<tr><td><b>${esc(s)}</b></td><td class="n">${o.total}</td><td class="n" style="color:#0E7C66">${o.documental_ok}</td><td class="n" style="color:#b91c1c">${o.falta_en_despliegue}</td><td class="n" style="color:#b45309">${o.concesionaria}</td><td class="n">${o.gestion}</td><td class="n">${o.terreno}</td><td>${bar(o)}</td></tr>`).join('')}</tbody></table></div>
+    <div class="grid2"><div><h3>Requisitos de equipamiento sin evidencia (más repetidos)</h3><div class="tw" style="max-height:44vh"><table class="x"><thead><tr><th>Requisito</th><th>Pauta</th><th>Recintos</th><th>Ejemplos</th></tr></thead><tbody>${PR.faltas_equipamiento.slice(0,60).map(x=>`<tr><td>${esc(x.t)}</td><td><small>${esc((AMB[x.amb]||{}).name||x.amb)}</small></td><td class="n">${x.recintos}</td><td><small>${x.ejemplos.slice(0,3).map(esc).join('<br>')}</small></td></tr>`).join('')}</tbody></table></div><p class="note">«Sin evidencia» = el equipo o mobiliario no figura en el despliegue EMMC de ese recinto. Puede faltar de verdad, estar cargado en otro código o venir como conjunto (p. ej. «Mobiliario paciente UCI» incluye cama, velador y mesa). Se confirma en terreno.</p></div>
+    <div><h3>Documentos de gestión que pide la norma</h3><div class="tw" style="max-height:44vh"><table class="x"><thead><tr><th>Requisito</th><th>Pauta</th><th>Veces</th></tr></thead><tbody>${PR.gestion_documental.slice(0,40).map(x=>`<tr><td>${esc(x.t)}</td><td><small>${esc((AMB[x.amb]||{}).name||x.amb)}</small></td><td class="n">${x.veces}</td></tr>`).join('')}</tbody></table></div><p class="note">Reglamentos, manuales, registros, programas y habilitaciones profesionales: los prepara el hospital (Calidad, Dirección, cada servicio), no dependen del recinto.</p></div></div>
+    <p class="note">El detalle requisito por requisito de cada recinto está en <b>_DEV/catymey/precotejo.json</b> y en el Excel <b>CATYMEY_Precotejo_AS.xlsx</b>.</p></div>`;
+})();
+/* ── Concesionaria ── */
+(function(){
+  const L=PR.solicitud_concesionaria;
+  document.getElementById('p-con').innerHTML=`<div class="card"><h2>Antecedentes que hay que pedir a la Sociedad Concesionaria</h2><p>${L.reduce((a,x)=>a+x.requisitos_afectados,0).toLocaleString('es-CL')} requisitos de las pautas dependen de obra e instalaciones y no se resuelven mirando el recinto: necesitan planos as-built, memorias y certificados. Agrupados por tema, con lo que corresponde pedir a través de la Inspección Fiscal.</p><div class="tools"><button class="btn p" onclick="copiarSolicitud()">⧉ Copiar como texto para el oficio</button></div>
+  ${L.map(x=>`<div class="tema"><b>${esc(x.tema)} <small>· ${x.requisitos_afectados} requisitos en ${x.pautas} pautas</small></b>${esc(x.que_pedir)}<br><small>Ejemplos de requisitos: ${x.ejemplos.slice(0,4).map(e=>esc(e.t)).join(' · ')}</small></div>`).join('')}
+  <p class="note">Además de la obra, tres antecedentes que el hospital no tiene y que condicionan la autorización: (1) resolución sanitaria de la central de alimentación (Concesionaria), (2) certificación D.S. 10/2013 de calderas y autoclaves, (3) planos as-built de arquitectura con superficies por recinto (el PMA solo trae superficie en 434 de 2.010 recintos).</p></div>`;
+  window.copiarSolicitud=()=>{const t='SOLICITUD DE ANTECEDENTES · AUTORIZACIÓN SANITARIA NHDS\n\n'+L.map((x,i)=>`${i+1}. ${x.tema} (${x.requisitos_afectados} requisitos en ${x.pautas} pautas)\n   ${x.que_pedir}`).join('\n\n');navigator.clipboard.writeText(t).then(()=>alert('Copiado.'));};
+})();
+/* ── Hospital / AA ── */
+(function(){
+  const bar=o=>o?`<small class="note">${o.documental_ok} respaldados · ${o.falta_en_despliegue} sin evidencia · ${o.concesionaria} Concesionaria · ${o.gestion} gestión · ${o.terreno} terreno</small>`:'';
+  document.getElementById('p-hos').innerHTML=`<div class="grid2"><div class="card"><h2>Hospital · ${AS.hospital.length} pautas</h2><p class="note">Una sola vez para todo el establecimiento. Las presenta la Dirección con Calidad, Operaciones y Puesta en Marcha.</p><ul class="tight">${AS.hospital.map(p=>`<li>${chip(p.amb)} <button class="dbtn" onclick="detalle('hospital','${esc(p.amb)}')">🔎</button> ${bar(PR.hospital[p.amb])}<br><small class="note">${esc(p.fundamento)}${p.quien?' · <b>Presenta:</b> '+esc(p.quien):''}</small></li>`).join('')}</ul>
+  <h3>Recintos del Atlas que respaldan los requisitos generales</h3><ul class="tight">${Object.entries(AS.evidencia_general).map(([a,v])=>`<li>${chip(a)} · ${v.length} recintos: ${[...new Set(v.map(x=>x.que))].map(esc).join('; ')}</li>`).join('')}</ul></div>
+  <div class="card"><h2>Edificio de Atención Abierta · ${AS.edificio_AA.length} pautas</h2><p class="note">El Anexo 2 como establecimiento de atención abierta (organización, recursos humanos, infraestructura general y equipamiento de las unidades ambulatorias).</p><ul class="tight">${AS.edificio_AA.map(p=>`<li>${chip(p.amb)} <button class="dbtn" onclick="detalle('edificio_AA','${esc(p.amb)}')">🔎</button> ${bar(PR.edificio_AA[p.amb])}<br><small class="note">${p.quien?'<b>Presenta:</b> '+esc(p.quien):''}</small></li>`).join('')}</ul></div></div>`;
+})();
+/* ── Detalle del precotejo (bajo demanda) ── */
+let _detCargando=null;
+function cargaDetalle(){ if(window.CATYMEY_PRECOTEJO_DETALLE) return Promise.resolve(); if(_detCargando) return _detCargando;
+  _detCargando=new Promise((ok,ko)=>{const sc=document.createElement('script');sc.src='data/catymey_precotejo_detalle.js?v='+Date.now();sc.onload=ok;sc.onerror=()=>ko(new Error('no se pudo cargar data/catymey_precotejo_detalle.js'));document.head.appendChild(sc);}); return _detCargando; }
+const EST_LBL={documental_ok:'respaldado',falta_en_despliegue:'sin evidencia',concesionaria:'Concesionaria',gestion:'gestión',terreno:'terreno',condicional:'condicional'};
+async function detalle(nivel,id){
+  document.getElementById('detTit').textContent='Cargando detalle…'; document.getElementById('detBody').innerHTML=''; detOv.classList.add('open');
+  try{ await cargaDetalle(); }catch(e){ document.getElementById('detTit').textContent='Sin detalle'; document.getElementById('detBody').innerHTML='<p class="note">'+esc(e.message)+' — el detalle está en _DEV/catymey/precotejo.json y en el Excel.</p>'; return; }
+  const DD=window.CATYMEY_PRECOTEJO_DETALLE; let pautas, tit;
+  if(nivel==='rec'){ const r=AS.recintos[id]; pautas=DD.recintos[id]||{}; tit=`🔎 ${r.code} · ${r.name} · ${r.svc}`; }
+  else if(nivel==='svc'){ pautas=DD.unidades[id]||{}; tit=`🔎 ${id} · pautas de la unidad`; }
+  else { pautas={[id]:(DD[nivel]||{})[id]||[]}; tit=`🔎 ${nivel==='hospital'?'Hospital':'Edificio AA'}`; }
+  document.getElementById('detTit').textContent=tit;
+  document.getElementById('detBody').innerHTML=Object.entries(pautas).map(([a,items])=>{const c={};items.forEach(i=>c[i.estado]=(c[i.estado]||0)+1);
+    return `<h3 style="margin:10px 0 6px">${chip(a)} <small class="note">${Object.entries(c).map(([k,v])=>`${v} ${EST_LBL[k]||k}`).join(' · ')}</small></h3><table class="x"><thead><tr><th>N°</th><th>Requisito</th><th>Precotejo</th><th>Evidencia / nota</th></tr></thead><tbody>${items.map(i=>`<tr><td class="n">${esc(i.n)}</td><td>${esc(i.t)}${i.g?`<br><small class="note">${esc(i.g)}</small>`:''}</td><td><span class="est ${esc(i.estado)}">${esc(EST_LBL[i.estado]||i.estado)}</span>${i.temas&&i.temas.length?`<br><small class="note">${i.temas.map(esc).join(' · ')}</small>`:''}</td><td><small>${(i.evidencia||[]).map(esc).join('; ')}${i.nota?(i.evidencia&&i.evidencia.length?' · ':'')+esc(i.nota):''}</small></td></tr>`).join('')}</tbody></table>`;}).join('')||'<p class="note">Sin pautas precotejadas para este elemento.</p>';
+}
+/* ── Insertar ── */
+document.getElementById('p-ins').innerHTML=`<div class="card"><h2>Cómo insertar a CATYMEY en las plataformas</h2><p>Dos líneas antes de <code>hub-home.js</code> en <b>16.AutorizacionSanitaria.html</b> y en la fuente <b>38.AutorizacionSanitariaMovil.html</b> (la 39 se regenera con tools/build_as_terreno.py):</p>
+<pre class="code">&lt;script src="SHARED_DATA/catymey_kb.js"&gt;&lt;/script&gt;
+&lt;script&gt;window.CATYMEY_CONFIG={lado:'left'};&lt;/script&gt;   // 'right' si el lado izquierdo está ocupado
+&lt;script src="SHARED_DATA/catymey.js"&gt;&lt;/script&gt;</pre>
+<p>Aparece el botón flotante «CATYMEY» y el panel de conversación. API: <code>CATYMEY.abrir()</code>, <code>CATYMEY.preguntar('17.2.6')</code>. Para publicarla en el 🟡 HUB-PM hay que agregar <code>SHARED_DATA/catymey_kb.js</code> y <code>SHARED_DATA/catymey.js</code> a la lista de datos de la plataforma en <code>_DEV/deploy_web_pm.py</code>.</p>
+<h3>Segunda opinión con un modelo de lenguaje (opcional)</h3><p>Si más adelante se publica un Apps Script que reciba <code>{q, contexto}</code> y devuelva <code>{respuesta}</code> (con la clave del modelo guardada en el script, nunca en la página), basta con <code>window.CATYMEY_CONFIG={endpoint:'https://script.google.com/…/exec'}</code>. Sin endpoint, CATYMEY responde solo con su base de conocimiento local.</p>
+<h3>Regenerar</h3><pre class="code">python3 _DEV/catymey/asigna_pautas.py   # propuesta de asignación
+python3 _DEV/catymey/precoteja.py       # precotejo documental
+python3 _DEV/catymey/build_kb.py        # base de conocimiento del agente
+python3 _DEV/catymey/export_xlsx.py     # Excel de la propuesta y del precotejo
+python3 _DEV/catymey/build_docs.py      # informes .md</pre></div>`;
+</script>
+<script src="hub-home.js"></script>
+</body>
+</html>

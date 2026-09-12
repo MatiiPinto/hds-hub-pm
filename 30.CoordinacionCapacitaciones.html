@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<script src="pm_config.js"></script>
+<script src="pm_gate.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coordinación de Capacitaciones · HDS</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230B5FA5'/><text x='50' y='70' font-size='54' font-family='Arial' font-weight='bold' fill='white' text-anchor='middle'>H</text></svg>">
+<style>
+:root{
+  --azul:#0B5FA5;--azul-osc:#084a82;--bg:#f4f6f9;--card:#fff;--bd:#e2e8f0;--tx:#1e293b;--tx2:#64748b;
+  --e-ejec:#16a34a;--e-ejec-bg:#dcfce7;--e-coor:#2563eb;--e-coor-bg:#dbeafe;
+  --e-porc:#b45309;--e-porc-bg:#fef3c7;--e-repr:#ea580c;--e-repr-bg:#ffedd5;--e-na:#64748b;--e-na-bg:#eef2f6;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--tx);font-size:13px}
+header{background:linear-gradient(135deg,var(--azul),var(--azul-osc));color:#fff;padding:14px 22px;position:sticky;top:0;z-index:30;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.hrow{display:flex;align-items:center;gap:14px;row-gap:10px;max-width:1500px;margin:0 auto;flex-wrap:wrap}
+/* el boton HUB·HDS lo inyecta hub-home.js como primer hijo del <header>;
+   un script al final lo mueve DENTRO de .hrow para que comparta la fila y el
+   contenedor de 1500px con el logo y el titulo (antes flotaba en su propia
+   linea, fuera de la caja centrada). El margen inline que trae se neutraliza
+   aqui porque la fila ya usa gap. */
+.hrow > a[data-hubhome]{flex:0 0 auto;margin-right:0!important}
+.logo{flex:0 0 auto;width:42px;height:42px;border-radius:9px;background:rgba(255,255,255,.18);display:grid;place-items:center;font-weight:800;font-size:18px}
+.htitle{flex:1 1 300px;min-width:0}
+.htitle h1{font-size:18px;font-weight:700;line-height:1.25}.htitle p{font-size:12px;opacity:.85;line-height:1.3}
+.htools{margin-left:auto;display:flex;align-items:center;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+#capUpdInfo{align-self:center;white-space:nowrap;margin-right:4px}
+.btn{border:none;border-radius:7px;padding:8px 13px;font-size:12.5px;font-weight:600;cursor:pointer;background:rgba(255,255,255,.16);color:#fff}
+.btn:hover{background:rgba(255,255,255,.28)}
+main{max-width:1500px;margin:0 auto;padding:16px 22px 50px}
+.dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+.kpi h3{font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--tx2);margin-bottom:7px;font-weight:700}
+.kpi .big{font-size:26px;font-weight:800;color:var(--azul)}
+.kpi .sub{font-size:11.5px;color:var(--tx2);margin-top:2px}
+.kpi.combo{background:linear-gradient(135deg,#0B5FA5,#084a82);color:#fff}
+.kpi.combo h3{color:rgba(255,255,255,.85)}.kpi.combo .big{color:#fff}.kpi.combo .sub{color:rgba(255,255,255,.8)}
+.bar{height:8px;border-radius:5px;background:#e2e8f0;overflow:hidden;margin-top:9px;display:flex}
+.bar i{display:block;height:100%}
+.kpi.combo .bar{background:rgba(255,255,255,.25)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin:4px 2px 14px;font-size:11.5px;color:var(--tx2)}
+.legend span{display:inline-flex;align-items:center;gap:5px}
+.dot{width:11px;height:11px;border-radius:3px;display:inline-block}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tab{border:1px solid var(--bd);background:#fff;border-radius:9px;padding:9px 15px;font-size:13px;font-weight:600;cursor:pointer;color:var(--tx2)}
+.tab.on{background:var(--azul);color:#fff;border-color:var(--azul)}
+.tab .c{font-size:11px;opacity:.8;margin-left:5px}
+.filters{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:11px;align-items:center}
+.filters input,.filters select{border:1px solid var(--bd);border-radius:8px;padding:8px 11px;font-size:12.5px;background:#fff;color:var(--tx);max-width:230px}
+.filters input[type=text]{min-width:220px}
+.fcount{font-size:12px;color:var(--tx2);margin-left:auto}
+.twrap{overflow:auto;border:1px solid var(--bd);border-radius:11px;background:#fff;max-height:70vh}
+table{border-collapse:collapse;width:100%;font-size:12px;white-space:nowrap}
+thead th{background:var(--azul);color:#fff;position:sticky;top:0;padding:9px 10px;text-align:left;font-weight:600;font-size:11.5px;z-index:5}
+tbody td{padding:6px 10px;border-bottom:1px solid #eef2f6;vertical-align:middle}
+tbody tr:hover td{background:#f8fafc}
+td.edit input,td.edit textarea{width:100%;min-width:90px;border:1px solid transparent;border-radius:5px;padding:4px 6px;font-size:12px;background:transparent;font-family:inherit;color:var(--tx)}
+td.edit input:hover,td.edit textarea:hover{border-color:var(--bd);background:#fff}
+td.edit input:focus,td.edit textarea:focus{border-color:var(--azul);background:#fff;outline:none}
+.est-sel{border:none;border-radius:20px;padding:5px 9px;font-size:11.5px;font-weight:700;cursor:pointer;-webkit-appearance:none;appearance:none}
+.e-ejecutada,.e-entregado{background:#dcfce7;color:#16a34a}
+.e-coordinada{background:#fef9c3;color:#a16207}
+.e-por_coordinar{background:#eef2f6;color:#64748b}
+.e-por_entregar{background:#fef3c7;color:#b45309}
+.e-reprogramada{background:#fee2e2;color:#dc2626}
+.e-inst_uso{background:#e0f2fe;color:#0369a1}
+.e-programado{background:#fef9c3;color:#a16207}
+.e-sin_info{background:#eef2f6;color:#64748b}
+.e-no_aplica{background:#ffffff;color:#64748b;border:1px solid #cbd5e1}
+.e-pendiente{background:#eef2f6;color:#64748b}
+.e-en_progreso{background:#ecfccb;color:#4d7c0f}
+tr.row-ejecutada,tr.row-entregado{background:#f3fcf6}
+tr.row-coordinada{background:#fffdf2}
+tr.row-por_coordinar{background:#f8fafc}
+tr.row-por_entregar{background:#fffdf5}
+tr.row-reprogramada{background:#fff5f5}
+tr.row-inst_uso{background:#f0f9ff}
+tr.row-programado{background:#fffdf2}
+tr.row-sin_info{background:#ffffff}
+tr.row-no_aplica{background:#ffffff}
+tr.row-pendiente{background:#f8fafc}
+tr.row-en_progreso{background:#f7fee7}
+.estbar{width:5px;padding:0!important}
+.eb-ejecutada,.eb-entregado{background:#16a34a}.eb-coordinada{background:#eab308}
+.eb-en_progreso{background:#84cc16}.eb-por_coordinar{background:#94a3b8}.eb-por_entregar{background:#f59e0b}.eb-reprogramada{background:#ef4444}.eb-no_aplica{background:#e2e8f0}.eb-pendiente{background:#94a3b8}.eb-inst_uso{background:#38bdf8}.eb-programado{background:#eab308}.eb-sin_info{background:#cbd5e1}
+.muted{color:var(--tx2)}
+.slotcell{min-width:245px}
+.slots{display:flex;flex-direction:column;gap:4px}
+.slot{display:flex;gap:4px;align-items:center}
+.slot input[type=date]{width:118px;border:1px solid var(--bd);border-radius:5px;padding:3px 5px;font-size:11px;font-family:inherit}
+.slot-h{width:90px;border:1px solid var(--bd);border-radius:5px;padding:3px 5px;font-size:11px;font-family:inherit}
+.slot-x{border:none;background:#fee2e2;color:#dc2626;border-radius:5px;cursor:pointer;font-size:13px;width:20px;height:23px;line-height:1;padding:0}
+.slot-add{border:1px dashed var(--azul);background:#eef6fc;color:var(--azul);border-radius:5px;cursor:pointer;font-size:11px;padding:3px 8px;align-self:flex-start}
+th.sortable{cursor:pointer;user-select:none}th.sortable:hover{background:#0a558f}
+.bulkbar{display:none;align-items:center;gap:12px;background:#0B5FA5;color:#fff;border-radius:10px;padding:9px 14px;margin-bottom:11px;font-size:13px;flex-wrap:wrap}
+.bulkbar.show{display:flex}
+.bulkbar b{font-weight:800}
+.bulkbar select{border:none;border-radius:7px;padding:6px 10px;font-size:12.5px;font-weight:600;color:#1e293b}
+.bulkbar button{border:none;border-radius:7px;padding:7px 12px;font-size:12.5px;font-weight:700;cursor:pointer}
+.bb-apply{background:#16a34a;color:#fff}.bb-clear{background:rgba(255,255,255,.22);color:#fff}
+.chk{width:15px;height:15px;cursor:pointer}
+
+/* ── Seguimiento de jornadas propuestas a la CSSO (cap_seguimiento.js) ───── */
+.segbadge{display:inline-block;min-width:18px;padding:1px 6px;margin-left:6px;border-radius:9px;background:#ef4444;color:#fff;font-size:11px;font-weight:800;text-align:center}
+.segmask{position:fixed;inset:0;background:rgba(15,23,42,.58);display:none;align-items:flex-start;justify-content:center;z-index:200;padding:26px 16px;overflow:auto}
+.segmask.on{display:flex}
+.segbox{background:var(--card);border-radius:14px;width:100%;max-width:1000px;box-shadow:0 18px 50px rgba(0,0,0,.3);overflow:hidden}
+.seghd{background:linear-gradient(135deg,var(--azul),var(--azul-osc));color:#fff;padding:14px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.seghd h2{font-size:15.5px;font-weight:700}
+.seghd .sub{font-size:11.5px;opacity:.85;width:100%}
+.seghd .x{margin-left:auto;background:rgba(255,255,255,.18);border:none;color:#fff;border-radius:7px;padding:5px 10px;font-size:14px;font-weight:700;cursor:pointer}
+.segbd{padding:16px 18px;max-height:64vh;overflow:auto}
+.segq{font-size:15px;font-weight:700;color:var(--tx);margin-bottom:3px}
+.segmeta{font-size:12px;color:var(--tx2);margin-bottom:12px}
+.segeq{border:1px solid var(--bd);border-radius:10px;overflow:hidden;margin-bottom:12px}
+.segeq label{display:flex;gap:9px;align-items:flex-start;padding:9px 12px;border-bottom:1px solid var(--bd);cursor:pointer;font-size:12.5px}
+.segeq label:last-child{border-bottom:none}
+.segeq label:hover{background:#f8fafc}
+.segeq input{margin-top:2px}
+.segeq .cod{font-weight:700;color:var(--azul)}
+.segeq .prov{color:var(--tx2);font-size:11.5px;display:block}
+.segnota{width:100%;border:1px solid var(--bd);border-radius:8px;padding:8px 10px;font-size:12.5px;font-family:inherit}
+.segft{padding:12px 18px;border-top:1px solid var(--bd);display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:#f8fafc}
+.segft .muted{margin-right:auto}
+.sbtn{border:none;border-radius:8px;padding:9px 14px;font-size:12.5px;font-weight:700;cursor:pointer;color:#fff}
+.sb-si{background:#16a34a}.sb-no{background:#ea580c}.sb-lat{background:#64748b}.sb-gh{background:#e2e8f0;color:#334155}
+.sbtn:hover{filter:brightness(1.08)}
+.segtb{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.segtb th{background:#f1f5f9;color:var(--tx2);text-align:left;padding:7px 9px;font-size:11px;text-transform:uppercase;letter-spacing:.3px;position:sticky;top:0}
+.segtb td{padding:7px 9px;border-top:1px solid var(--bd);vertical-align:top}
+.segtb col.c-n{width:4%}.segtb col.c-f{width:10%}.segtb col.c-h{width:7%}
+.segtb col.c-sv{width:21%}.segtb col.c-eq{width:37%}.segtb col.c-e{width:12%}.segtb col.c-a{width:9%}
+.segtb th,.segtb td{white-space:normal}
+.segtb td{overflow-wrap:anywhere;word-break:break-word}
+.segtb td:nth-child(5){font-size:11.5px;line-height:1.45}
+.segtb td:nth-child(1),.segtb td:nth-child(3){white-space:nowrap;color:var(--tx2)}
+.segtb td:nth-child(2){white-space:nowrap;font-weight:600}
+.segtb td:nth-child(4){line-height:1.35}
+.segtb tr:hover td{background:#f8fafc}
+.segtb .lnk{background:none;border:none;color:var(--azul);font-weight:700;cursor:pointer;font-size:11.5px;padding:0;text-decoration:underline}
+.segpill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.sp-si{background:var(--e-ejec-bg);color:#166534}.sp-no{background:var(--e-repr-bg);color:#9a3412}
+.sp-esp{background:#fee2e2;color:#991b1b}.sp-fut{background:#eef2f6;color:#475569}
+.sp-prog{background:#dbeafe;color:#1e40af}.sp-reprog{background:#fef3c7;color:#92400e}
+.segsel{font:inherit;font-size:11px;border:1px solid var(--bd,#cbd5e1);border-radius:7px;padding:3px 5px;background:#fff;color:#334155;max-width:118px}
+.segtabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.segtabs button{border:1px solid var(--bd);background:var(--card);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--tx2);cursor:pointer}
+.segtabs button.on{background:var(--azul);border-color:var(--azul);color:#fff}
+.eqcell{padding:4px 9px!important}
+.eqrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:3px 0;border-bottom:1px dashed #eef2f6}
+.eqrow:last-child{border-bottom:none}
+.eqnom{flex:1 1 220px;min-width:180px}
+.sp-mini{font-size:10px;padding:1px 7px}
+.eqsel{max-width:128px;font-size:10.5px}
+.eqnew{font-size:11px;font-weight:700;color:#92400e;white-space:nowrap}
+.eqedit{display:inline-flex;gap:4px;align-items:center;flex-wrap:wrap}
+.segtb col.c-eq2{width:46%}
+/* ── Carta Gantt ── */
+.gtt{border-collapse:collapse;font-size:11px;white-space:nowrap}
+.gtt th,.gtt td{border:1px solid #eef2f6;padding:2px 6px}
+.gtt thead th{background:var(--azul);color:#fff;position:sticky;top:0;z-index:6;font-weight:600}
+.gtt th.gd,.gtt td.gd{padding:1px;text-align:center;min-width:20px;max-width:24px}
+.gtt th.gd span{display:block;font-size:8.5px;opacity:.75}
+.gtt th.gfd{background:#64748b}
+.gtt td.gfd{background:#f1f5f9}
+.gtt .gfix{position:sticky;background:#fff;z-index:5}
+.gtt thead .gfix{z-index:7;background:var(--azul)}
+.gtt .g1{left:0;min-width:52px}.gtt .g2{left:52px;min-width:210px;max-width:230px;overflow:hidden;text-overflow:ellipsis}
+.gtt .g3{left:262px;min-width:150px;max-width:170px;overflow:hidden;text-overflow:ellipsis}.gtt .g4{left:412px;min-width:96px}
+.gtt tbody tr:hover td{background:#f8fafc}
+.gtt tbody tr:hover td.gfd{background:#eef2f6}
+.gbar{display:block;height:14px;border-radius:4px;margin:1px 0}
+.gsin{text-align:left!important;color:#dc2626;font-size:10.5px;background:#fff5f5;max-width:none!important}
+/* vista "Por día y servicio": misma lectura del reporte semanal al SSMO */
+.gvsw{margin-bottom:2px}
+.grep{font-size:12.5px;line-height:1.5}
+.grep-dia{margin:16px 0 6px;padding:6px 10px;border-radius:6px;background:#334155;color:#fff;
+  font-weight:700;font-size:11.5px;letter-spacing:.03em}
+.grep-dia:first-child{margin-top:2px}
+.grep-sv{margin:9px 0 3px;font-weight:700;color:var(--azul);font-size:12px}
+.grep-sv span{font-weight:500;color:var(--tx2);font-size:11px}
+.grep-eq{list-style:none;margin:0 0 0 4px;padding:0}
+.grep-eq li{padding:3px 0 3px 18px;position:relative;border-bottom:1px solid #f1f5f9}
+.grep-dot{position:absolute;left:2px;top:9px;width:8px;height:8px;border-radius:50%}
+.grep-cod{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:var(--tx2)}
+.grep-eq li b{margin-left:6px;font-size:11px;letter-spacing:.03em}
+.grep-obs{display:block;margin-left:0;color:var(--tx2);font-size:11px;font-style:italic}
+</style>
+</head>
+<body>
+<header>
+  <div class="hrow">
+    <div class="logo">HDS</div>
+    <div class="htitle"><h1>Coordinación de Capacitaciones</h1><p>Hospital del Salvador · Programa de Capacitación · Instructivos de Uso · Instrumental</p></div>
+    <div class="htools">
+      <span id="capUpdInfo" style="font-size:11px;color:#94a3b8;text-align:right;line-height:1.4"></span>
+      <button class="btn" id="btnCapUpd" onclick="actualizarDesdeExcel()" title="Vuelve a leer la hoja '4. Prog Capacitacion HDS' del Excel de Seguimiento y Control (Drive sincronizado) y regenera la reportería. Requiere el servidor local: python3 _DEV/deploy_server.py (o usá Actualizar-Capacitaciones.command).">⟳ Actualizar desde Excel</button>
+      <button class="btn" onclick="gAbrir()" title="Vista cronológica del programa con los colores de estado; exportable a Excel para el Servicio de Salud.">📊 Carta Gantt</button>
+      <button class="btn" id="btnSeg" onclick="segAbrir()" title="Jornadas propuestas a la CSSO (89 correos enviados el 20-08-2026): solo consulta. El estado oficial se corrige en la hoja 4 del Excel.">🎓 Jornadas CSSO</button>
+      <button class="btn" onclick="exportCSV()">⬇ Exportar CSV</button>
+      <button class="btn" onclick="resetEstados()">↺ Reiniciar estados</button>
+    </div>
+  </div>
+</header>
+<main>
+  <div class="dash" id="dash"></div>
+  <div class="legend" id="legend"></div>
+  <div class="tabs" id="tabs"></div>
+  <div class="filters" id="filters"></div>
+  <div class="bulkbar" id="bulkbar"></div>
+  <div class="twrap"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
+</main>
+
+<!-- cap_data se pide con URL única por carga: el navegador no puede servir
+     una copia vieja (Safari cacheaba la versión de días atrás y la reportería
+     se veía desactualizada aunque el Excel ya estuviera importado) -->
+<div class="segmask" id="segMask"><div class="segbox">
+  <div class="seghd"><h2 id="segTit">Jornadas propuestas a la CSSO</h2><button class="x" onclick="segCerrar()" title="Cerrar">×</button><div class="sub" id="segSub"></div></div>
+  <div class="segbd" id="segBody"></div>
+  <div class="segft" id="segFoot"></div>
+</div></div>
+
+<script>document.write('<scr'+'ipt src="SHARED_DATA/cap_data.js?v='+Date.now()+'"></scr'+'ipt>');</script>
+<!-- capa de seguimiento: las 89 jornadas propuestas a la CSSO (correos del 20-08-2026) -->
+<script>document.write('<scr'+'ipt src="SHARED_DATA/cap_seguimiento.js?v='+Date.now()+'"></scr'+'ipt>');</script>
+<script>
+"use strict";
+var D = window.CAP_DATA;
+var IDX={}; ["capacitaciones","instructivos","instrumental"].forEach(function(a){D[a].forEach(function(r){IDX[r.id]=r;});});
+var STORE_KEY = "hds_coordcap_v1";
+
+// estados por área
+var ST5 = [
+  {k:"ejecutada",lbl:"Ejecutada"},{k:"coordinada",lbl:"Coordinada"},
+  {k:"por_coordinar",lbl:"En Coordinación"},{k:"reprogramada",lbl:"Reprogramada"},{k:"no_aplica",lbl:"No aplica"}
+];
+var ST_CAP = [
+  {k:"coordinada",lbl:"Coordinada"},{k:"pendiente",lbl:"CSSO"},{k:"reprogramada",lbl:"Reprogramada"},
+  {k:"ejecutada",lbl:"Ejecutada"},{k:"en_progreso",lbl:"Ejecución parcial"},{k:"inst_uso",lbl:"Inst de Uso"}
+];
+var ST_QX = [
+  {k:"programado",lbl:"Programado"},{k:"ejecutada",lbl:"Ejecutado"},
+  {k:"inst_uso",lbl:"Inst de Uso"},{k:"sin_info",lbl:"Sin info"}
+];
+var ESTADOS = {
+  capacitaciones: ST_CAP,
+  instrumental:   ST_QX,
+  instructivos:   [{k:"entregado",lbl:"Entregado"},{k:"por_entregar",lbl:"Por entregar"}]
+};
+var DEFAULT_EST={capacitaciones:"pendiente",instrumental:"sin_info",instructivos:"por_entregar"};
+var DONE={capacitaciones:"ejecutada",instrumental:"ejecutada",instructivos:"entregado"};
+var DONE_WORD={capacitaciones:"ejecutadas",instrumental:"ejecutadas",instructivos:"entregados"};
+var EST_HEX={ejecutada:"#16a34a",en_progreso:"#84cc16",coordinada:"#eab308",programado:"#eab308",por_coordinar:"#94a3b8",reprogramada:"#ef4444",no_aplica:"#cbd5e1",pendiente:"#94a3b8",sin_info:"#94a3b8",inst_uso:"#38bdf8",
+             entregado:"#16a34a",por_entregar:"#f59e0b"};
+var EST_LBL={};Object.keys(ESTADOS).forEach(function(a){ESTADOS[a].forEach(function(e){EST_LBL[e.k]=e.lbl;});});
+function validKeys(area){return ESTADOS[area].map(function(e){return e.k;});}
+
+var COLS = {
+  capacitaciones:[
+    {key:"codigo",label:"Código"},{key:"equipo",label:"Equipo"},
+    {key:"lugar",label:"Lugar",edit:1},{key:"_slots",label:"Fechas/horas propuestas",slots:1},
+    {key:"participantes",label:"Particip.",edit:1},
+    {key:"proveedor",label:"Proveedor"},{key:"marca",label:"Marca"},{key:"modelo",label:"Modelo"},
+    {key:"duracion",label:"Duración",edit:1},{key:"cant_equipos",label:"Cant. eq."},
+    {key:"establecimiento",label:"Estab."},{key:"tipo_entrenamiento",label:"Tipo entren."},
+    {key:"propuesta_adelantar",label:"Prop. adelantar",edit:1},{key:"detalle_servicios",label:"Servicio clínico"}
+  ],
+  instructivos:[
+    {key:"codigo",label:"Código"},{key:"equipo",label:"Equipo"},{key:"cant_equipos",label:"Cant. eq."},
+    {key:"establecimiento",label:"Estab."},{key:"proveedor",label:"Proveedor"},{key:"marca",label:"Marca"},
+    {key:"modelo",label:"Modelo"},{key:"detalle_servicios",label:"Servicio clínico"},
+    {key:"fecha_coord",label:"Fecha entrega",edit:1,type:"date"}
+  ],
+  instrumental:[
+    {key:"codigo",label:"Código"},{key:"especialidad",label:"Especialidad"},{key:"caja",label:"Caja"},
+    {key:"cant_cajas",label:"Cant. cajas"},{key:"piezas_caja",label:"Piezas/caja"},{key:"piezas_total",label:"Piezas tot."},
+    {key:"proveedor",label:"Proveedor"},{key:"marca",label:"Marca"},
+    {key:"_slots",label:"Fechas propuestas",slots:1}
+  ]
+};
+var AREAS=[["capacitaciones","Programa de Capacitación"],["instructivos","Instructivos de Uso"],["instrumental","Instrumental"]];
+// filtros desplegables por área
+var FILTERFIELDS={
+  capacitaciones:["establecimiento","proveedor","marca","detalle_servicios"],
+  instructivos:["establecimiento","proveedor"],
+  instrumental:["especialidad","proveedor"]
+};
+
+var overrides = load();
+(function(){ var FLAG=window.CAP_IMPORT_FLAG||"hds_coordcap_capimport_2026jun26b";
+  if(!localStorage.getItem(FLAG)){
+    // El Excel manda SOLO sobre lo que ya conocía: en cada import se limpian
+    // los ajustes locales ANTERIORES a la edición del Excel. Lo ingresado en
+    // la plataforma DESPUÉS (sellado con _ts por ov()) sobrevive hasta que
+    // llegue un Excel más nuevo que lo incorpore.
+    var excelTs=0;
+    try{ if(window.CAP_EXCEL_MOD) excelTs=new Date(window.CAP_EXCEL_MOD.replace(' ','T')).getTime()||0; }catch(e){}
+    Object.keys(overrides).forEach(function(id){
+      if(id.indexOf("cap-")!==0&&id.indexOf("ins-")!==0&&id.indexOf("instr-")!==0) return;
+      var o=overrides[id]||{};
+      // instrumental: Programado / Inst de Uso son estados que la hoja 6 no
+      // puede expresar (solo verde=ejecutado) → sobreviven a los imports
+      if(id.indexOf("instr-")===0 && (o.estado==="programado"||o.estado==="inst_uso")) return;
+      if(!o._ts || o._ts<=excelTs) delete overrides[id];   // viejo → el Excel manda
+    });
+    localStorage.setItem(STORE_KEY, JSON.stringify(overrides));
+    localStorage.setItem(FLAG,"1");
+  }
+})();
+var active = "capacitaciones";
+var filtro = {q:"",estado:"",fields:{}};
+var selected = {};
+var sortBy = {key:null,dir:1};
+
+function load(){ try{return JSON.parse(localStorage.getItem(STORE_KEY)||"{}");}catch(e){return {};} }
+function save(){ localStorage.setItem(STORE_KEY, JSON.stringify(overrides)); }
+// cada ajuste local queda SELLADO con fecha (_ts): el import del Excel solo
+// borra ajustes ANTERIORES a la edición del Excel — lo ingresado después
+// (aún no reflejado en la planilla) sobrevive.
+function ov(id){ var o=overrides[id]||(overrides[id]={}); o._ts=Date.now(); return o; }
+function areaOf(id){ return id.indexOf("cap-")===0?"capacitaciones":(id.indexOf("ins-")===0?"instructivos":"instrumental"); }
+function estadoOf(area,row){
+  var o=overrides[row.id]; var v=(o&&o.estado)||row._estado||DEFAULT_EST[area];
+  if(validKeys(area).indexOf(v)<0) v=DEFAULT_EST[area];
+  return v;
+}
+function valOf(row,key){ if(key==="_slots") return slotsText(row); var o=overrides[row.id]; if(o&&o.fields&&o.fields[key]!=null) return o.fields[key]; return row[key]!=null?row[key]:""; }
+function slotsOf(r){ var o=overrides[r.id]; if(o&&o.slots) return o.slots; return r._slots||[]; }
+function ensureSlots(id){ var o=ov(id); if(!o.slots){ o.slots=((IDX[id]&&IDX[id]._slots)||[]).map(function(s){return {f:s.f,h:s.h};}); } return o.slots; }
+function slotsText(r){ return slotsOf(r).map(function(s){return (s.f||"")+" "+(s.h||"");}).join(" | "); }
+function slotsCell(r){
+  var slots=slotsOf(r), h='<td class="slotcell"><div class="slots">';
+  slots.forEach(function(s,i){
+    h+='<div class="slot"><input type="date" value="'+esc(s.f||"")+'" onchange="setSlot(\''+r.id+'\','+i+',\'f\',this.value)">'+
+       '<input type="text" class="slot-h" placeholder="hora" value="'+esc(s.h||"")+'" onchange="setSlot(\''+r.id+'\','+i+',\'h\',this.value)">'+
+       '<button class="slot-x" onclick="delSlot(\''+r.id+'\','+i+')" title="Quitar fecha">\u00d7</button></div>';
+  });
+  h+='<button class="slot-add" onclick="addSlot(\''+r.id+'\')">+ fecha</button></div></td>';
+  return h;
+}
+function addSlot(id){ ensureSlots(id).push({f:"",h:""}); save(); renderTable(); }
+function delSlot(id,i){ var a=ensureSlots(id); a.splice(i,1); save(); renderTable(); }
+function setSlot(id,i,f,v){ var a=ensureSlots(id); if(a[i]){ a[i][f]=v; save(); } }
+function esc(s){var d=document.createElement("div");d.textContent=s==null?"":s;return d.innerHTML;}
+
+function counts(area){
+  var c={total:0}; validKeys(area).forEach(function(k){c[k]=0;});
+  D[area].forEach(function(r){ c[estadoOf(area,r)]++; c.total++; });
+  return c;
+}
+// % SIEMPRE sobre el TOTAL del área (criterio Matías jul-2026): los "No
+// aplica" de capacitaciones significan "aún no se puede avanzar" — esas
+// capacitaciones SÍ se harán, así que cuentan en el universo (77/250).
+// Ejecucion parcial (tipologia capacitada en PARTE de sus servicios) pesa 0,5
+function doneArea(area,c){
+  return (c[DONE[area]]||0) + (area==="capacitaciones" ? (c.en_progreso||0)*0.5 : 0);
+}
+function fmtN(x){ return (Math.round(x*10)/10).toString().replace(".",","); }
+function pctArea(area,c){
+  return c.total>0?Math.round(doneArea(area,c)/c.total*100):0;
+}
+function barArea(area,c){
+  var t=c.total||1,h='<div class="bar">';
+  validKeys(area).forEach(function(k){ h+='<i style="width:'+((c[k]||0)/t*100).toFixed(2)+'%;background:'+EST_HEX[k]+'"></i>'; });
+  return h+'</div>';
+}
+// Instrumental ponderado por CAJAS FÍSICAS: cada tipo pesa su cant_cajas,
+// así el % refleja las ~1.500+ cajas reales y no solo los ~196 tipos.
+function cajasCounts(){
+  var c={total:0}; validKeys("instrumental").forEach(function(k){c[k]=0;});
+  D.instrumental.forEach(function(r){
+    var q=parseInt(String(valOf(r,"cant_cajas")).replace(/\D/g,""),10)||1;
+    c[estadoOf("instrumental",r)]+=q; c.total+=q;
+  });
+  return c;
+}
+function comboStats(areas){
+  // mismo criterio que pctArea: completados sobre el TOTAL (sin excluir No aplica)
+  var done=0,total=0;
+  areas.forEach(function(a){var c=counts(a); done+=doneArea(a,c); total+=c.total;});
+  return {done:done,total:total,base:total,pct:total>0?Math.round(done/total*100):0};
+}
+function writeSummary(){
+  var areas=["capacitaciones","instructivos","instrumental"];
+  var gd=0,gt=0;
+  areas.forEach(function(a){ var c=counts(a); gd+=doneArea(a,c); gt+=c.total; });
+  var gpct= gt>0?Math.round(gd/gt*100):0;
+  var cc=counts("capacitaciones");
+  var sum={ts:Date.now(),
+    global:{done:gd,total:gt,pct:gpct},
+    capacitaciones:{done:doneArea("capacitaciones",cc),total:cc.total,pct:pctArea("capacitaciones",cc)}};
+  try{ localStorage.setItem("hds_coordcap_summary", JSON.stringify(sum)); }catch(e){}
+}
+function barDone(p){ return '<div class="bar"><i style="width:'+p.toFixed(2)+'%;background:var(--e-ejec)"></i></div>'; }
+
+function renderDash(){
+  var h="";
+  AREAS.forEach(function(a){
+    var c=counts(a[0]);
+    if(a[0]==="instrumental"){
+      // % por TIPOLOGÍAS de caja; las cajas físicas quedan como referencia
+      var cw=cajasCounts();
+      h+='<div class="kpi"><h3>'+a[1]+'</h3><div class="big">'+pctArea("instrumental",c)+'%</div>'+
+         '<div class="sub">'+(c[DONE.instrumental]||0)+' de '+c.total+' tipologías · '+(cw[DONE.instrumental]||0)+'/'+cw.total+' cajas</div>'+barArea("instrumental",c)+'</div>';
+      return;
+    }
+    var subx=(c[DONE[a[0]]]||0)+' '+DONE_WORD[a[0]]+
+       (a[0]==="capacitaciones"&&c.en_progreso?(' + '+c.en_progreso+' parcial'+(c.en_progreso>1?'es':'')+' (×0,5)'):'')+
+       ' de '+c.total;
+    h+='<div class="kpi"><h3>'+a[1]+'</h3><div class="big">'+pctArea(a[0],c)+'%</div>'+
+       '<div class="sub">'+subx+'</div>'+barArea(a[0],c)+'</div>';
+  });
+  // los GLOBALES (tarjetas azules) van primero; después el detalle por área
+  var c1=comboStats(["capacitaciones","instructivos"]);
+  var c2=comboStats(["capacitaciones","instructivos","instrumental"]);
+  var subCombo=function(c){ return fmtN(c.done)+' completadas de '+c.total; };
+  var combos=
+    '<div class="kpi combo"><h3>Combinado · las 3 áreas (+ Instrumental)</h3><div class="big">'+c2.pct+'%</div>'+
+    '<div class="sub">'+subCombo(c2)+'</div>'+barDone(c2.pct)+'</div>'+
+    '<div class="kpi combo"><h3>Combinado · Capac. + Instructivos</h3><div class="big">'+c1.pct+'%</div>'+
+    '<div class="sub">'+subCombo(c1)+'</div>'+barDone(c1.pct)+'</div>';
+  document.getElementById("dash").innerHTML=combos+h;
+  writeSummary();
+}
+function renderLegend(){
+  document.getElementById("legend").innerHTML=
+    '<span class="muted" style="font-weight:600">'+AREAS.filter(function(a){return a[0]===active;})[0][1]+':</span>'+
+    ESTADOS[active].map(function(e){return '<span><i class="dot" style="background:'+EST_HEX[e.k]+'"></i>'+e.lbl+'</span>';}).join("")+
+    '<span class="muted">· El % cuenta '+DONE_WORD[active]+' sobre el TOTAL del área; la Ejecución parcial pesa 0,5. '+
+       'El equipamiento que sale de la hoja oficial (descontinuado o reemplazado) sale también del total.</span>';
+}
+function renderTabs(){
+  document.getElementById("tabs").innerHTML=AREAS.map(function(a){
+    return '<button class="tab'+(active===a[0]?' on':'')+'" onclick="setArea(\''+a[0]+'\')">'+a[1]+'<span class="c">'+D[a[0]].length+'</span></button>';
+  }).join("");
+}
+function setArea(a){ active=a; filtro={q:"",estado:"",fields:{}}; selected={}; sortBy={key:null,dir:1}; renderTabs(); renderLegend(); renderFilters(); renderBulk(); renderTable(); }
+
+function uniq(area,key){var s={};D[area].forEach(function(r){var v=valOf(r,key);if(v)s[v]=1;});return Object.keys(s).sort();}
+function colByKey(k){return COLS[active].filter(function(c){return c.key===k;})[0]||{label:k};}
+function renderFilters(){
+  var h='<input type="text" id="fq" placeholder="Buscar…" value="'+esc(filtro.q)+'" oninput="filtro.q=this.value;renderTable()">';
+  h+='<select onchange="filtro.estado=this.value;renderTable()"><option value="">Todos los estados</option>'+
+     ESTADOS[active].map(function(e){return '<option value="'+e.k+'"'+(filtro.estado===e.k?' selected':'')+'>'+e.lbl+'</option>';}).join("")+'</select>';
+  FILTERFIELDS[active].forEach(function(fk){
+    var col=colByKey(fk), cur=filtro.fields[fk]||"";
+    h+='<select onchange="setFieldFilter(\''+fk+'\',this.value)"><option value="">'+col.label+': todos</option>'+
+       uniq(active,fk).map(function(v){return '<option'+(cur===v?' selected':'')+'>'+esc(v)+'</option>';}).join("")+'</select>';
+  });
+  h+='<span class="fcount" id="fcount"></span>';
+  document.getElementById("filters").innerHTML=h;
+}
+function setFieldFilter(fk,v){ if(v) filtro.fields[fk]=v; else delete filtro.fields[fk]; renderTable(); }
+
+function filtered(){
+  var q=filtro.q.toLowerCase();
+  return D[active].filter(function(r){
+    if(filtro.estado && estadoOf(active,r)!==filtro.estado) return false;
+    for(var fk in filtro.fields){ if(valOf(r,fk)!==filtro.fields[fk]) return false; }
+    if(q){ var hay=COLS[active].some(function(c){return (valOf(r,c.key)+"").toLowerCase().indexOf(q)>-1;}); if(!hay) return false; }
+    return true;
+  });
+}
+var ORDEN_CAP={coordinada:0,reprogramada:1,pendiente:2,en_progreso:3,ejecutada:4,inst_uso:5};
+function renderTable(){
+  var cols=COLS[active];
+  var rows=filtered();
+  if(!sortBy.key && active==="capacitaciones"){
+    // vista por defecto: 1.Coordinadas arriba, luego 3.Reprogramadas, el resto despues
+    rows=rows.slice().sort(function(a,b){
+      var ka=estadoOf(active,a), kb=estadoOf(active,b);
+      var d=(ka in ORDEN_CAP?ORDEN_CAP[ka]:9)-(kb in ORDEN_CAP?ORDEN_CAP[kb]:9);
+      return d || String(valOf(a,"fecha")||"9999").localeCompare(String(valOf(b,"fecha")||"9999"));
+    });
+  }
+  if(sortBy.key){
+    rows=rows.slice().sort(function(a,b){
+      var va=sortBy.key==='_estado'?lblOf(active,estadoOf(active,a)):valOf(a,sortBy.key);
+      var vb=sortBy.key==='_estado'?lblOf(active,estadoOf(active,b)):valOf(b,sortBy.key);
+      return (''+va).localeCompare(''+vb,'es',{numeric:true,sensitivity:'base'})*sortBy.dir;
+    });
+  }
+  var allSel=rows.length>0 && rows.every(function(r){return selected[r.id];});
+  document.getElementById("thead").innerHTML='<tr><th class="estbar"></th>'+
+    '<th><input type="checkbox" class="chk" '+(allSel?'checked':'')+' onclick="toggleAll(this.checked)" title="Seleccionar todos"></th>'+
+    '<th class="sortable" onclick="setSort(\'_estado\')">Estado'+arrow('_estado')+'</th>'+
+    cols.map(function(c){return '<th class="sortable" onclick="setSort(\''+c.key+'\')">'+c.label+arrow(c.key)+'</th>';}).join("")+'<th>Notas coordinación</th></tr>';
+  var tb=rows.map(function(r){
+    var est=estadoOf(active,r);
+    var sel='<select class="est-sel e-'+est+'" onchange="setEstado(\''+r.id+'\',this.value)">'+
+      ESTADOS[active].map(function(e){return '<option value="'+e.k+'"'+(est===e.k?' selected':'')+'>'+e.lbl+'</option>';}).join("")+'</select>';
+    var tds=cols.map(function(c){
+      if(c.slots) return slotsCell(r);
+      var v=valOf(r,c.key);
+      if(c.edit) return '<td class="edit"><input type="'+(c.type||"text")+'" value="'+esc(v)+'" onchange="setField(\''+r.id+'\',\''+c.key+'\',this.value)"></td>';
+      return '<td>'+esc(v)+'</td>';
+    }).join("");
+    var notas=(overrides[r.id]&&overrides[r.id].notas)||"";
+    var ncell='<td class="edit"><input type="text" value="'+esc(notas)+'" placeholder="…" onchange="setNotas(\''+r.id+'\',this.value)" style="min-width:160px"></td>';
+    return '<tr class="row-'+est+'"><td class="estbar eb-'+est+'"></td>'+'<td><input type="checkbox" class="chk" '+(selected[r.id]?'checked':'')+' onclick="toggleSel(\''+r.id+'\',this.checked)"></td>'+'<td>'+sel+'</td>'+tds+ncell+'</tr>';
+  }).join("");
+  document.getElementById("tbody").innerHTML=tb||'<tr><td colspan="24" style="padding:30px;text-align:center" class="muted">Sin resultados.</td></tr>';
+  var fc=document.getElementById("fcount"); if(fc) fc.textContent=rows.length+" de "+D[active].length;
+}
+function setEstado(id,v){ ov(id).estado=v; save(); renderDash(); renderTable(); }
+function setField(id,key,v){ var o=ov(id); (o.fields=o.fields||{})[key]=v; save(); }
+function setNotas(id,v){ ov(id).notas=v; save(); }
+function resetEstados(){ if(confirm("¿Borrar todos los estados y anotaciones guardados y volver al estado inicial?")){ overrides={}; save(); renderDash(); renderTable(); } }
+function exportCSV(){
+  var cols=COLS[active];
+  var head=["Estado"].concat(cols.map(function(c){return c.label;})).concat(["Notas"]);
+  var lines=[head.map(q).join(",")];
+  filtered().forEach(function(r){
+    var row=[lblOf(active,estadoOf(active,r))].concat(cols.map(function(c){return valOf(r,c.key);})).concat([(overrides[r.id]&&overrides[r.id].notas)||""]);
+    lines.push(row.map(q).join(","));
+  });
+  var blob=new Blob(["﻿"+lines.join("\n")],{type:"text/csv;charset=utf-8;"});
+  var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="coordinacion_"+active+"_HDS.csv";a.click();
+}
+function q(v){v=(v==null?"":""+v);return '"'+v.replace(/"/g,'""')+'"';}
+function lblOf(area,k){var e=ESTADOS[area].filter(function(x){return x.k===k;})[0];return e?e.lbl:k;}
+function arrow(k){ return sortBy.key===k?(sortBy.dir>0?' \u25B2':' \u25BC'):''; }
+function setSort(k){ if(sortBy.key===k) sortBy.dir*=-1; else { sortBy.key=k; sortBy.dir=1; } renderTable(); }
+
+function toggleSel(id,ch){ if(ch) selected[id]=true; else delete selected[id]; renderBulk(); syncSelAll(); }
+function toggleAll(ch){ filtered().forEach(function(r){ if(ch) selected[r.id]=true; else delete selected[r.id]; }); renderTable(); renderBulk(); }
+function syncSelAll(){ var rows=filtered(); var all=rows.length>0&&rows.every(function(r){return selected[r.id];}); var b=document.querySelector('#thead .chk'); if(b) b.checked=all; }
+function selCount(){ return Object.keys(selected).length; }
+function renderBulk(){
+  var n=selCount(); var bb=document.getElementById("bulkbar");
+  if(n===0){ bb.className="bulkbar"; bb.innerHTML=""; return; }
+  bb.className="bulkbar show";
+  bb.innerHTML='<b>'+n+'</b> seleccionado'+(n>1?'s':'')+
+    ' · Cambiar estado a: <select id="bulkSel">'+
+    ESTADOS[active].map(function(e){return '<option value="'+e.k+'">'+e.lbl+'</option>';}).join("")+'</select>'+
+    '<button class="bb-apply" onclick="applyBulk()">Aplicar a seleccionados</button>'+
+    '<button class="bb-clear" onclick="clearSel()">Limpiar selección</button>';
+}
+function applyBulk(){
+  var v=document.getElementById("bulkSel").value;
+  Object.keys(selected).forEach(function(id){ ov(id).estado=v; });
+  save(); selected={}; renderDash(); renderTable(); renderBulk();
+}
+function clearSel(){ selected={}; renderTable(); renderBulk(); }
+
+renderDash();renderTabs();renderLegend();renderFilters();renderBulk();renderTable();
+
+// ── ACTUALIZAR DESDE EXCEL (botón del header) ───────────────────────────────
+// Pide al servidor local (python3 _DEV/deploy_server.py, puerto 8799) que corra
+// el generador build_capacitaciones_from_xlsx.py y recarga. En la versión de
+// consulta (HUB PM / público) el botón se oculta; la fecha queda visible.
+var PUBLIC_BUILD = true; /*__PUBLIC_FLAG__*/
+var PUBLIC = PUBLIC_BUILD || new URLSearchParams(location.search).get('public')==='1';
+(function(){
+  var info=document.getElementById('capUpdInfo');
+  if(info && window.CAP_GENERADO){
+    info.innerHTML='Última actualización: <b style="color:#e2e8f0">'+window.CAP_GENERADO+'</b>'
+      +(window.CAP_EXCEL_MOD?('<br>Excel al '+window.CAP_EXCEL_MOD):'');
+  }
+  if(PUBLIC){
+    var b=document.getElementById('btnCapUpd'); if(b) b.remove();
+    var r=document.querySelector('[onclick="resetEstados()"]'); if(r) r.remove();
+  }
+})();
+function actualizarDesdeExcel(){
+  var b=document.getElementById('btnCapUpd');
+  b.disabled=true; b.textContent='⟳ Actualizando…';
+  fetch('http://localhost:8799/build-capacitaciones',{method:'POST'})
+    .then(function(r){return r.json();})
+    .then(function(j){
+      if(j.ok){ b.textContent='✔ Actualizado'; setTimeout(function(){location.reload();},600); }
+      else { alert('El generador reportó un problema:\n\n'+(j.log||'')); b.disabled=false; b.textContent='⟳ Actualizar desde Excel'; }
+    })
+    .catch(function(){
+      alert('No encuentro el servidor local de actualización.\n\nOpciones:\n· Dejá corriendo:  python3 _DEV/deploy_server.py\n· O hacé doble clic en  Actualizar-Capacitaciones.command\n  y recargá esta página.');
+      b.disabled=false; b.textContent='⟳ Actualizar desde Excel';
+    });
+}
+
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     SEGUIMIENTO DE JORNADAS PROPUESTAS A LA CSSO
+     Fuente: SHARED_DATA/cap_seguimiento.js (propuestas enviadas a la CSSO).
+     v4 (30-08): SOLO CONSULTA. Se elimino el registro desde la plataforma
+     (el pop-up "¿se realizo?" y las marcas por equipo): la HOJA 4 del Excel
+     oficial es la unica fuente de verdad. Cualquier correccion se hace alli
+     y se regenera cap_data.js con _DEV/build_capacitaciones_from_xlsx.py.
+       1) SIEMBRA: carga en cada tipologia la fecha/hora propuesta y la deja
+          "En CSSO", solo si la hoja no la cerro ya. Una vez por version.
+       2) PANEL: lista de referencia de lo propuesto a la CSSO, mostrando el
+          estado oficial de cada equipo. Sin controles de edicion.
+     Estado local propio en localStorage "hds_coordcap_seg_v1" (solo la marca
+     de siembra); los estados viven donde siempre (hds_coordcap_v1).
+     ══════════════════════════════════════════════════════════════════════ -->
+<script>
+"use strict";
+(function(){
+var SEG = window.CAP_SEG;
+if(!SEG || !SEG.jornadas || !SEG.jornadas.length) return;
+// v4: el panel es identico en la plataforma local y en las copias de consulta
+// (HUB PM / publico): en todas es solo lectura.
+var SKEY = "hds_coordcap_seg_v1";
+var S; try{ S = JSON.parse(localStorage.getItem(SKEY)||"{}"); }catch(e){ S = {}; }
+// S.eq / S.snooze: marcas del registro v1-v3, hoy en desuso. Se leen una sola
+// vez en la migracion v4 para revertir lo que habian escrito, y se borran.
+S.eq = S.eq || {}; S.snooze = S.snooze || {};
+function ssave(){ try{ localStorage.setItem(SKEY, JSON.stringify(S)); }catch(e){} }
+function dmy(f){ return f?f.slice(8,10)+"-"+f.slice(5,7)+"-"+f.slice(0,4):""; }
+
+// ── migracion v1/v2 (marcas por jornada) → v3 (marcas por equipo) ─────────
+// se conserva solo para que la migracion v4 sepa que tipologias tocar.
+if(!S.v3){
+  SEG.jornadas.forEach(function(j){
+    var r=(S.resp||{})[j.key], c=(S.conf||{})[j.key];
+    j.equipos.forEach(function(e){
+      var k=j.key+"|"+e.cod;
+      if(S.eq[k]) return;
+      if(r) S.eq[k]={c:(r.r==="si"&&(r.ejec||[]).indexOf(e.cod)>=0)?"si":"no", nota:r.nota||"", ts:r.ts, dia:r.dia};
+      else if(c&&c.c==="prog")   S.eq[k]={c:"prog", ts:c.ts, dia:c.dia};
+      else if(c&&c.c==="reprog") S.eq[k]={c:"reprog", nf:c.nf, nh:c.nh, ts:c.ts, dia:c.dia};
+    });
+  });
+  delete S.resp; delete S.conf; S.v3=1; ssave();
+}
+
+// codigo -> fila de capacitaciones
+var BYCOD={}; D.capacitaciones.forEach(function(r){ BYCOD[String(r.codigo).trim()]=r; });
+function filas(j){ var o=[]; j.equipos.forEach(function(e){ var r=BYCOD[e.cod]; if(r) o.push(r); }); return o; }
+function esc2(s){ return esc(s); }
+
+// Una tipologia puede estar en VARIAS jornadas (136 tipologias → 206 pares).
+var JXROW={};
+SEG.jornadas.forEach(function(j){
+  filas(j).forEach(function(r){ (JXROW[r.id] = JXROW[r.id] || []).push(j); });
+});
+var NOTA_PFX = "Jornada CSSO: ";
+
+// ── migracion v3 → v4: se elimina el registro desde la plataforma ────────
+// Todo lo que el pop-up habia escrito sobre una tipologia se devuelve a lo
+// que diga la hoja oficial; desde ahora las correcciones se hacen en el Excel.
+if(!S.v4){
+  var _limp=0;
+  Object.keys(JXROW).forEach(function(id){
+    var cod=String(IDX[id].codigo).trim();
+    var tocada=JXROW[id].some(function(j){ return !!S.eq[j.key+"|"+cod]; });
+    if(!tocada) return;
+    var o=overrides[id]; if(!o) return;
+    if(o.estado){ delete o.estado; _limp++; }
+    if(o.notas && o.notas.indexOf(NOTA_PFX)===0) delete o.notas;
+  });
+  S.eq={}; S.snooze={}; delete S.resp; delete S.conf; delete S.seed;
+  S.v4=1; ssave(); save();
+  if(_limp && window.console)
+    console.log("[seguimiento CSSO] v4: "+_limp+" tipologías vuelven al estado de la hoja oficial");
+}
+
+// ── helpers por par (jornada, equipo) ─────────────────────────────────────
+// v4: ya no hay marcas locales, la fecha efectiva es siempre la propuesta.
+function slotsDe(js){ var v={}, o=[]; js.forEach(function(j){ var k=j.fecha+" "+j.hora;
+  if(!v[k]){ v[k]=1; o.push({f:j.fecha, h:j.hora}); } }); return o; }
+
+// ── 1. SIEMBRA de fechas propuestas ───────────────────────────────────────
+(function siembra(){
+  if(S.seed === SEG.version) return;
+  var n=0;
+  Object.keys(JXROW).forEach(function(id){
+    var r=IDX[id], est=estadoOf("capacitaciones", r);
+    // la hoja manda: solo se siembran fechas en lo que sigue "En CSSO"
+    if(r._estado && r._estado!=="pendiente") return;
+    if(est!=="pendiente") return;
+    var o=ov(id);
+    o.slots  = slotsDe(JXROW[id]);
+    o.estado = "pendiente";
+    if(!o.fields) o.fields={};
+    if(SEG.lugar) o.fields.lugar = SEG.lugar;
+    n++;
+  });
+  // limpieza: una tipologia que SALIO del programa (p.ej. quedo para
+  // reprogramacion) no debe conservar las fechas sembradas en una version
+  // anterior — vuelve a lo que diga la hoja oficial (cap_data).
+  D.capacitaciones.forEach(function(r){
+    if(JXROW[r.id]) return;
+    var o=overrides[r.id];
+    if(o && o.slots){ o.slots = (r._slots||[]).map(function(s0){return {f:s0.f,h:s0.h};});
+      if(o.estado==="pendiente") delete o.estado; }
+  });
+  S.seed = SEG.version; ssave(); save();
+  if(n && window.renderDash){ renderDash(); renderTable(); }
+  if(window.console) console.log("[seguimiento CSSO] fechas cargadas en "+n+" tipologias ("+
+    SEG.jornadas.length+" jornadas, "+SEG.jornadas.reduce(function(a,j){return a+j.equipos.length;},0)+" pares servicio-jornada)");
+})();
+
+// ── 2. estado por equipo/jornada: SIEMPRE desde la hoja oficial ───────────
+// v4: la plataforma ya no registra ejecuciones. El estado de cada tipologia
+// sale de cap_data.js (hoja 4 del Excel) y aqui solo se proyecta sobre las
+// jornadas que en su momento se propusieron a la CSSO.
+function estEq(cod){ var r=BYCOD[cod]; return r ? estadoOf("capacitaciones", r) : "pendiente"; }
+function estadoJor(j){
+  var st=j.equipos.map(function(e){ return estEq(e.cod); });
+  if(!st.length) return "sin";
+  var fin=st.filter(function(v){ return v==="ejecutada"||v==="inst_uso"; }).length;
+  if(fin===st.length) return "si";
+  if(fin || st.some(function(v){return v==="en_progreso";})) return "parcial";
+  if(st.some(function(v){return v==="reprogramada";})) return "reprog";
+  if(st.some(function(v){return v==="coordinada";})) return "prog";
+  return "sin";
+}
+
+// ── 3. panel (SOLO CONSULTA) ──────────────────────────────────────────────
+var mask=document.getElementById("segMask"), tit=document.getElementById("segTit"),
+    sub=document.getElementById("segSub"), body=document.getElementById("segBody"),
+    foot=document.getElementById("segFoot");
+function segCerrar(){ mask.className="segmask"; }
+function segAbrir(){ pintaLista(); mask.className="segmask on"; }
+window.segAbrir=segAbrir; window.segCerrar=segCerrar;
+
+var fJor="todas";
+function setFJor(v){ fJor=v; pintaLista(); }
+window.setFJor=setFJor;
+
+// ── 4. lista: lo propuesto a la CSSO con el estado oficial de cada equipo ─
+var JLBL={si:["Ejecutada","sp-si"],parcial:["Parcial","sp-si"],
+          reprog:["Reprogramada","sp-reprog"],prog:["Coordinada","sp-prog"],
+          sin:["En CSSO","sp-fut"]};
+function pintaLista(){
+  tit.textContent="Jornadas propuestas a la CSSO";
+  var vt={}; SEG.jornadas.forEach(function(j){ j.equipos.forEach(function(e){ vt[e.cod]=1; }); });
+  sub.textContent=SEG.jornadas.length+" jornadas · "+Object.keys(vt).length+" tipologías ("+
+    SEG.jornadas.reduce(function(a,j){return a+j.equipos.length;},0)+" pares servicio-jornada) · "+
+    dmy(SEG.jornadas[0].fecha)+" a "+dmy(SEG.jornadas[SEG.jornadas.length-1].fecha)+
+    " · estado según la hoja oficial";
+  var rows=SEG.jornadas.filter(function(j){
+    var e=estadoJor(j);
+    if(fJor==="todas")  return true;
+    if(fJor==="hechas") return e==="si"||e==="parcial";
+    return e===fJor;
+  });
+  var cnt={si:0,parcial:0,reprog:0,prog:0,sin:0};
+  SEG.jornadas.forEach(function(j){ cnt[estadoJor(j)]++; });
+  var h='<div class="segtabs">'+
+    [["todas","Todas ("+SEG.jornadas.length+")"],
+     ["hechas","Ejecutadas ("+(cnt.si+cnt.parcial)+")"],
+     ["prog","Coordinadas ("+cnt.prog+")"],
+     ["reprog","Reprogramadas ("+cnt.reprog+")"],
+     ["sin","En CSSO ("+cnt.sin+")"]].map(function(t){
+       return '<button class="'+(fJor===t[0]?"on":"")+'" onclick="setFJor(\''+t[0]+'\')">'+t[1]+'</button>';
+     }).join("")+'</div>';
+  h+='<table class="segtb"><colgroup><col class="c-n"><col class="c-f"><col class="c-h"><col class="c-sv"><col class="c-eq2"><col class="c-e"></colgroup>'+
+     '<thead><tr><th>#</th><th>Fecha propuesta</th><th>Hora</th><th>Servicio clínico</th>'+
+     '<th>Equipamiento · estado oficial (hoja 4)</th><th>Jornada</th></tr></thead><tbody>';
+  rows.forEach(function(j){
+    var e=estadoJor(j), l=JLBL[e];
+    var eqh=j.equipos.map(function(x){
+      var st=estEq(x.cod), hx=EST_HEX[st]||"#94a3b8";
+      var pill='<span class="segpill sp-mini" style="background:'+hx+'1a;color:'+hx+';border-color:'+hx+'55">'+
+               esc2(EST_LBL[st]||st)+'</span>';
+      var r=BYCOD[x.cod], sl=r?slotsOf(r).filter(function(s){return s.f;}):[];
+      var fec=sl.length?('<span class="eqnew">'+esc2(sl.map(function(s){
+                return dmy(s.f)+(s.h?(" "+s.h):"");}).join(" · "))+'</span>'):'';
+      return '<div class="eqrow"><span class="eqnom">['+esc2(x.cod)+'] '+esc2(x.nom)+'</span>'+pill+fec+'</div>';
+    }).join("");
+    h+='<tr><td>'+j.n+'</td><td>'+dmy(j.fecha)+'</td><td>'+esc2(j.hora)+'</td><td>'+esc2(j.servicio)+'</td>'+
+       '<td class="eqcell">'+eqh+'</td><td><span class="segpill '+l[1]+'">'+l[0]+'</span></td></tr>';
+  });
+  if(!rows.length) h+='<tr><td colspan="6" style="padding:22px;text-align:center;color:var(--tx2)">Sin jornadas en este filtro.</td></tr>';
+  h+='</tbody></table>';
+  body.innerHTML=h;
+  foot.innerHTML='<span class="muted" style="font-size:11.5px;color:var(--tx2)">'+
+    'Solo consulta: el estado de cada tipología se corrige en la <b>hoja 4 del Excel oficial</b> '+
+    'y se refleja aquí al regenerar los datos.</span>'+
+    '<button class="sbtn sb-gh" onclick="segCerrar()">Cerrar</button>';
+}
+
+// ── 5. arranque ───────────────────────────────────────────────────────────
+// v4 (30-08): sin pop-up. El panel se abre solo cuando el usuario lo pide.
+})();
+</script>
+
+<!-- ══════════════════════════════════════════════════════════════════════════
+     CARTA GANTT DEL PROGRAMA DE CAPACITACIONES
+     Vista cronologica por tipologia (colores del esquema v2) + exportacion a
+     Excel con formato (xlsx-js-style, vendorizada) para remitir al Servicio
+     de Salud cuando la soliciten. Lee el MISMO estado que la tabla
+     (estadoOf/slotsOf: hoja oficial + ajustes locales).
+     ══════════════════════════════════════════════════════════════════════ -->
+<div class="segmask" id="gMask"><div class="segbox" style="max-width:96vw">
+  <div class="seghd"><h2>Carta Gantt · Programa de Capacitación EMMC</h2>
+  <button class="x" onclick="gCerrar()" title="Cerrar">×</button>
+  <div class="sub" id="gSub"></div></div>
+  <div class="segbd" id="gBody" style="max-height:70vh"></div>
+  <div class="segft" id="gFoot"></div>
+</div></div>
+<script>
+"use strict";
+(function(){
+var FER={"2026-09-17":1,"2026-09-18":1};
+var ORD={coordinada:0,reprogramada:1,pendiente:2,en_progreso:3,ejecutada:4,inst_uso:5};
+var LBL={coordinada:"Coordinada",pendiente:"CSSO",reprogramada:"Reprogramada",
+         ejecutada:"Ejecutada",en_progreso:"Ejecución parcial",inst_uso:"Inst de Uso"};
+var mask=document.getElementById("gMask"), body=document.getElementById("gBody"),
+    sub=document.getElementById("gSub"), foot=document.getElementById("gFoot");
+var gF="prog";   // prog = programa activo (sin ejecutadas/IU) | todas | ejec
+var gV="gantt";  // gantt = cronograma · reporte = por dia y servicio (como el correo)
+function p2(n){return (n<10?"0":"")+n;}
+function dmy(f){return f?f.slice(8,10)+"-"+f.slice(5,7):"";}
+function esc3(s){return esc(s);}
+function gRows(){
+  var out=[];
+  D.capacitaciones.forEach(function(r){
+    var est=estadoOf("capacitaciones",r);
+    if(!(est in ORD)) return;                       // legados fuera del esquema
+    if(gF==="prog" && (est==="ejecutada"||est==="inst_uso")) return;
+    if(gF==="ejec" && est!=="ejecutada" && est!=="en_progreso") return;
+    var sl=slotsOf(r).filter(function(s){return s.f;});
+    out.push({cod:String(r.codigo||"").trim(), nom:valOf(r,"equipo"), est:est,
+              serv:valOf(r,"detalle_servicios"), prov:valOf(r,"proveedor"), sl:sl,
+              obs:valOf(r,"observaciones")});
+  });
+  out.sort(function(a,b){
+    var d=ORD[a.est]-ORD[b.est]; if(d) return d;
+    var fa=a.sl.length?a.sl[0].f:"9999", fb=b.sl.length?b.sl[0].f:"9999";
+    return fa<fb?-1:fa>fb?1:a.serv.localeCompare(b.serv);
+  });
+  return out;
+}
+function gDias(rows){
+  var fs=[]; rows.forEach(function(r){r.sl.forEach(function(s){fs.push(s.f);});});
+  if(!fs.length) return [];
+  fs.sort();
+  var d0=new Date(fs[0]+"T12:00"), d1=new Date(fs[fs.length-1]+"T12:00");
+  var out=[], d=new Date(d0), n=0;
+  while(d<=d1 && n++<70){
+    out.push(d.getFullYear()+"-"+p2(d.getMonth()+1)+"-"+p2(d.getDate()));
+    d.setDate(d.getDate()+1);
+  }
+  return out;
+}
+function finde(f){ var wd=new Date(f+"T12:00").getDay(); return wd===0||wd===6||FER[f]; }
+function gPinta(){
+  var rows=gRows(), dias=gDias(rows);
+  var cnt={}; rows.forEach(function(r){cnt[r.est]=(cnt[r.est]||0)+1;});
+  sub.textContent=rows.length+" tipologías · "+(dias.length?dmy(dias[0])+" a "+dmy(dias[dias.length-1]):"sin fechas")+
+    " · "+Object.keys(ORD).filter(function(k){return cnt[k];}).map(function(k){return cnt[k]+" "+LBL[k];}).join(" · ");
+  var h=gTabs();
+  h+='<div style="overflow:auto"><table class="gtt"><thead><tr>'+
+     '<th class="gfix g1">Código</th><th class="gfix g2">Equipo</th><th class="gfix g3">Servicio</th><th class="gfix g4">Estado</th>';
+  var mesRow='';
+  dias.forEach(function(f){
+    h+='<th class="gd'+(finde(f)?' gfd':'')+'">'+f.slice(8,10)+'<span>'+["D","L","M","X","J","V","S"][new Date(f+"T12:00").getDay()]+'</span></th>';
+  });
+  h+='</tr></thead><tbody>';
+  rows.forEach(function(r){
+    var mapa={}; r.sl.forEach(function(s){mapa[s.f]=s.h||"";});
+    h+='<tr><td class="gfix g1">'+esc3(r.cod)+'</td>'+
+       '<td class="gfix g2" title="'+esc3(r.prov)+'">'+esc3(r.nom)+'</td>'+
+       '<td class="gfix g3">'+esc3(r.serv.split("\n")[0])+(r.serv.indexOf("\n")>0?" +":"")+'</td>'+
+       '<td class="gfix g4"><span class="segpill sp-mini" style="background:'+EST_HEX[r.est]+'22;color:'+EST_HEX[r.est]+'">'+LBL[r.est]+'</span></td>';
+    if(!r.sl.length){
+      h+='<td class="gd gsin" colspan="'+(dias.length||1)+'">sin fecha — a la espera de propuesta oficial del proveedor</td>';
+    }else{
+      dias.forEach(function(f){
+        h+=(f in mapa)
+          ? '<td class="gd'+(finde(f)?' gfd':'')+'"><i class="gbar" style="background:'+EST_HEX[r.est]+'" title="'+esc3(dmy(f)+' '+mapa[f])+'"></i></td>'
+          : '<td class="gd'+(finde(f)?' gfd':'')+'"></td>';
+      });
+    }
+    h+='</tr>';
+  });
+  if(!rows.length) h+='<tr><td colspan="30" style="padding:22px;text-align:center;color:var(--tx2)">Sin tipologías en este filtro.</td></tr>';
+  h+='</tbody></table></div>';
+  body.innerHTML=h;
+  foot.innerHTML='<span class="muted" style="font-size:11.5px;color:var(--tx2)">'+
+    'Fines de semana y feriados (17-18 sep) sombreados. Las Reprogramadas van sin fecha hasta la propuesta oficial.</span>'+
+    '<button class="sbtn sb-si" onclick="gExport()">⬇ Exportar a Excel</button>'+
+    '<button class="sbtn sb-gh" onclick="gCerrar()">Cerrar</button>';
+}
+function gTabs(){
+  return '<div class="segtabs gvsw">'+
+    [["gantt","▦ Cronograma"],["reporte","▤ Por día y servicio"]].map(function(t){
+      return '<button class="'+(gV===t[0]?"on":"")+'" onclick="gVista(\''+t[0]+'\')">'+t[1]+'</button>';
+    }).join("")+'</div><div class="segtabs">'+
+    [["prog","Programa activo"],["todas","Todas"],["ejec","Ejecutadas"]].map(function(t){
+      return '<button class="'+(gF===t[0]?"on":"")+'" onclick="gVer(\''+t[0]+'\')">'+t[1]+'</button>';
+    }).join("")+'</div>';
+}
+function gRender(){ if(gV==="reporte") gPintaReporte(); else gPinta(); }
+function gAbrir(){ gRender(); mask.className="segmask on"; }
+function gCerrar(){ mask.className="segmask"; }
+function gVer(v){ gF=v; gRender(); }
+function gVista(v){ gV=v; gRender(); }
+window.gAbrir=gAbrir; window.gCerrar=gCerrar; window.gVer=gVer; window.gVista=gVista;
+
+// ── exportacion Excel (xlsx-js-style, carga perezosa) ─────────────────────
+function conXLSX(cb){
+  if(window.XLSX && window.XLSX.utils){ cb(); return; }
+  var s=document.createElement("script");
+  s.src="assets/vendor/xlsx-js-style-1.2.0.bundle.js";
+  s.onload=cb;
+  s.onerror=function(){ alert("No pude cargar la librería de Excel (assets/vendor)."); };
+  document.head.appendChild(s);
+}
+function hex(c){ return (c||"#94a3b8").replace("#","").toUpperCase(); }
+function gBuildWb(){
+  var rows=gRows(), dias=gDias(rows);
+  var hoy=new Date(), sello=p2(hoy.getDate())+"-"+p2(hoy.getMonth()+1)+"-"+hoy.getFullYear();
+  var aoa=[["CARTA GANTT · PROGRAMA DE CAPACITACIÓN DE EQUIPAMIENTO MÉDICO Y MOBILIARIO CLÍNICO — NHDS"],
+           ["Hospital del Salvador · generada el "+sello+" desde la plataforma de Coordinación de Capacitaciones"],
+           [],
+           ["Código","Equipo","Servicio Clínico","Proveedor","Estado","Fechas","Horas","Observación"].concat(dias.map(dmy))];
+  rows.forEach(function(r){
+    var fila=[r.cod, r.nom, r.serv.replace(/\n/g," · "), r.prov, LBL[r.est],
+              r.sl.map(function(s){return dmy(s.f);}).join("\n")||"sin fecha",
+              r.sl.map(function(s){return s.h||"";}).join("\n"), r.obs];
+    dias.forEach(function(f){ fila.push(r.sl.some(function(s){return s.f===f;})?"■":""); });
+    aoa.push(fila);
+  });
+  aoa.push([]);
+  aoa.push(["LEYENDA:"].concat(Object.keys(ORD).map(function(k){return LBL[k];})));
+  var ws=XLSX.utils.aoa_to_sheet(aoa);
+  var AZ="073763", BORD={style:"thin",color:{rgb:"BFBFBF"}};
+  function st(c,s){ if(ws[c]) ws[c].s=s; }
+  var ncol=8+dias.length, HDR=3, ley=aoa.length-1, FIJ=8;
+  ws["!merges"]=[{s:{r:0,c:0},e:{r:0,c:ncol-1}},{s:{r:1,c:0},e:{r:1,c:ncol-1}}];
+  st("A1",{font:{name:"Verdana",sz:12,bold:true,color:{rgb:AZ}}});
+  st("A2",{font:{name:"Verdana",sz:9,color:{rgb:AZ}}});
+  for(var c=0;c<ncol;c++){
+    var cell=XLSX.utils.encode_cell({r:HDR,c:c});
+    var esFinde=c>=FIJ && finde(dias[c-FIJ]);
+    st(cell,{font:{name:"Verdana",sz:8.5,bold:true,color:{rgb:"FFFFFF"}},
+             fill:{fgColor:{rgb:esFinde?"64748B":AZ}},
+             alignment:{horizontal:"center",vertical:"center",wrapText:true},
+             border:{top:BORD,bottom:BORD,left:BORD,right:BORD}});
+  }
+  rows.forEach(function(r,i){
+    var R=HDR+1+i;
+    for(var c=0;c<ncol;c++){
+      var cell=XLSX.utils.encode_cell({r:R,c:c});
+      var s={font:{name:"Verdana",sz:8.5,color:{rgb:AZ}},
+             border:{top:BORD,bottom:BORD,left:BORD,right:BORD},
+             alignment:{vertical:"top",wrapText:c<FIJ}};
+      if(c===4) s.fill={fgColor:{rgb:hex(EST_HEX[r.est])}}, s.font={name:"Verdana",sz:8.5,bold:true,color:{rgb:"FFFFFF"}};
+      if(c>=FIJ){
+        var f=dias[c-FIJ];
+        if(r.sl.some(function(x){return x.f===f;})){ s.fill={fgColor:{rgb:hex(EST_HEX[r.est])}}; if(ws[cell]) ws[cell].v=""; }
+        else if(finde(f)) s.fill={fgColor:{rgb:"EEF2F6"}};
+        s.alignment={horizontal:"center"};
+      }
+      if(!ws[cell]) ws[cell]={t:"s",v:""};
+      ws[cell].s=s;
+    }
+  });
+  for(var c2=1;c2<Object.keys(ORD).length+1;c2++){
+    var k=Object.keys(ORD)[c2-1], cel=XLSX.utils.encode_cell({r:ley,c:c2});
+    st(cel,{font:{name:"Verdana",sz:8.5,bold:true,color:{rgb:"FFFFFF"}},fill:{fgColor:{rgb:hex(EST_HEX[k])}},
+            alignment:{horizontal:"center"}});
+  }
+  ws["!cols"]=[{wch:8},{wch:38},{wch:26},{wch:26},{wch:13},{wch:10},{wch:7},{wch:50}]
+      .concat(dias.map(function(){return {wch:3.6};}));
+  ws["!freeze"]={xSplit:5,ySplit:HDR+1};
+  ws["!views"]=[{state:"frozen",xSplit:5,ySplit:HDR+1}];
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Carta Gantt");
+  XLSX.utils.book_append_sheet(wb,gBuildWsReporte(sello),"Reporte por día");
+  return wb;
+}
+window.gBuildWb=gBuildWb;
+function gExport(){
+  conXLSX(function(){
+    var hoy=new Date();
+    XLSX.writeFile(gBuildWb(),"Carta_Gantt_Capacitaciones_EMMC_"+hoy.getFullYear()+p2(hoy.getMonth()+1)+p2(hoy.getDate())+".xlsx");
+  });
+}
+window.gExport=gExport;
+
+// ── vista REPORTE POR DÍA Y SERVICIO (la misma lectura del correo) ────────
+// Agrupa día → servicio clínico → equipo, con el estado en mayúscula y su
+// color. Es lo que se remite al Servicio de Salud como evidencia del avance.
+var DSEM=["DOMINGO","LUNES","MARTES","MIÉRCOLES","JUEVES","VIERNES","SÁBADO"];
+var MESES=["ENERO","FEBRERO","MARZO","ABRIL","MAYO","JUNIO","JULIO","AGOSTO",
+           "SEPTIEMBRE","OCTUBRE","NOVIEMBRE","DICIEMBRE"];
+// el año va SIEMPRE: el programa arrastra jornadas de 2025 y sin el año dos
+// bandas de distinto año se leen identicas.
+function diaLargo(f){ var d=new Date(f+"T12:00");
+  return DSEM[d.getDay()]+" "+d.getDate()+" DE "+MESES[d.getMonth()]+" DE "+d.getFullYear(); }
+function LBLU(e){ return (LBL[e]||e).toUpperCase(); }
+
+// Esqueleto = las jornadas realmente propuestas a la CSSO (día · servicio ·
+// equipamiento), igual que el reporte semanal al SSMO; el ESTADO y la
+// observación salen siempre de la hoja oficial. Lo que no está en ninguna
+// jornada (ejecutado antes del programa, Inst de Uso) entra por la hoja.
+// Fecha del renglón: la de la hoja cuando es inequívoca (un solo servicio y
+// una sola fecha); si no, la fecha propuesta de esa jornada.
+function gEntradas(){
+  var vis={}, out=[];
+  gRows().forEach(function(r){ vis[r.cod]=r; });
+  var usados={}, SEG=window.CAP_SEG;
+  if(SEG && SEG.jornadas) SEG.jornadas.forEach(function(j){
+    j.equipos.forEach(function(e){
+      var r=vis[e.cod]; if(!r) return;                       // fuera del filtro
+      usados[e.cod]=1;
+      var svs=String(r.serv||"").split(/[\n;]+/).filter(function(x){return x.trim();});
+      // un solo servicio → las fechas de la hoja son inequivocas y mandan, y
+      // cada sesion (varias fechas/horas de una misma tipologia) va aparte.
+      if(svs.length<=1 && r.sl.length){
+        r.sl.forEach(function(sl){ out.push({f:sl.f, h:sl.h||"", serv:j.servicio, r:r}); });
+      }else{
+        out.push({f:j.fecha, h:j.hora||"", serv:j.servicio, r:r});
+      }
+    });
+  });
+  Object.keys(vis).forEach(function(cod){                     // sin jornada propuesta
+    if(usados[cod]) return;
+    var r=vis[cod];
+    var svs=String(r.serv||"").split(/[\n;]+/).map(function(x){return x.trim();}).filter(Boolean);
+    if(!r.sl.length){ out.push({f:"",h:"",serv:svs.join(" · ")||"—",r:r}); return; }
+    r.sl.forEach(function(s,i){
+      out.push({f:s.f, h:s.h||"", r:r,
+                serv:(svs.length===r.sl.length ? svs[i] : (svs.join(" · ")||"—"))});
+    });
+  });
+  out.sort(function(a,b){
+    if(!a.f!==!b.f) return a.f?-1:1;                          // las sin fecha, al final
+    if(a.f!==b.f) return a.f<b.f?-1:1;
+    if(a.h!==b.h) return a.h<b.h?-1:1;
+    if(a.serv!==b.serv) return a.serv.localeCompare(b.serv);
+    return a.r.cod.localeCompare(b.r.cod);
+  });
+  return out;
+}
+
+// agrupa en [{dia, grupos:[{serv, hora, items:[entrada]}]}]
+function gAgrupa(ent){
+  var dias=[], dcur=null, gcur=null;
+  ent.forEach(function(e){
+    if(!dcur || dcur.f!==e.f){ dcur={f:e.f, grupos:[]}; dias.push(dcur); gcur=null; }
+    if(!gcur || gcur.serv!==e.serv || gcur.hora!==e.h){
+      gcur={serv:e.serv, hora:e.h, items:[]}; dcur.grupos.push(gcur);
+    }
+    gcur.items.push(e);
+  });
+  return dias;
+}
+
+function gPintaReporte(){
+  var ent=gEntradas(), dias=gAgrupa(ent);
+  var cnt={}; ent.forEach(function(e){cnt[e.r.est]=(cnt[e.r.est]||0)+1;});
+  sub.textContent=ent.length+" capacitaciones por servicio · "+
+    Object.keys(ORD).filter(function(k){return cnt[k];})
+      .map(function(k){return cnt[k]+" "+LBL[k];}).join(" · ");
+  var h=gTabs();
+  h+='<div class="grep">';
+  dias.forEach(function(d){
+    h+='<div class="grep-dia">'+(d.f?esc3(diaLargo(d.f)):"SIN FECHA — a la espera de propuesta oficial del proveedor")+'</div>';
+    d.grupos.forEach(function(g){
+      h+='<div class="grep-sv">'+esc3(g.serv)+(g.hora?(' <span>'+esc3(g.hora)+' hrs</span>'):'')+'</div><ul class="grep-eq">';
+      g.items.forEach(function(e){
+        var hx=EST_HEX[e.r.est]||"#94a3b8", obs=e.r.obs;
+        h+='<li><span class="grep-dot" style="background:'+hx+'"></span>'+
+           '<span class="grep-cod">['+esc3(e.r.cod)+']</span> '+esc3(e.r.nom)+
+           ' <b style="color:'+hx+'">'+esc3(LBLU(e.r.est))+'</b>'+
+           (obs?'<span class="grep-obs">'+esc3(obs)+'</span>':'')+'</li>';
+      });
+      h+='</ul>';
+    });
+  });
+  h+='</div>';
+  body.innerHTML=h;
+  foot.innerHTML='<span class="muted" style="font-size:11.5px;color:var(--tx2)">'+
+    'Misma lectura que el reporte semanal al SSMO: día → servicio clínico → equipo, con su estado oficial. '+
+    'Las reprogramadas sin fecha nueva se muestran en el día en que fueron propuestas.</span>'+
+    '<button class="sbtn sb-si" onclick="gExport()">⬇ Exportar a Excel</button>'+
+    '<button class="sbtn sb-gh" onclick="gCerrar()">Cerrar</button>';
+}
+
+// ── hoja "Reporte por día" del libro exportado ───────────────────────────
+function gBuildWsReporte(sello){
+  var dias=gAgrupa(gEntradas());
+  var HEAD=["Servicio Clínico","Hora","Código","Equipo","Proveedor","Estado","Observación"];
+  var NC=HEAD.length;
+  var aoa=[["REPORTE POR DÍA Y SERVICIO CLÍNICO · PROGRAMA DE CAPACITACIÓN DE EQUIPAMIENTO MÉDICO Y MOBILIARIO CLÍNICO — NHDS"],
+           ["Hospital del Salvador · generado el "+sello+" desde la plataforma de Coordinación de Capacitaciones"],
+           [], HEAD];
+  var bandas=[], filas=[], cnt={};
+  dias.forEach(function(d){
+    bandas.push(aoa.length);
+    aoa.push([d.f?diaLargo(d.f):"SIN FECHA — A LA ESPERA DE PROPUESTA OFICIAL DEL PROVEEDOR"]);
+    d.grupos.forEach(function(g){
+      g.items.forEach(function(e,i){
+        cnt[e.r.est]=(cnt[e.r.est]||0)+1;
+        filas.push({r:aoa.length, est:e.r.est});
+        aoa.push([i?"":g.serv, g.hora||"", e.r.cod, e.r.nom, e.r.prov, LBLU(e.r.est), e.r.obs]);
+      });
+    });
+  });
+  aoa.push([]);
+  var rLey=aoa.length;
+  aoa.push(["RESUMEN:"].concat(Object.keys(ORD).filter(function(k){return cnt[k];})
+    .map(function(k){return cnt[k]+" "+LBL[k];})));
+
+  var ws=XLSX.utils.aoa_to_sheet(aoa), AZ="073763";
+  var BORD={style:"thin",color:{rgb:"BFBFBF"}};
+  ws["!merges"]=[{s:{r:0,c:0},e:{r:0,c:NC-1}},{s:{r:1,c:0},e:{r:1,c:NC-1}}]
+    .concat(bandas.map(function(R){return {s:{r:R,c:0},e:{r:R,c:NC-1}};}));
+  function st(c,s){ if(!ws[c]) ws[c]={t:"s",v:""}; ws[c].s=s; }
+  st("A1",{font:{name:"Verdana",sz:12,bold:true,color:{rgb:AZ}}});
+  st("A2",{font:{name:"Verdana",sz:9,color:{rgb:AZ}}});
+  for(var c=0;c<NC;c++) st(XLSX.utils.encode_cell({r:3,c:c}),
+    {font:{name:"Verdana",sz:8.5,bold:true,color:{rgb:"FFFFFF"}},fill:{fgColor:{rgb:AZ}},
+     alignment:{horizontal:"center",vertical:"center",wrapText:true},
+     border:{top:BORD,bottom:BORD,left:BORD,right:BORD}});
+  bandas.forEach(function(R){
+    for(var c=0;c<NC;c++) st(XLSX.utils.encode_cell({r:R,c:c}),
+      {font:{name:"Verdana",sz:9,bold:true,color:{rgb:"FFFFFF"}},fill:{fgColor:{rgb:"334155"}},
+       alignment:{horizontal:"left",vertical:"center"}});
+  });
+  filas.forEach(function(f){
+    for(var c=0;c<NC;c++){
+      var s={font:{name:"Verdana",sz:8.5,color:{rgb:AZ}},
+             border:{top:BORD,bottom:BORD,left:BORD,right:BORD},
+             alignment:{vertical:"top",wrapText:c===3||c===6}};
+      if(c===5) s={font:{name:"Verdana",sz:8.5,bold:true,color:{rgb:"FFFFFF"}},
+                   fill:{fgColor:{rgb:hex(EST_HEX[f.est])}},
+                   alignment:{horizontal:"center",vertical:"center"},
+                   border:{top:BORD,bottom:BORD,left:BORD,right:BORD}};
+      if(c===1||c===2) s.alignment={horizontal:"center",vertical:"top"};
+      st(XLSX.utils.encode_cell({r:f.r,c:c}),s);
+    }
+  });
+  var kk=Object.keys(ORD).filter(function(k){return cnt[k];});
+  st(XLSX.utils.encode_cell({r:rLey,c:0}),{font:{name:"Verdana",sz:8.5,bold:true,color:{rgb:AZ}}});
+  kk.forEach(function(k,i){ st(XLSX.utils.encode_cell({r:rLey,c:i+1}),
+    {font:{name:"Verdana",sz:8.5,bold:true,color:{rgb:"FFFFFF"}},
+     fill:{fgColor:{rgb:hex(EST_HEX[k])}},alignment:{horizontal:"center"}}); });
+  ws["!cols"]=[{wch:30},{wch:8},{wch:9},{wch:42},{wch:26},{wch:17},{wch:56}];
+  ws["!views"]=[{state:"frozen",ySplit:4}];
+  ws["!autofilter"]={ref:XLSX.utils.encode_range({s:{r:3,c:0},e:{r:aoa.length-2,c:NC-1}})};
+  return ws;
+}
+})();
+</script>
+<script src="hub-home.js"></script>
+<script>
+// hub-home.js inyecta el boton de retorno como primer hijo del <header>, o sea
+// FUERA de .hrow: quedaba en una linea propia y sin respetar el ancho centrado.
+// Se mueve dentro de la fila, delante del logo, y todo el header queda alineado.
+(function(){
+  var intentos = 0;
+  function mover(){
+    var h = document.querySelector("header"), fila = h && h.querySelector(".hrow");
+    if(!fila) return true;                                   // nada que hacer
+    var a = null, k = h.children;
+    for(var i=0;i<k.length;i++){ if(k[i].tagName==="A"){ a=k[i]; break; } }
+    if(!a) return (++intentos > 20);                         // aun no lo inyecta
+    a.setAttribute("data-hubhome-en-fila","1");
+    fila.insertBefore(a, fila.firstChild);
+    return true;
+  }
+  function arranca(){ if(!mover()) requestAnimationFrame(arranca); }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", arranca);
+  else arranca();
+})();
+</script>
+</body>
+</html>
