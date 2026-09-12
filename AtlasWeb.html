@@ -1068,7 +1068,7 @@ function loadDxfCalibOverrides(){
   return {};
 }
 function saveDxfCalibOverrides(obj){
-  try{ _lsSet('cabida_cad_dxf_calib', JSON.stringify(obj||{})); }catch{}
+  _lsPref('cabida_cad_dxf_calib', JSON.stringify(obj||{}));
 }
 let DXF_EXT_OVERRIDES = loadDxfCalibOverrides();
 const DXF_EXT = new Proxy({}, {
@@ -1318,7 +1318,7 @@ function flipDotName(key,defRight,atras){
   const cur=_cardPosOf(key,defRight);
   const i=CARD_POS.indexOf(cur);
   _dotNameSide[key]=CARD_POS[(i+(atras?CARD_POS.length-1:1))%CARD_POS.length];
-  try{ _lsSet('cabida_dotname_side',JSON.stringify(_dotNameSide)); }catch(e){}
+  _lsPref('cabida_dotname_side',JSON.stringify(_dotNameSide));
   renderSVG();
 }
 // Tarjeta para una posición del asterisco, a distancia gap del puesto. La
@@ -1341,7 +1341,7 @@ function _cardRectFor(pos,dx,dy,cw,ch,gap){
 }
 function toggleDotNames(){
   S.showDotNames=!S.showDotNames;
-  try{_lsSet('cabida_show_dotnames',S.showDotNames?'1':'0');}catch(e){}
+  _lsPref('cabida_show_dotnames',S.showDotNames?'1':'0');
   const b=document.getElementById('btnDotNames'); if(b)b.classList.toggle('active',S.showDotNames);
   { const ba=document.getElementById('btnBedAlt'); if(ba){ ba.textContent=S.bedAltView?'👁 Ver: alternativa':'👁 Ver: correlativa'; ba.classList.toggle('active',S.bedAltView); } }
   renderSVG();
@@ -1354,13 +1354,13 @@ function _dotShortName(n){
 }
 function cycleBoxVis(){
   S.boxVis = S.boxVis==='off' ? 'on' : 'off';
-  try{ _lsSet('cabida_box_vis', S.boxVis); }catch(e){}
+  _lsPref('cabida_box_vis', S.boxVis);
   applyBoxVis();
 }
 // Alterna entre el plano de mobiliario y el plano a color, recargando el actual.
 function togglePlanKind(){
   S.planKind = (S.planKind==='color') ? 'mobiliario' : 'color';
-  try{ _lsSet('cabida_plan_kind', S.planKind); }catch(e){}
+  _lsPref('cabida_plan_kind', S.planKind);
   const b=document.getElementById('btnPlanKind');
   if(b){ const c=S.planKind==='color'; b.textContent = c?'🗺 Ver mobiliario':'🖌 Ver color'; b.classList.toggle('active', c); }
   if(_planCurId||S.floorId) setFloorPlan(_planCurId||S.floorId);
@@ -1415,13 +1415,13 @@ let S = {
 // mismo color que "asignados" en la vista de servicios.
 function toggleAsigNum(){
   S.showAsigN=!S.showAsigN;
-  try{_lsSet('cabida_show_asign',S.showAsigN?'1':'0');}catch(e){}
+  _lsPref('cabida_show_asign',S.showAsigN?'1':'0');
   const b=document.getElementById('btnAsigN'); if(b)b.classList.toggle('active',S.showAsigN);
   renderSVG();
 }
 function toggleSenaletica(){
   S.showSen=!S.showSen;
-  try{_lsSet('cabida_show_sen',S.showSen?'1':'0');}catch(e){}
+  _lsPref('cabida_show_sen',S.showSen?'1':'0');
   const b=document.getElementById('btnSen'); if(b)b.classList.toggle('active',S.showSen);
   renderSVG();
 }
@@ -1529,6 +1529,11 @@ const LZ_OK=(function(){ try{
   const m='{"a":[1,2,3],"ñ":"áé í","b":{"c":"'+'x'.repeat(300)+'"}}';
   return LZ.desempacar(LZ.empacar(m))===m;
 }catch(e){ return false; } })();
+// Escritura de PREFERENCIAS y de estado suelto que NO pasa por ls(). Bajo
+// ?selftest=1 no guarda nada, igual que ls(): una corrida de prueba dejaba
+// apagadas las etiquetas de recinto o pisaba los ascensores del usuario, porque
+// estas escrituras iban directo a localStorage saltándose el guarda.
+function _lsPref(k,v){ if(_SELFTEST) return false; try{ _lsSet(k,v); return true; }catch(e){ return false; } }
 // VERSIÓN WEB: el estado viene del snapshot publicado
 // (WEB_DATA/atlas_web_data.js). Nadie escribe el estado principal…
 // …salvo el ROL ACOTADO del 🟡, que trabaja sobre una CAPA PROPIA guardada en
@@ -1697,7 +1702,7 @@ if(nameState.habnum){
       const b=look(c); if(b){ nameState.bim[rid]=b; n++; }
     }
     if(n){ try{ sNames(); }catch(e){} console.info('Atlas · BIM fill v1: '+n+' códigos BIM completados'); }
-    _lsSet('cabida_bim_fill','v1');
+    _lsPref('cabida_bim_fill','v1');
   }catch(e){ console.warn('Atlas · BIM fill v1 falló', e); }
 })();
 // MIGRACIÓN 2026-07 (BIM cajas v1): códigos BIM leídos de los planos de
@@ -1717,7 +1722,7 @@ if(nameState.habnum){
       nameState.bim[rid]=BC[rid]; n++;
     }
     if(n){ try{ sNames(); }catch(e){} console.info('Atlas · BIM cajas v1: '+n+' códigos BIM asignados desde planos'); }
-    _lsSet('cabida_bim_cajas','v1');
+    _lsPref('cabida_bim_cajas','v1');
   }catch(e){ console.warn('Atlas · BIM cajas v1 falló', e); }
 })();
 if(!nameState.bimMultiRev) nameState.bimMultiRev={}; // multi-BIM revisados (pestaña Revisión)
@@ -1749,7 +1754,7 @@ function _markSaved(ok){
   if(ok==='pend') return;                      // aún en cola: queda "Guardando…"
   if(ok===false){ try{updateSaveBadge('error');}catch{} return; }
   try{ updateSaveBadge('saved'); updateBackupBadge(); }catch{}
-  try{ window.__lastSavedAt=Date.now(); _lsSet('cabida_cad_lastchange', Date.now()); }catch{}
+  window.__lastSavedAt=Date.now(); _lsPref('cabida_cad_lastchange', Date.now());
   try{ fbakProgramar(); }catch{}   // agenda el respaldo a archivo (no bloquea)
   // El testigo de memoria se refresca justo cuando la ocupación cambió, pero
   // no más de una vez cada 3 s: recorrer localStorage entero no es gratis.
@@ -1918,7 +1923,7 @@ function pautaForRoom(roomId){
 // validada (🟢, confirmada a mano) · no_corresponde (⚪).
 const PAUTAS_MANUAL_KEY='pautas_recintos_manual_v1';
 function pmStore(){ try{ const s=JSON.parse(localStorage.getItem(PAUTAS_MANUAL_KEY)); return (s&&typeof s==='object')?Object.assign({recintos:{},servicios:{}},s):{recintos:{},servicios:{}}; }catch(e){ return {recintos:{},servicios:{}}; } }
-function pmSave(st){ try{ _lsSet(PAUTAS_MANUAL_KEY, JSON.stringify(st)); }catch(e){} }
+function pmSave(st){ _lsPref(PAUTAS_MANUAL_KEY, JSON.stringify(st)); }
 window.addEventListener('storage',e=>{ if(e.key===PAUTAS_MANUAL_KEY && S.autsanMode){ renderSVG(); } });
 // ── Sincronización con la hoja CENTRAL de pautas (fuente de verdad) ─────────
 // URL: PM_CONFIG (🟡, inyectado por el deploy) o pautas_remote.js (🔴 local).
@@ -2184,7 +2189,7 @@ function exportBackup(){
     const ts = new Date().toISOString().replace(/[:.]/g,'-').slice(0,19);
     guardarArchivo(EXP_DIRS.backup, 'Cabida_respaldo_'+ts+'.json',
       JSON.stringify(payload, null, 2), 'application/json');
-    try{ _lsSet('cabida_cad_last_export', Date.now()); }catch{}
+    _lsPref('cabida_cad_last_export', Date.now());
     updateSaveBadge('saved'); updateBackupBadge();
   }catch(err){
     alert('No se pudo exportar el respaldo: ' + (err && err.message || err));
@@ -2442,7 +2447,7 @@ async function _abWrite(force){
       const fh=await _abHandle.getFileHandle(name,{create:true});
       const w=await fh.createWritable(); await w.write(txt); await w.close();
     }
-    try{ _lsSet('cabida_cad_last_export', Date.now()); }catch(e){}
+    _lsPref('cabida_cad_last_export', Date.now());
     if(typeof updateBackupBadge==='function') updateBackupBadge();
   }catch(e){ console.warn('auto-respaldo falló:', e.message); _abLabel('reactivar'); _abHandle=null; }
 }
@@ -2733,7 +2738,7 @@ async function fbakAhora(manual){
     if(!j.ok) throw new Error(j.error||'el servidor rechazó el estado');
     _fbak.vivo=true; _fbak.ultimo=Date.now(); _fbak.ts=j.ts; _fbak.bytes=j.bytes; _fbak.error=null;
     if(j.historico) _fbak.historicos++;
-    try{ _lsSet('cabida_cad_last_filebak', Date.now()); }catch(e){}
+    _lsPref('cabida_cad_last_filebak', Date.now());
     if(j.aviso) console.warn('Atlas · respaldo a archivo: '+j.aviso);
     if(manual) alert('✓ Estado guardado en archivo.\n\n'+_fbakResumen()
       +(j.aviso?('\n\n⚠ '+j.aviso):''));
@@ -4981,11 +4986,11 @@ if(document.readyState==='loading') document.addEventListener('DOMContentLoaded'
 function dockToggle(){
   const d=document.getElementById('dock'); if(!d) return;
   d.classList.toggle('open');
-  try{ _lsSet('cabida_dock_open', d.classList.contains('open')?'1':'0'); }catch(e){}
+  _lsPref('cabida_dock_open', d.classList.contains('open')?'1':'0');
 }
 function toggleRoomLabels(){
   S.roomLabels=(S.roomLabels===false);
-  try{ _lsSet('cabida_room_labels', S.roomLabels?'1':'0'); }catch(e){}
+  _lsPref('cabida_room_labels', S.roomLabels?'1':'0');
   _dockSync();
 }
 function _dockSync(){
@@ -5554,7 +5559,7 @@ const STRUCT_TYPES = {
 };
 let structuresState = {};
 try { structuresState = JSON.parse(localStorage.getItem('cabida_cad_structures') || '{}'); } catch {}
-function sStruct(){ try{ _lsSet('cabida_cad_structures', JSON.stringify(structuresState)); _markSaved(); }catch{} }
+function sStruct(){ if(_lsPref('cabida_cad_structures', JSON.stringify(structuresState))) _markSaved(); }
 function structsOf(floorId){ return structuresState[floorId] || []; }
 
 // Estado del modo activo (qué tipo de elemento se está colocando)
@@ -7250,7 +7255,7 @@ function updateScenUI(){
 }
 function toggleScenario(){
   S.scenario=(S.scenario==='base')?'prop':'base';
-  try{_lsSet('cabida_scenario',S.scenario);}catch(e){}
+  _lsPref('cabida_scenario',S.scenario);
   updateScenUI(); renderSVG();
   if(_eqpRoomId && document.getElementById('equipModal').style.display!=='none') eqpShowTab(_eqpTab);
   if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent=S.scenario==='base'?'📦 Escenario: Despliegue 0 (catálogo oficial, sin traslados)':'↪ Escenario: Propuesta de reubicación (traslados aplicados)'; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},3000); }
@@ -7787,7 +7792,7 @@ function toggleRightPanel(force){
   const collapsed = (typeof force==='boolean') ? force : !p.classList.contains('collapsed');
   p.classList.toggle('collapsed',collapsed);
   const db=document.getElementById('dkPanel'); if(db) db.classList.toggle('on',!collapsed);
-  try{ _lsSet('cabida_rp_collapsed', collapsed?'1':'0'); }catch{}
+  _lsPref('cabida_rp_collapsed', collapsed?'1':'0');
 }
 (function initRightPanelState(){
   try{ if(localStorage.getItem('cabida_rp_collapsed')==='1') toggleRightPanel(true); }catch{}
@@ -11222,6 +11227,11 @@ document.addEventListener('DOMContentLoaded',updateScenUI); if(document.readySta
 // Batería de invariantes previa a cada commit. Corre con ls() bloqueado:
 // siembra, muta y exporta sin persistir nada; salir = recargar sin el parámetro.
 async function runSelfTest(){
+  // Testigo: al terminar, NINGUNA preferencia del usuario puede haber cambiado.
+  const _PREFS=['cabida_room_labels','cabida_show_dotnames','cabida_box_vis','cabida_plan_kind',
+                'cabida_show_asign','cabida_show_sen','cabida_scenario','cabida_rp_collapsed',
+                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures'];
+  const _PREV={}; _PREFS.forEach(k=>{ try{ _PREV[k]=localStorage.getItem(k); }catch(e){ _PREV[k]=null; } });
   const out=[]; const T=(nm,fn)=>{ try{ const r=fn(); if(r===false) out.push([0,nm,'aserción falsa']); else out.push([1,nm,'']); }catch(e){ out.push([0,nm,e.message]); } };
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   if(typeof _abWrite==='function') window._abWrite=()=>{};
@@ -11879,6 +11889,12 @@ async function runSelfTest(){
   wsState.dotLinks=(wsState.dotLinks||[]).filter(g=>!g.some(k=>k.startsWith('st_r')));
   FLOORS.forEach(f=>{ f.areas=f.areas.filter(a=>a.id!=='st_a'); });
   _codeBoxIndex=null; S.level=1; S.areaId=null; S.roomId=null; renderSVG();
+  T('El selftest no deja rastro en las preferencias del usuario', ()=>{
+    const cambiadas=_PREFS.filter(k=>{ let v=null; try{ v=localStorage.getItem(k); }catch(e){}
+      return v!==_PREV[k]; });
+    if(cambiadas.length) console.warn('preferencias tocadas por el selftest:',cambiadas);
+    return cambiadas.length===0;
+  });
   _stReport(out);
 }
 function _stReport(out){
