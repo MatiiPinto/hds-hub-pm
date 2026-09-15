@@ -209,6 +209,11 @@ code,.mono{font-family:var(--font-mono)}
 .tb-info{margin-left:auto;font-size:var(--fs-sm);color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .tb-info:not(:empty)::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:7px;vertical-align:middle}
 .tb-div,.tb-sep{display:none}
+/* acceso rápido en la barra de navegación: cajas · nombres · edición */
+#navQuick{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:10px}
+#navBar .tb-btn{height:26px;padding:0 8px;font-size:var(--fs-xs);gap:5px}
+#navBar .tog::after{width:22px;height:13px;margin-left:6px;background:radial-gradient(circle at 6.5px 50%,#fff 4px,transparent 4.6px) var(--n-200)}
+#navBar .tog.on::after,#navBar .tog.active::after{background:radial-gradient(circle at 15.5px 50%,#fff 4px,transparent 4.6px) var(--accent-600)}
 
 /* ── Botones de herramienta (.tb-btn) ────────────────────────────────────── */
 .tb-btn{display:inline-flex;align-items:center;gap:6px;height:var(--control-h);padding:0 var(--sp-3);border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface);color:var(--text);font-size:var(--fs-sm);font-weight:var(--fw-regular);cursor:pointer;white-space:nowrap;flex-shrink:0;line-height:1;transition:background .15s,border-color .15s,color .15s;font-variant-numeric:tabular-nums}
@@ -485,6 +490,12 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 .bim-desc{display:grid;grid-template-columns:auto 1fr;grid-template-areas:"u nm" "u sub";column-gap:8px;align-items:center;width:100%;background:var(--surface-sunken);border:1px dashed var(--border);border-radius:var(--r-md);padding:6px 8px;text-align:left;margin:2px 0;position:relative;opacity:.8}
 .bim-undo{grid-area:u;position:static;transform:none;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;background:var(--accent-50);border:1px solid var(--accent-300);color:var(--accent-700);font-size:12px;cursor:pointer}
 .bim-undo:hover{background:var(--accent-600);color:#fff}
+/* recintos en conflicto bajo una fila de revisión (mismo BIM en 2+ recintos) */
+.bim-extra{display:flex;flex-direction:column;gap:3px;padding:0 8px 8px 22px}
+.bim-extra-t{font-size:var(--fs-xs);color:var(--warn);font-weight:var(--fw-medium)}
+.bim-chip{display:flex;align-items:center;gap:6px;width:100%;text-align:left;padding:5px 8px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface);color:var(--text);font-size:var(--fs-xs);cursor:pointer;line-height:1.3}
+.bim-chip code{font-family:var(--font-mono);color:var(--text-2)}
+.bim-chip:hover{background:var(--accent-50);border-color:var(--accent-300);color:var(--accent-700)}
 
 /* ── Modales: un solo estilo (encabezado blanco, sin degradado) ──────────── */
 #fichaModal,#estadoModal,#equipModal{position:fixed;inset:0;background:rgba(15,22,34,.5);display:none;align-items:center;justify-content:center;z-index:120;padding:20px}
@@ -559,6 +570,7 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 .dot-panel .dp-t{font-size:var(--fs-md);font-weight:var(--fw-bold);color:var(--text)}
 .dot-panel .dp-s{font-size:var(--fs-xs);color:var(--text-2);margin-top:2px}
 .dot-panel .dp-body{overflow-y:auto;padding:4px 0}
+.beca-tag.grupo-tag{background:#FEF3C7;color:#92400E;border-color:#F2C46B}
 .beca-tag{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:9px;font-size:9.5px;font-weight:var(--fw-medium);letter-spacing:.2px;vertical-align:1px;background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd;white-space:nowrap}
 .beca-tag.vencido{background:#fef3c7;color:#b45309;border-color:#fcd34d}
 .dp-row{display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;border-bottom:1px solid var(--n-100)}
@@ -5231,9 +5243,9 @@ function exportDEA(){
 // el mensaje de estado.
 const DOCK_MAPA=[
   ['dkIr',    ['btnBuscaRec']],
-  ['dkVer',   ['btnBoxVis','btnDotNames','vwDD']],
+  ['dkVer',   ['vwDD']],
   ['dkCons',  ['btnFicha','btnAutSan','btnEquip','btnScen','btnMoves','btnServPuestos']],
-  ['dkEdit2', ['btnEdit','btnUndo','btnDraw','btnMerge','btnUnmerge','btnRename','btnDel','btnDelDot','btnOrdenarDots']],
+  ['dkEdit2', ['btnUndo','btnDraw','btnMerge','btnUnmerge','btnRename','btnDel','btnDelDot','btnOrdenarDots']],
   ['dkAdd',   ['btnPuertas','puertaTipoSel','btnPuertaDel','btnPuertaDelAll','btnPuertasAuto','btnDupMueble','btnStruct']],
   ['dkExp',   ['btnExpServ']]
 ];
@@ -5263,6 +5275,17 @@ function _dockMonta(){
   // el mensaje de estado pasa a la barra de navegación (la de edición queda vacía)
   const nav=document.getElementById('navBar'), ti=document.getElementById('tbInfo');
   if(nav&&ti) nav.appendChild(ti);
+  // Acceso rápido (petición 15-sep-2026): ver/ocultar cajas, nombres de
+  // funcionarios y modo edición quedan SIEMPRE a la vista en la barra superior.
+  if(nav){
+    const q=document.createElement('div'); q.id='navQuick';
+    ['btnBoxVis','btnDotNames','btnEdit'].forEach(id=>{
+      const e=document.getElementById(id); if(!e) return;
+      const m=ICO.exec(e.textContent||''); e.setAttribute('data-ic', m?m[1]:(e.textContent||'?').trim().slice(0,2));
+      q.appendChild(e);
+    });
+    nav.appendChild(q);
+  }
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',_dockMonta); else _dockMonta();
 function dockToggle(){
@@ -8441,9 +8464,12 @@ function _avBarra(a,n,alto){
     +'<span style="display:block;height:100%;width:'+p+'%;background:'+_avColor(p)+'"></span></span>';
 }
 // Solo el % global, para el rotulo de la pestaña: no arma el arbol entero.
+// Dotación que cuenta para el avance: los becados en formación quedan fuera
+// (no pertenecen a una subdirección; petición 15-sep-2026).
+function _avStaff(){ return _dpStaffAll().filter(s=>!s.beca); }
 function _avBadge(){
   const b=document.getElementById('sbAvN'); if(!b||!dotDB||!dotDB.staff) return;
-  const asg=_dpAsignados(), all=_dpStaffAll();
+  const asg=_dpAsignados(), all=_avStaff();
   let a=0; all.forEach(s=>{ if(asg[norm(s.nombre)]) a++; });
   b.textContent=_avPct(a,all.length)+'%';
 }
@@ -8452,7 +8478,7 @@ function avToggle(k){ _avAbierto[k]=!_avAbierto[k]; renderAvance(); }
 // circuito: cualquier número del avance se puede abrir hasta ver quién es.
 function _avPersonas(sd,sv,u,asg){
   const esc=x=>String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;');
-  const gente=_dpStaffAll().filter(s=>
+  const gente=_avStaff().filter(s=>
     String(s.subdireccion||'(sin subdirección)')===sd &&
     String(s.servicio||'(sin departamento)')===sv &&
     String(s.unidad||'(sin unidad)')===u);
@@ -8473,7 +8499,8 @@ function renderAvance(){
   const asg=_dpAsignados();
   // árbol sd → sv → u, contando personas y cuántas tienen recinto
   const arbol={};
-  _dpStaffAll().forEach(s=>{
+  const nBec=_dpStaffAll().length-_avStaff().length;
+  _avStaff().forEach(s=>{
     const sd=String(s.subdireccion||'(sin subdirección)');
     const sv=String(s.servicio||'(sin departamento)');
     // Sin unidad NO puede significar "sin fila": antes esta gente contaba en el
@@ -8495,7 +8522,8 @@ function renderAvance(){
     +'<b style="font-size:12px">Dotación asignada a recinto</b>'
     +'<b style="margin-left:auto;font-size:15px;color:'+_avColor(_avPct(tA,tN))+'">'+_avPct(tA,tN)+'%</b></div>'
     +'<div style="padding:0 4px 10px">'+_avBarra(tA,tN,8)
-    +'<div style="font-size:10.5px;color:#64748b;margin-top:3px">'+tA+' de '+tN+' personas · faltan '+(tN-tA)+'</div></div>');
+    +'<div style="font-size:10.5px;color:#64748b;margin-top:3px">'+tA+' de '+tN+' personas · faltan '+(tN-tA)+'</div>'
+    +(nBec?'<div style="font-size:10.5px;color:#94a3b8;margin-top:2px">🎓 '+nBec+' becados en formación no se cuentan: no pertenecen a una subdirección.</div>':'')+'</div>');
   const fila=(nivel,nombre,a,n,clave,hayHijos)=>{
     const p=_avPct(a,n), ab=!!_avAbierto[clave];
     const pad=[0,12,24][nivel];
@@ -10053,19 +10081,21 @@ function _externaPendientes(){
   const inM=n=>{ if(_inMatrixCache.has(n)) return _inMatrixCache.get(n); const v=isInMatrix(n); _inMatrixCache.set(n,v); return v; };
   FLOORS.forEach(fl=>fl.areas.forEach(a=>(a.rooms||[]).forEach(r=>{
     (wsState.dots[r.id]||[]).forEach((d,idx)=>{
-      const push=(nombre,enM,cds,sinMarca)=>{
-        if(cds && !enM && nameState.cdsRev[norm(nombre)]) return;   // CdS ya informada a RR.HH.
+      const push=(nombre,enM,cds,sinMarca,tIx)=>{
+        // CdS ya informada a RR.HH. sale de la lista… salvo que sea un rótulo
+        // («Compra Servicio 3»): eso no es una persona y hay que eliminarlo.
+        if(cds && !enM && nameState.cdsRev[norm(nombre)] && _nombreClase(nombre).propios) return;
         const cand=(!enM)?(_matrizCandidato(nombre)||{}).nombre:null;
-        out.push({fl,area:a,r,idx,nombre,enMatriz:enM,cand:cand||null,cds:!!cds,sinMarca:!!sinMarca,cargo:[d.cargo,d.estamento].filter(Boolean).join(' · ')});
+        out.push({fl,area:a,r,idx,d,tIx:(tIx==null?null:tIx),nombre,enMatriz:enM,cand:cand||null,cds:!!cds,sinMarca:!!sinMarca,cargo:[d.cargo,d.estamento].filter(Boolean).join(' · ')});
       };
       // Además de las marcas guardadas, se coteja CADA nombre asignado contra
       // la matriz vigente: capta asignaciones antiguas sin marca y personas
       // que salieron de la matriz en una actualización posterior.
       if(d.tipo==='dinamico'){
-        (d.turnos||[]).forEach(x=>{
+        (d.turnos||[]).forEach((x,tIx)=>{
           if(!x.nombre) return;
-          if(x.externa||x.cds) push(x.nombre, inM(x.nombre), x.cds);
-          else if(!inM(x.nombre)) push(x.nombre, false, false, true);
+          if(x.externa||x.cds) push(x.nombre, inM(x.nombre), x.cds, false, tIx);
+          else if(!inM(x.nombre)) push(x.nombre, false, false, true, tIx);
         });
       } else if(d.nombre && d.nombre.trim()){
         if(d.externa||d.cds) push(d.nombre, inM(d.nombre), d.cds);
@@ -10147,10 +10177,24 @@ function _relinkExterna(p){
 // Lista fusionada del filtro único de dotación. Cada fila lleva _chk con su
 // origen ('externa'|'comision'): mantiene las claves de rechazo 🚫 ya
 // guardadas (revDesc usa el prefijo original) y decide qué hace el ✓.
+// ¿El nombre asignado es una PERSONA o un rótulo? Se cuentan las palabras que
+// pueden ser nombre propio: se descartan cargos, estamentos, números y muletillas
+// («TENS 1», «Compra Servicio 3», «QF», «Operador Medical 2»). Cubicamos
+// personal real: un rótulo no aporta y son las jefaturas las que deben llegar
+// con el nombre de su gente (petición 15-sep-2026).
+const _GENERICOS=/^(TENS?|EU|ENFERMER[OA]S?|MEDIC[OA]S?|MEDICAL|DR|DRA|AUXILIAR(ES)?|AUX|TECNIC[OA]S?|PARAMEDIC[OA]S?|KINE|KINESIOLOG[OA]S?|SECRETARI[AO]S?|ADMINISTRATIV[OA]S?|COMPRA|COMPARA|SERVICIOS?|CDS|TURNOS?|JEFE|JEFA|JEFATURA|COORDINADOR[A]?|SUPERVISOR[A]?|RESIDENTE|BECAD[OA]|INTERN[OA]|ALUMN[OA]|PERSONAL|FUNCIONARI[OA]|DEFINIR|PENDIENTE|VACANTE|NUEV[OA]|REEMPLAZO|PUESTO|CUPO|ROTATIVO|DINAMIC[OA]|MATRON[AE]S?|NUTRICIONISTA|PSICOLOG[OA]|TERAPEUTA|FONOAUDIOLOG[OA]|TECNOLOG[OA]|QUIMIC[OA]|FARMACEUTIC[OA]|ODONTOLOG[OA]|CIRUJAN[OA]|ANESTESI\w*|TP|QF|TM|SPRE|DIALISIS|APOYO|ASEO|GUARDIA|VIGILANTE|CHOFER|ESTAFETA|TRANSPORTE|CAMILLER[OA]|OPERADOR[A]?|ENCARGAD[OA]|DIGITADOR[A]?|RECEPCION\w*|ADMISION\w*|CAJ[AE]R?[OA]?|NN|SIN|NOMBRE|POR|ASIGNAR|LIBRE|DISPONIBLE|EXTERN[OA]|HONORARIOS?|CONTRATA|PLANTA|PROFESIONAL|UNIDAD|SALA|BOX|SECTOR|PISO|NOCHE|DIA|MANANA|TARDE|LARGO|CORTO|CUARTO|TERCER|SEGUNDO|PRIMER|DE|DEL|LA|EL|LOS|LAS|Y)$/;
+function _nombreClase(nombre){
+  const toks=norm(nombre||'').toUpperCase().split(/[^A-Z0-9Ñ]+/).filter(Boolean);
+  const propios=toks.filter(t=>t.length>=3 && !/\d/.test(t) && !_GENERICOS.test(t));
+  return {propios:propios.length, genericos:toks.length-propios.length};
+}
 function _clasePersonal(p){
   if(p._chk==='comision') return 'dot_comision';
+  const g=_nombreClase(p.nombre);
+  if(!g.propios) return 'dot_generico';                 // ni una palabra de nombre propio
   if(p.enMatriz || p.cand) return 'dot_matriz';
   if(p.cds) return 'dot_cds';
+  if(g.propios<3) return 'dot_incompleto';              // «Valentina», «Laura Morales»: faltan nombres/apellidos
   const m=_matrizParecidos(p.nombre);
   if(m.toks<2) return 'dot_incompleto';
   if(m.best>=m.toks && m.nCands>1) return 'dot_incompleto';        // calza entero con varias personas
@@ -10283,8 +10327,40 @@ function _codClase(atlas,mapa){
   }
   return 'bim';
 }
+// Índice BIM → recintos DIBUJADOS del Atlas que lo llevan (para mostrar el
+// conflicto completo cuando un mismo BIM está en dos o más recintos).
+function _bimEnAtlas(){
+  const map={};
+  FLOORS.forEach(fl=>fl.areas.forEach(a=>(a.rooms||[]).forEach(r=>{
+    if(!(boxState.rooms[r.id]||[]).length) return;
+    ((rBim(r.id)||'').match(/[A-Za-z]\d{3,5}/g)||[]).forEach(c=>{ c=c.toUpperCase(); (map[c]=map[c]||[]).push({fl,area:a,r}); });
+  })));
+  return map;
+}
+// Chips con los OTROS recintos que llevan el mismo BIM: un clic va al recinto y
+// abre su ficha para corregir el BIM a mano (el conflicto se arregla ahí).
+function _bimConflictoHtml(p){
+  if(!p.otros||!p.otros.length) return '';
+  const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  return '<div class="bim-extra"><span class="bim-extra-t">BIM '+esc(p.bim)+' también en '+p.otros.length+' recinto'+(p.otros.length>1?'s':'')+':</span>'
+    +p.otros.map(o=>'<button class="bim-chip" onclick="event.stopPropagation();revIrRecinto(\''+o.r.id.replace(/'/g,"\\'")+'\')" title="Ir al recinto y corregir su BIM">'
+      +esc(rName(o.r.id)||o.r.id)+' <code>'+esc(rCode(o.r.id)||'sin código')+'</code> · '+esc(aName(o.area.id))+' · '+esc(o.fl.label)+'</button>').join('')
+    +'</div>';
+}
+function revIrRecinto(rid){
+  const ref=_roomRef(rid); if(!ref) return;
+  if(S.floorId!==ref.fl.id) goFloor(ref.fl.id);
+  goArea(ref.area.id);
+  const sh=boxState.rooms[rid]||[];
+  if(sh.length && typeof zoomTo==='function') zoomTo(bounds(sh),140);
+  if(S.viewOnly){ S.selIds=new Set([rid]); renderSVG(); return; }
+  if(!S.editMode) toggleEdit();
+  S.selIds=new Set([rid]); renderSVG();
+  setTimeout(()=>{ try{ editBoxName(); }catch(e){} },780);
+}
 function _codMapaFilas(clase){
   const out=[];
+  const idx=clase==='bim'?_bimEnAtlas():null;
   (_catRev().codigo_distinto||[]).forEach(x=>{
     const ref=_roomRef(x.rid); if(!ref) return;
     const cur=(rCode(x.rid)||'').replace(/\s+/g,'').toUpperCase();
@@ -10293,8 +10369,9 @@ function _codMapaFilas(clase){
     if((rBim(x.rid)||'').toUpperCase().indexOf(String(x.bim||'').toUpperCase())<0) return; // ya no lleva ese BIM
     if(nameState.recintosRev['codmapa|'+x.rid+'|'+x.codigo_mapa]) return;
     if(_codClase(x.codigo_atlas,x.codigo_mapa)!==clase) return;
+    const otros=idx?(idx[String(x.bim||'').toUpperCase()]||[]).filter(o=>o.r.id!==x.rid):[];
     out.push({...ref,bim:x.bim,codigoAtlas:x.codigo_atlas,codigoMapa:x.codigo_mapa,nombreMapa:x.nombre_mapa,servicio:x.servicio,
-              _dialogo:clase==='bim'});
+              otros, _dialogo:clase==='bim'});
   });
   return out;
 }
@@ -10345,7 +10422,9 @@ const REV_CHECKS={
   bimajeno:{label:'Catastro: BIM que parece de otro recinto',
     find:_bimAjenoPendientes, flat:true,
     subText:p=>'BIM '+p.bim+' es «'+(p.nombreMapa||'?')+'» ('+p.codigoMapa+') en el mapa, pero este recinto es '+p.codigoAtlas
+      +(p.otros&&p.otros.length?(' · ⚠ el mismo BIM está en '+(p.otros.length+1)+' recintos'):'')
       +' · el clic abre el recinto para corregir el BIM · 🚫 si el BIM está bien · '+p.fl.label,
+    extra:_bimConflictoHtml,
     done:'Ningún recinto lleva un BIM que en el mapa PMA pertenezca a otro recinto.'},
   variossv:{label:'Catastro: BIM dibujado fuera del servicio de su código',
     find:_variosSvPendientes, approve:true, noDialog:true, flat:true,
@@ -10372,11 +10451,20 @@ const REV_CHECKS={
     subText:p=>{ const m=_matrizParecidos(p.nombre); return '≈ parecido a '+m.cands.slice(0,2).map(x=>'«'+x.nombre+'»').join(' o ')+(m.nCands>2?(' (+'+(m.nCands-2)+')'):'')
       +' · clic: abre el puesto con los parecidos para elegir · '+_subPersonal(p); },
     done:'No hay nombres fuera de matriz parecidos a personas de la matriz.'},
-  dot_incompleto:{label:'Personal: nombre incompleto o rótulo',
+  dot_generico:{label:'Personal: rótulo que no es una persona (eliminar)',
+    find:()=>_dotPorClase('dot_generico'), flat:true, delDot:true, saveWs:true,
+    approve:true, okIf:()=>false, allIf:()=>true,
+    delTitle:'Eliminar este puesto: «TENS 1», «Compra de Servicio»… no es una persona',
+    allLabel:n=>'🗑 Eliminar los '+n+' puestos con rótulo',
+    allMsg:n=>'¿Eliminar los '+n+' puestos visibles?\n\nSon rótulos («TENS 1», «Compra Servicio 3», «QF»…), no personas: se borra el puesto (o ese turno) del plano. Las jefaturas deben llegar con el nombre de su personal.',
+    apply:p=>_borrarPuestoPendiente(p), go:p=>_goPersonal(p), goDestino:p=>_goDestinoPersonal(p),
+    subText:p=>'«'+p.nombre+'» es un rótulo, no un nombre propio · ✕ elimina el puesto · clic abre el diálogo por si hay que poner a alguien · '+_subPersonal(p),
+    done:'No quedan puestos con rótulos en vez de personas.'},
+  dot_incompleto:{label:'Personal: nombre incompleto (completar)',
     find:()=>_dotPorClase('dot_incompleto'), flat:true, go:p=>_goPersonal(p), goDestino:p=>_goDestinoPersonal(p),
-    subText:p=>{ const m=_matrizParecidos(p.nombre);
-      return (m.toks<2?'«'+p.nombre+'» no es un nombre de persona — poner al funcionario o dejar el puesto libre'
-                     :'calza con '+m.nCands+' personas de la matriz — completar el nombre')+' · '+_subPersonal(p); },
+    subText:p=>{ const g=_nombreClase(p.nombre), m=_matrizParecidos(p.nombre);
+      return (g.propios<3?'«'+p.nombre+'» trae '+g.propios+' palabra'+(g.propios>1?'s':'')+' de nombre — completar con nombres y ambos apellidos'
+                        :'calza con '+m.nCands+' personas de la matriz — completar el nombre')+' · '+_subPersonal(p); },
     done:'Todos los puestos llevan nombres completos de persona.'},
   dot_fuera:{label:'Personal: no está en la matriz (RR.HH.)',
     find:()=>_dotPorClase('dot_fuera').filter(p=>!nameState.extRev[norm(p.nombre)]), flat:true, approve:true,
@@ -10554,7 +10642,7 @@ function revAuditar(opts){
         const dialogo=!C.go && (!C.noDialog || p._dialogo);
         // 🚫 siempre existe para filas no informativas; pero una fila que SÓLO se
         // puede rechazar no es revisable: se exige ✓, ✕, diálogo o go.
-        if(!ok && !C.del && !dialogo && !C.go){ r.sinSalida++; if(r.ejemplos.length<3) r.ejemplos.push('sólo 🚫: '+k); }
+        if(!ok && !C.del && !C.delDot && !dialogo && !C.go){ r.sinSalida++; if(r.ejemplos.length<3) r.ejemplos.push('sólo 🚫: '+k); }
       });
       if(C.approve && C.apply && C.auditaUnoAUno){
         // Categorías cuyo ✓ en tanda sería destructivo (p.ej. quitar un recinto de
@@ -10678,6 +10766,33 @@ function revDeleteRoom(rid){
   renderSVG(); if(typeof updateSelUI==='function')updateSelUI(); if(typeof updateStats==='function')updateStats();
   renderSidebar();
 }
+// Borra el puesto (o sólo ese turno, si es un puesto dinámico) de una fila de
+// personal. Ubica el dot por referencia y, si el estado fue clonado (arnés),
+// por índice o por nombre. Devuelve true si borró algo.
+function _borrarPuestoPendiente(p){
+  const rid=p.r&&p.r.id, arr=wsState.dots[rid]; if(!arr) return false;
+  const calza=d=>!!d && (d.tipo==='dinamico' ? (d.turnos||[]).some(t=>norm(t.nombre||'')===norm(p.nombre)) : norm(d.nombre||'')===norm(p.nombre));
+  let ix=p.d?arr.indexOf(p.d):-1;
+  if(ix<0 && calza(arr[p.idx])) ix=p.idx;
+  if(ix<0) ix=arr.findIndex(calza);
+  if(ix<0) return false;
+  const d=arr[ix];
+  if(d.tipo==='dinamico' && (d.turnos||[]).length){
+    const t=d.turnos;
+    let j=(p.tIx!=null && t[p.tIx] && norm(t[p.tIx].nombre||'')===norm(p.nombre))?p.tIx:t.findIndex(x=>norm(x.nombre||'')===norm(p.nombre));
+    if(j>=0) t.splice(j,1);
+    if(t.length) return true;                      // el puesto sigue con los otros turnos
+  }
+  if(d.id&&wsState.dotLinks) wsState.dotLinks=wsState.dotLinks.map(g=>g.filter(k=>k!==rid+'§'+d.id)).filter(g=>g.length>1);
+  arr.splice(ix,1);
+  return true;
+}
+function revDeleteDot(i){
+  if(S.viewOnly) return;
+  const p=(document.getElementById('bimList')._pend||[])[i]; if(!p) return;
+  if(!confirm('¿Eliminar el puesto «'+p.nombre+'» de '+(rName(p.r.id)||p.r.id)+'?\n\nNo es una persona: se borra el puesto del plano.')) return;
+  _borrarPuestoPendiente(p); _revGuardar();
+}
 function renderBimPending(){
   const counts={}; let total=0;
   for(const c of Object.keys(REV_CHECKS)){ counts[c]=_revPend(c).length; total+=counts[c]; }
@@ -10724,14 +10839,18 @@ function renderBimPending(){
     const noBtn=(!S.viewOnly)
       ?'<span class="bim-no" title="Rechazar la sugerencia: este caso queda como está. Sale de la lista y del contador; se puede restaurar desde «descartadas» al pie." onclick="event.stopPropagation();revReject('+i+')">🚫</span>':'';
     const off2=noBtn?'style="right:26px"':'';
-    const xBtn=(REV_CHECKS[_revCheck].del&&!S.viewOnly)
-      ?'<span class="bim-x" '+off2+' title="Eliminar este recinto duplicado" onclick="event.stopPropagation();revDeleteRoom(\''+p.r.id+'\')">✕</span>':'';
+    const C0=REV_CHECKS[_revCheck];
+    const xBtn=((C0.del||C0.delDot)&&!S.viewOnly)
+      ?'<span class="bim-x" '+off2+' title="'+(C0.delTitle||'Eliminar este recinto duplicado')+'" onclick="event.stopPropagation();'
+        +(C0.delDot?('revDeleteDot('+i+')'):('revDeleteRoom(\''+p.r.id+'\')'))+'">✕</span>':'';
     const okBtn=(REV_CHECKS[_revCheck].approve&&!S.viewOnly&&(!REV_CHECKS[_revCheck].okIf||REV_CHECKS[_revCheck].okIf(p)))
       ?'<span class="bim-ok" '+off2+' title="'+(REV_CHECKS[_revCheck].okTitle||'Aceptar: aplicar el cambio propuesto')+'" onclick="event.stopPropagation();revApprove('+i+')">✓</span>':'';
     html+='<button class="bim-row'+((xBtn||okBtn)&&noBtn?' has-xx':((xBtn||okBtn||noBtn)?' has-x':''))+'" onclick="bimGo('+i+')">'+xBtn+okBtn+noBtn
       +'<span class="bim-nm">'+esc(p.nombre||(p.r&&(rName(p.r.id)||p.r.id))||'')+(p.nombre&&p.r?(' <span style=\'color:#7d97ad;font-weight:400\'>· '+esc(rName(p.r.id)||'')+'</span>'):'')+'</span>'
       +'<span class="bim-sub">'+esc([REV_CHECKS[_revCheck].subText(p), p.area?aName(p.area.id):''].filter(Boolean).join(' · '))+'</span>'
       +'</button>';
+    // bloque adicional bajo la fila (p. ej. los otros recintos en conflicto)
+    if(REV_CHECKS[_revCheck].extra){ try{ html+=REV_CHECKS[_revCheck].extra(p)||''; }catch(e){} }
   });
   html+=_revPieDesc()+_revPieFuera();
   html+='<div style="text-align:right;margin-top:6px"><a href="#" onclick="revAuditarUI();return false" style="font-size:10px;color:#64748b">🧪 Auditar la revisión</a></div>';
@@ -10989,6 +11108,7 @@ function loadDotDB(){
         vinculo: p.tipo_vinculo || '',
         // Becados con nombre: vienen de la nómina de formación (beca_*). Sin esos
         // campos se usan fecha_inicio/fecha_termino de la matriz.
+        grupos: Array.isArray(p.grupos) ? p.grupos.map(g=>({clave:g.clave, nombre:g.nombre, rol:g.rol||''})) : [],
         beca: (String(p.tipo_vinculo||'').toUpperCase()==='BECADO' || /BECAD/i.test(p.ley||'') || p.beca_origen==='nomina_becados')
           ? { tipo: String(p.beca_tipo||'').toUpperCase(),
               programa: p.beca_programa || p.especialidad || p.sp || '',
@@ -11025,8 +11145,13 @@ function loadDotDB(){
 
 // Distintivo del becado: especialidad o subespecialidad, y aviso cuando su
 // período de formación ya venció (hay que revisar si sigue en el hospital).
+// Grupos y círculos (overlay dotacion_grupos.json): chip por grupo, con el rol en el título
+function grupoTag(s){
+  if(!s || !Array.isArray(s.grupos) || !s.grupos.length) return '';
+  return s.grupos.map(g=>'<span class="beca-tag grupo-tag" title="'+String(g.nombre+(g.rol?' · '+g.rol:'')).replace(/"/g,'&quot;')+'">🖋️ '+esc(g.nombre.replace(/^Círculo de /,'Círculo '))+'</span>').join('');
+}
 function becaTag(s){
-  if(!s || !s.beca) return '';
+  if(!s || !s.beca) return (typeof grupoTag==='function' ? grupoTag(s) : '');
   const b = s.beca;
   const lbl = /SUB/.test(b.tipo) ? 'Becado subespecialidad'
             : /ESPEC/.test(b.tipo) ? 'Becado especialidad'
@@ -11036,7 +11161,7 @@ function becaTag(s){
   const tip = [b.programa, (b.inicio||fin) ? ('formación '+(b.inicio||'?')+' → '+(fin||'?')) : 'sin período informado']
     .filter(Boolean).join(' · ') + (vencido ? ' · PERÍODO VENCIDO: revisar si sigue en el hospital' : '');
   return '<span class="beca-tag'+(vencido?' vencido':'')+'" title="'+tip.replace(/"/g,'&quot;')+'">'
-    + '🎓 '+lbl+(vencido?' · vencido':'')+'</span>';
+    + '🎓 '+lbl+(vencido?' · vencido':'')+'</span>' + grupoTag(s);
 }
 
 // Normaliza texto: minúsculas + sin acentos + sin caracteres especiales
@@ -11966,9 +12091,11 @@ async function runSelfTest(){
   T('Avance: % por subdirección coherente con la dotación', ()=>{
     renderAvance();
     const b=document.getElementById('avBody'); if(!b||!b.innerText.trim()) return false;
-    const asg=_dpAsignados(), all=_dpStaffAll();
+    const asg=_dpAsignados(), all=_avStaff();
+    const hayBecados=_dpStaffAll().some(s=>s.beca), sinBecados=all.every(s=>!s.beca);
     let a=0; all.forEach(s=>{ if(asg[norm(s.nombre)]) a++; });
     const esperado=_avPct(a,all.length);
+    if(!(hayBecados && sinBecados)) return false;   // los becados no cuentan en el avance
     return a<=all.length && document.getElementById('sbAvN').textContent===esperado+'%'
         && /Dotación asignada a recinto/.test(b.innerText);
   });
@@ -12466,12 +12593,12 @@ async function runSelfTest(){
       const t=wsState.dots['st_r1'][1].turnos.slice(-1)[0];
       const turno=!!t && !t.externa && !t.cds;
       // refresco: con la Revisión abierta en «no está en la matriz», guardar saca la fila del DOM
-      wsState.dots['st_r1']=[{id:'st_rf',x:3,y:3,tipo:'fijo',nombre:'ZZ PRUEBA REFRESCO',cargo:'',estamento:'',externa:true}];
+      wsState.dots['st_r1']=[{id:'st_rf',x:3,y:3,tipo:'fijo',nombre:'ZZQ PRUEBA REFRESCO',cargo:'',estamento:'',externa:true}];
       _revOpen=true; _revCheck='dot_fuera'; renderBimPending();
       const box=document.getElementById('bimList');
-      const antes=/ZZ PRUEBA REFRESCO/.test(box.innerText);
+      const antes=/ZZQ PRUEBA REFRESCO/.test(box.innerText);
       openModal('st_r1',0); document.getElementById('mNombre').value=s1.nombre; saveWs();
-      const despues=/ZZ PRUEBA REFRESCO/.test(box.innerText);
+      const despues=/ZZQ PRUEBA REFRESCO/.test(box.innerText);
       return limpio && turno && antes && !despues;
     } finally {
       wsState.dots=JSON.parse(dPrev); _revOpen=oPrev; _revCheck=cPrev; mCtx=mPrev; try{ closeModal(); renderBimPending(); }catch(e){}
@@ -12483,15 +12610,27 @@ async function runSelfTest(){
     const casos=[
       [{_chk:'externa',nombre:m.nombre,enMatriz:true},'dot_matriz'],
       [{_chk:'externa',nombre:tk[0]+' '+tk[1]+' ZZQXW',enMatriz:false},'dot_probable'],
-      [{_chk:'externa',nombre:'SPRE',enMatriz:false},'dot_incompleto'],
+      [{_chk:'externa',nombre:'SPRE',enMatriz:false},'dot_generico'],
+      [{_chk:'externa',nombre:'TENS MEDICAL 1',enMatriz:false},'dot_generico'],
+      [{_chk:'externa',nombre:'COMPRA SERVICIO 3',enMatriz:false,cds:true},'dot_generico'],
+      [{_chk:'externa',nombre:'DANIELA',enMatriz:false},'dot_incompleto'],
+      [{_chk:'externa',nombre:'ZZQXW YYQXV',enMatriz:false},'dot_incompleto'],
       [{_chk:'externa',nombre:'ZZQXW YYQXV WWQXU',enMatriz:false},'dot_fuera'],
       [{_chk:'externa',nombre:'ZZQXW YYQXV',enMatriz:false,cds:true},'dot_cds'],
       [{_chk:'comision',nombre:m.nombre,rut:'1-9'},'dot_comision']];
     const ok=casos.every(([p,k])=>_clasePersonal(p)===k);
-    const sinMezcla=!('dotacion' in REV_CHECKS) && ['dot_matriz','dot_probable','dot_incompleto','dot_fuera','dot_cds','dot_comision'].every(k=>k in REV_CHECKS);
+    const sinMezcla=!('dotacion' in REV_CHECKS) && ['dot_matriz','dot_probable','dot_generico','dot_incompleto','dot_fuera','dot_cds','dot_comision'].every(k=>k in REV_CHECKS);
     // la suma de las categorías es exactamente el total de alertas de personal
     const total=_dotacionPendientes().filter(p=>!_revRechazada('x',p)).length;
-    const suma=['dot_matriz','dot_probable','dot_incompleto','dot_fuera','dot_cds','dot_comision'].reduce((a,k)=>a+_revRaw(k).length,0);
+    const suma=['dot_matriz','dot_probable','dot_generico','dot_incompleto','dot_fuera','dot_cds','dot_comision'].reduce((a,k)=>a+_revRaw(k).length,0);
+    // el rótulo se borra de verdad (puesto fijo y turno de un puesto dinámico), sin tocar el resto
+    const dPrev=wsState.dots['st_gen'];
+    wsState.dots['st_gen']=[{nombre:'TENS MEDICAL 1',x:1,y:1},{tipo:'dinamico',turnos:[{nombre:'COMPRA SERVICIO 2'},{nombre:'ZZQXW YYQXV WWQXU'}],x:2,y:2}];
+    const fila=(nombre,idx,tIx)=>({r:{id:'st_gen'},idx,tIx,nombre,_chk:'externa'});
+    const b1=_borrarPuestoPendiente(fila('TENS MEDICAL 1',0,null)) && wsState.dots['st_gen'].length===1 && wsState.dots['st_gen'][0].tipo==='dinamico';
+    const b2=_borrarPuestoPendiente(fila('COMPRA SERVICIO 2',0,0)) && wsState.dots['st_gen'].length===1 && wsState.dots['st_gen'][0].turnos.length===1 && wsState.dots['st_gen'][0].turnos[0].nombre==='ZZQXW YYQXV WWQXU';
+    if(dPrev===undefined) delete wsState.dots['st_gen']; else wsState.dots['st_gen']=dPrev;
+    if(!(b1&&b2)) return false;
     const extFiltrados=_dotPorClase('dot_fuera').filter(p=>nameState.extRev[norm(p.nombre)]).length;
     return ok && sinMezcla && (suma+extFiltrados===_dotacionPendientes().length);
   });
@@ -12544,13 +12683,16 @@ async function runSelfTest(){
   });
   T('Dock: la barra superior se vacía y los botones de edición viven en el gestor', ()=>{
     const dock=document.getElementById('dock'); if(!dock) return false;
-    const ids=['btnEdit','btnDraw','btnPuertas','btnDupMueble','btnStruct','btnMerge','btnDel','btnBoxVis','btnDotNames','btnFicha','btnExpServ','vwDD','puertaTipoSel'];
+    const ids=['btnDraw','btnPuertas','btnDupMueble','btnStruct','btnMerge','btnDel','btnFicha','btnExpServ','vwDD','puertaTipoSel'];
     const dentro=ids.every(id=>{ const e=document.getElementById(id); return e && dock.contains(e); });
+    // cajas · nombres · edición: acceso rápido en la barra de navegación
+    const nav=document.getElementById('navBar');
+    const rapidos=['btnBoxVis','btnDotNames','btnEdit'].every(id=>{ const e=document.getElementById(id); return e && nav.contains(e) && !dock.contains(e); });
     const bar=document.getElementById('editBar');
     const barSinBotones=![...bar.querySelectorAll('.tb-btn')].length;
     const conIcono=['btnEdit','btnPuertas','btnScen'].every(id=>(document.getElementById(id).getAttribute('data-ic')||'').length>0);
     const sinFlotante=!document.getElementById('rpReopen');
-    return dentro && barSinBotones && conIcono && sinFlotante;
+    return dentro && rapidos && barSinBotones && conIcono && sinFlotante;
   });
   T('Avance: nadie queda invisible — sin unidad tiene fila y las hojas abren los nombres', ()=>{
     const prev=dotDB.staff;

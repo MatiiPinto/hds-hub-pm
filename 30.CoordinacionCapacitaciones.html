@@ -64,6 +64,13 @@ table{border-collapse:collapse;width:100%;font-size:12px;white-space:nowrap}
 thead th{background:var(--azul);color:#fff;position:sticky;top:0;padding:9px 10px;text-align:left;font-weight:600;font-size:11.5px;z-index:5}
 tbody td{padding:6px 10px;border-bottom:1px solid #eef2f6;vertical-align:middle}
 tbody tr:hover td{background:#f8fafc}
+td.estam{min-width:230px;max-width:330px;white-space:normal}
+td.estam label{display:inline-block;font-size:10.5px;border:1px solid var(--bd);border-radius:10px;padding:1px 7px 1px 5px;margin:1px 2px 1px 0;cursor:pointer;background:#f8fafc;white-space:nowrap;user-select:none}
+td.estam label input{width:11px;height:11px;margin:0 3px 0 0;vertical-align:-1px;cursor:pointer}
+td.estam label.on{background:#dbeafe;border-color:#93c5fd;color:#1e3a8a;font-weight:600}
+td.estam.ok{box-shadow:inset 3px 0 0 #2563eb}
+td.estam .mini{font-size:10px;color:var(--tx2);cursor:pointer;text-decoration:underline;margin-left:5px;white-space:nowrap}
+td.estam.ro{font-size:11px;color:var(--tx2)}
 td.edit input,td.edit textarea{width:100%;min-width:90px;border:1px solid transparent;border-radius:5px;padding:4px 6px;font-size:12px;background:transparent;font-family:inherit;color:var(--tx)}
 td.edit input:hover,td.edit textarea:hover{border-color:var(--bd);background:#fff}
 td.edit input:focus,td.edit textarea:focus{border-color:var(--azul);background:#fff;outline:none}
@@ -207,6 +214,7 @@ th.sortable{cursor:pointer;user-select:none}th.sortable:hover{background:#0a558f
       <button class="btn" id="btnCapUpd" onclick="actualizarDesdeExcel()" title="Vuelve a leer la hoja '4. Prog Capacitacion HDS' del Excel de Seguimiento y Control (Drive sincronizado) y regenera la reportería. Requiere el servidor local: python3 _DEV/deploy_server.py (o usá Actualizar-Capacitaciones.command).">⟳ Actualizar desde Excel</button>
       <button class="btn" onclick="gAbrir()" title="Vista cronológica del programa con los colores de estado; exportable a Excel para el Servicio de Salud.">📊 Carta Gantt</button>
       <button class="btn" id="btnSeg" onclick="segAbrir()" title="Jornadas propuestas a la CSSO (89 correos enviados el 20-08-2026): solo consulta. El estado oficial se corrige en la hoja 4 del Excel.">🎓 Jornadas CSSO</button>
+      <button class="btn" onclick="exportEstam()" title="Descarga un JSON con los estamentos marcados por equipo para llevarlos a la columna S de la hoja 4 (_DEV/ingesta_estamentos.py).">👥 Exportar estamentos</button>
       <button class="btn" onclick="exportCSV()">⬇ Exportar CSV</button>
       <button class="btn" onclick="resetEstados()">↺ Reiniciar estados</button>
     </div>
@@ -234,6 +242,8 @@ th.sortable{cursor:pointer;user-select:none}th.sortable:hover{background:#0a558f
 <script>document.write('<scr'+'ipt src="SHARED_DATA/cap_data.js?v='+Date.now()+'"></scr'+'ipt>');</script>
 <!-- capa de seguimiento: las 89 jornadas propuestas a la CSSO (correos del 20-08-2026) -->
 <script>document.write('<scr'+'ipt src="SHARED_DATA/cap_seguimiento.js?v='+Date.now()+'"></scr'+'ipt>');</script>
+<!-- catálogo de estamentos por servicio (15-09-2026): quién puede participar; lo marcado por equipo va a la columna S -->
+<script>document.write('<scr'+'ipt src="SHARED_DATA/cap_estamentos.js?v='+Date.now()+'"></scr'+'ipt>');</script>
 <script>
 "use strict";
 var D = window.CAP_DATA;
@@ -274,7 +284,8 @@ var COLS = {
     {key:"proveedor",label:"Proveedor"},{key:"marca",label:"Marca"},{key:"modelo",label:"Modelo"},
     {key:"duracion",label:"Duración",edit:1},{key:"cant_equipos",label:"Cant. eq."},
     {key:"establecimiento",label:"Estab."},{key:"tipo_entrenamiento",label:"Tipo entren."},
-    {key:"propuesta_adelantar",label:"Prop. adelantar",edit:1},{key:"detalle_servicios",label:"Servicio clínico"}
+    {key:"propuesta_adelantar",label:"Prop. adelantar",edit:1},{key:"detalle_servicios",label:"Servicio clínico"},
+    {key:"_estam",label:"Estamentos que participan",estam:1}
   ],
   instructivos:[
     {key:"codigo",label:"Código"},{key:"equipo",label:"Equipo"},{key:"cant_equipos",label:"Cant. eq."},
@@ -452,6 +463,7 @@ function renderFaltan(){
     h+='<div class="fn"><div class="n">'+n+'</div><div class="l">'+g.l+'</div></div>';
   });
   h+='<div class="fn g"><div class="n">'+pend.length+'</div><div class="l">Total · de '+D.capacitaciones.length+'</div></div>';
+  if(typeof estamStats==="function"){ var es=estamStats(); h+='<div class="fn" title="Tipologías pendientes con al menos un estamento marcado"><div class="n">'+es.def+'<span style="font-size:13px;font-weight:600"> / '+es.pend+'</span></div><div class="l">👥 con estamentos</div></div>'; }
   el.innerHTML=h;
 }
 function renderLegend(){
@@ -523,6 +535,7 @@ function renderTable(){
       ESTADOS[active].map(function(e){return '<option value="'+e.k+'"'+(est===e.k?' selected':'')+'>'+e.lbl+'</option>';}).join("")+'</select>';
     var tds=cols.map(function(c){
       if(c.slots) return slotsCell(r);
+      if(c.estam) return estamCell(r);
       var v=valOf(r,c.key);
       if(c.edit) return '<td class="edit"><input type="'+(c.type||"text")+'" value="'+esc(v)+'" onchange="setField(\''+r.id+'\',\''+c.key+'\',this.value)"></td>';
       return '<td>'+esc(v)+'</td>';
@@ -566,6 +579,9 @@ function renderBulk(){
     ' · Cambiar estado a: <select id="bulkSel">'+
     ESTADOS[active].map(function(e){return '<option value="'+e.k+'">'+e.lbl+'</option>';}).join("")+'</select>'+
     '<button class="bb-apply" onclick="applyBulk()">Aplicar a seleccionados</button>'+
+    (active==="capacitaciones" ? ' · Estamentos: <button class="bb-apply" onclick="estamBulk(\'todos\')" title="Marca todos los estamentos del servicio en cada seleccionado">todos</button>'+
+      '<button class="bb-apply" onclick="estamBulk(\'copiar\')" title="Copia los estamentos del PRIMER seleccionado a los demás (familias como los 11 Leica)">copiar del 1º</button>'+
+      '<button class="bb-apply" onclick="estamBulk(\'ninguno\')">ninguno</button>' : '')+
     '<button class="bb-clear" onclick="clearSel()">Limpiar selección</button>';
 }
 function applyBulk(){
@@ -574,6 +590,52 @@ function applyBulk(){
   save(); selected={}; renderDash(); renderTable(); renderBulk();
 }
 function clearSel(){ selected={}; renderTable(); renderBulk(); }
+
+/* ── ESTAMENTOS QUE PARTICIPAN (15-09-2026) ───────────────────────────────
+   Catálogo por servicio: CAP_ESTAMENTOS. Lo marcado por equipo se guarda en
+   localStorage (hds_coordcap_estam_v1) y se lleva a la columna S de la hoja 4
+   con "👥 Exportar estamentos" + _DEV/ingesta_estamentos.py. La hoja manda:
+   r.estamentos (columna S) es la base; lo local la sobreescribe hasta exportar. */
+var CAT_EST = window.CAP_ESTAMENTOS || {};
+var EKEY = "hds_coordcap_estam_v1";
+var ES = (function(){ try{ return JSON.parse(localStorage.getItem(EKEY)||"{}"); }catch(e){ return {}; } })();
+function esave(){ try{ localStorage.setItem(EKEY, JSON.stringify(ES)); }catch(e){} }
+function servsOf(r){ return String(valOf(r,"detalle_servicios")||"").split(/[\n;]+/).map(function(x){return x.trim();}).filter(Boolean); }
+function estamOpts(r){ var o=[], seen={}; servsOf(r).forEach(function(sv){ (CAT_EST[sv]||[]).forEach(function(e){ if(!seen[e]){ seen[e]=1; o.push(e); } }); }); return o; }
+function estamOf(r){ var c=String(r.codigo); if(ES[c]) return ES[c]; return r.estamentos||[]; }
+function estamEditable(r){ var e=estadoOf("capacitaciones",r); return e!=="ejecutada" && e!=="inst_uso"; }
+function estamSet(cod, arr){ ES[String(cod)]=arr.slice(); esave(); renderFaltan(); }
+function estamToggle(cod, lbl, on){ var r=BYCOD_E[cod]; var cur=estamOf(r).slice(); var i=cur.indexOf(lbl); if(on&&i<0) cur.push(lbl); if(!on&&i>=0) cur.splice(i,1); estamSet(cod,cur); renderTable(); }
+function estamAll(cod){ estamSet(cod, estamOpts(BYCOD_E[cod])); renderTable(); }
+function estamNone(cod){ estamSet(cod, []); renderTable(); }
+var BYCOD_E={}; D.capacitaciones.forEach(function(r){ BYCOD_E[String(r.codigo)]=r; });
+function estamCell(r){
+  var cur=estamOf(r), opts=estamOpts(r);
+  if(!estamEditable(r)) return '<td class="estam ro">'+(cur.length?esc(cur.join(", ")):'<span class="muted">—</span>')+'</td>';
+  if(!opts.length) return '<td class="estam ro"><span class="muted" title="El servicio de esta fila no está en el catálogo cap_estamentos.js">sin catálogo</span></td>';
+  var h=opts.map(function(e){ var on=cur.indexOf(e)>=0;
+    return '<label class="'+(on?'on':'')+'"><input type="checkbox" '+(on?'checked':'')+' onchange="estamToggle(\''+r.codigo+'\',\''+e.replace(/'/g,"\\'")+'\',this.checked)">'+esc(e)+'</label>'; }).join("");
+  h+='<span class="mini" onclick="estamAll(\''+r.codigo+'\')">todos</span><span class="mini" onclick="estamNone(\''+r.codigo+'\')">ninguno</span>';
+  return '<td class="estam'+(cur.length?' ok':'')+'">'+h+'</td>';
+}
+function estamBulk(modo){
+  var ids=Object.keys(selected).map(function(id){return IDX[id];}).filter(function(r){return r&&estamEditable(r);});
+  if(!ids.length) return;
+  if(modo==="copiar"){ var base=estamOf(ids[0]); ids.slice(1).forEach(function(r){ estamSet(r.codigo, base); }); }
+  else ids.forEach(function(r){ estamSet(r.codigo, modo==="todos"?estamOpts(r):[]); });
+  renderTable();
+}
+function estamStats(){ var pend=D.capacitaciones.filter(estamEditable); var def=pend.filter(function(r){return estamOf(r).length>0;}).length; return {pend:pend.length, def:def}; }
+function exportEstam(){
+  var items={}; D.capacitaciones.forEach(function(r){ if(estamEditable(r)) items[String(r.codigo)]=estamOf(r); });
+  var st=estamStats();
+  var out={generado:new Date().toISOString(), fuente:"30.CoordinacionCapacitaciones.html", definidos:st.def, pendientes:st.pend, items:items};
+  var txt=JSON.stringify(out,null,1);
+  var a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([txt],{type:"application/json"}));
+  a.download="estamentos_"+new Date().toISOString().slice(0,10).replace(/-/g,"")+".json"; document.body.appendChild(a); a.click(); a.remove();
+  try{ navigator.clipboard.writeText(txt); }catch(e){}
+  alert("Estamentos exportados: "+st.def+" de "+st.pend+" tipologías pendientes con estamentos definidos.\nArchivo en Descargas (y copiado al portapapeles). Para llevarlo a la hoja 4:\n  python3 _DEV/ingesta_estamentos.py");
+}
 
 renderDash();renderTabs();renderLegend();renderFilters();renderBulk();renderTable();
 
