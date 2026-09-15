@@ -13,10 +13,64 @@
 <link rel="apple-touch-icon" href="Logos%20HUB-HDS/favicon-nhds-amarillo-512.png">
 
 <style>
+/* ═══════════════════════════════════════════════════════════════════════════
+   Atlas HDS · hoja de estilo (rediseño 15-sep-2026, Claude Design)
+   Todo el aspecto sale de los tokens de :root. Los colores con SIGNIFICADO
+   (tipologías, áreas, estados de puesto, propuestos, puertas, estructuras)
+   se conservan tal cual; el resto (chrome) es un solo sistema: superficies
+   blancas sobre el fondo gris azulado, un acento, 13 px base, 3 pesos.
+   Referencia: _DOCS/diseno-atlas/ATLAS_DESIGN.md · rediseno-export/
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  /* neutros fríos */
+  --n-0:#ffffff;  --n-25:#fbfcfd; --n-50:#f5f7fa; --n-100:#eceff4; --n-150:#e2e7ee;
+  --n-200:#d5dce5; --n-300:#b9c3cf; --n-400:#94a1b2; --n-500:#6f7d90; --n-600:#536174;
+  --n-700:#3d4a5c; --n-800:#2a3545; --n-900:#1a2433; --n-950:#0f1622;
+  /* roles de interfaz (fondo azulado conservado a pedido) */
+  --bg-page:#cdd9e6; --bg-canvas:#b0c4d4; --bg-canvas-grid:#a3b8ca; --panel-border:#b9c9d8;
+  --surface:var(--n-0); --surface-sunken:var(--n-50);
+  --border:var(--n-200); --border-strong:var(--n-300);
+  --text:var(--n-900); --text-2:var(--n-600); --text-3:var(--n-400); --text-on-accent:#fff;
+  /* acento (azul hospital) */
+  --accent-50:#eef5fb; --accent-100:#d8e8f5; --accent-300:#86b3da;
+  --accent-500:#2f78bd; --accent-600:#1d5fa0; --accent-700:#174d82; --accent-800:#123c66;
+  --focus-ring:0 0 0 3px rgba(47,120,189,.35);
+  /* estados */
+  --ok:#15803d; --ok-soft:#e8f6ee; --warn:#b45309; --warn-soft:#fdf3e2;
+  --danger:#c0262d; --danger-soft:#fdecec; --info:#1d5fa0; --info-soft:#eef5fb;
+  --external:#6d42c7; --external-soft:#f1ecfb;
+  /* estados de un puesto (vista 3) */
+  --state-assigned:#10b981; --state-free:#ef4444; --state-dynamic:#3b82f6; --state-outside:#f59e0b; --state-cds:#8b5cf6;
+  --asig-yes:#16a34a; --asig-zero:#dc2626;
+  /* propuestos, puertas, estructuras */
+  --prop-desk:#d100b6; --prop-totem:#7c3aed; --prop-dea:#16a34a; --prop-printer:#ea580c;
+  --door-90:#2563eb; --door-120:#ea580c; --door-200:#dc2626;
+  /* color por pestaña del panel derecho */
+  --tab-tools:var(--accent-600); --tab-tools-soft:var(--accent-50); --tab-tools-dark:var(--accent-700);
+  --tab-rev:#b45309; --tab-rev-soft:#fdf3e2; --tab-rev-dark:#8a3f06;
+  --tab-avance:#15803d; --tab-avance-soft:#e8f6ee; --tab-avance-dark:#0f5f2c;
+  --tab-personas:#6d42c7; --tab-personas-soft:#f1ecfb; --tab-personas-dark:#4f2f93;
+  /* tipografía */
+  --font-ui:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,sans-serif;
+  --font-mono:"SF Mono",ui-monospace,Menlo,Consolas,monospace;
+  --fs-xs:11px; --fs-sm:12px; --fs-md:13px; --fs-lg:15px; --fs-xl:18px; --fs-2xl:22px;
+  --lh-base:1.45; --fw-regular:400; --fw-medium:600; --fw-bold:700; --tracking-caps:.06em;
+  /* espacio, radios, elevación */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px; --sp-6:24px;
+  --control-h:30px; --row-h:32px;
+  --r-sm:4px; --r-md:8px; --r-lg:12px; --r-pill:999px;
+  --shadow-1:0 1px 2px rgba(15,22,34,.06),0 1px 3px rgba(15,22,34,.08);
+  --shadow-2:0 4px 12px rgba(15,22,34,.10),0 2px 4px rgba(15,22,34,.06);
+  --shadow-3:0 18px 48px rgba(15,22,34,.22),0 4px 12px rgba(15,22,34,.10);
+  /* estructura */
+  --sidebar-w:220px; --rightpanel-w:360px; --rail-w:44px; --header-h:52px; --navbar-h:40px;
+  --dur-fast:120ms; --dur-base:180ms; --ease:cubic-bezier(.2,.7,.2,1);
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:#cdd9e6;color:#1a3a5c;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;height:100vh;overflow:hidden;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
-button,input,select,textarea{font-family:inherit}
-:is(button,select,input):focus-visible{outline:2px solid #3b82f6;outline-offset:1px}
+html,body{background:var(--bg-page);color:var(--text)}
+body{font-family:var(--font-ui);font-size:var(--fs-md);line-height:var(--lh-base);height:100vh;overflow:hidden;display:flex;flex-direction:column;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+:is(button,select,input):focus-visible{outline:none;box-shadow:var(--focus-ring)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important}}
 /* ── VERSIÓN WEB: responsive ─────────────────────────────────────────────── */
 #viewer{touch-action:none}
@@ -34,142 +88,156 @@ button,input,select,textarea{font-family:inherit}
   #editBar{overflow-x:auto}
   #navBar .nav-crumb{max-width:130px}
 }
-#hdr{background:#bccede;border-bottom:1px solid #7ca4c0;padding:0 18px;height:48px;display:flex;align-items:center;gap:16px;flex-shrink:0;z-index:10}
+svg.i{width:14px;height:14px;flex:none;stroke:currentColor;fill:none;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+code,.mono{font-family:var(--font-mono)}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--n-300);border-radius:3px}
+
+/* ── Encabezado ──────────────────────────────────────────────────────────── */
+#hdr{height:var(--header-h);background:var(--surface);border-bottom:1px solid var(--panel-border);padding:0 var(--sp-4);display:flex;align-items:center;gap:var(--sp-3);flex-shrink:0;z-index:10}
 /* Encabezado angosto: primero se aprietan los espacios, después se van las
-   estadísticas (que también están en el panel), y por último la búsqueda.
-   Lo que NUNCA se va son los distintivos de guardado, respaldo y memoria:
-   son los testigos de que el trabajo se está guardando. */
-@media (max-width:1400px){#hdr{gap:10px;padding:0 12px}}
+   estadísticas (que también están en el panel). Lo que NUNCA se va son los
+   testigos de guardado, respaldo y memoria. */
+@media (max-width:1400px){#hdr{gap:8px;padding:0 12px}}
 @media (max-width:1240px){#hdr .hdr-stat,#hdr .hdr-sep{display:none}}
-@media (max-width:1040px){#hdr h1 span{display:none}}
-/* La barra de herramientas se desliza en vez de desbordar la ventana. */
-@media (max-width:1240px){#editBar{overflow-x:auto;scrollbar-width:thin}}
-#hdr h1{font-size:14px;font-weight:800;color:#17456e;letter-spacing:.6px;white-space:nowrap}
-.hdr-stat{font-size:11px;color:#48687e;text-align:center}
-.hdr-stat strong{display:block;font-size:16px;color:#1a3a5c;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
-.hdr-sep{width:1px;height:28px;background:#94b8d0}
+@media (max-width:1040px){#hdr h1 .t{display:none}}
+#hdr .hub-back{display:inline-flex;align-items:center;gap:5px;color:var(--text-2);font-size:var(--fs-sm);font-weight:var(--fw-regular);text-decoration:none;flex-shrink:0;padding:4px 6px;border-radius:var(--r-sm);white-space:nowrap}
+#hdr .hub-back:hover{color:var(--text);background:var(--surface-sunken)}
+#hdr h1{display:flex;align-items:center;gap:8px;font-size:var(--fs-md);font-weight:var(--fw-bold);color:var(--text);letter-spacing:.02em;white-space:nowrap}
+#hdr h1 .logo{width:22px;height:22px;border-radius:6px;background:var(--accent-600);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:none}
+.hdr-sep{width:1px;height:20px;background:var(--border);flex-shrink:0}
+.hdr-stat{display:flex;align-items:baseline;gap:5px;font-size:var(--fs-xs);color:var(--text-2);white-space:nowrap}
+.hdr-stat strong{font-size:var(--fs-lg);font-weight:var(--fw-bold);color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.hdr-prog{align-items:center;gap:7px}
+.hdr-prog .hdr-bar{width:72px;height:5px;background:var(--n-150);border-radius:3px;overflow:hidden;display:inline-block}
+.hdr-prog .hdr-bar i{display:block;height:100%;width:0;background:var(--ok);border-radius:3px;transition:width .3s}
+.hdr-prog strong{font-size:var(--fs-sm);font-weight:var(--fw-medium);color:var(--ok)}
+#gSearch{position:relative;flex:1;max-width:320px;min-width:150px}
+#gSearchInput{width:100%;height:var(--control-h);background:var(--surface-sunken);border:1px solid var(--border);border-radius:var(--r-md);color:var(--text);padding:0 12px 0 30px;font-size:var(--fs-sm);outline:none;transition:border-color .15s,box-shadow .15s,background .15s}
+#gSearchInput::placeholder{color:var(--text-3)}
+#gSearchInput:focus{background:var(--surface);border-color:var(--accent-500);box-shadow:var(--focus-ring)}
+#gSearchIcon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;pointer-events:none;color:var(--text-3)}
+#gSearchDrop{position:absolute;left:0;right:0;top:calc(100% + 6px);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);box-shadow:var(--shadow-2);z-index:600;display:none;max-height:320px;overflow-y:auto}
+#dbBadge{font-size:var(--fs-xs);background:var(--accent-50);color:var(--accent-600);border:1px solid var(--accent-100);border-radius:var(--r-pill);padding:2px 8px;white-space:nowrap;flex-shrink:0;display:none}
+/* testigos de guardado / respaldo / memoria: texto con punto de color */
+.hdr-chip{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-sm);font-weight:var(--fw-regular);white-space:nowrap;flex-shrink:0;padding:0 4px;border:0;background:transparent;color:var(--text-2);cursor:default;transition:opacity .2s}
+.hdr-chip::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+.hdr-chip.ok{color:var(--ok)}.hdr-chip.warn{color:var(--warn)}.hdr-chip.danger{color:var(--danger)}.hdr-chip.info{color:var(--accent-600)}
+#saveBadge{margin-left:auto}
+#backupBadge{cursor:pointer}
+#memBar{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-xs);color:var(--text-2);cursor:pointer;flex-shrink:0;white-space:nowrap;padding:0 4px;font-variant-numeric:tabular-nums}
+#memBar #memTrack{position:relative;width:46px;height:5px;border-radius:3px;background:var(--n-150);overflow:hidden;display:inline-block}
+#memBar #memFill{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:3px;transition:width .3s,background .3s}
+.backup-btn,.export-btn{height:var(--control-h);padding:0 var(--sp-3);border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface);color:var(--text);font-size:var(--fs-sm);font-weight:var(--fw-regular);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:background .15s,border-color .15s}
+.backup-btn:hover{background:var(--surface-sunken);border-color:var(--border-strong)}
+.export-btn{background:var(--accent-600);border-color:var(--accent-600);color:#fff;font-weight:var(--fw-medium)}
+.export-btn:hover{background:var(--accent-700);border-color:var(--accent-700)}
+@keyframes backupPulse{0%,100%{box-shadow:0 0 0 0 rgba(22,163,74,0)}50%{box-shadow:0 0 0 6px rgba(22,163,74,.35)}}
+.exp-dd{position:relative;display:inline-block;flex-shrink:0}
+.exp-menu{position:absolute;top:calc(100% + 6px);right:0;z-index:1200;display:none;min-width:310px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-2);padding:6px}
+.exp-menu.show{display:block}
+.exp-menu-lbl{font-size:10px;font-weight:var(--fw-medium);text-transform:uppercase;letter-spacing:var(--tracking-caps);color:var(--text-3);padding:8px 10px 3px}
+.exp-menu button{display:block;width:100%;text-align:left;background:none;border:none;border-radius:var(--r-sm);padding:7px 10px;font-size:var(--fs-sm);font-weight:var(--fw-regular);color:var(--text);cursor:pointer;white-space:nowrap}
+.exp-menu button:hover{background:var(--accent-50);color:var(--accent-700)}
+.exp-menu-sep{height:1px;background:var(--n-100);margin:5px 4px}
+
+/* ── Barra lateral ───────────────────────────────────────────────────────── */
 #layout{display:flex;flex:1;overflow:hidden;position:relative}
-#sidebar{width:200px;background:#bccede;border-right:1px solid #7ca4c0;display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
-#sidebar h2{font-size:10px;font-weight:600;color:#48687e;text-transform:uppercase;letter-spacing:1px;padding:12px 14px 8px}
-#sbTabs{display:flex;gap:4px;padding:10px 8px 6px}
-.sb-tab{flex:1;background:none;border:1px solid transparent;border-radius:7px;padding:6px 4px;cursor:pointer;font-size:10px;font-weight:700;color:#48687e;text-transform:uppercase;letter-spacing:.4px;transition:all .15s}
-.sb-tab:hover{background:#aec4d4;color:#1a3a5c}
-.sb-tab.on{background:#94b8d0;border-color:#3b82f6;color:#1d5fa0}
-#sbBimN{display:inline-block;background:#b45309;color:#fff;border-radius:8px;padding:1px 6px;font-size:9px;margin-left:4px}
-#sbBimN.done{background:#059669}
-#bimList{padding:2px 2px 4px}
+#sidebar{width:var(--sidebar-w);background:var(--surface);border-right:1px solid var(--panel-border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0}
+#sidebar h2{font-size:10px;font-weight:var(--fw-medium);color:var(--text-3);text-transform:uppercase;letter-spacing:var(--tracking-caps);padding:12px 14px 6px}
+#sbTabs{display:flex;padding:0 8px;border-bottom:1px solid var(--n-100);flex-shrink:0}
+.sb-tab{flex:1;background:none;border:0;border-bottom:2px solid transparent;border-radius:0;margin-bottom:-1px;padding:10px 6px 8px;cursor:pointer;font-size:var(--fs-sm);font-weight:var(--fw-regular);color:var(--text-2);white-space:nowrap;transition:color .15s,border-color .15s}
+.sb-tab:hover{color:var(--text)}
+.sb-tab.on{color:var(--accent-600);font-weight:var(--fw-medium);border-bottom-color:var(--accent-600)}
+#floorList{flex:1;overflow-y:auto;padding:6px 8px 8px}
+.fl-item{margin-bottom:2px}
+.fl-hdr{display:flex;align-items:flex-start;gap:4px;width:100%;background:none;border:0;border-radius:var(--r-md);padding:8px 8px;cursor:pointer;text-align:left;color:var(--text);transition:background .15s}
+.fl-hdr:hover{background:var(--surface-sunken)}
+.fl-item.cur>.fl-hdr{background:var(--accent-50);color:var(--accent-600)}
+.fl-toggle{font-size:8px;margin-top:5px;flex-shrink:0;line-height:1;transition:transform .18s;opacity:.5;width:10px}
+.fl-toggle.open{transform:rotate(90deg)}
+.fl-info{flex:1;min-width:0;display:grid;grid-template-columns:30px 1fr auto;align-items:baseline;column-gap:6px}
+.fl-name{font-size:var(--fs-md);font-weight:var(--fw-medium)}
+.fl-sub{font-size:var(--fs-sm);color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fl-item.cur .fl-sub{color:var(--accent-600)}
+.fl-pct{font-size:var(--fs-xs);color:var(--text-2);font-variant-numeric:tabular-nums}
+.fl-bar{grid-column:1/-1;height:3px;background:var(--n-150);border-radius:2px;margin-top:6px;overflow:hidden}
+.fl-fill{height:100%;border-radius:2px;background:var(--accent-600);transition:width .3s}
+.fl-fill.done{background:var(--ok)}
+.tree-areas{padding:2px 0 4px 14px}
+.tree-area-wrap{margin-bottom:1px}
+.tree-area-hdr{display:flex;align-items:center;gap:6px;width:100%;padding:6px 8px;cursor:pointer;color:var(--text);font-size:var(--fs-sm);border:0;border-radius:6px;background:none;text-align:left;transition:background .15s}
+.tree-area-hdr:hover{background:var(--surface-sunken)}
+.tree-area-hdr.cur{background:var(--accent-50);color:var(--accent-600)}
+.tree-area-toggle{font-size:7px;flex-shrink:0;transition:transform .18s;opacity:.5}
+.tree-area-toggle.open{transform:rotate(90deg)}
+.tree-area-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.3}
+.tree-badge{font-size:var(--fs-xs);flex-shrink:0;color:var(--text-3);font-variant-numeric:tabular-nums}
+.tree-area-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.tree-area-ws{font-size:10px;line-height:1.2;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--text-2)}
+.taw-asig{color:var(--ok);font-weight:var(--fw-medium)}.taw-disp{color:var(--warn);font-weight:var(--fw-medium)}.taw-zero{color:var(--text-3)}.taw-tot{color:var(--text-3)}
+.tree-rooms{padding-left:10px}
+.tree-room{display:block;width:100%;text-align:left;background:none;border:0;padding:4px 6px 4px 12px;font-size:var(--fs-xs);color:var(--text-2);cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:2px solid var(--n-150);transition:all .12s}
+.tree-room:hover,.tree-room.cur{color:var(--accent-700);background:var(--accent-50);border-left-color:var(--accent-300)}
+.tree-room-row{display:flex;align-items:center;gap:2px}
+.tree-room-row .tree-room{flex:1;min-width:0}
+.tree-room-del{flex-shrink:0;width:18px;height:18px;margin-right:4px;border:none;background:none;color:var(--danger);font-size:11px;font-weight:700;line-height:1;cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center;opacity:.6}
+.tree-room-del:hover{background:var(--danger-soft);opacity:1}
 #typeList{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:0 8px 8px}
 #tfHead{flex-shrink:0}
 #tfScroll{flex:1;overflow-y:auto}
-.tf-n{flex-shrink:0;font-size:9px;font-variant-numeric:tabular-nums;color:#15803d;font-weight:700;margin-left:6px}
-.tf-n .tot{color:#7d97ad;font-weight:400}
-.bim-fl{font-size:10px;font-weight:800;color:#1a3a5c;text-transform:uppercase;letter-spacing:.5px;padding:8px 4px 3px;border-bottom:1px solid #94b8d0;margin-bottom:3px}
-.bim-row{display:block;width:100%;background:none;border:1px solid transparent;border-radius:7px;padding:5px 7px;cursor:pointer;text-align:left;transition:all .12s;margin-bottom:1px}
-.bim-row:hover{background:#aec4d4;border-color:#7ca4c0}
-.bim-row.has-x{position:relative;padding-right:26px}
-.bim-x{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:17px;height:17px;line-height:16px;text-align:center;border-radius:5px;background:#fee2e2;border:1px solid #b91c1c;color:#b91c1c;font-size:10px;font-weight:800;cursor:pointer}
-.bim-ok{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:17px;height:17px;line-height:15px;text-align:center;border-radius:5px;background:#dcfce7;border:1px solid #059669;color:#065f46;font-size:11px;font-weight:800;cursor:pointer}
-.bim-ok:hover{background:#059669;color:#fff}
-.bim-x:hover{background:#dc2626;color:#fff}
-.bim-no{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:17px;height:17px;line-height:15px;text-align:center;border-radius:5px;background:#f1f5f9;border:1px solid #64748b;color:#475569;font-size:10px;font-weight:800;cursor:pointer}
-.bim-no:hover{background:#475569;color:#fff}
-.bim-row.has-xx{position:relative;padding-right:46px}
-.bim-desc{display:block;width:100%;background:#f8fafc;border:1px dashed #94a3b8;border-radius:7px;padding:4px 7px 4px 26px;text-align:left;margin-bottom:1px;position:relative;opacity:.8}
-.bim-undo{position:absolute;left:5px;top:50%;transform:translateY(-50%);width:17px;height:17px;line-height:15px;text-align:center;border-radius:5px;background:#e0f2fe;border:1px solid #0369a1;color:#0369a1;font-size:11px;font-weight:800;cursor:pointer}
-.bim-undo:hover{background:#0369a1;color:#fff}
-.bim-nm{font-size:11px;font-weight:600;color:#1a3a5c;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bim-sub{font-size:9px;color:#48687e;display:block;margin-top:1px}
-.wp-row{display:flex;justify-content:space-between;padding:2px 4px;border-radius:5px;transition:background .12s}
-.wp-row[onclick]:hover{background:#eff6ff}
-.wpl-row{display:flex;align-items:center;gap:8px;padding:7px 4px;border-bottom:1px solid #e8eef5;cursor:pointer;transition:background .12s}
-.wpl-row:hover{background:#eff6ff}
-.wpl-row.off{cursor:default;opacity:.55}
-#floorList{flex:1;overflow-y:auto;padding:0 8px 8px}
-#dataStamp{flex-shrink:0;border-top:1px solid #9db9cf;padding:7px 12px 9px;font-size:9px;line-height:1.5;color:#48687e;background:#b6c9dc}
-#dataStamp b{color:#1a3a5c;font-weight:700}
+.tf-n{flex-shrink:0;font-size:var(--fs-xs);font-variant-numeric:tabular-nums;color:var(--ok);font-weight:var(--fw-medium);margin-left:6px}
+.tf-n .tot{color:var(--text-3);font-weight:400}
+#dataStamp{flex-shrink:0;border-top:1px solid var(--n-100);padding:8px 12px 10px;font-size:var(--fs-xs);line-height:1.6;color:var(--text-2);background:var(--surface)}
+#dataStamp b{color:var(--text);font-weight:var(--fw-medium)}
 #dataStamp .ds-row{font-variant-numeric:tabular-nums;margin-top:2px}
 #dataStamp .ds-row:first-child{margin-top:0}
-#dataStamp .ds-k{color:#48687e;text-transform:uppercase;letter-spacing:.4px;font-weight:700;font-size:8px}
-.fl-btn{width:100%;background:none;border:1px solid transparent;border-radius:8px;padding:10px 10px;cursor:pointer;text-align:left;color:#48687e;transition:all .15s;margin-bottom:4px}
-.fl-btn:hover{background:#aec4d4;border-color:#7ca4c0;color:#1a3a5c}
-.fl-btn.active{background:#94b8d0;border-color:#3b82f6;color:#1d5fa0}
-.fl-name{font-size:12px;font-weight:600;display:block}
-.fl-sub{font-size:10px;color:#48687e;margin-top:2px;display:block}
-.fl-bar{height:3px;background:#94b8d0;border-radius:2px;margin-top:6px}
-.fl-fill{height:100%;border-radius:2px;background:#2563eb;transition:width .3s}
-.fl-pct{font-size:9px;color:#48687e;margin-top:2px}
-/* ── Tree sidebar ── */
-.fl-item{margin-bottom:3px;}
-.fl-hdr{display:flex;align-items:flex-start;gap:5px;width:100%;background:none;border:1px solid transparent;border-radius:8px;padding:8px 8px;cursor:pointer;text-align:left;color:#48687e;transition:all .15s;}
-.fl-hdr:hover{background:#aec4d4;border-color:#7ca4c0;color:#1a3a5c;}
-.fl-item.cur>.fl-hdr{background:#94b8d0;border-color:#3b82f6;color:#1d5fa0;}
-.fl-toggle{font-size:8px;margin-top:3px;flex-shrink:0;line-height:1;transition:transform .18s;opacity:.6;}
-.fl-toggle.open{transform:rotate(90deg);}
-.fl-info{flex:1;min-width:0;}
-.tree-areas{padding-left:2px;padding-bottom:2px;}
-.tree-area-wrap{margin-bottom:1px;}
-.tree-area-hdr{display:flex;align-items:center;gap:4px;padding:5px 6px 5px 10px;cursor:pointer;color:#3d6080;font-size:11px;border-left:2px solid transparent;border-radius:0 5px 5px 0;transition:all .15s;width:100%;background:none;text-align:left;}
-.tree-area-hdr:hover{color:#1d5fa0;background:#c4dcee;border-left-color:#2563eb;}
-.tree-area-hdr.cur{color:#1d5fa0;border-left-color:#3b82f6;background:#aec4d4;}
-.tree-area-toggle{font-size:7px;flex-shrink:0;transition:transform .18s;opacity:.6;}
-.tree-area-toggle.open{transform:rotate(90deg);}
-.tree-area-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.3;}
-.tree-badge{font-size:9px;flex-shrink:0;opacity:.55;font-variant-numeric:tabular-nums;}
-.tree-area-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px;}
-.tree-area-ws{font-size:8.5px;line-height:1.2;font-variant-numeric:tabular-nums;white-space:nowrap;}
-.taw-asig{color:#15803d;font-weight:700;}
-.taw-disp{color:#b45309;font-weight:700;}
-.taw-zero{color:#94a3b8;font-weight:700;}
-.taw-tot{color:#7d97ad;opacity:.8;}
-.tree-rooms{padding-left:6px;}
-.tree-room{display:block;width:100%;text-align:left;background:none;border:none;padding:4px 6px 4px 16px;font-size:10px;color:#4a6280;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:2px solid transparent;border-radius:0 4px 4px 0;transition:all .15s;}
-.tree-room:hover{color:#1e55a0;background:#c4dcee;border-left-color:#38bdf8;}
-.tree-room.cur{color:#1e55a0;border-left-color:#38bdf8;background:#c4dcee;}
-.tree-room-row{display:flex;align-items:center;gap:2px;}
-.tree-room-row .tree-room{flex:1;min-width:0;}
-.tree-room-del{flex-shrink:0;width:18px;height:18px;margin-right:4px;border:none;background:none;color:#dc2626;font-size:11px;font-weight:800;line-height:1;cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center;opacity:.6;transition:all .15s;}
-.tree-room-del:hover{background:#fee2e2;opacity:1;}
+#dataStamp .ds-k{color:var(--text-2);font-weight:var(--fw-regular);font-size:var(--fs-xs)}
+
+/* ── Navegación (migas) y mensaje de estado ──────────────────────────────── */
 #main{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative}
-#navBar{height:38px;background:#bccede;border-bottom:1px solid #7ca4c0;display:flex;align-items:center;padding:0 14px;gap:8px;flex-shrink:0;z-index:5}
-.nav-crumb{font-size:11px;color:#48687e;cursor:default;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.nav-crumb.link{color:#1d5fa0;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
-.nav-crumb.link:hover{color:#1d5fa0}
-.nav-sep{font-size:11px;color:#4a6280;flex-shrink:0}
-.back-btn{background:#e7eff7;border:1px solid #a9c3d6;border-radius:7px;color:#17456e;cursor:pointer;padding:3px 10px;font-size:11px;font-weight:600;margin-right:4px;flex-shrink:0;transition:background .15s,border-color .15s}
-.back-btn:hover{background:#ffffff;border-color:#7ca4c0}
-.level-badge{margin-left:auto;font-size:10px;font-weight:600;color:#3d6080;background:#e7eff7;border-radius:999px;padding:2px 10px;border:1px solid #a9c3d6;white-space:nowrap;flex-shrink:0}
-#editBar.solo-info{gap:0;padding:0 14px}
-#editBar.solo-info .tb-div{display:none}
-#editBar{height:38px;background:#bccede;border-bottom:1px solid #7ca4c0;display:flex;align-items:center;padding:0 14px;gap:8px;flex-shrink:0;z-index:5;overflow-x:visible;position:relative}
-.tb-btn{background:#e7eff7;border:1px solid #a9c3d6;border-radius:7px;color:#17456e;cursor:pointer;padding:4px 12px;font-size:11px;font-weight:600;line-height:1.5;transition:background .15s,border-color .15s,color .15s,box-shadow .15s;white-space:nowrap;flex-shrink:0;font-variant-numeric:tabular-nums}
-.tb-div{width:1px;height:20px;background:#9db9cf;margin:0 3px;flex-shrink:0;border-radius:1px}
-.struct-opt{display:flex;align-items:center;gap:8px;width:100%;background:transparent;border:0;border-left:4px solid var(--c,#94a3b8);padding:8px 10px;font-size:13px;color:#1e293b;cursor:pointer;text-align:left;border-radius:6px;margin-bottom:2px}
+#navBar{height:var(--navbar-h);background:var(--surface);border-bottom:1px solid var(--panel-border);display:flex;align-items:center;padding:0 var(--sp-4);gap:8px;flex-shrink:0;z-index:5}
+.nav-crumb{font-size:var(--fs-sm);color:var(--text);font-weight:var(--fw-medium);cursor:default;max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav-crumb.link{color:var(--text-2);font-weight:var(--fw-regular);cursor:pointer}
+.nav-crumb.link:hover{color:var(--accent-600)}
+.nav-sep{font-size:var(--fs-sm);color:var(--n-300);flex-shrink:0}
+.back-btn{height:26px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);color:var(--text);cursor:pointer;padding:0 10px;font-size:var(--fs-sm);font-weight:var(--fw-regular);margin-right:4px;flex-shrink:0;transition:background .15s,border-color .15s}
+.back-btn:hover{background:var(--surface-sunken);border-color:var(--border-strong)}
+.level-badge{font-size:var(--fs-xs);font-weight:var(--fw-medium);color:var(--accent-600);background:var(--accent-50);border-radius:var(--r-pill);padding:2px 9px;white-space:nowrap;flex-shrink:0;margin-left:2px}
+/* La barra de edición quedó vacía: sus botones viven en el gestor y el
+   mensaje de estado (#tbInfo) se muda a la barra de navegación. */
+#editBar{display:none}
+.tb-info{margin-left:auto;font-size:var(--fs-sm);color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.tb-info:not(:empty)::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:7px;vertical-align:middle}
+.tb-div,.tb-sep{display:none}
+
+/* ── Botones de herramienta (.tb-btn) ────────────────────────────────────── */
+.tb-btn{display:inline-flex;align-items:center;gap:6px;height:var(--control-h);padding:0 var(--sp-3);border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface);color:var(--text);font-size:var(--fs-sm);font-weight:var(--fw-regular);cursor:pointer;white-space:nowrap;flex-shrink:0;line-height:1;transition:background .15s,border-color .15s,color .15s;font-variant-numeric:tabular-nums}
+.tb-btn:hover{background:var(--surface-sunken);border-color:var(--border-strong)}
+.tb-btn.active{background:var(--accent-50);border-color:var(--accent-300);color:var(--accent-700);font-weight:var(--fw-medium)}
+.tb-btn.danger{color:var(--danger);border-color:#e6c4c4}
+.tb-btn.danger:hover{background:var(--danger-soft)}
+.tb-btn.danger.active{background:var(--danger);border-color:var(--danger);color:#fff}
+.tb-btn.warn{color:var(--warn);border-color:#ead7b8}
+.tb-btn.warn:hover{background:var(--warn-soft)}
+.tb-btn.warn.active{background:var(--warn);border-color:var(--warn);color:#fff}
+.struct-opt{display:flex;align-items:center;gap:8px;width:100%;background:transparent;border:0;border-left:3px solid var(--c,#94a3b8);padding:7px 10px;font-size:12.5px;color:var(--text);cursor:pointer;text-align:left;border-radius:6px;margin-bottom:2px}
 .struct-opt:hover{background:var(--c,#94a3b8);background:color-mix(in srgb, var(--c) 12%, transparent)}
-.struct-opt.active{background:color-mix(in srgb, var(--c) 22%, transparent);font-weight:700}
+.struct-opt.active{background:color-mix(in srgb, var(--c) 22%, transparent);font-weight:var(--fw-medium)}
 /* OJO: nunca usar transform en :hover — en SVG el transform CSS reemplaza al
    translate(x,y) del atributo y el marcador salta al origen (parpadeo, × inclicable). */
 .struct-marker{cursor:pointer}
 .struct-marker:hover>rect:first-of-type{stroke:#0f172a;stroke-width:5;opacity:1}
 .struct-delbtn circle.hit{fill:transparent;stroke:none}
 .struct-circ-path{fill:none;stroke-linecap:round;stroke-linejoin:round;cursor:pointer}
-.tb-btn:hover{background:#ffffff;border-color:#7ca4c0;color:#0f3557;box-shadow:0 1px 3px rgba(23,69,110,.12)}
-.tb-btn.active{background:#2563eb;border-color:#1d4ed8;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
-.tb-btn.danger{background:#fff1f2;border-color:#7f1d1d;color:#b91c1c}
-.tb-btn.danger:hover{background:#fee2e2}
-.tb-btn.danger.active{background:#dc2626;border-color:#ef4444;color:#fff}
-.tb-btn.warn{background:#fffbeb;border-color:#92400e;color:#78350f}
-.tb-btn.warn.active{background:#d97706;border-color:#78350f;color:#fff}
-.tb-info{font-size:10px;color:#48687e;margin-left:4px;white-space:nowrap}
-.tb-sep{flex:1}
-/* ── Viewer ── */
-#viewer{flex:1;position:relative;overflow:hidden;cursor:grab;background:#b0c4d4;user-select:none}
+
+/* ── Visor ───────────────────────────────────────────────────────────────── */
+#viewer{flex:1;position:relative;overflow:hidden;cursor:grab;background:var(--bg-canvas);background-image:linear-gradient(var(--bg-canvas-grid) 1px,transparent 1px),linear-gradient(90deg,var(--bg-canvas-grid) 1px,transparent 1px);background-size:40px 40px;user-select:none}
 #viewer.panning{cursor:grabbing}
 #imgWrap{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform}
-/* High-quality rendering at all zoom levels */
 #floorImg{display:block;width:16208px;height:12337px;image-rendering:auto}
-#planLoading{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:30;display:none;align-items:center;gap:8px;background:#0f2233;color:#e6eef7;border:1px solid #1d5fa0;border-radius:99px;padding:7px 16px;font-size:12px;font-weight:700;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+#planLoading{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:30;display:none;align-items:center;gap:8px;background:var(--n-900);color:#fff;border:0;border-radius:var(--r-pill);padding:7px 16px;font-size:var(--fs-sm);font-weight:var(--fw-medium);box-shadow:var(--shadow-2)}
 #planLoading.show{display:flex}
-#planLoading .pl-spin{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#60a5fa;border-radius:50%;animation:plspin .7s linear infinite}
+#planLoading .pl-spin{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:plspin .7s linear infinite}
 @keyframes plspin{to{transform:rotate(360deg)}}
 /* ── Modo Aut. Sanitaria: dot de estado de pauta por recinto/servicio ── */
 @keyframes psdBlink{0%,100%{opacity:1}50%{opacity:.2}}
@@ -180,20 +248,20 @@ button,input,select,textarea{font-family:inherit}
 .psd-ambar circle{fill:#d97706}
 .psd-verde circle{fill:#16a34a;animation:psdTwinkle 2.4s ease-in-out infinite}
 .psd-gris circle{fill:#94a3b8}
-#psPanel{position:fixed;top:70px;right:14px;width:420px;max-width:94vw;max-height:calc(100vh - 90px);overflow:auto;background:#fff;border:1px solid #cbd5e1;border-radius:14px;box-shadow:0 18px 60px rgba(15,23,42,.35);z-index:9500;font-size:13px;color:#1e293b}
-#psPanel .ps-hd{position:sticky;top:0;background:#0f2547;color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+#psPanel{position:fixed;top:70px;right:14px;width:420px;max-width:94vw;max-height:calc(100vh - 90px);overflow:auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-3);z-index:9500;font-size:var(--fs-md);color:var(--text)}
+#psPanel .ps-hd{position:sticky;top:0;background:var(--surface);color:var(--text);padding:12px 16px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;border-bottom:1px solid var(--border)}
 #psPanel .ps-bd{padding:12px 16px 16px}
-#psPanel .ps-chip{display:inline-block;border-radius:999px;padding:2px 10px;font-size:11px;font-weight:700;margin-left:6px}
-#psPanel .ps-amb{border:1px solid #e2e8f0;border-radius:8px;padding:6px 9px;margin:4px 0;font-size:12px;background:#f8fafc}
-#psPanel label.ps-opt{display:flex;gap:8px;align-items:flex-start;padding:4px 2px;font-size:12px;cursor:pointer;border-bottom:1px dashed #f1f5f9}
-#psPanel .ps-btn{border:none;border-radius:8px;padding:9px 13px;font-size:12.5px;font-weight:700;cursor:pointer;margin:3px 4px 0 0}
+#psPanel .ps-chip{display:inline-block;border-radius:var(--r-pill);padding:2px 10px;font-size:var(--fs-xs);font-weight:var(--fw-medium);margin-left:6px}
+#psPanel .ps-amb{border:1px solid var(--border);border-radius:var(--r-md);padding:6px 9px;margin:4px 0;font-size:var(--fs-sm);background:var(--surface-sunken)}
+#psPanel label.ps-opt{display:flex;gap:8px;align-items:flex-start;padding:4px 2px;font-size:var(--fs-sm);cursor:pointer;border-bottom:1px dashed var(--n-100)}
+#psPanel .ps-btn{border:none;border-radius:var(--r-md);padding:8px 13px;font-size:12.5px;font-weight:var(--fw-medium);cursor:pointer;margin:3px 4px 0 0}
 
 #svgLayer{position:absolute;top:0;left:0;width:16208px;height:12337px;overflow:visible;pointer-events:none;transition:opacity .18s}
 #svgLayer.interactive{pointer-events:all}
 /* Visibilidad de las cajas dibujadas y su información (para ver el plano de fondo) */
 #svgLayer.vis-dim{opacity:.35}
 #svgLayer.vis-off{opacity:0 !important;pointer-events:none !important}
-/* SVG box styles */
+/* ── SVG: cajas, rótulos y marcadores del plano (colores con significado) ── */
 .area-box{fill:rgba(59,130,246,.18);stroke:#3b82f6;stroke-width:4;cursor:pointer}
 .area-box:hover{fill:rgba(59,130,246,.32)}
 .area-box.sel{fill:rgba(234,179,8,.22);stroke:#eab308;stroke-width:5}
@@ -218,51 +286,209 @@ button,input,select,textarea{font-family:inherit}
 .handle.e,.handle.w{cursor:ew-resize;fill:#fef3c7;stroke:#f59e0b}
 .draw-rect{fill:rgba(250,204,21,.10);stroke:#fbbf24;stroke-width:3;stroke-dasharray:14 7;pointer-events:none}
 .ws-dot{cursor:pointer;pointer-events:all}
-/* Panel 👥 Personas: fila señalable y pulso del marcador en el plano */
-.per-row:hover{background:#fff7ed;box-shadow:inset 3px 0 0 #f59e0b}
-
 .add-zone{fill:rgba(99,102,241,.07);stroke:#6366f1;stroke-width:3;stroke-dasharray:18 8;pointer-events:all}
-/* Delete mode */
 #viewer.del-mode .ws-dot circle{stroke:#ef4444 !important;stroke-width:4 !important}
 #viewer.move-mode .area-box,#viewer.move-mode .room-box{cursor:move}
 #viewer.del-mode .ws-dot{cursor:crosshair}
-/* Camas (dots cuadrados) */
 .eq-mk{cursor:move;pointer-events:all}
 .eq-mk:hover rect{filter:brightness(1.12)}
 #viewer.equip-mode{cursor:pointer}
 .ws-bed{cursor:pointer;pointer-events:all}
 .ws-bed rect{fill:rgba(14,165,233,.20);stroke:#0284c7;stroke-width:2.5}
 .ws-bed text{fill:#0369a1;font-weight:700;pointer-events:none}
-/* Sillón: mismo dot numerado pero en verde y esquinas redondeadas (silla) */
 .ws-bed.sillon rect{fill:rgba(13,148,136,.20);stroke:#0d9488}
 .ws-bed.sillon text{fill:#0f766e}
 #viewer.bed-mode{cursor:crosshair}
 #viewer.bed-mode .add-zone{fill:rgba(14,165,233,.10);stroke:#0284c7}
 #viewer.del-mode .ws-bed rect{stroke:#ef4444 !important;stroke-width:4 !important}
+#viewer.ficha-mode{cursor:help}
+.prop-g{cursor:move}
+svg.hide-room-labels .room-label,svg.hide-room-labels .room-code{display:none}
+.puerta-g{cursor:grab}
+.puerta-g:active{cursor:grabbing}
+.stamp-marquee{fill:rgba(13,148,136,.12);stroke:#0d9488;stroke-width:3;stroke-dasharray:12 8;pointer-events:none}
+.stamp-copy{cursor:grab}
+.stamp-copy:active{cursor:grabbing}
+.stamp-copy .stamp-frame{fill:none;stroke:#0d9488;stroke-width:3;stroke-dasharray:10 7;opacity:.9}
+/* Modo ubicación (vista 1): sólo el plano de fondo y los marcadores de tótems,
+   DEA e impresoras; se esconden cajas, rótulos, estructuras y todo lo demás. */
+svg.ubic-mode > :not(.ubic-layer){display:none !important}
+.ubic-mk{cursor:pointer}
+.ubic-mk:hover circle.bola{stroke:#0f172a}
+
+/* ── Avisos flotantes sobre el plano: un solo patrón (pastilla oscura) ────── */
+.float-hint{position:absolute;bottom:var(--sp-5);left:50%;transform:translateX(-50%);display:none;align-items:center;gap:10px;max-width:min(940px,calc(100% - 40px));padding:8px 16px;background:var(--n-900);color:#fff;border:0;border-radius:var(--r-lg);box-shadow:var(--shadow-2);font-size:var(--fs-sm);line-height:1.4;text-align:center;z-index:10;pointer-events:none}
+.float-hint.show{display:block}
+.float-hint::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--state-outside);margin-right:8px;vertical-align:middle}
+#mergeHint::before{background:#eab308}
+#delHint::before{background:#ef4444}
+#stampHint::before{background:#0d9488}
+#puertaHint::before{background:#60a5fa}
+#propHint::before{background:var(--prop-desk)}
+#bedHint::before{background:#38bdf8}
+#lblHint{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:31;background:var(--n-900);color:#fff;border:0;border-radius:var(--r-pill);padding:6px 14px;font-size:var(--fs-sm);cursor:pointer;box-shadow:var(--shadow-2);white-space:nowrap}
+#lblHint b{font-weight:var(--fw-medium);text-decoration:underline;text-underline-offset:2px}
+#lblHint:hover{background:var(--n-800)}
+#ubicLegend{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:31;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-pill);padding:5px 14px;font-size:var(--fs-sm);color:var(--text);box-shadow:var(--shadow-2);white-space:nowrap}
+#ubicLegend b{margin-left:2px}
+
+/* ── Gestor de herramientas (#dock): vive en la pestaña Herramientas ───────
+   del panel derecho como lista de filas. Los botones de la barra superior se
+   montan acá (_dockMonta) y conservan sus ids, clases y manejadores. */
+#dock{display:flex;flex-direction:column;gap:1px;padding:4px 8px 10px;user-select:none}
+.dk-h{display:flex;align-items:center;gap:8px;font-size:10px;font-weight:var(--fw-medium);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--tab-tools);padding:12px 6px 4px;white-space:nowrap}
+.dk-h::after{content:"";flex:1;height:1px;background:var(--accent-100)}
+.dk-sep{display:none}
+.dk-sub{display:flex;flex-direction:column;gap:1px;padding-left:14px}
+.dk-btn,#dock .tb-btn{display:flex;align-items:center;gap:10px;width:100%;height:34px;padding:0 10px;border:0;border-radius:var(--r-md);background:transparent;color:var(--text-2);font-size:12.5px;font-weight:var(--fw-regular);text-align:left;justify-content:flex-start;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;position:relative;line-height:1.3;margin:0;flex-shrink:0;transition:background .12s,color .12s}
+.dk-btn:hover,#dock .tb-btn:hover{background:var(--surface-sunken);color:var(--text);border-color:transparent}
+.dk-btn.on,#dock .tb-btn.active{background:var(--accent-50);color:var(--accent-700);font-weight:var(--fw-medium)}
+.dk-btn.on.prop{background:#fbe6f7;color:#9d0a8a}
+.dk-btn.dis{opacity:.45;cursor:not-allowed}
+#dock .tb-btn.danger{color:var(--danger)}
+#dock .tb-btn.danger.active{background:var(--danger-soft);color:var(--danger)}
+#dock .tb-btn.warn{color:var(--warn)}
+#dock .tb-btn.warn.active{background:var(--warn-soft);color:var(--warn)}
+.dk-btn .ic{font-size:15px;width:20px;text-align:center;flex-shrink:0;line-height:1}
+.dk-btn .lb{display:inline;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.dk-btn .n{margin-left:auto;font-size:var(--fs-xs);font-weight:var(--fw-medium);color:var(--text-2);font-variant-numeric:tabular-nums;flex-shrink:0}
+.dk-btn .n:empty{display:none}
+#dkPropImpN{color:var(--warn)}
+/* interruptores: los botones que prenden/apagan algo muestran un switch */
+.tog::after{content:"";margin-left:auto;width:26px;height:16px;border-radius:999px;flex-shrink:0;background:radial-gradient(circle at 8px 50%,#fff 5px,transparent 5.6px) var(--n-200);transition:background .15s}
+.tog.on::after,.tog.active::after{background:radial-gradient(circle at 18px 50%,#fff 5px,transparent 5.6px) var(--accent-600)}
+.tog .lb,.tog .n{margin-left:0}
+.dk-btn.tog .n{margin-left:auto}
+#dock .dk-row{display:flex;gap:4px;align-items:center;padding:2px 10px 6px 40px}
+#dock .dk-row .tb-btn{width:auto;flex:1;height:26px;justify-content:center;text-align:center;border:1px solid var(--border);padding:0;font-size:var(--fs-xs);background:var(--surface)}
+#dock .dk-row .tb-btn.active{border-color:var(--accent-300);background:var(--accent-50)}
+#dock .vw-dd{display:block;width:100%}
+/* Los desplegables NO pueden vivir dentro del panel (recorta): se cuelgan del
+   body y se posicionan fijos junto a su botón (_popJunto). */
+.dock-pop{position:fixed !important;z-index:1200;max-height:80vh;overflow-y:auto}
+.vw-dd{position:relative;display:inline-block}
+.vw-menu{position:absolute;top:calc(100% + 4px);left:0;z-index:1150;display:none;flex-direction:column;gap:2px;min-width:240px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-2);padding:6px}
+.vw-menu.show{display:flex}
+.vw-menu .tb-btn{width:100%;text-align:left;justify-content:flex-start;border:0;height:32px;background:transparent;color:var(--text-2)}
+.vw-menu .tb-btn:hover{background:var(--surface-sunken);color:var(--text)}
+.vw-menu .tb-btn.active{background:var(--accent-50);color:var(--accent-700)}
+#structMenu{position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-2);padding:8px;min-width:240px}
+#structMenu .sm-h{font-size:10px;font-weight:var(--fw-medium);color:var(--text-3);text-transform:uppercase;letter-spacing:var(--tracking-caps);padding:8px 8px 4px}
+#structMenu .sm-note{font-size:var(--fs-xs);color:var(--text-2);padding:6px 8px 2px;line-height:1.4}
+
+/* ── Panel derecho ───────────────────────────────────────────────────────── */
+#rightPanel{width:var(--rightpanel-w);background:var(--surface);border-left:1px solid var(--panel-border);display:flex;flex-direction:column;overflow:hidden;flex-shrink:0;position:relative;transition:width .18s ease}
+@media (max-width:1280px){#rightPanel:not(.collapsed){width:300px}}
+/* Plegado: queda un riel de 44 px con las 4 pestañas como iconos */
+#rightPanel.collapsed{width:var(--rail-w)}
+#rightPanel.collapsed>*:not(#rpRail){display:none}
+#rpRail{display:none;flex-direction:column;align-items:center;gap:4px;padding:8px 0;flex:1}
+#rightPanel.collapsed #rpRail{display:flex}
+.rp-rail-btn{position:relative;width:30px;height:30px;border:0;border-radius:var(--r-md);background:transparent;color:var(--text-2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.rp-rail-btn:hover{background:var(--surface-sunken);color:var(--text)}
+.rp-rail-btn.on{background:var(--tab-tools-soft);color:var(--tab-tools-dark)}
+.rp-rail-btn[data-tab="rev"].on{background:var(--tab-rev-soft);color:var(--tab-rev-dark)}
+.rp-rail-btn[data-tab="av"].on{background:var(--tab-avance-soft);color:var(--tab-avance-dark)}
+.rp-rail-btn[data-tab="per"].on{background:var(--tab-personas-soft);color:var(--tab-personas-dark)}
+.rp-rail-btn .n{position:absolute;top:-3px;right:-5px;min-width:14px;height:14px;padding:0 4px;border-radius:7px;background:var(--warn);color:#fff;font-size:9px;font-weight:var(--fw-bold);display:flex;align-items:center;justify-content:center;line-height:1}
+.rp-rail-btn .n:empty,.rp-rail-btn .n.done{display:none}
+.rp-rail-sep{width:22px;height:1px;background:var(--n-150);margin:4px 0}
+/* Pestañas: la barra se tiñe con el color de la activa */
+.rp-tabs{display:flex;align-items:stretch;padding:0 6px;border-bottom:1px solid var(--border);background:var(--surface);flex-shrink:0;transition:background .18s}
+#rightPanel[data-tab="herr"] .rp-tabs{background:var(--tab-tools-soft)}
+#rightPanel[data-tab="rev"] .rp-tabs{background:var(--tab-rev-soft)}
+#rightPanel[data-tab="av"] .rp-tabs{background:var(--tab-avance-soft)}
+#rightPanel[data-tab="per"] .rp-tabs{background:var(--tab-personas-soft)}
+.rp-tabs .sb-tab{flex:1 1 auto;display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:12px 2px 10px;font-size:var(--fs-sm);min-width:0;overflow:hidden}
+.rp-tabs .sb-tab svg{display:none}   /* el icono va en el riel plegado; acá no cabe con el rótulo */
+@media (max-width:1280px){.rp-tabs .sb-tab{font-size:var(--fs-xs);padding:12px 1px 10px;gap:3px} .rp-tabs #sbAvN,.rp-tabs #sbPerN{display:none}}
+.rp-tabs .sb-tab[data-tab="rev"].on{color:var(--tab-rev-dark);border-bottom-color:var(--tab-rev)}
+.rp-tabs .sb-tab[data-tab="av"].on{color:var(--tab-avance-dark);border-bottom-color:var(--tab-avance)}
+.rp-tabs .sb-tab[data-tab="per"].on{color:var(--tab-personas-dark);border-bottom-color:var(--tab-personas)}
+#sbBimN{display:inline-flex;align-items:center;padding:0 5px;height:15px;border-radius:8px;background:var(--warn);color:#fff;font-size:10px;font-weight:var(--fw-bold);line-height:1}
+#sbBimN.done{background:var(--ok)}
+#sbAvN,#sbPerN{font-size:var(--fs-xs);color:var(--text-3);font-weight:var(--fw-medium);font-variant-numeric:tabular-nums}
+.rp-collapse{align-self:center;flex:none;width:24px;height:24px;border:0;border-radius:6px;background:transparent;color:var(--text-2);cursor:pointer;font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0;margin-left:2px}
+.rp-collapse:hover{background:rgba(15,22,34,.06);color:var(--text)}
+#rpScroll{flex:1;overflow-y:auto;overflow-x:hidden}
+.rp-body{padding:4px 6px 8px}
+#bimList{padding:6px 6px 10px}
+.rp-card{background:transparent;border:0;border-top:1px solid var(--n-100);border-radius:0;box-shadow:none;padding:14px 12px;margin:0}
+.rp-card .rp-t,.rp-t{font-size:var(--fs-md);font-weight:var(--fw-medium);color:var(--text);display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.rp-total-badge{margin-left:auto;font-size:var(--fs-xs);font-weight:var(--fw-regular);color:var(--text-2);background:transparent;border:0;padding:0}
+.rp-total-badge b{color:var(--text);font-size:var(--fs-sm);font-weight:var(--fw-medium)}
+.rp-fld{margin-bottom:8px}
+.rp-fld label{display:block;font-size:10px;font-weight:var(--fw-medium);color:var(--text-2);text-transform:uppercase;letter-spacing:var(--tracking-caps);margin-bottom:3px}
+.rp-fld input{width:100%;height:var(--control-h);border:1px solid var(--border);border-radius:var(--r-md);padding:0 9px;font-size:var(--fs-md);background:var(--surface);outline:none;transition:border-color .15s,box-shadow .15s}
+.rp-fld input:focus{border-color:var(--accent-500);box-shadow:var(--focus-ring)}
+.rp-row{display:flex;gap:6px}
+.rp-row .rp-fld{flex:1}
+.rp-next{background:var(--accent-50);border:1px dashed var(--accent-300);border-radius:var(--r-md);padding:6px 8px;font-size:var(--fs-md);font-weight:var(--fw-bold);color:var(--accent-700);text-align:center;margin:6px 0;font-variant-numeric:tabular-nums}
+.rp-bedbtn{width:100%;height:32px;background:var(--accent-600);color:#fff;border:0;border-radius:var(--r-md);font-size:var(--fs-sm);font-weight:var(--fw-medium);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;margin-top:4px;transition:background .15s}
+.rp-bedbtn:hover{background:var(--accent-700)}
+.rp-bedbtn.active{background:var(--warn);color:#fff}
+.rp-bedbtn.sec{background:var(--surface);color:var(--accent-600);border:1px solid var(--border)}
+.rp-bedbtn.sec:hover{background:var(--accent-50);border-color:var(--accent-300)}
+.rp-hint{font-size:var(--fs-xs);color:var(--text-2);margin-top:6px;line-height:1.4}
+.rp-count{display:flex;justify-content:space-between;align-items:center;min-height:30px;padding:2px 0;border-top:1px solid var(--n-100)}
+.rp-t+.rp-count,.rp-puestos+.rp-count{border-top:0}
+.rp-count .lbl{font-size:var(--fs-sm);color:var(--text);font-weight:var(--fw-regular);display:flex;align-items:center;gap:7px}
+.rp-count .lbl .sw{width:8px;height:8px;border-radius:2px;display:inline-block}
+.rp-count .num{font-size:var(--fs-sm);font-weight:var(--fw-medium);color:var(--text);font-variant-numeric:tabular-nums}
+.rp-break{font-size:var(--fs-xs);color:var(--text-2);margin:2px 0 6px;line-height:1.45}
+.rp-break.exp{display:none}
+.rp-count.expandable{cursor:pointer;border-radius:4px}
+.rp-count.expandable:hover{background:var(--surface-sunken)}
+.proc-tab{border:1px solid var(--border);background:var(--surface);color:var(--text-2);border-radius:var(--r-pill);padding:2px 8px;font-size:10px;font-weight:var(--fw-medium);cursor:pointer}
+.proc-tab.on{background:#c026d3;border-color:#a21caf;color:#fff}
+.rp-puestos{font-size:var(--fs-xs);line-height:1.45;margin-bottom:8px;padding:8px 10px;background:var(--surface-sunken);border:1px solid var(--border);border-radius:var(--r-md);font-variant-numeric:tabular-nums;color:var(--text-2)}
+.rp-puestos .rpp-lbl{color:var(--text);font-weight:var(--fw-medium)}
+.rp-otros-tog{display:flex;align-items:center;gap:6px;width:100%;margin-top:6px;padding:6px 0;background:none;border:0;border-top:1px solid var(--n-100);cursor:pointer;font-size:var(--fs-sm);font-weight:var(--fw-regular);color:var(--text-2);text-align:left}
+.rp-otros-tog:hover{color:var(--text)}
+.rp-otros-car{font-size:8px;transition:transform .18s;display:inline-block}
+.rp-otros-tog.open .rp-otros-car{transform:rotate(90deg)}
+.rp-otros-n{margin-left:auto;font-size:var(--fs-xs);font-weight:var(--fw-medium);color:var(--text);min-width:18px;text-align:right}
+.rp-otros{padding-left:2px}
+.wp-row{display:flex;justify-content:space-between;padding:2px 4px;border-radius:5px;transition:background .12s}
+.wp-row[onclick]:hover{background:var(--accent-50)}
+.wpl-row{display:flex;align-items:center;gap:8px;padding:7px 4px;border-bottom:1px solid var(--n-100);cursor:pointer;transition:background .12s}
+.wpl-row:hover{background:var(--accent-50)}
+.wpl-row.off{cursor:default;opacity:.55}
+/* Panel 👥 Personas: fila señalable y pulso del marcador en el plano */
+.per-row:hover{background:var(--warn-soft);box-shadow:inset 3px 0 0 var(--state-outside)}
 /* Selector de tipo de puesto (camilla/sillón) en el panel de numeración */
 .bedkind-seg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.bedkind{border:1px solid #cbd5e1;background:#f8fafc;border-radius:6px;padding:5px 6px;font-size:12px;font-weight:700;cursor:pointer;color:#475569;font-family:inherit}
+.bedkind{border:1px solid var(--border);background:var(--surface);border-radius:var(--r-md);padding:6px;font-size:var(--fs-sm);font-weight:var(--fw-medium);cursor:pointer;color:var(--text-2)}
 .bedkind.active{background:#0284c7;border-color:#0284c7;color:#fff}
 .bedkind.sillon.active{background:#0d9488;border-color:#0d9488}
 .bedkind.cupo.active{background:#A0522D;border-color:#7a3f1d;color:#fff}
 .bedkind.puesto.active{background:#B8860B;border-color:#8a6508;color:#fff}
-/* Panel derecho */
-#rightPanel{width:464px;background:#bccede;border-left:1px solid #7ca4c0;display:flex;flex-direction:column;overflow-y:auto;flex-shrink:0;font-family:system-ui,-apple-system,sans-serif;transition:width .18s ease,margin .18s ease}
-#rightPanel.collapsed{width:0;border-left:none;overflow:hidden}
-@media (max-width:1280px){#rightPanel:not(.collapsed){width:300px}}
-#rightPanel.collapsed>*{display:none}
-#rightPanel h2{font-size:10px;font-weight:700;color:#48687e;text-transform:uppercase;letter-spacing:1px;padding:12px 14px 6px;margin:0;display:flex;align-items:center;justify-content:space-between;gap:6px}
-.rp-collapse{background:#94b8d0;border:1px solid #6d93b0;color:#1a3a5c;border-radius:6px;width:22px;height:22px;cursor:pointer;font-size:13px;font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;flex-shrink:0;padding:0}
-.rp-collapse:hover{background:#b5d0ea}
-#rpReopen{position:absolute;top:50px;right:0;z-index:30;background:#0284c7;color:#fff;border:none;border-top-left-radius:8px;border-bottom-left-radius:8px;width:26px;height:54px;cursor:pointer;font-size:15px;font-weight:800;box-shadow:-2px 2px 8px rgba(0,0,0,.25);display:none;align-items:center;justify-content:center;writing-mode:vertical-rl}
-#rpReopen.show{display:flex}
-/* Modo Ficha */
-#viewer.ficha-mode{cursor:help}
-#btnFicha.active{background:#0284c7;border-color:#0284c7;color:#fff}
-/* Modal Ficha de recinto */
-#fichaModal,#estadoModal,#equipModal{position:fixed;inset:0;background:rgba(15,30,52,.55);display:none;align-items:center;justify-content:center;z-index:120;padding:20px}
+
+/* ── Revisión: filas de 44 px con punto de estado · nombre · motivo · ✓ ⊘ ── */
+#revSel{width:100%;height:var(--control-h);margin:4px 0 8px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface);color:var(--text);font-size:var(--fs-sm);font-weight:var(--fw-medium);padding:0 8px}
+.bim-fl{font-size:10px;font-weight:var(--fw-medium);color:var(--text-3);text-transform:uppercase;letter-spacing:var(--tracking-caps);padding:10px 8px 4px;border:0;margin:0}
+.bim-row{display:grid;grid-template-columns:1fr auto auto auto;grid-template-areas:"nm x ok no" "sub x ok no";column-gap:6px;align-items:center;width:100%;min-height:44px;padding:6px 8px;border:0;border-top:1px solid var(--n-100);border-radius:0;background:none;cursor:pointer;text-align:left;transition:background .12s;position:relative;margin:0}
+#bimList .bim-row{grid-template-columns:8px 1fr auto auto auto;grid-template-areas:"dot nm x ok no" "dot sub x ok no"}
+#bimList .bim-row::before{content:"";grid-area:dot;width:8px;height:8px;border-radius:50%;background:var(--warn)}
+#bimList .bim-row.off::before{background:var(--n-300)}
+.bim-row:hover{background:var(--surface-sunken)}
+.bim-row.has-x,.bim-row.has-xx{padding-right:8px}
+.bim-nm{grid-area:nm;font-size:12.5px;font-weight:var(--fw-medium);color:var(--text);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.bim-sub{grid-area:sub;font-size:11.5px;color:var(--text-2);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;margin-top:1px}
+.bim-ok,.bim-x,.bim-no{position:static !important;transform:none;grid-row:1/3;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text-2);font-size:12px;line-height:1;cursor:pointer}
+.bim-x{grid-area:x;color:var(--danger)}
+.bim-ok{grid-area:ok;color:var(--ok)}
+.bim-no{grid-area:no}
+.bim-ok:hover{background:var(--ok-soft);border-color:var(--ok)}
+.bim-x:hover{background:var(--danger-soft);border-color:var(--danger)}
+.bim-no:hover{background:var(--surface-sunken);border-color:var(--border-strong)}
+.bim-desc{display:grid;grid-template-columns:auto 1fr;grid-template-areas:"u nm" "u sub";column-gap:8px;align-items:center;width:100%;background:var(--surface-sunken);border:1px dashed var(--border);border-radius:var(--r-md);padding:6px 8px;text-align:left;margin:2px 0;position:relative;opacity:.8}
+.bim-undo{grid-area:u;position:static;transform:none;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;background:var(--accent-50);border:1px solid var(--accent-300);color:var(--accent-700);font-size:12px;cursor:pointer}
+.bim-undo:hover{background:var(--accent-600);color:#fff}
+
+/* ── Modales: un solo estilo (encabezado blanco, sin degradado) ──────────── */
+#fichaModal,#estadoModal,#equipModal{position:fixed;inset:0;background:rgba(15,22,34,.5);display:none;align-items:center;justify-content:center;z-index:120;padding:20px}
 #fichaModal.show,#estadoModal.show,#equipModal.show{display:flex}
-/* ── Impresión de ficha de recinto: solo el modal, a página completa ── */
 #fkPrintStamp{display:none}
 @media print{
   body.print-ficha>*{display:none !important}
@@ -272,318 +498,182 @@ button,input,select,textarea{font-family:inherit}
   body.print-ficha .ficha-x,body.print-ficha .fk-open,body.print-ficha button{display:none !important}
   body.print-ficha #fkPrintStamp{display:block;font-size:10.5px;color:#64748b;margin-top:4px}
 }
-/* Panel de equipamiento del recinto: lista con miniaturas de EquiBox. Mientras
-   está abierto, el overlay deja el plano estático; al cerrarlo vuelve a ser interactivo. */
-.eqp-box{background:#fff;border-radius:14px;width:min(94vw,780px);max-height:84vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 18px 50px rgba(15,30,52,.35)}
-.eqp-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid #e2e8f0;background:#f8fafc}
-.eqp-list{overflow-y:auto;padding:6px 0}
-.eqp-row{display:flex;align-items:center;gap:12px;padding:8px 18px;border-bottom:1px solid #eef2f7}
-.eqp-row.eqp-click{cursor:pointer}
-.eqp-row.eqp-click:hover{background:#eff6ff}
-.eqp-row:last-child{border-bottom:none}
-.eqp-thumb{position:relative;width:54px;height:54px;flex-shrink:0;background:#f1f5f9;border:1px solid #e2e8f0;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:19px}
-.eqp-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff;border-radius:8px}
-.eqp-info{flex:1;min-width:0}
-.eqp-nm{font-size:13px;font-weight:700;color:#1e293b;line-height:1.25}
-.eqp-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:3px}
-.eqp-fam{font-size:10px;font-weight:700;color:#0f766e;background:#ccfbf1;border-radius:6px;padding:1px 8px}
-.eqp-emmc{font-size:10px;font-family:'Courier New',monospace;font-weight:700;color:#475569;background:#f1f5f9;border-radius:6px;padding:1px 8px}
-.eqp-qty{font-size:14px;font-weight:800;color:#0284c7;flex-shrink:0}
-.eqp-tabs{display:flex;flex-wrap:wrap;gap:6px;padding:10px 18px 0;background:#f8fafc;border-bottom:1px solid #e2e8f0}
-.eqp-tab{border:1px solid #cbd5e1;border-bottom:none;background:#eef2f7;color:#475569;border-radius:8px 8px 0 0;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit}
-.eqp-tab.on{background:#fff;color:#0c4a6e;border-color:#94a3b8}
-.est-table{width:100%;border-collapse:collapse;font-size:12px}
-.est-table th{background:#eef4fb;text-align:left;padding:7px 9px;font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:#48687e;border-bottom:1px solid #cbd5e1}
-.est-table td{padding:7px 9px;border-bottom:1px solid #eef2f7;color:#1e293b}
-.est-table td.n{text-align:center;font-variant-numeric:tabular-nums}
-.est-table tr.tot td{font-weight:800;background:#f8fafc;border-top:2px solid #cbd5e1}
-.est-bar{height:7px;background:#e8edf5;border-radius:99px;overflow:hidden;margin-top:3px}
-.est-bar>div{height:100%;background:linear-gradient(90deg,#3b82f6,#60a5fa)}
-.ficha-box{background:#fff;border-radius:14px;width:680px;max-width:96vw;max-height:90vh;display:flex;flex-direction:column;box-shadow:0 24px 70px rgba(0,0,0,.4);overflow:hidden;font-family:system-ui,-apple-system,sans-serif}
-.ficha-head{background:linear-gradient(180deg,#1D2D5B,#264281);color:#fff;padding:14px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-shrink:0}
-.ficha-title{font-size:16px;font-weight:800;line-height:1.2}
-.ficha-sub{font-size:11px;color:#bcd0ee;margin-top:3px}
-.ficha-x{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;width:30px;height:30px;border-radius:8px;font-size:18px;cursor:pointer;flex-shrink:0;line-height:1}
-.ficha-x:hover{background:rgba(255,255,255,.3)}
+.ficha-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);width:680px;max-width:96vw;max-height:90vh;display:flex;flex-direction:column;box-shadow:var(--shadow-3);overflow:hidden;color:var(--text)}
+.ficha-head{background:var(--surface);color:var(--text);padding:14px 18px;display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-shrink:0;border-bottom:1px solid var(--border)}
+.ficha-title{font-size:var(--fs-lg);font-weight:var(--fw-bold);line-height:1.25}
+.ficha-sub{font-size:var(--fs-xs);color:var(--text-2);margin-top:3px}
+.ficha-x{background:var(--surface);border:1px solid var(--border);color:var(--text-2);width:30px;height:30px;border-radius:var(--r-md);font-size:16px;cursor:pointer;flex-shrink:0;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.ficha-x:hover{background:var(--surface-sunken);color:var(--text);border-color:var(--border-strong)}
 .ficha-body{padding:16px 18px 20px;overflow-y:auto}
 .fk-sec{margin-bottom:18px}
-.fk-sec-t{font-size:12px;font-weight:800;color:#1D2D5B;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:7px;margin-bottom:8px;padding-bottom:5px;border-bottom:2px solid #e2e8f0}
-.fk-sec-t .cnt{margin-left:auto;font-size:11px;font-weight:700;color:#64748b;background:#eef2f9;border-radius:10px;padding:1px 9px}
-.fk-eq{display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px dashed #eef2f9;font-size:13px}
+.fk-sec-t{font-size:var(--fs-xs);font-weight:var(--fw-medium);color:var(--text-2);text-transform:uppercase;letter-spacing:var(--tracking-caps);display:flex;align-items:center;gap:7px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border)}
+.fk-sec-t .cnt{margin-left:auto;font-size:var(--fs-xs);font-weight:var(--fw-medium);color:var(--text-2);background:var(--surface-sunken);border-radius:10px;padding:1px 9px}
+.fk-eq{display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px dashed var(--n-100);font-size:var(--fs-md)}
 .fk-eq.fk-click{cursor:pointer;transition:background .12s}
-.fk-eq.fk-click:hover{background:#eff6ff}
-.fk-go{color:#93b3cc;font-weight:800;margin-left:4px}
+.fk-eq.fk-click:hover{background:var(--accent-50)}
+.fk-go{color:var(--text-3);font-weight:var(--fw-bold);margin-left:4px}
 .fk-eq:last-child{border-bottom:none}
-.fk-eq .q{font-weight:800;color:#0284c7;min-width:30px}
-.fk-eq .nm{flex:1;color:#1e293b}
-.fk-eq .fam{font-size:10px;color:#94a3b8;background:#f1f5f9;border-radius:6px;padding:1px 7px;white-space:nowrap}
-.fk-empty{font-size:12px;color:#94a3b8;font-style:italic;padding:6px 0}
-.fk-pauta{background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;padding:12px 14px}
-.fk-pauta .pa-rule{font-size:11px;color:#0369a1;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:7px}
-.fk-pauta .pa-item{font-size:13px;color:#0c4a6e;padding:3px 0;display:flex;gap:7px}
-.fk-pauta .pa-item .nb{color:#0284c7;font-weight:800}
-.fk-open{margin-top:11px;display:inline-flex;align-items:center;gap:7px;background:#0284c7;color:#fff;border:none;border-radius:8px;padding:9px 15px;font-size:12.5px;font-weight:700;cursor:pointer;text-decoration:none}
-.fk-open:hover{background:#0369a1}
-.rp-card{background:#fff;border:1px solid #cbd5e1;border-radius:10px;margin:6px 10px;padding:10px 11px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
-.rp-card .rp-t{font-size:12px;font-weight:800;color:#1e3a5f;display:flex;align-items:center;gap:6px;margin-bottom:8px}
-.rp-fld{margin-bottom:7px}
-.rp-fld label{display:block;font-size:9.5px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}
-.rp-fld input{width:100%;border:1px solid #cbd5e1;border-radius:6px;padding:5px 8px;font-size:13px;font-family:inherit;outline:none}
-.rp-fld input:focus{border-color:#0284c7}
-.rp-row{display:flex;gap:6px}
-.rp-row .rp-fld{flex:1}
-.rp-next{background:#e0f2fe;border:1px dashed #0284c7;border-radius:7px;padding:6px 8px;font-size:13px;font-weight:800;color:#0369a1;text-align:center;margin:6px 0}
-.rp-bedbtn{width:100%;background:#0284c7;color:#fff;border:none;border-radius:8px;padding:8px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
-.rp-bedbtn:hover{background:#0369a1}
-.rp-bedbtn.active{background:#f59e0b;color:#3a2a06}
-.rp-hint{font-size:10px;color:#64748b;margin-top:5px;line-height:1.35}
-.rp-count{display:flex;justify-content:space-between;align-items:baseline;padding:3px 0;border-bottom:1px dashed #e2e8f0}
-.rp-count:last-child{border-bottom:none}
-.rp-count .lbl{font-size:11.5px;color:#334155;font-weight:600;display:flex;align-items:center;gap:5px}
-.rp-count .lbl .sw{width:10px;height:10px;border-radius:3px;display:inline-block}
-.rp-count .num{font-size:15px;font-weight:800;color:#1e3a5f}
-.rp-break{font-size:10px;color:#64748b;margin-top:3px;line-height:1.4}
-.rp-count.expandable{cursor:pointer;border-radius:5px}
-.rp-count.expandable:hover{background:#eff6ff}
-.proc-tab{border:1px solid #cbd5e1;background:#f1f5f9;color:#475569;border-radius:6px;padding:2px 8px;font-size:9.5px;font-weight:700;cursor:pointer}
-.proc-tab.on{background:#c026d3;border-color:#a21caf;color:#fff}
-.rp-break.exp{display:none}
-.rp-total-badge{margin-left:auto;font-size:10px;font-weight:600;color:#475569;background:#eef2f7;border-radius:999px;padding:2px 9px}
-.rp-total-badge b{color:#1e3a5f;font-size:11.5px}
-.rp-puestos{font-size:10.5px;line-height:1.4;margin-bottom:8px;padding:6px 8px;background:#f6f9fc;border:1px solid #e2e8f0;border-radius:7px;font-variant-numeric:tabular-nums}
-.rp-puestos .rpp-lbl{color:#475569;font-weight:700}
-.rp-otros-tog{display:flex;align-items:center;gap:5px;width:100%;margin-top:8px;padding:5px 0;background:none;border:none;border-top:1px solid #e2e8f0;cursor:pointer;font-size:11px;font-weight:700;color:#475569;text-align:left}
-.rp-otros-tog:hover{color:#1d5fa0}
-.rp-otros-car{font-size:8px;transition:transform .18s;display:inline-block}
-.rp-otros-tog.open .rp-otros-car{transform:rotate(90deg)}
-.rp-otros-n{margin-left:auto;font-size:10px;font-weight:800;color:#1e3a5f;background:#eef2f7;border-radius:999px;padding:1px 8px;min-width:18px;text-align:center}
-.rp-otros{padding-left:2px}
-/* Modal */
-#wsModal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;z-index:100}
+.fk-eq .q{font-weight:var(--fw-bold);color:var(--accent-600);min-width:30px;font-variant-numeric:tabular-nums}
+.fk-eq .nm{flex:1;color:var(--text)}
+.fk-eq .fam{font-size:10px;color:var(--text-2);background:var(--surface-sunken);border-radius:6px;padding:1px 7px;white-space:nowrap}
+.fk-empty{font-size:var(--fs-sm);color:var(--text-3);font-style:italic;padding:6px 0}
+.fk-pauta{background:var(--info-soft);border:1px solid var(--accent-100);border-radius:var(--r-md);padding:12px 14px}
+.fk-pauta .pa-rule{font-size:var(--fs-xs);color:var(--accent-700);font-weight:var(--fw-medium);text-transform:uppercase;letter-spacing:var(--tracking-caps);margin-bottom:7px}
+.fk-pauta .pa-item{font-size:var(--fs-md);color:var(--text);padding:3px 0;display:flex;gap:7px}
+.fk-pauta .pa-item .nb{color:var(--accent-600);font-weight:var(--fw-bold)}
+.fk-open{margin-top:11px;display:inline-flex;align-items:center;gap:7px;background:var(--accent-600);color:#fff;border:none;border-radius:var(--r-md);padding:8px 15px;font-size:12.5px;font-weight:var(--fw-medium);cursor:pointer;text-decoration:none}
+.fk-open:hover{background:var(--accent-700)}
+.eqp-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);width:min(94vw,780px);max-height:84vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--shadow-3)}
+.eqp-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid var(--border);background:var(--surface)}
+.eqp-list{overflow-y:auto;padding:6px 0}
+.eqp-row{display:flex;align-items:center;gap:12px;padding:8px 18px;border-bottom:1px solid var(--n-100)}
+.eqp-row.eqp-click{cursor:pointer}
+.eqp-row.eqp-click:hover{background:var(--accent-50)}
+.eqp-row:last-child{border-bottom:none}
+.eqp-thumb{position:relative;width:54px;height:54px;flex-shrink:0;background:var(--surface-sunken);border:1px solid var(--border);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;color:var(--text-3);font-size:19px}
+.eqp-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#fff;border-radius:var(--r-md)}
+.eqp-info{flex:1;min-width:0}
+.eqp-nm{font-size:var(--fs-md);font-weight:var(--fw-medium);color:var(--text);line-height:1.25}
+.eqp-meta{display:flex;gap:6px;flex-wrap:wrap;margin-top:3px}
+.eqp-fam{font-size:10px;font-weight:var(--fw-medium);color:#0f766e;background:#ccfbf1;border-radius:6px;padding:1px 8px}
+.eqp-emmc{font-size:10px;font-family:var(--font-mono);font-weight:var(--fw-medium);color:var(--text-2);background:var(--surface-sunken);border-radius:6px;padding:1px 8px}
+.eqp-qty{font-size:14px;font-weight:var(--fw-bold);color:var(--accent-600);flex-shrink:0}
+.eqp-tabs{display:flex;flex-wrap:wrap;gap:0;padding:0 18px;background:var(--surface);border-bottom:1px solid var(--border)}
+.eqp-tab{border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:transparent;color:var(--text-2);border-radius:0;padding:9px 12px;font-size:var(--fs-sm);font-weight:var(--fw-regular);cursor:pointer}
+.eqp-tab.on{color:var(--accent-600);border-bottom-color:var(--accent-600);font-weight:var(--fw-medium)}
+.est-table{width:100%;border-collapse:collapse;font-size:var(--fs-sm)}
+.est-table th{background:var(--surface-sunken);text-align:left;padding:7px 9px;font-size:10px;text-transform:uppercase;letter-spacing:var(--tracking-caps);color:var(--text-2);font-weight:var(--fw-medium);border-bottom:1px solid var(--border)}
+.est-table td{padding:7px 9px;border-bottom:1px solid var(--n-100);color:var(--text)}
+.est-table td.n{text-align:center;font-variant-numeric:tabular-nums}
+.est-table tr.tot td{font-weight:var(--fw-bold);background:var(--surface-sunken);border-top:2px solid var(--border)}
+.est-bar{height:6px;background:var(--n-150);border-radius:99px;overflow:hidden;margin-top:3px}
+.est-bar>div{height:100%;background:var(--accent-500)}
+/* Diálogo de puesto */
+#wsModal{position:fixed;inset:0;background:rgba(15,22,34,.55);display:none;align-items:center;justify-content:center;z-index:100}
 #wsModal.show{display:flex}
-.modal-box{background:#f4f8fc;border:1px solid #a9c3d6;border-radius:14px;padding:24px;width:360px;max-width:90vw;box-shadow:0 18px 50px rgba(15,30,52,.35)}
+.modal-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 22px;width:360px;max-width:90vw;box-shadow:var(--shadow-3)}
 #wsModal .modal-wrap{display:flex;gap:14px;align-items:flex-start;max-height:92vh}
-.dot-panel{background:#fff;border:1px solid #a9c3d6;border-radius:14px;width:330px;max-width:44vw;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 18px 50px rgba(15,30,52,.35);overflow:hidden}
-.dot-panel .dp-h{padding:12px 14px 8px;border-bottom:1px solid #e2eaf4;flex-shrink:0}
-.dot-panel .dp-t{font-size:12.5px;font-weight:800;color:#17456e}
-.dot-panel .dp-s{font-size:10.5px;color:#64748b;margin-top:2px}
+.modal-box h3{font-size:var(--fs-lg);font-weight:var(--fw-bold);color:var(--text);margin-bottom:14px}
+.dot-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);width:330px;max-width:44vw;max-height:92vh;display:flex;flex-direction:column;box-shadow:var(--shadow-3);overflow:hidden}
+.dot-panel .dp-h{padding:12px 14px 8px;border-bottom:1px solid var(--border);flex-shrink:0}
+.dot-panel .dp-t{font-size:var(--fs-md);font-weight:var(--fw-bold);color:var(--text)}
+.dot-panel .dp-s{font-size:var(--fs-xs);color:var(--text-2);margin-top:2px}
 .dot-panel .dp-body{overflow-y:auto;padding:4px 0}
-.beca-tag{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:9px;font-size:9.5px;font-weight:700;
-  letter-spacing:.2px;vertical-align:1px;background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd;white-space:nowrap}
+.beca-tag{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:9px;font-size:9.5px;font-weight:var(--fw-medium);letter-spacing:.2px;vertical-align:1px;background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd;white-space:nowrap}
 .beca-tag.vencido{background:#fef3c7;color:#b45309;border-color:#fcd34d}
-.dp-row{display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;border-bottom:1px solid #f1f5f9}
-.dp-row:hover{background:#eff6ff}
-.dp-row.kb{background:#dbeafe;box-shadow:inset 3px 0 0 #2563eb}
-.dp-row .nm{flex:1;min-width:0;font-size:11.5px;color:#0f172a;font-weight:600;line-height:1.25}
-.dp-row .sub{font-size:9.5px;color:#64748b;font-weight:400;display:block}
-.dp-row .st{font-size:9px;font-weight:800;border-radius:6px;padding:2px 6px;white-space:nowrap;flex-shrink:0}
-.dp-row.ok .st{background:#dcfce7;color:#15803d}
-.dp-row.no .st{background:#fee2e2;color:#b91c1c}
-.dp-row.grp .st{background:#e0edf9;color:#1d5fa0}
-.dp-row.grp.full .st{background:#dcfce7;color:#15803d}
-.dp-row.grp .nm::after{content:'›';float:right;color:#94a3b8;font-weight:800;margin-left:6px}
-.dp-sug{display:inline-block;margin-left:6px;font-size:8.5px;font-weight:800;color:#065f46;background:#dcfce7;border:1px solid #86efac;border-radius:5px;padding:0 4px;vertical-align:middle}
-.dp-crumb{font-size:10px;color:#48687e;margin-top:3px;line-height:1.5}
-.dp-crumb a{color:#1d5fa0;font-weight:700;cursor:pointer}
+.dp-row{display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;border-bottom:1px solid var(--n-100)}
+.dp-row:hover{background:var(--accent-50)}
+.dp-row.kb{background:var(--accent-100);box-shadow:inset 3px 0 0 var(--accent-600)}
+.dp-row .nm{flex:1;min-width:0;font-size:var(--fs-sm);color:var(--text);font-weight:var(--fw-medium);line-height:1.25}
+.dp-row .sub{font-size:10px;color:var(--text-2);font-weight:400;display:block}
+.dp-row .st{font-size:9.5px;font-weight:var(--fw-bold);border-radius:6px;padding:2px 6px;white-space:nowrap;flex-shrink:0}
+.dp-row.ok .st{background:var(--ok-soft);color:var(--ok)}
+.dp-row.no .st{background:var(--danger-soft);color:var(--danger)}
+.dp-row.grp .st{background:var(--accent-50);color:var(--accent-600)}
+.dp-row.grp.full .st{background:var(--ok-soft);color:var(--ok)}
+.dp-row.grp .nm::after{content:'›';float:right;color:var(--text-3);font-weight:700;margin-left:6px}
+.dp-sug{display:inline-block;margin-left:6px;font-size:9px;font-weight:var(--fw-bold);color:var(--ok);background:var(--ok-soft);border:1px solid #86efac;border-radius:5px;padding:0 4px;vertical-align:middle}
+.dp-crumb{font-size:10.5px;color:var(--text-2);margin-top:3px;line-height:1.5}
+.dp-crumb a{color:var(--accent-600);font-weight:var(--fw-medium);cursor:pointer}
 .dp-crumb a:hover{text-decoration:underline}
-.dp-crumb .sep{color:#b6c6d6;margin:0 3px}
-.modal-box h3{font-size:14px;font-weight:800;color:#17456e;margin-bottom:16px}
+.dp-crumb .sep{color:var(--n-300);margin:0 3px}
 .form-row{margin-bottom:12px}
-.form-row label{display:block;font-size:10px;color:#48687e;text-transform:uppercase;margin-bottom:4px;letter-spacing:.5px}
-.form-row input{width:100%;background:#ffffff;border:1px solid #a9c3d6;border-radius:7px;color:#17456e;padding:7px 10px;font-size:12px;outline:none}
-.form-row input:focus{border-color:#3b82f6}
+.form-row label{display:block;font-size:10px;font-weight:var(--fw-medium);color:var(--text-2);text-transform:uppercase;margin-bottom:4px;letter-spacing:var(--tracking-caps)}
+.form-row input{width:100%;height:var(--control-h);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);color:var(--text);padding:0 10px;font-size:var(--fs-md);outline:none;transition:border-color .15s,box-shadow .15s}
+.form-row input:focus{border-color:var(--accent-500);box-shadow:var(--focus-ring)}
+.form-row input[type=checkbox]{height:auto}
 .tipo-toggle{display:flex;gap:6px}
-.tipo-btn{flex:1;padding:7px;border-radius:7px;border:1px solid #a9c3d6;background:#e7eff7;color:#48687e;font-size:11px;cursor:pointer;text-align:center;transition:all .15s}
-.tipo-btn.fi{background:#2563eb;border-color:#1d4ed8;color:#fff}
-.tipo-btn.di{background:#fffbeb;border-color:#f59e0b;color:#78350f}
-.rtype-btn{display:flex;align-items:center;gap:5px;padding:4px 9px;border-radius:6px;border:1px solid #d1d5db;background:#f8fafc;color:#374151;font-size:10px;cursor:pointer;transition:all .12s;white-space:nowrap}
-.rtype-btn.sel{color:#fff;font-weight:600}
-.rtype-badge{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block}
+.tipo-btn{flex:1;padding:7px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface);color:var(--text-2);font-size:var(--fs-sm);cursor:pointer;text-align:center;transition:all .15s}
+.tipo-btn.fi{background:var(--accent-600);border-color:var(--accent-600);color:#fff;font-weight:var(--fw-medium)}
+.tipo-btn.di{background:var(--warn-soft);border-color:var(--warn);color:var(--warn);font-weight:var(--fw-medium)}
+.rtype-btn{display:flex;align-items:center;gap:5px;padding:4px 9px;border-radius:var(--r-pill);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:var(--fs-xs);cursor:pointer;transition:all .12s;white-space:nowrap}
+.rtype-btn.sel{color:#fff;font-weight:var(--fw-medium)}
+.rtype-badge{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block;margin-right:4px;vertical-align:middle}
 .modal-actions{display:flex;gap:8px;margin-top:18px}
-.modal-actions button{flex:1;padding:8px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:600}
-.btn-save{background:#3b82f6;color:#fff}.btn-save:hover{background:#2563eb}
-.btn-del{background:#fee2e2;color:#b91c1c}.btn-del:hover{background:#fecaca}
-.btn-cancel{background:#94b8d0;color:#1d5fa0}.btn-cancel:hover{background:#b5d0ea}
-/* Hints */
-.float-hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);border-radius:8px;padding:6px 18px;font-size:11px;display:none;z-index:10;pointer-events:none;white-space:nowrap}
-#mergeHint{background:#ffffff;border:1px solid #eab308;color:#78350f}
-#delHint{background:#fff1f2;border:1px solid #ef4444;color:#b91c1c}
-#stampHint{background:#f0fdfa;border:1px solid #0d9488;color:#0f766e}
-#puertaHint{background:#eff6ff;border:1px solid #2563eb;color:#1d4ed8}
-#propHint{background:#fdf2fa;border:1px solid #d100b6;color:#9d0a8a}
-#lblHint{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:31;background:#fffbeb;border:1px solid #d97706;color:#92400e;border-radius:16px;padding:4px 14px;font-size:11.5px;font-family:system-ui,-apple-system,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
-#lblHint:hover{background:#fef3c7}
-/* Modo ubicación (vista 1): sólo el plano de fondo y los marcadores de tótems,
-   DEA e impresoras; se esconden cajas, rótulos, estructuras y todo lo demás. */
-svg.ubic-mode > :not(.ubic-layer){display:none !important}
-.ubic-mk{cursor:pointer}
-.ubic-mk:hover circle.bola{stroke:#0f172a}
-#ubicLegend{position:absolute;top:44px;left:50%;transform:translateX(-50%);z-index:31;background:rgba(255,255,255,.96);border:1px solid #94a3b8;border-radius:16px;padding:4px 12px;font-size:11.5px;font-family:system-ui,-apple-system,sans-serif;color:#1e293b;box-shadow:0 2px 8px rgba(0,0,0,.12);white-space:nowrap}
-#ubicLegend b{margin-left:2px}
-.dk-sub{display:flex;gap:3px;padding:0 2px}
-#dock:not(.open) .dk-sub{flex-direction:column}
-.dk-sub .dk-btn{justify-content:center}
-#dock.open .dk-sub .dk-btn .lb{display:none}
-#dkLabels:not(.on){border-color:#d97706;background:#fffbeb}
-/* ── Gestor de herramientas lateral (dock) ─────────────────────────────── */
-#dock{position:absolute;top:10px;right:10px;z-index:32;display:flex;flex-direction:column;gap:2px;background:rgba(255,255,255,.97);border:1px solid #94a3b8;border-radius:12px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.18);font-family:system-ui,-apple-system,sans-serif;width:46px;transition:width .15s;user-select:none;max-height:calc(100% - 20px);overflow-y:auto;overflow-x:visible;scrollbar-width:thin}
-#dock.open{width:236px}
-/* Los botones que vivían en la barra superior ahora viven acá: en modo angosto
-   se muestra sólo su icono (data-ic), que no se pierde aunque el código cambie
-   el texto del botón (escenario, nº de traslados…). */
-#dock .tb-btn{width:100%;display:flex;align-items:center;gap:7px;text-align:left;justify-content:flex-start;margin:0}
-#dock:not(.open) .tb-btn{font-size:0;padding:5px 0;justify-content:center;gap:0}
-#dock:not(.open) .tb-btn::before{content:attr(data-ic);font-size:15px;line-height:1}
-#dock:not(.open) .dk-row{justify-content:center}
-#dock .dk-row{display:flex;gap:3px;align-items:center;flex-wrap:wrap}
-#dock .dk-row .tb-btn{width:auto;flex:1 1 40px;justify-content:center;text-align:center}
-#dock:not(.open) .dk-row{display:none}
-#dock .vw-dd{display:block;width:100%}
-/* Los desplegables NO pueden vivir dentro del dock: al tener scroll vertical el
-   navegador recorta también el eje horizontal (overflow-x:visible se vuelve auto),
-   y el menú quedaba invisible. Se cuelgan del body y se posicionan fijos en JS. */
-.dock-pop{position:fixed !important;z-index:1200;max-height:80vh;overflow-y:auto}
-#dockTog{display:flex;align-items:center;justify-content:center;gap:6px;border:0;background:#1D2D5B;color:#fff;border-radius:8px;padding:5px 6px;cursor:pointer;font-size:12px;font-weight:800;margin-bottom:4px;white-space:nowrap;overflow:hidden}
-#dockTog .lb{display:none}#dock.open #dockTog .lb{display:inline}
-.dk-h{font-size:9px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.6px;padding:6px 6px 2px;white-space:nowrap;overflow:hidden;display:none}
-#dock.open .dk-h{display:block}
-#dock:not(.open) .dk-sep{height:1px;background:#e2e8f0;margin:3px 4px}
-.dk-btn{display:flex;align-items:center;gap:8px;width:100%;border:1px solid transparent;background:transparent;border-radius:8px;padding:4px 6px;cursor:pointer;font-size:12px;color:#17456e;font-weight:600;text-align:left;white-space:nowrap;overflow:hidden;position:relative;line-height:1.3}
-.dk-btn:hover{background:#e7eff7;border-color:#a9c3d6}
-.dk-btn.on{background:#2563eb;border-color:#1d4ed8;color:#fff}
-.dk-btn.on.prop{background:#d100b6;border-color:#a3008d}
-.dk-btn.dis{opacity:.38}
-.dk-btn .ic{font-size:16px;width:20px;text-align:center;flex-shrink:0}
-.dk-btn .lb{display:none;overflow:hidden;text-overflow:ellipsis}
-#dock.open .dk-btn .lb{display:inline}
-#dock .tb-btn.active{background:#2563eb;border-color:#1d4ed8;color:#fff}
-.dk-btn .n{position:absolute;top:0;right:2px;background:#d100b6;color:#fff;font-size:9px;font-weight:800;border-radius:8px;padding:0 5px;line-height:14px;min-width:8px;text-align:center}
-.dk-btn .n:empty{display:none}
-.prop-g{cursor:move}
-svg.hide-room-labels .room-label,svg.hide-room-labels .room-code{display:none}
-#propModal{display:none;position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:9000;align-items:center;justify-content:center}
-#propModal.show{display:flex}
-.pm-tbl{width:100%;border-collapse:collapse;font-size:12px}
-.pm-tbl th{background:#eef4fa;color:#1d5fa0;text-align:left;padding:6px 8px;font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;position:sticky;top:0}
-.pm-tbl td{padding:5px 8px;border-bottom:1px solid #e2e8f0;vertical-align:top}
-.pm-tbl tr.pm-go{cursor:pointer}.pm-tbl tr.pm-go:hover td{background:#f0f7ff}
-.pm-tbl td.num{text-align:center;font-variant-numeric:tabular-nums;font-weight:700}
-.pm-kpi{display:flex;gap:10px;margin:0 0 12px;flex-wrap:wrap}
-.pm-kpi div{flex:1;min-width:120px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:8px 12px}
-.pm-kpi b{display:block;font-size:22px;line-height:1.1}.pm-kpi span{font-size:11px;color:#48687e}
-.puerta-g{cursor:grab}
-.puerta-g:active{cursor:grabbing}
-.stamp-marquee{fill:rgba(13,148,136,.12);stroke:#0d9488;stroke-width:3;stroke-dasharray:12 8;pointer-events:none}
-.stamp-copy{cursor:grab}
-.stamp-copy:active{cursor:grabbing}
-.stamp-copy .stamp-frame{fill:none;stroke:#0d9488;stroke-width:3;stroke-dasharray:10 7;opacity:.9}
-.float-hint.show{display:block}
-
-/* ── Dinámico turno list ── */
-#mTurnosList{max-height:160px;overflow-y:auto;margin:4px 0;}
-.turno-row{display:flex;align-items:center;gap:6px;padding:5px 6px;border-radius:6px;background:#bccede;margin-bottom:3px;}
-.turno-row:last-child{margin-bottom:0;}
-.turno-name{flex:1;font-size:11px;color:#1a3a5c;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.turno-sub{font-size:9px;color:#48687e;}
-.turno-del{background:none;border:none;color:#ef4444;cursor:pointer;font-size:13px;padding:0 2px;flex-shrink:0;}
-.turno-del:hover{color:#b91c1c;}
-.turno-add-btn{display:flex;align-items:center;gap:6px;width:100%;background:#a8c2de;border:1px dashed #93c5fd;border-radius:6px;color:#1d4ed8;cursor:pointer;padding:5px 10px;font-size:11px;margin-top:4px;transition:all .15s;}
-.turno-add-btn:hover{background:#bfdbfe;}
-#mTurnosSection{display:none;}
-.btn-add-turno{background:#3b82f6;color:#fff;}
-.btn-add-turno:hover{background:#2563eb;}
-::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#bccede}::-webkit-scrollbar-thumb{background:#94b8d0;border-radius:3px}
-
-/* ── Room type colors ── */
-.rtype-btn{flex:1;padding:5px 6px;border-radius:5px;border:1px solid #7ca4c0;background:#bccede;color:#48687e;font-size:10px;cursor:pointer;text-align:center;transition:all .15s;white-space:nowrap;}
-.rtype-btn.sel{font-weight:700;color:#fff;}
-.rtype-badge{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;flex-shrink:0;vertical-align:middle;}
-/* ── Autocomplete & Global search ── */
-.ac-wrap{position:relative;}
-.ac-drop{position:absolute;left:0;right:0;top:calc(100% + 2px);background:#fff;border:1px solid #7ca4c0;border-radius:8px;box-shadow:0 6px 20px rgba(0,60,120,.13);z-index:600;display:none;max-height:240px;overflow-y:auto;}
-.ac-item{padding:8px 12px;cursor:pointer;border-bottom:1px solid #e8f0fa;transition:background .1s;}
-.ac-item:last-child{border-bottom:none;}
-.ac-item:hover{background:#c4dcee;}
-.ac-item strong{display:block;font-size:12px;color:#1a3a5c;font-weight:600;}
-.ac-item span{font-size:10px;color:#48687e;margin-top:1px;display:block;}
-.ac-hdr{padding:4px 12px;font-size:9px;font-weight:700;color:#48687e;text-transform:uppercase;letter-spacing:.6px;background:#c8d8e8;border-bottom:1px solid #e0eaf5;}
-.mServ-info{font-size:10px;color:#3d6080;margin-top:3px;min-height:13px;font-style:italic;}
-#gSearch{position:relative;flex:1;max-width:300px;}
-#gSearchInput{width:100%;background:#c8d8e8;border:1px solid #7ca4c0;border-radius:20px;color:#1a3a5c;padding:5px 12px 5px 30px;font-size:12px;outline:none;transition:all .15s;}
-#gSearchInput::placeholder{color:#8aabcc;}
-#gSearchInput:focus{background:#fff;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.12);}
-#gSearchIcon{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:12px;pointer-events:none;color:#8aabcc;}
-#gSearchDrop{position:absolute;left:0;right:0;top:calc(100% + 6px);background:#fff;border:1px solid #7ca4c0;border-radius:10px;box-shadow:0 8px 24px rgba(0,60,120,.14);z-index:600;display:none;max-height:320px;overflow-y:auto;}
-#dbBadge{font-size:9px;background:#a8c2de;color:#1d4ed8;border:1px solid #bfdbfe;border-radius:10px;padding:2px 8px;white-space:nowrap;flex-shrink:0;display:none;}
-.export-btn{background:#e7eff7;border:1px solid #a9c3d6;border-radius:7px;color:#17456e;cursor:pointer;padding:4px 10px;font-size:10px;font-weight:600;white-space:nowrap;flex-shrink:0;transition:background .15s,border-color .15s;}
-.export-btn:hover{background:#ffffff;border-color:#7ca4c0;}
-.exp-dd{position:relative;display:inline-block;flex-shrink:0}
-.exp-menu{position:absolute;top:calc(100% + 4px);right:0;z-index:1200;display:none;min-width:290px;background:#fff;border:1px solid #cbd5e1;border-radius:9px;box-shadow:0 8px 28px rgba(15,23,42,.22);padding:5px}
-.exp-menu.show{display:block}
-.exp-menu-lbl{font-size:8.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:#94a3b8;padding:6px 9px 3px}
-.exp-menu button{display:block;width:100%;text-align:left;background:none;border:none;border-radius:6px;padding:7px 10px;font-size:11px;font-weight:600;color:#1e293b;cursor:pointer;white-space:nowrap}
-.exp-menu button:hover{background:#eff6ff;color:#1d4ed8}
-.exp-menu-sep{height:1px;background:#e2e8f0;margin:5px 4px}
-.vw-dd{position:relative;display:inline-block}
-.vw-menu{position:absolute;top:calc(100% + 4px);left:0;z-index:1150;display:none;flex-direction:column;gap:4px;min-width:230px;background:#fff;border:1px solid #cbd5e1;border-radius:10px;box-shadow:0 8px 28px rgba(15,23,42,.22);padding:6px}
-.vw-menu.show{display:flex}
-.vw-menu .tb-btn{width:100%;text-align:left;justify-content:flex-start}
-#roomSearch{position:fixed;inset:0;background:rgba(15,30,52,.45);display:none;align-items:flex-start;justify-content:center;z-index:130;padding:9vh 20px 20px}
+.modal-actions button{flex:1;height:32px;padding:0 10px;border-radius:var(--r-md);border:1px solid var(--border);cursor:pointer;font-size:var(--fs-sm);font-weight:var(--fw-medium);background:var(--surface);color:var(--text)}
+.btn-save,.btn-add-turno{background:var(--accent-600) !important;border-color:var(--accent-600) !important;color:#fff !important}
+.btn-save:hover,.btn-add-turno:hover{background:var(--accent-700) !important}
+.btn-del{color:var(--danger) !important;border-color:#e6c4c4 !important}
+.btn-del:hover{background:var(--danger-soft) !important}
+.btn-cancel{height:32px;padding:0 12px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:var(--fs-sm);font-weight:var(--fw-medium);cursor:pointer}
+.btn-cancel:hover{background:var(--surface-sunken);border-color:var(--border-strong)}
+#mTurnosList{max-height:160px;overflow-y:auto;margin:4px 0}
+.turno-row{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:6px;background:var(--surface-sunken);border:1px solid var(--n-100);margin-bottom:3px}
+.turno-row:last-child{margin-bottom:0}
+.turno-name{flex:1;font-size:var(--fs-sm);color:var(--text);font-weight:var(--fw-medium);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.turno-sub{font-size:10px;color:var(--text-2)}
+.turno-del{background:none;border:none;color:var(--danger);cursor:pointer;font-size:13px;padding:0 2px;flex-shrink:0}
+.turno-del:hover{color:#991b1b}
+.turno-add-btn{display:flex;align-items:center;gap:6px;width:100%;background:var(--accent-50);border:1px dashed var(--accent-300);border-radius:6px;color:var(--accent-700);cursor:pointer;padding:6px 10px;font-size:var(--fs-sm);margin-top:4px;transition:all .15s}
+.turno-add-btn:hover{background:var(--accent-100)}
+#mTurnosSection{display:none}
+/* Autocompletar y buscador global */
+.ac-wrap{position:relative}
+.ac-drop{position:absolute;left:0;right:0;top:calc(100% + 2px);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);box-shadow:var(--shadow-2);z-index:600;display:none;max-height:240px;overflow-y:auto;padding:4px}
+.ac-item{padding:7px 10px;cursor:pointer;border-radius:var(--r-sm);transition:background .1s}
+.ac-item:hover,.ac-item.sel{background:var(--accent-50)}
+.ac-item strong{display:block;font-size:var(--fs-sm);color:var(--text);font-weight:var(--fw-medium)}
+.ac-item span{font-size:var(--fs-xs);color:var(--text-2);margin-top:1px;display:block}
+.ac-hdr{padding:6px 10px 3px;font-size:10px;font-weight:var(--fw-medium);color:var(--text-3);text-transform:uppercase;letter-spacing:var(--tracking-caps)}
+.mServ-info{font-size:var(--fs-xs);color:var(--text-2);margin-top:3px;min-height:13px;font-style:italic}
+#roomSearch{position:fixed;inset:0;background:rgba(15,22,34,.45);display:none;align-items:flex-start;justify-content:center;z-index:130;padding:9vh 20px 20px}
 #roomSearch.show{display:flex}
-.rs-box{background:#fff;border-radius:14px;width:min(92vw,640px);max-height:70vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 18px 50px rgba(15,30,52,.35)}
-.rs-box input{border:none;outline:none;padding:15px 18px;font-size:15px;font-family:inherit;border-bottom:1px solid #e2e8f0}
+.rs-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);width:min(92vw,640px);max-height:70vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--shadow-3)}
+.rs-box input{border:none;outline:none;padding:15px 18px;font-size:var(--fs-lg);border-bottom:1px solid var(--border);background:var(--surface);color:var(--text)}
 .rs-list{overflow-y:auto}
-.rs-row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid #f1f5f9;padding:9px 16px;cursor:pointer;font-family:inherit}
-.rs-row:hover,.rs-row.sel{background:#eff6ff}
+.rs-row{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid var(--n-100);padding:9px 16px;cursor:pointer}
+.rs-row:hover,.rs-row.sel{background:var(--accent-50)}
 .rs-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
-.rs-nm{font-size:13px;font-weight:700;color:#1e293b}
-.rs-sub{font-size:11px;color:#64748b}
-.rs-right{margin-left:auto;font-size:10px;color:#94a3b8;white-space:nowrap}
+.rs-nm{font-size:var(--fs-md);font-weight:var(--fw-medium);color:var(--text)}
+.rs-sub{font-size:var(--fs-xs);color:var(--text-2)}
+.rs-right{margin-left:auto;font-size:var(--fs-xs);color:var(--text-3);white-space:nowrap}
 body.view-only #btnEdit, body.view-only #btnUndo, body.view-only .backup-btn,
 body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedbtn{display:none !important}
-.backup-btn{background:#e7eff7;border:1px solid #a9c3d6;border-radius:7px;color:#17456e;cursor:pointer;padding:4px 10px;font-size:10px;font-weight:600;white-space:nowrap;flex-shrink:0;transition:background .15s,border-color .15s;margin-right:4px;}
-.backup-btn:hover{background:#ffffff;border-color:#7ca4c0;}
-.backup-btn.restore{background:#e7eff7;}
-.backup-btn.restore:hover{background:#ffffff;}
-@keyframes backupPulse{0%,100%{box-shadow:0 0 0 0 rgba(22,163,74,0)}50%{box-shadow:0 0 0 6px rgba(22,163,74,.35)}}
-/* ── Panel Metas oficiales de recintos (Resumen Ejecutivo) ── */
-#metasPanel{position:absolute;right:14px;top:14px;width:234px;background:rgba(255,255,255,.97);border:1px solid #cbd5e1;border-radius:12px;box-shadow:0 14px 40px -10px rgba(0,0,0,.35);z-index:40;font-family:system-ui,-apple-system,sans-serif;overflow:hidden;}
-#metasPanel .mp-hdr{background:#1d4ed8;color:#fff;font-size:12px;font-weight:700;padding:9px 12px;display:flex;align-items:center;gap:6px;}
-#metasPanel .mp-hdr span{font-weight:500;opacity:.82;font-size:10px;}
-#metasPanel .mp-hdr button{margin-left:auto;background:none;border:none;color:#fff;font-size:16px;cursor:pointer;line-height:1;padding:0;}
-#metasPanel .mp-body{padding:11px 12px;display:flex;flex-direction:column;gap:11px;}
-.mp-row .mp-top{display:flex;justify-content:space-between;font-size:12px;color:#1e293b;}
-.mp-row .mp-lbl{font-weight:600;} .mp-row .mp-val{color:#475569;} .mp-row .mp-val b{color:#0f172a;font-size:13px;}
-.mp-bar{height:7px;background:#e2e8f0;border-radius:4px;margin:4px 0 2px;overflow:hidden;}
-.mp-fill{height:100%;border-radius:4px;transition:width .3s;}
-.mp-row .mp-sub{font-size:10px;color:#94a3b8;}
-#metasPanel .mp-foot{font-size:10px;color:#64748b;padding:2px 12px 10px;line-height:1.4;}
-#btnMetas.active{background:#1d4ed8;color:#fff;border-color:#1d4ed8;}
+/* Panel Metas oficiales de recintos (Resumen Ejecutivo) */
+#metasPanel{position:absolute;right:14px;top:14px;width:250px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-2);z-index:40;overflow:hidden}
+#metasPanel .mp-hdr{background:var(--surface);color:var(--text);font-size:var(--fs-sm);font-weight:var(--fw-medium);padding:9px 12px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--border)}
+#metasPanel .mp-hdr span{font-weight:var(--fw-regular);color:var(--text-2);font-size:var(--fs-xs)}
+#metasPanel .mp-hdr button{margin-left:auto;background:none;border:none;color:var(--text-2);font-size:16px;cursor:pointer;line-height:1;padding:0}
+#metasPanel .mp-body{padding:11px 12px;display:flex;flex-direction:column;gap:11px}
+.mp-row .mp-top{display:flex;justify-content:space-between;font-size:var(--fs-sm);color:var(--text)}
+.mp-row .mp-lbl{font-weight:var(--fw-medium)}.mp-row .mp-val{color:var(--text-2)}.mp-row .mp-val b{color:var(--text);font-size:var(--fs-md)}
+.mp-bar{height:6px;background:var(--n-150);border-radius:4px;margin:4px 0 2px;overflow:hidden}
+.mp-fill{height:100%;border-radius:4px;transition:width .3s}
+.mp-row .mp-sub{font-size:var(--fs-xs);color:var(--text-3)}
+#metasPanel .mp-foot{font-size:var(--fs-xs);color:var(--text-2);padding:2px 12px 10px;line-height:1.4}
+/* Reporte de propuestos */
+#propModal{display:none;position:fixed;inset:0;background:rgba(15,22,34,.55);z-index:9000;align-items:center;justify-content:center}
+#propModal.show{display:flex}
+.pm-tbl{width:100%;border-collapse:collapse;font-size:var(--fs-sm)}
+.pm-tbl th{background:var(--surface-sunken);color:var(--text-2);text-align:left;padding:6px 8px;font-size:10px;font-weight:var(--fw-medium);text-transform:uppercase;letter-spacing:var(--tracking-caps);position:sticky;top:0}
+.pm-tbl td{padding:6px 8px;border-bottom:1px solid var(--n-100);vertical-align:top}
+.pm-tbl tr.pm-go{cursor:pointer}.pm-tbl tr.pm-go:hover td{background:var(--accent-50)}
+.pm-tbl td.num{text-align:center;font-variant-numeric:tabular-nums;font-weight:var(--fw-medium)}
+.pm-kpi{display:flex;gap:10px;margin:0 0 12px;flex-wrap:wrap}
+.pm-kpi div{flex:1;min-width:120px;background:var(--surface-sunken);border:1px solid var(--border);border-radius:var(--r-md);padding:8px 12px}
+.pm-kpi b{display:block;font-size:var(--fs-2xl);line-height:1.1;font-weight:var(--fw-bold)}.pm-kpi span{font-size:var(--fs-xs);color:var(--text-2)}
 </style>
 <!-- xlsx-js-style: fork de SheetJS con soporte de estilos de celda (para colorear filas en el export de dotación) -->
 <script src="assets/vendor/xlsx-js-style-1.2.0.bundle.js"></script>
 </head>
 <body>
 <div id="hdr">
-  <a href="index.html" class="hub-back" title="Volver al HUB" style="background:#e7eff7;border:1px solid #a9c3d6;color:#17456e;padding:5px 11px;border-radius:7px;font-size:11px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:5px;flex-shrink:0;margin-right:4px" onmouseover="this.style.background='#ffffff'" onmouseout="this.style.background='#e7eff7'">
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>HUB
+  <a href="index.html" class="hub-back" title="Volver al HUB">
+    <svg class="i" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>HUB
   </a>
-  <h1>🌐 HDS · ATLAS <span style="font-weight:600;color:#48687e">· CONSULTA</span></h1>
   <div class="hdr-sep"></div>
-  <div class="hdr-stat"><strong id="statTotal">0</strong>Puestos</div>
-  <div class="hdr-sep"></div>
-  <div class="hdr-stat"><strong id="statAsig">0</strong>Asignados</div>
-  <div class="hdr-sep"></div>
-  <div class="hdr-stat"><strong id="statPct">0%</strong>Completado</div>
-  <div class="hdr-sep"></div>
+  <h1><span class="logo">A</span><span class="t">Atlas HDS</span><span class="t" style="font-weight:400;color:#536174">· consulta</span></h1>
+  <div class="hdr-stat"><strong id="statTotal">0</strong>puestos</div>
+  <div class="hdr-stat"><strong id="statAsig">0</strong>asignados</div>
+  <div class="hdr-stat hdr-prog" title="Puestos con persona asignada"><span class="hdr-bar"><i id="statBar"></i></span><strong id="statPct">0%</strong></div>
   <div id="gSearch">
     <span id="gSearchIcon">🔍</span>
     <input id="gSearchInput" placeholder="Buscar funcionario..." autocomplete="off" type="search" spellcheck="false">
     <div id="gSearchDrop" class="ac-drop"></div>
   </div>
   <span id="dbBadge"></span>
-  <button class="backup-btn" onclick="exportBackup()" title="Descargar un .json con TODO tu trabajo (recintos dibujados, nombres, asignaciones). Guárdalo: te protege si el navegador pierde datos locales.">💾 Respaldar</button>
-  <button class="backup-btn restore" onclick="document.getElementById('_restoreFile').click()" title="Restaurar trabajo desde un .json de respaldo">↻ Restaurar</button>
+  <button class="backup-btn" onclick="exportBackup()" title="Descargar un .json con TODO tu trabajo (recintos dibujados, nombres, asignaciones). Guárdalo: te protege si el navegador pierde datos locales.">Respaldar</button>
+  <button class="backup-btn restore" onclick="document.getElementById('_restoreFile').click()" title="Restaurar trabajo desde un .json de respaldo">Restaurar</button>
   <input id="_restoreFile" type="file" accept="application/json,.json" style="display:none" onchange="importBackup(event)">
   <div class="exp-dd" id="expDD">
     <button class="export-btn" onclick="toggleExpMenu(event)" title="Exportar planillas (XLSX)">⬇ Exportar ▾</button>
@@ -615,7 +705,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
   <aside id="sidebar">
     <div id="sbTabs">
       <button id="sbTabPisos" class="sb-tab on" onclick="sbShowTab('pisos')">Pisos</button>
-      <button id="sbTabTipos" class="sb-tab" onclick="sbShowTab('tipos')">🏷 Tipologías</button>
+      <button id="sbTabTipos" class="sb-tab" onclick="sbShowTab('tipos')">Tipologías</button>
     </div>
     <div id="floorList"></div>
     <div id="typeList" style="display:none"></div>
@@ -635,7 +725,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
     <div id="editBar">
       <button class="tb-btn" id="btnBuscaRec" onclick="openRoomSearch()" title="Buscar recinto por nombre, código, BIM o señalética y saltar a él (Ctrl+K)">🔎 Recinto</button>
       <span class="tb-div"></span>
-      <button class="tb-btn" id="btnEdit" onclick="toggleEdit()">✏️ Editar cajas</button>
+      <button class="tb-btn tog" id="btnEdit" onclick="toggleEdit()">✏️ Editar cajas</button>
       <button class="tb-btn" id="btnUndo" onclick="doUndo()" title="Deshacer el último cambio (Ctrl+Z)" style="display:none">↩ Deshacer</button>
       <span class="tb-div"></span>
       <button class="tb-btn" id="btnFicha" onclick="toggleFichaMode()" title="Ver ficha del recinto: equipamiento, mobiliario y pauta de Autorización Sanitaria">🔍 Ficha recinto</button>
@@ -657,8 +747,8 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="tb-btn" id="btnPuertasAuto" onclick="puertasAutoClick()" style="display:none" title="Asignación automática: coloca una flecha de salida en cada recinto dibujado del área que aún no tiene puerta, sobre el lado más despejado (el que no colinda con otros recintos). Tipo pabellón (200) para pabellones/quirófanos; camilla (120) para habitaciones, recuperación, urgencia y recintos con camillas; normal (90) para el resto.">⚡ Auto puertas</button>
       <button class="tb-btn" id="btnDupMueble" onclick="toggleStampMode()" style="display:none" title="Duplicar mobiliario: recorta un trozo del plano (como una captura de pantalla) y lo estampa como copia dentro del recinto, para proponer más puestos con el mismo mueble. La copia se mueve arrastrándola y se elimina con doble clic.">🪑 Duplicar mueble</button>
       <button class="tb-btn" id="btnServPuestos" onclick="openServPuestos()" style="display:none" title="Ver todos los puestos asignados del servicio: en cantidad o con el nombre de cada funcionario">👥 Puestos del servicio</button>
-      <button class="tb-btn" id="btnBoxVis" onclick="cycleBoxVis()" title="Ver u ocultar las cajas dibujadas y su información (para ver el plano de fondo)">👁 Cajas</button>
-      <button class="tb-btn" id="btnDotNames" onclick="toggleDotNames()" title="Mostrar u ocultar el nombre de las personas asignadas a los puestos en vista 3 (útil en recintos con muchos funcionarios)">👤 Nombres</button>
+      <button class="tb-btn tog" id="btnBoxVis" onclick="cycleBoxVis()" title="Ver u ocultar las cajas dibujadas y su información (para ver el plano de fondo)">👁 Cajas</button>
+      <button class="tb-btn tog" id="btnDotNames" onclick="toggleDotNames()" title="Mostrar u ocultar el nombre de las personas asignadas a los puestos en vista 3 (útil en recintos con muchos funcionarios)">👤 Nombres</button>
       <div class="vw-dd" id="vwDD">
         <button class="tb-btn" id="btnVista" onclick="toggleVwMenu(event)" title="Opciones de visualización del plano">🎛 Vista ▾</button>
         <div class="vw-menu" id="vwMenu">
@@ -671,19 +761,19 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       </div>
       <button class="tb-btn" id="btnDraw" onclick="toggleDraw()" style="display:none">⬛ Dibujar</button>
       <button class="tb-btn" id="btnStruct" onclick="toggleStructMenu()" title="Agregar elementos transversales al piso: ascensores, escaleras, escalera mecánica, líneas de circulación." style="display:none">🛗 Estructura</button>
-      <div id="structMenu" style="display:none;position:absolute;top:42px;left:0;background:#fff;border:1px solid #94a3b8;border-radius:10px;box-shadow:0 12px 32px rgba(0,0,0,.25);padding:8px;z-index:200;min-width:230px;font-family:system-ui,-apple-system,sans-serif;">
-        <div style="font-size:11px;font-weight:700;color:#334155;text-transform:uppercase;letter-spacing:.5px;padding:4px 8px 6px;border-bottom:1px solid #e2e8f0;margin-bottom:4px">Ascensores</div>
+      <div id="structMenu" style="display:none">
+        <div class="sm-h">Ascensores</div>
         <button class="struct-opt" data-kind="asc-G"     style="--c:#16a34a">🛗 <b>General</b> <span style="opacity:.65">· verde</span></button>
         <button class="struct-opt" data-kind="asc-S"     style="--c:#f97316">🛗 <b>Servicio</b> <span style="opacity:.65">· naranjo</span></button>
         <button class="struct-opt" data-kind="asc-P"     style="--c:#2563eb">🛗 <b>Pacientes</b> <span style="opacity:.65">· azul</span></button>
         <button class="struct-opt" data-kind="asc-Pplus" style="--c:#1d4ed8">🛗 <b>Pacientes+</b> <span style="opacity:.65">· azul oscuro</span></button>
-        <div style="font-size:11px;font-weight:700;color:#334155;text-transform:uppercase;letter-spacing:.5px;padding:8px 8px 6px;border-bottom:1px solid #e2e8f0;margin:4px 0">Otros</div>
+        <div class="sm-h">Otros</div>
         <button class="struct-opt" data-kind="stair"     style="--c:#7c3aed">🪜 <b>Escalera</b></button>
         <button class="struct-opt" data-kind="escalator" style="--c:#0891b2">⬆ <b>Escalera Mecánica</b></button>
         <button class="struct-opt" data-kind="circulation" style="--c:#475569">〰 <b>Línea de Circulación</b> <span style="opacity:.55">· dbl-click p/terminar</span></button>
-        <div style="font-size:11px;font-weight:700;color:#334155;text-transform:uppercase;letter-spacing:.5px;padding:8px 8px 6px;border-bottom:1px solid #e2e8f0;margin:4px 0">Desde Navegación</div>
+        <div class="sm-h">Desde Navegación</div>
         <button class="struct-opt" onclick="importarVerticalesNav()" style="--c:#0ea5e9" title="Trae los ascensores, escaleras y escaleras mecánicas dibujados en 8.Navegacion (siembra nav_verticales.js) a TODOS los pisos, a su tamaño real. Reemplaza los ascensores/escaleras que hubiera; las líneas de circulación se conservan. Después solo hay que ubicarlos y escalarlos.">⬇ <b>Importar de Navegación</b> <span style="opacity:.55">· reemplaza</span></button>
-        <div style="font-size:10px;color:#64748b;padding:4px 8px 2px;line-height:1.35">En edición: arrastrar mueve · ⇧+arrastrar mueve TODOS los del piso · esquina ◢ escala · × borra</div>
+        <div class="sm-note">En edición: arrastrar mueve · ⇧+arrastrar mueve TODOS los del piso · esquina ◢ escala · × borra</div>
       </div>
       <button class="tb-btn warn" id="btnMerge" onclick="doMerge()" style="display:none">🔗 Fusionar</button>
       <button class="tb-btn warn" id="btnUnmerge" onclick="doUnmerge()" style="display:none" title="Separar los bloques de este recinto en recintos independientes">✂ Des-fusionar</button>
@@ -701,26 +791,53 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <div class="float-hint" id="delHint">Modo eliminar — clic en dot para eliminar · ESC para salir</div>
       <div class="float-hint" id="puertaHint">🚪 Puertas — elige el tipo en la barra (90 · 120 · 200) y haz clic en el borde del recinto · atajos: Alt+clic=120, Shift+clic=200 · ⌘+clic sobre una puerta rota el tipo · arrastrar mueve · doble clic elimina · ⚡ Auto completa el área y ↩ lo deshace · ✕ borra 1 a 1 · 🗑 borra todas las del servicio · ESC sale</div>
       <div class="float-hint" id="stampHint">🪑 Duplicar mueble — arrastra un rectángulo sobre el mueble a copiar (como una captura de pantalla); al soltar, la copia queda junto al original · muévela arrastrándola · doble clic la elimina · ESC para salir</div>
-      <div class="float-hint" id="bedHint" style="border-color:#0284c7;color:#0369a1">🛏 Modo puestos — en vista 2, clic DENTRO de un recinto: camillas/sillones en Recuperación, Habitación o Clínica; cupos (⭕) en Recuperación, Pre-Anestesia, Box Urgencia, Reanimador y Sala de Procedimiento; puestos de toma (🧪) solo en Laboratorio · ESC para salir</div>
+      <div class="float-hint" id="bedHint">🛏 Modo puestos — en vista 2, clic DENTRO de un recinto: camillas/sillones en Recuperación, Habitación o Clínica; cupos (⭕) en Recuperación, Pre-Anestesia, Box Urgencia, Reanimador y Sala de Procedimiento; puestos de toma (🧪) solo en Laboratorio · ESC para salir</div>
       <div class="float-hint" id="propHint"></div>
       <div id="ubicLegend" style="display:none"></div>
       <button id="lblHint" style="display:none" onclick="toggleRoomLabels()" title="Los nombres y códigos de los recintos están ocultos. Clic para mostrarlos (también desde 🧰 → 🏷 Etiquetas de recintos).">🏷 Nombres de recinto ocultos · <b>mostrar</b></button>
-      <!-- Gestor de herramientas lateral: ver · editar · agregar propuestos · reporte -->
-      <!-- Gestor de herramientas: ÚNICO lugar de edición y acciones. Los botones
-           que estaban en la barra superior se montan acá en _dockMonta(). -->
+      <div id="planLoading"><span class="pl-spin"></span> Cargando plano…</div>
+      <div id="metasPanel" style="display:none">
+        <div class="mp-hdr">📋 Metas oficiales <span>Resumen Ejecutivo</span><button onclick="toggleMetas()" title="Cerrar">×</button></div>
+        <div class="mp-body"></div>
+        <div class="mp-foot">Recintos asignados en Atlas vs meta oficial del nuevo HDS.</div>
+      </div>
+    </div>
+  </div>
+  <aside id="rightPanel" data-tab="herr">
+    <div id="rpRail">
+      <button class="rp-rail-btn" data-tab="herr" onclick="rpRail('herr')" title="Herramientas"><svg class="i" viewBox="0 0 24 24"><path d="M4 7h16v13H4zM9 7V4h6v3M4 12h16"/></svg></button>
+      <button class="rp-rail-btn" data-tab="rev" onclick="rpRail('rev')" title="Revisión"><svg class="i" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span class="n" id="railBimN"></span></button>
+      <button class="rp-rail-btn" data-tab="av" onclick="rpRail('av')" title="Avance"><svg class="i" viewBox="0 0 24 24"><path d="M4 20h16M7 17V9M12 17V5M17 17v-7"/></svg></button>
+      <button class="rp-rail-btn" data-tab="per" onclick="rpRail('per')" title="Personas"><svg class="i" viewBox="0 0 24 24"><path d="M9 11a3.5 3.5 0 100-7 3.5 3.5 0 100 7zM2 20c1-3.5 3.5-5.5 7-5.5s6 2 7 5.5M16 4.5a3.5 3.5 0 011.5 6.7M22 20c-.5-2.5-2-4.3-4-5"/></svg></button>
+      <div class="rp-rail-sep"></div>
+      <button class="rp-rail-btn" onclick="toggleRightPanel(false)" title="Mostrar panel">‹</button>
+    </div>
+    <div class="rp-tabs">
+      <button id="rpTabHerr" class="sb-tab on" data-tab="herr" onclick="rpShowTab('herr')"><svg class="i" viewBox="0 0 24 24"><path d="M4 7h16v13H4zM9 7V4h6v3M4 12h16"/></svg>Herramientas</button>
+      <button id="rpTabRev" class="sb-tab" data-tab="rev" onclick="rpShowTab('rev')"><svg class="i" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>Revisión <span id="sbBimN">0</span></button>
+      <button id="rpTabAv" class="sb-tab" data-tab="av" onclick="rpShowTab('av')" title="Cuánto de la dotación está asignada a un recinto, por subdirección y su desglose"><svg class="i" viewBox="0 0 24 24"><path d="M4 20h16M7 17V9M12 17V5M17 17v-7"/></svg>Avance <span id="sbAvN">—</span></button>
+      <button id="rpTabPer" class="sb-tab" data-tab="per" onclick="rpShowTab('per')" title="Nombres de todas las personas asignadas en este servicio: al pasar el mouse se ilumina su puesto en el plano"><svg class="i" viewBox="0 0 24 24"><path d="M9 11a3.5 3.5 0 100-7 3.5 3.5 0 100 7zM2 20c1-3.5 3.5-5.5 7-5.5s6 2 7 5.5M16 4.5a3.5 3.5 0 011.5 6.7M22 20c-.5-2.5-2-4.3-4-5"/></svg>Personas <span id="sbPerN">—</span></button>
+      <button class="rp-collapse" onclick="toggleRightPanel()" title="Ocultar panel">›</button>
+    </div>
+    <div id="rpScroll">
+      <div id="avBody" class="rp-body" style="display:none"></div>
+      <div id="perBody" class="rp-body" style="display:none"></div>
+      <div id="bimList" style="display:none"></div>
+      <div id="toolsBody" style="display:none">
+      <!-- Gestor de herramientas: ÚNICO lugar de edición y acciones. Vive en la
+           pestaña Herramientas del panel derecho; los botones que estaban en la
+           barra superior se montan acá en _dockMonta(). -->
       <div id="dock">
-        <button id="dockTog" onclick="dockToggle()" title="Abrir o cerrar el gestor de herramientas">🧰<span class="lb">Herramientas</span></button>
         <div class="dk-h">Ir a</div><div id="dkIr"></div>
         <div class="dk-sep"></div><div class="dk-h">Ver</div><div id="dkVer"></div>
         <div class="dk-h">Ubicación en planta</div>
         <div class="dk-sub">
-          <button class="dk-btn" id="dkUbicTotem" onclick="toggleUbic('totem')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van los TÓTEMS (círculo grande + icono)"><span class="ic">🎫</span><span class="lb">Tótems</span></button>
-          <button class="dk-btn" id="dkUbicDea" onclick="toggleUbic('dea')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van los DEA"><span class="ic">💚</span><span class="lb">DEA</span></button>
-          <button class="dk-btn" id="dkUbicPrinter" onclick="toggleUbic('printer')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van las IMPRESORAS"><span class="ic">🖨</span><span class="lb">Impresoras</span></button>
+          <button class="dk-btn tog" id="dkUbicTotem" onclick="toggleUbic('totem')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van los TÓTEMS (círculo grande + icono)"><span class="ic">🎫</span><span class="lb">Tótems</span></button>
+          <button class="dk-btn tog" id="dkUbicDea" onclick="toggleUbic('dea')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van los DEA"><span class="ic">💚</span><span class="lb">DEA</span></button>
+          <button class="dk-btn tog" id="dkUbicPrinter" onclick="toggleUbic('printer')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van las IMPRESORAS"><span class="ic">🖨</span><span class="lb">Impresoras</span></button>
         </div>
-        <button class="dk-btn" id="dkLabels" onclick="toggleRoomLabels()" title="Mostrar u ocultar el nombre y código de cada recinto sobre el plano"><span class="ic">🏷</span><span class="lb">Etiquetas de recintos</span></button>
+        <button class="dk-btn tog" id="dkLabels" onclick="toggleRoomLabels()" title="Mostrar u ocultar el nombre y código de cada recinto sobre el plano"><span class="ic">🏷</span><span class="lb">Etiquetas de recintos</span></button>
         <div class="dk-sep"></div><div class="dk-h">Consultar</div><div id="dkCons"></div>
-        <button class="dk-btn" id="dkPanel" onclick="toggleRightPanel()" title="Abrir o cerrar el cuadro de camas, recintos, revisión, avance y personas"><span class="ic">📋</span><span class="lb">Avance y revisión</span><span class="n" id="dkPanelN"></span></button>
         <div class="dk-sep"></div><div class="dk-h">Editar</div><div id="dkEdit2"></div>
         <div class="dk-sep"></div><div class="dk-h">Agregar</div><div id="dkAdd"></div>
         <button class="dk-btn prop" id="dkDesk" onclick="setPropMode('desk')" title="Puesto de trabajo NUEVO: escritorio con computador a escala del plano (150 × 160 cm). Clic coloca · clic derecho rota 90° · arrastrar mueve · doble clic elimina"><span class="ic">🖥</span><span class="lb">Puesto de trabajo nuevo</span><span class="n" id="dkDeskN"></span></button>
@@ -733,30 +850,10 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
         <div class="dk-sep"></div><div class="dk-h">Exportar</div><div id="dkExp"></div>
         <button class="dk-btn" id="dkReport" onclick="openPropReport()" title="Resumen de todo lo propuesto (puestos, tótems, DEA) por piso, área y recinto, con exportación a Excel y a Clave Azul"><span class="ic">📊</span><span class="lb">Reporte de propuestos</span><span class="n" id="dkReportN"></span></button>
       </div>
-      <div id="planLoading"><span class="pl-spin"></span> Cargando plano…</div>
-      <div id="metasPanel" style="display:none">
-        <div class="mp-hdr">📋 Metas oficiales <span>Resumen Ejecutivo</span><button onclick="toggleMetas()" title="Cerrar">×</button></div>
-        <div class="mp-body"></div>
-        <div class="mp-foot">Recintos asignados en Atlas vs meta oficial del nuevo HDS.</div>
-      </div>
-    </div>
-  </div>
-  <aside id="rightPanel">
-    <h2>Camas &amp; Recintos<button class="rp-collapse" onclick="toggleRightPanel()" title="Ocultar panel">›</button></h2>
-    <div class="rp-card">
-      <div style="display:flex;gap:4px;margin-bottom:6px">
-        <button id="rpTabHerr" class="sb-tab on" onclick="rpShowTab('herr')">🧰 Herramientas</button>
-        <button id="rpTabRev" class="sb-tab" onclick="rpShowTab('rev')">🧩 Revisión <span id="sbBimN">0</span></button>
-        <button id="rpTabAv" class="sb-tab" onclick="rpShowTab('av')" title="Cuánto de la dotación está asignada a un recinto, por subdirección y su desglose">📊 Avance <span id="sbAvN">—</span></button>
-        <button id="rpTabPer" class="sb-tab" onclick="rpShowTab('per')" title="Nombres de todas las personas asignadas en este servicio: al pasar el mouse se ilumina su puesto en el plano">👥 Personas <span id="sbPerN">—</span></button>
-      </div>
-      <div id="avBody" style="display:none;max-height:58vh;overflow-y:auto"></div>
-      <div id="perBody" style="display:none;max-height:58vh;overflow-y:auto"></div>
-      <div id="bimList" style="display:none;max-height:58vh;overflow-y:auto"></div>
-      <div id="toolsBody" style="display:none">
+      <div class="rp-card">
       <div class="rp-t" style="margin-top:2px">✏️ Nombres de recinto</div>
-      <button class="rp-bedbtn" style="background:#eef4fa;color:#1d5fa0;border:1px solid #a9c3d6" onclick="revisarNombres()" title="Revisa la ortografía de todos los nombres de recinto y quita las tildes (la Ñ se mantiene). Muestra los cambios antes de aplicarlos.">✏️ Revisar ortografía</button>
-      <button class="rp-bedbtn" style="background:#eef4fa;color:#1d5fa0;border:1px solid #a9c3d6" onclick="revisarCodigos()" title="Busca códigos de recinto mal escritos (puntos dobles, punto final, caracteres raros) y propone la corrección solo cuando el código corregido existe de verdad en el PMA o en el catálogo de equipamiento">🔢 Revisar códigos</button>
+      <button class="rp-bedbtn sec" onclick="revisarNombres()" title="Revisa la ortografía de todos los nombres de recinto y quita las tildes (la Ñ se mantiene). Muestra los cambios antes de aplicarlos.">✏️ Revisar ortografía</button>
+      <button class="rp-bedbtn sec" onclick="revisarCodigos()" title="Busca códigos de recinto mal escritos (puntos dobles, punto final, caracteres raros) y propone la corrección solo cuando el código corregido existe de verdad en el PMA o en el catálogo de equipamiento">🔢 Revisar códigos</button>
       <div class="rp-hint">Corrige erratas detectadas y deja los nombres sin tildes. Muestra la lista de cambios y solo se aplica si lo confirmás.</div>
       <div class="rp-t" style="margin-top:2px">🛏 Numeración de puestos</div>
       <div class="rp-fld"><label>Tipo de puesto</label>
@@ -776,8 +873,8 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <div class="rp-next" id="bedNextPreview">2-001</div>
       <button class="rp-bedbtn" id="btnBedMode" onclick="toggleBedMode()">🛏 Colocar puestos</button>
       <div style="display:flex;gap:4px;margin-top:4px">
-        <button class="rp-bedbtn" style="flex:1;background:#eef4fa;color:#1d5fa0;border:1px solid #a9c3d6" onclick="aplicarNumeracionAlt()" title="Genera (o regenera) la numeración ALTERNATIVA de las camas, paralela a la correlativa y en su mismo orden: P2 → UCI-01…24, UTI-01…47, UHI-01…12, UIH-01…18 · P3/P4 → habitación 301/401 en adelante con cama 1-4 (301-1…301-4); las habitaciones de 1 cama (aislamiento, pensionado) quedan con el número de habitación correlativo. Se guarda en cada cama.">🔢 Numeración alternativa</button>
-        <button class="rp-bedbtn" id="btnBedAlt" style="flex:1;background:#eef4fa;color:#1d5fa0;border:1px solid #a9c3d6" onclick="toggleBedAltView()" title="Alterna en el plano entre la numeración correlativa (MQ 3-001) y la alternativa (301-1)">👁 Ver: correlativa</button>
+        <button class="rp-bedbtn sec" style="flex:1;" onclick="aplicarNumeracionAlt()" title="Genera (o regenera) la numeración ALTERNATIVA de las camas, paralela a la correlativa y en su mismo orden: P2 → UCI-01…24, UTI-01…47, UHI-01…12, UIH-01…18 · P3/P4 → habitación 301/401 en adelante con cama 1-4 (301-1…301-4); las habitaciones de 1 cama (aislamiento, pensionado) quedan con el número de habitación correlativo. Se guarda en cada cama.">🔢 Numeración alternativa</button>
+        <button class="rp-bedbtn sec" id="btnBedAlt" style="flex:1;" onclick="toggleBedAltView()" title="Alterna en el plano entre la numeración correlativa (MQ 3-001) y la alternativa (301-1)">👁 Ver: correlativa</button>
       </div>
       <div class="rp-hint">Numerá box de Urgencias, puestos de Quimio y Recuperaciones (Recuperación, Habitación o Clínica). Elegí Camilla o Sillón antes de colocar. Cada clic coloca un puesto y el número avanza solo. Clic en un puesto = editar N°/eliminar · Shift+clic = cambiar su tipo.</div>
       </div>
@@ -805,6 +902,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <div class="rp-t">💼 Puestos de trabajo <span class="rp-total-badge">Total <b id="wpTotal">0</b></span></div>
       <div id="wpBody" style="font-size:11px"></div>
     </div>
+    </div>
   </aside>
 </div>
 <!-- Estado de carga del hospital -->
@@ -826,71 +924,71 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
   </div>
 </div>
 <div id="wpModal" onclick="if(event.target===this)closeWpList()" style="position:fixed;inset:0;background:rgba(15,30,52,.6);display:none;align-items:center;justify-content:center;z-index:140;padding:20px">
-  <div style="background:#fff;border-radius:14px;width:min(94vw,560px);max-height:82vh;display:flex;flex-direction:column;padding:18px 20px;box-shadow:0 18px 50px rgba(15,30,52,.4)">
+  <div style="background:#fff;border-radius:12px;width:min(94vw,560px);max-height:82vh;display:flex;flex-direction:column;padding:18px 20px;box-shadow:0 18px 50px rgba(15,30,52,.4)">
     <div style="display:flex;align-items:center;gap:10px">
-      <div style="flex:1"><div id="wplTitle" style="font-size:15px;font-weight:800;color:#0f172a"></div>
+      <div style="flex:1"><div id="wplTitle" style="font-size:15px;font-weight:700;color:#1a2433"></div>
       <div id="wplSub" style="font-size:11px;color:#64748b;margin-top:2px"></div></div>
-      <button onclick="closeWpList()" style="background:#e2eaf4;border:none;color:#1a3a5c;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer">Cerrar</button>
+      <button onclick="closeWpList()" class="btn-cancel">Cerrar</button>
     </div>
     <div id="wplBody" style="overflow-y:auto;margin-top:10px"></div>
   </div>
 </div>
 <div id="movesModal" onclick="if(event.target===this)closeMovesList()" style="position:fixed;inset:0;background:rgba(15,30,52,.6);display:none;align-items:center;justify-content:center;z-index:140;padding:20px">
-  <div style="background:#fff;border-radius:14px;width:min(94vw,640px);max-height:82vh;display:flex;flex-direction:column;padding:18px 20px;box-shadow:0 18px 50px rgba(15,30,52,.4)">
+  <div style="background:#fff;border-radius:12px;width:min(94vw,640px);max-height:82vh;display:flex;flex-direction:column;padding:18px 20px;box-shadow:0 18px 50px rgba(15,30,52,.4)">
     <div style="display:flex;align-items:center;gap:10px">
-      <div style="flex:1"><div style="font-size:15px;font-weight:800;color:#0f172a">↪ Traslados propuestos</div>
+      <div style="flex:1"><div style="font-size:15px;font-weight:700;color:#1a2433">↪ Traslados propuestos</div>
       <div style="font-size:11px;color:#64748b;margin-top:2px" id="mvlSub"></div></div>
       <button onclick="exportMoves()" style="background:#ecfdf5;border:1px solid #059669;color:#065f46;border-radius:7px;padding:7px 12px;font-size:11.5px;font-weight:700;cursor:pointer">📊 Exportar XLSX</button>
-      <button onclick="closeMovesList()" style="background:#e2eaf4;border:none;color:#1a3a5c;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer">Cerrar</button>
+      <button onclick="closeMovesList()" class="btn-cancel">Cerrar</button>
     </div>
     <div id="mvlBody" style="overflow-y:auto;margin-top:10px"></div>
   </div>
 </div>
 <div id="codModal" onclick="if(event.target===this)cerrarCodigos()" style="position:fixed;inset:0;background:rgba(15,30,52,.6);display:none;align-items:center;justify-content:center;z-index:145;padding:20px">
-  <div style="background:#fff;border-radius:14px;width:min(94vw,720px);max-height:84vh;display:flex;flex-direction:column;padding:18px 20px;box-shadow:0 18px 50px rgba(15,30,52,.4)">
+  <div style="background:#fff;border-radius:12px;width:min(94vw,720px);max-height:84vh;display:flex;flex-direction:column;padding:18px 20px;box-shadow:0 18px 50px rgba(15,30,52,.4)">
     <div style="display:flex;align-items:center;gap:10px">
       <div style="flex:1;min-width:0">
-        <div style="font-size:15px;font-weight:800;color:#0f172a">🔢 Códigos de recinto mal formados</div>
+        <div style="font-size:15px;font-weight:700;color:#1a2433">🔢 Códigos de recinto mal formados</div>
         <div style="font-size:11px;color:#64748b;margin-top:2px" id="codSub"></div>
       </div>
       <button id="codOk" onclick="aplicarCodigos()" style="background:#15803d;border:none;color:#fff;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:800;cursor:pointer;flex-shrink:0">Aplicar los seguros</button>
-      <button onclick="cerrarCodigos()" style="background:#e2eaf4;border:none;color:#1a3a5c;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">Cerrar</button>
+      <button onclick="cerrarCodigos()" class="btn-cancel" style="flex-shrink:0">Cerrar</button>
     </div>
     <div id="codBody" style="overflow-y:auto;margin-top:12px"></div>
   </div>
 </div>
 <div id="nomModal" onclick="if(event.target===this)cerrarNombres()" style="position:fixed;inset:0;background:rgba(15,30,52,.6);display:none;align-items:center;justify-content:center;z-index:145;padding:20px">
-  <div style="background:#fff;border-radius:14px;width:min(94vw,680px);max-height:84vh;display:flex;flex-direction:column;padding:18px 20px;box-shadow:0 18px 50px rgba(15,30,52,.4)">
+  <div style="background:#fff;border-radius:12px;width:min(94vw,680px);max-height:84vh;display:flex;flex-direction:column;padding:18px 20px;box-shadow:0 18px 50px rgba(15,30,52,.4)">
     <div style="display:flex;align-items:center;gap:10px">
       <div style="flex:1;min-width:0">
-        <div style="font-size:15px;font-weight:800;color:#0f172a">✏️ Ortografía de los nombres de recinto</div>
+        <div style="font-size:15px;font-weight:700;color:#1a2433">✏️ Ortografía de los nombres de recinto</div>
         <div style="font-size:11px;color:#64748b;margin-top:2px" id="nomSub"></div>
       </div>
       <button id="nomOk" onclick="aplicarNombres()" style="background:#15803d;border:none;color:#fff;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:800;cursor:pointer;flex-shrink:0">Aplicar</button>
-      <button onclick="cerrarNombres()" style="background:#e2eaf4;border:none;color:#1a3a5c;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">Cerrar</button>
+      <button onclick="cerrarNombres()" class="btn-cancel" style="flex-shrink:0">Cerrar</button>
     </div>
     <div id="nomBody" style="overflow-y:auto;margin-top:12px"></div>
   </div>
 </div>
 <div id="servModal" onclick="if(event.target===this)closeServPuestos()" style="position:fixed;inset:0;background:rgba(15,30,52,.6);display:none;align-items:center;justify-content:center;z-index:140;padding:20px">
-  <div style="background:#fff;border-radius:14px;width:min(94vw,760px);max-height:84vh;display:flex;flex-direction:column;padding:18px 20px;box-shadow:0 18px 50px rgba(15,30,52,.4)">
+  <div style="background:#fff;border-radius:12px;width:min(94vw,760px);max-height:84vh;display:flex;flex-direction:column;padding:18px 20px;box-shadow:0 18px 50px rgba(15,30,52,.4)">
     <div style="display:flex;align-items:center;gap:10px">
       <div style="flex:1;min-width:0">
-        <div style="font-size:15px;font-weight:800;color:#0f172a" id="spTitle">👥 Puestos del servicio</div>
+        <div style="font-size:15px;font-weight:700;color:#1a2433" id="spTitle">👥 Puestos del servicio</div>
         <div style="font-size:11px;color:#64748b;margin-top:2px" id="spSub"></div>
       </div>
       <div style="display:flex;gap:0;border:1px solid #cbd5e1;border-radius:8px;overflow:hidden;flex-shrink:0">
         <button id="spModoCant" onclick="servSetMode('cant')" style="background:#1d5fa0;color:#fff;border:none;padding:7px 13px;font-size:11.5px;font-weight:700;cursor:pointer">🔢 Cantidad</button>
         <button id="spModoNom" onclick="servSetMode('nom')" style="background:#fff;color:#1a3a5c;border:none;border-left:1px solid #cbd5e1;padding:7px 13px;font-size:11.5px;font-weight:700;cursor:pointer">👤 Nombres</button>
       </div>
-      <button onclick="closeServPuestos()" style="background:#e2eaf4;border:none;color:#1a3a5c;border-radius:7px;padding:7px 12px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">Cerrar</button>
+      <button onclick="closeServPuestos()" class="btn-cancel" style="flex-shrink:0">Cerrar</button>
     </div>
     <div id="spBody" style="overflow-y:auto;margin-top:12px"></div>
   </div>
 </div>
 <div id="moveModal" onclick="if(event.target===this)closeMoveDialog()" style="position:fixed;inset:0;background:rgba(15,30,52,.6);display:none;align-items:center;justify-content:center;z-index:140;padding:20px">
-  <div style="background:#fff;border-radius:14px;width:min(92vw,480px);padding:18px 20px;box-shadow:0 18px 50px rgba(15,30,52,.4)">
-    <div style="font-size:15px;font-weight:800;color:#0f172a;margin-bottom:2px" id="mvTitle">↪ Trasladar unidad</div>
+  <div style="background:#fff;border-radius:12px;width:min(92vw,480px);padding:18px 20px;box-shadow:0 18px 50px rgba(15,30,52,.4)">
+    <div style="font-size:15px;font-weight:700;color:#1a2433;margin-bottom:2px" id="mvTitle">↪ Trasladar unidad</div>
     <div style="font-size:11px;color:#64748b;margin-bottom:12px" id="mvSub"></div>
     <label style="font-size:10px;font-weight:700;color:#48687e;text-transform:uppercase;letter-spacing:.5px">Piso destino</label>
     <select id="mvFloor" style="width:100%;border:1px solid #cbd5e1;border-radius:7px;padding:7px 10px;font-size:13px;margin:3px 0 10px" onchange="_mvFillAreas()"></select>
@@ -899,7 +997,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
     <label style="font-size:10px;font-weight:700;color:#48687e;text-transform:uppercase;letter-spacing:.5px">Recinto destino</label>
     <select id="mvRoom" style="width:100%;border:1px solid #cbd5e1;border-radius:7px;padding:7px 10px;font-size:13px;margin:3px 0 14px"></select>
     <div style="display:flex;gap:8px;justify-content:flex-end">
-      <button onclick="closeMoveDialog()" style="background:#e2eaf4;color:#1a3a5c;border:none;border-radius:7px;padding:8px 14px;cursor:pointer;font-size:12px;font-weight:700">Cancelar</button>
+      <button onclick="closeMoveDialog()" class="btn-cancel">Cancelar</button>
       <button id="mvReturnBtn" onclick="returnMove()" style="display:none;background:#fef3c7;color:#78350f;border:1px solid #f59e0b;border-radius:7px;padding:8px 14px;cursor:pointer;font-size:12px;font-weight:700">↩ Devolver al origen</button>
       <button onclick="confirmMove()" style="background:#2563eb;color:#fff;border:none;border-radius:7px;padding:8px 16px;cursor:pointer;font-size:12px;font-weight:800">Trasladar</button>
     </div>
@@ -924,11 +1022,11 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
   </div>
 </div>
 <div id="eqDetModal" onclick="if(event.target===this)closeEquipDetail()" style="position:fixed;inset:0;background:rgba(15,30,52,.62);display:none;align-items:center;justify-content:center;z-index:150;padding:20px">
-  <div style="background:#fff;border-radius:14px;width:min(94vw,520px);max-height:86vh;overflow-y:auto;padding:18px 20px;box-shadow:0 18px 50px rgba(15,30,52,.4)">
+  <div style="background:#fff;border-radius:12px;width:min(94vw,520px);max-height:86vh;overflow-y:auto;padding:18px 20px;box-shadow:0 18px 50px rgba(15,30,52,.4)">
     <div style="display:flex;align-items:flex-start;gap:10px">
-      <div style="flex:1"><div id="edTitle" style="font-size:16px;font-weight:800;color:#0f172a"></div>
+      <div style="flex:1"><div id="edTitle" style="font-size:16px;font-weight:700;color:#1a2433"></div>
       <div id="edSub" style="font-size:11px;color:#64748b;margin-top:2px"></div></div>
-      <button onclick="closeEquipDetail()" style="background:#e2eaf4;border:none;color:#1a3a5c;border-radius:7px;padding:6px 12px;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0">Cerrar</button>
+      <button onclick="closeEquipDetail()" class="btn-cancel" style="flex-shrink:0">Cerrar</button>
     </div>
     <div id="edImgWrap" style="text-align:center;margin:12px 0;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px;display:none">
       <img id="edImg" alt="" style="max-width:100%;max-height:260px;object-fit:contain">
@@ -977,6 +1075,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
         <div id="mNombreDrop" class="ac-drop"></div>
       </div>
       <div id="mServInfo" class="mServ-info"></div>
+      <div id="mMatrizEstado" style="display:none"></div>
     </div>
     <div class="form-row"><label>Cargo / Función</label><input id="mCargo" autocomplete="hds-cargo" spellcheck="false"></div>
     <div class="form-row"><label>Estamento</label><input id="mEst" autocomplete="hds-estamento" spellcheck="false"></div>
@@ -1288,7 +1387,8 @@ function _popJunto(m,btn){
     if(!b||!b.width) b=dock?dock.getBoundingClientRect():{left:window.innerWidth-40,right:window.innerWidth-8,top:60};
     const r=m.getBoundingClientRect();
     const w=r.width||230, h=r.height||200;
-    let x=b.left-w-8; if(x<6) x=Math.max(6, Math.min(b.right+8, window.innerWidth-w-6));
+    const dl=(dock&&dock.getBoundingClientRect().width)?dock.getBoundingClientRect().left:b.left;
+    let x=Math.min(b.left,dl)-w-8; if(x<6) x=Math.max(6, Math.min(b.right+8, window.innerWidth-w-6));
     let y=b.top;      if(y+h>window.innerHeight-8) y=Math.max(8, window.innerHeight-h-8);
     m.style.left=Math.round(x)+'px'; m.style.top=Math.round(Math.max(8,y))+'px'; m.style.visibility='';
   };
@@ -1757,6 +1857,7 @@ if(!nameState.bimRepRev) nameState.bimRepRev={};     // BIM repetidos revisados:
 if(!nameState.repartoRev) nameState.repartoRev={};   // repartos EMMC desparejos revisados (firma por código)
 if(!nameState.comisionRev) nameState.comisionRev={};
 if(!nameState.cdsRev) nameState.cdsRev={};
+if(!nameState.extRev) nameState.extRev={};        // fuera de matriz ya informado a RR.HH. (por nombre normalizado)
 if(!nameState.propCupos) nameState.propCupos={};  // cupo finito por tipo de propuesto (p.ej. {printer:40}); sin clave = sin cupo        // Compra de Servicio ya informada a RR.HH. (por nombre normalizado)  // coincidencias comisión de servicio revisadas (por RUT)
 if(!nameState.revDesc) nameState.revDesc={};
 if(!nameState.recintosRev) nameState.recintosRev={};   // avisos del catastro de recintos marcados como revisados (clave check|rid|valor)          // sugerencias de Revisión rechazadas ("queda como está"), clave check|item
@@ -2357,7 +2458,7 @@ function _diagPanel(texto){
     +'<span style="flex:1;font-family:ui-monospace,monospace;font-size:11px">'+esc(k)+'</span>'
     +'<b style="font-size:11px;color:#475569">'+kb(n)+'</b></label>').join('');
   const totalAjeno=ajenas.reduce((s,x)=>s+x[1],0);
-  wrap.innerHTML='<div style="background:#fff;border-radius:14px;max-width:820px;width:100%;'
+  wrap.innerHTML='<div style="background:#fff;border-radius:12px;max-width:820px;width:100%;'
     +'max-height:88vh;display:flex;flex-direction:column;box-shadow:0 18px 60px rgba(0,0,0,.4)">'
     +'<div style="padding:14px 18px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:10px">'
     +'<b style="flex:1;font-size:14px">🩺 Diagnóstico de guardado</b>'
@@ -2594,16 +2695,16 @@ function updateSaveBadge(state){
     const hdr=document.getElementById('hdr'); if(!hdr) return;
     el=document.createElement('span');
     el.id='saveBadge';
-    el.style.cssText='font-size:10px;border-radius:10px;padding:3px 10px;margin-left:auto;border:1px solid #94b8d0;background:#e6eef7;color:#1d5fa0;font-weight:600;white-space:nowrap;flex-shrink:0;transition:opacity .2s;';
+    el.className='hdr-chip ok';
     // El botón de exportar vive dentro del dropdown .exp-dd: insertar antes del
     // ANCESTRO que sí es hijo directo del header (insertBefore exige eso).
     let ref=hdr.querySelector('.exp-dd')||hdr.querySelector('.export-btn');
     while(ref && ref.parentElement!==hdr) ref=ref.parentElement;
     if(ref) hdr.insertBefore(el,ref); else hdr.appendChild(el);
   }
-  if(state==='dirty'){ el.textContent='✏️ Guardando…'; el.style.background='#fef3c7'; el.style.borderColor='#f59e0b'; el.style.color='#78350f'; }
-  else if(state==='error'){ el.textContent='⚠ Error al guardar'; el.style.background='#fee2e2'; el.style.borderColor='#ef4444'; el.style.color='#b91c1c'; }
-  else { el.textContent='✓ Guardado'; el.style.background='#dcfce7'; el.style.borderColor='#16a34a'; el.style.color='#15803d'; }
+  if(state==='dirty'){ el.textContent='Guardando…'; el.className='hdr-chip warn'; }
+  else if(state==='error'){ el.textContent='Error al guardar'; el.className='hdr-chip danger'; }
+  else { el.textContent='Guardado'; el.className='hdr-chip ok'; }
 }
 
 // ── Indicador de RESPALDO A ARCHIVO ──────────────────────────────────────────
@@ -2616,7 +2717,7 @@ function updateBackupBadge(){
   if(!el){
     const hdr=document.getElementById('hdr'); if(!hdr) return;
     el=document.createElement('span'); el.id='backupBadge';
-    el.style.cssText='font-size:10px;border-radius:10px;padding:3px 10px;margin-left:8px;white-space:nowrap;flex-shrink:0;cursor:pointer;font-weight:600;border:1px solid #94b8d0;transition:opacity .2s;';
+    el.className='hdr-chip';
     el.onclick=exportBackup;
     const sb=document.getElementById('saveBadge');
     if(sb&&sb.parentNode) sb.parentNode.insertBefore(el, sb.nextSibling); else hdr.appendChild(el);
@@ -2626,22 +2727,22 @@ function updateBackupBadge(){
   const last=Math.max(lastExp,lastFile);
   const chg=parseInt(localStorage.getItem('cabida_cad_lastchange')||'0',10);
   const ago=ms=>{ const h=(Date.now()-ms)/3.6e6; if(h<1){ const m=Math.round((Date.now()-ms)/6e4); return m<2?'recién':('hace '+m+' min'); } if(h<24) return 'hace '+Math.floor(h)+' h'; return 'hace '+Math.floor(h/24)+' d'; };
-  let txt,bg,bd,fg,tip;
+  let txt,cls,tip;
   // Respaldo automático a archivo andando y al día: es la mejor protección que
   // hay en Safari, y el distintivo lo tiene que mostrar.
   if(typeof _fbak!=='undefined' && _fbak.vivo && lastFile && (Date.now()-lastFile)<6*3.6e6){
-    el.textContent='🗄 Archivo '+ago(lastFile);
-    el.style.background='#dcfce7'; el.style.borderColor='#16a34a'; el.style.color='#15803d';
+    el.textContent='Archivo '+ago(lastFile);
+    el.className='hdr-chip ok';
     el.title='Respaldo automático a archivo activo'+(_fbak.carpeta?(' en '+_fbak.carpeta):'')
       +'. Se guarda solo mientras trabajas. Click para respaldar además a un .json descargado.';
     return;
   }
-  if(!last){ txt='⚠ Sin respaldo'; bg='#fee2e2'; bd='#ef4444'; fg='#b91c1c'; tip='Nunca descargaste un respaldo a archivo. Si el navegador borra los datos, pierdes el trabajo. Click para respaldar ahora.'; }
+  if(!last){ txt='Sin respaldo'; cls='danger'; tip='Nunca descargaste un respaldo a archivo. Si el navegador borra los datos, pierdes el trabajo. Click para respaldar ahora.'; }
   else { const stale=chg>last, d=(Date.now()-last)/8.64e7;
-    if(stale||d>7){ txt='⚠ Respaldar ('+ago(last)+')'; bg='#fef3c7'; bd='#f59e0b'; fg='#78350f'; tip=(stale?'Tienes cambios sin respaldar a archivo. ':'Tu último respaldo es antiguo. ')+'Click para respaldar ahora.'; }
-    else { txt='🗄 Respaldado '+ago(last); bg='#dcfce7'; bd='#16a34a'; fg='#15803d'; tip='Trabajo respaldado a archivo. Click para respaldar de nuevo.'; }
+    if(stale||d>7){ txt='Respaldar ('+ago(last)+')'; cls='warn'; tip=(stale?'Tienes cambios sin respaldar a archivo. ':'Tu último respaldo es antiguo. ')+'Click para respaldar ahora.'; }
+    else { txt='Respaldado '+ago(last); cls='ok'; tip='Trabajo respaldado a archivo. Click para respaldar de nuevo.'; }
   }
-  el.textContent=txt; el.style.background=bg; el.style.borderColor=bd; el.style.color=fg; el.title=tip;
+  el.textContent=txt; el.className='hdr-chip '+cls; el.title=tip;
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',updateBackupBadge);
 else updateBackupBadge();
@@ -2661,13 +2762,8 @@ function updateMemBar(){
   if(!el){
     const hdr=document.getElementById('hdr'); if(!hdr) return;
     el=document.createElement('span'); el.id='memBar';
-    el.style.cssText='display:inline-flex;align-items:center;gap:5px;margin-left:8px;padding:3px 8px;'
-      +'border:1px solid #94b8d0;border-radius:10px;background:#eef4fa;cursor:pointer;'
-      +'flex-shrink:0;white-space:nowrap;font-size:10px;font-weight:600;transition:opacity .2s';
-    el.innerHTML='<span style="font-size:10px;line-height:1">🧠</span>'
-      +'<span id="memTrack" style="position:relative;width:46px;height:6px;border-radius:3px;background:#cbd9e6;overflow:hidden">'
-      +'<span id="memFill" style="position:absolute;left:0;top:0;bottom:0;width:0;border-radius:3px;transition:width .3s,background .3s"></span></span>'
-      +'<span id="memTxt" style="font-variant-numeric:tabular-nums"></span>';
+    el.title='Memoria del navegador';
+    el.innerHTML='<span id="memTrack"><span id="memFill"></span></span><span id="memTxt"></span>';
     el.onclick=()=>{ try{ diagGuardado(); }catch(e){} };
     const bb=document.getElementById('backupBadge');
     if(bb&&bb.parentNode) bb.parentNode.insertBefore(el, bb.nextSibling); else hdr.appendChild(el);
@@ -2693,7 +2789,6 @@ function updateMemBar(){
       +'Si el aviso no se va, avisá — significa que la compresión no está pudiendo escribir.';
     return;
   }
-  el.style.borderColor = pct>=80 ? '#dc2626' : '#94b8d0';
   // Cuánto de lo ocupado NO es del Atlas: es lo primero que hay que saber
   // cuando esto se llena, porque el cupo se comparte con las demás plataformas.
   let ajeno=0; try{ for(const k in localStorage)
@@ -5165,6 +5260,9 @@ function _dockMonta(){
     if(m){ m.classList.add('dock-pop'); document.body.appendChild(m); }
   });
   const bar=document.getElementById('editBar'); if(bar) bar.classList.add('solo-info');
+  // el mensaje de estado pasa a la barra de navegación (la de edición queda vacía)
+  const nav=document.getElementById('navBar'), ti=document.getElementById('tbInfo');
+  if(nav&&ti) nav.appendChild(ti);
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',_dockMonta); else _dockMonta();
 function dockToggle(){
@@ -5207,10 +5305,10 @@ function _dockSync(){
   { const cp=_propCupo('printer'), nt=_propTotal('printer');
     const lb=document.getElementById('dkPrinterCupoLb'), nb=document.getElementById('dkPrinterCupoN');
     if(lb) lb.textContent=cp?('Impresoras '+nt+' / '+cp+(nt>cp?' ⚠':'')):'Fijar cupo de impresoras';
-    if(nb){ nb.textContent=cp?(nt+'/'+cp):''; nb.style.background=cp?(nt>cp?'#dc2626':(nt===cp?'#d97706':'#16a34a')):''; }
+    if(nb){ nb.textContent=cp?(nt+'/'+cp):''; nb.style.color=cp?(nt>cp?'#dc2626':(nt===cp?'#d97706':'#16a34a')):''; }
     const h=document.getElementById('propHint'); if(h && S.propMode==='printer') h.textContent=_propHintTxt('printer'); }
   setN('dkPropImpN', ((window.PROPUESTOS_PLANO||{}).total)||0);
-  { const b=document.getElementById('sbBimN'); const e=document.getElementById('dkPanelN'); if(b&&e) e.textContent=b.textContent||''; }
+  { const b=document.getElementById('sbBimN'); const e=document.getElementById('railBimN'); if(b&&e){ e.textContent=b.textContent||''; e.classList.toggle('done',b.classList.contains('done')); } }
   let tot=0; Object.values(propState).forEach(a=>{ tot+=(a||[]).length; }); setN('dkReportN',tot);
 }
 
@@ -8156,11 +8254,20 @@ function rpShowTab(tab){
   document.getElementById('rpTabPer')?.classList.toggle('on',per);
   const pb=document.getElementById('perBody'); if(pb) pb.style.display=per?'':'none';
   if(!per) perHiOff();
+  // la barra de pestañas se tiñe con la activa; el riel plegado la refleja; las
+  // tarjetas de resumen (recintos dibujados, puestos) sólo acompañan a Avance,
+  // Personas o a ninguna pestaña
+  { const rp=document.getElementById('rightPanel');
+    if(rp){ rp.dataset.tab=_rpTab; rp.classList.toggle('rp-solo',herr||rev); }
+    document.querySelectorAll('.rp-rail-btn[data-tab]').forEach(b=>b.classList.toggle('on',b.dataset.tab===_rpTab)); }
   _revOpen=rev;
   if(rev) renderBimPending();
   if(av) renderAvance();
   if(per) renderPersonas();
 }
+// Riel del panel plegado: abre el panel en esa pestaña.
+function rpRail(tab){ toggleRightPanel(false); if(_rpTab!==tab) rpShowTab(tab); }
+(function initRpTab(){ try{ if(!_rpTab) rpShowTab('herr'); }catch(e){} })();
 
 /* ── PERSONAS DEL SERVICIO (vista 2) ────────────────────────────────────────
    Lista los nombres asignados en el servicio abierto y, al pasar el mouse por
@@ -9076,6 +9183,7 @@ function dpPick(i){
   const info=document.getElementById('mServInfo'); if(info) info.textContent=s.servicio?('📋 '+s.servicio):'';
   const ext=document.getElementById('mExterna'); if(ext) ext.checked=false;
   const dr=document.getElementById('mNombreDrop'); if(dr) dr.style.display='none';
+  try{ _mEstadoMatriz(); }catch(e){}
   if(inp) inp.focus();
 }
 // ── NORMALIZACIÓN DE NOMBRES DE RECINTO ─────────────────────────────────────
@@ -9304,6 +9412,7 @@ function openModal(roomId,idx){
   setTipo(dot.tipo||'fijo');
   renderTurnosList(dot);
   const info=document.getElementById('mServInfo'); if(info) info.textContent='';
+  try{ _mEstadoMatriz(); }catch(e){}
   // El filtro y la navegación del panel se CONSERVAN: se trabaja 1 servicio a
   // la vez en distintos lugares (buildDotPanel respeta _dpNavFijo y el texto
   // del filtro queda tal como estaba).
@@ -9332,6 +9441,7 @@ function removeTurno(ti){
   if(!dot.turnos)return;
   dot.turnos.splice(ti,1);
   sWs(); renderTurnosList(dot); renderSVG(); updateStats();
+  try{ renderBimPending(); }catch(e){}
 }
 function startAddTurno(){
   mCtx.addingTurno=true;
@@ -9357,11 +9467,12 @@ function confirmAddTurno(){
   const cargo=document.getElementById('mCargo').value.trim();
   const estamento=document.getElementById('mEst').value.trim();
   if(!dot.turnos)dot.turnos=[];
-  const externa = document.getElementById('mExterna').checked || !isInMatrix(nombre);
-  const cds = !!(document.getElementById('mCds')&&document.getElementById('mCds').checked);
+  const _mk=_marcasPersona(nombre, document.getElementById('mCds')&&document.getElementById('mCds').checked);
+  const externa=_mk.externa, cds=_mk.cds;
   const dinClin = !!(document.getElementById('mDinClin')&&document.getElementById('mDinClin').checked);
   dot.turnos.push({nombre,cargo,estamento,externa,cds,dinClin});
   sWs(); renderTurnosList(dot); renderSVG(); updateStats();
+  try{ renderBimPending(); }catch(e){}
   document.getElementById('mNombre').value='';
   document.getElementById('mCargo').value='';
   document.getElementById('mEst').value='';
@@ -9399,6 +9510,81 @@ function _ubicRecinto(rid){
   const c=(typeof _findRoom==='function')?_findRoom(rid):null;
   if(!c) return 'este puesto';
   return c.floor.label+' › '+aName(c.area.id)+' › '+(rName(c.room.id)||c.room.id);
+}
+// Marcas «fuera de matriz» y «Compra de Servicio» de un nombre. La MATRIZ manda:
+// si el nombre está en la dotación, no puede ser externo ni CdS. Antes las marcas
+// salían de las casillas del diálogo, que conservan el estado con que se abrió
+// el puesto: se buscaba a la persona, se guardaba y la alerta seguía (4 de 5
+// caminos de búsqueda fallaban; sólo el panel de dotación desmarcaba la casilla).
+function _marcasPersona(nombre, cdsMarcado){
+  const n=String(nombre||'').trim(); if(!n) return {externa:false, cds:false};
+  const enM=isInMatrix(n);
+  return {externa:!enM, cds:!enM && !!cdsMarcado};
+}
+// Estado vivo del nombre en el diálogo del puesto: sincroniza las casillas y dice
+// antes de guardar si la alerta se va a cerrar.
+function _mEstadoMatriz(){
+  const inp=document.getElementById('mNombre'), box=document.getElementById('mMatrizEstado'); if(!inp) return;
+  const n=inp.value.trim(), ext=document.getElementById('mExterna'), mc=document.getElementById('mCds');
+  if(!box) return;
+  if(!n){ box.textContent=''; box.style.display='none'; return; }
+  if(isInMatrix(n)){
+    if(ext) ext.checked=false; if(mc) mc.checked=false;
+    box.innerHTML='✔ <b>En la matriz de dotación</b> · al guardar se quita cualquier marca y se cierra su alerta';
+    box.style.cssText='display:block;color:#15803d;background:#f0fdf4;border:1px solid #86efac;border-radius:6px;padding:3px 8px;font-size:11px;margin-top:3px';
+  } else {
+    if(ext) ext.checked=true;
+    const m=_matrizParecidos(n);
+    box.innerHTML='⚠ <b>No está en la matriz</b> · quedará marcado fuera de matriz'
+      +(m.best>=2&&m.cands.length?(' · parecido a: '+m.cands.slice(0,3).map(x=>x.nombre).join(' / ')):'');
+    box.style.cssText='display:block;color:#92400e;background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:3px 8px;font-size:11px;margin-top:3px';
+  }
+}
+// Parecidos en la matriz: personas que comparten 2+ palabras del nombre (tolera
+// una letra). Sirve para clasificar la revisión y para sugerir en el diálogo.
+const _parecCache=new Map();
+function _matrizParecidos(nombre){
+  const k=norm(nombre||''); if(_parecCache.has(k)) return _parecCache.get(k);
+  const toks=fold(nombre||'').split(/\s+/).filter(t=>t.length>=3);
+  let best=0, cands=[];
+  if(toks.length>=2) (dotDB&&dotDB.staff||[]).forEach(sx=>{
+    const st=fold(sx.nombre||'').split(/\s+/).filter(t=>t.length>=3); const us=new Set(); let n=0;
+    toks.forEach(a=>{ const j=st.findIndex((u,ix)=>!us.has(ix)&&_tokSim(a,u)); if(j>=0){ us.add(j); n++; } });
+    if(n<2) return;
+    if(n>best){ best=n; cands=[sx]; } else if(n===best) cands.push(sx);
+  });
+  const r={toks:toks.length, best, cands:cands.slice(0,8), nCands:cands.length};
+  _parecCache.set(k,r); return r;
+}
+// Cuántas alertas de personal abiertas tiene un recinto (para avisar al guardar).
+function _alertasPersonalDe(rid){
+  try{ return _dotacionPendientes().filter(p=>p._chk==='externa' && p.r && p.r.id===rid).map(p=>norm(p.nombre)); }catch(e){ return []; }
+}
+function _trasGuardarPersonal(rid, antes){
+  try{ renderBimPending(); }catch(e){}
+  const despues=_alertasPersonalDe(rid);
+  const cerradas=antes.filter(n=>!despues.includes(n));
+  if(cerradas.length && !window._auditandoPersonal && typeof tbInfo!=='undefined' && tbInfo){
+    tbInfo.textContent='✔ '+cerradas.length+' alerta'+(cerradas.length===1?'':'s')+' de personal cerrada'+(cerradas.length===1?'':'s')+' en '+(rName(rid)||'el recinto');
+    setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },4500);
+  }
+}
+// Limpieza al cargar: asignaciones guardadas con marca «fuera de matriz» o CdS
+// cuyo nombre SÍ está tal cual en la matriz (quedaron así por el bug de las
+// casillas). Se quita la marca; el nombre, cargo y estamento no se tocan.
+function _normalizaMarcasDotacion(){
+  if(!dotDB||!dotDB.staff) return 0;
+  let n=0;
+  const limpia=o=>{ if(o && o.nombre && (o.externa||o.cds) && isInMatrix(o.nombre)){ delete o.externa; delete o.cds; n++; } };
+  Object.values(wsState.dots||{}).forEach(arr=>(arr||[]).forEach(d=>{
+    if(!d) return;
+    if(d.tipo==='dinamico') (d.turnos||[]).forEach(limpia); else limpia(d);
+  }));
+  if(n){
+    console.info('Atlas HDS · '+n+' asignaciones con marca fuera de matriz/CdS ya estaban en la matriz: marca quitada');
+    if(!S.viewOnly) try{ sWs(); }catch(e){}
+  }
+  return n;
 }
 function findExclusiveConflict(nombre,skipRoomId,skipIdx){
   if(!nombre)return null;
@@ -9450,11 +9636,13 @@ function saveWs(){
   d.nombre=nombre;
   d.cargo=document.getElementById('mCargo').value.trim();
   d.estamento=document.getElementById('mEst').value.trim();
-  d.externa = !!(nombre && (document.getElementById('mExterna').checked || !isInMatrix(nombre)));
-  d.cds = !!(nombre && document.getElementById('mCds') && document.getElementById('mCds').checked);
+  const _antes=_alertasPersonalDe(roomId);
+  { const mk=_marcasPersona(nombre, document.getElementById('mCds') && document.getElementById('mCds').checked);
+    d.externa=mk.externa; d.cds=mk.cds; }
   d.dinClin = !!(nombre && document.getElementById('mDinClin') && document.getElementById('mDinClin').checked);
   d.tipo='fijo';
   sWs(); closeModal(); renderSVG(); updateStats();
+  _trasGuardarPersonal(roomId, _antes);
 }
 function deleteWs(){
   const{roomId,idx}=mCtx; if(roomId===null)return;
@@ -9462,6 +9650,7 @@ function deleteWs(){
   if(d.nombre&&d.nombre.trim()&&!confirm(`¿Eliminar puesto de "${d.nombre}"?`))return;
   if(d.id&&wsState.dotLinks) wsState.dotLinks=wsState.dotLinks.map(g=>g.filter(k=>k!==roomId+'§'+d.id)).filter(g=>g.length>1);
   wsState.dots[roomId].splice(idx,1); sWs(); closeModal(); renderSVG(); updateStats();
+  try{ renderBimPending(); }catch(e){}
 }
 // ── COLOCACIÓN DE PUESTOS CON ARRASTRE ──────────────────────────────────────
 // Clic izquierdo sostenido: el puesto aparece de inmediato y sigue al cursor
@@ -9566,6 +9755,7 @@ function updateStats(){
   document.getElementById('statTotal').textContent=total;
   document.getElementById('statAsig').textContent=asig;
   document.getElementById('statPct').textContent=pct+'%';
+  { const b=document.getElementById('statBar'); if(b) b.style.width=pct+'%'; }
   renderSidebar();
   if(typeof renderRightPanel==='function') renderRightPanel();
   if(typeof renderMetas==='function') renderMetas();
@@ -9957,6 +10147,38 @@ function _relinkExterna(p){
 // Lista fusionada del filtro único de dotación. Cada fila lleva _chk con su
 // origen ('externa'|'comision'): mantiene las claves de rechazo 🚫 ya
 // guardadas (revDesc usa el prefijo original) y decide qué hace el ✓.
+function _clasePersonal(p){
+  if(p._chk==='comision') return 'dot_comision';
+  if(p.enMatriz || p.cand) return 'dot_matriz';
+  if(p.cds) return 'dot_cds';
+  const m=_matrizParecidos(p.nombre);
+  if(m.toks<2) return 'dot_incompleto';
+  if(m.best>=m.toks && m.nCands>1) return 'dot_incompleto';        // calza entero con varias personas
+  if(m.best>=2) return 'dot_probable';
+  return 'dot_fuera';
+}
+function _dotPorClase(k){ return _dotacionPendientes().filter(p=>_clasePersonal(p)===k); }
+function _subPersonal(p){ return [p.cargo,p.area?aName(p.area.id):'',p.fl&&p.fl.label].filter(Boolean).join(' · '); }
+function _goPersonal(p){
+  if(S.viewOnly && !S.editPM) return;
+  let rid=null, ix=-1;
+  if(p._chk==='externa'){ rid=p.r.id; ix=p.idx; }
+  else if(p.asignado && p.r){
+    rid=p.r.id;
+    ix=(wsState.dots[rid]||[]).findIndex(d=> d.tipo==='dinamico'
+        ? (d.turnos||[]).some(t=>norm(t.nombre||'')===norm(p.nombre))
+        : norm(d.nombre||'')===norm(p.nombre));
+  }
+  if(rid!=null && ix>=0){ try{ openModal(rid,ix); }catch(e){} return; }
+  // sin puesto en el Atlas: su ficha en el buscador de funcionarios
+  const inp=document.getElementById('gSearchInput');
+  if(inp){ inp.value=p.nombre; inp.dispatchEvent(new Event('input',{bubbles:true})); inp.focus(); }
+  if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='👤 '+p.nombre+' no tiene puesto en el Atlas: su ficha quedó abierta en el buscador'; setTimeout(()=>{ if(tbInfo)tbInfo.textContent=''; },5000); }
+}
+function _goDestinoPersonal(p){
+  return p._chk==='externa' ? !!(p.r && (wsState.dots[p.r.id]||[])[p.idx])
+       : (p.asignado ? !!p.r : !!document.getElementById('gSearchInput'));
+}
 function _dotacionPendientes(){
   return _externaPendientes().map(p=>({...p,_chk:'externa'}))
     .concat(_comisionPendientes().map(p=>({...p,_chk:'comision'})));
@@ -10134,50 +10356,50 @@ const REV_CHECKS={
   // UN SOLO filtro de dotación (petición 03-09): fuera de matriz + Compra de
   // Servicio + comisiones, en una lista. El clic NO navega al plano: abre
   // directamente el diálogo del puesto para ver, buscar o reemplazar a mano.
-  dotacion:{label:'Dotación: fuera de matriz · CdS · comisiones',
-    find:_dotacionPendientes, flat:true,
-    approve:true,
-    okIf:p=>p._chk==='comision' || p.enMatriz || !!p.cand || (p._chk==='externa' && p.cds && !p.enMatriz),
-    allIf:p=>p._chk==='externa' && p.enMatriz,
-    saveWs:true,
-    okTitle:'Aceptar: si la persona ya está en la matriz, la reemplaza por su ficha oficial; en comisiones, marca la coincidencia como revisada',
-    allLabel:n=>'✓ Reemplazar los '+n+' que YA están en la matriz',
-    allMsg:n=>'¿Reemplazar a los '+n+' funcionarios que ya aparecen en la matriz de dotación?\n\nCada uno queda vinculado a su ficha oficial (nombre, cargo, estamento) y pierde la marca fuera-de-matriz. Los demás casos no se tocan.',
-    apply:p=>{ if(p._chk==='comision') nameState.comisionRev[p.rut]=1;
-               else if(p.cds && !p.enMatriz && !p.cand) nameState.cdsRev[norm(p.nombre)]=1;   // CdS: informada a RR.HH.
-               else _relinkExterna(p); },
-    go:p=>{
-      if(S.viewOnly && !S.editPM) return;
-      let rid=null, ix=-1;
-      if(p._chk==='externa'){ rid=p.r.id; ix=p.idx; }
-      else if(p.asignado && p.r){
-        rid=p.r.id;
-        ix=(wsState.dots[rid]||[]).findIndex(d=> d.tipo==='dinamico'
-            ? (d.turnos||[]).some(t=>norm(t.nombre||'')===norm(p.nombre))
-            : norm(d.nombre||'')===norm(p.nombre));
-      }
-      if(rid!=null && ix>=0){ try{ openModal(rid,ix); }catch(e){} }
-      else {
-        // Sin puesto en el Atlas: antes el clic sólo avisaba y no llevaba a nada.
-        // Ahora abre su ficha en el buscador de funcionarios (unidad, cargo, marca
-        // de comisión), desde donde se le puede asignar puesto.
-        const inp=document.getElementById('gSearchInput');
-        if(inp){ inp.value=p.nombre; inp.dispatchEvent(new Event('input',{bubbles:true})); inp.focus(); }
-        if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='👤 '+p.nombre+' no tiene puesto en el Atlas: su ficha quedó abierta en el buscador'; setTimeout(()=>{ if(tbInfo)tbInfo.textContent=''; },5000); }
-      }
-    },
-    goDestino:p=> p._chk==='externa' ? !!(p.r && (wsState.dots[p.r.id]||[])[p.idx])
-                 : (p.asignado ? !!p.r : !!document.getElementById('gSearchInput')),
-    subText:p=> p._chk==='comision'
-      ? ('🔁 comisión de servicio · '+[p.cargo,p.unidad,p.turno].filter(Boolean).join(' · ')
-         +' · '+(p.asignado?('📍 asignado: '+(rName(p.r.id)||p.r.id)):'sin asignar en Atlas'))
-      : ((p.enMatriz?'✔ YA EN LA MATRIZ — el ✓ la reemplaza por su ficha oficial · '
-        :p.cand?('≈ EN LA MATRIZ COMO «'+p.cand+'» — el ✓ la vincula a esa ficha · ')
-        :(p.cds?'🛒 Compra de Servicio — gestionar con RR.HH.; ✓ cuando ya esté informada · '
-        :(p.sinMarca?'⚠ NO está en la matriz actual (sin marca: guardar la asignación la marcará) · '
-               :'⚠ fuera de matriz — gestionar con RR.HH. · ')))
-        +[p.cargo,p.fl&&p.fl.label].filter(Boolean).join(' · ')),
-    done:'Dotación al día: nadie fuera de matriz y todas las comisiones revisadas.'},
+  // PERSONAL: antes una sola lista mezclaba cinco problemas distintos (y 233
+  // comisiones que no son de cuadratura). Ahora cada punto dice qué hacer.
+  dot_matriz:{label:'Personal: ya está en la matriz (vincular)',
+    find:()=>_dotPorClase('dot_matriz'), flat:true, approve:true, saveWs:true,
+    allIf:p=>p.enMatriz,
+    okTitle:'Vincular con su ficha oficial de la matriz (nombre, cargo, estamento) y quitar la marca',
+    allLabel:n=>'✓ Vincular los '+n+' que calzan exacto',
+    allMsg:n=>'¿Vincular a los '+n+' funcionarios cuyo nombre ya está tal cual en la matriz?\n\nQuedan con su ficha oficial (nombre, cargo, estamento) y sin marca fuera de matriz.',
+    apply:p=>_relinkExterna(p), go:p=>_goPersonal(p), goDestino:p=>_goDestinoPersonal(p),
+    subText:p=>(p.enMatriz?'✔ el nombre ya está en la matriz':('≈ en la matriz como «'+p.cand+'»'))+' · ✓ lo vincula · '+_subPersonal(p),
+    done:'Nadie marcado fuera de matriz figura ya en ella.'},
+  dot_probable:{label:'Personal: fuera de matriz, parecido a alguien',
+    find:()=>_dotPorClase('dot_probable'), flat:true, go:p=>_goPersonal(p), goDestino:p=>_goDestinoPersonal(p),
+    subText:p=>{ const m=_matrizParecidos(p.nombre); return '≈ parecido a '+m.cands.slice(0,2).map(x=>'«'+x.nombre+'»').join(' o ')+(m.nCands>2?(' (+'+(m.nCands-2)+')'):'')
+      +' · clic: abre el puesto con los parecidos para elegir · '+_subPersonal(p); },
+    done:'No hay nombres fuera de matriz parecidos a personas de la matriz.'},
+  dot_incompleto:{label:'Personal: nombre incompleto o rótulo',
+    find:()=>_dotPorClase('dot_incompleto'), flat:true, go:p=>_goPersonal(p), goDestino:p=>_goDestinoPersonal(p),
+    subText:p=>{ const m=_matrizParecidos(p.nombre);
+      return (m.toks<2?'«'+p.nombre+'» no es un nombre de persona — poner al funcionario o dejar el puesto libre'
+                     :'calza con '+m.nCands+' personas de la matriz — completar el nombre')+' · '+_subPersonal(p); },
+    done:'Todos los puestos llevan nombres completos de persona.'},
+  dot_fuera:{label:'Personal: no está en la matriz (RR.HH.)',
+    find:()=>_dotPorClase('dot_fuera').filter(p=>!nameState.extRev[norm(p.nombre)]), flat:true, approve:true,
+    okTitle:'Informado a RR.HH. (si después aparece en la matriz, vuelve como «ya está en la matriz»)',
+    allLabel:n=>'✓ Marcar los '+n+' como informados a RR.HH.',
+    allMsg:n=>'¿Marcar a los '+n+' funcionarios como informados a RR.HH.?\n\nSalen de la lista. Si en una actualización de la matriz aparecen, vuelven solos en «ya está en la matriz».',
+    apply:p=>{ nameState.extRev[norm(p.nombre)]=1; }, go:p=>_goPersonal(p), goDestino:p=>_goDestinoPersonal(p),
+    subText:p=>'⚠ ni exacto ni parecido en la matriz: ingreso reciente, reemplazo u honorario · ✓ cuando esté informado a RR.HH. · '+_subPersonal(p),
+    done:'Todas las personas fuera de la matriz están informadas a RR.HH.'},
+  dot_cds:{label:'Personal: Compra de Servicio',
+    find:()=>_dotPorClase('dot_cds'), flat:true, approve:true,
+    okTitle:'Compra de Servicio ya informada a RR.HH.',
+    allLabel:n=>'✓ Marcar las '+n+' como informadas',
+    apply:p=>{ nameState.cdsRev[norm(p.nombre)]=1; }, go:p=>_goPersonal(p), goDestino:p=>_goDestinoPersonal(p),
+    subText:p=>'🛒 función externalizada: no es dotación · ✓ cuando esté informada a RR.HH. · '+_subPersonal(p),
+    done:'Todas las Compras de Servicio están informadas.'},
+  dot_comision:{label:'Personal: comisiones de servicio',
+    find:()=>_dotPorClase('dot_comision'), flat:true, approve:true, allIf:()=>false,
+    okTitle:'Comisión revisada (vigente o ya cumplida)',
+    apply:p=>{ nameState.comisionRev[p.rut]=1; }, go:p=>_goPersonal(p), goDestino:p=>_goDestinoPersonal(p),
+    subText:p=>'🔁 marca de comisión en la matriz · '+[p.cargo,p.unidad,p.turno].filter(Boolean).join(' · ')
+      +' · '+(p.asignado?('📍 '+(rName(p.r.id)||p.r.id)):'sin puesto en el Atlas')+' · ✓ revisada',
+    done:'Todas las comisiones de servicio están revisadas.'},
   pma:{label:'BIM oficial (PMA)',
     find:_pmaPendientes, approve:true, noDialog:true,
     subText:p=>(p.current?('actual '+p.current):'sin BIM')+' → '+p.proposed,
@@ -10362,6 +10584,53 @@ function revAuditar(opts){
   } finally { revert(); }
   return res;
 }
+// ARNÉS DEL FLUJO DE PERSONAL. Reproduce con el diálogo real cada forma de
+// reemplazar a una persona marcada (fuera de matriz o Compra de Servicio) por
+// alguien de la matriz, guarda, y exige que: el nombre quede guardado, sin
+// marcas, y que su alerta desaparezca de la Revisión. Todo se revierte.
+const FLUJOS_PERSONAL=[
+  ['buscador del nombre (autocompletar)', t=>{ const i=document.getElementById('mNombre'); i.value=t.nombre; i.dispatchEvent(new Event('input',{bubbles:true}));
+      const it=[...document.querySelectorAll('#mNombreDrop .ac-item')].find(x=>(x.querySelector('strong')||{}).textContent===t.nombre);
+      if(it) it.dispatchEvent(new MouseEvent('mousedown',{bubbles:true,cancelable:true})); }],
+  ['tipear el nombre exacto', t=>{ document.getElementById('mNombre').value=t.nombre; }],
+  ['panel de dotación', t=>{ _dpPeople=[t.nombre]; dpPick(0); }],
+  ['sugerencia al abrir el puesto', t=>{ const i=document.getElementById('mNombre'); i.value=t.nombre;
+      const it=[...document.querySelectorAll('#mNombreDrop .ac-item')].find(x=>(x.querySelector('strong')||{}).textContent===t.nombre);
+      if(it) it.dispatchEvent(new MouseEvent('mousedown',{bubbles:true,cancelable:true})); }]
+];
+function _auditaFlujoPersonal(opts){
+  opts=opts||{};
+  const snapW=JSON.stringify(wsState);
+  const revert=()=>{ const w=JSON.parse(snapW); Object.keys(wsState).forEach(k=>delete wsState[k]); Object.assign(wsState,w); };
+  const cPrev=window.confirm, mPrev=mCtx, abierto=document.getElementById('wsModal').classList.contains('show');
+  const asg=_dpAsignados();
+  const libres=(dotDB&&dotDB.staff||[]).filter(x=>x.nombre && !asg[norm(x.nombre)]);
+  const filas=(opts.filas||_dotacionPendientes()).filter(p=>p._chk==='externa' && p.r && (wsState.dots[p.r.id]||[])[p.idx]
+      && (wsState.dots[p.r.id]||[])[p.idx].tipo!=='dinamico');
+  const deTipo=k=>filas.filter(p=>{ const d=wsState.dots[p.r.id][p.idx]; return k==='cds'?!!d.cds:(!!d.externa&&!d.cds); });
+  const res=[]; let li=0;
+  window.confirm=()=>true; window._auditandoPersonal=true;
+  try{
+    [['marca naranja',deTipo('ext')],['Compra de Servicio',deTipo('cds')]].forEach(([marca,lista])=>{
+      FLUJOS_PERSONAL.forEach(([camino,fn],ci)=>{
+        const p=lista[ci]; const t=libres[li++];
+        if(!p||!t){ res.push({marca,camino,ok:null,motivo:'sin casos para probar'}); return; }
+        const rid=p.r.id, idx=p.idx, antes=norm(p.nombre);
+        openModal(rid,idx); fn(t); saveWs();
+        const d=(wsState.dots[rid]||[])[idx];
+        const guardado=!!d && d.nombre===t.nombre;
+        const sinMarcas=!!d && !d.externa && !d.cds;
+        const alerta=_dotacionPendientes().some(q=>q._chk==='externa'&&q.r&&q.r.id===rid&&(norm(q.nombre)===norm(t.nombre)||norm(q.nombre)===antes));
+        res.push({marca,camino,ok:guardado&&sinMarcas&&!alerta,
+          motivo:!guardado?'el nombre no se guardó':(!sinMarcas?'quedó con marca '+(d.cds?'CdS':'fuera de matriz'):(alerta?'la alerta sigue en la Revisión':''))});
+        revert();
+      });
+    });
+  } finally {
+    window.confirm=cPrev; window._auditandoPersonal=false; revert(); mCtx=mPrev; if(!abierto) closeModal();
+  }
+  return res;
+}
 function revAuditarUI(){
   const t0=performance.now(); const R=revAuditar(); const ms=Math.round(performance.now()-t0);
   const filas=Object.values(R);
@@ -10371,6 +10640,9 @@ function revAuditarUI(){
       +(r.okProbados?(' · ✓ probado en '+r.okProbados):'')
       +(r.sana?'':(' · '+[r.informativas&&(r.informativas+' sin acción'),r.sinDestino&&(r.sinDestino+' sin destino'),r.sinSalida&&(r.sinSalida+' sólo 🚫'),r.okNoResuelve&&(r.okNoResuelve+' ✓ que no resuelve'),r.clavesRepetidas&&(r.clavesRepetidas+' claves repetidas')].filter(Boolean).join(' · ')))
       +(r.ejemplos.length&&!r.sana?('\n     '+r.ejemplos.join('\n     ')):'')).join('\n')
+    +(()=>{ const F=_auditaFlujoPersonal(); const malos=F.filter(x=>x.ok===false);
+        return '\n\n'+(malos.length?('⚠ Flujo de personal: '+malos.length+' camino(s) no cierran la alerta'):'✅ Flujo de personal: buscar y guardar a alguien de la matriz cierra la alerta en todos los caminos')
+          +'\n'+F.map(x=>'   '+(x.ok===null?'·':(x.ok?'✅':'⚠'))+' '+x.marca+' · '+x.camino+(x.motivo?(' — '+x.motivo):'')).join('\n'); })()
     +'\n\n(arnés sobre los datos vivos · '+ms+' ms · nada se guardó)';
   console.table(filas.map(r=>({categoria:r.label,n:r.n,sinDestino:r.sinDestino,soloRechazo:r.sinSalida,okNoResuelve:r.okNoResuelve,claves:r.clavesRepetidas,sana:r.sana})));
   alert(txt);
@@ -10411,10 +10683,11 @@ function renderBimPending(){
   for(const c of Object.keys(REV_CHECKS)){ counts[c]=_revPend(c).length; total+=counts[c]; }
   const badge=document.getElementById('sbBimN');
   if(badge){ badge.textContent=total; badge.classList.toggle('done',!total); }
+  { const rb=document.getElementById('railBimN'); if(rb){ rb.textContent=total; rb.classList.toggle('done',!total); } }
   if(!_revOpen) return;
   const box=document.getElementById('bimList'); if(!box) return;
   const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
-  let html='<select id="revSel" onchange="revSetCheck(this.value)" style="width:100%;margin:6px 0 4px;border:1px solid #7ca4c0;border-radius:7px;background:#dce8f2;color:#1a3a5c;font-size:11px;font-weight:700;padding:5px 6px">'
+  let html='<select id="revSel" onchange="revSetCheck(this.value)">'
     +(()=>{ const opt=c=>'<option value="'+c+'"'+(c===_revCheck?' selected':'')+'>'+REV_CHECKS[c].label+' ('+counts[c]+')</option>';
             const con=Object.keys(REV_CHECKS).filter(c=>counts[c]), sin=Object.keys(REV_CHECKS).filter(c=>!counts[c]);
             return '<optgroup label="Con pendientes">'+con.map(opt).join('')+'</optgroup>'
@@ -10525,7 +10798,7 @@ function renderSidebar(){
     const info=document.createElement('div');
     info.className='fl-info';
     info.innerHTML=`<span class="fl-name">${fl.id}</span><span class="fl-sub">${fl.label}</span>`
-      +(total?`<div class="fl-bar"><div class="fl-fill" style="width:${pct}%"></div></div><div class="fl-pct">${asig}/${total} puestos (${pct}%)</div>`:'');
+      +(total?`<div class="fl-pct" title="${asig}/${total} puestos">${pct}%</div><div class="fl-bar"><div class="fl-fill${pct>=85?' done':''}" style="width:${pct}%"></div></div>`:'');
     hdr.append(tog,info);
     hdr.onclick=()=>{ if(S.floorId===fl.id){ if(activeAreas.length)toggleFloor(fl.id); } else goFloor(fl.id); };
     item.appendChild(hdr);
@@ -10716,7 +10989,7 @@ function loadDotDB(){
         vinculo: p.tipo_vinculo || '',
         // Becados con nombre: vienen de la nómina de formación (beca_*). Sin esos
         // campos se usan fecha_inicio/fecha_termino de la matriz.
-        beca: (String(p.tipo_vinculo||'').toUpperCase()==='BECADO' || /BECAD/i.test(p.ley||''))
+        beca: (String(p.tipo_vinculo||'').toUpperCase()==='BECADO' || /BECAD/i.test(p.ley||'') || p.beca_origen==='nomina_becados')
           ? { tipo: String(p.beca_tipo||'').toUpperCase(),
               programa: p.beca_programa || p.especialidad || p.sp || '',
               inicio: p.beca_inicio || p.fecha_inicio || '',
@@ -10756,7 +11029,8 @@ function becaTag(s){
   if(!s || !s.beca) return '';
   const b = s.beca;
   const lbl = /SUB/.test(b.tipo) ? 'Becado subespecialidad'
-            : /ESPEC/.test(b.tipo) ? 'Becado especialidad' : 'Becado';
+            : /ESPEC/.test(b.tipo) ? 'Becado especialidad'
+            : /DIPLO/.test(b.tipo) ? 'Diplomado' : 'Becado';
   const fin = String(b.termino||'').slice(0,10);
   const vencido = /^\d{4}-\d{2}-\d{2}$/.test(fin) && fin < new Date().toISOString().slice(0,10);
   const tip = [b.programa, (b.inicio||fin) ? ('formación '+(b.inicio||'?')+' → '+(fin||'?')) : 'sin período informado']
@@ -10803,15 +11077,18 @@ function findDotLocation(nombre){
 // cierra el caso. Así se van dando de baja los naranjos uno a uno.
 function _mSugerirMatriz(dot){
   const drop=document.getElementById('mNombreDrop'), info=document.getElementById('mServInfo');
-  if(!drop||!dot||!(dot.externa||dot.cds)) return;
+  if(!drop||!dot) return;
   const n=String(dot.nombre||'').trim(); if(n.length<2) return;
-  let res=searchDB(n,6);
+  if(!(dot.externa||dot.cds) && isInMatrix(n)) return;          // ya calza: nada que sugerir
+  let res=searchDB(n,6), parecido=false;
   if(!res.length){ const c=_matrizCandidato(n); if(c) res=[c]; }
+  if(!res.length){ const m=_matrizParecidos(n); if(m.best>=2){ res=m.cands.slice(0,6); parecido=true; } }
   if(!res.length) return;
   drop.innerHTML='';
   const h=document.createElement('div');
   h.style.cssText='padding:5px 9px;font-size:10px;font-weight:800;color:#b45309;background:#fffbeb;border-bottom:1px solid #f59e0b';
-  h.textContent='🔎 Está en la matriz de dotación — clic para reemplazar y quitar la marca naranja:';
+  h.textContent=parecido?'≈ Parecidos en la matriz — elige a la persona correcta (al guardar se cierra la alerta):'
+                        :'🔎 Está en la matriz de dotación — clic para reemplazar y quitar la marca naranja:';
   drop.appendChild(h);
   res.forEach(sx=>{
     const it=document.createElement('div');
@@ -10826,6 +11103,7 @@ function _mSugerirMatriz(dot){
       const ext=document.getElementById('mExterna'); if(ext) ext.checked=false;
       const mc=document.getElementById('mCds'); if(mc) mc.checked=false;
       drop.style.display='none';
+      try{ _mEstadoMatriz(); }catch(e){}
     };
     drop.appendChild(it);
   });
@@ -10841,6 +11119,7 @@ function initAutocomplete(){
     const q = inp.value.trim();
     drop.innerHTML='';
     info.textContent='';
+    try{ _mEstadoMatriz(); }catch(e){}
     if(q.length<2){drop.style.display='none';return;}
     const res = searchDB(q,10);
     if(!res.length){drop.style.display='none';return;}
@@ -10855,6 +11134,7 @@ function initAutocomplete(){
         document.getElementById('mEst').value=s.estamento||'';
         info.textContent=s.servicio?`📋 ${s.servicio}`:'';
         drop.style.display='none';
+        try{ _mEstadoMatriz(); }catch(e){}
       };
       drop.appendChild(it);
     });
@@ -11619,6 +11899,9 @@ function init(){
   { const b=document.getElementById('btnPlanKind'); if(b){ const c=S.planKind==='color'; b.textContent=c?'🗺 Ver mobiliario':'🖌 Ver color'; b.classList.toggle('active',c); } }
   applyBoxVis();
   loadDotDB(); // async pero NO awaiteamos: el plano puede cargar en paralelo. Búsqueda queda lista cuando termine fetch.
+  try{ const nl=_normalizaMarcasDotacion();
+    if(nl) setTimeout(()=>{ if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🧹 '+nl+' asignaciones marcadas fuera de matriz ya estaban en la matriz: se quitó la marca'; setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },7000); } },1500);
+  }catch(e){ console.warn('normalización de marcas de dotación',e); }
   setFloorPlan(S.floorId);
   updateFloorDims(S.floorId);
   _undoBase=_undoSerialize();   // punto de partida del historial de deshacer
@@ -12151,6 +12434,67 @@ async function runSelfTest(){
       fl.areas=snapAreas; const d=JSON.parse(snapD); Object.keys(floorsDelta).forEach(k=>delete floorsDelta[k]); Object.assign(floorsDelta,d);
     }
   });
+  T('Personal: buscar y guardar a alguien de la matriz cierra la alerta por TODOS los caminos', ()=>{
+    const dPrev=JSON.stringify(wsState.dots);
+    try{
+      const asg=_dpAsignados();
+      const libres=dotDB.staff.filter(x=>x.nombre&&!asg[norm(x.nombre)]).slice(0,2);
+      // 4 puestos naranjos + 4 CdS con nombres que NO están en la matriz
+      wsState.dots['st_r1']=[];
+      for(let i=0;i<8;i++) wsState.dots['st_r1'].push({id:'st_fp'+i,x:10*i,y:10,tipo:'fijo',nombre:'ZZ PRUEBA NOEXISTE '+i,cargo:'',estamento:'',externa:true,cds:i>=4});
+      const filas=_dotacionPendientes().filter(p=>p._chk==='externa'&&p.r&&p.r.id==='st_r1');
+      const F=_auditaFlujoPersonal({filas});
+      const probados=F.filter(x=>x.ok!==null), malos=F.filter(x=>x.ok===false);
+      if(malos.length) console.warn('flujo personal:',malos);
+      return probados.length===8 && !malos.length;
+    } finally { wsState.dots=JSON.parse(dPrev); }
+  });
+  T('Personal: turno dinámico, limpieza al cargar y refresco de la lista al guardar', ()=>{
+    const dPrev=JSON.stringify(wsState.dots), oPrev=_revOpen, cPrev=_revCheck, mPrev=mCtx;
+    try{
+      const s1=dotDB.staff.find(x=>x.nombre&&!x.comision);
+      // limpieza: asignación guardada con marca pero nombre exacto de la matriz
+      wsState.dots['st_r1']=[{id:'st_l1',x:1,y:1,tipo:'fijo',nombre:s1.nombre,externa:true,cds:true},
+                             {id:'st_l2',x:2,y:2,tipo:'dinamico',turnos:[{nombre:s1.nombre,externa:true}]}];
+      const n=_normalizaMarcasDotacion();
+      const limpio=n===2 && !wsState.dots['st_r1'][0].externa && !wsState.dots['st_r1'][0].cds && !wsState.dots['st_r1'][1].turnos[0].externa;
+      // turno: aunque la casilla quede marcada, un nombre de la matriz entra sin marca
+      mCtx={roomId:'st_r1',idx:1,addingTurno:true};
+      document.getElementById('mNombre').value=s1.nombre; document.getElementById('mExterna').checked=true;
+      const mc=document.getElementById('mCds'); if(mc) mc.checked=true;
+      confirmAddTurno();
+      const t=wsState.dots['st_r1'][1].turnos.slice(-1)[0];
+      const turno=!!t && !t.externa && !t.cds;
+      // refresco: con la Revisión abierta en «no está en la matriz», guardar saca la fila del DOM
+      wsState.dots['st_r1']=[{id:'st_rf',x:3,y:3,tipo:'fijo',nombre:'ZZ PRUEBA REFRESCO',cargo:'',estamento:'',externa:true}];
+      _revOpen=true; _revCheck='dot_fuera'; renderBimPending();
+      const box=document.getElementById('bimList');
+      const antes=/ZZ PRUEBA REFRESCO/.test(box.innerText);
+      openModal('st_r1',0); document.getElementById('mNombre').value=s1.nombre; saveWs();
+      const despues=/ZZ PRUEBA REFRESCO/.test(box.innerText);
+      return limpio && turno && antes && !despues;
+    } finally {
+      wsState.dots=JSON.parse(dPrev); _revOpen=oPrev; _revCheck=cPrev; mCtx=mPrev; try{ closeModal(); renderBimPending(); }catch(e){}
+    }
+  });
+  T('Personal: cada alerta cae en UNA categoría con qué hacer (matriz, parecido, incompleto, RR.HH., CdS, comisión)', ()=>{
+    const m=dotDB.staff.find(x=>x.nombre&&fold(x.nombre).split(/\s+/).filter(t=>t.length>=3).length>=3);
+    const tk=fold(m.nombre).split(/\s+/).filter(t=>t.length>=3);
+    const casos=[
+      [{_chk:'externa',nombre:m.nombre,enMatriz:true},'dot_matriz'],
+      [{_chk:'externa',nombre:tk[0]+' '+tk[1]+' ZZQXW',enMatriz:false},'dot_probable'],
+      [{_chk:'externa',nombre:'SPRE',enMatriz:false},'dot_incompleto'],
+      [{_chk:'externa',nombre:'ZZQXW YYQXV WWQXU',enMatriz:false},'dot_fuera'],
+      [{_chk:'externa',nombre:'ZZQXW YYQXV',enMatriz:false,cds:true},'dot_cds'],
+      [{_chk:'comision',nombre:m.nombre,rut:'1-9'},'dot_comision']];
+    const ok=casos.every(([p,k])=>_clasePersonal(p)===k);
+    const sinMezcla=!('dotacion' in REV_CHECKS) && ['dot_matriz','dot_probable','dot_incompleto','dot_fuera','dot_cds','dot_comision'].every(k=>k in REV_CHECKS);
+    // la suma de las categorías es exactamente el total de alertas de personal
+    const total=_dotacionPendientes().filter(p=>!_revRechazada('x',p)).length;
+    const suma=['dot_matriz','dot_probable','dot_incompleto','dot_fuera','dot_cds','dot_comision'].reduce((a,k)=>a+_revRaw(k).length,0);
+    const extFiltrados=_dotPorClase('dot_fuera').filter(p=>nameState.extRev[norm(p.nombre)]).length;
+    return ok && sinMezcla && (suma+extFiltrados===_dotacionPendientes().length);
+  });
   T('Revisión: turnos distintos del mismo puesto no comparten clave', ()=>{
     const a={r:{id:'st_r1'},idx:0,nombre:'ST UNO',_chk:'externa'}, b={r:{id:'st_r1'},idx:0,nombre:'ST DOS',_chk:'externa'};
     const distintas=_revKey('dotacion',a)!==_revKey('dotacion',b);
@@ -12314,8 +12658,8 @@ async function runSelfTest(){
     _inMatrixCache=new Map();
     const pend=_externaPendientes().filter(p=>p.r.id==='st_r1'&&norm(p.nombre)===norm(s.nombre));
     const listado=pend.length===1 && pend[0].enMatriz===true;
-    const okIf=REV_CHECKS.dotacion.okIf(pend[0]||{});
-    if(pend.length) REV_CHECKS.dotacion.apply(pend[0]);
+    const okIf=_clasePersonal(pend[0]||{_chk:'externa',enMatriz:true})==='dot_matriz';
+    if(pend.length) REV_CHECKS.dot_matriz.apply(pend[0]);
     const d=wsState.dots['st_r1'].find(x=>x.id==='st_ext1');
     const relig=d && d.nombre===s.nombre && !d.externa && d.estamento===(s.estamento||'');
     const ya=!_externaPendientes().some(p=>p.r&&p.r.id==='st_r1'&&norm(p.nombre)===norm(s.nombre));
@@ -12333,7 +12677,7 @@ async function runSelfTest(){
       _inMatrixCache=new Map(); _candCache.clear();
       const p2=_externaPendientes().find(q=>q.r.id==='st_r1'&&q.idx===wsState.dots['st_r1'].length-1);
       const hallado=p2 && !p2.enMatriz && p2.cand && norm(p2.cand)===norm(s2.nombre);
-      if(p2) REV_CHECKS.dotacion.apply(p2);
+      if(p2) REV_CHECKS.dot_matriz.apply(p2);
       const d2=wsState.dots['st_r1'].find(x=>x.id==='st_ext2');
       aproxOK=hallado && d2 && d2.nombre===s2.nombre && !d2.externa;
       wsState.dots['st_r1']=wsState.dots['st_r1'].filter(x=>x.id!=='st_ext2');

@@ -31,6 +31,13 @@ header{background:linear-gradient(135deg,var(--azul),var(--azul-osc));color:#fff
 .btn{border:none;border-radius:7px;padding:8px 13px;font-size:12.5px;font-weight:600;cursor:pointer;background:rgba(255,255,255,.16);color:#fff}
 .btn:hover{background:rgba(255,255,255,.28)}
 main{max-width:1500px;margin:0 auto;padding:16px 22px 50px}
+.faltan{display:flex;flex-wrap:wrap;align-items:stretch;gap:10px;background:linear-gradient(135deg,#7f1d1d,#b91c1c);color:#fff;border-radius:12px;padding:12px 14px;margin-bottom:12px;box-shadow:0 2px 8px rgba(185,28,28,.25)}
+.faltan .ft{flex:1 1 180px;display:flex;flex-direction:column;justify-content:center;font-size:12px;line-height:1.35;color:rgba(255,255,255,.9)}
+.faltan .ft b{font-size:13.5px;color:#fff;letter-spacing:.2px}
+.faltan .fn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:10px;padding:6px 12px;min-width:118px;text-align:center}
+.faltan .fn.g{background:#fff;color:#7f1d1d;border-color:#fff}
+.faltan .fn .n{font-size:26px;font-weight:800;line-height:1.1}
+.faltan .fn .l{font-size:10.5px;text-transform:uppercase;letter-spacing:.4px;opacity:.9}
 .dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:16px}
 .kpi{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
 .kpi h3{font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--tx2);margin-bottom:7px;font-weight:700}
@@ -206,6 +213,7 @@ th.sortable{cursor:pointer;user-select:none}th.sortable:hover{background:#0a558f
   </div>
 </header>
 <main>
+  <div class="faltan" id="faltan"></div>
   <div class="dash" id="dash"></div>
   <div class="legend" id="legend"></div>
   <div class="tabs" id="tabs"></div>
@@ -423,7 +431,28 @@ function renderDash(){
     '<div class="kpi combo"><h3>Combinado · Capac. + Instructivos</h3><div class="big">'+c1.pct+'%</div>'+
     '<div class="sub">'+subCombo(c1)+'</div>'+barDone(c1.pct)+'</div>';
   document.getElementById("dash").innerHTML=combos+h;
+  renderFaltan();
   writeSummary();
+}
+// Banner «nos faltan»: equipos (tipologías) del Programa de Capacitación aún no ejecutados, en los grandes
+// recintos y en total. Mismo estado que el avance (Excel + ajustes locales); parcial = todavía falta.
+var FALTAN_GRUPOS=[
+  {l:"Pabellones",       re:/PABELLON/},
+  {l:"UPC · UCI y UTI",  re:/UNIDAD DE CUIDADOS (INTENSIVOS|INTERMEDIOS)/},
+  {l:"Med. Física y Rehab.", re:/MEDICINA FISICA Y REHABILITACION/},
+  {l:"Esterilización",   re:/ESTERILIZACION/}
+];
+function renderFaltan(){
+  var el=document.getElementById("faltan"); if(!el) return;
+  var pend=D.capacitaciones.filter(function(r){ return estadoOf("capacitaciones",r)!==DONE.capacitaciones; });
+  var norm=function(t){ return String(t||"").toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); };
+  var h='<div class="ft"><b>⏳ Equipos que nos faltan por capacitar</b>Programa de Capacitación · grandes recintos</div>';
+  FALTAN_GRUPOS.forEach(function(g){
+    var n=pend.filter(function(r){ return g.re.test(norm(valOf(r,"detalle_servicios"))); }).length;
+    h+='<div class="fn"><div class="n">'+n+'</div><div class="l">'+g.l+'</div></div>';
+  });
+  h+='<div class="fn g"><div class="n">'+pend.length+'</div><div class="l">Total · de '+D.capacitaciones.length+'</div></div>';
+  el.innerHTML=h;
 }
 function renderLegend(){
   document.getElementById("legend").innerHTML=
