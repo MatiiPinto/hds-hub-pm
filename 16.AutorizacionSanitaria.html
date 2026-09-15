@@ -864,6 +864,7 @@
 <script src="SHARED_DATA/recinto_mnc.js"></script>
 <script src="SHARED_DATA/as_remote.js"></script>
 <script>document.write('<scr'+'ipt src="data/as_movil_datos.js?v='+Date.now()+'"></scr'+'ipt>');</script>
+<script>document.write('<scr'+'ipt src="SHARED_DATA/as_expediente.js?v='+Date.now()+'"></scr'+'ipt>');</script>
 
 <!-- ═══════════════════════ HEADER ═══════════════════════ -->
 <header>
@@ -987,6 +988,7 @@
     <button class="hd-btn" onclick="abrirDrivePautas()" title="Abrir en Drive la carpeta con las pautas ya cotejadas (compartida con el equipo)">☁ Pautas cotejadas</button>
     <button class="hd-btn" onclick="openRespaldo()" title="Respaldo del avance, estado del almacenamiento y selftest">💾 Respaldo<span id="bk-dot" class="hd-badge" style="display:none">!</span></button>
     <button class="hd-btn" onclick="asgAbrir()" title="Asignar pautas a cada recinto o unidad como en una planilla: mismos datos del Atlas y mismo backend que la plataforma de terreno">🧩 Asignación</button>
+    <button class="hd-btn" onclick="expAbrir()" title="Expediente de la solicitud de Autorización Sanitaria: trámites, documentos, resoluciones, accesos, recintos, responsables y bitácora" style="background:#00A1E1;border-color:#00A1E1;color:#fff">📂 Expediente AS</button>
     <button class="hd-btn" onclick="guAbrir()" title="Guía rápida para cualquier clínico: cómo aplicar una pauta (CUMPLE · NO CUMPLE · N/A, evidencia, firma)">📘 Guía rápida</button>
     <button class="hd-btn" onclick="openChangelog()" title="Control de cambios: historial de altas, bajas, ediciones y fotos">📋 Cambios<span id="cl-count" class="hd-badge" style="display:none"></span></button>
     <button class="hd-btn" onclick="exportData()" title="Exportar evaluación a JSON">⬇ Exportar</button>
@@ -4902,7 +4904,7 @@ const A16={correo:null,nivel:null,servicios:[],est:{},vista:'rec',sel:new Set(),
 })();
 const a16esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function a16msg(t,ms){const e=document.getElementById('a16msg');e.textContent=t;e.style.display='block';clearTimeout(e._t);e._t=setTimeout(()=>e.style.display='none',ms||2600);}
-const NORMA_CORTA={al:'Alimentación',atencion_cerrada:'At. Cerrada',cirugia_menor:'Cirugía Menor',cp:'Caldera/Presión',cz:'Centro Quirúrgico',dialisis:'Diálisis',dr:'Radiaciones',farmacia:'Farmacia',hospitalizacion_psiquiatrica:'Hosp. Psiquiátrica',imagenologia:'Imagenología',laboratorio:'Laboratorio',medicina_nuclear:'Med. Nuclear',quimioterapia:'Quimioterapia',re:'REAS'};
+const NORMA_CORTA={al:'Alimentación',atencion_cerrada:'At. Cerrada',cirugia_menor:'Cirugía Menor',cp:'Caldera/Presión',cz:'Central de Mezclas',dialisis:'Diálisis',dr:'Droguería',farmacia:'Farmacia',hospitalizacion_psiquiatrica:'Hosp. Psiquiátrica',imagenologia:'Imagenología',laboratorio:'Laboratorio',medicina_nuclear:'Med. Nuclear',quimioterapia:'Quimioterapia',re:'REAS'};
 const REGLA_LBL={box_consulta:'Box de consulta',quirofano:'Quirófano',sala_procedimientos:'Sala de procedimientos',hospitalizacion:'Hospitalización',tipo_box:'Box (Atlas)',tipo_pabellon:'Pabellón (Atlas)',tipo_proced:'Procedimientos (Atlas)',tipo_habitacion:'Habitación (Atlas)',tipo_lab:'Laboratorio (Atlas)',tipo_clinic:'Clínico (Atlas)'};
 const reglaLbl=r=>REGLA_LBL[r]||(r?r.replace(/^tipo_/,'Tipo ').replace(/_/g,' '):'');
 function ambNombre(id){const a=A16.amb[id];if(!a)return {t:id,n:''};let t=a.name.replace(/^(Artículo|Art\.)\s*\d+\s*·\s*/i,'').trim();if(t.length>70)t=t.slice(0,68)+'…';return {t,n:NORMA_CORTA[a.norma]||a.norma};}
@@ -5149,6 +5151,251 @@ function guHTML(){return `
 if(location.hash==='#guia') setTimeout(guAbrir,300);
 if(location.hash==='#asignacion') setTimeout(asgAbrir,300);
 if(location.hash==='#informes') setTimeout(itAbrir,300);
+</script>
+
+<!-- ═══════════ EXPEDIENTE DE AUTORIZACIÓN SANITARIA · BITÁCORA ═══════════
+     Bloque añadido (no reemplaza nada). Datos: SHARED_DATA/as_expediente.js (window.AS_EXPEDIENTE, generado por
+     _DEV/as_expediente/build_expediente.py) + SHARED_DATA/as_resumen_recintos.js (se carga al abrir Recintos).
+     Lo que se edita acá (estado, nota, evidencia, entradas de bitácora) queda en este navegador
+     (localStorage as16_expediente_v1) y se respalda con Exportar. ⛔ Aquí no se guardan contraseñas. -->
+<style>
+.ex-tabs{display:flex;gap:2px;padding:0 12px;background:#eef2f8;border-bottom:1px solid #d8e0ec;overflow-x:auto}
+.ex-tabs button{border:0;background:none;padding:10px 12px;font-size:12.5px;font-weight:700;color:#5b6b85;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.ex-tabs button.on{color:#202945;border-bottom-color:#00A1E1}
+.ex-body{flex:1;overflow:auto;background:#f6f8fb;padding:16px 20px}
+.ex-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.ex-kpi{background:#fff;border:1px solid #d8e0ec;border-radius:12px;padding:10px 12px;border-left:4px solid #00A1E1}
+.ex-kpi b{display:block;font-size:22px;color:#202945;line-height:1.1}.ex-kpi span{font-size:11px;color:#5b6b85}
+.ex-kpi.warn{border-left-color:#B45309}.ex-kpi.bad{border-left-color:#B91C1C}.ex-kpi.ok{border-left-color:#0E7C66}
+.ex-card{background:#fff;border:1px solid #d8e0ec;border-radius:12px;padding:12px 14px;margin-bottom:10px}
+.ex-card h3{margin:0 0 4px;font-size:14px;color:#202945}.ex-card .m{font-size:11.5px;color:#5b6b85}
+.ex-h{font-size:12px;font-weight:800;color:#202945;text-transform:uppercase;letter-spacing:.4px;margin:16px 0 8px;border-bottom:2px solid #d8e0ec;padding-bottom:4px}
+.ex-grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(380px,1fr));gap:10px}
+.ex-tbl{border-collapse:collapse;width:100%;font-size:12px;background:#fff}
+.ex-tbl th{position:sticky;top:-16px;background:#e8eef7;color:#1e293b;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;padding:6px 8px;border:1px solid #cbd5e1;text-align:left;z-index:1}
+.ex-tbl td{border:1px solid #e2e8f0;padding:5px 8px;vertical-align:top;line-height:1.35}
+.ex-tbl tr:hover td{background:#f5faff}
+.ex-st{border:1px solid #cbd5e1;border-radius:6px;padding:2px 4px;font-size:11.5px;font-weight:700}
+.ex-pill{display:inline-block;border-radius:999px;padding:1px 8px;font-size:10.5px;font-weight:800;white-space:nowrap}
+.ex-s-pendiente{background:#fef3c7;color:#92400e}.ex-s-en_curso{background:#dbeafe;color:#1e40af}.ex-s-listo{background:#dcfce7;color:#166534}
+.ex-s-no_aplica{background:#f1f5f9;color:#475569}.ex-s-por_verificar{background:#fde2e2;color:#991b1b}.ex-s-observado{background:#ffedd5;color:#9a3412}
+.ex-v-VERIFICADO{background:#dcfce7;color:#166534}.ex-v-INDICIO{background:#fef3c7;color:#92400e}.ex-v-NO{background:#fde2e2;color:#991b1b}
+.ex-note{width:100%;min-width:160px;border:1px solid #e2e8f0;border-radius:6px;padding:3px 6px;font-size:11.5px;font-family:inherit;resize:vertical}
+.ex-bar{height:8px;background:#e2e8f0;border-radius:99px;overflow:hidden;display:flex;margin:6px 0}
+.ex-bar i{display:block;height:100%}
+.ex-tl{position:relative;margin-left:10px;border-left:3px solid #d8e0ec;padding-left:18px}
+.ex-tl .it{position:relative;margin-bottom:12px}.ex-tl .it:before{content:'';position:absolute;left:-26px;top:3px;width:13px;height:13px;border-radius:50%;background:#00A1E1;border:2px solid #fff;box-shadow:0 0 0 1px #00A1E1}
+.ex-tl .it.done:before{background:#0E7C66;box-shadow:0 0 0 1px #0E7C66}.ex-tl .it.late:before{background:#B91C1C;box-shadow:0 0 0 1px #B91C1C}
+.ex-tl .f{font-size:11px;color:#5b6b85;font-weight:700}
+.ex-warn{background:#fff7e6;border:1px solid #f5c26b;color:#7c4a03;border-radius:10px;padding:8px 12px;font-size:12px;margin-bottom:10px}
+.ex-info{background:#eaf6fd;border:1px solid #9bd4f0;color:#0b4a6f;border-radius:10px;padding:8px 12px;font-size:12px;margin-bottom:10px}
+.ex-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px;font-size:12px}
+.ex-tools select,.ex-tools input[type=text]{border:1px solid #cbd5e1;border-radius:7px;padding:6px 8px;font-size:12px;background:#fff}
+.ex-a{color:#0369a1;text-decoration:none}.ex-a:hover{text-decoration:underline}
+.ex-mono{font-family:ui-monospace,Menlo,monospace;font-size:11px}
+@media (max-width:760px){#expOv{padding:0}#expOv .a16-panel{border-radius:0}#expOv .a16-hd{flex-wrap:wrap;gap:6px;padding:10px 12px}#expOv .a16-hd h2{font-size:14px}#expOv .a16-hd .sub{display:none}#expOv .a16-hd .a16-btn{padding:5px 8px;font-size:11px}#expOv .ex-body{padding:10px}.ex-grid2{grid-template-columns:1fr}}
+@media print{#expOv .a16-hd .a16-btn,#expOv .a16-hd .x,#expOv .ex-tabs,#expOv .ex-tools{display:none!important}#expOv{position:static;padding:0;background:#fff;display:block}#expOv .ex-body{overflow:visible;background:#fff}}
+</style>
+
+<div class="a16-ov" id="expOv"><div class="a16-panel">
+  <div class="a16-hd"><div><h2>📂 Expediente de Autorización Sanitaria · bitácora de la solicitud</h2><div class="sub" id="expSub">Todo lo necesario para solicitar la AS del Nuevo Hospital Del Salvador: trámites, documentos, resoluciones, accesos, recintos y responsables</div></div>
+    <button class="a16-btn" style="margin-left:auto" onclick="expExport()" title="Descargar respaldo JSON de lo editado en este navegador">⬇ Respaldo</button>
+    <label class="a16-btn" title="Cargar un respaldo JSON">⬆ Cargar<input type="file" accept=".json" style="display:none" onchange="expImport(this)"></label>
+    <button class="a16-btn" onclick="expMD()" title="Descargar el expediente con su estado actual en Markdown">⬇ Informe .md</button>
+    <button class="a16-btn" onclick="window.print()">🖨</button>
+    <button class="x" onclick="expCerrar()">×</button></div>
+  <div class="ex-tabs" id="expTabs"></div>
+  <div class="ex-body" id="expBody"></div>
+</div></div>
+
+<script>
+(function(){
+const EXK='as16_expediente_v1';
+const ST=[['pendiente','Pendiente'],['en_curso','En curso'],['listo','Listo'],['observado','Observado'],['por_verificar','Por verificar'],['no_aplica','No aplica']];
+const STL=Object.fromEntries(ST);
+const TABS=[['panel','🧭 Panel'],['ruta','🗺 Hoja de ruta'],['tramites','🏛 Trámites'],['docs','📑 Documentos'],['res','⚖ Resoluciones'],['acc','🔑 Accesos y claves'],['rec','🏥 Recintos'],['act','👥 Actores'],['log','📓 Bitácora'],['riesgos','⚠ Riesgos'],['marco','📚 Marco y fuentes']];
+let TAB='panel', F={tram:'',estado:'',q:'',resp:''};
+const E=()=>window.AS_EXPEDIENTE||{};
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function load(){try{return JSON.parse(localStorage.getItem(EXK)||'{}')}catch(e){return {}}}
+function save(s){try{s.ts=new Date().toISOString();localStorage.setItem(EXK,JSON.stringify(s))}catch(e){alert('No se pudo guardar en este navegador: exporta un respaldo.')}}
+let S=load(); ['doc','tram','res','acc','riesgo'].forEach(k=>S[k]=S[k]||{}); S.log=S.log||[];
+const ov=(tipo,id,base)=>Object.assign({},base,(S[tipo]||{})[id]||{});
+function setv(tipo,id,campo,val){S[tipo][id]=S[tipo][id]||{};S[tipo][id][campo]=val;S[tipo][id].mod=new Date().toISOString();save(S);}
+const pill=e=>`<span class="ex-pill ex-s-${esc(e||'pendiente')}">${esc(STL[e]||e||'Pendiente')}</span>`;
+const vpill=v=>v?`<span class="ex-pill ex-v-${esc(String(v).split(' ')[0])}">${esc(v)}</span>`:'';
+const sel=(tipo,id,e)=>`<select class="ex-st" onchange="EXP.set('${tipo}','${esc(id)}','estado',this.value)">${ST.map(([k,l])=>`<option value="${k}"${k===(e||'pendiente')?' selected':''}>${l}</option>`).join('')}</select>`;
+const note=(tipo,id,v,ph)=>`<textarea class="ex-note" rows="1" placeholder="${esc(ph||'nota')}" onchange="EXP.set('${tipo}','${esc(id)}','nota',this.value)">${esc(v||'')}</textarea>`;
+const link=(u,t)=>u?`<a class="ex-a" href="${esc(u)}" target="_blank" rel="noopener">${esc(t||'enlace')}</a>`:'';
+const fmtF=d=>{if(!d)return '';const x=new Date(d+'T12:00:00');return isNaN(x)?d:x.toLocaleDateString('es-CL',{day:'2-digit',month:'short',year:'numeric'});};
+const dias=d=>Math.ceil((new Date(d+'T00:00:00')-new Date(new Date().toDateString()))/864e5);
+
+function docs(){return (E().documentos||[]).map(d=>ov('doc',d.id,d));}
+function tramites(){return (E().tramites||[]).map(t=>ov('tram',t.id,t));}
+function cuenta(list){const c={};list.forEach(x=>c[x.estado||'pendiente']=(c[x.estado||'pendiente']||0)+1);return c;}
+function barra(c,tot){const col={listo:'#0E7C66',en_curso:'#2563eb',observado:'#ea580c',por_verificar:'#B91C1C',pendiente:'#f59e0b',no_aplica:'#94a3b8'};return `<div class="ex-bar">${Object.keys(col).map(k=>c[k]?`<i title="${STL[k]}: ${c[k]}" style="width:${100*c[k]/tot}%;background:${col[k]}"></i>`:'').join('')}</div>`;}
+
+function rPanel(){
+  const e=E(), D=docs(), T=tramites(), c=cuenta(D), apl=D.filter(d=>d.estado!=='no_aplica');
+  const hito=(e.hitos||{}), tr=hito.traslado_inicio;
+  const res=(e.resoluciones||[]).map(r=>ov('res',r.id,r));
+  const acc=(e.accesos||[]).map(a=>ov('acc',a.id,a));
+  let h='';
+  if(e.aviso) h+=`<div class="ex-warn">${e.aviso}</div>`;
+  h+=`<div class="ex-kpis">
+   ${tr?`<div class="ex-kpi ${dias(tr)<45?'bad':'warn'}"><b>${dias(tr)}</b><span>días al inicio del traslado (${fmtF(tr)})</span></div>`:''}
+   <div class="ex-kpi"><b>${T.length}</b><span>trámites / autorizaciones identificados</span></div>
+   <div class="ex-kpi ok"><b>${c.listo||0}<small style="font-size:13px;color:#5b6b85"> / ${apl.length}</small></b><span>documentos listos</span></div>
+   <div class="ex-kpi warn"><b>${(c.pendiente||0)+(c.por_verificar||0)}</b><span>documentos pendientes o por verificar</span></div>
+   <div class="ex-kpi"><b>${res.filter(r=>/vigente/i.test(r.situacion||'')).length} / ${res.length}</b><span>resoluciones vigentes / catastradas</span></div>
+   <div class="ex-kpi ${acc.some(a=>(a.estado||'pendiente')!=='listo')?'warn':'ok'}"><b>${acc.filter(a=>a.estado==='listo').length} / ${acc.length}</b><span>accesos a plataformas resueltos</span></div>
+  </div>`;
+  h+=`<div class="ex-card"><h3>Avance documental</h3>${barra(c,D.length||1)}<div class="m">${ST.map(([k,l])=>`${l}: <b>${c[k]||0}</b>`).join(' · ')}</div></div>`;
+  if(e.conclusion) h+=`<div class="ex-card"><h3>Dónde estamos</h3><div style="font-size:12.5px;line-height:1.55">${e.conclusion}</div></div>`;
+  h+=`<div class="ex-h">Trámites por prioridad</div><table class="ex-tbl"><tr><th>Prioridad</th><th>Trámite</th><th>Autoridad</th><th>Documentos</th><th>Estado</th><th>Responsable</th></tr>`;
+  T.slice().sort((a,b)=>(a.prioridad||9)-(b.prioridad||9)).forEach(t=>{const dd=D.filter(d=>d.tramite===t.id), cc=cuenta(dd);
+    h+=`<tr><td class="ex-mono">P${esc(t.prioridad||'-')}</td><td><b>${esc(t.nombre)}</b><div class="m" style="font-size:11px;color:#5b6b85">${esc(t.norma||'')}</div></td><td>${esc(t.autoridad||'')}</td><td style="min-width:140px">${dd.length?barra(cc,dd.length)+`<small>${cc.listo||0}/${dd.length} listos</small>`:'—'}</td><td>${pill(t.estado)}</td><td>${esc(t.responsable||'')}</td></tr>`;});
+  h+='</table>';
+  const prox=(e.hoja_ruta||[]).flatMap(f=>(f.hitos||[]).map(x=>Object.assign({fase:f.fase},x))).filter(x=>x.fecha&&dias(x.fecha)>=0).sort((a,b)=>a.fecha.localeCompare(b.fecha)).slice(0,8);
+  if(prox.length){h+=`<div class="ex-h">Próximos hitos</div><div class="ex-tl">${prox.map(x=>`<div class="it"><div class="f">${fmtF(x.fecha)} · en ${dias(x.fecha)} días · ${esc(x.fase)}</div>${esc(x.hito)}${x.responsable?` <small style="color:#5b6b85">· ${esc(x.responsable)}</small>`:''}</div>`).join('')}</div>`;}
+  return h;
+}
+function rRuta(){
+  const e=E(); let h='<div class="ex-info">Secuencia recomendada para llegar con la solicitud presentada y la inspección coordinada antes de atender pacientes en el edificio nuevo. Las fechas son propuestas de trabajo: se ajustan en la bitácora a medida que la SEREMI y la Concesionaria confirman.</div>';
+  (e.hoja_ruta||[]).forEach(f=>{h+=`<div class="ex-card"><h3>${esc(f.fase)}</h3><div class="m">${fmtF(f.desde)} → ${fmtF(f.hasta)}${f.objetivo?' · '+esc(f.objetivo):''}</div><div class="ex-tl" style="margin-top:8px">${(f.hitos||[]).map(x=>{const d=x.fecha?dias(x.fecha):null;return `<div class="it ${x.hecho?'done':(d!==null&&d<0?'late':'')}"><div class="f">${x.fecha?fmtF(x.fecha):'sin fecha'}${x.responsable?' · '+esc(x.responsable):''}</div>${esc(x.hito)}${x.nota?`<div style="font-size:11px;color:#5b6b85">${esc(x.nota)}</div>`:''}</div>`}).join('')}</div></div>`;});
+  return h;
+}
+function rTramites(){
+  const D=docs(); let h='<div class="ex-grid2">';
+  tramites().forEach(t=>{const dd=D.filter(d=>d.tramite===t.id), cc=cuenta(dd);
+    h+=`<div class="ex-card"><div style="display:flex;gap:8px;align-items:flex-start"><div style="flex:1"><h3>${esc(t.nombre)}</h3><div class="m">${esc(t.norma||'')}</div></div>${sel('tram',t.id,t.estado)}</div>
+    <table class="ex-tbl" style="margin-top:8px">
+     <tr><td style="width:120px"><b>Autoridad</b></td><td>${esc(t.autoridad||'')}</td></tr>
+     <tr><td><b>Canal</b></td><td>${esc(t.canal||'')}</td></tr>
+     <tr><td><b>¿Aplica al NHDS?</b></td><td>${esc(t.aplica||'')}</td></tr>
+     ${t.arancel?`<tr><td><b>Arancel</b></td><td>${esc(t.arancel)}</td></tr>`:''}
+     ${t.plazo?`<tr><td><b>Plazo</b></td><td>${esc(t.plazo)}</td></tr>`:''}
+     ${t.vigencia?`<tr><td><b>Vigencia</b></td><td>${esc(t.vigencia)}</td></tr>`:''}
+     <tr><td><b>Responsable</b></td><td>${esc(t.responsable||'')}</td></tr>
+     ${t.estado_actual?`<tr><td><b>Situación</b></td><td>${esc(t.estado_actual)}</td></tr>`:''}
+     <tr><td><b>Documentos</b></td><td>${dd.length?barra(cc,dd.length)+`${cc.listo||0} de ${dd.length} listos · <a class="ex-a" href="#" onclick="EXP.verDocs('${esc(t.id)}');return false">ver checklist</a>`:'—'}</td></tr>
+     ${(t.fuentes||[]).length?`<tr><td><b>Fuentes</b></td><td>${t.fuentes.map(f=>link(f.url,f.titulo)).join('<br>')} ${vpill(t.verificacion)}</td></tr>`:''}
+    </table>${t.notas?`<div class="m" style="margin-top:6px">${esc(t.notas)}</div>`:''}${note('tram',t.id,t.nota,'nota de seguimiento')}</div>`;});
+  return h+'</div>';
+}
+function rDocs(){
+  const T=tramites(), D=docs();
+  const resps=[...new Set(D.map(d=>d.responsable).filter(Boolean))].sort();
+  let h=`<div class="ex-tools"><select onchange="EXP.f('tram',this.value)"><option value="">Todos los trámites</option>${T.map(t=>`<option value="${esc(t.id)}"${F.tram===t.id?' selected':''}>${esc(t.nombre)}</option>`).join('')}</select>
+   <select onchange="EXP.f('estado',this.value)"><option value="">Todos los estados</option>${ST.map(([k,l])=>`<option value="${k}"${F.estado===k?' selected':''}>${l}</option>`).join('')}</select>
+   <select onchange="EXP.f('resp',this.value)"><option value="">Todos los responsables</option>${resps.map(r=>`<option${F.resp===r?' selected':''}>${esc(r)}</option>`).join('')}</select>
+   <input type="text" placeholder="Buscar documento…" value="${esc(F.q)}" oninput="EXP.fq(this.value)">
+   <button class="a16-btn" onclick="EXP.csv()">⬇ CSV</button><span id="exCnt" style="color:#5b6b85"></span></div>`;
+  const L=D.filter(d=>(!F.tram||d.tramite===F.tram)&&(!F.estado||(d.estado||'pendiente')===F.estado)&&(!F.resp||d.responsable===F.resp)&&(!F.q||(d.nombre+' '+(d.detalle||'')+' '+(d.bloque||'')).toLowerCase().includes(F.q.toLowerCase())));
+  const tn=Object.fromEntries(T.map(t=>[t.id,t.nombre]));
+  h+=`<table class="ex-tbl"><tr><th>#</th><th>Documento / antecedente</th><th>Trámite · bloque</th><th>Responsable</th><th>Evidencia encontrada</th><th>Estado</th><th>Nota / enlace</th></tr>`;
+  L.forEach(d=>{h+=`<tr><td class="ex-mono">${esc(d.id)}</td><td><b>${esc(d.nombre)}</b>${d.detalle?`<div style="font-size:11px;color:#5b6b85">${esc(d.detalle)}</div>`:''}${d.norma?`<div style="font-size:10.5px;color:#0369a1">${esc(d.norma)}</div>`:''}</td><td style="font-size:11.5px">${esc(tn[d.tramite]||d.tramite)}<br><small style="color:#5b6b85">${esc(d.bloque||'')}</small></td><td style="font-size:11.5px">${esc(d.responsable||'')}</td><td style="font-size:11px;min-width:230px;max-width:320px">${esc(d.evidencia||'')}</td><td>${sel('doc',d.id,d.estado)}</td><td>${note('doc',d.id,d.nota,'qué falta, quién, link Drive…')}</td></tr>`;});
+  h+='</table>'; setTimeout(()=>{const c=document.getElementById('exCnt');if(c)c.textContent=L.length+' de '+D.length;},0);
+  return h;
+}
+function rRes(){
+  const L=(E().resoluciones||[]).map(r=>ov('res',r.id,r));
+  let h='<div class="ex-info">Actos administrativos que el expediente debe citar o que hay que obtener. «Situación» dice si existe (vigente), si hay que actualizarla por el traslado, o si todavía no existe.</div>';
+  h+=`<table class="ex-tbl"><tr><th>Tipo · N°</th><th>Fecha</th><th>Emisor</th><th>Materia</th><th>Situación</th><th>Para qué trámite</th><th>Archivo / fuente</th><th>Estado</th><th>Nota</th></tr>`;
+  L.forEach(r=>{h+=`<tr><td><b>${esc(r.tipo||'')} ${esc(r.numero||'')}</b></td><td class="ex-mono">${esc(r.fecha||'')}</td><td>${esc(r.emisor||'')}</td><td>${esc(r.materia||'')}</td><td>${esc(r.situacion||'')}</td><td style="font-size:11.5px">${esc(r.tramite||'')}</td><td style="font-size:11px">${r.url?link(r.url,r.archivo||'abrir'):esc(r.archivo||'')}</td><td>${sel('res',r.id,r.estado)}</td><td>${note('res',r.id,r.nota)}</td></tr>`;});
+  return h+'</table>';
+}
+function rAcc(){
+  const L=(E().accesos||[]).map(a=>ov('acc',a.id,a));
+  let h='<div class="ex-warn">⛔ <b>Aquí no se escriben contraseñas, códigos ni claves.</b> Se registra qué cuenta hace falta, a nombre de quién debe estar, quién la custodia y si ya está operativa. Las claves viven con su titular (ClaveÚnica es personal e intransferible).</div>';
+  h+=`<table class="ex-tbl"><tr><th>Plataforma</th><th>Para qué</th><th>Titular requerido</th><th>Custodio / quién opera</th><th>Cómo se obtiene</th><th>Estado</th><th>Nota</th></tr>`;
+  L.forEach(a=>{h+=`<tr><td><b>${a.url?link(a.url,a.plataforma):esc(a.plataforma)}</b></td><td>${esc(a.uso||'')}</td><td>${esc(a.titular||'')}</td><td>${esc(a.custodio||'')}</td><td style="font-size:11.5px">${esc(a.como||'')}</td><td>${sel('acc',a.id,a.estado)}</td><td>${note('acc',a.id,a.nota)}</td></tr>`;});
+  return h+'</table>';
+}
+function rRec(){
+  const R=window.AS_RESUMEN_RECINTOS;
+  if(!R){const s=document.createElement('script');s.src='SHARED_DATA/as_resumen_recintos.js?v='+Date.now();s.onload=()=>{if(TAB==='rec')render();};s.onerror=()=>{document.getElementById('expBody').innerHTML='<div class="ex-warn">No se pudo cargar SHARED_DATA/as_resumen_recintos.js</div>';};document.head.appendChild(s);return '<div class="ex-info">Cargando el resumen de recintos del Atlas…</div>';}
+  const t=R.totales, n=x=>Number(x||0).toLocaleString('es-CL');
+  let h=`<div class="ex-info">${esc(R.lectura)} Planilla completa: <span class="ex-mono">_DOCUMENTOS/AS_Resumen_Recintos_NHDS.xlsx</span> · detalle: <span class="ex-mono">_DOCS/AS_Expediente/Resumen_Recintos_AS.md</span></div>
+  <div class="ex-kpis"><div class="ex-kpi"><b>${n(t.recintos)}</b><span>recintos en el Atlas</span></div><div class="ex-kpi ok"><b>${n(t.con_pauta_propuesta)}</b><span>con pauta propuesta (${n(t.con_pauta_vigente)} vigente)</span></div>
+  <div class="ex-kpi"><b>${n(R.servicios.length)}</b><span>servicios / áreas</span></div><div class="ex-kpi warn"><b>${n(t.camas)}</b><span>camas en cupos BIM (conciliar con 637 oficiales)</span></div>
+  <div class="ex-kpi"><b>${n(R.precotejo.requisitos_evaluados)}</b><span>requisitos precotejados</span></div><div class="ex-kpi bad"><b>${n(R.precotejo.terreno)}</b><span>solo verificables en terreno</span></div></div>
+  <div class="ex-h">Por piso y edificio</div><div class="m">${Object.entries(R.por_piso).map(([k,v])=>`${k}: <b>${n(v)}</b>`).join(' · ')} &nbsp;|&nbsp; ${Object.entries(R.por_edificio).map(([k,v])=>`${esc(k)}: <b>${n(v)}</b>`).join(' · ')}</div>
+  <div class="ex-h">Autorizaciones que arrastran los recintos</div><table class="ex-tbl"><tr><th>Norma</th><th>Decreto</th><th>Autorización</th><th>Req. digitalizados</th><th>Recintos</th><th>Servicios</th></tr>
+  ${R.normas.map(x=>`<tr><td><b>${esc(x.nombre)}</b></td><td>${esc(x.decreto)}</td><td>${esc(x.autorizacion)}</td><td>${n(x.requisitos_digitalizados)}</td><td>${n(x.recintos)}</td><td style="font-size:11px">${esc([...new Set([...x.servicios_recinto,...x.servicios_unidad])].join(', '))}</td></tr>`).join('')}</table>
+  <div class="ex-h">Por servicio</div><div class="ex-tools"><input type="text" placeholder="Filtrar servicio…" oninput="EXP.fsvc(this.value)"></div>
+  <table class="ex-tbl" id="exSvc"><tr><th>Servicio</th><th>Pisos</th><th>Edif.</th><th>Recintos</th><th>Con pauta</th><th>Camas</th><th>Normas de unidad</th><th>Precotejo</th><th>Responsables</th></tr>
+  ${R.servicios.slice().sort((a,b)=>b.recintos-a.recintos).map(s=>{const p=s.precotejo||{},tot=p.total||0;return `<tr data-s="${esc(s.servicio.toLowerCase())}"><td><b>${esc(s.servicio)}</b>${s.congelado?' <span class="ex-pill ex-s-no_aplica">congelado</span>':''}</td><td>${esc(s.pisos.join(' '))}</td><td>${esc(s.edificio)}</td><td>${n(s.recintos)}</td><td>${n(s.con_pauta)}</td><td>${s.camas||''}</td><td style="font-size:11px">${esc(Object.keys(s.normas_unidad).join(', '))}</td><td style="min-width:130px">${tot?`<div class="ex-bar"><i style="width:${100*(p.documental_ok||0)/tot}%;background:#0E7C66" title="respaldado"></i><i style="width:${100*(p.falta_en_despliegue||0)/tot}%;background:#B91C1C" title="sin evidencia"></i><i style="width:${100*(p.concesionaria||0)/tot}%;background:#7c3aed" title="Concesionaria"></i><i style="width:${100*(p.gestion||0)/tot}%;background:#2563eb" title="gestión"></i><i style="width:${100*(p.terreno||0)/tot}%;background:#f59e0b" title="terreno"></i></div><small>${n(tot)} req.</small>`:'—'}</td><td style="font-size:11px">${esc(s.responsables.map(r=>r.nombre).join('; '))}</td></tr>`}).join('')}</table>
+  <div class="m" style="margin-top:6px">Barra: <b style="color:#0E7C66">respaldado</b> · <b style="color:#B91C1C">sin evidencia</b> · <b style="color:#7c3aed">Concesionaria</b> · <b style="color:#2563eb">gestión</b> · <b style="color:#f59e0b">terreno</b></div>`;
+  return h;
+}
+function rAct(){
+  const L=E().actores||[];
+  let h=`<table class="ex-tbl"><tr><th>Nombre</th><th>Cargo</th><th>Institución</th><th>Rol en la AS</th><th>Correo institucional</th></tr>`;
+  L.forEach(a=>{h+=`<tr><td><b>${esc(a.nombre)}</b></td><td>${esc(a.cargo||'')}</td><td>${esc(a.institucion||'')}</td><td>${esc(a.rol||'')}</td><td class="ex-mono">${esc(a.correo||'')}</td></tr>`;});
+  return h+'</table>';
+}
+function rLog(){
+  const base=(E().bitacora||[]).map(x=>Object.assign({origen:'expediente'},x));
+  const L=base.concat(S.log.map(x=>Object.assign({origen:'navegador'},x))).sort((a,b)=>String(b.fecha).localeCompare(String(a.fecha)));
+  let h=`<div class="ex-card"><h3>Agregar entrada</h3><div class="ex-tools" style="margin:6px 0 0"><input type="date" id="exLF" value="${new Date().toISOString().slice(0,10)}" style="border:1px solid #cbd5e1;border-radius:7px;padding:5px"><select id="exLT"><option>gestión</option><option>reunión</option><option>correo</option><option>documento</option><option>resolución</option><option>inspección</option><option>acuerdo</option><option>riesgo</option></select><input type="text" id="exLH" placeholder="Qué pasó (hecho, acuerdo, compromiso)…" style="flex:1;min-width:300px"><input type="text" id="exLS" placeholder="Fuente (correo, acta, link)"><button class="a16-btn p" onclick="EXP.addLog()">＋ Registrar</button></div></div>`;
+  h+=`<table class="ex-tbl"><tr><th>Fecha</th><th>Tipo</th><th>Hecho</th><th>Fuente</th><th></th></tr>`;
+  L.forEach((x,i)=>{h+=`<tr><td class="ex-mono">${esc(x.fecha)}</td><td>${esc(x.tipo||'')}</td><td>${esc(x.hecho)}</td><td style="font-size:11px">${x.url?link(x.url,x.fuente||'fuente'):esc(x.fuente||'')}</td><td>${x.origen==='navegador'?`<button class="a16-btn" title="Quitar esta entrada (solo las agregadas en este navegador)" onclick="EXP.delLog('${esc(x.id)}')">×</button>`:''}</td></tr>`;});
+  return h+'</table>';
+}
+function rRiesgos(){
+  const L=(E().riesgos||[]).map(r=>ov('riesgo',r.id,r));
+  let h=`<table class="ex-tbl"><tr><th>Riesgo</th><th>Impacto</th><th>Mitigación</th><th>Responsable</th><th>Estado</th><th>Nota</th></tr>`;
+  L.forEach(r=>{h+=`<tr><td><b>${esc(r.riesgo)}</b></td><td>${esc(r.impacto||'')}</td><td>${esc(r.mitigacion||'')}</td><td>${esc(r.responsable||'')}</td><td>${sel('riesgo',r.id,r.estado)}</td><td>${note('riesgo',r.id,r.nota)}</td></tr>`;});
+  return h+'</table>';
+}
+function rMarco(){
+  const e=E(); let h='';
+  h+=`<div class="ex-h">Marco normativo</div><table class="ex-tbl"><tr><th>Norma</th><th>Qué regula</th><th>Relevancia para la solicitud</th><th>Verificación</th><th>Fuente</th></tr>`;
+  (e.marco||[]).forEach(m=>{h+=`<tr><td><b>${esc(m.norma)}</b></td><td>${esc(m.titulo||'')}</td><td>${esc(m.relevancia||'')}</td><td>${vpill(m.verificacion)}</td><td style="font-size:11px">${(m.fuentes||[]).map(f=>link(f.url,f.titulo)).join('<br>')}</td></tr>`;});
+  h+='</table>';
+  h+=`<div class="ex-h">Fuentes del expediente</div><table class="ex-tbl"><tr><th>Tipo</th><th>Fuente</th><th>Qué aporta</th></tr>`;
+  (e.fuentes||[]).forEach(f=>{h+=`<tr><td>${esc(f.tipo||'')}</td><td>${f.url?link(f.url,f.titulo):esc(f.titulo)}</td><td>${esc(f.aporta||'')}</td></tr>`;});
+  return h+'</table>';
+}
+const R={panel:rPanel,ruta:rRuta,tramites:rTramites,docs:rDocs,res:rRes,acc:rAcc,rec:rRec,act:rAct,log:rLog,riesgos:rRiesgos,marco:rMarco};
+function render(){
+  document.getElementById('expTabs').innerHTML=TABS.map(([k,l])=>`<button class="${k===TAB?'on':''}" onclick="EXP.tab('${k}')">${l}</button>`).join('');
+  const b=document.getElementById('expBody');
+  if(!window.AS_EXPEDIENTE){b.innerHTML='<div class="ex-warn">No está cargado SHARED_DATA/as_expediente.js</div>';return;}
+  b.innerHTML=R[TAB]();
+  const e=E(); document.getElementById('expSub').textContent=`Versión ${e.version||''} · ${(e.documentos||[]).length} documentos · ${(e.tramites||[]).length} trámites · lo editado se guarda en este navegador${S.ts?' (último cambio '+new Date(S.ts).toLocaleString('es-CL')+')':''}`;
+}
+function csv(){
+  const T=Object.fromEntries(tramites().map(t=>[t.id,t.nombre]));
+  const rows=[['id','documento','detalle','tramite','bloque','responsable','evidencia','estado','nota']].concat(docs().map(d=>[d.id,d.nombre,d.detalle||'',T[d.tramite]||d.tramite,d.bloque||'',d.responsable||'',d.evidencia||'',STL[d.estado||'pendiente'],d.nota||'']));
+  dl('Expediente_AS_documentos.csv','﻿'+rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('\n'),'text/csv');
+}
+function dl(name,txt,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:type||'application/json'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}
+function md(){
+  const e=E(), D=docs(), T=tramites(); const L=[`# Expediente de Autorización Sanitaria · Nuevo Hospital Del Salvador`,'',`Estado al ${new Date().toLocaleString('es-CL')} · versión de datos ${e.version||''}`,''];
+  L.push('## Trámites','','| P | Trámite | Norma | Autoridad | Estado | Documentos listos | Nota |','|---|---|---|---|---|---|---|');
+  T.forEach(t=>{const dd=D.filter(d=>d.tramite===t.id);L.push(`| ${t.prioridad||''} | ${t.nombre} | ${t.norma||''} | ${t.autoridad||''} | ${STL[t.estado||'pendiente']} | ${dd.filter(d=>d.estado==='listo').length}/${dd.length} | ${(t.nota||'').replace(/\n/g,' ')} |`);});
+  T.forEach(t=>{const dd=D.filter(d=>d.tramite===t.id);if(!dd.length)return;L.push('',`## ${t.nombre}`,'','| # | Documento | Responsable | Estado | Nota |','|---|---|---|---|---|');dd.forEach(d=>L.push(`| ${d.id} | ${d.nombre} | ${d.responsable||''} | ${STL[d.estado||'pendiente']} | ${(d.nota||'').replace(/\n/g,' ')} |`));});
+  L.push('','## Bitácora','');(e.bitacora||[]).concat(S.log).sort((a,b)=>String(b.fecha).localeCompare(String(a.fecha))).forEach(x=>L.push(`- **${x.fecha}** · ${x.tipo||''} · ${x.hecho}${x.fuente?' _('+x.fuente+')_':''}`));
+  dl('Expediente_AS_'+new Date().toISOString().slice(0,10)+'.md',L.join('\n'),'text/markdown');
+}
+window.EXP={
+  tab:k=>{TAB=k;render();document.getElementById('expBody').scrollTop=0;},
+  set:(t,id,c,v)=>{setv(t,id,c,v);if(c==='estado'&&(TAB==='panel'||TAB==='tramites'))render();},
+  f:(k,v)=>{F[k]=v;render();}, fq:v=>{F.q=v;clearTimeout(EXP._t);EXP._t=setTimeout(()=>{render();const i=document.querySelector('#expBody .ex-tools input[type=text]');if(i){i.focus();i.setSelectionRange(v.length,v.length);}},250);},
+  verDocs:id=>{F.tram=id;TAB='docs';render();},
+  fsvc:v=>{v=v.toLowerCase();document.querySelectorAll('#exSvc tr[data-s]').forEach(tr=>tr.style.display=tr.dataset.s.includes(v)?'':'none');},
+  csv, addLog:()=>{const h=document.getElementById('exLH').value.trim();if(!h)return;S.log.push({id:'L'+Date.now(),fecha:document.getElementById('exLF').value,tipo:document.getElementById('exLT').value,hecho:h,fuente:document.getElementById('exLS').value.trim()});save(S);render();},
+  delLog:id=>{if(!confirm('¿Quitar esta entrada de la bitácora de este navegador?'))return;S.log=S.log.filter(x=>x.id!==id);save(S);render();},
+};
+window.expAbrir=function(tab){if(tab)TAB=tab;document.getElementById('expOv').classList.add('open');render();};
+window.expCerrar=function(){document.getElementById('expOv').classList.remove('open');};
+window.expExport=function(){dl('Expediente_AS_respaldo_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify({app:'Expediente AS 16',exportado:new Date().toISOString(),estado:S},null,1));};
+window.expImport=function(inp){const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);const st=j.estado||j;if(!confirm('¿Reemplazar lo editado en este navegador por el respaldo cargado?'))return;S=st;['doc','tram','res','acc','riesgo'].forEach(k=>S[k]=S[k]||{});S.log=S.log||[];save(S);render();}catch(e){alert('Archivo no válido');}};r.readAsText(f);inp.value='';};
+window.expMD=md;
+if(location.hash==='#expediente') setTimeout(()=>expAbrir(),350);
+})();
 </script>
 
 <script src="hub-home.js"></script>

@@ -368,6 +368,9 @@ button,input,select,textarea{font-family:inherit}
 .dot-panel .dp-t{font-size:12.5px;font-weight:800;color:#17456e}
 .dot-panel .dp-s{font-size:10.5px;color:#64748b;margin-top:2px}
 .dot-panel .dp-body{overflow-y:auto;padding:4px 0}
+.beca-tag{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:9px;font-size:9.5px;font-weight:700;
+  letter-spacing:.2px;vertical-align:1px;background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd;white-space:nowrap}
+.beca-tag.vencido{background:#fef3c7;color:#b45309;border-color:#fcd34d}
 .dp-row{display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;border-bottom:1px solid #f1f5f9}
 .dp-row:hover{background:#eff6ff}
 .dp-row.kb{background:#dbeafe;box-shadow:inset 3px 0 0 #2563eb}
@@ -408,6 +411,20 @@ button,input,select,textarea{font-family:inherit}
 #stampHint{background:#f0fdfa;border:1px solid #0d9488;color:#0f766e}
 #puertaHint{background:#eff6ff;border:1px solid #2563eb;color:#1d4ed8}
 #propHint{background:#fdf2fa;border:1px solid #d100b6;color:#9d0a8a}
+#lblHint{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:31;background:#fffbeb;border:1px solid #d97706;color:#92400e;border-radius:16px;padding:4px 14px;font-size:11.5px;font-family:system-ui,-apple-system,sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+#lblHint:hover{background:#fef3c7}
+/* Modo ubicación (vista 1): sólo el plano de fondo y los marcadores de tótems,
+   DEA e impresoras; se esconden cajas, rótulos, estructuras y todo lo demás. */
+svg.ubic-mode > :not(.ubic-layer){display:none !important}
+.ubic-mk{cursor:pointer}
+.ubic-mk:hover circle.bola{stroke:#0f172a}
+#ubicLegend{position:absolute;top:44px;left:50%;transform:translateX(-50%);z-index:31;background:rgba(255,255,255,.96);border:1px solid #94a3b8;border-radius:16px;padding:4px 12px;font-size:11.5px;font-family:system-ui,-apple-system,sans-serif;color:#1e293b;box-shadow:0 2px 8px rgba(0,0,0,.12);white-space:nowrap}
+#ubicLegend b{margin-left:2px}
+.dk-sub{display:flex;gap:3px;padding:0 2px}
+#dock:not(.open) .dk-sub{flex-direction:column}
+.dk-sub .dk-btn{justify-content:center}
+#dock.open .dk-sub .dk-btn .lb{display:none}
+#dkLabels:not(.on){border-color:#d97706;background:#fffbeb}
 /* ── Gestor de herramientas lateral (dock) ─────────────────────────────── */
 #dock{position:absolute;top:10px;right:10px;z-index:32;display:flex;flex-direction:column;gap:2px;background:rgba(255,255,255,.97);border:1px solid #94a3b8;border-radius:12px;padding:6px;box-shadow:0 8px 24px rgba(0,0,0,.18);font-family:system-ui,-apple-system,sans-serif;width:46px;transition:width .15s;user-select:none;max-height:calc(100% - 20px);overflow-y:auto;overflow-x:visible;scrollbar-width:thin}
 #dock.open{width:236px}
@@ -686,6 +703,8 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <div class="float-hint" id="stampHint">🪑 Duplicar mueble — arrastra un rectángulo sobre el mueble a copiar (como una captura de pantalla); al soltar, la copia queda junto al original · muévela arrastrándola · doble clic la elimina · ESC para salir</div>
       <div class="float-hint" id="bedHint" style="border-color:#0284c7;color:#0369a1">🛏 Modo puestos — en vista 2, clic DENTRO de un recinto: camillas/sillones en Recuperación, Habitación o Clínica; cupos (⭕) en Recuperación, Pre-Anestesia, Box Urgencia, Reanimador y Sala de Procedimiento; puestos de toma (🧪) solo en Laboratorio · ESC para salir</div>
       <div class="float-hint" id="propHint"></div>
+      <div id="ubicLegend" style="display:none"></div>
+      <button id="lblHint" style="display:none" onclick="toggleRoomLabels()" title="Los nombres y códigos de los recintos están ocultos. Clic para mostrarlos (también desde 🧰 → 🏷 Etiquetas de recintos).">🏷 Nombres de recinto ocultos · <b>mostrar</b></button>
       <!-- Gestor de herramientas lateral: ver · editar · agregar propuestos · reporte -->
       <!-- Gestor de herramientas: ÚNICO lugar de edición y acciones. Los botones
            que estaban en la barra superior se montan acá en _dockMonta(). -->
@@ -693,6 +712,12 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
         <button id="dockTog" onclick="dockToggle()" title="Abrir o cerrar el gestor de herramientas">🧰<span class="lb">Herramientas</span></button>
         <div class="dk-h">Ir a</div><div id="dkIr"></div>
         <div class="dk-sep"></div><div class="dk-h">Ver</div><div id="dkVer"></div>
+        <div class="dk-h">Ubicación en planta</div>
+        <div class="dk-sub">
+          <button class="dk-btn" id="dkUbicTotem" onclick="toggleUbic('totem')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van los TÓTEMS (círculo grande + icono)"><span class="ic">🎫</span><span class="lb">Tótems</span></button>
+          <button class="dk-btn" id="dkUbicDea" onclick="toggleUbic('dea')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van los DEA"><span class="ic">💚</span><span class="lb">DEA</span></button>
+          <button class="dk-btn" id="dkUbicPrinter" onclick="toggleUbic('printer')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van las IMPRESORAS"><span class="ic">🖨</span><span class="lb">Impresoras</span></button>
+        </div>
         <button class="dk-btn" id="dkLabels" onclick="toggleRoomLabels()" title="Mostrar u ocultar el nombre y código de cada recinto sobre el plano"><span class="ic">🏷</span><span class="lb">Etiquetas de recintos</span></button>
         <div class="dk-sep"></div><div class="dk-h">Consultar</div><div id="dkCons"></div>
         <button class="dk-btn" id="dkPanel" onclick="toggleRightPanel()" title="Abrir o cerrar el cuadro de camas, recintos, revisión, avance y personas"><span class="ic">📋</span><span class="lb">Avance y revisión</span><span class="n" id="dkPanelN"></span></button>
@@ -701,6 +726,8 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
         <button class="dk-btn prop" id="dkDesk" onclick="setPropMode('desk')" title="Puesto de trabajo NUEVO: escritorio con computador a escala del plano (150 × 160 cm). Clic coloca · clic derecho rota 90° · arrastrar mueve · doble clic elimina"><span class="ic">🖥</span><span class="lb">Puesto de trabajo nuevo</span><span class="n" id="dkDeskN"></span></button>
         <button class="dk-btn prop" id="dkTotem" onclick="setPropMode('totem')" title="Tótem / gestor de fila (dispositivo TI para salas de espera). Clic coloca · clic derecho rota · arrastrar mueve · doble clic elimina"><span class="ic">🎫</span><span class="lb">Tótem / gestor de fila</span><span class="n" id="dkTotemN"></span></button>
         <button class="dk-btn prop" id="dkDea" onclick="setPropMode('dea')" title="DEA · desfibrilador externo automático (se exporta a Clave Azul). Clic coloca · arrastrar mueve · doble clic elimina"><span class="ic">💚</span><span class="lb">DEA · Clave Azul</span><span class="n" id="dkDeaN"></span></button>
+        <button class="dk-btn prop" id="dkPrinter" onclick="setPropMode('printer')" title="Impresora (dispositivo TI). Clic coloca · clic derecho rota 90° · arrastrar mueve · doble clic elimina"><span class="ic">🖨</span><span class="lb">Impresora</span><span class="n" id="dkPrinterN"></span></button>
+        <button class="dk-btn" id="dkPrinterCupo" onclick="fijarCupo('printer')" title="Fijar el número total de impresoras adjudicadas al hospital y ver cuántas van colocadas en todos los pisos"><span class="ic">🔢</span><span class="lb" id="dkPrinterCupoLb">Cupo de impresoras</span><span class="n" id="dkPrinterCupoN"></span></button>
         <button class="dk-btn" id="dkPropImp" onclick="importarPropuestosPlano()" title="Traer los puestos de trabajo que el proyectista marcó en MAGENTA en el plano de Coordinación Mobiliario. Reemplaza los que ya se importaron antes; lo que colocaste a mano no se toca."><span class="ic">⬇</span><span class="lb">Importar del plano</span><span class="n" id="dkPropImpN"></span></button>
         <button class="dk-btn" id="dkPropDel" onclick="propBorrarCtx()" title="Borrar TODO lo propuesto del contexto en que estás trabajando (el recinto en vista 3, el área en vista 2, el piso en vista 1)"><span class="ic">🗑</span><span class="lb">Borrar propuestos de aquí</span></button>
         <div class="dk-sep"></div><div class="dk-h">Exportar</div><div id="dkExp"></div>
@@ -913,7 +940,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
   <div class="ficha-box" style="width:860px">
     <div class="ficha-head">
       <div>
-        <div class="ficha-title">📊 Propuestos · puestos nuevos, tótems y DEA</div>
+        <div class="ficha-title">📊 Propuestos · puestos nuevos, tótems, DEA e impresoras</div>
         <div class="ficha-sub" id="pmSub"></div>
       </div>
       <button class="ficha-x" onclick="exportPropuestos()" title="Exportar TODO lo propuesto a Excel">⬇</button>
@@ -1728,7 +1755,9 @@ if(nameState.habnum){
 if(!nameState.bimMultiRev) nameState.bimMultiRev={}; // multi-BIM revisados (pestaña Revisión)
 if(!nameState.bimRepRev) nameState.bimRepRev={};     // BIM repetidos revisados: guarda el valor BIM al revisar
 if(!nameState.repartoRev) nameState.repartoRev={};   // repartos EMMC desparejos revisados (firma por código)
-if(!nameState.comisionRev) nameState.comisionRev={};  // coincidencias comisión de servicio revisadas (por RUT)
+if(!nameState.comisionRev) nameState.comisionRev={};
+if(!nameState.cdsRev) nameState.cdsRev={};
+if(!nameState.propCupos) nameState.propCupos={};  // cupo finito por tipo de propuesto (p.ej. {printer:40}); sin clave = sin cupo        // Compra de Servicio ya informada a RR.HH. (por nombre normalizado)  // coincidencias comisión de servicio revisadas (por RUT)
 if(!nameState.revDesc) nameState.revDesc={};
 if(!nameState.recintosRev) nameState.recintosRev={};   // avisos del catastro de recintos marcados como revisados (clave check|rid|valor)          // sugerencias de Revisión rechazadas ("queda como está"), clave check|item
 if(!nameState.corrDesc) nameState.corrDesc={};        // correcciones de ortografía/códigos descartadas de forma permanente
@@ -1852,11 +1881,13 @@ const IMAGEN_LBL={ion:'Blindaje ionizante', mag:'Blindaje magnético', noion:'No
 const IMAGEN_ICO={ion:'☢', mag:'🧲', noion:'〰'};
 const IMAGEN_COL={ion:'#b45309', mag:'#1d4ed8', noion:'#365314'};
 function rImagen(id){ return (nameState.imagen||{})[id]||''; }   // '' | 'ion' | 'mag' | 'noion'
-// Box consulta: el NOMBRE del recinto es 1 de 4 (no hay subtipo aparte: evita la
+// Box consulta: el NOMBRE del recinto es 1 de 6 (no hay subtipo aparte: evita la
 // redundancia nombre/subtipo). Lo que no calce cae en la Revisión «Consultas:
-// nombre fuera de los 4», con sugerencia por nombre actual / planilla PMA-BIM / equipamiento.
-const CONSULTA_NOMBRES=['Consulta','Consulta c/ Baño','Consulta c/ Sofá','Consulta c/ Sillón Clínico'];
-const CONSULTA_KEY={consulta:0,bano:1,sofa:2,sillon:3};
+// nombre fuera de los 6», con sugerencia por nombre actual / planilla PMA-BIM / equipamiento.
+// La 5ª (Kine) agrupa los box de kinesiología y la 6ª (Entrevista) los de
+// entrevista a pacientes o familias (14-sep-2026).
+const CONSULTA_NOMBRES=['Consulta','Consulta c/ Baño','Consulta c/ Sofá','Consulta c/ Sillón Clínico','Consulta Kine','Consulta Entrevista'];
+const CONSULTA_KEY={consulta:0,bano:1,sofa:2,sillon:3,kine:4,entrevista:5};
 function _consultaNorm(x){ return norm(x||'').replace(/\s*\/\s*/g,'/').replace(/\s+/g,' ').trim(); }
 const _CONSULTA_SET=new Set(CONSULTA_NOMBRES.map(_consultaNorm));
 function esNombreConsulta(nm){ return _CONSULTA_SET.has(_consultaNorm(nm)); }
@@ -1865,6 +1896,9 @@ function _consultaSugerida(id){
   if(/ba[nñ]o|c\/b\b|cbano/.test(nm)) return {nombre:N[1],why:'el nombre actual indica baño'};
   if(/sin exam|sofa|divan/.test(nm)) return {nombre:N[2],why:'el nombre actual indica sofá / sin examen físico'};
   if(/sillon/.test(nm)) return {nombre:N[3],why:'el nombre actual indica sillón'};
+  // antes que la planilla: el mapa PMA las clasifica como consulta genérica
+  if(/\bkine/.test(nm)) return {nombre:N[4],why:'el nombre actual indica kinesiología'};
+  if(/\bentrev|\bentr\b/.test(nm)) return {nombre:N[5],why:'el nombre actual indica entrevista'};
   const PB=((window.CONSULTA_SUBTIPOS||{}).porBim)||{};
   const bims=(rBim(id)||'').match(/[A-Za-z]\d{3,5}/g)||[];
   const ks=[...new Set(bims.map(b=>PB[b]).filter(Boolean))];
@@ -2973,6 +3007,38 @@ function applyDelta(){
   }
 }
 applyDelta();
+// Quita un recinto de UN área, en memoria y en el delta persistido (sin borrarlo
+// del resto: su caja, nombre y puestos siguen). applyDelta copia las áreas, así
+// que tocar sólo la memoria no alcanza: al recargar el recinto volvía.
+function _quitarRecintoDeArea(rid, areaId){
+  for(const f of FLOORS){ const a=f.areas.find(x=>x.id===areaId); if(a) a.rooms=(a.rooms||[]).filter(r=>r.id!==rid); }
+  for(const arr of Object.values(floorsDelta.added_areas||{})){
+    (arr||[]).forEach(a=>{ if(a.id===areaId && Array.isArray(a.rooms)) a.rooms=a.rooms.filter(r=>r.id!==rid); });
+  }
+  if(floorsDelta.added_rooms && floorsDelta.added_rooms[areaId])
+    floorsDelta.added_rooms[areaId]=floorsDelta.added_rooms[areaId].filter(r=>r.id!==rid);
+}
+function _recintosEnVariasAreas(){
+  const m={};
+  FLOORS.forEach(f=>f.areas.forEach(a=>(a.rooms||[]).forEach(r=>{ (m[r.id]=m[r.id]||[]).push({fl:f,area:a,r}); })));
+  return Object.entries(m).filter(([,v])=>v.length>1);
+}
+// Reparación al cargar: el des-fusionar de áreas movía los recintos sólo en
+// memoria, así que al recargar quedaban en el área original Y en la nueva
+// («DAN (ESTERILIZACION)» y «ESTERILIZACION»: 17 recintos, sep-2026). Si una de
+// las dos áreas es hija de la otra por des-fusión (id «<padre>-U<n>-…»), la
+// intención era mover: se deja sólo en la hija. Lo demás queda como aviso.
+function _reparaRecintosEnDosAreas(){
+  let n=0;
+  _recintosEnVariasAreas().forEach(([rid,v])=>{
+    const hija=v.find(x=>v.some(y=>y!==x && x.area.id.startsWith(y.area.id+'-U')));
+    if(!hija) return;
+    v.forEach(x=>{ if(x!==hija){ _quitarRecintoDeArea(rid,x.area.id); n++; } });
+  });
+  if(n){ console.warn('Atlas HDS · '+n+' recintos que quedaron en dos áreas tras des-fusionar se dejaron sólo en el área nueva'); try{ sDelta(); }catch(e){} }
+  return n;
+}
+try{ _reparaRecintosEnDosAreas(); }catch(e){ console.warn('reparación de recintos en dos áreas', e); }
 
 // ═══ UNION PATH ═════════════════════════════════════════════════════════════
 // Computes the exact outer boundary of a set of axis-aligned rectangles as a
@@ -3148,7 +3214,7 @@ function animTo(tz,tox,toy,dur=600,cb=null){
     const e=1-Math.pow(1-p,4);
     S.zoom=fz+(tz-fz)*e; S.ox=fox+(tox-fox)*e; S.oy=foy+(toy-foy)*e;
     applyT();
-    if(S.level===1) updateAreaLabelSizes();
+    if(S.level===1){ updateAreaLabelSizes(); _ubicRescale(); }
     if(p<1)S.rafId=requestAnimationFrame(step);
     else{S.rafId=null;if(cb)cb();}
   }
@@ -3226,7 +3292,7 @@ const _FRICTION=0.80;   // per-frame decay: higher = more glide
 const _MAX_V=0.08;      // log-zoom cap per burst — reducido 50% para respuesta más suave
 
 function _zTick(){
-  if(Math.abs(_zv)<1e-4){ _zRaf=null; if(S.level===1) updateAreaLabelSizes(); return; }
+  if(Math.abs(_zv)<1e-4){ _zRaf=null; if(S.level===1){ updateAreaLabelSizes(); _ubicRescale(); } return; }
   const nz=Math.min(Math.max(S.zoom*Math.exp(_zv),.03),22);
   S.ox=_zmx-(_zmx-S.ox)*nz/S.zoom;
   S.oy=_zmy-(_zmy-S.oy)*nz/S.zoom;
@@ -3747,6 +3813,11 @@ function renderSVG(){
   // interactiva solo en vista 1 (en 2 y 3 no captura clics, para no tapar
   // recintos ni puestos).
   paintStructures();
+  // Modo ubicación: en vista 1, sólo los marcadores de los tipos elegidos
+  { const tipos=_ubicTipos(), on=S.level===1 && tipos.length>0;
+    svg.classList.toggle('ubic-mode', on);
+    if(on) _ubicLayer(tipos);
+    const lg=document.getElementById('ubicLegend'); if(lg && !on) lg.style.display='none'; }
   // Overlay de diagnóstico DXF (siempre encima de todo, no interactivo)
   if(_dxfOverlayOn && S.level<=2) paintDxfOverlay();
   try{ _dockSync(); }catch(e){}
@@ -4015,16 +4086,24 @@ function renderL2(){
     }
     // N° de funcionarios asignados: esquina inferior derecha, donde no compite
     // con el nombre (arriba), el código+aforo (bajo el nombre) ni la tipología
-    // (abajo al centro). Solo el número, y solo si hay alguien.
-    if(S.showAsigN){
-      const _dd=(wsState.dots||{})[room.id]||[];
-      const _na=_dd.filter(isDotAsignado).length;
-      if(_na){
-        svg.appendChild(txt(b.x+b.w-fs*.30, b.y+b.h-fs*.34, String(_na),
-          {fill:'#15803d', stroke:'#ffffff', 'stroke-width':fs*.20, 'paint-order':'stroke fill',
-           'font-size':fs*.78, 'text-anchor':'end', 'pointer-events':'none',
-           'font-family':'Segoe UI,sans-serif', 'font-weight':'900'}));
-      }
+    // (abajo al centro). Al doble de tamaño que antes: VERDE si hay al menos una
+    // persona (en cualquier recinto); 0 en ROJO sólo si el recinto tiene puestos
+    // dibujados y ninguno está asignado. Sin puestos y sin nadie: nada (baños,
+    // bodegas, shafts no se llenan de ceros).
+    const _dd=(wsState.dots||{})[room.id]||[];
+    const _na=_dd.filter(isDotAsignado).length;
+    if(S.showAsigN && (_na || _dd.length)){
+      // txt() centra en vertical (dominant-baseline:middle): con el número al
+      // doble, un centro a 0,26·fs del borde dejaba medio dígito pisando la línea.
+      // Centro a ~0,95·fs deja el dígito entero adentro, con aire igual al lateral.
+      const _t=txt(b.x+b.w-fs*.42, b.y+b.h-fs*.95, String(_na),
+        {class:'asig-n '+(_na?'asig-si':'asig-no'),
+         fill:_na?'#16a34a':'#dc2626', stroke:'#ffffff', 'stroke-width':fs*.30, 'paint-order':'stroke fill',
+         'font-size':fs*1.56, 'text-anchor':'end', 'pointer-events':'none',
+         'font-family':'Segoe UI,sans-serif', 'font-weight':'900'});
+      const _tt=el('title'); _tt.textContent=_na?(_na+' persona'+(_na===1?'':'s')+' asignada'+(_na===1?'':'s')+' a este recinto'):'Nadie asignado a este recinto todavía';
+      _t.appendChild(_tt);
+      svg.appendChild(_t);
     }
     // Código BIM (del plano o manual), visible bajo el código de recinto.
     // Clic sobre la línea = edición en línea del BIM (sin abrir el diálogo completo).
@@ -4696,7 +4775,8 @@ function sProp(){ const k=ls('cabida_cad_propuestos',propState); _markSaved(k); 
 const PROP_DEF={
   desk: {lbl:'Puesto de trabajo nuevo', corto:'Puesto nuevo', ico:'🖥', col:'#d100b6', cm:{w:150,h:160}, rota:true},
   totem:{lbl:'Tótem / gestor de fila',  corto:'Tótem',        ico:'🎫', col:'#7c3aed', cm:{w:60,h:60},   rota:true},
-  dea:  {lbl:'DEA · Clave Azul',        corto:'DEA',          ico:'💚', col:'#16a34a', cm:{w:60,h:60},   rota:false}
+  dea:  {lbl:'DEA · Clave Azul',        corto:'DEA',          ico:'💚', col:'#16a34a', cm:{w:60,h:60},   rota:false},
+  printer:{lbl:'Impresora',             corto:'Impresora',    ico:'🖨', col:'#ea580c', cm:{w:60,h:50},   rota:true}
 };
 // centímetros por píxel del plano de un piso (extensión DXF / tamaño de imagen);
 // sin calibración (P-2, P-3, P5) se asume 1,6 cm/px como el resto del edificio.
@@ -4716,6 +4796,11 @@ function _propEnCtx(){
   const ids=_propCtxIds(); const items=_propItems();
   return ids?items.filter(it=>it.rid&&ids.has(it.rid)):items.slice();
 }
+function _propHintTxt(k){
+  const D=PROP_DEF[k], c=_propCupo(k), n=_propTotal(k);
+  return D.ico+' '+D.lbl+' — clic en el plano coloca uno'+(D.rota?' · clic derecho rota 90°':'')+' · arrastrar mueve · doble clic elimina · Esc sale'
+    +(c?(' · '+n+' de '+c+(n>=c?(n>c?(' ⚠ '+(n-c)+' sobre el cupo'):' · cupo completo'):(' · quedan '+(c-n)))):'');
+}
 function setPropMode(k){
   if(S.viewOnly && !S.editPM) return;
   if(k && !PROP_DEF[k]) k=null;
@@ -4727,7 +4812,7 @@ function setPropMode(k){
   if(S.propMode){ if(S.puertaMode) togglePuertaMode(); if(S.stampMode) toggleStampMode(); }
   const h=document.getElementById('propHint');
   if(h){
-    if(S.propMode){ const D=PROP_DEF[S.propMode]; h.textContent=D.ico+' '+D.lbl+' — clic en el plano coloca uno'+(D.rota?' · clic derecho rota 90°':'')+' · arrastrar mueve · doble clic elimina · Esc sale'; h.classList.add('show'); }
+    if(S.propMode){ h.textContent=_propHintTxt(S.propMode); h.classList.add('show'); }
     else h.classList.remove('show');
   }
   svg.style.cursor=S.propMode?'copy':'';
@@ -4774,6 +4859,13 @@ function _propSymbol(it){
     g.appendChild(el('rect',{x:-W/2+6*f,y:-H/2+6*f,width:W-12*f,height:12*f,rx:2*f,fill:D.col,'fill-opacity':.85}));   // pantalla
     g.appendChild(el('path',{d:`M ${-W/2} ${H/2} l ${-8*f} ${14*f} h ${W+16*f} l ${-8*f} ${-14*f} z`,fill:D.col,'fill-opacity':.55}));  // frente / base
     g.appendChild(txt(0,6*f,'🎫',{'font-size':Math.max(12,22*f*1.6),'pointer-events':'none'}));
+  } else if(it.k==='printer'){
+    // multifuncional ~60 × 50 cm; bandeja de salida hacia el frente (+y)
+    const W=60*f, H=50*f;
+    g.appendChild(el('rect',{x:-W/2,y:-H/2,width:W,height:H,rx:6*f,fill:D.col,'fill-opacity':.22,stroke:D.col,'stroke-width':sw,'stroke-dasharray':`${8*f} ${5*f}`}));
+    g.appendChild(el('rect',{x:-W/2+6*f,y:-H/2+5*f,width:W-12*f,height:14*f,rx:2*f,fill:D.col,'fill-opacity':.85}));        // escáner / tapa
+    g.appendChild(el('rect',{x:-W/2+10*f,y:H/2-4*f,width:W-20*f,height:12*f,rx:2*f,fill:'#fff',stroke:D.col,'stroke-width':sw*.7}));   // bandeja con hoja
+    g.appendChild(txt(0,2*f,'🖨',{'font-size':Math.max(12,22*f*1.6),'pointer-events':'none'}));
   } else {  // dea
     const W=60*f;
     g.appendChild(el('rect',{x:-W/2,y:-W/2,width:W,height:W,rx:10*f,fill:D.col,stroke:'#fff','stroke-width':sw}));
@@ -4809,6 +4901,11 @@ function _propLayer(){
       if(e.button!==0) return;
       e.preventDefault(); e.stopPropagation();
       const p=s2i(e.clientX,e.clientY);
+      const cupo=_propCupo(S.propMode), n=_propTotal(S.propMode);
+      if(cupo && n>=cupo){
+        const D=PROP_DEF[S.propMode];
+        if(!confirm('⚠ Ya se colocaron '+n+' '+D.lbl.toLowerCase()+'s y el cupo es '+cupo+'.\n\n¿Colocar igual y quedar '+(n+1-cupo)+' sobre el cupo?')) return;
+      }
       const it=propAdd(S.propMode,p.x,p.y,0);
       if(it && !it.rid && typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='⚠ Colocado fuera de un recinto dibujado: no saldrá asociado a ningún recinto en el reporte'; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},4000); }
       renderSVG();
@@ -4844,6 +4941,88 @@ function _propDragUp(){
   }
   _propDrag=null;
 }
+// ═══ CUPO FINITO DE PROPUESTOS (impresoras) ═════════════════════════════════
+// El hospital recibe un número cerrado de impresoras. Se fija el cupo total y el
+// Atlas cuenta las colocadas en TODOS los pisos: el gestor muestra «12 / 40», el
+// modo colocar avisa cuántas quedan y, al llegar al cupo, pide confirmar antes de
+// pasarse. Sin cupo fijado, todo funciona como antes.
+function _propCupo(k){ const v=+((nameState.propCupos||{})[k]); return (Number.isFinite(v)&&v>0)?Math.floor(v):null; }
+function _propTotal(k){ let n=0; Object.values(propState).forEach(a=>(a||[]).forEach(x=>{ if(x&&x.k===k) n++; })); return n; }
+function _propCupoTxt(k){ const c=_propCupo(k), n=_propTotal(k); return c?(n+' / '+c):String(n); }
+function fijarCupo(k){
+  if(S.viewOnly && !S.editPM) return;
+  const D=PROP_DEF[k]; const actual=_propCupo(k), n=_propTotal(k);
+  const r=prompt('Cupo total de '+D.lbl.toLowerCase()+'s para todo el hospital.\n\n'
+    +'Hoy hay '+n+' colocada'+(n===1?'':'s')+' en el Atlas.'
+    +(actual?(' Cupo vigente: '+actual+'.'):' Todavía sin cupo.')
+    +'\n\nEscribe el número (deja vacío o 0 para quitar el cupo):', actual||'');
+  if(r===null) return;
+  const v=parseInt(String(r).replace(/[^\d]/g,''),10);
+  if(!v){ delete nameState.propCupos[k]; }
+  else {
+    if(v<n && !confirm('Fijaste '+v+' pero ya hay '+n+' colocadas: quedarías '+(n-v)+' sobre el cupo. ¿Fijarlo igual?')) return;
+    nameState.propCupos[k]=v;
+  }
+  sNames(); renderSVG();
+  if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent=v?(D.ico+' Cupo de '+D.lbl.toLowerCase()+'s: '+v+' · colocadas '+n+' · quedan '+Math.max(0,v-n)):(D.ico+' Cupo de '+D.lbl.toLowerCase()+'s quitado'); setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},5000); }
+}
+// ═══ UBICACIÓN EN PLANTA (vista 1) ══════════════════════════════════════════
+// A escala de piso completo un tótem de 60 cm mide un par de píxeles. Este modo
+// esconde todas las cajas y dibuja cada elemento como un círculo de tamaño FIJO
+// en pantalla (no crece ni se achica con el zoom) con su icono, para ver de un
+// vistazo dónde van los tótems, los DEA o las impresoras del piso.
+function _UBIC(){ return ['totem','dea','printer']; }   // función y no const: renderSVG puede correr antes de esta línea
+if(!S.ubic){ try{ S.ubic=new Set((localStorage.getItem('cabida_ubic')||'').split(',').filter(k=>_UBIC().includes(k))); }catch(e){ S.ubic=new Set(); } }
+function _ubicTipos(){ return _UBIC().filter(k=>S.ubic && S.ubic.has(k)); }
+function toggleUbic(k){
+  if(!S.ubic) S.ubic=new Set();
+  if(S.ubic.has(k)) S.ubic.delete(k); else S.ubic.add(k);
+  _lsPref('cabida_ubic',[...S.ubic].join(','));
+  if(S.ubic.size && S.level!==1 && typeof tbInfo!=='undefined' && tbInfo){
+    tbInfo.textContent='📍 La ubicación en planta se ve en la vista de piso (← Volver hasta la vista 1)'; setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },4000);
+  }
+  renderSVG();
+}
+function _ubicLayer(tipos){
+  const items=_propItems().filter(it=>tipos.includes(it.k));
+  const g=el('g',{class:'ubic-layer'});
+  const k=1/Math.max(S.zoom,1e-4);
+  items.forEach(it=>{
+    const D=PROP_DEF[it.k];
+    const mk=el('g',{class:'ubic-mk ubic-'+it.k,transform:`translate(${it.x},${it.y}) scale(${k})`});
+    mk.appendChild(el('circle',{cx:0,cy:0,r:16,fill:'#ffffff',opacity:.9}));
+    mk.appendChild(el('circle',{class:'bola',cx:0,cy:0,r:13,fill:D.col,stroke:'#ffffff','stroke-width':2.5}));
+    mk.appendChild(txt(0,1,D.ico,{'font-size':13.5,'pointer-events':'none'}));
+    const ttl=el('title'); ttl.textContent=D.ico+' '+D.lbl+(it.rid?(' · '+(rName(it.rid)||'')+' · '+(_findRoom(it.rid)?aName(_findRoom(it.rid).area.id):'')):' · fuera de recinto')+' · clic = ir al recinto';
+    mk.appendChild(ttl);
+    mk.addEventListener('mousedown',e=>e.stopPropagation());
+    mk.addEventListener('click',e=>{ e.stopPropagation(); _ubicIr(it); });
+    g.appendChild(mk);
+  });
+  svg.appendChild(g);
+  // leyenda con el conteo del piso
+  const lg=document.getElementById('ubicLegend');
+  if(lg){
+    const c={}; items.forEach(it=>{ c[it.k]=(c[it.k]||0)+1; });
+    lg.innerHTML='📍 '+(curFloor()?curFloor().label:S.floorId)+' · '
+      +tipos.map(t=>PROP_DEF[t].ico+' '+PROP_DEF[t].lbl.split(' ·')[0].split(' /')[0]+' <b>'+(c[t]||0)+'</b>'
+        +(_propCupo(t)?(' <span style="color:'+(_propTotal(t)>_propCupo(t)?'#dc2626':'#64748b')+'">(hospital '+_propTotal(t)+'/'+_propCupo(t)+')</span>'):'')).join(' · ')
+      +(items.length?'':' <span style="color:#b45309">— ninguno colocado en este piso</span>');
+    lg.style.display='';
+  }
+}
+function _ubicRescale(){
+  if(!svg.classList.contains('ubic-mode')) return;
+  const k=1/Math.max(S.zoom,1e-4);
+  svg.querySelectorAll('.ubic-mk').forEach(m=>{
+    const t=m.getAttribute('transform')||''; m.setAttribute('transform', t.replace(/scale\([^)]*\)/,'scale('+k+')'));
+  });
+}
+function _ubicIr(it){
+  const ctx=it.rid?_findRoom(it.rid):null;
+  if(ctx){ didPan=false; goArea(ctx.area.id); setTimeout(()=>{ try{ zoomTo({x:it.x-150,y:it.y-150,w:300,h:300},120); }catch(e){} },750); }
+  else { try{ zoomTo({x:it.x-400,y:it.y-400,w:800,h:800},60); }catch(e){} }
+}
 // Siembra desde los planos de Coordinación Mobiliario: trae los puestos que el
 // proyectista marcó en magenta. Es idempotente — reemplaza SOLO lo que vino del
 // plano (src:'plano') y respeta todo lo que se colocó a mano.
@@ -4873,7 +5052,7 @@ function importarPropuestosPlano(sinConfirmar){
 }
 // Resumen por piso → área → recinto (para el reporte, el dock y la exportación)
 function _propResumen(){
-  const filas=[]; const tot={desk:0,totem:0,dea:0,sin:0};
+  const filas=[]; const tot={desk:0,totem:0,dea:0,printer:0,sin:0};
   FLOORS.forEach(fl=>{
     (propState[fl.id]||[]).forEach(it=>{
       const ctx=it.rid?_findRoom(it.rid):null;
@@ -4892,22 +5071,27 @@ function openPropReport(){
   const {filas,tot}=_propResumen();
   const esc=x=>String(x||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
   const sub=document.getElementById('pmSub'), body=document.getElementById('pmBody');
-  sub.textContent=filas.length?(filas.length+' elementos propuestos · '+tot.desk+' puestos · '+tot.totem+' tótems · '+tot.dea+' DEA'+(tot.sin?(' · '+tot.sin+' fuera de recinto'):'')):'Todavía no hay elementos propuestos.';
+  sub.textContent=filas.length?(filas.length+' elementos propuestos · '+tot.desk+' puestos · '+tot.totem+' tótems · '+tot.dea+' DEA · '+tot.printer+' impresoras'+(tot.sin?(' · '+tot.sin+' fuera de recinto'):'')):'Todavía no hay elementos propuestos.';
   let h='<div class="pm-kpi">'
     +'<div><b style="color:#d100b6">'+tot.desk+'</b><span>🖥 Puestos de trabajo nuevos</span></div>'
     +'<div><b style="color:#7c3aed">'+tot.totem+'</b><span>🎫 Tótems / gestores de fila</span></div>'
-    +'<div><b style="color:#16a34a">'+tot.dea+'</b><span>💚 DEA para Clave Azul</span></div></div>';
+    +'<div><b style="color:#16a34a">'+tot.dea+'</b><span>💚 DEA para Clave Azul</span></div>'
+    +(()=>{ const cp=_propCupo('printer'), nt=_propTotal('printer');
+       return '<div><b style="color:'+(cp&&nt>cp?'#dc2626':'#ea580c')+'">'+(cp?(nt+' / '+cp):nt)+'</b><span>🖨 Impresoras'
+         +(cp?(nt>cp?(' · ⚠ '+(nt-cp)+' sobre el cupo'):(' · quedan '+(cp-nt))):'')
+         +' · <a href="#" onclick="fijarCupo(\'printer\');openPropReport();return false" style="color:#1d5fa0">'+(cp?'cambiar cupo':'fijar cupo')+'</a></span></div>'; })()
+    +'</div>';
   if(!filas.length){ h+='<div class="fk-empty">Coloca puestos nuevos, tótems o DEA desde el gestor lateral 🧰 (vista 2 o 3). Aquí aparecen agrupados por piso, área y recinto.</div>'; body.innerHTML=h; }
   else {
     // agrupar por piso / área / recinto
     const grp=new Map();
-    filas.forEach(f=>{ const k=f.fl.id+'|'+(f.area?f.area.id:'')+'|'+(f.r?f.r.id:''); if(!grp.has(k)) grp.set(k,{fl:f.fl,area:f.area,r:f.r,desk:0,totem:0,dea:0}); grp.get(k)[f.it.k]++; });
-    h+='<table class="pm-tbl"><thead><tr><th>Piso</th><th>Área</th><th>Recinto</th><th>Código</th><th style="text-align:center">🖥</th><th style="text-align:center">🎫</th><th style="text-align:center">💚</th></tr></thead><tbody>';
+    filas.forEach(f=>{ const k=f.fl.id+'|'+(f.area?f.area.id:'')+'|'+(f.r?f.r.id:''); if(!grp.has(k)) grp.set(k,{fl:f.fl,area:f.area,r:f.r,desk:0,totem:0,dea:0,printer:0}); grp.get(k)[f.it.k]++; });
+    h+='<table class="pm-tbl"><thead><tr><th>Piso</th><th>Área</th><th>Recinto</th><th>Código</th><th style="text-align:center">🖥</th><th style="text-align:center">🎫</th><th style="text-align:center">💚</th><th style="text-align:center">🖨</th></tr></thead><tbody>';
     [...grp.values()].sort((a,b)=>FLOORS.indexOf(a.fl)-FLOORS.indexOf(b.fl)||String(a.area?aName(a.area.id):'').localeCompare(String(b.area?aName(b.area.id):''),'es')||String(a.r?rName(a.r.id):'').localeCompare(String(b.r?rName(b.r.id):''),'es'))
       .forEach(g=>{
         h+='<tr class="pm-go" onclick="propIr(\''+esc(g.fl.id)+'\',\''+esc(g.area?g.area.id:'')+'\',\''+esc(g.r?g.r.id:'')+'\')" title="Ir al recinto en el plano">'
           +'<td>'+esc(g.fl.label)+'</td><td>'+esc(g.area?aName(g.area.id):'—')+'</td><td>'+esc(g.r?(rName(g.r.id)||g.r.id):'<i>fuera de recinto</i>')+'</td><td>'+esc(g.r?(rCode(g.r.id)||''):'')+'</td>'
-          +'<td class="num">'+(g.desk||'')+'</td><td class="num">'+(g.totem||'')+'</td><td class="num">'+(g.dea||'')+'</td></tr>';
+          +'<td class="num">'+(g.desk||'')+'</td><td class="num">'+(g.totem||'')+'</td><td class="num">'+(g.dea||'')+'</td><td class="num">'+(g.printer||'')+'</td></tr>';
       });
     h+='</tbody></table>';
     h+='<div style="font-size:11px;color:#48687e;margin-top:10px">Clic en una fila para ir al recinto. ⬇ exporta todo a Excel · 💚 exporta solo los DEA con coordenadas para Clave Azul.</div>';
@@ -4995,20 +5179,36 @@ function toggleRoomLabels(){
 }
 function _dockSync(){
   const d=document.getElementById('dock'); if(!d) return;
-  if(S.roomLabels===undefined){ try{ S.roomLabels=localStorage.getItem('cabida_room_labels')!=='0'; }catch(e){ S.roomLabels=true; } }
+  if(S.roomLabels===undefined){
+    let v=null, rep=null;
+    try{ v=localStorage.getItem('cabida_room_labels'); rep=localStorage.getItem('cabida_room_labels_rep1'); }catch(e){}
+    // Reparación ÚNICA (12-sep-2026): el selftest anterior escribía esta
+    // preferencia saltándose el guarda y podía dejarla apagada sin que el
+    // usuario lo eligiera. Se enciende una sola vez; si después se apaga a
+    // propósito, se respeta.
+    if(!rep){ if(v==='0') v='1'; _lsPref('cabida_room_labels', v==='0'?'0':'1'); _lsPref('cabida_room_labels_rep1','1'); }
+    S.roomLabels = v!=='0';
+  }
   if(!d._init){ d._init=true; try{ if(localStorage.getItem('cabida_dock_open')==='1') d.classList.add('open'); }catch(e){} }
   svg.classList.toggle('hide-room-labels', S.roomLabels===false);
+  { const h=document.getElementById('lblHint'); if(h) h.style.display=(S.roomLabels===false && S.level>=2)?'':'none'; }
   const on=(id,v)=>{ const b=document.getElementById(id); if(b) b.classList.toggle('on',!!v); };
   const dis=(id,v)=>{ const b=document.getElementById(id); if(b) b.classList.toggle('dis',!!v); };
   on('dkLabels',S.roomLabels!==false);
   { const p=document.getElementById('rightPanel'); on('dkPanel', p && !p.classList.contains('collapsed')); }
-  ['desk','totem','dea'].forEach(k=>on('dk'+k.charAt(0).toUpperCase()+k.slice(1),S.propMode===k));
+  ['desk','totem','dea','printer'].forEach(k=>on('dk'+k.charAt(0).toUpperCase()+k.slice(1),S.propMode===k));
+  _UBIC().forEach(k=>on('dkUbic'+k.charAt(0).toUpperCase()+k.slice(1), S.ubic&&S.ubic.has(k)));
   const ro=S.viewOnly&&!S.editPM;
-  dis('dkDesk',ro||S.level<2); dis('dkTotem',ro||S.level<2); dis('dkDea',ro||S.level<2); dis('dkPropDel',ro||!_propEnCtx().length);
+  dis('dkDesk',ro||S.level<2); dis('dkTotem',ro||S.level<2); dis('dkDea',ro||S.level<2); dis('dkPrinter',ro||S.level<2); dis('dkPropDel',ro||!_propEnCtx().length);
   // contadores del contexto (piso / área / recinto)
-  const items=_propEnCtx(); const c={desk:0,totem:0,dea:0}; items.forEach(it=>{ c[it.k]=(c[it.k]||0)+1; });
+  const items=_propEnCtx(); const c={desk:0,totem:0,dea:0,printer:0}; items.forEach(it=>{ c[it.k]=(c[it.k]||0)+1; });
   const setN=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v?String(v):''; };
-  setN('dkDeskN',c.desk); setN('dkTotemN',c.totem); setN('dkDeaN',c.dea);
+  setN('dkDeskN',c.desk); setN('dkTotemN',c.totem); setN('dkDeaN',c.dea); setN('dkPrinterN',c.printer);
+  { const cp=_propCupo('printer'), nt=_propTotal('printer');
+    const lb=document.getElementById('dkPrinterCupoLb'), nb=document.getElementById('dkPrinterCupoN');
+    if(lb) lb.textContent=cp?('Impresoras '+nt+' / '+cp+(nt>cp?' ⚠':'')):'Fijar cupo de impresoras';
+    if(nb){ nb.textContent=cp?(nt+'/'+cp):''; nb.style.background=cp?(nt>cp?'#dc2626':(nt===cp?'#d97706':'#16a34a')):''; }
+    const h=document.getElementById('propHint'); if(h && S.propMode==='printer') h.textContent=_propHintTxt('printer'); }
   setN('dkPropImpN', ((window.PROPUESTOS_PLANO||{}).total)||0);
   { const b=document.getElementById('sbBimN'); const e=document.getElementById('dkPanelN'); if(b&&e) e.textContent=b.textContent||''; }
   let tot=0; Object.values(propState).forEach(a=>{ tot+=(a||[]).length; }); setN('dkReportN',tot);
@@ -6332,12 +6532,12 @@ function editBoxName(){
     imgWrap.append(imgLbl,imgSel,imgHint);
     box.append(imgWrap);
 
-    // ── Box consulta · el nombre es 1 de 4 (chips que escriben el nombre) ──
+    // ── Box consulta · el nombre es 1 de 6 (chips que escriben el nombre) ──
     const cnRow=document.createElement('div');
     cnRow.style.cssText='display:none;flex-wrap:wrap;gap:5px;padding:8px;background:#f5f3ff;border:1px dashed #7c3aed;border-radius:6px;margin-top:2px;align-items:center;';
     const cnLbl=document.createElement('span');
     cnLbl.style.cssText='font-size:10px;color:#5b21b6;text-transform:uppercase;letter-spacing:.5px;font-weight:700;width:100%;';
-    cnLbl.textContent='🩺 Nombre de consulta · 1 de 4';
+    cnLbl.textContent='🩺 Nombre de consulta · 1 de 6';
     cnRow.appendChild(cnLbl);
     const _cnPaint=()=>{ cnRow.querySelectorAll('button').forEach(b=>{ const on=_consultaNorm(b.textContent)===_consultaNorm(inp.value); b.style.background=on?'#7c3aed':'#fff'; b.style.color=on?'#fff':'#5b21b6'; }); };
     CONSULTA_NOMBRES.forEach(nm=>{
@@ -6349,7 +6549,7 @@ function editBoxName(){
     const cnHint=document.createElement('div');
     cnHint.style.cssText='font-size:9px;color:#5b21b6;font-style:italic;width:100%;';
     { const sg=(!esNombreConsulta(cur))?_consultaSugerida(id):null;
-      cnHint.textContent=sg?('Sugerido: '+sg.nombre+' — '+sg.why+'.'):'Otro nombre deja la consulta en la Revisión «Consultas: nombre fuera de los 4».'; }
+      cnHint.textContent=sg?('Sugerido: '+sg.nombre+' — '+sg.why+'.'):'Otro nombre deja la consulta en la Revisión «Consultas: nombre fuera de los 6».'; }
     cnRow.appendChild(cnHint);
     inp.addEventListener('input',_cnPaint); _cnPaint();
     box.append(cnRow);
@@ -6694,14 +6894,17 @@ function doUnmerge(){
     boxState.areas[id]=[ash[0]];   // el área original conserva el primer bloque
     // reasignar recintos por posición (centroide) al bloque que los contiene
     const keep=[];
+    const movidos=[];
     (srcArea.rooms||[]).forEach(rm=>{
       const rs=boxState.rooms[rm.id]||[];
       if(rs.length){ const c=bounds(rs); const p={x:c.x+c.w/2,y:c.y+c.h/2};
         const hit=newAreas.find(x=>inside(x.shape,p));
-        if(hit){ hit.na.rooms.push(rm); return; } }
+        if(hit){ hit.na.rooms.push({...rm}); movidos.push(rm.id); return; } }
       keep.push(rm);
     });
     srcArea.rooms=keep;
+    // el delta también: si no, al recargar vuelven al área original y quedan duplicados
+    movidos.forEach(rid=>_quitarRecintoDeArea(rid, srcArea.id));
     const nB=ash.length;
     S.selIds.clear();
     sBox(); sNames(); sDelta(); flushAutosave();
@@ -7699,7 +7902,7 @@ function openFichaRecinto(roomId){
   const _instN=(typeof codeInstances==='function')?codeInstances(code):1;
   const _m2=roomM2Label(roomId);
   const _ty=rType(roomId);
-  const _subT=_ty==='box'?(esNombreConsulta(nm)?'':'⚠ nombre fuera de los 4 de consulta'):_ty==='pabellon'?('🔪 '+PABELLON_LBL[rPabellon(roomId)||'mayor']):_ty==='proced'?('💉 '+PROC_LBL[rProcKind(roomId)]):_ty==='imagen'?(IMAGEN_ICO[rImagen(roomId)||'ion']+' '+IMAGEN_LBL[rImagen(roomId)||'ion']):'';
+  const _subT=_ty==='box'?(esNombreConsulta(nm)?'':'⚠ nombre fuera de los 6 de consulta'):_ty==='pabellon'?('🔪 '+PABELLON_LBL[rPabellon(roomId)||'mayor']):_ty==='proced'?('💉 '+PROC_LBL[rProcKind(roomId)]):_ty==='imagen'?(IMAGEN_ICO[rImagen(roomId)||'ion']+' '+IMAGEN_LBL[rImagen(roomId)||'ion']):'';
   const sub=[code?('Código '+code):'', tp, _subT, _m2?('📐 '+_m2):'', ctx.area.name, (curFloor()?curFloor().name:S.floorId), _instN>1?('1 de '+_instN+' instancias del código'):''].filter(Boolean).join(' · ');
   document.getElementById('fkSub').textContent=sub;
   // ── 4 categorías: Equipamiento · Mobiliario Clínico · Informática · Mobiliario No Clínico ──
@@ -8628,7 +8831,7 @@ function renderDotPanel(){
         : '';
       filas.push('<div class="dp-row '+(rid?'ok':'no')+'" onclick="dpPick('+_i+')">'
         +_chk
-        +'<span class="nm">'+esc(s.nombre)+'<span class="sub">'+esc(sub||'—')
+        +'<span class="nm">'+esc(s.nombre)+becaTag(s)+'<span class="sub">'+esc(sub||'—')
         +(rid?(' · en '+esc(rName(rid)||'')):(buscando&&s.servicio?(' · '+esc(corto(s.servicio))):''))+'</span></span>'
         +'<span class="st">'+(rid?'✔':'○')+'</span></div>');
     });
@@ -9190,6 +9393,13 @@ function setTipo(t){
   // (el puesto dinámico se pinta azul en vista 3 apenas se marca)
   if(mCtx.roomId!==null){ try{ sWs(); renderSVG(); if(typeof updateStats==='function')updateStats(); }catch(e){} }
 }
+// "Piso › Área › Recinto" de un recinto, para poder nombrar SIEMPRE los dos
+// extremos de un traslado (de dónde sale y a dónde va).
+function _ubicRecinto(rid){
+  const c=(typeof _findRoom==='function')?_findRoom(rid):null;
+  if(!c) return 'este puesto';
+  return c.floor.label+' › '+aName(c.area.id)+' › '+(rName(c.room.id)||c.room.id);
+}
 function findExclusiveConflict(nombre,skipRoomId,skipIdx){
   if(!nombre)return null;
   const n=nombre.toLowerCase();
@@ -9200,7 +9410,7 @@ function findExclusiveConflict(nombre,skipRoomId,skipIdx){
       if(d.tipo==='dinamico')continue;
       if(room.id===skipRoomId&&i===skipIdx)continue;
       if(d.nombre&&d.nombre.toLowerCase()===n)
-        return{floorLabel:fl.label,areaLabel:aName(area.id),roomLabel:rName(room.id)};
+        return{floorLabel:fl.label,areaLabel:aName(area.id),roomLabel:rName(room.id),roomId:room.id};
     }
   }
   return null;
@@ -9217,10 +9427,15 @@ function saveWs(){
       // Antes esto era un callejón sin salida: avisaba y no dejaba hacer nada,
       // así que había que ir al otro recinto a borrarlo a mano. Ahora se ofrece
       // el movimiento, que es lo que casi siempre se quiere.
-      const mover=confirm('⚠ "'+nombre+'" ya está asignado en:\n'
-        + conflict.floorLabel+' › '+conflict.areaLabel+' › '+conflict.roomLabel
-        + '\n\nCada persona puede estar en un solo puesto.\n\n'
-        + 'Aceptar = MOVERLO acá (se elimina su puesto en '+conflict.roomLabel+')\n'
+      // El cuadro nombra los DOS extremos: desde la Revisión uno no tiene a la
+      // vista dónde está parado, así que decir sólo el origen no alcanza.
+      const destino=_ubicRecinto(roomId);
+      const mismo=conflict.roomId===roomId;
+      const mover=confirm('⚠ "'+nombre+'" ya tiene un puesto asignado.\n\n'
+        + '📍 Hoy está en:\n     '+conflict.floorLabel+' › '+conflict.areaLabel+' › '+conflict.roomLabel+'\n\n'
+        + '➡️ Se movería a:\n     '+destino+(mismo?'  (otro puesto del mismo recinto)':'')+'\n\n'
+        + 'Cada persona puede estar en un solo puesto.\n\n'
+        + 'Aceptar = MOVERLO (su puesto en '+conflict.roomLabel+' queda libre)\n'
         + 'Cancelar = dejarlo donde está');
       if(!mover) return;
       _quitarDeSuPuesto(nombre, roomId);
@@ -9620,20 +9835,6 @@ function _m2Pendientes(){
 // Pendientes de cuadratura EMMC (SHARED_DATA/emmc_pendientes.js): códigos del
 // Despliegue sin recinto conocido + casos especiales. Si un pendiente calza con
 // un recinto dibujado, la fila navega; si no, se muestra como informativa.
-function _emmcDiffPendientes(){
-  const pend=window.EMMC_PEND||[], out=[];
-  const drawnByCode={};
-  FLOORS.forEach(fl=>fl.areas.forEach(a=>(a.rooms||[]).forEach(r=>{
-    if(!(boxState.rooms[r.id]||[]).length) return;
-    const c=rCode(r.id); if(c) (drawnByCode[c]=drawnByCode[c]||[]).push({fl,area:a,r});
-  })));
-  pend.forEach(d=>{
-    const hits=drawnByCode[d.code];
-    if(hits) hits.forEach(h=>out.push({...h,diff:d}));
-    else out.push({noNav:true, title:d.code, sub:d.unidades+' unidad'+(d.unidades===1?'':'es')+' · '+d.motivo});
-  });
-  return out;
-}
 // Reparto EMMC desparejo: códigos multi-instancia cuyos items no dividen
 // exacto entre las instancias (el resto se asigna determinístico, pero la
 // ubicación fina es decisión manual → traslados o aprobación).
@@ -9663,6 +9864,7 @@ function _externaPendientes(){
   FLOORS.forEach(fl=>fl.areas.forEach(a=>(a.rooms||[]).forEach(r=>{
     (wsState.dots[r.id]||[]).forEach((d,idx)=>{
       const push=(nombre,enM,cds,sinMarca)=>{
+        if(cds && !enM && nameState.cdsRev[norm(nombre)]) return;   // CdS ya informada a RR.HH.
         const cand=(!enM)?(_matrizCandidato(nombre)||{}).nombre:null;
         out.push({fl,area:a,r,idx,nombre,enMatriz:enM,cand:cand||null,cds:!!cds,sinMarca:!!sinMarca,cargo:[d.cargo,d.estamento].filter(Boolean).join(' · ')});
       };
@@ -9773,10 +9975,13 @@ function _comisionPendientes(){
       else if(d.nombre) put(d.nombre);
     });
   })));
-  const out=[];
+  const out=[], rutVisto=new Set();
   dotDB.staff.forEach(s=>{
     if(!s.comision||!s.nombre) return;
     if(nameState.comisionRev[s.rut]) return;
+    // una persona con dos líneas en la matriz (dos nombramientos) salía dos veces
+    // con la misma clave: el ✓ de una "no hacía nada" porque quedaba la otra
+    if(s.rut){ if(rutVisto.has(s.rut)) return; rutVisto.add(s.rut); }
     const loc=idx[norm(s.nombre)];
     out.push({nombre:s.nombre,rut:s.rut,cargo:s.cargo,unidad:s.unidad,turno:s.turno,
               asignado:!!loc, fl:loc&&loc.fl, area:loc&&loc.area, r:loc&&loc.r});
@@ -9819,21 +10024,66 @@ function _catSinBimPendientes(){
   });
   return out;
 }
-function _codMapaPendientes(){
+// Triage de "código Atlas ≠ mapa PMA". Antes toda diferencia ofrecía el mismo ✓
+// (escribir el código del mapa), y en la mitad de los casos eso era DAÑINO: si el
+// BIM del recinto pertenece a un Aseo de otra familia, lo que está mal es el BIM,
+// no el código. Clases:
+//   'codigo' → misma familia, un código contra otro (o el del Atlas mal escrito):
+//              el ✓ toma el del mapa.
+//   'bim'    → familia distinta, sufijo _A/_B (subespacio) o fusión disjunta: el
+//              BIM parece de OTRO recinto; se corrige el BIM en el diálogo.
+//   null     → no es una discrepancia accionable en el Atlas: fusiones que
+//              representan lo mismo ("57.7.3 / 57.7.4" = "57.7.3/4"), código del
+//              Atlas contenido en el del mapa (baño compartido por 3 códigos) o
+//              código del mapa inválido ("-", "27.XX/…"): problema del mapa.
+function _codExpand(c){
+  const out=[]; let prev=null;
+  String(c||'').split('/').map(x=>x.trim()).filter(Boolean).forEach(x=>{
+    x=x.replace(/\.{2,}/g,'.');
+    if(prev && /^\w+$/.test(x) && !x.includes('.')){ const sg=prev.split('.'); sg[sg.length-1]=x; out.push(sg.join('.')); }
+    else { out.push(x); prev=x; }
+  });
+  return out;
+}
+const _codValido=c=>/^\d+(\.\d+)*(_[A-Z])?$/.test(c);
+function _codClase(atlas,mapa){
+  const rawA=String(atlas||''), A=_codExpand(atlas), M=_codExpand(mapa);
+  if(!M.length || !M.every(_codValido)) return null;              // mapa inválido
+  const bienEscrito=rawA.split('/').map(x=>x.trim()).every(x=>_codValido(x)||/^\w+$/.test(x));
+  const iguales=A.length===M.length && A.every(a=>M.includes(a));
+  if(iguales) return bienEscrito?null:'codigo';                     // mismo código: sólo corrige la escritura
+  if(A.every(a=>M.includes(a)) || M.every(m=>A.includes(m))) return null;   // uno contiene al otro
+  if(A.length===1 && M.length===1){
+    const a=A[0], m=M[0];
+    if(a.replace(/_[A-Z]$/,'')===m.replace(/_[A-Z]$/,'')) return 'bim';     // subespacio (_B = su baño…)
+    if(a.split('.')[0]!==m.split('.')[0]) return 'bim';                     // otra familia
+    return 'codigo';
+  }
+  return 'bim';
+}
+function _codMapaFilas(clase){
   const out=[];
   (_catRev().codigo_distinto||[]).forEach(x=>{
     const ref=_roomRef(x.rid); if(!ref) return;
     const cur=(rCode(x.rid)||'').replace(/\s+/g,'').toUpperCase();
     if(cur===String(x.codigo_mapa||'').replace(/\s+/g,'').toUpperCase()) return;   // ya coincide
     if(cur!==String(x.codigo_atlas||'').replace(/\s+/g,'').toUpperCase()) return;  // ya lo cambió a otra cosa
+    if((rBim(x.rid)||'').toUpperCase().indexOf(String(x.bim||'').toUpperCase())<0) return; // ya no lleva ese BIM
     if(nameState.recintosRev['codmapa|'+x.rid+'|'+x.codigo_mapa]) return;
-    out.push({...ref,bim:x.bim,codigoAtlas:x.codigo_atlas,codigoMapa:x.codigo_mapa,nombreMapa:x.nombre_mapa,servicio:x.servicio});
+    if(_codClase(x.codigo_atlas,x.codigo_mapa)!==clase) return;
+    out.push({...ref,bim:x.bim,codigoAtlas:x.codigo_atlas,codigoMapa:x.codigo_mapa,nombreMapa:x.nombre_mapa,servicio:x.servicio,
+              _dialogo:clase==='bim'});
   });
   return out;
 }
+function _codMapaPendientes(){ return _codMapaFilas('codigo'); }
+function _bimAjenoPendientes(){ return _codMapaFilas('bim'); }
 function _variosSvPendientes(){
   const out=[];
   (_catRev().varios_servicios||[]).forEach(x=>{
+    // Las instancias que están en el servicio al que pertenece el código son lo
+    // esperado: listarlas inflaba la cuenta (28) con 19 casos sin nada que revisar.
+    if(x.servicio && x.asignado_a && x.servicio===x.asignado_a) return;
     const ref=_roomRef(x.rid); if(!ref) return;
     if(nameState.recintosRev['variossv|'+x.rid+'|'+x.bim]) return;
     out.push({...ref,bim:x.bim,codigo:x.codigo,servicio:x.servicio,asignadoA:x.asignado_a,servicios:x.servicios});
@@ -9861,25 +10111,41 @@ const REV_CHECKS={
     apply:p=>{ nameState.codes=nameState.codes||{}; nameState.codes[p.r.id]=p.codigoMapa; nameState.recintosRev['codmapa|'+p.r.id+'|'+p.codigoMapa]=1; },
     subText:p=>'BIM '+p.bim+' · Atlas '+p.codigoAtlas+' vs mapa '+p.codigoMapa+' («'+(p.nombreMapa||'')+'») · '+p.fl.label,
     done:'Todos los códigos del Atlas coinciden con el mapa PMA, o quedaron confirmados.'},
-  variossv:{label:'Catastro: código con BIM en varios servicios',
+  recdup:{label:'Recintos en dos áreas a la vez',
+    find:()=>_recintosEnVariasAreas().flatMap(([rid,v])=>v.map(x=>({fl:x.fl,area:x.area,r:x.r,otras:v.filter(y=>y!==x).map(y=>aName(y.area.id)),
+      code:'dup|'+rid+'|'+x.area.id}))),
+    approve:true, noDialog:true, flat:true, auditaUnoAUno:true,
+    allIf:()=>false,
+    okTitle:'Quitar el recinto de ESTA área (queda sólo en la otra)',
+    apply:p=>{ _quitarRecintoDeArea(p.r.id,p.area.id); try{ sDelta(); }catch(e){} },
+    subText:p=>'«'+(rName(p.r.id)||p.r.id)+'» también está en '+p.otras.join(', ')+' · ✓ lo quita de '+aName(p.area.id)+' · '+p.fl.label,
+    done:'Cada recinto pertenece a una sola área.'},
+  bimajeno:{label:'Catastro: BIM que parece de otro recinto',
+    find:_bimAjenoPendientes, flat:true,
+    subText:p=>'BIM '+p.bim+' es «'+(p.nombreMapa||'?')+'» ('+p.codigoMapa+') en el mapa, pero este recinto es '+p.codigoAtlas
+      +' · el clic abre el recinto para corregir el BIM · 🚫 si el BIM está bien · '+p.fl.label,
+    done:'Ningún recinto lleva un BIM que en el mapa PMA pertenezca a otro recinto.'},
+  variossv:{label:'Catastro: BIM dibujado fuera del servicio de su código',
     find:_variosSvPendientes, approve:true, noDialog:true, flat:true,
-    okTitle:'Marcar como revisado (el BIM está donde corresponde)',
+    okTitle:'Correcto así: el recinto va en este servicio aunque su código sea de otro',
     apply:p=>{ nameState.recintosRev['variossv|'+p.r.id+'|'+p.bim]=1; },
-    subText:p=>'BIM '+p.bim+' · código '+p.codigo+' en '+p.servicios+' · quedó en '+p.asignadoA+' · '+p.fl.label,
-    done:'Ningún código tiene BIM dibujados en más de un servicio.'},
+    subText:p=>'BIM '+p.bim+' · código '+p.codigo+' de '+p.asignadoA+', dibujado en '+p.servicio+' · clic = ir al recinto · ✓ correcto así · '+p.fl.label,
+    done:'Todos los BIM están dibujados en el servicio al que pertenece su código, o quedaron confirmados.'},
   // UN SOLO filtro de dotación (petición 03-09): fuera de matriz + Compra de
   // Servicio + comisiones, en una lista. El clic NO navega al plano: abre
   // directamente el diálogo del puesto para ver, buscar o reemplazar a mano.
   dotacion:{label:'Dotación: fuera de matriz · CdS · comisiones',
     find:_dotacionPendientes, flat:true,
     approve:true,
-    okIf:p=>p._chk==='comision' || p.enMatriz || !!p.cand,
+    okIf:p=>p._chk==='comision' || p.enMatriz || !!p.cand || (p._chk==='externa' && p.cds && !p.enMatriz),
     allIf:p=>p._chk==='externa' && p.enMatriz,
     saveWs:true,
     okTitle:'Aceptar: si la persona ya está en la matriz, la reemplaza por su ficha oficial; en comisiones, marca la coincidencia como revisada',
     allLabel:n=>'✓ Reemplazar los '+n+' que YA están en la matriz',
     allMsg:n=>'¿Reemplazar a los '+n+' funcionarios que ya aparecen en la matriz de dotación?\n\nCada uno queda vinculado a su ficha oficial (nombre, cargo, estamento) y pierde la marca fuera-de-matriz. Los demás casos no se tocan.',
-    apply:p=>{ if(p._chk==='comision') nameState.comisionRev[p.rut]=1; else _relinkExterna(p); },
+    apply:p=>{ if(p._chk==='comision') nameState.comisionRev[p.rut]=1;
+               else if(p.cds && !p.enMatriz && !p.cand) nameState.cdsRev[norm(p.nombre)]=1;   // CdS: informada a RR.HH.
+               else _relinkExterna(p); },
     go:p=>{
       if(S.viewOnly && !S.editPM) return;
       let rid=null, ix=-1;
@@ -9891,17 +10157,23 @@ const REV_CHECKS={
             : norm(d.nombre||'')===norm(p.nombre));
       }
       if(rid!=null && ix>=0){ try{ openModal(rid,ix); }catch(e){} }
-      else if(typeof tbInfo!=='undefined'&&tbInfo){
-        tbInfo.textContent='👤 '+p.nombre+' no tiene puesto asignado en el Atlas (solo figura en la matriz)';
-        setTimeout(()=>{ if(tbInfo)tbInfo.textContent=''; },4000);
+      else {
+        // Sin puesto en el Atlas: antes el clic sólo avisaba y no llevaba a nada.
+        // Ahora abre su ficha en el buscador de funcionarios (unidad, cargo, marca
+        // de comisión), desde donde se le puede asignar puesto.
+        const inp=document.getElementById('gSearchInput');
+        if(inp){ inp.value=p.nombre; inp.dispatchEvent(new Event('input',{bubbles:true})); inp.focus(); }
+        if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='👤 '+p.nombre+' no tiene puesto en el Atlas: su ficha quedó abierta en el buscador'; setTimeout(()=>{ if(tbInfo)tbInfo.textContent=''; },5000); }
       }
     },
+    goDestino:p=> p._chk==='externa' ? !!(p.r && (wsState.dots[p.r.id]||[])[p.idx])
+                 : (p.asignado ? !!p.r : !!document.getElementById('gSearchInput')),
     subText:p=> p._chk==='comision'
       ? ('🔁 comisión de servicio · '+[p.cargo,p.unidad,p.turno].filter(Boolean).join(' · ')
          +' · '+(p.asignado?('📍 asignado: '+(rName(p.r.id)||p.r.id)):'sin asignar en Atlas'))
       : ((p.enMatriz?'✔ YA EN LA MATRIZ — el ✓ la reemplaza por su ficha oficial · '
         :p.cand?('≈ EN LA MATRIZ COMO «'+p.cand+'» — el ✓ la vincula a esa ficha · ')
-        :(p.cds?'🛒 Compra de Servicio — incorporar a dotación vía RR.HH. · '
+        :(p.cds?'🛒 Compra de Servicio — gestionar con RR.HH.; ✓ cuando ya esté informada · '
         :(p.sinMarca?'⚠ NO está en la matriz actual (sin marca: guardar la asignación la marcará) · '
                :'⚠ fuera de matriz — gestionar con RR.HH. · ')))
         +[p.cargo,p.fl&&p.fl.label].filter(Boolean).join(' · ')),
@@ -9919,18 +10191,18 @@ const REV_CHECKS={
     test:r=>!rType(r),
     subText:p=>rCode(p.r.id)||'sin código',
     done:'Todos los recintos dibujados tienen tipología asignada.'},
-  consulta:{label:'Consultas: nombre fuera de los 4',
-    // Toda consulta (tipología Box Consulta) se llama 1 de 4: Consulta · Consulta c/ Baño ·
-    // Consulta c/ Sofá · Consulta c/ Sillón Clínico. Las demás se listan aquí; el ✓ renombra
+  consulta:{label:'Consultas: nombre fuera de los 6',
+    // Toda consulta (tipología Box Consulta) se llama 1 de 6: Consulta · Consulta c/ Baño ·
+    // Consulta c/ Sofá · Consulta c/ Sillón Clínico · Consulta Kine · Consulta Entrevista. Las demás se listan aquí; el ✓ renombra
     // con la sugerencia (nombre actual / planilla PMA-BIM / equipamiento) y el clic abre el diálogo.
     find:_consultaPendientes, approve:true,
     okIf:p=>!!p.sug, allIf:p=>!!p.sug,
     okTitle:'Renombrar esta consulta con el nombre sugerido',
     allLabel:n=>'✓ Renombrar las '+n+' con sugerencia',
-    allMsg:n=>'¿Renombrar las '+n+' consultas con su nombre sugerido?\n\nEl nombre actual se reemplaza por uno de los 4 nombres de consulta. Las que no tienen sugerencia siguen en la lista para definirlas a mano.',
+    allMsg:n=>'¿Renombrar las '+n+' consultas con su nombre sugerido?\n\nEl nombre actual se reemplaza por uno de los 6 nombres de consulta. Las que no tienen sugerencia siguen en la lista para definirlas a mano.',
     apply:p=>{ nameState.rooms[p.r.id]=p.sug; },
     subText:p=>'«'+(rName(p.r.id)||'')+'» '+(p.sug?('→ '+p.sug+' · '+p.why):'⚠ sin sugerencia — definir a mano'),
-    done:'Todas las consultas dibujadas se llaman Consulta · Consulta c/ Baño · Consulta c/ Sofá · Consulta c/ Sillón Clínico.'},
+    done:'Todas las consultas dibujadas se llaman Consulta · Consulta c/ Baño · Consulta c/ Sofá · Consulta c/ Sillón Clínico · Consulta Kine · Consulta Entrevista.'},
   dup:{label:'Duplicados sin tipología',
     find:_dupPendientes, del:true,
     subText:p=>'≈'+Math.round(p.ratio*100)+'% sobre '+(rName(p.dupOf.id)||p.dupOf.id),
@@ -9948,10 +10220,6 @@ const REV_CHECKS={
     subText:p=>p.resto.slice(0,3).map(e=>e.n+' '+e.c+'/'+p.N).join(' · ')+(p.resto.length>3?(' +'+(p.resto.length-3)):'')+' · '+p.fl.label,
     apply:p=>{ nameState.repartoRev[p.code]=p.firma; },
     done:'Todos los repartos multi-instancia dividen parejo o fueron confirmados.'},
-  emmcdiff:{label:'Cuadratura EMMC (Despliegue)',
-    find:_emmcDiffPendientes, noDialog:true, flat:true,
-    subText:p=>p.diff?(p.diff.unidades+' unidades · '+p.diff.motivo+' · '+p.fl.label):'',
-    done:'El Despliegue EMMC cuadra completo con Atlas (8.358 unidades).'},
   multibim:{label:'Multi-BIM sin revisar',
     // más de 1 código BIM; los baños quedan fuera (legítimamente tienen 2);
     // guardar la ficha del recinto lo marca revisado aunque el BIM no cambie
@@ -9964,9 +10232,22 @@ const REV_CHECKS={
 function _revKey(check,p){
   check = p._chk || check;           // filas fusionadas conservan su prefijo original
   const id = p.rut || p.code
-    || (p.r && p.r.id && (p.r.id + (p.idx!=null?('#'+p.idx):'') + (p.repBim?('#'+p.repBim):'')))
+    || (p.r && p.r.id && (p.r.id + (p.idx!=null?('#'+p.idx):'') + (p.repBim?('#'+p.repBim):'') + (p.bim?('#'+p.bim):'')
+        + ((p.idx!=null && p.nombre)?('#'+norm(p.nombre)):'')))
     || p.repBim || p.title || '';
   return check+'|'+id;
+}
+// Clave anterior (sin el BIM): se sigue respetando para no revivir rechazos ya
+// hechos. Con ella dos avisos del mismo recinto compartían clave y el ✓ de uno
+// "no hacía nada" porque el otro seguía listado.
+function _revKeyLegacy(check,p){
+  if(p.rut || p.code || !p.r) return null;
+  if(!p.bim && !(p.idx!=null && p.nombre)) return null;
+  return (p._chk||check)+'|'+p.r.id+(p.idx!=null?('#'+p.idx):'')+(p.repBim?('#'+p.repBim):'');
+}
+function _revRechazada(check,p){
+  const k=_revKey(check,p), kl=_revKeyLegacy(check,p);
+  return !!(nameState.revDesc[k] || (kl && nameState.revDesc[kl]));
 }
 function _revRaw(check){
   if(REV_CHECKS[check].find) return REV_CHECKS[check].find();
@@ -9980,10 +10261,10 @@ function _revRaw(check){
 // Pendientes = crudos MENOS los rechazados ("queda como está"). Las filas
 // informativas (noNav) no se pueden rechazar y siempre se muestran.
 function _revPend(check){
-  return _revRaw(check).filter(p=>p.noNav || !nameState.revDesc[_revKey(check,p)]);
+  return _revRaw(check).filter(p=>p.noNav || !_revRechazada(check,p));
 }
 function _revDescartadas(check){
-  return _revRaw(check).filter(p=>!p.noNav && nameState.revDesc[_revKey(check,p)]);
+  return _revRaw(check).filter(p=>!p.noNav && _revRechazada(check,p));
 }
 // Rechazar una sugerencia: este caso queda como está. Sale de la lista y del
 // contador, pero se puede restaurar desde el pie "descartadas" de la pestaña.
@@ -9995,7 +10276,10 @@ function revReject(i){
 }
 function revRestore(keyEnc){
   if(S.viewOnly) return;
-  delete nameState.revDesc[decodeURIComponent(keyEnc)];
+  const k=decodeURIComponent(keyEnc);
+  delete nameState.revDesc[k];
+  // si la fila venía rechazada con la clave antigua (sin BIM), también se libera
+  const m=/^(.+?)(#[A-Za-z]\d{3,5})?(#[^#]*[a-z ][^#]*)?$/.exec(k); if(m && m[1]!==k) delete nameState.revDesc[m[1]];
   sNames(); flushAutosave(); renderBimPending();
 }
 let _revShowDesc=false;
@@ -10018,6 +10302,93 @@ function _revPieDesc(){
   return h;
 }
 function revSetCheck(c){ _revCheck=c; renderBimPending(); }
+// ARNÉS DE LA REVISIÓN. Recorre cada categoría con los datos vivos y responde,
+// fila por fila: ¿apunta a un recinto dibujado (o abre un diálogo propio)? ¿tiene
+// al menos una salida (✓, ✕, diálogo o 🚫)? ¿el ✓ la hace desaparecer de verdad?
+// ¿su clave es única? Nada se guarda: el ✓ se prueba sobre una copia y se revierte.
+function revAuditar(opts){
+  opts=opts||{}; const maxOk=opts.maxOk||400;
+  const snapN=JSON.stringify(nameState), snapW=JSON.stringify(wsState), snapD=JSON.stringify(floorsDelta);
+  const snapA=FLOORS.map(f=>f.areas.map(a=>[a,(a.rooms||[]).slice()]));
+  const revert=()=>{ const n=JSON.parse(snapN), w=JSON.parse(snapW), d=JSON.parse(snapD);
+    Object.keys(nameState).forEach(k=>delete nameState[k]); Object.assign(nameState,n);
+    Object.keys(wsState).forEach(k=>delete wsState[k]); Object.assign(wsState,w);
+    Object.keys(floorsDelta).forEach(k=>delete floorsDelta[k]); Object.assign(floorsDelta,d);
+    FLOORS.forEach((f,i)=>{ f.areas=snapA[i].map(([a,rooms])=>{ a.rooms=rooms.slice(); return a; }); });
+    try{ _candCache.clear(); }catch(e){} };
+  const res={};
+  try{
+    for(const c of Object.keys(REV_CHECKS)){
+      const C=REV_CHECKS[c]; const pend=_revPend(c);
+      const r={label:C.label,n:pend.length,informativas:0,sinDestino:0,sinSalida:0,okNoResuelve:0,okProbados:0,clavesRepetidas:0,ejemplos:[]};
+      const vistas=new Set();
+      pend.forEach(p=>{
+        if(p.noNav){ r.informativas++; return; }
+        const k=_revKey(c,p); if(vistas.has(k)){ r.clavesRepetidas++; if(r.ejemplos.length<3) r.ejemplos.push('clave repetida: '+k); } vistas.add(k);
+        const destino=C.go ? (C.goDestino?C.goDestino(p):true)
+                           : !!(p.r && (boxState.rooms[p.r.id]||[]).length>0 && _findRoom(p.r.id));
+        if(!destino){ r.sinDestino++; if(r.ejemplos.length<3) r.ejemplos.push('sin destino: '+k); }
+        const ok=!!(C.approve&&C.apply&&(!C.okIf||C.okIf(p)));
+        const dialogo=!C.go && (!C.noDialog || p._dialogo);
+        // 🚫 siempre existe para filas no informativas; pero una fila que SÓLO se
+        // puede rechazar no es revisable: se exige ✓, ✕, diálogo o go.
+        if(!ok && !C.del && !dialogo && !C.go){ r.sinSalida++; if(r.ejemplos.length<3) r.ejemplos.push('sólo 🚫: '+k); }
+      });
+      if(C.approve && C.apply && C.auditaUnoAUno){
+        // Categorías cuyo ✓ en tanda sería destructivo (p.ej. quitar un recinto de
+        // las DOS áreas): se prueba fila por fila.
+        pend.filter(p=>!p.noNav && (!C.okIf||C.okIf(p))).slice(0,60).forEach(p=>{
+          const k=_revKey(c,p); r.okProbados++;
+          try{ C.apply(p); if(_revPend(c).some(q=>_revKey(c,q)===k)){ r.okNoResuelve++; if(r.ejemplos.length<3) r.ejemplos.push('✓ no resuelve: '+k); } }
+          catch(e){ r.okNoResuelve++; }
+          revert();
+        });
+      } else if(C.approve && C.apply){
+        // En tanda: se aplican TODOS los ✓ ofrecidos, se recalcula una sola vez y
+        // cualquier fila que siga listada es un ✓ que no resuelve. (Probarlos uno
+        // a uno recalculaba la categoría entera por fila: minutos con la dotación.)
+        const conOk=pend.filter(p=>!p.noNav && (!C.okIf||C.okIf(p))).slice(0,maxOk);
+        const claves=new Set();
+        conOk.forEach(p=>{ claves.add(_revKey(c,p)); try{ C.apply(p); }catch(e){ r.okNoResuelve++; if(r.ejemplos.length<3) r.ejemplos.push('✓ lanza: '+String(e).slice(0,60)); } });
+        r.okProbados=conOk.length;
+        if(conOk.length){
+          _revPend(c).forEach(q=>{ const k=_revKey(c,q); if(claves.has(k)){ r.okNoResuelve++; if(r.ejemplos.length<3) r.ejemplos.push('✓ no resuelve: '+k); } });
+          revert();
+        }
+      }
+      r.sana = !r.informativas && !r.sinDestino && !r.sinSalida && !r.okNoResuelve && !r.clavesRepetidas;
+      res[c]=r;
+    }
+  } finally { revert(); }
+  return res;
+}
+function revAuditarUI(){
+  const t0=performance.now(); const R=revAuditar(); const ms=Math.round(performance.now()-t0);
+  const filas=Object.values(R);
+  const malas=filas.filter(r=>!r.sana);
+  const txt=(malas.length?'⚠ '+malas.length+' categoría(s) con filas que no se pueden revisar:\n\n':'✅ Todas las categorías son revisables.\n\n')
+    +filas.map(r=>(r.sana?'✅ ':'⚠ ')+r.label+' — '+r.n+' pendientes'
+      +(r.okProbados?(' · ✓ probado en '+r.okProbados):'')
+      +(r.sana?'':(' · '+[r.informativas&&(r.informativas+' sin acción'),r.sinDestino&&(r.sinDestino+' sin destino'),r.sinSalida&&(r.sinSalida+' sólo 🚫'),r.okNoResuelve&&(r.okNoResuelve+' ✓ que no resuelve'),r.clavesRepetidas&&(r.clavesRepetidas+' claves repetidas')].filter(Boolean).join(' · ')))
+      +(r.ejemplos.length&&!r.sana?('\n     '+r.ejemplos.join('\n     ')):'')).join('\n')
+    +'\n\n(arnés sobre los datos vivos · '+ms+' ms · nada se guardó)';
+  console.table(filas.map(r=>({categoria:r.label,n:r.n,sinDestino:r.sinDestino,soloRechazo:r.sinSalida,okNoResuelve:r.okNoResuelve,claves:r.clavesRepetidas,sana:r.sana})));
+  alert(txt);
+}
+// Lo que no se resuelve en el Atlas no va como pendiente (no tiene recinto, ni
+// botón, ni rechazo posible): va como informe exportable al pie de la Revisión.
+function _revPieFuera(){
+  const n=(window.EMMC_PEND||[]).length; if(!n) return '';
+  const u=(window.EMMC_PEND||[]).reduce((a,d)=>a+(d.unidades||0),0);
+  return '<div style="margin-top:8px;padding:7px 9px;border:1px dashed #94a3b8;border-radius:8px;background:#f8fafc;font-size:10.5px;color:#475569;line-height:1.4">'
+    +'📦 <b>Fuera del Atlas</b> · '+n+' códigos del Despliegue EMMC ('+u+' unidades) sin recinto conocido. Se corrigen en la planilla, no en el plano.'
+    +' <a href="#" onclick="exportEmmcPend();return false" style="color:#1d5fa0;font-weight:800">⬇ Exportar lista</a></div>';
+}
+function exportEmmcPend(){
+  const P=window.EMMC_PEND||[]; if(!P.length){ alert('No hay códigos EMMC pendientes.'); return; }
+  const rows=[['Código del Despliegue','Unidades','Motivo']].concat(P.map(d=>[d.code,d.unidades||0,d.motivo||'']));
+  xlsxDownload(rows,'EMMC sin recinto','EMMC_sin_recinto_'+new Date().toISOString().slice(0,10)+'.xlsx',[{wch:34},{wch:10},{wch:70}]);
+}
 // Eliminar un recinto desde la pestaña Revisión (independiente de la vista actual).
 function revDeleteRoom(rid){
   if(S.viewOnly) return;
@@ -10044,7 +10415,10 @@ function renderBimPending(){
   const box=document.getElementById('bimList'); if(!box) return;
   const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
   let html='<select id="revSel" onchange="revSetCheck(this.value)" style="width:100%;margin:6px 0 4px;border:1px solid #7ca4c0;border-radius:7px;background:#dce8f2;color:#1a3a5c;font-size:11px;font-weight:700;padding:5px 6px">'
-    +Object.keys(REV_CHECKS).map(c=>'<option value="'+c+'"'+(c===_revCheck?' selected':'')+'>'+REV_CHECKS[c].label+' ('+counts[c]+')</option>').join('')
+    +(()=>{ const opt=c=>'<option value="'+c+'"'+(c===_revCheck?' selected':'')+'>'+REV_CHECKS[c].label+' ('+counts[c]+')</option>';
+            const con=Object.keys(REV_CHECKS).filter(c=>counts[c]), sin=Object.keys(REV_CHECKS).filter(c=>!counts[c]);
+            return '<optgroup label="Con pendientes">'+con.map(opt).join('')+'</optgroup>'
+                  +(sin.length?('<optgroup label="Al día">'+sin.map(opt).join('')+'</optgroup>'):''); })()
     +'</select>';
   const pend=_revPend(_revCheck);
   {
@@ -10058,7 +10432,7 @@ function renderBimPending(){
   }
   if(!pend.length){
     html+='<div style="padding:20px 8px;text-align:center;color:#1d5fa0;font-size:11px;font-weight:700">✅ 0 pendientes<br><span style="font-weight:400;color:#48687e">'+REV_CHECKS[_revCheck].done+'</span></div>';
-    html+=_revPieDesc();
+    html+=_revPieDesc()+_revPieFuera();
     box.innerHTML=html; box._pend=[]; return;
   }
   const gOf=REV_CHECKS[_revCheck].groupOf, flat=REV_CHECKS[_revCheck].flat;
@@ -10086,7 +10460,8 @@ function renderBimPending(){
       +'<span class="bim-sub">'+esc([REV_CHECKS[_revCheck].subText(p), p.area?aName(p.area.id):''].filter(Boolean).join(' · '))+'</span>'
       +'</button>';
   });
-  html+=_revPieDesc();
+  html+=_revPieDesc()+_revPieFuera();
+  html+='<div style="text-align:right;margin-top:6px"><a href="#" onclick="revAuditarUI();return false" style="font-size:10px;color:#64748b">🧪 Auditar la revisión</a></div>';
   box.innerHTML=html;
   box._pend=pend;
 }
@@ -10098,7 +10473,7 @@ function bimGo(i){
   goArea(p.area.id);
   const sh=boxState.rooms[p.r.id]||[];
   if(sh.length && typeof zoomTo==='function') zoomTo(bounds(sh),140);
-  if(REV_CHECKS[_revCheck].noDialog || S.viewOnly){
+  if((REV_CHECKS[_revCheck].noDialog && !p._dialogo) || S.viewOnly){
     // solo vista 2: el BIM se corrige en línea sobre el recinto (clic en "BIM …")
     S.selIds=new Set([p.r.id]); renderSVG();
     return;
@@ -10311,11 +10686,23 @@ function loadDotDB(){
   try {
     const data = window.SHARED_DOTACION;
     if(!data || !data.staff) throw new Error('window.SHARED_DOTACION no disponible');
+    // Plazas sin persona detrás —«BECADOS <servicio>», «COMPRAS DE SERVICIO»— no
+    // se ofrecen para asignar: la matriz del Atlas es de personas con nombre
+    // (decisión 2026-09-12). Se cuentan aparte en dotDB.genericos para que el
+    // dato no se pierda en los resúmenes. Las compras de servicio CON nombre
+    // siguen siendo asignables.
+    const _GENERICO = /^\s*(BECAD|COMPRAS?\s+DE\s+SERVICIO)/i;
+    const _personas = data.staff.filter(p => !_GENERICO.test(String(p.n||'')));
+    const _genericos = data.staff.filter(p => _GENERICO.test(String(p.n||'')));
     dotDB = {
       version: data.version || '',
       generado: data.g || '',
-      total: data.total || data.staff.length,
-      staff: data.staff.map(p => ({
+      total: _personas.length,
+      genericos: {
+        becados: _genericos.filter(p => /BECAD/i.test(p.n)).length,
+        compras: _genericos.filter(p => !/BECAD/i.test(p.n)).length
+      },
+      staff: _personas.map(p => ({
         id: p.i, rut: p.i, nombre: p.n,
         estamento: p.e, calidad: p.q,
         cargo: p.c, funcion: '',
@@ -10325,12 +10712,24 @@ function loadDotDB(){
         horas: p.horas_cto || p.horas_sum || '',
         // Comisión de servicio: INFORMATIVO. Toda la dotación activa queda
         // disponible para selección, esté o no en comisión (decisión 2026-09-01).
-        comision: String(p.comision_servicio||'').trim().toUpperCase().startsWith('SI')
+        comision: String(p.comision_servicio||'').trim().toUpperCase().startsWith('SI'),
+        vinculo: p.tipo_vinculo || '',
+        // Becados con nombre: vienen de la nómina de formación (beca_*). Sin esos
+        // campos se usan fecha_inicio/fecha_termino de la matriz.
+        beca: (String(p.tipo_vinculo||'').toUpperCase()==='BECADO' || /BECAD/i.test(p.ley||''))
+          ? { tipo: String(p.beca_tipo||'').toUpperCase(),
+              programa: p.beca_programa || p.especialidad || p.sp || '',
+              inicio: p.beca_inicio || p.fecha_inicio || '',
+              termino: p.beca_termino || p.fecha_termino || '' }
+          : null
       }))
     };
     const badge = document.getElementById('dbBadge');
     if(badge){
       badge.textContent = `DB ${dotDB.version} · ${dotDB.total} func.`;
+      badge.title = `${dotDB.total} personas con nombre. Fuera de la selección: `
+        + `${dotDB.genericos.becados} plazas «BECADOS» y ${dotDB.genericos.compras} `
+        + `«COMPRAS DE SERVICIO» sin nombre.`;
       badge.style.display = '';
     }
     initAutocomplete();
@@ -10349,6 +10748,21 @@ function loadDotDB(){
     }
     dotDB = {version:'',total:0,staff:[]};
   }
+}
+
+// Distintivo del becado: especialidad o subespecialidad, y aviso cuando su
+// período de formación ya venció (hay que revisar si sigue en el hospital).
+function becaTag(s){
+  if(!s || !s.beca) return '';
+  const b = s.beca;
+  const lbl = /SUB/.test(b.tipo) ? 'Becado subespecialidad'
+            : /ESPEC/.test(b.tipo) ? 'Becado especialidad' : 'Becado';
+  const fin = String(b.termino||'').slice(0,10);
+  const vencido = /^\d{4}-\d{2}-\d{2}$/.test(fin) && fin < new Date().toISOString().slice(0,10);
+  const tip = [b.programa, (b.inicio||fin) ? ('formación '+(b.inicio||'?')+' → '+(fin||'?')) : 'sin período informado']
+    .filter(Boolean).join(' · ') + (vencido ? ' · PERÍODO VENCIDO: revisar si sigue en el hospital' : '');
+  return '<span class="beca-tag'+(vencido?' vencido':'')+'" title="'+tip.replace(/"/g,'&quot;')+'">'
+    + '🎓 '+lbl+(vencido?' · vencido':'')+'</span>';
 }
 
 // Normaliza texto: minúsculas + sin acentos + sin caracteres especiales
@@ -10433,7 +10847,7 @@ function initAutocomplete(){
     res.forEach(s=>{
       const it=document.createElement('div');
       it.className='ac-item';
-      it.innerHTML=`<strong>${s.nombre}</strong><span>${[s.cargo||s.funcion,s.estamento,s.servicio].filter(Boolean).join(' · ')}</span>`;
+      it.innerHTML=`<strong>${s.nombre}</strong>${becaTag(s)}<span>${[s.cargo||s.funcion,s.estamento,s.servicio].filter(Boolean).join(' · ')}</span>`;
       it.onmousedown=e=>{
         e.preventDefault();
         inp.value=s.nombre;
@@ -10525,9 +10939,18 @@ function initGlobalSearch(){
 //   2) Sin Asignar — filtro directo de no asignados (mismas columnas)
 //   3) Resumen — totales y desglose por estamento / subdirección
 // ¿el nombre está en la matriz de dotación? (para marcar personas externas)
+// Coteja contra un conjunto de nombres normalizados de la matriz. Antes era
+// searchDB(nombre,8): una búsqueda difusa sobre 3.390 personas POR NOMBRE, que
+// la primera vez costaba ~5 s al abrir la Revisión, y que además podía no ver
+// la coincidencia exacta si había más de 8 parecidos antes que ella.
+let _mtxSet=null, _mtxSrc=null;
 function isInMatrix(nombre){
   if(!nombre) return true;
-  try{ return searchDB(nombre,8).some(s=>norm(s.nombre)===norm(nombre)); }catch(e){ return true; }
+  try{
+    const src=dotDB&&dotDB.staff; if(!src) return true;
+    if(_mtxSrc!==src){ _mtxSet=new Set(src.filter(x=>x&&x.nombre).map(x=>norm(x.nombre))); _mtxSrc=src; }
+    return _mtxSet.has(norm(nombre));
+  }catch(e){ return true; }
 }
 // Descarga genérica de una hoja XLSX con encabezado estilado
 function xlsxDownload(rows, sheetName, fileName, colW, extra){
@@ -10958,7 +11381,9 @@ function exportAsignaciones(){
   const _pf = n => baseN ? (n*100/baseN).toFixed(1).replace('.',',') : '0';
   const sumRow = new Array(headers.length).fill('');
   sumRow[0]='✔ Asignados: '+verdes+' ('+_pf(verdes)+'%)';
-  sumRow[4]='🛒 Compras de Servicio: '+(cdsMatrix+totalCds);
+  sumRow[4]='🛒 Compras de Servicio: '+(cdsMatrix+totalCds)
+    +(dotDB.genericos ? ' · fuera de selección (sin nombre): '+dotDB.genericos.compras
+      +' compras y '+dotDB.genericos.becados+' becados' : '');
   sumRow[8]='✘ No asignados: '+rojosN+' ('+_pf(rojosN)+'%)';
   const rows = [sumRow, headers, ...dataRows.map(d=>d.row)];
   const unassignedRows = [sumRow.slice(0,12), headers.slice(0,12), ...noAsigRows.map(d=>d.row)];
@@ -11230,7 +11655,7 @@ async function runSelfTest(){
   // Testigo: al terminar, NINGUNA preferencia del usuario puede haber cambiado.
   const _PREFS=['cabida_room_labels','cabida_show_dotnames','cabida_box_vis','cabida_plan_kind',
                 'cabida_show_asign','cabida_show_sen','cabida_scenario','cabida_rp_collapsed',
-                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures'];
+                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures','cabida_ubic'];
   const _PREV={}; _PREFS.forEach(k=>{ try{ _PREV[k]=localStorage.getItem(k); }catch(e){ _PREV[k]=null; } });
   const out=[]; const T=(nm,fn)=>{ try{ const r=fn(); if(r===false) out.push([0,nm,'aserción falsa']); else out.push([1,nm,'']); }catch(e){ out.push([0,nm,e.message]); } };
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -11497,12 +11922,20 @@ async function runSelfTest(){
     S.level=nivel; S.areaId=aPrev; renderSVG();
     return defIon && mag && noion && gen && ded;
   });
-  T('Consultas: el nombre es 1 de 4, sugerencia (nombre / PMA-BIM) y revisión renombra', ()=>{
+  T('Consultas: el nombre es 1 de 6, sugerencia (nombre / PMA-BIM / Kine / Entrevista) y revisión renombra', ()=>{
     const tPrev=nameState.types['st_r1'], nmPrev=nameState.rooms['st_r1'], bimPrev=nameState.bim['st_r1'], CSprev=window.CONSULTA_SUBTIPOS;
     const fin=()=>{ nameState.types['st_r1']=tPrev; nameState.rooms['st_r1']=nmPrev; if(bimPrev)nameState.bim['st_r1']=bimPrev; else delete nameState.bim['st_r1']; window.CONSULTA_SUBTIPOS=CSprev; };
     try{
       nameState.types['st_r1']='box'; delete nameState.bim['st_r1'];
-      const canon=['Consulta','consulta c/baño','Consulta c/ Sofa','CONSULTA C/ SILLON CLINICO'].every(esNombreConsulta) && !esNombreConsulta('Consulta Medica');
+      const canon=['Consulta','consulta c/baño','Consulta c/ Sofa','CONSULTA C/ SILLON CLINICO','consulta kine','Consulta entrevista'].every(esNombreConsulta) && !esNombreConsulta('Consulta Medica');
+      nameState.rooms['st_r1']='Kinesiologo'; nameState.bim['st_r1']='Z9998';
+      window.CONSULTA_SUBTIPOS={porBim:{Z9998:'consulta'}};                     // la planilla dice consulta: gana el nombre
+      const kine=(_consultaSugerida('st_r1')||{}).nombre==='Consulta Kine';
+      nameState.rooms['st_r1']='Entr Medico Paciente';
+      const entrev=(_consultaSugerida('st_r1')||{}).nombre==='Consulta Entrevista';
+      nameState.rooms['st_r1']='Entrevista Psicologia';
+      const entrev2=(_consultaSugerida('st_r1')||{}).nombre==='Consulta Entrevista';
+      delete nameState.bim['st_r1'];
       nameState.rooms['st_r1']='Consulta c/Baño 2';
       const bano=(_consultaSugerida('st_r1')||{}).nombre==='Consulta c/ Baño';
       nameState.rooms['st_r1']='Consulta sin Exam Fisico';
@@ -11517,7 +11950,7 @@ async function runSelfTest(){
       nameState.rooms['st_r1']='Consulta';
       const plana=!_consultaPendientes().some(p=>p.r.id==='st_r1');
       fin();
-      return canon && bano && sofa && pma && listada && renombrada && plana;
+      return canon && kine && entrev && entrev2 && bano && sofa && pma && listada && renombrada && plana;
     }catch(e){ fin(); throw e; }
   });
   T('Propuestos: importar del plano reemplaza lo del plano y respeta lo puesto a mano', ()=>{
@@ -11547,19 +11980,23 @@ async function runSelfTest(){
       S.level=2; S.areaId='st_a'; S.roomId=null;
       const base=_propResumen().tot;                       // el usuario puede tener propuestos reales
       const d1=propAdd('desk',1200,1200,0), t1=propAdd('totem',1300,1300,0), e1=propAdd('dea',1400,1400,0), fuera=propAdd('desk',50,50,0);
+      const i1=propAdd('printer',1500,1500,0); propRotar(i1.id);
+      const impresora=i1.rid==='st_r1' && propFind(i1.id).it.rot===90;
       const enRecinto=d1.rid==='st_r1' && t1.rid==='st_r1' && e1.rid==='st_r1' && fuera.rid===null;
       propRotar(d1.id); propRotar(e1.id);                       // el DEA no rota
       const rota=propFind(d1.id).it.rot===90 && propFind(e1.id).it.rot===0;
       propFind(t1.id).it.x=1250; propFind(t1.id).it.y=1250; _propDrag={id:t1.id,moved:true}; _propDragUp();
       const movido=propFind(t1.id).it.x===1250 && propFind(t1.id).it.rid==='st_r1';
       renderSVG();
-      const dib=svg.querySelectorAll('.prop-g').length>=4 && !!svg.querySelector('.prop-desk') && !!svg.querySelector('.prop-dea');
+      const dib=svg.querySelectorAll('.prop-g').length>=5 && !!svg.querySelector('.prop-desk') && !!svg.querySelector('.prop-dea')
+        && !!svg.querySelector('.prop-printer') && Math.abs(parseFloat(svg.querySelector('.prop-printer rect').getAttribute('width'))-60/_cmPorPx(S.floorId))<0.01;
       const f=1/_cmPorPx(S.floorId), desk=svg.querySelector('.prop-desk rect');
       const escala=!!desk && Math.abs(parseFloat(desk.getAttribute('width'))-150*f)<0.01;   // 150 cm a escala del piso
       const ctx=_propEnCtx().filter(x=>[d1.id,t1.id,e1.id].includes(x.id));
       const cuenta=ctx.length===3 && (+document.getElementById('dkDeskN').textContent||0)>=1;
       const {tot}=_propResumen();
-      const resumen=tot.desk-base.desk===2 && tot.totem-base.totem===1 && tot.dea-base.dea===1 && tot.sin-base.sin===1;
+      const resumen=tot.desk-base.desk===2 && tot.totem-base.totem===1 && tot.dea-base.dea===1 && tot.printer-(base.printer||0)===1 && tot.sin-base.sin===1
+        && document.getElementById('dkPrinterN').textContent!=='';
       // xlsxDownload escribe con XLSX.write + guardarArchivo (no writeFile): se capturan ambos
       const origW=XLSX.write, origG=window.guardarArchivo; let cap=null;
       try{ XLSX.write=(wb)=>{ cap={wb}; return new Uint8Array(0); }; window.guardarArchivo=(dir,fn)=>{ if(cap) cap.fn=fn; }; exportDEA(); }
@@ -11571,8 +12008,177 @@ async function runSelfTest(){
       propBorrar(fuera.id); const borrado=!propFind(fuera.id);
       S.level=3; S.roomId='st_r1'; propBorrarCtx(true); const vacio=_propEnCtx().length===0;
       fin();
-      return enRecinto && rota && movido && dib && escala && cuenta && resumen && exp && borrado && vacio;
+      return enRecinto && impresora && rota && movido && dib && escala && cuenta && resumen && exp && borrado && vacio;
     }catch(e){ fin(); throw e; }
+  });
+  T('N° asignados: verde y al doble si hay alguien, 0 rojo sólo si hay puestos libres, nada sin puestos', ()=>{
+    const nivel=S.level, aPrev=S.areaId, prevN=S.showAsigN, dPrev=JSON.stringify(wsState.dots);
+    try{
+      S.level=2; S.areaId='st_a'; S.showAsigN=true;
+      wsState.dots['st_r1']=[{id:'st_n1',x:1,y:1,tipo:'fijo',nombre:'ST ALGUIEN',cargo:'',estamento:''}];
+      var _r2Prev=boxState.rooms['st_r2'];
+      boxState.rooms['st_r2']=_r2Prev||[{x:2200,y:900,w:900,h:800}];
+      // recinto SIN puestos dibujados: no muestra nada
+      wsState.dots['st_r2']=[]; renderSVG();
+      const nadaSinPuestos=![...svg.querySelectorAll('.asig-n')].some(t=>t.textContent.startsWith('0'));
+      // recinto CON un puesto libre: 0 rojo
+      wsState.dots['st_r2']=[{id:'st_n2',x:1,y:1,tipo:'fijo',nombre:'',cargo:'',estamento:''}];
+      renderSVG();
+      const si=[...svg.querySelectorAll('.asig-n.asig-si')].find(t=>t.textContent.startsWith('1'));
+      const no=[...svg.querySelectorAll('.asig-n.asig-no')].find(t=>t.textContent.startsWith('0'));
+      const colores=nadaSinPuestos && !!si && !!no && si.getAttribute('fill')==='#16a34a' && no.getAttribute('fill')==='#dc2626';
+      // tamaño: el número mide 1,56× el tamaño base del recinto (antes 0,78×)
+      const fsNombre=parseFloat((svg.querySelector('.room-label')||{getAttribute:()=>0}).getAttribute('font-size'));
+      const doble=!!si && fsNombre>0 && Math.abs(parseFloat(si.getAttribute('font-size'))/fsNombre-1.56)<0.01;
+      S.showAsigN=false; renderSVG();
+      const apagado=!svg.querySelector('.asig-n');
+      return colores && doble && apagado;
+    } finally {
+      wsState.dots=JSON.parse(dPrev); if(typeof _r2Prev!=='undefined' && !_r2Prev) delete boxState.rooms['st_r2'];
+      S.showAsigN=prevN; S.level=nivel; S.areaId=aPrev; renderSVG();
+    }
+  });
+  T('Cupo de impresoras: cuenta en todos los pisos, avisa al llegar y no se pasa sin confirmar', ()=>{
+    const snapP=JSON.stringify(propState), cPrev=(nameState.propCupos||{}).printer, nivel=S.level, aPrev=S.areaId, mPrev=S.propMode, conf=window.confirm;
+    try{
+      Object.keys(propState).forEach(k=>delete propState[k]);
+      propState['PX']=[{id:'c0',k:'printer',x:1,y:1,rot:0,rid:null}];              // otro piso: también cuenta
+      nameState.propCupos.printer=2;
+      S.level=2; S.areaId='st_a'; renderSVG();
+      const total=_propTotal('printer')===1 && _propCupoTxt('printer')==='1 / 2';
+      setPropMode('printer');
+      const cap=svg.querySelector('.prop-layer rect[style*="copy"]');
+      const r=svg.getBoundingClientRect();
+      const click=()=>cap.dispatchEvent(new MouseEvent('mousedown',{bubbles:true,cancelable:true,button:0,clientX:r.left+5,clientY:r.top+5}));
+      let preguntas=0; window.confirm=()=>{ preguntas++; return false; };
+      click();                                     // 2 de 2: entra sin preguntar
+      const segunda=_propTotal('printer')===2 && preguntas===0;
+      click();                                     // llegaría a 3: pregunta y Cancelar no coloca
+      const bloquea=_propTotal('printer')===2 && preguntas===1;
+      window.confirm=()=>true; click();            // Aceptar: se pasa y queda marcado
+      const pasa=_propTotal('printer')===3;
+      _dockSync();
+      const rojo=document.getElementById('dkPrinterCupoN').textContent==='3/2' && /⚠/.test(document.getElementById('dkPrinterCupoLb').textContent);
+      const aviso=/sobre el cupo/.test(document.getElementById('propHint').textContent);
+      return total && segunda && bloquea && pasa && rojo && aviso;
+    } finally {
+      window.confirm=conf; if(S.propMode) setPropMode(null);
+      const sp=JSON.parse(snapP); Object.keys(propState).forEach(k=>delete propState[k]); Object.assign(propState,sp);
+      if(cPrev) nameState.propCupos.printer=cPrev; else delete nameState.propCupos.printer;
+      S.level=nivel; S.areaId=aPrev; renderSVG();
+    }
+  });
+  T('Ubicación en planta: vista 1 esconde cajas y muestra sólo tótems/DEA/impresoras a tamaño fijo', ()=>{
+    const fid=S.floorId, snapP=JSON.stringify(propState), prevU=new Set(S.ubic||[]), nivel=S.level, aPrev=S.areaId, zPrev=S.zoom;
+    try{
+      propState[fid]=[{id:'u1',k:'totem',x:1100,y:1100,rot:0,rid:'st_r1'},{id:'u2',k:'dea',x:1300,y:1100,rot:0,rid:'st_r1'},
+                      {id:'u3',k:'printer',x:1500,y:1100,rot:0,rid:'st_r1'},{id:'u4',k:'desk',x:1700,y:1100,rot:0,rid:'st_r1'}];
+      S.level=1; S.areaId=null; S.ubic=new Set(); renderSVG();
+      const normal=!svg.classList.contains('ubic-mode') && !svg.querySelector('.ubic-mk');
+      toggleUbic('totem'); toggleUbic('printer');
+      const on=svg.classList.contains('ubic-mode');
+      const mks=[...svg.querySelectorAll('.ubic-mk')];
+      const soloElegidos=mks.length===2 && !!svg.querySelector('.ubic-totem') && !!svg.querySelector('.ubic-printer') && !svg.querySelector('.ubic-dea');
+      const otro=[...svg.children].find(c=>!c.classList.contains('ubic-layer'));
+      const ocultaResto=!otro || getComputedStyle(otro).display==='none';
+      // tamaño fijo en pantalla: al cambiar el zoom, la escala se ajusta
+      S.zoom=0.1; _ubicRescale(); const k1=/scale\(10\)/.test(mks[0].getAttribute('transform'));
+      S.zoom=0.5; _ubicRescale(); const k2=/scale\(2\)/.test(mks[0].getAttribute('transform'));
+      const leyenda=/Tótem <b>1<\/b>/.test(document.getElementById('ubicLegend').innerHTML);
+      S.level=2; S.areaId='st_a'; renderSVG();
+      const vista2=!svg.classList.contains('ubic-mode') && document.getElementById('ubicLegend').style.display==='none';
+      return normal && on && soloElegidos && ocultaResto && k1 && k2 && leyenda && vista2;
+    } finally {
+      const sp=JSON.parse(snapP); Object.keys(propState).forEach(k=>delete propState[k]); Object.assign(propState,sp);
+      S.ubic=prevU; S.zoom=zPrev; S.level=nivel; S.areaId=aPrev; renderSVG();
+    }
+  });
+  T('Etiquetas ocultas: aparece el aviso «mostrar» en vista 2 y un clic las devuelve', ()=>{
+    const nivel=S.level, aPrev=S.areaId, prev=S.roomLabels;
+    try{
+      S.level=2; S.areaId='st_a'; S.roomLabels=false; renderSVG();
+      const h=document.getElementById('lblHint');
+      const avisa=!!h && h.style.display!=='none' && svg.classList.contains('hide-room-labels');
+      h.click();
+      const vuelve=S.roomLabels===true && h.style.display==='none' && !svg.classList.contains('hide-room-labels');
+      S.level=1; S.roomLabels=false; renderSVG();
+      const noEnVista1=h.style.display==='none';                 // en vista 1 no molesta
+      return avisa && vuelve && noEnVista1;
+    } finally { S.roomLabels=prev; S.level=nivel; S.areaId=aPrev; renderSVG(); }
+  });
+  T('Revisión: el arnés declara sanas todas las categorías (destino, salida, ✓ que resuelve, claves)', ()=>{
+    const snapN=JSON.stringify(nameState), RRprev=window.RECINTOS_REVISAR;
+    try{
+      // datos sintéticos que ejercitan el triage del catastro
+      window.RECINTOS_REVISAR={varios_servicios:[
+          {rid:'st_r1',bim:'Z0001',codigo:'9.1',servicio:'A',asignado_a:'A',servicios:'A (1) · B (1)'},
+          {rid:'st_r2',bim:'Z0002',codigo:'9.1',servicio:'B',asignado_a:'A',servicios:'A (1) · B (1)'}],
+        codigo_distinto:[
+          {rid:'st_r1',bim:'Z0001',codigo_atlas:'9.1.1',codigo_mapa:'9.1.2',nombre_mapa:'Box'},
+          {rid:'st_r2',bim:'Z0002',codigo_atlas:'9.1.1',codigo_mapa:'57.7.5',nombre_mapa:'Aseo'}]};
+      nameState.bim['st_r1']='Z0001'; nameState.bim['st_r2']='Z0002';
+      nameState.codes['st_r1']='9.1.1'; nameState.codes['st_r2']='9.1.1';
+      const R=revAuditar();
+      const malas=Object.entries(R).filter(([,r])=>!r.sana).map(([k,r])=>k+':'+JSON.stringify(r.ejemplos));
+      if(malas.length) console.warn('arnés revisión:',malas);
+      const triage=_codMapaPendientes().some(p=>p.r.id==='st_r1') && _bimAjenoPendientes().some(p=>p.r.id==='st_r2')
+        && !_codMapaPendientes().some(p=>p.r.id==='st_r2');
+      const soloFuera=_variosSvPendientes().length===1 && _variosSvPendientes()[0].r.id==='st_r2';
+      const clases=_codClase('57.7.3 / 57.7.4','57.7.3/4')===null && _codClase('12..2.13.5','12.2.13.5')==='codigo'
+        && _codClase('42.4.3','42.4.3_B')==='bim' && _codClase('17.4.2','11.3.1/14.3.1/17.4.2')===null && _codClase('12.1.1','-')===null;
+      const sinEmmc=!('emmcdiff' in REV_CHECKS);
+      return !malas.length && triage && soloFuera && clases && sinEmmc;
+    } finally {
+      const n=JSON.parse(snapN); Object.keys(nameState).forEach(k=>delete nameState[k]); Object.assign(nameState,n);
+      window.RECINTOS_REVISAR=RRprev;
+    }
+  });
+  T('Recintos en dos áreas: des-fusionar persiste el movimiento y la carga repara lo ya duplicado', ()=>{
+    const fl=curFloor(), snapD=JSON.stringify(floorsDelta), snapAreas=fl.areas.slice();
+    try{
+      const padre={id:'st_pa',name:'PADRE',rooms:[{id:'st_x1'},{id:'st_x2'}]};
+      const hija={id:'st_pa-U1-00001',name:'PADRE (2)',rooms:[{id:'st_x2'}]};
+      fl.areas.push(padre,hija);
+      (floorsDelta.added_areas[fl.id]=floorsDelta.added_areas[fl.id]||[]).push({id:'st_pa',name:'PADRE',rooms:[{id:'st_x1'},{id:'st_x2'}]},{id:'st_pa-U1-00001',name:'PADRE (2)',rooms:[{id:'st_x2'}]});
+      const antes=_recintosEnVariasAreas().some(([rid])=>rid==='st_x2');
+      _reparaRecintosEnDosAreas();
+      const mem=!padre.rooms.some(r=>r.id==='st_x2') && hija.rooms.some(r=>r.id==='st_x2');
+      const dPadre=floorsDelta.added_areas[fl.id].find(a=>a.id==='st_pa');
+      const persistido=!dPadre.rooms.some(r=>r.id==='st_x2');
+      const listaVacia=!_revPend('recdup').some(p=>p.r.id==='st_x2');
+      return antes && mem && persistido && listaVacia;
+    } finally {
+      fl.areas=snapAreas; const d=JSON.parse(snapD); Object.keys(floorsDelta).forEach(k=>delete floorsDelta[k]); Object.assign(floorsDelta,d);
+    }
+  });
+  T('Revisión: turnos distintos del mismo puesto no comparten clave', ()=>{
+    const a={r:{id:'st_r1'},idx:0,nombre:'ST UNO',_chk:'externa'}, b={r:{id:'st_r1'},idx:0,nombre:'ST DOS',_chk:'externa'};
+    const distintas=_revKey('dotacion',a)!==_revKey('dotacion',b);
+    // un rechazo guardado con la clave antigua se sigue respetando
+    const prev=nameState.revDesc['externa|st_r1#0']; nameState.revDesc['externa|st_r1#0']={c:'dotacion',ts:1};
+    const compat=_revRechazada('dotacion',a);
+    if(prev) nameState.revDesc['externa|st_r1#0']=prev; else delete nameState.revDesc['externa|st_r1#0'];
+    return distintas && compat;
+  });
+  T('Traslado de una persona: el aviso nombra el puesto actual Y el destino', ()=>{
+    const dPrev=JSON.parse(JSON.stringify(wsState.dots)), mPrev={...mCtx}, cPrev=window.confirm;
+    let msg='';
+    try{
+      wsState.dots['st_r1']=[{id:'st_w1',x:1,y:1,tipo:'fijo',nombre:'ST PERSONA',cargo:'',estamento:''},
+                             {id:'st_w2',x:2,y:2,tipo:'fijo',nombre:'',cargo:'',estamento:''}];
+      mCtx={roomId:'st_r1',idx:1};
+      ['mNombre','mCargo','mEst'].forEach(id=>{ const e=document.getElementById(id); if(e) e.value=(id==='mNombre'?'ST PERSONA':''); });
+      ['mExterna','mCds','mDinClin'].forEach(id=>{ const e=document.getElementById(id); if(e) e.checked=false; });
+      const tf=document.getElementById('tFijo'); if(tf) tf.dataset.v='1';
+      window.confirm=(t)=>{ msg=t; return false; };            // Cancelar: no muta nada
+      saveWs();
+      const ubic=_ubicRecinto('st_r1');
+      return /Hoy está en/.test(msg) && /Se movería a/.test(msg)
+        && msg.includes(ubic) && /mismo recinto/.test(msg)
+        && wsState.dots['st_r1'].length===2 && !wsState.dots['st_r1'][1].nombre;
+    } finally {
+      window.confirm=cPrev; wsState.dots=dPrev; mCtx=mPrev;
+    }
   });
   T('Dock: los desplegables (Vista, Estructura) se ven fuera del gestor y no quedan recortados', ()=>{
     const dock=document.getElementById('dock');
