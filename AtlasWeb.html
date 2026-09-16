@@ -495,6 +495,12 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 .av-tools span{flex:1 1 100%}
 .av-tools a{color:var(--accent-600);font-weight:var(--fw-medium);text-decoration:none;white-space:nowrap}
 .av-tools a:hover{text-decoration:underline}
+.av-tools a.av-grupo{padding:2px 8px;border:1px solid var(--border);border-radius:var(--r-pill);color:var(--external)}
+.av-tools a.av-grupo:hover{background:var(--external-soft);text-decoration:none}
+.av-tools a.av-grupo.on{background:var(--external);border-color:var(--external);color:#fff}
+.av-tools a.av-falt{padding:2px 8px;border:1px solid var(--border);border-radius:var(--r-pill);color:var(--danger)}
+.av-tools a.av-falt:hover{background:var(--danger-soft);text-decoration:none}
+.av-tools a.av-falt.on{background:var(--danger);border-color:var(--danger);color:#fff}
 .av-fila.av-abre:hover{background:var(--surface-sunken)}
 .av-chev{color:var(--accent-600);width:9px;display:inline-block;font-size:10px}
 .av-hijos{font-size:10px;font-weight:var(--fw-regular);color:var(--text-3);white-space:nowrap}
@@ -8510,18 +8516,20 @@ function _avExportFilas(){
 }
 function exportAvance(){
   const rows=_avExportFilas(); if(rows.length<3){ alert('La matriz de dotación no está cargada.'); return; }
-  xlsxDownload(rows,'Avance','Avance_dotacion_asignada_'+new Date().toISOString().slice(0,10)+'.xlsx',
+  const suf=_avFiltro?('_'+norm(_avGrupoNombre(_avFiltro)).replace(/[^a-z0-9]+/g,'_')):'';
+  xlsxDownload(rows,'Avance','Avance_dotacion_asignada'+suf+'_'+new Date().toISOString().slice(0,10)+'.xlsx',
     [{wch:13},{wch:38},{wch:44},{wch:40},{wch:10},{wch:12},{wch:9},{wch:10}]);
 }
 // Nombres de una unidad del árbol, con su estado de asignación. Cierra el
 // circuito: cualquier número del avance se puede abrir hasta ver quién es.
 function _avPersonas(sd,sv,u,asg){
   const esc=x=>String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;');
-  const gente=_avStaff().filter(s=>
+  const gente=_avStaffFiltrado().filter(s=>
     String(s.subdireccion||'(sin subdirección)')===sd &&
     String(s.servicio||'(sin departamento)')===sv &&
-    String(s.unidad||'(sin unidad)')===u);
-  if(!gente.length) return '<div style="padding:4px 4px 6px 40px;font-size:10px;color:#b45309">Sin personas en la matriz para esta unidad.</div>';
+    String(s.unidad||'(sin unidad)')===u &&
+    (!_avSoloFaltan || !asg[norm(s.nombre)]));          // modo faltantes: sólo quienes no tienen recinto
+  if(!gente.length) return '<div style="padding:4px 4px 6px 40px;font-size:10px;color:#b45309">'+(_avSoloFaltan?'Nadie falta en esta unidad.':'Sin personas en la matriz para esta unidad.')+'</div>';
   gente.sort((a,b)=>String(a.nombre).localeCompare(String(b.nombre),'es'));
   return '<div style="padding:2px 4px 6px 40px">'+gente.map(g=>{
     const ok=!!asg[norm(g.nombre)];
@@ -8532,12 +8540,49 @@ function _avPersonas(sd,sv,u,asg){
 }
 // Árbol sd → sv → u de la dotación (sin becados), con personas y asignadas por nodo.
 // Lo usan el visor de avance y su exportación.
+// Filtro del visor: null = toda la dotación; una clave de grupo (p. ej.
+// 'circulo_secretarias') = sólo las personas de ese grupo, que es transversal
+// y multi-subdirección, con el mismo árbol y el mismo avance.
+let _avFiltro=null;
+function _avGrupoNombre(clave){
+  for(const s of _dpStaffAll()) for(const g of (s.grupos||[])) if(g.clave===clave) return g.nombre||clave;
+  return clave;
+}
+function _avStaffFiltrado(){ return _avFiltro ? _avStaff().filter(s=>(s.grupos||[]).some(g=>g.clave===_avFiltro)) : _avStaff(); }
+function avFiltrar(clave){
+  _avFiltro=(clave && _avFiltro!==clave)?clave:null;
+  if(_avFiltro) avExpandir(true); else renderAvance();   // el grupo es chico: se abre entero
+}
+// Modo «sólo faltantes»: el árbol muestra únicamente donde falta alguien, cada
+// fila dice cuántos faltan y las hojas listan sólo a quienes no tienen recinto.
+let _avSoloFaltan=false;
+function avSoloFaltan(){ _avSoloFaltan=!_avSoloFaltan; renderAvance(); }
+// Quiénes faltan por cubicar (respeta el grupo filtrado), listos para Excel.
+function _avFaltantes(){
+  const asg=_dpAsignados();
+  return _avStaffFiltrado().filter(s=>!asg[norm(s.nombre)])
+    .sort((a,b)=>String(a.subdireccion||'').localeCompare(String(b.subdireccion||''),'es')
+              || String(a.servicio||'').localeCompare(String(b.servicio||''),'es')
+              || String(a.unidad||'').localeCompare(String(b.unidad||''),'es')
+              || String(a.nombre).localeCompare(String(b.nombre),'es'));
+}
+function _avFaltantesFilas(){
+  const rows=[['Subdirección','Servicio / Departamento','Unidad','Nombre','Cargo','Estamento']];
+  _avFaltantes().forEach(s=>rows.push([s.subdireccion||'(sin subdirección)',s.servicio||'(sin departamento)',s.unidad||'(sin unidad)',s.nombre,s.cargo||'',s.estamento||'']));
+  return rows;
+}
+function exportFaltantes(){
+  const rows=_avFaltantesFilas(); if(rows.length<2){ alert('No falta nadie por cubicar.'); return; }
+  const suf=_avFiltro?('_'+norm(_avGrupoNombre(_avFiltro)).replace(/[^a-z0-9]+/g,'_')):'';
+  xlsxDownload(rows,'Faltan por cubicar','Faltan_por_cubicar'+suf+'_'+new Date().toISOString().slice(0,10)+'.xlsx',
+    [{wch:38},{wch:44},{wch:40},{wch:40},{wch:30},{wch:22}]);
+}
 function _avArbol(){
   const asg=_dpAsignados();
   // árbol sd → sv → u, contando personas y cuántas tienen recinto
   const arbol={};
   const nBec=_dpStaffAll().length-_avStaff().length;
-  _avStaff().forEach(s=>{
+  _avStaffFiltrado().forEach(s=>{
     const sd=String(s.subdireccion||'(sin subdirección)');
     const sv=String(s.servicio||'(sin departamento)');
     // Sin unidad NO puede significar "sin fila": antes esta gente contaba en el
@@ -8561,19 +8606,25 @@ function renderAvance(){
   const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
   const corto=s=>String(s||'').replace(/^SUBDIRECCION\s+(DE\s+)?/i,'').replace(/^DEPARTAMENTO\s+/i,'Depto. ').replace(/^SERVICIO\s+(DE\s+)?/i,'');
   const {asg,arbol,nBec,tN,tA}=_avArbol();
-  const badge=document.getElementById('sbAvN'); if(badge) badge.textContent=_avPct(tA,tN)+'%';
+  const badge=document.getElementById('sbAvN'); if(badge && !_avFiltro) badge.textContent=_avPct(tA,tN)+'%';
   const H=[];
   H.push('<div style="display:flex;align-items:center;gap:8px;padding:6px 4px 10px">'
-    +'<b style="font-size:12px">Dotación asignada a recinto</b>'
+    +'<b style="font-size:12px">'+(_avFiltro?('🖋️ '+esc(_avGrupoNombre(_avFiltro))+' · asignadas a recinto'):'Dotación asignada a recinto')+'</b>'
     +'<b style="margin-left:auto;font-size:15px;color:'+_avColor(_avPct(tA,tN))+'">'+_avPct(tA,tN)+'%</b></div>'
     +'<div style="padding:0 4px 10px">'+_avBarra(tA,tN,8)
     +'<div style="font-size:10.5px;color:#64748b;margin-top:3px">'+tA+' de '+tN+' personas · faltan '+(tN-tA)+'</div>'
-    +(nBec?'<div style="font-size:10.5px;color:#94a3b8;margin-top:2px">🎓 '+nBec+' becados en formación no se cuentan: no pertenecen a una subdirección.</div>':'')+'</div>');
+    +((!_avFiltro&&nBec)?'<div style="font-size:10.5px;color:#94a3b8;margin-top:2px">🎓 '+nBec+' becados en formación no se cuentan: no pertenecen a una subdirección.</div>':'')
+    +(_avFiltro?'<div style="font-size:10.5px;color:#94a3b8;margin-top:2px">Grupo transversal: se mira aparte, repartido en las '+Object.keys(arbol).length+' subdirecciones donde tiene gente.</div>':'')+'</div>');
   // cada subdirección se abre a sus servicios/departamentos y éstos a sus
   // unidades, con el mismo avance; todo el árbol se puede abrir de una vez o exportar
   H.push('<div class="av-tools"><span>clic en una fila abre sus servicios y unidades</span>'
     +'<a href="#" onclick="avExpandir(true);return false">Expandir todo</a><a href="#" onclick="avExpandir(false);return false">Contraer</a>'
-    +'<a href="#" onclick="exportAvance();return false" title="Excel con el avance de cada subdirección, servicio/departamento y unidad">⬇ Exportar avance</a></div>');
+    +'<a href="#" onclick="exportAvance();return false" title="Excel con el avance de cada subdirección, servicio/departamento y unidad">⬇ Exportar avance</a>'
+    +'<a href="#" class="av-grupo'+(_avFiltro==='circulo_secretarias'?' on':'')+'" onclick="avFiltrar(\'circulo_secretarias\');return false" title="Avance sólo del Círculo de Secretarias: grupo transversal, repartido en varias subdirecciones">'
+    +(_avFiltro==='circulo_secretarias'?'✕ Ver toda la dotación':'🖋️ Círculo de secretarias')+'</a>'
+    +'<a href="#" class="av-falt'+(_avSoloFaltan?' on':'')+'" onclick="avSoloFaltan();return false" title="Ver sólo dónde falta gente por cubicar y quiénes son (el % restante)">'
+    +(_avSoloFaltan?'✕ Ver todo':'○ Sólo faltantes ('+(tN-tA)+')')+'</a>'
+    +'<a href="#" onclick="exportFaltantes();return false" title="Excel con nombre, cargo, subdirección, servicio y unidad de cada persona que aún no tiene recinto">⬇ Exportar faltantes</a></div>');
   const fila=(nivel,nombre,a,n,clave,hayHijos,nHijos)=>{
     const p=_avPct(a,n), ab=!!_avAbierto[clave];
     const pad=[0,12,24][nivel];
@@ -8588,19 +8639,23 @@ function renderAvance(){
         +(nivel===0?'font-weight:700':nivel===1?'font-weight:600':'color:#475569')+'">'+esc(corto(nombre))
         +(nHijos&&!ab?' <span class="av-hijos">'+nHijos+' '+(nivel===0?'servicio':'unidad')+(nHijos>1?(nivel===0?'s':'es'):'')+'</span>':'')
         +(nivel===2&&!ab?' <span class="av-hijos">nombres</span>':'')+'</span>'
-      +'<span style="color:#64748b;font-size:10px;white-space:nowrap">'+a+'/'+n+'</span>'
+      +(_avSoloFaltan?'<span style="color:#c0262d;font-size:10px;font-weight:600;white-space:nowrap">faltan '+(n-a)+'</span>'
+                     :'<span style="color:#64748b;font-size:10px;white-space:nowrap">'+a+'/'+n+'</span>')
       +'<b style="width:32px;text-align:right;color:'+_avColor(p)+';font-size:10.5px">'+p+'%</b></div>'
       +'<div style="margin:3px 0 0 15px">'+_avBarra(a,n,nivel===0?6:4)+'</div></div>';
   };
-  Object.entries(arbol).sort((x,y)=>y[1].n-x[1].n).forEach(([sd,A])=>{
-    const kA='sd:'+sd, hijosA=Object.entries(A.hijos);
+  // modo faltantes: sólo los nodos donde todavía falta alguien, ordenados por cuántos faltan
+  const vivo=x=>!_avSoloFaltan || x.n-x.a>0;
+  const orden=(x,y)=>_avSoloFaltan ? ((y[1].n-y[1].a)-(x[1].n-x[1].a)) : (y[1].n-x[1].n);
+  Object.entries(arbol).filter(([,A])=>vivo(A)).sort(orden).forEach(([sd,A])=>{
+    const kA='sd:'+sd, hijosA=Object.entries(A.hijos).filter(([,B])=>vivo(B));
     H.push(fila(0,sd,A.a,A.n,kA,hijosA.length>0,hijosA.length));
     if(!_avAbierto[kA]) return;
-    hijosA.sort((x,y)=>y[1].n-x[1].n).forEach(([sv,B])=>{
-      const kB=kA+'|sv:'+sv, hijosB=Object.entries(B.hijos);
+    hijosA.sort(orden).forEach(([sv,B])=>{
+      const kB=kA+'|sv:'+sv, hijosB=Object.entries(B.hijos).filter(([,C])=>vivo(C));
       H.push(fila(1,sv,B.a,B.n,kB,hijosB.length>0,hijosB.length));
       if(!_avAbierto[kB]) return;
-      hijosB.sort((x,y)=>y[1].n-x[1].n).forEach(([u,C])=>{
+      hijosB.sort(orden).forEach(([u,C])=>{
         const kC=kB+'|u:'+u;
         H.push(fila(2,u,C.a,C.n,kC,false));
         if(_avAbierto[kC]) H.push(_avPersonas(sd,sv,u,asg));
@@ -12934,6 +12989,44 @@ async function runSelfTest(){
       const cerrado=document.querySelectorAll('#avBody .av-fila').length===nSd;
       return nSd>0 && abiertos && filas && exp && cerrado && /servicio/.test(t);
     } finally { _avAbierto=abPrev; renderAvance(); }
+  });
+  T('Avance: «sólo faltantes» muestra únicamente dónde y quiénes faltan por cubicar, y el export los lista uno a uno', ()=>{
+    const abPrev={..._avAbierto}, fPrev=_avFiltro, sPrev=_avSoloFaltan;
+    try{
+      _avFiltro=null; _avSoloFaltan=false; renderAvance();
+      const {tN,tA}=_avArbol(); const faltan=tN-tA;
+      const rows=_avFaltantesFilas();
+      const exp=rows.length===faltan+1 && rows.slice(1).every(r=>r.length===6 && r[3]);
+      avSoloFaltan(); avExpandir(true); if(!_avSoloFaltan) return false;
+      const cont=document.getElementById('avBody');
+      const filas=[...cont.querySelectorAll('.av-fila')];
+      const soloConFalta=filas.length>0 && filas.every(f=>/faltan [1-9]\d*/.test(f.innerText));
+      // abrir una unidad: sólo aparecen ○ (nadie con ✔)
+      const kU=Object.keys(_avAbierto).find(k=>/\|sv:/.test(k)); let hoja=true;
+      if(kU){ const {arbol}=_avArbol(); const [sd,sv]=[kU.replace(/^sd:/,'').split('|sv:')[0], kU.split('|sv:')[1]];
+        const u=Object.keys(((arbol[sd]||{}).hijos||{})[sv]?.hijos||{}).find(x=>{ const C=arbol[sd].hijos[sv].hijos[x]; return C.n-C.a>0; });
+        if(u){ _avAbierto[kU+'|u:'+u]=true; renderAvance(); const t=cont.innerText; hoja=!/✔/.test(t) && /○/.test(t); } }
+      avSoloFaltan();
+      return exp && soloConFalta && hoja && !_avSoloFaltan;
+    } finally { _avFiltro=fPrev; _avSoloFaltan=sPrev; _avAbierto=abPrev; renderAvance(); }
+  });
+  T('Avance: el círculo de secretarias se mira aparte, transversal a las subdirecciones, sin tocar el % general', ()=>{
+    const abPrev={..._avAbierto}, fPrev=_avFiltro;
+    try{
+      _avFiltro=null; renderAvance();
+      const badgeAntes=document.getElementById('sbAvN').textContent;
+      const grupo=_avStaff().filter(s=>(s.grupos||[]).some(g=>g.clave==='circulo_secretarias'));
+      if(!grupo.length) return true;                      // sin grupo en la matriz no hay nada que probar
+      avFiltrar('circulo_secretarias');
+      const {arbol,tN}=_avArbol();
+      const t=document.getElementById('avBody').innerText;
+      const sds=new Set(grupo.map(s=>String(s.subdireccion||'(sin subdirección)')));
+      const ok=_avFiltro==='circulo_secretarias' && tN===grupo.length && Object.keys(arbol).length===sds.size && sds.size>=2
+        && /Círculo de Secretarias/.test(t) && document.getElementById('sbAvN').textContent===badgeAntes
+        && _avExportFilas()[1][4]===grupo.length;
+      avFiltrar('circulo_secretarias');                   // segundo clic vuelve a toda la dotación
+      return ok && _avFiltro===null && /Dotación asignada a recinto/.test(document.getElementById('avBody').innerText);
+    } finally { _avFiltro=fPrev; _avAbierto=abPrev; renderAvance(); }
   });
   T('Revisión: exportar la categoría visible arma una fila por pendiente, en todas las categorías', ()=>{
     return Object.keys(REV_CHECKS).every(c=>{
