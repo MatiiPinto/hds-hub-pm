@@ -490,6 +490,17 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 .bim-desc{display:grid;grid-template-columns:auto 1fr;grid-template-areas:"u nm" "u sub";column-gap:8px;align-items:center;width:100%;background:var(--surface-sunken);border:1px dashed var(--border);border-radius:var(--r-md);padding:6px 8px;text-align:left;margin:2px 0;position:relative;opacity:.8}
 .bim-undo{grid-area:u;position:static;transform:none;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;background:var(--accent-50);border:1px solid var(--accent-300);color:var(--accent-700);font-size:12px;cursor:pointer}
 .bim-undo:hover{background:var(--accent-600);color:#fff}
+/* visor de avance: filas desplegables (subdirección → servicio → unidad → nombres) */
+.av-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:0 4px 8px;font-size:var(--fs-xs);color:var(--text-3)}
+.av-tools span{flex:1 1 100%}
+.av-tools a{color:var(--accent-600);font-weight:var(--fw-medium);text-decoration:none;white-space:nowrap}
+.av-tools a:hover{text-decoration:underline}
+.av-fila.av-abre:hover{background:var(--surface-sunken)}
+.av-chev{color:var(--accent-600);width:9px;display:inline-block;font-size:10px}
+.av-hijos{font-size:10px;font-weight:var(--fw-regular);color:var(--text-3);white-space:nowrap}
+.rev-tools{display:flex;justify-content:flex-end;margin:0 0 6px}
+.rev-exp{height:26px;padding:0 10px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface);color:var(--accent-600);font-size:var(--fs-xs);font-weight:var(--fw-medium);cursor:pointer}
+.rev-exp:hover{background:var(--accent-50);border-color:var(--accent-300)}
 /* recintos en conflicto bajo una fila de revisión (mismo BIM en 2+ recintos) */
 .bim-extra{display:flex;flex-direction:column;gap:3px;padding:0 8px 8px 22px}
 .bim-extra-t{font-size:var(--fs-xs);color:var(--warn);font-weight:var(--fw-medium)}
@@ -8474,6 +8485,34 @@ function _avBadge(){
   b.textContent=_avPct(a,all.length)+'%';
 }
 function avToggle(k){ _avAbierto[k]=!_avAbierto[k]; renderAvance(); }
+// Abre (o cierra) todas las subdirecciones y sus servicios de una vez; los
+// nombres de cada unidad siguen abriéndose fila por fila.
+function avExpandir(on){
+  if(!on){ _avAbierto={}; renderAvance(); return; }
+  const {arbol}=_avArbol();
+  Object.entries(arbol).forEach(([sd,A])=>{ _avAbierto['sd:'+sd]=true; Object.keys(A.hijos).forEach(sv=>{ _avAbierto['sd:'+sd+'|sv:'+sv]=true; }); });
+  renderAvance();
+}
+// Filas del avance para Excel: una por subdirección, servicio/departamento y unidad.
+function _avExportFilas(){
+  const {arbol,tN,tA}=_avArbol();
+  const rows=[['Nivel','Subdirección','Servicio / Departamento','Unidad','Personas','Asignadas a recinto','Faltan','% avance']];
+  const fila=(niv,sd,sv,u,x)=>rows.push([niv,sd,sv,u,x.n,x.a,x.n-x.a,_avPct(x.a,x.n)]);
+  rows.push(['Total','','','',tN,tA,tN-tA,_avPct(tA,tN)]);
+  Object.entries(arbol).sort((x,y)=>y[1].n-x[1].n).forEach(([sd,A])=>{
+    fila('Subdirección',sd,'','',A);
+    Object.entries(A.hijos).sort((x,y)=>y[1].n-x[1].n).forEach(([sv,B])=>{
+      fila('Servicio',sd,sv,'',B);
+      Object.entries(B.hijos).sort((x,y)=>y[1].n-x[1].n).forEach(([u,C])=>fila('Unidad',sd,sv,u,C));
+    });
+  });
+  return rows;
+}
+function exportAvance(){
+  const rows=_avExportFilas(); if(rows.length<3){ alert('La matriz de dotación no está cargada.'); return; }
+  xlsxDownload(rows,'Avance','Avance_dotacion_asignada_'+new Date().toISOString().slice(0,10)+'.xlsx',
+    [{wch:13},{wch:38},{wch:44},{wch:40},{wch:10},{wch:12},{wch:9},{wch:10}]);
+}
 // Nombres de una unidad del árbol, con su estado de asignación. Cierra el
 // circuito: cualquier número del avance se puede abrir hasta ver quién es.
 function _avPersonas(sd,sv,u,asg){
@@ -8491,11 +8530,9 @@ function _avPersonas(sd,sv,u,asg){
       +'<span style="flex:1;min-width:0;overflow-wrap:anywhere">'+esc(g.nombre)+(g.cargo?(' <span style="color:#94a3b8">· '+esc(g.cargo)+'</span>'):'')+'</span></div>';
   }).join('')+'</div>';
 }
-function renderAvance(){
-  const cont=document.getElementById('avBody'); if(!cont) return;
-  if(!dotDB||!dotDB.staff){ cont.innerHTML='<div style="padding:8px;color:#64748b">La matriz de dotación no está cargada.</div>'; return; }
-  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
-  const corto=s=>String(s||'').replace(/^SUBDIRECCION\s+(DE\s+)?/i,'').replace(/^DEPARTAMENTO\s+/i,'Depto. ').replace(/^SERVICIO\s+(DE\s+)?/i,'');
+// Árbol sd → sv → u de la dotación (sin becados), con personas y asignadas por nodo.
+// Lo usan el visor de avance y su exportación.
+function _avArbol(){
   const asg=_dpAsignados();
   // árbol sd → sv → u, contando personas y cuántas tienen recinto
   const arbol={};
@@ -8516,6 +8553,14 @@ function renderAvance(){
   });
   const tN=Object.values(arbol).reduce((x,v)=>x+v.n,0);
   const tA=Object.values(arbol).reduce((x,v)=>x+v.a,0);
+  return {asg,arbol,nBec,tN,tA};
+}
+function renderAvance(){
+  const cont=document.getElementById('avBody'); if(!cont) return;
+  if(!dotDB||!dotDB.staff){ cont.innerHTML='<div style="padding:8px;color:#64748b">La matriz de dotación no está cargada.</div>'; return; }
+  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const corto=s=>String(s||'').replace(/^SUBDIRECCION\s+(DE\s+)?/i,'').replace(/^DEPARTAMENTO\s+/i,'Depto. ').replace(/^SERVICIO\s+(DE\s+)?/i,'');
+  const {asg,arbol,nBec,tN,tA}=_avArbol();
   const badge=document.getElementById('sbAvN'); if(badge) badge.textContent=_avPct(tA,tN)+'%';
   const H=[];
   H.push('<div style="display:flex;align-items:center;gap:8px;padding:6px 4px 10px">'
@@ -8524,29 +8569,36 @@ function renderAvance(){
     +'<div style="padding:0 4px 10px">'+_avBarra(tA,tN,8)
     +'<div style="font-size:10.5px;color:#64748b;margin-top:3px">'+tA+' de '+tN+' personas · faltan '+(tN-tA)+'</div>'
     +(nBec?'<div style="font-size:10.5px;color:#94a3b8;margin-top:2px">🎓 '+nBec+' becados en formación no se cuentan: no pertenecen a una subdirección.</div>':'')+'</div>');
-  const fila=(nivel,nombre,a,n,clave,hayHijos)=>{
+  // cada subdirección se abre a sus servicios/departamentos y éstos a sus
+  // unidades, con el mismo avance; todo el árbol se puede abrir de una vez o exportar
+  H.push('<div class="av-tools"><span>clic en una fila abre sus servicios y unidades</span>'
+    +'<a href="#" onclick="avExpandir(true);return false">Expandir todo</a><a href="#" onclick="avExpandir(false);return false">Contraer</a>'
+    +'<a href="#" onclick="exportAvance();return false" title="Excel con el avance de cada subdirección, servicio/departamento y unidad">⬇ Exportar avance</a></div>');
+  const fila=(nivel,nombre,a,n,clave,hayHijos,nHijos)=>{
     const p=_avPct(a,n), ab=!!_avAbierto[clave];
     const pad=[0,12,24][nivel];
     const abre=hayHijos||nivel===2;          // la hoja despliega los NOMBRES
-    return '<div style="padding:5px 4px 5px '+(4+pad)+'px;border-top:1px solid #eef2f7;'
+    return '<div class="av-fila'+(abre?' av-abre':'')+(ab?' av-ab':'')+'" style="padding:5px 4px 5px '+(4+pad)+'px;border-top:1px solid #eef2f7;'
       +(abre?'cursor:pointer':'')+'" '+(abre?'onclick="avToggle(\''+clave.replace(/'/g,"\\'")+'\')"':'')+'>'
       +'<div style="display:flex;align-items:flex-start;gap:6px;font-size:'+[11.5,11,10.5][nivel]+'px">'
-      +(abre?'<span style="color:#94a3b8;width:9px;display:inline-block">'+(ab?'▾':'▸')+'</span>':'<span style="width:9px;display:inline-block"></span>')
+      +(abre?'<span class="av-chev">'+(ab?'▾':'▸')+'</span>':'<span style="width:9px;display:inline-block"></span>')
       // El nombre envuelve en vez de recortarse: en un testigo, un nombre a
       // medias es peor que una fila un poco más alta.
       +'<span title="'+esc(nombre)+'" style="flex:1;min-width:0;overflow-wrap:anywhere;line-height:1.25;'
-        +(nivel===0?'font-weight:700':nivel===1?'font-weight:600':'color:#475569')+'">'+esc(corto(nombre))+'</span>'
+        +(nivel===0?'font-weight:700':nivel===1?'font-weight:600':'color:#475569')+'">'+esc(corto(nombre))
+        +(nHijos&&!ab?' <span class="av-hijos">'+nHijos+' '+(nivel===0?'servicio':'unidad')+(nHijos>1?(nivel===0?'s':'es'):'')+'</span>':'')
+        +(nivel===2&&!ab?' <span class="av-hijos">nombres</span>':'')+'</span>'
       +'<span style="color:#64748b;font-size:10px;white-space:nowrap">'+a+'/'+n+'</span>'
       +'<b style="width:32px;text-align:right;color:'+_avColor(p)+';font-size:10.5px">'+p+'%</b></div>'
       +'<div style="margin:3px 0 0 15px">'+_avBarra(a,n,nivel===0?6:4)+'</div></div>';
   };
   Object.entries(arbol).sort((x,y)=>y[1].n-x[1].n).forEach(([sd,A])=>{
     const kA='sd:'+sd, hijosA=Object.entries(A.hijos);
-    H.push(fila(0,sd,A.a,A.n,kA,hijosA.length>0));
+    H.push(fila(0,sd,A.a,A.n,kA,hijosA.length>0,hijosA.length));
     if(!_avAbierto[kA]) return;
     hijosA.sort((x,y)=>y[1].n-x[1].n).forEach(([sv,B])=>{
       const kB=kA+'|sv:'+sv, hijosB=Object.entries(B.hijos);
-      H.push(fila(1,sv,B.a,B.n,kB,hijosB.length>0));
+      H.push(fila(1,sv,B.a,B.n,kB,hijosB.length>0,hijosB.length));
       if(!_avAbierto[kB]) return;
       hijosB.sort((x,y)=>y[1].n-x[1].n).forEach(([u,C])=>{
         const kC=kB+'|u:'+u;
@@ -10787,6 +10839,27 @@ function _borrarPuestoPendiente(p){
   arr.splice(ix,1);
   return true;
 }
+// Filas de la categoría visible, listas para Excel (misma información que la lista).
+function _revExportFilas(check){
+  const C=REV_CHECKS[check||_revCheck]; if(!C) return [];
+  const pend=_revPend(check||_revCheck).filter(p=>!p.noNav);
+  const rows=[['Categoría','Título','Detalle','Recinto','Código','BIM','Área / servicio','Piso','Persona','Cargo']];
+  pend.forEach(p=>{
+    const rid=p.r&&p.r.id;
+    let det=''; try{ det=C.subText?String(C.subText(p)||''):''; }catch(e){}
+    rows.push([C.label, p.nombre||(rid?(rName(rid)||rid):'')||p.title||'', det,
+               rid?(rName(rid)||''):'', rid?(rCode(rid)||''):'', rid?(rBim(rid)||''):'',
+               p.area?aName(p.area.id):'', p.fl?p.fl.label:'', p.nombre||'', p.cargo||'']);
+  });
+  return rows;
+}
+function exportRevision(){
+  const C=REV_CHECKS[_revCheck]; const rows=_revExportFilas();
+  if(rows.length<2){ alert('No hay pendientes en «'+C.label+'».'); return; }
+  const slug=norm(C.label).replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,50);
+  xlsxDownload(rows,'Revisión','Revision_'+slug+'_'+new Date().toISOString().slice(0,10)+'.xlsx',
+    [{wch:34},{wch:34},{wch:70},{wch:30},{wch:12},{wch:14},{wch:30},{wch:14},{wch:34},{wch:24}]);
+}
 function revDeleteDot(i){
   if(S.viewOnly) return;
   const p=(document.getElementById('bimList')._pend||[])[i]; if(!p) return;
@@ -10809,6 +10882,11 @@ function renderBimPending(){
                   +(sin.length?('<optgroup label="Al día">'+sin.map(opt).join('')+'</optgroup>'):''); })()
     +'</select>';
   const pend=_revPend(_revCheck);
+  // Exportar puntualmente la categoría que se está mirando (petición 15-sep-2026):
+  // una fila por pendiente, con lo mismo que muestra la lista más recinto/código/BIM.
+  if(pend.some(p=>!p.noNav) && typeof xlsxDownload==='function'){
+    html+='<div class="rev-tools"><button class="rev-exp" onclick="exportRevision()" title="Descarga en Excel los pendientes de esta categoría, tal como se ven en la lista">⬇ Exportar esta lista ('+pend.filter(p=>!p.noNav).length+')</button></div>';
+  }
   {
     const C=REV_CHECKS[_revCheck];
     const fAll=C.allIf||C.okIf;
@@ -12839,6 +12917,29 @@ async function runSelfTest(){
     }
     probe.remove();
     return ok;
+  });
+  T('Avance: expandir todo abre cada subdirección a sus servicios y el export trae una fila por nodo', ()=>{
+    const abPrev={..._avAbierto};
+    try{
+      const {arbol}=_avArbol();
+      const nSd=Object.keys(arbol).length, nSv=Object.values(arbol).reduce((x,A)=>x+Object.keys(A.hijos).length,0);
+      const nU=Object.values(arbol).reduce((x,A)=>x+Object.values(A.hijos).reduce((y,B)=>y+Object.keys(B.hijos).length,0),0);
+      avExpandir(true);
+      const t=document.getElementById('avBody').innerText;
+      const abiertos=Object.values(_avAbierto).filter(Boolean).length===nSd+nSv;
+      const filas=document.querySelectorAll('#avBody .av-fila').length===nSd+nSv+nU;
+      const rows=_avExportFilas();
+      const exp=rows.length===2+nSd+nSv+nU && rows[1][0]==='Total' && rows.slice(2).every(r=>r.length===8 && r[4]>=r[5] && r[6]===r[4]-r[5]);
+      avExpandir(false);
+      const cerrado=document.querySelectorAll('#avBody .av-fila').length===nSd;
+      return nSd>0 && abiertos && filas && exp && cerrado && /servicio/.test(t);
+    } finally { _avAbierto=abPrev; renderAvance(); }
+  });
+  T('Revisión: exportar la categoría visible arma una fila por pendiente, en todas las categorías', ()=>{
+    return Object.keys(REV_CHECKS).every(c=>{
+      const rows=_revExportFilas(c), n=_revPend(c).filter(p=>!p.noNav).length;
+      return rows.length===n+1 && rows[0].length===10 && rows.slice(1).every(r=>r.length===10 && r[0]===REV_CHECKS[c].label);
+    });
   });
   T('Revisión: rechazar saca del contador y restaurar la devuelve', ()=>{
     const antes=_revPend('sinbim').length;

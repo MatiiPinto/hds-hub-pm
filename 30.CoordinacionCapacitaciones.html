@@ -64,6 +64,7 @@ table{border-collapse:collapse;width:100%;font-size:12px;white-space:nowrap}
 thead th{background:var(--azul);color:#fff;position:sticky;top:0;padding:9px 10px;text-align:left;font-weight:600;font-size:11.5px;z-index:5}
 tbody td{padding:6px 10px;border-bottom:1px solid #eef2f6;vertical-align:middle}
 tbody tr:hover td{background:#f8fafc}
+td.lista{white-space:normal;min-width:190px;max-width:280px;line-height:1.4;font-size:11.5px}
 td.estam{min-width:230px;max-width:330px;white-space:normal}
 td.estam label{display:inline-block;font-size:10.5px;border:1px solid var(--bd);border-radius:10px;padding:1px 7px 1px 5px;margin:1px 2px 1px 0;cursor:pointer;background:#f8fafc;white-space:nowrap;user-select:none}
 td.estam label input{width:11px;height:11px;margin:0 3px 0 0;vertical-align:-1px;cursor:pointer}
@@ -284,13 +285,13 @@ var COLS = {
     {key:"proveedor",label:"Proveedor"},{key:"marca",label:"Marca"},{key:"modelo",label:"Modelo"},
     {key:"duracion",label:"Duración",edit:1},{key:"cant_equipos",label:"Cant. eq."},
     {key:"establecimiento",label:"Estab."},{key:"tipo_entrenamiento",label:"Tipo entren."},
-    {key:"propuesta_adelantar",label:"Prop. adelantar",edit:1},{key:"detalle_servicios",label:"Servicio clínico"},
+    {key:"propuesta_adelantar",label:"Prop. adelantar",edit:1},{key:"detalle_servicios",label:"Servicio clínico",lista:1},
     {key:"_estam",label:"Estamentos que participan",estam:1}
   ],
   instructivos:[
     {key:"codigo",label:"Código"},{key:"equipo",label:"Equipo"},{key:"cant_equipos",label:"Cant. eq."},
     {key:"establecimiento",label:"Estab."},{key:"proveedor",label:"Proveedor"},{key:"marca",label:"Marca"},
-    {key:"modelo",label:"Modelo"},{key:"detalle_servicios",label:"Servicio clínico"},
+    {key:"modelo",label:"Modelo"},{key:"detalle_servicios",label:"Servicio clínico",lista:1},
     {key:"fecha_coord",label:"Fecha entrega",edit:1,type:"date"}
   ],
   instrumental:[
@@ -537,6 +538,7 @@ function renderTable(){
       if(c.slots) return slotsCell(r);
       if(c.estam) return estamCell(r);
       var v=valOf(r,c.key);
+      if(c.lista) return '<td class="lista">'+String(v||"").split(/[\n;]+/).map(function(x){return x.trim();}).filter(Boolean).map(esc).join('<br>')+'</td>';
       if(c.edit) return '<td class="edit"><input type="'+(c.type||"text")+'" value="'+esc(v)+'" onchange="setField(\''+r.id+'\',\''+c.key+'\',this.value)"></td>';
       return '<td>'+esc(v)+'</td>';
     }).join("");
