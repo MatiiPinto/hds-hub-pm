@@ -279,14 +279,13 @@ function validKeys(area){return ESTADOS[area].map(function(e){return e.k;});}
 
 var COLS = {
   capacitaciones:[
-    {key:"codigo",label:"Código"},{key:"equipo",label:"Equipo"},
+    {key:"codigo",label:"Código"},{key:"_estam",label:"Estamentos que participan",estam:1},{key:"equipo",label:"Equipo"},
     {key:"lugar",label:"Lugar",edit:1},{key:"_slots",label:"Fechas/horas propuestas",slots:1},
     {key:"participantes",label:"Particip.",edit:1},
     {key:"proveedor",label:"Proveedor"},{key:"marca",label:"Marca"},{key:"modelo",label:"Modelo"},
     {key:"duracion",label:"Duración",edit:1},{key:"cant_equipos",label:"Cant. eq."},
     {key:"establecimiento",label:"Estab."},{key:"tipo_entrenamiento",label:"Tipo entren."},
-    {key:"propuesta_adelantar",label:"Prop. adelantar",edit:1},{key:"detalle_servicios",label:"Servicio clínico",lista:1},
-    {key:"_estam",label:"Estamentos que participan",estam:1}
+    {key:"propuesta_adelantar",label:"Prop. adelantar",edit:1},{key:"detalle_servicios",label:"Servicio clínico",lista:1}
   ],
   instructivos:[
     {key:"codigo",label:"Código"},{key:"equipo",label:"Equipo"},{key:"cant_equipos",label:"Cant. eq."},
