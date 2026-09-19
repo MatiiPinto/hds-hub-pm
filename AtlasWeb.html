@@ -211,9 +211,12 @@ code,.mono{font-family:var(--font-mono)}
 .tb-div,.tb-sep{display:none}
 /* acceso rápido en la barra de navegación: cajas · nombres · edición */
 #navQuick{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:10px}
+#navBar .tb-btn.dis{opacity:.45}
 #navBar .tb-btn{height:26px;padding:0 8px;font-size:var(--fs-xs);gap:5px}
 #navBar .tog::after{width:22px;height:13px;margin-left:6px;background:radial-gradient(circle at 6.5px 50%,#fff 4px,transparent 4.6px) var(--n-200)}
 #navBar .tog.on::after,#navBar .tog.active::after{background:radial-gradient(circle at 15.5px 50%,#fff 4px,transparent 4.6px) var(--accent-600)}
+/* ventana angosta: los 4 interruptores quedan sólo con su icono (el rótulo va en el tooltip) */
+@media (max-width:1360px){#navQuick .tb-btn{font-size:0;gap:0;padding:0 7px}#navQuick .tb-btn::before{content:attr(data-ic);font-size:13px;line-height:1}}
 
 /* ── Botones de herramienta (.tb-btn) ────────────────────────────────────── */
 .tb-btn{display:inline-flex;align-items:center;gap:6px;height:var(--control-h);padding:0 var(--sp-3);border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface);color:var(--text);font-size:var(--fs-sm);font-weight:var(--fw-regular);cursor:pointer;white-space:nowrap;flex-shrink:0;line-height:1;transition:background .15s,border-color .15s,color .15s;font-variant-numeric:tabular-nums}
@@ -490,9 +493,29 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 .bim-desc{display:grid;grid-template-columns:auto 1fr;grid-template-areas:"u nm" "u sub";column-gap:8px;align-items:center;width:100%;background:var(--surface-sunken);border:1px dashed var(--border);border-radius:var(--r-md);padding:6px 8px;text-align:left;margin:2px 0;position:relative;opacity:.8}
 .bim-undo{grid-area:u;position:static;transform:none;width:22px;height:22px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;background:var(--accent-50);border:1px solid var(--accent-300);color:var(--accent-700);font-size:12px;cursor:pointer}
 .bim-undo:hover{background:var(--accent-600);color:#fff}
+/* jardines (imagen entre el plano y las cajas) y esculturas (marcador + ficha flotante) */
+#jardinImg{position:absolute;pointer-events:none;user-select:none;image-rendering:auto}
+.esc-mk{cursor:help;pointer-events:all}
+.esc-mk:hover circle.bola{stroke:#0f172a}
+#escTip{display:none;position:fixed;z-index:1300;width:330px;max-width:calc(100vw - 16px);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-3);padding:12px 14px;font-size:var(--fs-sm);color:var(--text);pointer-events:none;line-height:1.45}
+#escTip .et-t{font-size:var(--fs-md);font-weight:var(--fw-bold);margin-bottom:6px}
+#escTip .et-d{color:var(--text-2)}
+#escTip .et-f{margin-top:6px;color:var(--text-2)}
+#escTip .et-tr{margin-top:8px;padding:6px 8px;border-radius:var(--r-md);background:var(--warn-soft);color:var(--warn)}
+#escTip .et-src{margin-top:8px;font-size:10px;color:var(--text-3)}
+/* funciones específicas de los TENS: chips (diálogo y filtro) e insignias (listas) */
+.func-chips{display:flex;flex-wrap:wrap;gap:6px}
+.func-chip{height:26px;padding:0 10px;border:1px solid var(--border);border-radius:var(--r-pill);background:var(--surface);color:var(--text);font-size:var(--fs-xs);cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.func-chip i{width:8px;height:8px;border-radius:50%;background:var(--fc);flex:none}
+.func-chip:hover{border-color:var(--fc)}
+.func-chip.on{background:var(--fc);border-color:var(--fc);color:#fff;font-weight:var(--fw-medium)}
+.func-chip.on i{background:#fff}
+.func-chip.sm{height:22px;padding:0 8px;font-size:10px}
+.func-b{display:inline-block;margin-left:4px;padding:0 5px;border-radius:7px;color:#fff;font-size:9px;font-weight:var(--fw-bold);line-height:14px;vertical-align:1px}
+.func-mas{display:inline-block;margin:-4px 0 10px;font-size:var(--fs-xs);color:var(--accent-600);text-decoration:none}
+.func-mas:hover{text-decoration:underline}
 /* visor de avance: filas desplegables (subdirección → servicio → unidad → nombres) */
-.av-tools{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:0 4px 8px;font-size:var(--fs-xs);color:var(--text-3)}
-.av-tools span{flex:1 1 100%}
+.av-tools{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap;padding:2px 4px 6px;font-size:var(--fs-xs);color:var(--text-3)}
 .av-tools a{color:var(--accent-600);font-weight:var(--fw-medium);text-decoration:none;white-space:nowrap}
 .av-tools a:hover{text-decoration:underline}
 .av-tools a.av-grupo{padding:2px 8px;border:1px solid var(--border);border-radius:var(--r-pill);color:var(--external)}
@@ -709,11 +732,12 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
     <div class="exp-menu" id="expMenu">
       <div class="exp-menu-lbl" id="expDest" style="color:#1d5fa0;font-weight:800;text-transform:none;letter-spacing:0;font-size:10px;padding-bottom:6px">⬇ Se descarga a la carpeta de Descargas</div>
       <div class="exp-menu-lbl">Recintos</div>
-      <button onclick="exportRecintos();closeExpMenu()">🚪 Recintos (código, BIM, señalética, tipo, aforo)</button>
+      <button onclick="exportRecintos();closeExpMenu()" title="Una fila por recinto dibujado: piso, servicio, tipología general y específica, PMA y BIM (todos), m², aforo, puestos, personas, camas y equipamiento. + Resumen de tipologías por servicio y totales del hospital">🚪 Recintos · tipologías por servicio</button>
       <button onclick="exportSenaletica();closeExpMenu()">🏷 Señalética por recinto</button>
       <div class="exp-menu-lbl">Personas y puestos</div>
+      <button onclick="exportPuestosTrabajo();closeExpMenu()" title="¿Calzan las personas asignadas con los puestos de trabajo? Puestos del plano (escritorio + computador) + escritorios nuevos fucsia vs. personas, contando el 4º turno como un solo puesto. Por servicio y por recinto">💼 Puestos de trabajo vs personas</button>
       <button onclick="exportAsignaciones();closeExpMenu()">👥 Dotación en recinto</button>
-      <button onclick="exportCamas();closeExpMenu()">🛏 Puestos/camas en recinto (camilla/sillón)</button>
+      <button onclick="exportCamas();closeExpMenu()">🛏 Camas, sillones y cupos numerados</button>
       <div class="exp-menu-lbl">Equipamiento</div>
       <button onclick="exportEquipamiento();closeExpMenu()">🔧 Equipamiento en recinto (EquiBox)</button>
       <button onclick="exportMobiliarioClinico();closeExpMenu()">🪑 Mobiliario clínico en recinto</button>
@@ -777,6 +801,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="tb-btn" id="btnDupMueble" onclick="toggleStampMode()" style="display:none" title="Duplicar mobiliario: recorta un trozo del plano (como una captura de pantalla) y lo estampa como copia dentro del recinto, para proponer más puestos con el mismo mueble. La copia se mueve arrastrándola y se elimina con doble clic.">🪑 Duplicar mueble</button>
       <button class="tb-btn" id="btnServPuestos" onclick="openServPuestos()" style="display:none" title="Ver todos los puestos asignados del servicio: en cantidad o con el nombre de cada funcionario">👥 Puestos del servicio</button>
       <button class="tb-btn tog" id="btnBoxVis" onclick="cycleBoxVis()" title="Ver u ocultar las cajas dibujadas y su información (para ver el plano de fondo)">👁 Cajas</button>
+      <button class="tb-btn tog" id="btnJardines" onclick="toggleJardines()" title="Mostrar u ocultar los jardines y las esculturas del piso 1 (lámina de Paisajismo PAI-PL-GEN-X-P-E-081, calibrada contra el plano). Pasa el mouse por una 🗿 para ver su ficha y fechas de traslado.">🌳 Jardines</button>
       <button class="tb-btn tog" id="btnDotNames" onclick="toggleDotNames()" title="Mostrar u ocultar el nombre de las personas asignadas a los puestos en vista 3 (útil en recintos con muchos funcionarios)">👤 Nombres</button>
       <div class="vw-dd" id="vwDD">
         <button class="tb-btn" id="btnVista" onclick="toggleVwMenu(event)" title="Opciones de visualización del plano">🎛 Vista ▾</button>
@@ -1108,6 +1133,8 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
     </div>
     <div class="form-row"><label>Cargo / Función</label><input id="mCargo" autocomplete="hds-cargo" spellcheck="false"></div>
     <div class="form-row"><label>Estamento</label><input id="mEst" autocomplete="hds-estamento" spellcheck="false"></div>
+    <div class="form-row" id="mFuncRow" style="display:none"><label>Funciones específicas <span style="text-transform:none;letter-spacing:0;font-weight:400">· TENS y enfermería · una o más</span></label><div id="mFuncChips" class="func-chips"></div></div>
+    <a href="#" id="mFuncMas" class="func-mas" onclick="_mFuncMostrar(true);return false">＋ Funciones específicas (TENS · enfermería)</a>
     <div class="form-row"><label>Origen</label><label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:#92400e;cursor:pointer"><input type="checkbox" id="mExterna" style="width:auto;margin:0"> Persona fuera de la matriz de dotación</label></div>
     <div class="form-row"><label></label><label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:#5b21b6;cursor:pointer"><input type="checkbox" id="mCds" style="width:auto;margin:0"> 🛒 Compra de Servicio (función externalizada)</label></div>
     <div class="form-row"><label></label><label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:#0369a1;cursor:pointer"><input type="checkbox" id="mDinClin" style="width:auto;margin:0"> 🔄 Personal dinámico clínico (rota entre servicios, ej. 4º turno)</label></div>
@@ -1180,6 +1207,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 <script src="SHARED_DATA/emmc_pendientes.js"></script>
 <script src="SHARED_DATA/nav_verticales.js"></script>
 <script src="SHARED_DATA/propuestos_plano.js"></script>
+<script src="SHARED_DATA/paisajismo.js"></script>
 <script src="SHARED_DATA/planos_meta.js"></script>
 <script src="SHARED_DATA/recinto_mnc2.js"></script>
 <script src="SHARED_DATA/senaletica.js"></script>
@@ -1886,6 +1914,60 @@ if(!nameState.bimRepRev) nameState.bimRepRev={};     // BIM repetidos revisados:
 if(!nameState.repartoRev) nameState.repartoRev={};   // repartos EMMC desparejos revisados (firma por código)
 if(!nameState.comisionRev) nameState.comisionRev={};
 if(!nameState.cdsRev) nameState.cdsRev={};
+// ── Funciones específicas de los TENS (referencia: personal de pabellón) ─────
+// La matriz sólo dice «TENS»; en la práctica se diferencian por función y una
+// misma persona puede tener UNA O MÁS. Se guardan POR PERSONA (nombre
+// normalizado), así la siguen aunque cambie de puesto. Catálogo extensible.
+if(!nameState.funcTens) nameState.funcTens={};
+const FUNC_TENS=[
+  {k:'rx',   cod:'RX', lbl:'Rayos X',           col:'#ca8a04'},
+  {k:'anest',cod:'AN', lbl:'Aux. de anestesia', col:'#2563eb'},
+  {k:'pab',  cod:'PB', lbl:'Pabellonera/o',     col:'#0f766e'},
+  {k:'ars',  cod:'AR', lbl:'Arsenalera/o',      col:'#be123c'},
+  {k:'oft',  cod:'OF', lbl:'Oftalmología',      col:'#7c3aed'},
+  {k:'endo', cod:'EN', lbl:'Endoscopía',        col:'#c2410c'},
+  // especialidades quirúrgicas (18-sep-2026): valen para TENS y para enfermería
+  {k:'uro',  cod:'UR', lbl:'Urología',          col:'#0891b2'},
+  {k:'orl',  cod:'OT', lbl:'Otorrino',          col:'#65a30d'},
+  {k:'rob',  cod:'RB', lbl:'Robótica',          col:'#475569'},
+  {k:'trau', cod:'TR', lbl:'Traumatología',     col:'#db2777'}
+];
+// A quiénes se les ofrece la fila sin pedirla: TENS/técnicos/auxiliares y enfermería.
+const _FUNC_ESTAMENTOS=/tens|t[eé]cnic|param[eé]dic|auxiliar|enfermer|\beu\b|matron/i;
+function _funcDe(nombre){ const v=(nameState.funcTens||{})[norm(nombre||'')]; return Array.isArray(v)?FUNC_TENS.map(f=>f.k).filter(k=>v.includes(k)):[]; }
+function _funcCods(nombre){ return _funcDe(nombre).map(k=>FUNC_TENS.find(f=>f.k===k).cod); }
+function _funcTexto(nombre){ return _funcDe(nombre).map(k=>FUNC_TENS.find(f=>f.k===k).lbl).join(' · '); }
+function _funcBadges(nombre){ return _funcDe(nombre).map(k=>{ const f=FUNC_TENS.find(x=>x.k===k); return '<span class="func-b" style="background:'+f.col+'" title="'+f.lbl+'">'+f.cod+'</span>'; }).join(''); }
+// Chips del diálogo del puesto: selección en memoria hasta Guardar.
+let _mFunc=new Set(), _mFuncKey='', _mFuncForzado=false, _mFuncOido=false;
+function _mFuncPinta(){
+  const row=document.getElementById('mFuncRow'), box=document.getElementById('mFuncChips'), mas=document.getElementById('mFuncMas'); if(!row||!box) return;
+  const txt=((document.getElementById('mEst')||{}).value||'')+' '+((document.getElementById('mCargo')||{}).value||'');
+  const ver=_mFuncForzado || _mFunc.size>0 || _FUNC_ESTAMENTOS.test(txt);
+  row.style.display=ver?'':'none'; if(mas) mas.style.display=ver?'none':'';
+  box.innerHTML=FUNC_TENS.map(f=>'<button type="button" class="func-chip'+(_mFunc.has(f.k)?' on':'')+'" style="--fc:'+f.col+'" onclick="_mFuncToggle(\''+f.k+'\')"><i></i>'+f.lbl+'</button>').join('');
+}
+function _mFuncToggle(k){ if(_mFunc.has(k)) _mFunc.delete(k); else _mFunc.add(k); _mFuncPinta(); }
+function _mFuncMostrar(v){ _mFuncForzado=!!v; _mFuncPinta(); }
+function _mFuncCarga(nombre){
+  _mFuncKey=norm(nombre||''); _mFunc=new Set(_funcDe(nombre)); _mFuncForzado=false;
+  if(!_mFuncOido){ _mFuncOido=true; ['mEst','mCargo'].forEach(id=>{ const e=document.getElementById(id); if(e) e.addEventListener('input',_mFuncPinta); }); }
+  _mFuncPinta();
+}
+// El nombre cambió en el diálogo: se cargan las funciones de ESA persona (si
+// se marcaron chips antes de escribir el nombre, se conservan).
+function _mFuncSync(){
+  const inp=document.getElementById('mNombre'); if(!inp) return;
+  const k=norm(inp.value||'');
+  if(k!==_mFuncKey){ const g=_funcDe(inp.value); if(g.length || _mFuncKey) _mFunc=new Set(g); _mFuncKey=k; }
+  _mFuncPinta();
+}
+function _mFuncGuarda(nombre){
+  const k=norm(nombre||''); if(!k) return;
+  nameState.funcTens=nameState.funcTens||{};
+  if(_mFunc.size) nameState.funcTens[k]=FUNC_TENS.map(f=>f.k).filter(x=>_mFunc.has(x)); else delete nameState.funcTens[k];
+  try{ sNames(); }catch(e){}
+}
 if(!nameState.extRev) nameState.extRev={};        // fuera de matriz ya informado a RR.HH. (por nombre normalizado)
 if(!nameState.propCupos) nameState.propCupos={};  // cupo finito por tipo de propuesto (p.ej. {printer:40}); sin clave = sin cupo        // Compra de Servicio ya informada a RR.HH. (por nombre normalizado)  // coincidencias comisión de servicio revisadas (por RUT)
 if(!nameState.revDesc) nameState.revDesc={};
@@ -2324,13 +2406,25 @@ function _backupPayload(){
       cabida_cad_dxf_calib:  DXF_EXT_OVERRIDES
     };
 }
+// Estado para la VERSIÓN WEB (consulta, se publica en el 🟡 HUB-PM): el mismo
+// respaldo SIN marcas indexadas por RUT. nameState.comisionRev guarda qué
+// comisiones de servicio se revisaron usando el RUT como clave; la consulta no
+// las usa y el servidor rechaza (con razón) cualquier snapshot con RUT — desde
+// el 01-sep el botón 🟡 no podía publicar por esto (18-sep-2026).
+const _WEB_SIN_PII=['comisionRev'];
+function _webPayload(){
+  const p=_backupPayload();
+  const n={...nameState}; _WEB_SIN_PII.forEach(k=>{ delete n[k]; });
+  p.cabida_cad_names=n;
+  return p;
+}
 // Publica el snapshot DIRECTO al 🟡 HUB-PM vía el servidor local de acciones
 // (localhost:8799): instala WEB_DATA/atlas_web_data.js + deploy + commit.
 // Fallback sin servidor: exportWebData() + doble clic en Actualizar-Web-PM.command.
 async function publicarAtlasPM(){
   const js='// Snapshot de Atlas HDS para la versión web de consulta — generado '
     +new Date().toISOString()+'\n'
-    +'window.ATLAS_WEB_DATA='+JSON.stringify(_backupPayload())+';\n';
+    +'window.ATLAS_WEB_DATA='+JSON.stringify(_webPayload())+';\n';
   try{ await fetch('http://localhost:8799/ping',{cache:'no-store'}); }
   catch(e){
     alert('El botón necesita el servidor local de acciones (el del HUB).\n\n'+
@@ -3315,7 +3409,79 @@ const viewer=document.getElementById('viewer'),imgWrap=document.getElementById('
       mergeHint=document.getElementById('mergeHint'),delHint=document.getElementById('delHint');
 
 // ═══ TRANSFORM ══════════════════════════════════════════════════════════════
-const applyT = () => { imgWrap.style.transform=`translate(${S.ox}px,${S.oy}px) scale(${S.zoom})`; };
+const applyT = () => { imgWrap.style.transform=`translate(${S.ox}px,${S.oy}px) scale(${S.zoom})`; try{ _escRescale(); }catch(e){} };
+
+// ═══ JARDINES Y ESCULTURAS (capa del piso 1) ═════════════════════════════════
+// Siembra SHARED_DATA/paisajismo.js (la genera _DEV/build_paisajismo_p1.py desde
+// la lámina PAI-PL-GEN-X-P-E-081, registrada por imagen contra el plano: residuo
+// mediano 0,8 px). Los jardines son una imagen transparente ENTRE el plano y las
+// cajas: se ven en el terreno blanco y a través de las áreas de vista 1. Las
+// esculturas son marcadores de tamaño fijo en pantalla; al pasar el mouse
+// despliegan su ficha (emplazamiento, basamento y fechas de traslado).
+function _pais(){ const P=window.PAISAJISMO||{}; return P[S.floorId]||null; }
+function toggleJardines(){
+  S.jardines=(S.jardines===false);
+  _lsPref('cabida_jardines', S.jardines?'1':'0');
+  _jardinesSync();
+}
+function _escTipOff(){ const t=document.getElementById('escTip'); if(t) t.style.display='none'; }
+function _escTip(e,ev){
+  let t=document.getElementById('escTip');
+  if(!t){ t=document.createElement('div'); t.id='escTip'; document.body.appendChild(t); }
+  const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const P=_pais()||{};
+  t.innerHTML='<div class="et-t">🗿 '+esc(e.n)+' · '+esc(e.nombre)+'</div>'
+    +(e.desc?'<div class="et-d">'+esc(e.desc)+'</div>':'')
+    +(e.ficha?'<div class="et-f">'+esc(e.ficha)+'</div>':'')
+    +(e.traslado?'<div class="et-tr">🚚 <b>Traslado 2026:</b> '+esc(e.traslado)+'</div>':'')
+    +'<div class="et-src">'+esc(P.fuente||'')+(e.anclada==='basamento'?' · ubicada en su basamento':' · ubicada por la flecha del rótulo')+'</div>';
+  t.style.display='block';
+  const w=t.offsetWidth||320, h=t.offsetHeight||160;
+  let x=ev.clientX+18, y=ev.clientY+14;
+  if(x+w>window.innerWidth-8) x=ev.clientX-w-18;
+  if(y+h>window.innerHeight-8) y=Math.max(8,window.innerHeight-h-8);
+  t.style.left=Math.max(8,x)+'px'; t.style.top=y+'px';
+}
+function _escRescale(){
+  if(typeof svg==='undefined'||!svg) return;
+  const k=1/Math.max(S.zoom,1e-4);
+  svg.querySelectorAll('.esc-mk').forEach(m=>{
+    const t=m.getAttribute('transform')||''; m.setAttribute('transform', t.replace(/scale\([^)]*\)/,'scale('+k+')'));
+  });
+}
+function _jardinesSync(){
+  if(S.jardines===undefined){ let v=null; try{ v=localStorage.getItem('cabida_jardines'); }catch(e){} S.jardines=(v!=='0'); }
+  const P=_pais(), on=!!P && S.jardines!==false;
+  { const b=document.getElementById('btnJardines'); if(b){ b.classList.toggle('active',S.jardines!==false); b.classList.toggle('dis',!P);
+      b.title=P?'Mostrar u ocultar los jardines y las esculturas de este piso (lámina de Paisajismo, calibrada contra el plano). Pasa el mouse por una 🗿 para ver su ficha y fechas de traslado.'
+               :'Jardines y esculturas: por ahora sólo hay lámina de paisajismo para el piso 1'; } }
+  let im=document.getElementById('jardinImg');
+  if(on){
+    if(!im){
+      im=document.createElement('img'); im.id='jardinImg'; im.alt=''; im.draggable=false;
+      const fi=document.getElementById('floorImg'); fi.parentNode.insertBefore(im, fi.nextSibling);   // sobre el plano, bajo el SVG
+    }
+    if(im.dataset.src!==P.img){ im.dataset.src=P.img; im.src=P.img; }
+    im.style.left=P.x+'px'; im.style.top=P.y+'px'; im.style.width=P.w+'px'; im.style.height=P.h+'px'; im.style.display='';
+  } else if(im) im.style.display='none';
+  if(typeof svg==='undefined'||!svg) return;
+  svg.querySelectorAll('.esc-layer').forEach(x=>x.remove()); _escTipOff();
+  if(!on) return;
+  const g=el('g',{class:'esc-layer'}), k=1/Math.max(S.zoom,1e-4);
+  (P.esculturas||[]).forEach(e=>{
+    const mk=el('g',{class:'esc-mk',transform:`translate(${e.x},${e.y}) scale(${k})`});
+    mk.appendChild(el('circle',{cx:0,cy:0,r:17,fill:'#ffffff',opacity:.92}));
+    mk.appendChild(el('circle',{class:'bola',cx:0,cy:0,r:14,fill:'#9d174d',stroke:'#ffffff','stroke-width':2.5}));
+    mk.appendChild(txt(0,1,'🗿',{'font-size':15,'pointer-events':'none'}));
+    mk.addEventListener('mouseenter',ev=>_escTip(e,ev));
+    mk.addEventListener('mousemove',ev=>_escTip(e,ev));
+    mk.addEventListener('mouseleave',_escTipOff);
+    mk.addEventListener('mousedown',ev=>ev.stopPropagation());
+    mk.addEventListener('click',ev=>{ ev.stopPropagation(); try{ zoomTo({x:e.x-450,y:e.y-450,w:900,h:900},60); }catch(err){} });
+    g.appendChild(mk);
+  });
+  svg.appendChild(g);
+}
 
 function fitView(){
   const vW=viewer.clientWidth,vH=viewer.clientHeight;
@@ -4585,9 +4751,9 @@ function dotTitle(dot){
   const _tag=x=>[(x.cds?'🛒 CdS':''),(x.externa&&!x.cds?'⚠ fuera de matriz':''),(x.dinClin?'🔄 din. clínico':'')].filter(Boolean).join(' · ');
   if(dot.tipo==='dinamico'){
     const ts=(dot.turnos||[]);
-    return ts.length?('🔄 Dinámico · '+ts.length+' en turno:\n'+ts.map(x=>'👤 '+x.nombre+(_tag(x)?(' ('+_tag(x)+')'):'')).join('\n')):'🔄 Puesto dinámico · sin turnos';
+    return ts.length?('🔄 Dinámico · '+ts.length+' en turno:\n'+ts.map(x=>'👤 '+x.nombre+(_funcCods(x.nombre).length?(' ['+_funcCods(x.nombre).join('·')+']'):'')+(_tag(x)?(' ('+_tag(x)+')'):'')).join('\n')):'🔄 Puesto dinámico · sin turnos';
   }
-  if(dot.nombre&&dot.nombre.trim()) return '👤 '+dot.nombre+(dot.cds?'\n🛒 Compra de Servicio':'')+(dot.externa&&!dot.cds?'\n⚠ Fuera de la matriz de dotación':'')+(dot.dinClin?'\n🔄 Dinámico clínico (rota entre servicios)':'')+([dot.cargo,dot.estamento].filter(Boolean).length?('\n'+[dot.cargo,dot.estamento].filter(Boolean).join(' · ')):'');
+  if(dot.nombre&&dot.nombre.trim()) return '👤 '+dot.nombre+(_funcCods(dot.nombre).length?('\n⚕ '+_funcCods(dot.nombre).join(' · ')):'')+(dot.cds?'\n🛒 Compra de Servicio':'')+(dot.externa&&!dot.cds?'\n⚠ Fuera de la matriz de dotación':'')+(dot.dinClin?'\n🔄 Dinámico clínico (rota entre servicios)':'')+([dot.cargo,dot.estamento].filter(Boolean).length?('\n'+[dot.cargo,dot.estamento].filter(Boolean).join(' · ')):'');
   return dot.cargo?('Puesto disponible · '+dot.cargo):'Puesto disponible';
 }
 // Arrastre de puestos en vista 3 (clic sin mover = abrir asignación).
@@ -5150,6 +5316,34 @@ function _ubicIr(it){
 // Siembra desde los planos de Coordinación Mobiliario: trae los puestos que el
 // proyectista marcó en magenta. Es idempotente — reemplaza SOLO lo que vino del
 // plano (src:'plano') y respeta todo lo que se colocó a mano.
+// Escritorios de la siembra (SHARED_DATA/propuestos_plano.js) que faltan en
+// este Atlas, por id. La importación es idempotente: sólo reemplaza lo que vino
+// del plano y respeta lo colocado a mano.
+function _planoPendientes(){
+  const PP=window.PROPUESTOS_PLANO; if(!PP||!PP.floors) return 0;
+  const ids=new Set(Object.values(propState||{}).flat().map(x=>x.id));
+  return Object.values(PP.floors).flat().filter(x=>!ids.has(x.id)).length;
+}
+// Firma de la siembra: fecha + total + posiciones (cambia si cambia cualquier escritorio).
+function _firmaPlano(PP){
+  let h=0; const t=JSON.stringify(PP.floors||{});
+  for(let i=0;i<t.length;i++){ h=((h<<5)-h+t.charCodeAt(i))|0; }
+  return (PP.generado||'')+'·'+(PP.total||0)+'·'+(h>>>0).toString(36);
+}
+function _autoImportarPlano(){
+  if(_SELFTEST || (S.viewOnly && !S.editPM)) return 0;
+  const PP=window.PROPUESTOS_PLANO; if(!PP||!PP.floors) return 0;
+  const firma=_firmaPlano(PP);
+  let hecho=null; try{ hecho=localStorage.getItem('cabida_prop_plano_firma'); }catch(e){}
+  if(hecho===firma) return 0;                      // esta versión de la siembra ya se trajo
+  // Versión nueva de la siembra: se importa SIEMPRE (reemplaza lo que vino del
+  // plano, p. ej. el P4 pasó de P.TRABAJO v.1 a «Estudio Cabida P4 AA»), aunque
+  // los ids coincidan con los ya importados.
+  const n=Object.values(PP.floors).flat().length;
+  if(n) importarPropuestosPlano(true);
+  _lsPref('cabida_prop_plano_firma', firma);
+  return n;
+}
 function importarPropuestosPlano(sinConfirmar){
   if(S.viewOnly && !S.editPM) return;
   const PP=window.PROPUESTOS_PLANO;
@@ -5296,7 +5490,7 @@ function _dockMonta(){
   // funcionarios y modo edición quedan SIEMPRE a la vista en la barra superior.
   if(nav){
     const q=document.createElement('div'); q.id='navQuick';
-    ['btnBoxVis','btnDotNames','btnEdit'].forEach(id=>{
+    ['btnBoxVis','btnDotNames','btnJardines','btnEdit'].forEach(id=>{
       const e=document.getElementById(id); if(!e) return;
       const m=ICO.exec(e.textContent||''); e.setAttribute('data-ic', m?m[1]:(e.textContent||'?').trim().slice(0,2));
       q.appendChild(e);
@@ -5316,6 +5510,7 @@ function toggleRoomLabels(){
   _dockSync();
 }
 function _dockSync(){
+  try{ _jardinesSync(); }catch(e){}            // capa de jardines y esculturas (corre al final de cada render)
   const d=document.getElementById('dock'); if(!d) return;
   if(S.roomLabels===undefined){
     let v=null, rep=null;
@@ -8314,7 +8509,8 @@ function rpRail(tab){ toggleRightPanel(false); if(_rpTab!==tab) rpShowTab(tab); 
    uno, ilumina su puesto sobre el plano. Los puestos guardan coordenadas del
    plano (las mismas que las cajas), así que el punto se puede marcar sin
    entrar al recinto. Clic = ir al recinto. */
-let _perFiltro='';
+let _perFiltro='', _perFunc='';
+function perFuncFiltrar(k){ _perFunc=(_perFunc===k)?'':k; renderPersonas(); }
 /* El campo 'estamento' que quedó guardado en cada puesto viene sucio: 40
    variantes escritas a mano (tens, TENS, Enfermera, Eu 4to turno, reemplazos…).
    El estamento OFICIAL está en la matriz de dotación, y resuelve 1.232 de las
@@ -8405,6 +8601,7 @@ function renderPersonas(){
   // agrupado por recinto: así se lee dónde está cada uno, que es el punto
   const porRec={};
   D.gente.forEach(g=>{ if(_perFiltro && !norm(g.nom+' '+g.cargo+' '+g.recinto).includes(_perFiltro)) return;
+    if(_perFunc && !_funcDe(g.nom).includes(_perFunc)) return;          // filtro por función TENS
     (porRec[g.rid]=porRec[g.rid]||{nom:g.recinto,gente:[]}).gente.push(g); });
   const recs=Object.entries(porRec).sort((a,b)=>String(a[1].nom).localeCompare(String(b[1].nom),'es'));
   const vis=recs.reduce((s,[,v])=>s+v.gente.length,0);
@@ -8417,7 +8614,12 @@ function renderPersonas(){
     +'oninput="perFiltrar(this.value)" style="width:100%;box-sizing:border-box;border:1px solid #a9c3d6;'
     +'border-radius:8px;padding:6px 9px;font-size:11.5px">'
     +'<div style="font-size:10.5px;color:#64748b;margin-top:5px">'+vis+' de '+D.gente.length
-    +' persona(s) · pasá el mouse por un nombre para verlo en el plano</div></div>'];
+    +' persona(s) · pasá el mouse por un nombre para verlo en el plano</div>'
+    // funciones específicas de los TENS presentes en el servicio: clic filtra
+    +(()=>{ const c={}; D.gente.forEach(g=>_funcDe(g.nom).forEach(k=>{ c[k]=(c[k]||0)+1; }));
+        const ks=FUNC_TENS.filter(f=>c[f.k]||_perFunc===f.k); if(!ks.length) return '';
+        return '<div class="func-chips" style="margin-top:6px">'+ks.map(f=>'<button type="button" class="func-chip sm'+(_perFunc===f.k?' on':'')+'" style="--fc:'+f.col+'" onclick="perFuncFiltrar(\''+f.k+'\')" title="Ver sólo '+f.lbl+'"><i></i>'+f.lbl+' '+(c[f.k]||0)+'</button>').join('')+'</div>'; })()
+    +'</div>'];
   recs.forEach(([rid,v])=>{
     // Título de RECINTO: barra con fondo y el número en pastilla, para que se
     // distinga de un plumazo de los nombres (antes ambos eran texto suelto y
@@ -8447,7 +8649,7 @@ function renderPersonas(){
           +'onclick="perIr(\''+rid.replace(/'/g,"\\'")+'\')" '
           +'style="padding:3px 8px 3px 26px;cursor:pointer;border-left:3px solid '+col+'33;'
           +'font-size:11px;line-height:1.3">'
-          +'<div style="font-weight:600;color:#0f172a">'+esc(g.nom)
+          +'<div style="font-weight:600;color:#0f172a">'+esc(g.nom)+_funcBadges(g.nom)
           +(g.turno?' <span style="color:#3b82f6;font-size:9.5px">🔄</span>':'')
           +(g.cds?' <span style="color:#8b5cf6;font-size:9.5px">🛒</span>':'')+'</div>'
           +(g.cargo?'<div style="color:#64748b;font-size:10px">'+esc(g.cargo)+'</div>':'')
@@ -8608,16 +8810,16 @@ function renderAvance(){
   const {asg,arbol,nBec,tN,tA}=_avArbol();
   const badge=document.getElementById('sbAvN'); if(badge && !_avFiltro) badge.textContent=_avPct(tA,tN)+'%';
   const H=[];
-  H.push('<div style="display:flex;align-items:center;gap:8px;padding:6px 4px 10px">'
+  H.push('<div style="display:flex;align-items:center;gap:8px;padding:4px 4px 6px">'
     +'<b style="font-size:12px">'+(_avFiltro?('🖋️ '+esc(_avGrupoNombre(_avFiltro))+' · asignadas a recinto'):'Dotación asignada a recinto')+'</b>'
     +'<b style="margin-left:auto;font-size:15px;color:'+_avColor(_avPct(tA,tN))+'">'+_avPct(tA,tN)+'%</b></div>'
-    +'<div style="padding:0 4px 10px">'+_avBarra(tA,tN,8)
+    +'<div style="padding:0 4px 6px">'+_avBarra(tA,tN,8)
     +'<div style="font-size:10.5px;color:#64748b;margin-top:3px">'+tA+' de '+tN+' personas · faltan '+(tN-tA)+'</div>'
-    +((!_avFiltro&&nBec)?'<div style="font-size:10.5px;color:#94a3b8;margin-top:2px">🎓 '+nBec+' becados en formación no se cuentan: no pertenecen a una subdirección.</div>':'')
-    +(_avFiltro?'<div style="font-size:10.5px;color:#94a3b8;margin-top:2px">Grupo transversal: se mira aparte, repartido en las '+Object.keys(arbol).length+' subdirecciones donde tiene gente.</div>':'')+'</div>');
+    +((!_avFiltro&&nBec)?'<div style="font-size:10.5px;color:#94a3b8;margin-top:2px" title="Los becados en formación no pertenecen a una subdirección">🎓 '+nBec+' becados no considerados</div>':'')
+    +(_avFiltro?'<div style="font-size:10.5px;color:#94a3b8;margin-top:2px">Grupo transversal · '+Object.keys(arbol).length+' subdirecciones</div>':'')+'</div>');
   // cada subdirección se abre a sus servicios/departamentos y éstos a sus
   // unidades, con el mismo avance; todo el árbol se puede abrir de una vez o exportar
-  H.push('<div class="av-tools"><span>clic en una fila abre sus servicios y unidades</span>'
+  H.push('<div class="av-tools">'
     +'<a href="#" onclick="avExpandir(true);return false">Expandir todo</a><a href="#" onclick="avExpandir(false);return false">Contraer</a>'
     +'<a href="#" onclick="exportAvance();return false" title="Excel con el avance de cada subdirección, servicio/departamento y unidad">⬇ Exportar avance</a>'
     +'<a href="#" class="av-grupo'+(_avFiltro==='circulo_secretarias'?' on':'')+'" onclick="avFiltrar(\'circulo_secretarias\');return false" title="Avance sólo del Círculo de Secretarias: grupo transversal, repartido en varias subdirecciones">'
@@ -9544,6 +9746,7 @@ function openModal(roomId,idx){
   document.getElementById('mExterna').checked=!!dot.externa;
   const _mc=document.getElementById('mCds'); if(_mc)_mc.checked=!!dot.cds;
   const _md=document.getElementById('mDinClin'); if(_md)_md.checked=!!dot.dinClin;
+  try{ _mFuncCarga(dot.nombre||''); }catch(e){}
   setTipo(dot.tipo||'fijo');
   renderTurnosList(dot);
   const info=document.getElementById('mServInfo'); if(info) info.textContent='';
@@ -9587,6 +9790,7 @@ function startAddTurno(){
   if(document.getElementById('mCds')) document.getElementById('mCds').checked=false;
   if(document.getElementById('mDinClin')) document.getElementById('mDinClin').checked=false;
   if(document.getElementById('mServInfo')) document.getElementById('mServInfo').textContent='';
+  try{ _mFuncCarga(''); }catch(e){}
   document.getElementById('btnSaveWs').style.display='none';
   document.getElementById('btnAddTurno').style.display='';
   // Show the name/cargo/est fields temporarily for input
@@ -9606,6 +9810,7 @@ function confirmAddTurno(){
   const externa=_mk.externa, cds=_mk.cds;
   const dinClin = !!(document.getElementById('mDinClin')&&document.getElementById('mDinClin').checked);
   dot.turnos.push({nombre,cargo,estamento,externa,cds,dinClin});
+  try{ _mFuncGuarda(nombre); _mFuncCarga(''); }catch(e){}
   sWs(); renderTurnosList(dot); renderSVG(); updateStats();
   try{ renderBimPending(); }catch(e){}
   document.getElementById('mNombre').value='';
@@ -9660,6 +9865,7 @@ function _marcasPersona(nombre, cdsMarcado){
 // antes de guardar si la alerta se va a cerrar.
 function _mEstadoMatriz(){
   const inp=document.getElementById('mNombre'), box=document.getElementById('mMatrizEstado'); if(!inp) return;
+  try{ _mFuncSync(); }catch(e){}               // las funciones TENS siguen a la persona escrita
   const n=inp.value.trim(), ext=document.getElementById('mExterna'), mc=document.getElementById('mCds');
   if(!box) return;
   if(!n){ box.textContent=''; box.style.display='none'; return; }
@@ -9771,6 +9977,7 @@ function saveWs(){
   d.nombre=nombre;
   d.cargo=document.getElementById('mCargo').value.trim();
   d.estamento=document.getElementById('mEst').value.trim();
+  try{ _mFuncGuarda(nombre); }catch(e){}
   const _antes=_alertasPersonalDe(roomId);
   { const mk=_marcasPersona(nombre, document.getElementById('mCds') && document.getElementById('mCds').checked);
     d.externa=mk.externa; d.cds=mk.cds; }
@@ -11716,24 +11923,281 @@ function exportServicioHTML(){
   });
   return html;
 }
+// ═══ EXPORTS DE RECINTOS Y DE PUESTOS DE TRABAJO (18-sep-2026) ══════════════
+// Libro XLSX de varias hojas. Cada hoja: {name, rows, colW, hdr (fila de
+// encabezado, 0 por defecto), estilo(r,c,v) opcional}. Las celdas con saltos de
+// línea (varios PMA o BIM en un mismo recinto) quedan con ajuste de texto y la
+// fila con el alto que necesitan.
+function xlsxLibro(hojas, fileName){
+  if(typeof XLSX==='undefined'){ alert('La librería XLSX no se cargó (assets/vendor).'); return null; }
+  const HDR={fill:{patternType:'solid',fgColor:{rgb:'FF1E3A5F'}},font:{color:{rgb:'FFFFFFFF'},bold:true},alignment:{vertical:'center',wrapText:true}};
+  const TOT={font:{bold:true},fill:{patternType:'solid',fgColor:{rgb:'FFEEF2F7'}}};
+  const wb=XLSX.utils.book_new();
+  hojas.forEach(h=>{
+    if(!h.rows||!h.rows.length) return;
+    const ws=XLSX.utils.aoa_to_sheet(h.rows);
+    const rg=XLSX.utils.decode_range(ws['!ref']); const hr=h.hdr||0;
+    const alturas=[];
+    for(let r=rg.s.r;r<=rg.e.r;r++){
+      let lineas=1;
+      for(let c=rg.s.c;c<=rg.e.c;c++){
+        const a=XLSX.utils.encode_cell({r,c}), cell=ws[a]; if(!cell) continue;
+        const v=cell.v; let st=null;
+        if(r===hr) st=HDR;
+        else if(r<hr) st={font:{bold:r===0,sz:r===0?13:10,color:{rgb:r===0?'FF1A2433':'FF536174'}}};
+        else {
+          if(typeof v==='string' && v.indexOf('\n')>=0){ lineas=Math.max(lineas,v.split('\n').length); st={alignment:{wrapText:true,vertical:'top'}}; }
+          if(h.totalRow && r===rg.e.r) st={...(st||{}),...TOT};
+          const ex=h.estilo?h.estilo(r,c,v):null; if(ex) st={...(st||{}),...ex};
+        }
+        if(st) cell.s=st;
+      }
+      alturas[r]= r===hr ? {hpt:30} : (lineas>1 ? {hpt:15*lineas} : undefined);
+    }
+    ws['!rows']=alturas;
+    if(h.colW) ws['!cols']=h.colW;
+    ws['!freeze']={xSplit:h.freezeCols||0,ySplit:hr+1};
+    ws['!autofilter']={ref:XLSX.utils.encode_range({s:{r:hr,c:rg.s.c},e:{r:rg.e.r-(h.totalRow?1:0),c:rg.e.c}})};
+    XLSX.utils.book_append_sheet(wb,ws,String(h.name).slice(0,31));
+  });
+  const buf=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+  guardarArchivo(EXP_DIRS.planilla, fileName, new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+  return wb;
+}
+// Nombre del recinto sin la numeración de serie: «Box Consulta 3» → «Box Consulta».
+function _nombreBase(n){
+  return String(n||'').replace(/\s+/g,' ').trim()
+    .replace(/(\s+(n[°º]?\s*)?(\d+[a-z]?|[ivx]{1,4}|[a-h]))+$/i,'').trim();
+}
+// Tipología específica: el subtipo si la tipología lo tiene (pabellón,
+// procedimiento, imagen), el nombre normado si es consulta y, en el resto, el
+// nombre del recinto sin su numeración (Estar, Residencia, Secretaría…).
+function _tipoEspecifico(rid){
+  const t=rType(rid), nm=rName(rid)||'';
+  if(t==='pabellon') return 'Pabellón · '+(PABELLON_LBL[rPabellon(rid)||'mayor']||'');
+  if(t==='proced')   return 'Procedimiento · '+(PROC_LBL[rProcKind(rid)]||'General');
+  if(t==='imagen')   return 'Imagen · '+(IMAGEN_LBL[rImagen(rid)||'ion']||'');
+  if(t==='box'){
+    const k=_consultaNorm(nm), c=CONSULTA_NOMBRES.find(x=>_consultaNorm(x)===k);
+    return c||'Consulta (por clasificar)';
+  }
+  return _nombreBase(nm)||'(sin nombre)';
+}
+function _tipoGeneral(rid){ return (ROOM_TYPES[rType(rid)]||ROOM_TYPES['']).label; }
+function _bimLista(rid){ const v=((rBim(rid)||'').match(/[A-Za-z]\d{3,5}/g)||[]).map(b=>b.toUpperCase()); return [...new Set(v)]; }
+function _camasTexto(rid){
+  const c={}; ((wsState.beds||{})[rid]||[]).forEach(b=>{ const k=b.kind||'camilla'; c[k]=(c[k]||0)+1; });
+  const L={camilla:'camilla',sillon:'sillón',cupo:'cupo',puesto:'puesto de toma'};
+  return Object.entries(c).map(([k,n])=>n+' '+(L[k]||k)+(n>1?(k==='sillon'?'es':'s'):'')).join(' · ');
+}
+// Recintos del Atlas (sólo los dibujados: un recinto existe si tiene caja).
+function _recintosDibujados(){
+  const out=[];
+  for(const fl of FLOORS) for(const area of fl.areas) for(const r of area.rooms){
+    if((boxState.rooms[r.id]||[]).length) out.push({fl,area,r,rid:r.id});
+  }
+  return out;
+}
 function exportRecintos(){
-  const rows=[['Piso','Área','Código','Código BIM','Recinto','Tipo','Subtipo','Señalética','N° Señalética','# Puestos','# Asignados','# Camillas/Sillones','Dibujado']];
-  for(const fl of FLOORS){ for(const area of fl.areas){ for(const r of area.rooms){
-    const dots=wsState.dots[r.id]||[];
-    const asig=dots.filter(isDotAsignado).length;
-    const camas=((wsState.beds||{})[r.id]||[]).length;
-    const dibujado=((boxState.rooms[r.id]||[]).length>0)?'Sí':'No';
-    const tlbl=(ROOM_TYPES[rType(r.id)]||ROOM_TYPES['']).label;
-    const ty=rType(r.id);
-    const sublbl=ty==='pabellon'?PABELLON_LBL[rPabellon(r.id)||'mayor']:ty==='proced'?PROC_LBL[rProcKind(r.id)]:ty==='imagen'?IMAGEN_LBL[rImagen(r.id)||'ion']:'';
-    rows.push([fl.label, aName(area.id), rCode(r.id)||'', rBim(r.id)||'', rName(r.id), tlbl, sublbl, rSenaletica(r.id)||'', rSenNum(r.id)||'', dots.length, asig, camas, dibujado]);
-  }}}
-  if(rows.length<2){ alert('No hay recintos para exportar.'); return; }
-  xlsxDownload(rows,'Recintos','recintos_HDS_'+new Date().toISOString().slice(0,10)+'.xlsx',
-    [{wch:11},{wch:30},{wch:12},{wch:20},{wch:34},{wch:18},{wch:20},{wch:24},{wch:14},{wch:10},{wch:11},{wch:9},{wch:10}]);
+  const L=_recintosDibujados(); if(!L.length){ alert('No hay recintos dibujados para exportar.'); return; }
+  const P=_puestosPorRecinto();
+  const hoy=new Date().toISOString().slice(0,10);
+  const tipoOrden=Object.values(ROOM_TYPES).map(t=>t.label);
+  const f1=v=>v==null||v===''?'':Math.round(v*10)/10;
+  // ── Hoja 1 · Recintos ─────────────────────────────────────────────────────
+  const H1=['Piso','Servicio (vista 1)','Tipología general','Tipología específica','PMA','BIM','Nombre del recinto',
+    'Señalética','N° señalética','m² (matriz)','m² dibujado','Aforo','Puestos de trabajo (plano)','Puestos nuevos (fucsia)',
+    'Personas asignadas','Camas · sillones · cupos','Equipamiento EMMC (unid.)','Tótems · DEA · impresoras propuestos','Instancia del código','Id Atlas'];
+  const filas=L.map(x=>{
+    const rid=x.rid, mat=roomMatrizM2(rid), dib=roomDrawnM2(rid), p=P[rid]||{};
+    const pma=rCodeParts(rid), code1=pma[0];
+    const inst=code1?codeInstances(code1):1, sh=code1?_codeShareOf(rid,code1):{k:0};
+    const prop={}; Object.values(propState||{}).flat().forEach(it=>{ if(it.rid===rid && it.k!=='desk') prop[it.k]=(prop[it.k]||0)+1; });
+    let eqN=0; try{ eqN=(effectiveEquipUnits(rid)||[]).length; }catch(e){}
+    return {x, fila:[x.fl.label, aName(x.area.id), _tipoGeneral(rid), _tipoEspecifico(rid), pma.join('\n'), _bimLista(rid).join('\n'), rName(rid)||'',
+      rSenaletica(rid)||'', rSenNum(rid)||'', mat?f1(mat.m2):'', dib?f1(dib):'', rCapacity(rid)||'',
+      p.pc||0, p.fucsia||0, p.personas||0, _camasTexto(rid), eqN,
+      [prop.totem?('🎫 '+prop.totem):'',prop.dea?('💚 '+prop.dea):'',prop.printer?('🖨 '+prop.printer):''].filter(Boolean).join(' · '),
+      inst>1?((sh.k+1)+' de '+inst):'', rid]};
+  });
+  const pisoOrd=id=>FLOORS.findIndex(f=>f.id===id);
+  filas.sort((a,b)=>pisoOrd(a.x.fl.id)-pisoOrd(b.x.fl.id) || String(a.fila[1]).localeCompare(b.fila[1],'es')
+    || tipoOrden.indexOf(a.fila[2])-tipoOrden.indexOf(b.fila[2]) || String(a.fila[3]).localeCompare(b.fila[3],'es',{numeric:true})
+    || String(a.fila[6]).localeCompare(b.fila[6],'es',{numeric:true}));
+  const hoja1=[H1,...filas.map(f=>f.fila)];
+  // ── Hoja 2 · Resumen por servicio (una columna por tipología general) ─────
+  const svc={}, usados=new Set();
+  filas.forEach(({x,fila})=>{
+    const k=x.fl.id+'§'+x.area.id;
+    const o=svc[k]||(svc[k]={piso:x.fl.label,ord:pisoOrd(x.fl.id),serv:fila[1],n:0,m2:0,pc:0,per:0,t:{}});
+    o.n++; o.t[fila[2]]=(o.t[fila[2]]||0)+1; usados.add(fila[2]);
+    if(fila[9]!=='') o.m2+=+fila[9]; o.pc+=fila[12]+fila[13]; o.per+=fila[14];
+  });
+  const tipos=tipoOrden.filter(t=>usados.has(t));
+  const svcs=Object.values(svc).sort((a,b)=>a.ord-b.ord||String(a.serv).localeCompare(b.serv,'es'));
+  const tot={n:0,m2:0,pc:0,per:0,t:{}};
+  const hoja2=[['Piso','Servicio (vista 1)','Total recintos',...tipos,'m² (matriz)','Puestos de trabajo','Personas asignadas']];
+  svcs.forEach(o=>{
+    hoja2.push([o.piso,o.serv,o.n,...tipos.map(t=>o.t[t]||''),Math.round(o.m2),o.pc,o.per]);
+    tot.n+=o.n; tot.m2+=o.m2; tot.pc+=o.pc; tot.per+=o.per; tipos.forEach(t=>{ tot.t[t]=(tot.t[t]||0)+(o.t[t]||0); });
+  });
+  hoja2.push(['TOTAL','',tot.n,...tipos.map(t=>tot.t[t]||0),Math.round(tot.m2),tot.pc,tot.per]);
+  // ── Hoja 3 · Tipologías específicas por servicio ─────────────────────────
+  const esp={};
+  filas.forEach(({x,fila})=>{
+    const k=[x.fl.id,x.area.id,fila[2],fila[3]].join('§');
+    const o=esp[k]||(esp[k]={ord:pisoOrd(x.fl.id),f:[x.fl.label,fila[1],fila[2],fila[3]],n:0,m2:0});
+    o.n++; if(fila[9]!=='') o.m2+=+fila[9];
+  });
+  const hoja3=[['Piso','Servicio (vista 1)','Tipología general','Tipología específica','Cantidad','m² (matriz)']]
+    .concat(Object.values(esp).sort((a,b)=>a.ord-b.ord||String(a.f[1]).localeCompare(b.f[1],'es')||tipoOrden.indexOf(a.f[2])-tipoOrden.indexOf(b.f[2])||b.n-a.n)
+      .map(o=>[...o.f,o.n,Math.round(o.m2*10)/10]));
+  // ── Hoja 4 · Totales del hospital por tipología ──────────────────────────
+  const hos={};
+  filas.forEach(({fila})=>{ const k=fila[2]+'§'+fila[3]; const o=hos[k]||(hos[k]={g:fila[2],e:fila[3],n:0,serv:new Set()}); o.n++; o.serv.add(fila[1]); });
+  const hoja4=[['Tipología general','Tipología específica','Cantidad','Servicios donde está']]
+    .concat(Object.values(hos).sort((a,b)=>tipoOrden.indexOf(a.g)-tipoOrden.indexOf(b.g)||b.n-a.n).map(o=>[o.g,o.e,o.n,o.serv.size]));
+  const W=n=>({wch:n});
+  return xlsxLibro([
+    {name:'Recintos',rows:hoja1,freezeCols:2,colW:[W(11),W(30),W(18),W(28),W(13),W(10),W(30),W(26),W(12),W(10),W(11),W(8),W(12),W(11),W(11),W(22),W(12),W(18),W(11),W(26)]},
+    {name:'Resumen por servicio',rows:hoja2,freezeCols:2,totalRow:true,colW:[W(11),W(34),W(10),...tipos.map(()=>W(11)),W(11),W(11),W(11)]},
+    {name:'Tipologías por servicio',rows:hoja3,colW:[W(11),W(34),W(20),W(34),W(10),W(11)]},
+    {name:'Totales hospital',rows:hoja4,colW:[W(20),W(36),W(10),W(12)]}
+  ], 'Recintos_HDS_'+hoy+'.xlsx');
+}
+
+// ── Puestos de trabajo vs personas ───────────────────────────────────────────
+// Puesto de trabajo del PLANO = estación con computador fijo, tal como la dibuja
+// la Coordinación de Mobiliario (escritorio verde-azulado + computador amarillo):
+// se cuenta por los computadores de escritorio del Despliegue EMMC que le tocan
+// al recinto (60005/60006/60008/60015/60019; los notebooks no son un puesto), con
+// el mismo reparto por instancia que usa la ficha. Se suman los puestos NUEVOS
+// (escritorios fucsia: los colocados y los de la siembra del plano aún no
+// importados). Personas: un 4º turno (puestos unidos ⛓) comparte UN puesto; un
+// puesto dinámico con varios turnos también ocupa uno.
+const _PC_FIJO=/^(60005|60006|60008|60015|60019)$/;
+const _SILLA_ERG=/^(150073|150072)$/;
+const _ESTACION=/^(150088|150094|150090)$/;
+function _fucsiaPorRecinto(){
+  const out={}; const ids=new Set();
+  Object.entries(propState||{}).forEach(([fid,arr])=>(arr||[]).forEach(it=>{
+    ids.add(it.id); if(it.k!=='desk') return;
+    const rid=it.rid||null; if(rid) out[rid]=(out[rid]||0)+1;
+  }));
+  const PP=window.PROPUESTOS_PLANO; let sinImportar=0;
+  if(PP&&PP.floors){
+    const fPrev=S.floorId;
+    try{
+      Object.entries(PP.floors).forEach(([fid,arr])=>{
+        S.floorId=fid;
+        (arr||[]).forEach(it=>{
+          if(it.k!=='desk' || ids.has(it.id)) return;
+          const rid=_roomAtPoint(it.x,it.y)||it.rid; sinImportar++;
+          if(rid) out[rid]=(out[rid]||0)+1;
+        });
+      });
+    } finally { S.floorId=fPrev; }
+  }
+  out._sinImportar=sinImportar;
+  return out;
+}
+function _puestosPorRecinto(){
+  const F=_fucsiaPorRecinto();
+  const grupoDe={};                                        // «rid§dotId» → índice del grupo de 4º turno
+  (wsState.dotLinks||[]).forEach((g,gi)=>g.forEach(k=>{ grupoDe[k]=gi; }));
+  const out={};
+  for(const fl of FLOORS) for(const area of fl.areas) for(const r of area.rooms){
+    const rid=r.id; if(!(boxState.rooms[rid]||[]).length) continue;
+    const sum=(arr,re)=>arr.filter(e=>re.test(String(e.t||'').replace(/\./g,''))).reduce((a,e)=>a+(parseInt(e.c)||1),0);
+    let pc=0, sil=0, est=0;
+    try{ pc=(effectiveEquipUnits(rid)||[]).filter(u=>_PC_FIJO.test(String(u.t||''))).length; }catch(e){}
+    try{ const m=mncForRoom(rid)||[]; sil=sum(m,_SILLA_ERG); est=sum(m,_ESTACION); }catch(e){}
+    const dots=wsState.dots[rid]||[];
+    let personas=0, fijos=0, libres=0, din=0, dinPers=0, cuartoPers=0; const grupos=new Set();
+    dots.forEach(d=>{
+      if(d.tipo==='dinamico'){ const n=(d.turnos||[]).filter(t=>(t.nombre||'').trim()).length; if(n){ din++; dinPers+=n; personas+=n; } return; }
+      if(!(d.nombre||'').trim()){ libres++; return; }
+      personas++;
+      const g=grupoDe[rid+'§'+d.id];
+      if(g!==undefined){ grupos.add(g); cuartoPers++; } else fijos++;
+    });
+    const necesarios=fijos+grupos.size+din;
+    const fucsia=F[rid]||0, disp=pc+fucsia;
+    if(!disp && !dots.length && !sil) continue;
+    out[rid]={fl,area,r,pc,fucsia,disp,sil,est,personas,fijos,cuartoPers,cuartoGrupos:grupos.size,din,dinPers,libres,necesarios,balance:disp-necesarios,balSillas:sil+fucsia-necesarios};
+  }
+  Object.defineProperty(out,'_sinImportar',{value:F._sinImportar,enumerable:false});
+  return out;
+}
+function _estadoPuesto(o){
+  if(!o.necesarios && !o.disp) return 'Sin puestos ni personas';
+  if(!o.necesarios) return 'Sin personas asignadas';
+  if(!o.disp) return 'Sin puestos en el plano';
+  if(o.balance===0) return 'Calza';
+  return o.balance>0 ? ('Holgura +'+o.balance) : ('Faltan '+(-o.balance));
+}
+function exportPuestosTrabajo(){
+  const P=_puestosPorRecinto(), L=Object.values(P);
+  if(!L.length){ alert('No hay puestos de trabajo ni personas asignadas para exportar.'); return; }
+  const hoy=new Date().toISOString().slice(0,10);
+  const pisoOrd=id=>FLOORS.findIndex(f=>f.id===id);
+  L.sort((a,b)=>pisoOrd(a.fl.id)-pisoOrd(b.fl.id)||String(aName(a.area.id)).localeCompare(aName(b.area.id),'es')||String(rName(a.r.id)).localeCompare(rName(b.r.id),'es',{numeric:true}));
+  // ── Hoja 2 · Por recinto ──────────────────────────────────────────────────
+  const H=['Piso','Servicio (vista 1)','Recinto','Tipología general','Tipología específica','PMA','BIM',
+    'Puestos plano (PC fijo)','Puestos nuevos (fucsia)','Puestos disponibles','Sillas ergonómicas','Estaciones de trabajo',
+    'Personas asignadas','· en 4º turno','· grupos de 4º turno','· en puestos dinámicos','Puestos necesarios (simultáneos)',
+    'Puestos marcados sin persona','Balance (disponibles − necesarios)','Balance con sillas (sillas + fucsia − necesarios)','Estado'];
+  const det=[H].concat(L.map(o=>[o.fl.label,aName(o.area.id),rName(o.r.id)||'',_tipoGeneral(o.r.id),_tipoEspecifico(o.r.id),
+    rCodeParts(o.r.id).join('\n'),_bimLista(o.r.id).join('\n'),o.pc,o.fucsia,o.disp,o.sil,o.est,o.personas,o.cuartoPers,o.cuartoGrupos,o.dinPers,
+    o.necesarios,o.libres,o.balance,o.balSillas,_estadoPuesto(o)]));
+  // ── Hoja 1 · Resumen por servicio ─────────────────────────────────────────
+  const svc={};
+  L.forEach(o=>{
+    const k=o.fl.id+'§'+o.area.id;
+    const s=svc[k]||(svc[k]={ord:pisoOrd(o.fl.id),piso:o.fl.label,serv:aName(o.area.id),rec:0,pc:0,fucsia:0,disp:0,sil:0,per:0,cuarto:0,grupos:0,nec:0,deficit:0,faltan:0,holgura:0,sinPlano:0,fucsiaS:0});
+    s.rec++; s.pc+=o.pc; s.fucsia+=o.fucsia; s.disp+=o.disp; s.sil+=o.sil; s.per+=o.personas; s.cuarto+=o.cuartoPers; s.grupos+=o.cuartoGrupos; s.nec+=o.necesarios;
+    if(o.necesarios && !o.disp) s.sinPlano+=o.necesarios;
+    else if(o.balance<0){ s.deficit++; s.faltan+=-o.balance; }
+    else if(o.balance>0 && o.necesarios) s.holgura+=o.balance;
+  });
+  const SV=Object.values(svc).sort((a,b)=>a.ord-b.ord||String(a.serv).localeCompare(b.serv,'es'));
+  const HR=['Piso','Servicio (vista 1)','Recintos','Puestos plano (PC fijo)','Puestos nuevos (fucsia)','Puestos disponibles','Sillas ergonómicas',
+    'Personas asignadas','· en 4º turno','Puestos necesarios (simultáneos)','Balance servicio','Balance con sillas','Estado servicio',
+    'Recintos con déficit','Puestos que faltan en esos recintos','Personas en recintos sin puestos en el plano'];
+  const T={rec:0,pc:0,fucsia:0,disp:0,sil:0,per:0,cuarto:0,nec:0,deficit:0,faltan:0,sinPlano:0};
+  const res=[HR].concat(SV.map(s=>{ Object.keys(T).forEach(k=>{ T[k]+=s[k]||0; });
+    const b=s.disp-s.nec; return [s.piso,s.serv,s.rec,s.pc,s.fucsia,s.disp,s.sil,s.per,s.cuarto,s.nec,b,s.sil+s.fucsia-s.nec,_estadoPuesto({disp:s.disp,necesarios:s.nec,balance:b}),s.deficit,s.faltan,s.sinPlano]; }));
+  const bT=T.disp-T.nec;
+  res.push(['TOTAL','',T.rec,T.pc,T.fucsia,T.disp,T.sil,T.per,T.cuarto,T.nec,bT,T.sil+T.fucsia-T.nec,_estadoPuesto({disp:T.disp,necesarios:T.nec,balance:bT}),T.deficit,T.faltan,T.sinPlano]);
+  // ── Hoja 3 · Cómo se cuenta ───────────────────────────────────────────────
+  const sinImp=P._sinImportar||0;
+  const notas=[['Cómo se cuenta'],[''],
+    ['Puestos plano (PC fijo)','Estaciones con computador de escritorio del Despliegue EMMC en el recinto (códigos 60005 · 60006 · 60008 · 60015 · 60019): es lo que el plano de Coordinación de Mobiliario dibuja como escritorio verde-azulado + computador amarillo. Los notebooks (60020) no cuentan como puesto. Si varios recintos comparten código, se reparte igual que en la ficha del recinto.'],
+    ['Puestos nuevos (fucsia)','Escritorios agregados por el proyectista (magenta en los planos «Estudio Cabida» y «P.TRABAJO»): los colocados en el Atlas'+(sinImp?(' + '+sinImp+' de la siembra del plano que aún no se importan (⬇ Importar del plano en el gestor 🧰)'):'')+'.'],
+    ['Sillas ergonómicas','Sillas 150073 / 150072 de la matriz de mobiliario no clínico: sirve de segunda referencia (una por puesto).'],
+    ['Estaciones de trabajo','Escritorios 150088 / 150094 / 150090 de la misma matriz (muchos puestos clínicos están sobre mesones, por eso es menor).'],
+    ['Personas asignadas','Nombres puestos en el Atlas en ese recinto (puestos fijos + turnos de los puestos dinámicos).'],
+    ['4º turno','Puestos unidos con ⛓ (Cmd+clic): varias personas que usan el MISMO puesto en distintos turnos. Cada grupo necesita 1 puesto.'],
+    ['Puestos necesarios (simultáneos)','Personas en puesto fijo + 1 por grupo de 4º turno + 1 por puesto dinámico con turnos. Es lo que debe caber al mismo tiempo.'],
+    ['Balance','Puestos disponibles − puestos necesarios. «Calza» = 0 · «Holgura +N» = sobran · «Faltan N» = hay más personas simultáneas que puestos.'],
+    ['Balance con sillas','Lo mismo, midiendo contra las sillas ergonómicas + escritorios fucsia en vez de los computadores: útil donde se trabaja sin computador propio (estaciones de enfermería, mesones).'],
+    ['Sin puestos en el plano','Hay personas asignadas en un recinto donde el plano no dibuja puestos de trabajo (p. ej. estación de enfermería sobre mesón, o asignación en un recinto que no es de trabajo): revisar dónde se sientan.'],
+    [''],['Generado',new Date().toLocaleString('es-CL')+' · Atlas HDS · estado '+(S.scenario==='base'?'Despliegue 0':'Propuesta')]];
+  const COLOR={ok:'FFE8F6EE',warn:'FFFDF3E2',bad:'FFFDECEC',gris:'FFF1F5F9'};
+  const pintaEstado=idx=>(r,c,v)=>{
+    if(c!==idx||typeof v!=='string') return null;
+    const f=/^Calza/.test(v)?COLOR.ok:/^Holgura/.test(v)?COLOR.warn:/^(Faltan|Sin puestos en)/.test(v)?COLOR.bad:COLOR.gris;
+    return {fill:{patternType:'solid',fgColor:{rgb:f}},font:{bold:true}};
+  };
+  const W=n=>({wch:n});
+  return xlsxLibro([
+    {name:'Resumen por servicio',rows:res,freezeCols:2,totalRow:true,estilo:pintaEstado(12),colW:[W(11),W(34),W(9),W(11),W(11),W(11),W(11),W(11),W(9),W(12),W(10),W(10),W(18),W(10),W(12),W(14)]},
+    {name:'Por recinto',rows:det,freezeCols:3,estilo:pintaEstado(20),colW:[W(11),W(30),W(28),W(18),W(24),W(13),W(10),W(10),W(10),W(10),W(10),W(10),W(10),W(9),W(9),W(9),W(12),W(11),W(11),W(12),W(24)]},
+    {name:'Cómo se cuenta',rows:notas,hdr:-1,colW:[W(32),W(120)]}
+  ], 'Puestos_de_trabajo_HDS_'+hoy+'.xlsx');
 }
 function exportCamas(){
-  const rows=[['Piso','Área','Código recinto','Código BIM','Recinto','Tipo recinto','Señalética','N° Señalética','Puesto','Nº','Nº alternativo']];
+  const rows=[['Piso','Área','Código recinto','Código BIM','Recinto','Tipo recinto','Señalética','N° Señalética','Tipo de puesto','Nº','Nº alternativo']];
   const loc=_roomLoc();
   Object.keys(wsState.beds||{}).forEach(cid=>{
     const bedsArr=(wsState.beds[cid]||[]); if(!bedsArr.length) return;
@@ -11746,11 +12210,12 @@ function exportCamas(){
     const tlbl = L?(ROOM_TYPES[rType(L.r.id)]||ROOM_TYPES['']).label:'';
     const sen = L?(rSenaletica(L.r.id)||''):'';
     const senN = L?(rSenNum(L.r.id)||''):'';
-    bedsArr.forEach(b=>rows.push([piso,areaN,cod,bim,rn,tlbl,sen,senN,(b.kind==='sillon'?'Sillón':'Camilla'),b.num||'',b.alt||'']));
+    bedsArr.forEach(b=>rows.push([piso,areaN,cod,bim,rn,tlbl,sen,senN,({sillon:'Sillón',cupo:'Cupo',puesto:'Puesto de toma'})[b.kind]||'Camilla',b.num||'',b.alt||'']));
   });
-  if(rows.length<2){ alert('No hay puestos colocados para exportar.'); return; }
-  rows.slice(1).sort((a,b)=>String(a[9]).localeCompare(String(b[9]),'es',{numeric:true}));
-  xlsxDownload(rows,'Puestos','puestos_HDS_'+new Date().toISOString().slice(0,10)+'.xlsx',
+  if(rows.length<2){ alert('No hay camas, sillones ni cupos numerados para exportar.'); return; }
+  const _cuerpo=rows.slice(1).sort((a,b)=>String(a[9]).localeCompare(String(b[9]),'es',{numeric:true}));
+  rows.length=1; rows.push(..._cuerpo);
+  xlsxDownload(rows,'Camas y cupos','camas_sillones_cupos_HDS_'+new Date().toISOString().slice(0,10)+'.xlsx',
     [{wch:11},{wch:30},{wch:15},{wch:20},{wch:34},{wch:16},{wch:24},{wch:14},{wch:10},{wch:14}]);
 }
 
@@ -11851,7 +12316,8 @@ function exportAsignaciones(){
   //    Una fila POR ASIGNACIÓN (persona repetida si tiene varios puestos).
   const headers = ['Subdirección','Unidad','Asignado','RUT','Nombre','Estamento','Calidad',
                    'Turno','Cargo','Ley de contrato','Horas Contratadas','Servicio',
-                   'Piso','Servicio (Atlas)','Recinto','Código recinto','BIM','Tipo de puesto'];
+                   'Piso','Servicio (Atlas)','Recinto','Código recinto','BIM','Tipo de puesto',
+                   'Funciones específicas (TENS · enfermería)'];
   const SEP_COL = 11;   // borde grueso a la derecha de "Servicio"
   let totalAsig = 0;
   const byEst = {}, bySub = {};
@@ -11887,9 +12353,9 @@ function exportAsignaciones(){
     ];
     const rank = esCds ? 2 : (isAsig ? 0 : 3);
     if(isAsig){
-      asigs.forEach(a => dataRows.push({rank, nombre:s.nombre, row:person.concat([a.piso||'', a.area||'', a.recinto||'', a.recintoCode||'', a.bim||'', _tipoAsig(a)])}));
+      asigs.forEach(a => dataRows.push({rank, nombre:s.nombre, row:person.concat([a.piso||'', a.area||'', a.recinto||'', a.recintoCode||'', a.bim||'', _tipoAsig(a), _funcTexto(s.nombre)])}));
     } else {
-      dataRows.push({rank, nombre:s.nombre, row:person.concat(['','','','','',''])});
+      dataRows.push({rank, nombre:s.nombre, row:person.concat(['','','','','','', _funcTexto(s.nombre)])});
       if(rank===3) noAsigRows.push({nombre:s.nombre, row:person.slice(0,12)});
     }
   });
@@ -11908,7 +12374,7 @@ function exportAsignaciones(){
       '', a0.nombreOrig || '', a0.estamento || '', '',
       '', a0.cargo || '', esCds ? 'COMPRA DE SERVICIO' : '', '', ''
     ];
-    asigs.forEach(a => dataRows.push({rank: esCds?2:1, nombre:a0.nombreOrig||'', row:person.concat([a.piso||'', a.area||'', a.recinto||'', a.recintoCode||'', a.bim||'', _tipoAsig(a)])}));
+    asigs.forEach(a => dataRows.push({rank: esCds?2:1, nombre:a0.nombreOrig||'', row:person.concat([a.piso||'', a.area||'', a.recinto||'', a.recintoCode||'', a.bim||'', _tipoAsig(a), _funcTexto(a0.nombreOrig)])}));
   });
 
   // 2c) Orden final + fila 1 de resumen (los % excluyen las Compras de Servicio)
@@ -11929,7 +12395,7 @@ function exportAsignaciones(){
   // 3) Crear hojas con estilos
   const COL_W = [{wch:32},{wch:26},{wch:12},{wch:13},{wch:34},{wch:18},{wch:14},
                  {wch:12},{wch:32},{wch:18},{wch:9},{wch:38},
-                 {wch:11},{wch:28},{wch:28},{wch:13},{wch:12},{wch:16}];
+                 {wch:11},{wch:28},{wch:28},{wch:13},{wch:12},{wch:16},{wch:40}];
   const HDR_STYLE = {
     font: {bold:true, color:{rgb:'FFFFFFFF'}, sz:11},
     fill: {patternType:'solid', fgColor:{rgb:'FF1D5FA0'}},
@@ -12172,6 +12638,9 @@ function init(){
     document.getElementById('hdr')?.appendChild(chip);
   }
   try{ pautasRemotePull(); }catch(e){}   // hidratar asignaciones desde la hoja central
+  // Escritorios nuevos (fucsia) de la siembra que todavía no están en este Atlas:
+  // se importan UNA vez por versión de la siembra (petición 18-sep-2026).
+  setTimeout(()=>{ try{ _autoImportarPlano(); }catch(e){ console.warn('importación automática del plano',e); } },900);
   // El fit inicial solo cuando el viewer YA tiene tamaño: si la pestaña abre
   // en background o el layout no terminó, clientWidth es 0 y el plano quedaría
   // microscópico. rAF reintenta (y en pestañas ocultas espera a ser visibles).
@@ -12196,7 +12665,7 @@ async function runSelfTest(){
   // Testigo: al terminar, NINGUNA preferencia del usuario puede haber cambiado.
   const _PREFS=['cabida_room_labels','cabida_show_dotnames','cabida_box_vis','cabida_plan_kind',
                 'cabida_show_asign','cabida_show_sen','cabida_scenario','cabida_rp_collapsed',
-                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures','cabida_ubic'];
+                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures','cabida_ubic','cabida_jardines'];
   const _PREV={}; _PREFS.forEach(k=>{ try{ _PREV[k]=localStorage.getItem(k); }catch(e){ _PREV[k]=null; } });
   const out=[]; const T=(nm,fn)=>{ try{ const r=fn(); if(r===false) out.push([0,nm,'aserción falsa']); else out.push([1,nm,'']); }catch(e){ out.push([0,nm,e.message]); } };
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -12820,7 +13289,7 @@ async function runSelfTest(){
     const dentro=ids.every(id=>{ const e=document.getElementById(id); return e && dock.contains(e); });
     // cajas · nombres · edición: acceso rápido en la barra de navegación
     const nav=document.getElementById('navBar');
-    const rapidos=['btnBoxVis','btnDotNames','btnEdit'].every(id=>{ const e=document.getElementById(id); return e && nav.contains(e) && !dock.contains(e); });
+    const rapidos=['btnBoxVis','btnDotNames','btnJardines','btnEdit'].every(id=>{ const e=document.getElementById(id); return e && nav.contains(e) && !dock.contains(e); });
     const bar=document.getElementById('editBar');
     const barSinBotones=![...bar.querySelectorAll('.tb-btn')].length;
     const conIcono=['btnEdit','btnPuertas','btnScen'].every(id=>(document.getElementById(id).getAttribute('data-ic')||'').length>0);
@@ -12987,8 +13456,109 @@ async function runSelfTest(){
       const exp=rows.length===2+nSd+nSv+nU && rows[1][0]==='Total' && rows.slice(2).every(r=>r.length===8 && r[4]>=r[5] && r[6]===r[4]-r[5]);
       avExpandir(false);
       const cerrado=document.querySelectorAll('#avBody .av-fila').length===nSd;
-      return nSd>0 && abiertos && filas && exp && cerrado && /servicio/.test(t);
+      return nSd>0 && abiertos && filas && exp && cerrado && /nombres/.test(t);   // las unidades ofrecen abrir sus nombres
     } finally { _avAbierto=abPrev; renderAvance(); }
+  });
+  T('Snapshot web (🟡 HUB-PM): sin RUT ni correos aunque haya comisiones revisadas', ()=>{
+    const prev=nameState.comisionRev;
+    try{
+      nameState.comisionRev={...(prev||{}),'12345678-9':1};
+      const t=JSON.stringify(_webPayload());
+      const ruts=(t.match(/\b\d{7,8}-[\dkK]\b/g)||[]).length, mails=(t.match(/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g)||[]).length;
+      return ruts===0 && mails===0 && !!nameState.comisionRev['12345678-9'] && JSON.stringify(_backupPayload()).includes('12345678-9');
+    } finally { nameState.comisionRev=prev; if(prev===undefined) delete nameState.comisionRev; }
+  });
+  T('Escritorios fucsia: los de la siembra que faltan se importan y reimportar no duplica', ()=>{
+    const PP=window.PROPUESTOS_PLANO; if(!PP||!PP.floors) return false;
+    const prev=JSON.stringify(propState);
+    try{
+      Object.keys(propState).forEach(f=>{ propState[f]=(propState[f]||[]).filter(x=>x.src!=='plano'); });
+      const mano=Object.values(propState).flat().length, total=Object.values(PP.floors).flat().length;
+      const falt=_planoPendientes();
+      importarPropuestosPlano(true);
+      const n1=Object.values(propState).flat().filter(x=>x.src==='plano').length;
+      importarPropuestosPlano(true);
+      const n2=Object.values(propState).flat().filter(x=>x.src==='plano').length;
+      const conRecinto=Object.values(propState).flat().filter(x=>x.src==='plano' && x.rid).length;
+      return falt===total && n1===total && n2===total && _planoPendientes()===0
+        && Object.values(propState).flat().length===mano+total && conRecinto>=total-2 && _autoImportarPlano()===0;
+    } finally { propState=JSON.parse(prev); renderSVG(); }
+  });
+  T('Exports: Recintos en el orden pedido (PMA/BIM uno bajo otro) y Puestos cuenta el 4º turno como UN puesto', ()=>{
+    const g0=window.guardarArchivo; window.guardarArchivo=async()=>true;
+    const L=_recintosDibujados(); const rid=L[0]&&L[0].rid; if(!rid){ window.guardarArchivo=g0; return false; }
+    const dPrev=wsState.dots[rid], lPrev=wsState.dotLinks;
+    try{
+      const wb=exportRecintos(); const sh=n=>XLSX.utils.sheet_to_json(wb.Sheets[n],{header:1});
+      const r=sh('Recintos'), s2=sh('Resumen por servicio');
+      const orden=JSON.stringify(r[0].slice(0,6))===JSON.stringify(['Piso','Servicio (vista 1)','Tipología general','Tipología específica','PMA','BIM']);
+      const multi=r.slice(1).filter(x=>String(x[4]).includes('\n')).every(x=>String(x[4]).split('\n').every(c=>/\d/.test(c)));
+      const cuadra=r.length-1===L.length && s2[s2.length-1][2]===L.length && sh('Tipologías por servicio').slice(1).reduce((a,x)=>a+x[4],0)===L.length;
+      // 4 personas unidas en 4º turno + 2 fijas + 1 puesto sin persona + 1 dinámico con 3 turnos
+      const D=[1,2,3,4].map(i=>({id:'st_q'+i,x:i,y:1,tipo:'fijo',nombre:'ZZQ CUARTO '+i}))
+        .concat([{id:'st_f1',x:9,y:1,tipo:'fijo',nombre:'ZZQ FIJO UNO'},{id:'st_f2',x:9,y:2,tipo:'fijo',nombre:'ZZQ FIJO DOS'},
+                 {id:'st_l1',x:9,y:3,tipo:'fijo',nombre:''},{id:'st_d1',x:9,y:4,tipo:'dinamico',turnos:[{nombre:'A B C'},{nombre:'D E F'},{nombre:'G H I'}]}]);
+      wsState.dots[rid]=D; wsState.dotLinks=[[1,2,3,4].map(i=>rid+'§st_q'+i)];
+      const o=_puestosPorRecinto()[rid];
+      const cuenta=o.personas===9 && o.cuartoPers===4 && o.cuartoGrupos===1 && o.dinPers===3 && o.libres===1 && o.necesarios===4 && o.balance===o.disp-4;
+      const wb2=exportPuestosTrabajo(); const det=XLSX.utils.sheet_to_json(wb2.Sheets['Por recinto'],{header:1});
+      const fila=det.find(x=>x[2]===(rName(rid)||'') && x[16]===4);
+      return orden && multi && cuadra && cuenta && !!fila && wb2.SheetNames.length===3;
+    } finally { wsState.dots[rid]=dPrev; if(dPrev===undefined) delete wsState.dots[rid]; wsState.dotLinks=lPrev; window.guardarArchivo=g0; }
+  });
+  T('Jardines y esculturas: capa del piso 1 calibrada, se prende y apaga, marcadores de tamaño fijo con ficha', ()=>{
+    const P=(window.PAISAJISMO||{}).P1; if(!P) return false;
+    const fPrev=S.floorId, lPrev=S.level, aPrev=S.areaId, rPrev=S.roomId, jPrev=S.jardines, zPrev=S.zoom;
+    try{
+      // la siembra cae dentro del plano y trae las 6 esculturas de la lámina con su ficha
+      const D=FLOOR_DIMS.P1;
+      const dentro=P.x>=0 && P.y>=0 && P.x+P.w<=D.w && P.y+P.h<=D.h && P.afin && Math.abs(P.afin[0][0]-P.afin[1][1])<0.01;
+      const seis=(P.esculturas||[]).length===6 && P.esculturas.every(e=>e.nombre && e.traslado && e.x>P.x && e.x<P.x+P.w && e.y>P.y && e.y<P.y+P.h);
+      S.floorId='P1'; S.level=1; S.areaId=null; S.roomId=null; S.jardines=true; renderSVG();
+      const im=document.getElementById('jardinImg');
+      const img=!!im && im.style.display!=='none' && im.style.left===P.x+'px' && im.style.width===P.w+'px'
+        && im.previousElementSibling && im.previousElementSibling.id==='floorImg';       // entre el plano y el SVG
+      const mks=[...svg.querySelectorAll('.esc-layer .esc-mk')];
+      S.zoom=0.1; _escRescale(); const k1=/scale\(10\)/.test(mks[0].getAttribute('transform'));
+      S.zoom=0.5; _escRescale(); const k2=/scale\(2\)/.test(mks[0].getAttribute('transform'));
+      mks[0].dispatchEvent(new MouseEvent('mouseenter',{clientX:200,clientY:200}));
+      const tip=document.getElementById('escTip'); const ficha=!!tip && tip.style.display==='block' && /Traslado 2026/.test(tip.innerText) && tip.innerText.includes(P.esculturas[0].nombre);
+      mks[0].dispatchEvent(new MouseEvent('mouseleave')); const cierra=tip.style.display==='none';
+      S.jardines=true; toggleJardines();
+      const apaga=S.jardines===false && im.style.display==='none' && !svg.querySelector('.esc-layer') && !document.getElementById('btnJardines').classList.contains('active');
+      toggleJardines(); const prende=im.style.display!=='none' && svg.querySelectorAll('.esc-mk').length===6;
+      // otro piso: sin siembra no hay capa y el botón queda atenuado
+      S.floorId='P2'; renderSVG(); const otro=im.style.display==='none' && !svg.querySelector('.esc-layer') && document.getElementById('btnJardines').classList.contains('dis');
+      return dentro && seis && img && mks.length===6 && k1 && k2 && ficha && cierra && apaga && prende && otro;
+    } finally { S.floorId=fPrev; S.level=lPrev; S.areaId=aPrev; S.roomId=rPrev; S.jardines=jPrev; S.zoom=zPrev; _escTipOff(); renderSVG(); }
+  });
+  T('Funciones TENS: una persona lleva una o más, la siguen por nombre y se ven en tarjeta, diálogo y Personas', ()=>{
+    const fPrev=JSON.stringify(nameState.funcTens||{}), dPrev=wsState.dots['st_fn'], mPrev=mCtx;
+    try{
+      nameState.funcTens={}; const N='ZZQ PRUEBA FUNCIONES';
+      wsState.dots['st_fn']=[{id:'st_fn1',x:5,y:5,tipo:'fijo',nombre:N,cargo:'',estamento:'TENS'}];
+      // diálogo: la fila aparece por el estamento TENS, se marcan DOS funciones y se guardan
+      openModal('st_fn',0);
+      let visible=document.getElementById('mFuncRow').style.display!=='none' && document.querySelectorAll('#mFuncChips .func-chip').length===FUNC_TENS.length;
+      // enfermería también la ve sin pedirla; una secretaria no (queda el enlace «＋»)
+      { const e=document.getElementById('mEst'); const prev=e.value;
+        e.value='ENFERMERAS'; _mFuncPinta(); const enf=document.getElementById('mFuncRow').style.display!=='none';
+        e.value='ADMINISTRATIVOS'; _mFuncPinta(); const adm=document.getElementById('mFuncRow').style.display==='none' && document.getElementById('mFuncMas').style.display!=='none';
+        e.value=prev; _mFuncPinta(); visible=visible && enf && adm && ['uro','orl','rob','trau','oft'].every(k=>FUNC_TENS.some(f=>f.k===k)); }
+      _mFuncToggle('pab'); _mFuncToggle('ars');
+      const c=window.confirm; window.confirm=()=>true; try{ saveWs(); } finally { window.confirm=c; }
+      const guardo=JSON.stringify(_funcDe(N))===JSON.stringify(['pab','ars']);
+      const tarjeta=/PB · AR/.test(dotTitle(wsState.dots['st_fn'][0])) && /Pabellonera\/o · Arsenalera\/o/.test(_funcTexto(N)) && (_funcBadges(N).match(/func-b/g)||[]).length===2;
+      // sigue a la persona: en otro puesto (turno de un dinámico) sale igual; quitar todo lo borra
+      const din={tipo:'dinamico',turnos:[{nombre:N}]}; const sigue=/\[PB·AR\]/.test(dotTitle(din));
+      openModal('st_fn',0); const recarga=_mFunc.has('pab') && _mFunc.has('ars') && _mFunc.size===2;
+      _mFuncToggle('pab'); _mFuncToggle('ars'); _mFuncGuarda(N);
+      const borra=!(norm(N) in nameState.funcTens) && _funcDe(N).length===0;
+      return visible && guardo && tarjeta && sigue && recarga && borra;
+    } finally {
+      nameState.funcTens=JSON.parse(fPrev); if(dPrev===undefined) delete wsState.dots['st_fn']; else wsState.dots['st_fn']=dPrev;
+      mCtx=mPrev; try{ closeModal(); }catch(e){}
+    }
   });
   T('Avance: «sólo faltantes» muestra únicamente dónde y quiénes faltan por cubicar, y el export los lista uno a uno', ()=>{
     const abPrev={..._avAbierto}, fPrev=_avFiltro, sPrev=_avSoloFaltan;

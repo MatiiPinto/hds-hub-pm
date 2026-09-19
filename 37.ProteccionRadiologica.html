@@ -4,7 +4,7 @@
 <script src="pm_gate.js"></script>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Protección Radiológica · Oficial de PR · HDS</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23800020'/><circle cx='50' cy='50' r='9' fill='%23FACC15'/><g fill='%23FACC15'><path d='M50 12a38 38 0 0 1 33 19l-16 9A19 19 0 0 0 50 31z'/><path d='M83 69a38 38 0 0 1-33 19V69a19 19 0 0 0 17-9z'/><path d='M17 69a38 38 0 0 1 0-38l16 9a19 19 0 0 0 0 20z'/></g></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23B36679'/><circle cx='50' cy='50' r='9' fill='%23FACC15'/><g fill='%23FACC15'><path d='M50 12a38 38 0 0 1 33 19l-16 9A19 19 0 0 0 50 31z'/><path d='M83 69a38 38 0 0 1-33 19V69a19 19 0 0 0 17-9z'/><path d='M17 69a38 38 0 0 1 0-38l16 9a19 19 0 0 0 0 20z'/></g></svg>">
 <style>
 /* ══ Protección Radiológica · HDS ═══════════════════════════════════════════
    Herramienta de trabajo del Oficial de Protección Radiológica (TM). Cubre las
@@ -12,17 +12,19 @@
    elementos de protección, vigilancia de instalaciones y personal expuesto.
    ⚠ USO INTERNO: la nómina de POE y las lecturas viven SOLO en este navegador
    (localStorage) y se respaldan a archivo. No se publican en ningún HUB.      */
-/* Paleta base BURDEO: color del estamento de Tecnólogos Médicos (el OPR es TM) · amarillo = trébol de radiación */
+/* Paleta base BURDEO: color del estamento de Tecnólogos Médicos (el OPR es TM) · amarillo = trébol de radiación.
+   Fondo = burdeo #800020 aclarado un 40 % (#B36679). Las tarjetas van en burdeo oscuro para que el texto
+   claro mantenga contraste AA (≥ 4,5:1) sobre ellas. */
 :root{
-  --bg:#1C0B12; --panel:#2A111C; --panel2:#230D17; --bd:#4D2233;
-  --tx:#F6EAEE; --tx2:#C9A2B1; --burdeo:#800020; --am:#FACC15; --am2:#B45309;
-  --ok:#22C55E; --warn:#F59E0B; --bad:#EF4444; --info:#38BDF8; --vio:#A78BFA;
+  --bg:#B36679; --panel:#5A1428; --panel2:#4C1022; --bd:#8E4A60;
+  --tx:#F6EAEE; --tx2:#EBC7D3; --burdeo:#800020; --burdeo40:#B36679; --am:#FACC15; --am2:#B45309;
+  --ok:#22C55E; --warn:#F59E0B; --bad:#F87171; --info:#38BDF8; --vio:#A78BFA;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
   background:var(--bg);color:var(--tx);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
 
-header{background:linear-gradient(120deg,#3D0716,#6B0F2A 60%,#800020);padding:13px 22px;
+header{background:linear-gradient(120deg,#6B0F2A,#800020 55%,#93304B);padding:13px 22px;
   position:sticky;top:0;z-index:40;border-bottom:1px solid var(--bd)}
 .hrow{display:flex;align-items:center;gap:14px;max-width:1240px;margin:0 auto;flex-wrap:wrap}
 .logo{width:44px;height:44px;border-radius:12px;background:rgba(250,204,21,.14);border:1px solid rgba(250,204,21,.4);
@@ -104,14 +106,14 @@ label{display:block;font-size:11px;color:var(--tx2);font-weight:700;margin-botto
 .field{margin-bottom:9px}
 
 .aviso{border-radius:11px;padding:11px 14px;font-size:12.5px;line-height:1.5;margin-bottom:12px}
-.a-warn{background:rgba(245,158,11,.10);border:1px solid rgba(245,158,11,.35);color:#FCD34D}
-.a-info{background:rgba(56,189,248,.09);border:1px solid rgba(56,189,248,.3);color:#7DD3FC}
-.a-bad{background:rgba(239,68,68,.10);border:1px solid rgba(239,68,68,.35);color:#FCA5A5}
+.a-warn{background:linear-gradient(rgba(245,158,11,.10),rgba(245,158,11,.10)),var(--panel2);border:1px solid rgba(245,158,11,.35);color:#FCD34D}
+.a-info{background:linear-gradient(rgba(56,189,248,.09),rgba(56,189,248,.09)),var(--panel2);border:1px solid rgba(56,189,248,.3);color:#7DD3FC}
+.a-bad{background:linear-gradient(rgba(239,68,68,.12),rgba(239,68,68,.12)),var(--panel2);border:1px solid rgba(239,68,68,.35);color:#FCA5A5}
 
 .bar{height:8px;background:var(--bd);border-radius:20px;overflow:hidden;display:flex}
 .bar i{display:block;height:100%}
 .empty{text-align:center;color:var(--tx2);padding:26px;font-size:13px}
-footer{border-top:1px solid var(--bd);color:var(--tx2);font-size:11.5px;padding:16px 22px;text-align:center;line-height:1.6}
+footer{background:var(--panel2);border-top:1px solid var(--bd);color:var(--tx2);font-size:11.5px;padding:16px 22px;text-align:center;line-height:1.6}
 @media(max-width:640px){nav{top:76px}main{padding:14px 13px 40px}.hstats{width:100%;margin-left:0}}
 </style>
 </head><body>
@@ -328,7 +330,8 @@ function vPanel(){
         +(cri.length?'<div class="aviso a-bad" style="margin-top:12px"><b>⚠ '+cri.length+' persona(s) con la autorización de desempeño vencida:</b> '
           +cri.slice(0,8).map(p=>esc(p.nombre)+' ('+p.vence_desempeno+')').join(' · ')+'</div>':'')
         +'<div style="margin-top:10px"><button class="btn pri" onclick="irA(\'cumpl\')">Ver la matriz completa →</button> '
-        +'<button class="btn" onclick="irA(\'hist\')">📈 Historial CCHEN</button> <button class="btn" onclick="irA(\'cot\')">🧮 Cotejo nóminas</button></div></div>';})() : cardAgregada())
+        +'<button class="btn" onclick="irA(\'hist\')">📈 Historial CCHEN</button> <button class="btn" onclick="irA(\'cot\')">🧮 Cotejo nóminas</button> '
+        +'<button class="btn" onclick="exportCapacitacion()">🎓 Nómina de capacitación (Excel)</button></div></div>';})() : cardAgregada())
     +'<div class="card"><h2>📌 Qué controla esta plataforma</h2>'
     +'<div class="d" style="margin-bottom:10px">¿Primera vez acá? La <b>🎬 Guía rápida</b> explica en un minuto '
     +'cómo se usa, con los siete pasos del ciclo. '
@@ -782,6 +785,7 @@ function vCumpl(){
     +[['nombre','Orden alfabético'],['dosis','Mayor dosis 12 meses'],['vence','Vence antes']]
       .map(([v,l])=>'<option value="'+v+'"'+(CF.ord===v?' selected':'')+'>'+l+'</option>').join('')+'</select>'
     +'<button class="btn" onclick="cumplCSV()">📄 Exportar CSV</button>'
+    +'<button class="btn pri" onclick="exportCapacitacion()" title="Excel para la Unidad de Capacitación: quién tiene el curso de Protección Radiológica, quién lo declara sin respaldo y a quién inscribir">🎓 Nómina de capacitación (Excel)</button>'
     +'<span style="margin-left:auto;font-size:12px;color:var(--tx2)">'+L.length+' persona(s)'+(L.length>400?' · se muestran 400':'')+'</span></div>'
     +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>Persona</th><th>Unidad con dosimetría</th>'
     +'<th>Curso PR</th><th>Autorización de desempeño</th><th>Dosimetría</th>'
@@ -1023,7 +1027,8 @@ function vLev(){
     + 'y hay que adjuntar los respaldos de curso y autorización de quienes estén expuestos.'
     + (pl.maximo ? '<div style="margin-top:6px"><b>Primer avance:</b> ' + esc(pl.primer_avance) + (dAv != null ? ' (' + (dAv >= 0 ? 'en ' + dAv + ' día(s)' : 'hace ' + (-dAv) + ' día(s)') + ')' : '')
       + ' · <b>Plazo máximo:</b> ' + esc(pl.maximo) + (dTope != null ? ' (' + (dTope >= 0 ? 'en ' + dTope + ' día(s)' : 'vencido hace ' + (-dTope) + ' día(s)') + ')' : '') + '</div>' : '')
-    + (L.form ? '<div style="margin-top:6px"><a class="btn xs" href="' + esc(L.form) + '" target="_blank">📝 Abrir el formulario</a></div>' : '') + '</div>'
+    + '<div style="margin-top:6px">' + (L.form ? '<a class="btn xs" href="' + esc(L.form) + '" target="_blank">📝 Abrir el formulario</a> ' : '')
+    + (PR ? '<button class="btn xs" onclick="exportCapacitacion()">🎓 Nómina de capacitación (Excel)</button>' : '') + '</div></div>'
     + kpis([['Personas en las planillas', T.personas, 'var(--tx)'], ['Declaran exposición', T.expone, T.expone ? 'var(--info)' : 'var(--tx2)'],
       ['Sin responder', T.sin, T.sin ? 'var(--warn)' : 'var(--ok)'], ['Servicios', S.length, 'var(--tx)']])
     + '<div class="card" style="margin-top:12px"><h2>🏥 Avance por servicio</h2>'
@@ -1060,6 +1065,105 @@ function vOpr(){
     + '<div class="card"><h2>📇 Contactos</h2><div class="tw" style="margin-top:8px"><table><thead><tr><th>Nombre</th><th>Rol</th><th>Correo</th></tr></thead><tbody>'
     + O.contactos.map(c => '<tr><td><b>' + esc(c.nombre) + '</b></td><td><small>' + esc(c.rol) + '</small></td><td class="mono">' + esc(c.correo) + (c.anexo ? ' · anexo ' + esc(c.anexo) : '') + '</td></tr>').join('')
     + '</tbody></table></div></div>';
+}
+
+/* ══ 🎓 EXPORT PARA CAPACITACIÓN · nómina con y sin curso de Protección Radiológica ══
+   Excel para la Unidad de Capacitación: quién tiene el curso (con su respaldo), quién lo declara
+   sin documento y a quién hay que inscribir. Usa la base nominada: solo existe en el 🔴 HUB local.
+   La librería (assets/vendor/xlsx-js-style) se carga recién al exportar. */
+function cargarXLSX(){
+  if(window.XLSX) return Promise.resolve(window.XLSX);
+  return new Promise((ok, ko) => { const s = document.createElement('script'); s.src = 'assets/vendor/xlsx-js-style-1.2.0.bundle.js';
+    s.onload = () => ok(window.XLSX); s.onerror = () => ko(new Error('No se pudo cargar la librería de Excel')); document.head.appendChild(s); });
+}
+function capServicio(p){
+  if(p.cotejo && p.cotejo.servicios.length) return p.cotejo.servicios.join(' · ');
+  if(p.levantamiento && p.levantamiento.servicio) return p.levantamiento.servicio;
+  if(p.unidades_pr.length) return p.unidades_pr.map(u => u.charAt(0) + u.slice(1).toLowerCase()).join(' · ');
+  return (p.dotacion && p.dotacion.unidad) || 'Sin servicio identificado';
+}
+function capFila(p){
+  const c = p.curso || {}, d = p.dotacion || {};
+  // la nómina del servicio declara el curso pero no hay registro en SIRH ni en la nómina de cursos 2026
+  const e = p.estado.curso === 'falta' && (p.cotejo && p.cotejo.declara && p.cotejo.declara.curso) ? 'declarado' : p.estado.curso;
+  const tiene = e === 'ok' ? 'Sí' : e === 'declarado' ? 'Declarado, sin respaldo' : 'No';
+  const fuente = !p.curso ? '' : /2026/.test(c.situacion || '') ? 'Nómina de cursos realizados 2026' : 'Reporte SIRH (ene-2015 a mar-2026)';
+  const expo = p.estado.dosimetria === 'ok' ? 'Sí · dosímetro al día'
+    : (p.levantamiento && p.levantamiento.expone === true) ? 'Sí · declarado por el servicio'
+    : p.unidades_pr.length ? 'Tuvo dosímetro (no vigente)' : (p.cotejo ? 'Por confirmar (nómina de servicio)' : 'Sin antecedente');
+  const accion = e === 'ok' ? 'Ninguna: curso respaldado'
+    : e === 'declarado' ? 'Pedir el certificado del curso' : (p.estado.dosimetria === 'ok' || p.cotejo ? 'Inscribir en curso de Protección Radiológica' : 'Evaluar si requiere el curso');
+  return {
+    'Nombre': p.nombre, 'RUT': p.run ? p.run.slice(0, -1) + '-' + p.run.slice(-1) : '',
+    'Servicio': capServicio(p), 'Estamento / planta': (p.cotejo && p.cotejo.estamento) || d.planta || '',
+    'Función': d.funcion || '', 'Unidad de contrato': d.unidad || '', 'Exposición a radiación': expo,
+    '¿Tiene curso de PR?': tiene, 'Curso': c.curso || '', 'Organismo': c.organismo || '',
+    'Horas': c.horas != null ? c.horas : '', 'Término': c.termino ? String(c.termino).slice(0, 10) : '',
+    'Nota': c.nota != null ? c.nota : '', 'Fuente del respaldo': fuente, 'Acción sugerida': accion
+  };
+}
+async function exportCapacitacion(){
+  if(!PR){ alert('La nómina con nombres está disponible solo en el HUB local.'); return; }
+  let X; try{ X = await cargarXLSX(); }catch(e){ alert(e.message); return; }
+  const universo = PRP.filter(p => p.estado.dosimetria === 'ok' || p.cotejo || p.levantamiento || p.curso || p.unidades_pr.length);
+  const filas = universo.map(capFila).sort((a, b) => a['Servicio'].localeCompare(b['Servicio']) || a['Nombre'].localeCompare(b['Nombre']));
+  const sin = filas.filter(f => f['¿Tiene curso de PR?'] === 'No'), decl = filas.filter(f => f['¿Tiene curso de PR?'].startsWith('Declarado')), con = filas.filter(f => f['¿Tiene curso de PR?'] === 'Sí');
+  const servs = [...new Set(filas.map(f => f['Servicio']))].sort();
+  const resumen = servs.map(s => { const L = filas.filter(f => f['Servicio'] === s);
+    const n = k => L.filter(f => f['¿Tiene curso de PR?'].startsWith(k)).length;
+    const exp = L.filter(f => f['Exposición a radiación'].startsWith('Sí'));
+    return { 'Servicio': s, 'Personas': L.length, 'Con curso': n('Sí'), 'Declarado sin respaldo': n('Declarado'), 'Sin curso': n('No'),
+      'Expuestos sin curso': exp.filter(f => f['¿Tiene curso de PR?'] === 'No').length,
+      '% con curso': L.length ? Math.round(n('Sí') * 100 / L.length) + '%' : '' }; })
+    .sort((a, b) => b['Expuestos sin curso'] - a['Expuestos sin curso'] || b['Sin curso'] - a['Sin curso']);
+  const tot = { 'Servicio': 'TOTAL', 'Personas': filas.length, 'Con curso': con.length, 'Declarado sin respaldo': decl.length, 'Sin curso': sin.length,
+    'Expuestos sin curso': sin.filter(f => f['Exposición a radiación'].startsWith('Sí')).length, '% con curso': Math.round(con.length * 100 / Math.max(1, filas.length)) + '%' };
+
+  const BURDEO = '800020', CLARO = 'F6E3E8';
+  const head = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: BURDEO } }, alignment: { vertical: 'center', wrapText: true } };
+  const hoja = (rows, anchos) => {
+    const ws = X.utils.json_to_sheet(rows);
+    const r = X.utils.decode_range(ws['!ref']);
+    for(let C = r.s.c; C <= r.e.c; C++){ const a = ws[X.utils.encode_cell({ r: 0, c: C })]; if(a) a.s = head; }
+    ws['!cols'] = anchos.map(w => ({ wch: w })); ws['!autofilter'] = { ref: ws['!ref'] }; ws['!freeze'] = { xSplit: 0, ySplit: 1 };
+    ws['!views'] = [{ state: 'frozen', ySplit: 1 }];
+    return ws;
+  };
+  const anchos = [34, 12, 22, 20, 22, 30, 28, 20, 34, 34, 7, 11, 6, 30, 36];
+  const wb = X.utils.book_new();
+  const wr = hoja(resumen.concat([tot]), [30, 10, 11, 20, 10, 18, 12]);
+  const ult = X.utils.decode_range(wr['!ref']).e.r;
+  for(let C = 0; C <= 6; C++){ const a = wr[X.utils.encode_cell({ r: ult, c: C })]; if(a) a.s = { font: { bold: true }, fill: { fgColor: { rgb: CLARO } } }; }
+  X.utils.book_append_sheet(wb, wr, 'Resumen por servicio');
+  X.utils.book_append_sheet(wb, hoja(sin, anchos), 'Sin curso (inscribir)');
+  X.utils.book_append_sheet(wb, hoja(decl, anchos), 'Declarado sin respaldo');
+  X.utils.book_append_sheet(wb, hoja(con, anchos), 'Con curso');
+  X.utils.book_append_sheet(wb, hoja(filas, anchos), 'Nómina completa');
+  const leeme = [
+    ['Nómina de capacitación · Curso de Protección Radiológica · Hospital Del Salvador'],
+    ['Generado el ' + hoy() + ' desde la plataforma del Oficial de Protección Radiológica (corte de datos ' + PR.version + ').'],
+    [''],
+    ['Para qué sirve', 'Saber a quién inscribir en el curso de Protección Radiológica, que la Autorización Sanitaria exige a todo el personal expuesto (punto 16 del requerimiento de RRHH).'],
+    ['Con curso', 'Aprobado según el reporte de cursos del SIRH (ene-2015 a mar-2026) o la nómina de cursos realizados 2026.'],
+    ['Declarado sin respaldo', 'La nómina del servicio dice que tiene el curso, pero no aparece en ninguna de las dos fuentes: hay que pedir el certificado.'],
+    ['Sin curso', 'No hay registro del curso. La columna «Acción sugerida» separa a quienes están expuestos (inscribir) de quienes hay que evaluar.'],
+    ['Exposición', '«Dosímetro al día» = tiene lectura en el último trimestre de la CCHEN. «Declarado por el servicio» = lo marcó su jefatura en el levantamiento de septiembre.'],
+    [''],
+    ['⚠ Dato sensible', 'Contiene nombres y RUT. Uso interno de Capacitación y del OPR; no reenviar fuera del hospital.'],
+    ['Contacto', 'Allyson Davis Zubiri · Oficial de Protección Radiológica · adavis@hsalvador.cl · anexo 286947'],
+  ];
+  const wl = X.utils.aoa_to_sheet(leeme); wl['!cols'] = [{ wch: 24 }, { wch: 110 }];
+  wl['A1'].s = { font: { bold: true, sz: 14, color: { rgb: BURDEO } } };
+  X.utils.book_append_sheet(wb, wl, 'Léeme');
+  X.writeFile(wb, 'Capacitacion_Proteccion_Radiologica_' + hoy() + '.xlsx');
+  toastPR('🎓 Nómina exportada: ' + con.length + ' con curso · ' + decl.length + ' declarado sin respaldo · ' + sin.length + ' sin curso');
+}
+function toastPR(t){
+  let el = document.getElementById('toastPR');
+  if(!el){ el = document.createElement('div'); el.id = 'toastPR';
+    el.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#2A0A14;color:#fff;border:1px solid #B36679;padding:10px 16px;border-radius:999px;font-size:12.5px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.35)';
+    document.body.appendChild(el); }
+  el.textContent = t; el.hidden = false; clearTimeout(el._t); el._t = setTimeout(() => { el.hidden = true; }, 4500);
 }
 
 /* ══ 📑 REQUERIMIENTO AS · los 21 puntos que pide RRHH ════════════════════════ */
