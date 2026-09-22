@@ -43,6 +43,10 @@ window.PM_CONFIG = {
   // planillas de recintos, señalética, camas, equipamiento, mobiliario clínico
   // y MNC·TI·MOA (impresoras incluidas). Las de DOTACIÓN no se ofrecen nunca.
   EXPORTADORES: ['mpinto', 'csoto', 'ebecerra'],
+  // EXPORTADORES CON DOTACIÓN: lo mismo + las planillas de dotación (puestos
+  // de trabajo vs personas y dotación en recinto), generadas desde la versión
+  // slim (nombre, cargo, estamento, unidad; SIN RUT ni correos). Equipo de Cabida.
+  EXPORTADORES_DOT: ['mpinto', 'crivera', 'lperez'],
   // ── ACCESOS TEMPORALES ────────────────────────────────────────────────────
   // usuario → ÚLTIMO día en que puede entrar (inclusive, hora de Chile).
   // Pasada esa fecha el login se rechaza y las sesiones ya abiertas dejan de

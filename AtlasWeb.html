@@ -3,7 +3,7 @@
 <head>
 <script src="pm_config.js"></script>
 <script src="pm_gate.js"></script>
-<style>/*HUB-PM*/ body:not(.pm-export) #expDD, body:not(.pm-editor) #wsModal, #expDD [onclick^="exportPuestosTrabajo"], #expDD [onclick^="exportAsignaciones"], #expDD [onclick^="exportBackup"], #expDD [onclick^="exportWebData"], #expDD [onclick^="publicarAtlasPM"], #expDD [onclick^="fbakAhora"], #expDD [onclick^="fbakRestaurar"], #expDD [onclick^="diagGuardado"], #expDD [onclick^="copyConsultaLink"], #expDD [onclick^="exportForWeb"], #expDD [onclick*="_abHandle"] { display:none !important; }</style>
+<style>/*HUB-PM*/ body:not(.pm-export) #expDD, body:not(.pm-editor) #wsModal, body:not(.pm-export-dot) #expDD [onclick^="exportPuestosTrabajo"], body:not(.pm-export-dot) #expDD [onclick^="exportAsignaciones"], #expDD [onclick^="exportBackup"], #expDD [onclick^="exportWebData"], #expDD [onclick^="publicarAtlasPM"], #expDD [onclick^="fbakAhora"], #expDD [onclick^="fbakRestaurar"], #expDD [onclick^="diagGuardado"], #expDD [onclick^="copyConsultaLink"], #expDD [onclick^="exportForWeb"], #expDD [onclick*="_abHandle"] { display:none !important; }</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>HDS · Atlas — Consulta Web</title>
@@ -14690,8 +14690,13 @@ document.addEventListener('keydown',e=>{
   try{
     if(!window.PM_CONFIG || typeof pmSession!=='function') return;
     const s=pmSession();
-    if(s && (window.PM_CONFIG.EXPORTADORES||[]).indexOf(s.u)!==-1)
+    const C=window.PM_CONFIG;
+    const conDot = s && (C.EXPORTADORES_DOT||[]).indexOf(s.u)!==-1;
+    if(s && (conDot || (C.EXPORTADORES||[]).indexOf(s.u)!==-1))
       document.body.classList.add('pm-export');
+    // EXPORTADORES_DOT además ven las dos exportaciones de dotación
+    // (puestos vs personas · dotación en recinto), siempre desde el slim.
+    if(conDot) document.body.classList.add('pm-export-dot');
   }catch(e){}
 })();
 // ── ROL EDITOR ACOTADO: barra propia y línea base del delta ────────────────
