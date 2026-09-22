@@ -840,6 +840,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="tb-btn" id="btnMoves" onclick="openMovesList()" style="display:none" title="Ver el listado completo de traslados propuestos">↪ 0</button>
       <span class="tb-div"></span>
       <button class="tb-btn" id="btnExpServ" onclick="exportServicioHTML()" style="display:none" title="Exportar este servicio como HTML autónomo: imagen del plano recortada al contorno punteado, recintos clicables con su ficha (equipamiento, mobiliario, TI, MNC) y opción de ocultar las cajas. No incluye información de funcionarios.">📄 Exportar servicio</button>
+      <button class="tb-btn" id="btnMapaServ" onclick="exportMapaServicio()" style="display:none" title="Mapa de navegación de este servicio en página carta: plano a página completa, recintos numerados y leyenda con nombre, código y señalética. Se guarda el HTML y se abre el diálogo de impresión para Guardar como PDF. Sin funcionarios.">🗺 Mapa carta (PDF)</button>
       <button class="tb-btn" id="btnOrdenarDots" onclick="ordenarDots()" style="display:none" title="Ordenar los puestos del recinto en una cuadrícula alineada, con espacio suficiente para que las tarjetas de nombre no se superpongan">⊞ Ordenar puestos</button>
       <button class="tb-btn" id="btnPuertas" onclick="togglePuertaMode()" style="display:none" title="Puertas de acceso y salida de cada recinto: flecha sobre el muro que indica la salida. Clic en el borde de un recinto coloca puerta normal (90 cm); Alt+clic camilla (120 cm); Shift+clic pabellón (200 cm). ⌘+clic sobre una puerta rota el tipo (90→120→200) · arrastrar la mueve · doble clic la elimina.">🚪 Puertas</button>
       <span id="puertaTipoSel" style="display:none;align-items:center;gap:2px">
@@ -6106,7 +6107,7 @@ const DOCK_MAPA=[
   ['dkCons',  ['btnFicha','btnAutSan','btnEquip','btnMob','btnScen','btnMoves','btnServPuestos']],
   ['dkEdit2', ['btnUndo','btnDraw','btnMerge','btnUnmerge','btnRename','btnDel','btnDelDot','btnOrdenarDots']],
   ['dkAdd',   ['btnPuertas','puertaTipoSel','btnPuertaDel','btnPuertaDelAll','btnPuertasAuto','btnDupMueble','btnStruct']],
-  ['dkExp',   ['btnExpServ']]
+  ['dkExp',   ['btnExpServ','btnMapaServ']]
 ];
 function _dockMonta(){
   const dock=document.getElementById('dock'); if(!dock||dock._montado) return;
@@ -12078,7 +12079,8 @@ function updateUI(){
     const pdA=document.getElementById('btnPuertaDelAll'); if(pdA) pdA.style.display=(S.level>1&&S.puertaMode&&(!S.viewOnly||S.editPM))?'':'none';
     if(S.level<2&&S.puertaMode){ S.puertaMode=false; if(bpu)bpu.classList.remove('active'); const ph=document.getElementById('puertaHint'); if(ph)ph.classList.remove('show'); svg.style.cursor=''; }
     if(S.level!==3&&S.stampMode){ S.stampMode=false; if(bdm)bdm.classList.remove('active'); const sh=document.getElementById('stampHint'); if(sh)sh.classList.remove('show'); svg.style.cursor=''; }
-    const bxs=document.getElementById('btnExpServ'); if(bxs) bxs.style.display=(S.level===2)?'':'none'; }
+    const bxs=document.getElementById('btnExpServ'); if(bxs) bxs.style.display=(S.level===2)?'':'none';
+    const bms=document.getElementById('btnMapaServ'); if(bms) bms.style.display=(S.level===2)?'':'none'; }
   // Area jump selector: show at level 1 so user can navigate to any area (even without drawn shape)
   if(S.level===1 && fl){
     const undrawn=fl.areas.filter(a=>(boxState.areas[a.id]||[]).length===0 && a.rooms && a.rooms.length>0);
@@ -12611,6 +12613,120 @@ function exportServicioHTML(){
       setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },6000);
     }
   });
+  return html;
+}
+// ═══ MAPA DE NAVEGACIÓN DE UN SERVICIO · CARTA · PDF (22-sep-2026) ═══════════
+// Página carta con el plano del servicio a página completa, recintos numerados
+// y leyenda (N° · nombre · código · señalética). La orientación sale sola de la
+// forma del servicio. Se guarda el HTML en Respaldo y Export ATLAS/Servicios y
+// se abre en una ventana con el diálogo de impresión: ahí «Guardar como PDF».
+// No incluye funcionarios.
+function _servRecorte(){
+  const area=curArea(); if(!area) return null;
+  const aSh=aShapes(area); if(!aSh.length) return {area, error:'Este servicio no tiene contorno dibujado.'};
+  const PAD=60, ab=bounds(aSh);
+  const b={x:Math.max(0,ab.x-PAD), y:Math.max(0,ab.y-PAD)};
+  b.w=Math.min(IMG_W,ab.x+ab.w+PAD)-b.x; b.h=Math.min(IMG_H,ab.y+ab.h+PAD)-b.y;
+  let dataURL=null;
+  const maxW=2600, sc=Math.min(1, maxW/Math.max(b.w,b.h));
+  try{
+    const cv=document.createElement('canvas');
+    cv.width=Math.round(b.w*sc); cv.height=Math.round(b.h*sc);
+    const cx=cv.getContext('2d');
+    cx.fillStyle='#ffffff'; cx.fillRect(0,0,cv.width,cv.height);
+    cx.save(); cx.beginPath();
+    aSh.forEach(s=>cx.rect((s.x-b.x)*sc,(s.y-b.y)*sc,s.w*sc,s.h*sc));
+    cx.clip(); cx.drawImage(floorImg, b.x,b.y,b.w,b.h, 0,0,cv.width,cv.height); cx.restore();
+    dataURL=cv.toDataURL('image/jpeg',0.86);
+  }catch(e){}
+  const rel=q=>({x:q.x-b.x, y:q.y-b.y, w:q.w, h:q.h});
+  const guiaD=unionPath(aSh.map(rel)).replace(/-?\d+\.\d+/g,m=>(+m).toFixed(1));
+  const rooms=[];
+  (area.rooms||[]).forEach(r=>{
+    const sh=rShapes(r); if(!sh.length) return;
+    const m=ROOM_TYPES[rType(r.id)]||ROOM_TYPES[''], bb=bounds(sh);
+    rooms.push({id:r.id, nm:rName(r.id)||r.id, code:rCode(r.id)||'', tipo:m.label, col:m.col,
+      sen:(/^\s*N\/A/i.test(rSenaletica(r.id)||'')?'':(rSenaletica(r.id)||'')), senN:rSenNum(r.id)||'', cx:bb.x+bb.w/2-b.x, cy:bb.y+bb.h/2-b.y,
+      d:unionPath(sh.map(rel)).replace(/-?\d+\.\d+/g,m=>(+m).toFixed(1))});
+  });
+  rooms.sort((a,c)=>String(a.code).localeCompare(String(c.code),'es',{numeric:true})||String(a.nm).localeCompare(String(c.nm),'es'));
+  return {area, aSh, b, dataURL, planAbs:new URL(floorImg.getAttribute('src'), location.href).href, guiaD, rooms,
+          sinDibujo:(area.rooms||[]).length-rooms.length};
+}
+function _mapaServicioHTML(R){
+  const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const nomServ=aName(R.area.id), piso=(curFloor()||{}).label||S.floorId;
+  const fecha=new Date().toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const N=R.rooms.length, apaisado=R.b.w>=R.b.h*0.95;
+  // el plano ocupa una hoja carta (0,5 in de margen): 10 × 7,5 in apaisado, 7,5 × 10 vertical
+  const paginaW=apaisado?10:7.5, paginaH=apaisado?7.5:10, cab=0.7, pie=0.35;
+  // leyenda: al costado en apaisado (2,9 in, dos columnas si son muchos), abajo en vertical
+  const lado=apaisado&&N<=30, abajo=!apaisado&&N<=16, aparte=!lado&&!abajo;   // dónde va la leyenda
+  const leyAncho=lado?2.9:0, mapaW=paginaW-leyAncho-(leyAncho?0.15:0);
+  const mapaH=abajo?Math.min(paginaH-cab-pie-1.7, mapaW*R.b.h/R.b.w):(paginaH-cab-pie);
+  const ms=Math.max(30,Math.min(70,Math.min(R.b.w,R.b.h)/26));       // marcador en px del plano
+  let svg='<svg viewBox="0 0 '+R.b.w+' '+R.b.h+'" preserveAspectRatio="xMidYMid meet">';
+  svg+='<defs><clipPath id="cp"><path d="'+R.guiaD+'"/></clipPath></defs>';
+  svg+=R.dataURL?('<image href="'+R.dataURL+'" x="0" y="0" width="'+R.b.w+'" height="'+R.b.h+'" clip-path="url(#cp)"/>')
+    :('<image href="'+R.planAbs+'" x="'+(-R.b.x)+'" y="'+(-R.b.y)+'" width="'+IMG_W+'" height="'+IMG_H+'" clip-path="url(#cp)"/>');
+  svg+='<path d="'+R.guiaD+'" fill="none" stroke="#e11d48" stroke-width="'+(ms*.12)+'" stroke-dasharray="'+(ms*.6)+' '+(ms*.3)+'" stroke-linejoin="round"/>';
+  R.rooms.forEach(r=>{ svg+='<path d="'+r.d+'" fill-rule="evenodd" fill="'+r.col+'" fill-opacity=".16" stroke="'+r.col+'" stroke-width="'+(ms*.07)+'" stroke-linejoin="round"/>'; });
+  R.rooms.forEach((r,i)=>{
+    svg+='<g><circle cx="'+r.cx.toFixed(1)+'" cy="'+r.cy.toFixed(1)+'" r="'+(ms/2)+'" fill="#fff" stroke="'+r.col+'" stroke-width="'+(ms*.11)+'"/>'
+      +'<text x="'+r.cx.toFixed(1)+'" y="'+(r.cy+ms*.02).toFixed(1)+'" text-anchor="middle" dominant-baseline="middle" font-size="'+(ms*(i>=99?.42:.55))+'" font-weight="800" fill="#0f172a">'+(i+1)+'</text></g>';
+  });
+  svg+='</svg>';
+  const tipos={}; R.rooms.forEach(r=>{ (tipos[r.tipo]=tipos[r.tipo]||{n:0,col:r.col}).n++; });
+  const ley=R.rooms.map((r,i)=>'<li><span class="n" style="border-color:'+r.col+'">'+(i+1)+'</span><span class="t"><b>'+esc(r.nm)+'</b>'
+    +(r.code?' <span class="c">'+esc(r.code)+'</span>':'')+((r.sen||r.senN)?'<br><span class="s">🪧 '+esc([r.sen,r.senN?('N° '+r.senN):''].filter(Boolean).join(' · '))+'</span>':'')+'</span></li>').join('');
+  return ['<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Mapa '+esc(nomServ)+' · '+esc(piso)+' · Atlas HDS</title>',
+'<style>',
+'@page{size:letter '+(apaisado?'landscape':'portrait')+';margin:0.5in}',
+'*{margin:0;padding:0;box-sizing:border-box}',
+'html,body{background:#fff;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}',
+'body{width:'+paginaW+'in;margin:0 auto;padding:0.25in 0}',
+'header{height:'+cab+'in;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;border-bottom:2px solid #1d5fa0;padding-bottom:4px;margin-bottom:6px}',
+'header h1{font-size:15pt;font-weight:800;color:#1d5fa0;line-height:1.15}',
+'header .sub{font-size:8.5pt;color:#475569;margin-top:2px}',
+'header .tipos{font-size:7.5pt;color:#334155;text-align:right;max-width:3.4in;line-height:1.5}',
+'header .tipos i{display:inline-block;width:8px;height:8px;border-radius:2px;margin:0 3px 0 8px;vertical-align:-1px}',
+'.cuerpo{display:flex;gap:0.15in;align-items:flex-start'+(lado?'':';flex-direction:column')+'}',
+'.mapa{width:'+mapaW+'in;height:'+mapaH+'in;border:1px solid #cbd5e1;border-radius:6px;overflow:hidden;background:#fff;flex-shrink:0}',
+'.mapa svg{width:100%;height:100%;display:block}',
+'.mapa text{font-family:"Segoe UI",system-ui,sans-serif}',
+'aside{'+(lado?('width:'+leyAncho+'in;height:'+mapaH+'in;overflow:hidden'):('width:100%'+(aparte?';break-before:page;padding-top:0.1in':'')))+'}',
+'aside h2{font-size:8pt;font-weight:800;text-transform:uppercase;letter-spacing:.6px;color:#1d5fa0;border-bottom:1px solid #dbe7f2;padding-bottom:2px;margin-bottom:4px}',
+'ol{list-style:none;column-count:'+(lado?1:(apaisado?(N>60?4:3):(N>40?3:2)))+';column-gap:0.18in;column-fill:'+(lado?'auto':'balance')+(lado?(';height:calc('+mapaH+'in - 0.25in)'):'')+'}',
+'li{display:flex;gap:5px;align-items:flex-start;font-size:'+(N>90?7:8)+'pt;line-height:1.25;padding:1.5px 0;break-inside:avoid;color:#0f172a}',
+'li .n{flex-shrink:0;min-width:15px;height:15px;border:1.5px solid #64748b;border-radius:50%;font-size:6.6pt;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 2px;margin-top:1px}',
+'li .c{color:#64748b;font-size:.9em}',
+'li .s{color:#7c2d12;font-size:.9em}',
+'footer{margin-top:5px;font-size:7pt;color:#64748b;display:flex;justify-content:space-between}',
+'#ctl{position:fixed;top:10px;right:10px;display:flex;gap:6px}',
+'#ctl button{background:#1d5fa0;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.25)}',
+'@media print{#ctl{display:none}body{padding:0}}',
+'</style></head><body>',
+'<div id="ctl"><button onclick="window.print()">🖨 Imprimir / Guardar PDF</button></div>',
+'<header><div><h1>🗺 '+esc(nomServ)+'</h1><div class="sub">'+esc(piso)+' · '+N+' recintos · Mapa de navegación · Atlas HDS · '+fecha+'</div></div>',
+'<div class="tipos">'+Object.entries(tipos).sort((a,c)=>c[1].n-a[1].n).map(([t,v])=>'<i style="background:'+v.col+'"></i>'+esc(t)+' '+v.n).join('')+'</div></header>',
+'<div class="cuerpo"><div class="mapa">'+svg+'</div>',
+'<aside><h2>Recintos'+(aparte?(' · '+esc(nomServ)+' · '+esc(piso)):'')+'</h2><ol>'+ley+'</ol></aside></div>',
+'<footer><span>Contorno punteado = límite del servicio · los números van sobre cada recinto'+(R.sinDibujo?(' · '+R.sinDibujo+' recinto(s) aún sin dibujar no aparecen'):'')+'</span><span>Solo consulta · sin información de funcionarios</span></footer>',
+'</body></html>'].join('\n');
+}
+function exportMapaServicio(soloHtml){
+  const R=_servRecorte();
+  if(!R){ alert('Entra a un servicio (vista 2) para exportar su mapa.'); return null; }
+  if(R.error){ alert(R.error); return null; }
+  if(!R.rooms.length){ alert('Este servicio no tiene recintos dibujados.'); return null; }
+  const html=_mapaServicioHTML(R);
+  if(soloHtml) return html;
+  const nom='Mapa_'+String(aName(R.area.id)).replace(/[^A-Za-z0-9Ññ]+/g,'_').replace(/^_|_$/g,'')+'_'+new Date().toISOString().slice(0,10)+'.html';
+  guardarArchivo('Servicios', nom, html, 'text/html');
+  // ventana con el diálogo de impresión (Guardar como PDF); si el navegador la bloquea, queda el HTML guardado
+  const w=window.open('', '_blank');
+  if(w){ w.document.open(); w.document.write(html); w.document.close(); w.onload=()=>setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){} },400); }
+  else if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🗺 Mapa guardado en Servicios/'+nom+' — el navegador bloqueó la ventana: ábrelo y usa Imprimir → Guardar PDF'; setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },7000); }
   return html;
 }
 // ═══ EXPORTS DE RECINTOS Y DE PUESTOS DE TRABAJO (18-sep-2026) ══════════════
@@ -14544,7 +14660,27 @@ async function runSelfTest(){
       closeReporteTI();
       return iconosOk && apagado && modalOk && !document.getElementById('tiModal').classList.contains('show');
     } finally { S.showTI=prev; S.floorId=fPrev; S.level=lPrev; S.areaId=aPrev; renderSVG(); }
+  });  T('Mapa carta del servicio: recintos numerados, leyenda y página carta', ()=>{
+    const fPrev=S.floorId, lPrev=S.level, aPrev=S.areaId;
+    const fl=FLOORS.find(f=>f.areas.some(a=>(a.rooms||[]).filter(r=>rShapes(r).length).length>=3 && aShapes(a).length));
+    if(!fl) return false;
+    const area=fl.areas.find(a=>(a.rooms||[]).filter(r=>rShapes(r).length).length>=3 && aShapes(a).length);
+    try{
+      S.floorId=fl.id; S.level=2; S.areaId=area.id;
+      const R=_servRecorte(); const html=exportMapaServicio(true);
+      if(!R||!html) return false;
+      const n=R.rooms.length;
+      const marcas=(html.match(/<circle /g)||[]).length, items=(html.match(/<li>/g)||[]).length;
+      const carta=/@page\{size:letter (landscape|portrait)/.test(html);
+      const orient=(R.b.w>=R.b.h*0.95)===/letter landscape/.test(html);
+      const ult=new RegExp('>'+n+'</text>').test(html) && html.indexOf('<span class="n"')>0;
+      // sin gente: ningún nombre de la dotación asignada al servicio aparece en el mapa
+      const nombres=(area.rooms||[]).flatMap(r=>((wsState.dots||{})[r.id]||[]).flatMap(d=>d.tipo==='dinamico'?(d.turnos||[]).map(t=>t.nombre):[d.nombre])).filter(x=>x&&x.trim().length>6);
+      const sinGente=!nombres.some(nm=>html.indexOf(nm)>=0);
+      return marcas===n && items===n && carta && orient && ult && sinGente;
+    } finally { S.floorId=fPrev; S.level=lPrev; S.areaId=aPrev; }
   });
+
   _stReport(out);
 }
 function _stReport(out){
