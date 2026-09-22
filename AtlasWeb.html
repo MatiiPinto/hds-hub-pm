@@ -863,7 +863,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
           <button class="tb-btn" id="btnAudit" onclick="toggleAudit()" title="Colorear cada recinto según la completitud de sus datos: tipo, código, BIM y señalética">✅ Auditoría de datos</button>
           <button class="tb-btn" id="btnMetas" onclick="toggleMetas()" title="Metas oficiales de recintos (Resumen Ejecutivo HDS): asignados vs meta">🎯 Metas</button>
           <button class="tb-btn" id="btnAsigN" onclick="toggleAsigNum()" title="Mostrar en cada recinto cuántos funcionarios tiene asignados (solo el número, abajo a la derecha)">🧑 N° asignados</button>
-          <button class="tb-btn" id="btnTiPrint" onclick="toggleTiPrint()" title="Mostrar en cada recinto (vista de servicio) las impresoras del HDS según el archivo Comodatos Jun-2026 cruzado con el PMA/BIM, abajo a la izquierda: 🖨 + 👤 láser monousuario · 👥 láser multiusuario · 📠 multifuncional multiusuario. Clic abre la ficha.">🖨 Impresoras</button>
+          <button class="tb-btn" id="btnTiPrint" onclick="toggleTiPrint()" title="Mostrar en cada recinto (vista de servicio) las impresoras del HDS según el archivo Comodatos Jun-2026 cruzado con el PMA/BIM, abajo a la izquierda: 🖨 + 👤 láser monousuario · 👥 láser multiusuario · 📠 multifuncional · 🎨 multifuncional color. Clic abre la ficha.">🖨 Impresoras</button>
         </div>
       </div>
       <button class="tb-btn" id="btnDraw" onclick="toggleDraw()" style="display:none">⬛ Dibujar</button>
@@ -1215,7 +1215,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
   <div class="ficha-box" style="width:640px">
     <div class="ficha-head">
       <div><div class="ficha-title">🖨 Impresoras HDS · <span id="tiModalN">0</span></div>
-      <div class="ficha-sub">Comodatos y Traslados HDS-ING (Junio 2026) × PMA/BIM · láser monousuario, láser multiusuario y multifuncional</div></div>
+      <div class="ficha-sub">Comodatos y Traslados HDS-ING (Junio 2026) × PMA/BIM · láser mono/multiusuario, multifuncional y multifuncional color (10 por cubicar)</div></div>
       <button class="ficha-x" onclick="exportImpresorasTI()" title="Exportar a Excel">⬇</button>
       <button class="ficha-x" onclick="closeReporteTI()" title="Cerrar">×</button>
     </div>
@@ -5782,7 +5782,7 @@ function _tiUnidades(){
   const ord={}; _tiTipos().forEach((t,i)=>{ ord[t.k]=i; });
   const por={}, sin=[], filas={};
   _tiD().filas.forEach(f=>{
-    const code=[f.cod].concat(f.alt||[]).find(c=>(_codeBoxes(c)||[]).length);
+    const code=[f.cod].concat(f.alt||[]).find(c=>c&&(_codeBoxes(c)||[]).length);
     if(!code){ sin.push(f); return; }
     const a=(por[code]=por[code]||[]);
     for(let i=0;i<f.cant;i++) a.push(f.tipo);
@@ -5850,7 +5850,7 @@ function _tiRecintos(){
 // Lo que el archivo trae y no cae en una caja: [{code,recinto,k,cant,motivo,rid}] menos lo ya cubierto a mano.
 function _tiFaltantes(){
   const U=_tiUnidades(), auto=_tiRecintosAuto(), out=[];
-  U.sin.forEach(f=>out.push({code:f.cod_orig, recinto:f.recinto, k:f.tipo, cant:f.cant, rid:null, motivo:'código sin caja dibujada en el Atlas'}));
+  U.sin.forEach(f=>out.push({code:f.cod_orig, recinto:f.recinto, k:f.tipo, cant:f.cant, rid:null, motivo:f.motivo||'código sin caja dibujada en el Atlas'}));
   const placed={}; auto.forEach(z=>z.asig.forEach(x=>{ const kk=x.code+'|'+x.k; placed[kk]=(placed[kk]||0)+x.q; }));
   Object.keys(U.por).sort().forEach(code=>{
     const t={}; U.por[code].forEach(k=>{ t[k]=(t[k]||0)+1; });
@@ -5893,7 +5893,7 @@ function toggleTiPrint(){
 function _tiResumen(){
   const D=_tiD(), auto={}, man={}, tot={}, fact={};
   _tiTipos().forEach(t=>{ auto[t.k]=0; man[t.k]=0; tot[t.k]=0; fact[t.k]={}; });
-  D.filas.forEach(f=>{ tot[f.tipo]+=f.cant; const c=f.fact||'(vacío)'; fact[f.tipo][c]=(fact[f.tipo][c]||0)+f.cant; });
+  D.filas.forEach(f=>{ tot[f.tipo]+=f.cant; const c=f.fact||(f.cod?'(vacío)':'sin archivo'); fact[f.tipo][c]=(fact[f.tipo][c]||0)+f.cant; });
   _tiRecintosAuto().forEach(z=>Object.entries(z.items).forEach(([k,q])=>{ auto[k]+=q; }));
   _tiManuales().forEach(m=>{ man[m.k]=(man[m.k]||0)+1; });
   return _tiTipos().map(t=>({k:t.k, n:t.nombre, ico:t.ico, auto:auto[t.k], man:man[t.k], desp:auto[t.k]+man[t.k], total:tot[t.k], fact:fact[t.k]}));
@@ -5927,7 +5927,7 @@ function abrirReporteTI(){
     +'<div style="padding:0 18px 8px;font-size:12.5px;color:#0f172a"><b>'+C.auto+'</b> automáticas + <b>'+C.manual+'</b> a mano = <b>'+C.desp+'</b> de '+C.total
     +(C.faltan?(' · quedan <b style="color:#b45309">'+C.faltan+'</b> por ubicar'):(C.sobre?(' · <b style="color:#dc2626">'+C.sobre+' sobre el total</b>'):' · <b style="color:#16a34a">completo</b>'))+'</div>'
     +filas+lista
-    +'<div style="padding:8px 18px 0;font-size:11.5px;color:#475569"><b>Testigo en el plano:</b> 🖨 + 👤 monousuario · 👥 multiusuario · 📠 multifuncional (con la cantidad si es más de una).</div>'
+    +'<div style="padding:8px 18px 0;font-size:11.5px;color:#475569"><b>Testigo en el plano:</b> 🖨 + 👤 monousuario · 👥 multiusuario · 📠 multifuncional · 🎨 multifuncional color (con la cantidad si es más de una).</div>'
     +(nOrden?'<div style="padding:6px 18px 0;font-size:11.5px;color:#92400e">⚠ En '+nOrden+' recinto'+(nOrden===1?'':'s')+' el tipo se asignó <b>por orden PMA</b>: el archivo da el total por código de recinto, no por BIM, y ese código tiene varias instancias y más de un tipo.</div>':'')
     +'<div style="padding:10px 18px 4px;display:flex;gap:8px;flex-wrap:wrap">'
     +(C.faltan&&!(S.viewOnly&&!S.editPM)?'<button class="fk-open" onclick="closeReporteTI();setPropMode(\'printer\')" style="border:none;background:#ea580c;color:#fff;cursor:pointer" title="Entra a un servicio (vista 2) y haz clic en el plano: cada clic suma una, con el tipo que falta">🖨 Colocar las que faltan</button>':'')
@@ -14519,7 +14519,7 @@ async function runSelfTest(){
 
   // Impresoras del HDS: archivo Comodatos Jun-2026 (3 tipos) × PMA/BIM
   T('Impresoras HDS: lo desplegado + lo sin ubicar cuadra exacto con el archivo, por tipo', ()=>{
-    if(!_tiD().filas.length || _tiTipos().length!==3) return false;
+    if(!_tiD().filas.length || _tiTipos().length!==4) return false;
     const U=_tiUnidades(), res=_tiResumen();
     // desplegado nunca supera al archivo y el total del archivo se explica entero
     const sinPorTipo={}; U.sin.forEach(f=>{ sinPorTipo[f.tipo]=(sinPorTipo[f.tipo]||0)+f.cant; });

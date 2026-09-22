@@ -1,7 +1,7 @@
 // SHARED_DATA/impresoras_hds.js — impresoras del HDS (3 tipos) desde el archivo Comodatos y
 // Traslados HDS-ING (Junio 2026). GENERADO por _DEV/build_impresoras_hds.py — no editar a mano.
 window.IMPRESORAS_HDS = {
- "generado": "2026-09-21",
+ "generado": "2026-09-22",
  "fuente": "Comodatos y Traslados HDS-ING (Junio 2026).xlsx · hoja Comodatos (HDS + AMBOS)",
  "nota": "Cantidad = total del código de recinto; el Atlas la reparte entre sus cajas dibujadas por PMA/BIM.",
  "tipos": [
@@ -22,12 +22,19 @@ window.IMPRESORAS_HDS = {
    "nombre": "Impresora Multifuncional Multiusuario",
    "ico": "📠",
    "corto": "Multifuncional multiusuario"
+  },
+  {
+   "k": "mfpc",
+   "nombre": "Impresora Multifuncional Multiusuario Color",
+   "ico": "🎨",
+   "corto": "Multifuncional color"
   }
  ],
  "totales": {
   "mono": 313,
   "multi": 150,
-  "mfp": 172
+  "mfp": 172,
+  "mfpc": 10
  },
  "filas": [
   {
@@ -5397,6 +5404,19 @@ window.IMPRESORAS_HDS = {
    "cant": 1,
    "fact": "SI",
    "obs": ""
+  },
+  {
+   "fila": 0,
+   "est": "HDS",
+   "recinto": "Por cubicar",
+   "cod": "",
+   "alt": [],
+   "cod_orig": "—",
+   "tipo": "mfpc",
+   "cant": 10,
+   "fact": "",
+   "obs": "informadas el 22-sep-2026, no vienen en el archivo: por cubicar",
+   "motivo": "informadas el 22-sep-2026, no vienen en el archivo: por cubicar"
   }
  ]
 };
