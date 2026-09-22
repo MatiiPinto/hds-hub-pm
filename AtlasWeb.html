@@ -855,6 +855,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="tb-btn" id="btnServPuestos" onclick="openServPuestos()" style="display:none" title="Ver todos los puestos asignados del servicio: en cantidad o con el nombre de cada funcionario">👥 Puestos del servicio</button>
       <button class="tb-btn tog" id="btnBoxVis" onclick="cycleBoxVis()" title="Ver u ocultar las cajas dibujadas y su información (para ver el plano de fondo)">👁 Cajas</button>
       <button class="tb-btn tog" id="btnJardines" onclick="toggleJardines()" title="Mostrar u ocultar los jardines y las esculturas del piso 1 (lámina de Paisajismo PAI-PL-GEN-X-P-E-081, calibrada contra el plano). Pasa el mouse por una 🗿 para ver su ficha y fechas de traslado.">🌳 Jardines</button>
+      <button class="tb-btn tog" id="btnVert" onclick="toggleVerticales()" title="Mostrar u ocultar los ascensores, escaleras y escaleras mecánicas (se ven en todas las vistas). Las líneas de circulación no se tocan.">🛗 Ascensores</button>
       <button class="tb-btn tog" id="btnDotNames" onclick="toggleDotNames()" title="Mostrar u ocultar el nombre de las personas asignadas a los puestos en vista 3 (útil en recintos con muchos funcionarios)">👤 Nombres</button>
       <div class="vw-dd" id="vwDD">
         <button class="tb-btn" id="btnVista" onclick="toggleVwMenu(event)" title="Opciones de visualización del plano">🎛 Vista ▾</button>
@@ -871,10 +872,10 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="tb-btn" id="btnStruct" onclick="toggleStructMenu()" title="Agregar elementos transversales al piso: ascensores, escaleras, escalera mecánica, líneas de circulación." style="display:none">🛗 Estructura</button>
       <div id="structMenu" style="display:none">
         <div class="sm-h">Ascensores</div>
-        <button class="struct-opt" data-kind="asc-G"     style="--c:#16a34a">🛗 <b>General</b> <span style="opacity:.65">· verde</span></button>
-        <button class="struct-opt" data-kind="asc-S"     style="--c:#f97316">🛗 <b>Servicio</b> <span style="opacity:.65">· naranjo</span></button>
-        <button class="struct-opt" data-kind="asc-P"     style="--c:#2563eb">🛗 <b>Pacientes</b> <span style="opacity:.65">· azul</span></button>
-        <button class="struct-opt" data-kind="asc-Pplus" style="--c:#1d4ed8">🛗 <b>Pacientes+</b> <span style="opacity:.65">· azul oscuro</span></button>
+        <button class="struct-opt" data-kind="asc-G"     style="--c:#7AC143">🛗 <b>Público</b> <span style="opacity:.65">· verde</span></button>
+        <button class="struct-opt" data-kind="asc-S"     style="--c:#FBB000">🛗 <b>Servicio</b> <span style="opacity:.65">· amarillo</span></button>
+        <button class="struct-opt" data-kind="asc-P"     style="--c:#29ABE2">🛗 <b>Montacamas</b> <span style="opacity:.65">· celeste</span></button>
+        <button class="struct-opt" data-kind="asc-Pplus" style="--c:#0B2A6B">🛗 <b>Montacamas mayor</b> <span style="opacity:.65">· azul</span></button>
         <div class="sm-h">Otros</div>
         <button class="struct-opt" data-kind="stair"     style="--c:#7c3aed">🪜 <b>Escalera</b></button>
         <button class="struct-opt" data-kind="escalator" style="--c:#0891b2">⬆ <b>Escalera Mecánica</b></button>
@@ -3647,6 +3648,13 @@ const applyT = () => { imgWrap.style.transform=`translate(${S.ox}px,${S.oy}px) s
 // esculturas son marcadores de tamaño fijo en pantalla; al pasar el mouse
 // despliegan su ficha (emplazamiento, basamento y fechas de traslado).
 function _pais(){ const P=window.PAISAJISMO||{}; return P[S.floorId]||null; }
+// Ascensores y escaleras: visibles SIEMPRE (vista 1, 2 y 3) salvo que se apaguen acá.
+function toggleVerticales(){
+  S.verticales=(S.verticales===false);
+  _lsPref('cabida_verticales', S.verticales?'1':'0');
+  const b=document.getElementById('btnVert'); if(b) b.classList.toggle('active',S.verticales!==false);
+  renderSVG();
+}
 function toggleJardines(){
   S.jardines=(S.jardines===false);
   _lsPref('cabida_jardines', S.jardines?'1':'0');
@@ -3679,6 +3687,8 @@ function _escRescale(){
 }
 function _jardinesSync(){
   if(S.jardines===undefined){ let v=null; try{ v=localStorage.getItem('cabida_jardines'); }catch(e){} S.jardines=(v!=='0'); }
+  if(S.verticales===undefined){ let v=null; try{ v=localStorage.getItem('cabida_verticales'); }catch(e){} S.verticales=(v!=='0');
+    const b=document.getElementById('btnVert'); if(b) b.classList.toggle('active',S.verticales!==false); }
   const P=_pais(), on=!!P && S.jardines!==false;
   { const b=document.getElementById('btnJardines'); if(b){ b.classList.toggle('active',S.jardines!==false); b.classList.toggle('dis',!P);
       b.title=P?'Mostrar u ocultar los jardines y las esculturas de este piso (lámina de Paisajismo, calibrada contra el plano). Pasa el mouse por una 🗿 para ver su ficha y fechas de traslado.'
@@ -6139,7 +6149,7 @@ function _dockMonta(){
   // funcionarios y modo edición quedan SIEMPRE a la vista en la barra superior.
   if(nav){
     const q=document.createElement('div'); q.id='navQuick';
-    ['btnBoxVis','btnDotNames','btnJardines','btnEdit'].forEach(id=>{
+    ['btnBoxVis','btnDotNames','btnJardines','btnVert','btnEdit'].forEach(id=>{
       const e=document.getElementById(id); if(!e) return;
       const m=ICO.exec(e.textContent||''); e.setAttribute('data-ic', m?m[1]:(e.textContent||'?').trim().slice(0,2));
       q.appendChild(e);
@@ -6730,10 +6740,12 @@ function resetCalibration(){
 // Item: { id, kind, x?, y?, points?[] } donde kind ∈
 //   'asc-G','asc-S','asc-P','asc-Pplus','stair','escalator','circulation'
 const STRUCT_TYPES = {
-  'asc-G':       {label:'Ascensor General',     short:'G',   col:'#16a34a', symbol:'🛗', kind:'point'},
-  'asc-S':       {label:'Ascensor Servicio',    short:'S',   col:'#f97316', symbol:'🛗', kind:'point'},
-  'asc-P':       {label:'Ascensor Pacientes',   short:'P',   col:'#2563eb', symbol:'🛗', kind:'point'},
-  'asc-Pplus':   {label:'Ascensor Pacientes+',  short:'P+',  col:'#1d4ed8', symbol:'🛗', kind:'point'},
+  // 4 tipologías por color, los MISMOS de 8.Navegación (ASC_TIPO): verde público ·
+  // amarillo servicio · celeste montacamas · azul montacamas mayor. Acá en sólido.
+  'asc-G':       {label:'Ascensor de público',      short:'G',   col:'#7AC143', symbol:'🛗', kind:'point'},
+  'asc-S':       {label:'Ascensor de servicio',     short:'S',   col:'#FBB000', symbol:'🛗', kind:'point'},
+  'asc-P':       {label:'Montacamas',               short:'M',   col:'#29ABE2', symbol:'🛗', kind:'point'},
+  'asc-Pplus':   {label:'Montacamas mayor',         short:'M+',  col:'#0B2A6B', symbol:'🛗', kind:'point'},
   'stair':       {label:'Escalera',             short:'',    col:'#7c3aed', symbol:'🪜', kind:'point'},
   'escalator':   {label:'Escalera Mecánica',    short:'',    col:'#0891b2', symbol:'⬆',  kind:'point'},
   'circulation': {label:'Circulación',          short:'',    col:'#475569', symbol:'〰', kind:'line'}
@@ -6866,7 +6878,7 @@ function deleteStruct(id){
 }
 
 function paintStructures(){
-  const items = structsOf(S.floorId);
+  const items = structsOf(S.floorId).filter(it=>S.verticales!==false || !STRUCT_TYPES[it.kind] || STRUCT_TYPES[it.kind].kind!=='point');
   if(!items.length && !_structLine) return;
   const g = el('g', {class:'structures-layer',
     ...(S.level>1?{'pointer-events':'none'}:{})});
@@ -6924,17 +6936,32 @@ function renderStructMarker(it, tdef){
   } else if(it.kind === 'escalator'){
     g.appendChild(el('path',{d:`M ${-R*0.55} ${R*0.55} L ${R*0.55} ${-R*0.55} M ${R*0.55} ${-R*0.55} L ${R*0.1} ${-R*0.55} M ${R*0.55} ${-R*0.55} L ${R*0.55} ${-R*0.1}`,stroke:'#fff','stroke-width':Math.max(3,R*0.14),fill:'none','stroke-linecap':'round','stroke-linejoin':'round'}));
   }
+  // Puerta(s) del ascensor: flecha ⇄ en el lado de entrada/salida (n/s/e/w; doble = 'ns' / 'ew')
+  if(it.kind.startsWith('asc-') && it.salida){
+    const fw = Math.max(3, R*0.16), L = Math.max(10, Math.min(bw,bh)*0.32);
+    String(it.salida).split('').forEach(lado=>{
+      const p = {n:[0,-bh/2,0], s:[0,bh/2,180], e:[bw/2,0,90], w:[-bw/2,0,-90]}[lado]; if(!p) return;
+      const d = el('g',{class:'struct-puerta',transform:`translate(${p[0]},${p[1]}) rotate(${p[2]})`});
+      d.appendChild(el('rect',{x:-L*0.55,y:-fw*0.9,width:L*1.1,height:fw*1.8,rx:fw*0.6,fill:'#fff',stroke:tdef.col,'stroke-width':Math.max(1.5,fw*0.35)}));
+      d.appendChild(el('path',{d:`M ${-L*0.42} 0 L ${L*0.42} 0 M ${-L*0.42} 0 l ${L*0.16} ${-L*0.16} M ${-L*0.42} 0 l ${L*0.16} ${L*0.16} M ${L*0.42} 0 l ${-L*0.16} ${-L*0.16} M ${L*0.42} 0 l ${-L*0.16} ${L*0.16}`,
+        stroke:tdef.col,'stroke-width':Math.max(1.5,fw*0.4),fill:'none','stroke-linecap':'round','transform':'rotate(90)'}));
+      g.appendChild(d);
+    });
+  }
   // Tooltip (sin alert: estorba al arrastrar)
   const ttl = el('title');
   const ext = DXF_EXT[S.floorId], dim = FLOOR_DIMS[S.floorId];
   const mx = (ext&&dim) ? ((ext.xmax-ext.xmin)/dim.w) : 0, my = (ext&&dim) ? ((ext.ymax-ext.ymin)/dim.h) : 0;
+  const PUERTA={n:'norte',s:'sur',e:'este',w:'oeste',ns:'norte y sur (doble)',ew:'este y oeste (doble)',sn:'norte y sur (doble)',we:'este y oeste (doble)'};
   ttl.textContent = tdef.label + (it.etq?(' '+it.etq):'') + (sized&&mx ? ` · ${(bw*mx).toFixed(1)} × ${(bh*my).toFixed(1)} m` : '')
-    + ((S.editMode&&S.level===1) ? ' · arrastrar mueve · ⇧ mueve todo el piso · ◢ escala · × borra' : '');
+    + (it.kind.startsWith('asc-') ? (' · puerta: '+(PUERTA[it.salida]||it.salida||'sin dato')) : '')
+    + ((S.editMode&&S.level===1) ? ' · arrastrar mueve · ⇧ mueve todo el piso · ◢ escala · × borra'+(it.kind.startsWith('asc-')?' · clic derecho cambia la puerta':'') : '');
   g.appendChild(ttl);
   g.addEventListener('click', e => { e.stopPropagation(); });
   if(S.editMode && S.level===1 && !_structKind){
     g.style.cursor = 'grab';
     g.addEventListener('mousedown', e => _startStructDrag(e, it, 'move'));
+    if(it.kind.startsWith('asc-')) g.addEventListener('contextmenu', e => { e.preventDefault(); e.stopPropagation(); ciclarPuerta(it.id); });
     // esquina de escala ◢
     const hs = Math.max(10, Math.min(18, R*0.3));
     const hz = el('rect',{x:bw/2-hs,y:bh/2-hs,width:hs,height:hs,fill:'#fff',stroke:tdef.col,'stroke-width':2,class:'struct-resize'});
@@ -6961,6 +6988,16 @@ function renderStructMarker(it, tdef){
 // arrastrar = mover · ⇧+arrastrar = mover TODOS los del piso (corrige un
 // desfase sistemático de la importación) · esquina ◢ = escalar.
 let _stDrag=null;
+// Clic derecho sobre un ascensor (edición, vista 1): rota el lado de la puerta
+// n → e → s → w → ns → ew → sin dato.
+const _PUERTAS=['n','e','s','w','ns','ew',''];
+function ciclarPuerta(id){
+  const it=structsOf(S.floorId).find(x=>x.id===id); if(!it) return;
+  const i=_PUERTAS.indexOf(it.salida||''); it.salida=_PUERTAS[(i+1)%_PUERTAS.length];
+  if(!it.salida) delete it.salida;
+  sStruct(); renderSVG();
+  if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🛗 '+(it.etq||'')+' puerta: '+({n:'norte',e:'este',s:'sur',w:'oeste',ns:'norte y sur',ew:'este y oeste'}[it.salida]||'sin dato'); setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },2500); }
+}
 function _startStructDrag(e, it, mode){
   if(!(S.editMode && S.level===1) || _structKind) return;
   if(e.button!==0) return;
@@ -7006,7 +7043,7 @@ function importarVerticalesNav(sinConfirmar){
   const actuales=Object.values(structuresState).flat().filter(x=>x.kind!=='circulation').length;
   if(!sinConfirmar && !confirm('Importar '+total+' ascensores/escaleras desde Navegación ('+pisos.join(', ')+')?\n\n'
       +'Se REEMPLAZAN los '+actuales+' ascensores/escaleras que hay ahora en el Atlas (las líneas de circulación se conservan).\n'
-      +'Vienen cuadrados con el plano de cada piso, así que no hay que reubicarlos: si alguno quedó corrido, arrastrar mueve, ⇧+arrastrar mueve todos los del piso y la esquina ◢ escala.')) return;
+      +'Vienen cuadrados con el plano de cada piso (circunscritos a sus muros), con tipología por color, lado de puerta y las gemelas del mismo tamaño; P5 y P-3 salen del directorio de ascensores. Si alguno quedó corrido: arrastrar mueve, ⇧+arrastrar mueve todo el piso, ◢ escala, clic derecho cambia la puerta.')) return;
   const pisosTodos=new Set([...pisos, ...Object.keys(structuresState)]);
   pisosTodos.forEach(p=>{
     const lineas=(structuresState[p]||[]).filter(x=>x.kind==='circulation');
@@ -13483,7 +13520,7 @@ async function runSelfTest(){
   // Testigo: al terminar, NINGUNA preferencia del usuario puede haber cambiado.
   const _PREFS=['cabida_room_labels','cabida_show_dotnames','cabida_box_vis','cabida_plan_kind',
                 'cabida_show_asign','cabida_show_sen','cabida_scenario','cabida_rp_collapsed',
-                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures','cabida_ubic','cabida_jardines'];
+                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures','cabida_ubic','cabida_jardines','cabida_verticales'];
   const _PREV={}; _PREFS.forEach(k=>{ try{ _PREV[k]=localStorage.getItem(k); }catch(e){ _PREV[k]=null; } });
   const out=[]; const T=(nm,fn)=>{ try{ const r=fn(); if(r===false) out.push([0,nm,'aserción falsa']); else out.push([1,nm,'']); }catch(e){ out.push([0,nm,e.message]); } };
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -14679,6 +14716,30 @@ async function runSelfTest(){
       const sinGente=!nombres.some(nm=>html.indexOf(nm)>=0);
       return marcas===n && items===n && carta && orient && ult && sinGente;
     } finally { S.floorId=fPrev; S.level=lPrev; S.areaId=aPrev; }
+  });
+  T('Verticales: 4 tipologías por color, puerta dibujada y botón 🛗 que las oculta en todas las vistas', ()=>{
+    const snap=JSON.stringify(structuresState), vPrev=S.verticales, nivel=S.level, aPrev=S.areaId, rPrev=S.roomId;
+    try{
+      const cols={ 'asc-G':'#7AC143','asc-S':'#FBB000','asc-P':'#29ABE2','asc-Pplus':'#0B2A6B' };   // los de 8.Navegación
+      const tip=Object.entries(cols).every(([k,c])=>STRUCT_TYPES[k].col===c);
+      structuresState[fl.id]=[{id:'st_v1',kind:'asc-Pplus',x:1000,y:800,w:150,h:180,etq:'G1',salida:'ns'},{id:'st_line',kind:'circulation',points:[{x:0,y:0},{x:9,y:9}]}];
+      S.verticales=true;
+      const en=[1,2,3].map(lv=>{ S.level=lv; if(lv>1) S.areaId='st_a'; if(lv===3) S.roomId='st_r1'; renderSVG(); const m=svg.querySelector('.struct-marker'); return m && m.querySelectorAll('.struct-puerta').length===2 && m.querySelector('rect').getAttribute('fill')==='#0B2A6B'; });
+      const nav=document.getElementById('navBar'), b=document.getElementById('btnVert');
+      const enBarra=!!b && nav.contains(b);
+      toggleVerticales();
+      const apaga=S.verticales===false && !svg.querySelector('.struct-marker') && !!svg.querySelector('.struct-circ-path') && !b.classList.contains('active');
+      toggleVerticales();
+      const vuelve=!!svg.querySelector('.struct-marker');
+      // clic derecho cicla la puerta
+      S.level=1; S.editMode=true; renderSVG();
+      const it=structuresState[fl.id][0]; ciclarPuerta(it.id); const c1=it.salida==='ew'; ciclarPuerta(it.id); const c2=!it.salida; ciclarPuerta(it.id); const c3=it.salida==='n';
+      S.editMode=false;
+      return tip && en.every(Boolean) && enBarra && apaga && vuelve && c1 && c2 && c3;
+    } finally {
+      S.verticales=vPrev; S.editMode=false; S.level=nivel; S.areaId=aPrev; S.roomId=rPrev;
+      Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
+    }
   });
 
   _stReport(out);
