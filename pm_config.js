@@ -39,6 +39,10 @@ window.PM_CONFIG = {
   // (prefijo pm_, el snapshot publicado no se toca) y se consolida mandando el
   // delta con 📤 Enviar mis cambios.
   EDITORES_ATLAS: ['mpinto', 'crivera'],
+  // usuarios con rol EXPORTADOR del Atlas: ven el menú ⬇ Exportar para bajar
+  // planillas de recintos, señalética, camas, equipamiento, mobiliario clínico
+  // y MNC·TI·MOA (impresoras incluidas). Las de DOTACIÓN no se ofrecen nunca.
+  EXPORTADORES: ['mpinto', 'csoto', 'ebecerra'],
   // ── ACCESOS TEMPORALES ────────────────────────────────────────────────────
   // usuario → ÚLTIMO día en que puede entrar (inclusive, hora de Chile).
   // Pasada esa fecha el login se rechaza y las sesiones ya abiertas dejan de
@@ -95,7 +99,10 @@ window.PM_CONFIG = {
     // Constanza Ortiz · ingeniera de la Asesoría a la Inspección Fiscal
     // (AIF · MOP). Contraparte de
     // FISCALIZACIÓN, externa al HDS y al SSMO. Solo consulta.
-    'cortiz':     '04f4ea706c4dae3e865e5eb3d0d699db20c7df21a3e91d4ea0fc154820f8013f'
+    'cortiz':     '04f4ea706c4dae3e865e5eb3d0d699db20c7df21a3e91d4ea0fc154820f8013f',
+    // Cynthia Soto Pérez · Departamento de Informática — exportadora del Atlas
+    // (cubicación de impresoras y equipos TI por recinto)
+    'csoto':      '3d890c00eaf2e280de4c876efcdf90588ae463e1962ddea43a4df0a77922ff57'
   }
 };
 

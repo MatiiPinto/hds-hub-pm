@@ -3,7 +3,7 @@
 <head>
 <script src="pm_config.js"></script>
 <script src="pm_gate.js"></script>
-<style>/*HUB-PM*/ #expDD, body:not(.pm-editor) #wsModal { display:none !important; }</style>
+<style>/*HUB-PM*/ body:not(.pm-export) #expDD, body:not(.pm-editor) #wsModal, #expDD [onclick^="exportPuestosTrabajo"], #expDD [onclick^="exportAsignaciones"], #expDD [onclick^="exportBackup"], #expDD [onclick^="exportWebData"], #expDD [onclick^="publicarAtlasPM"], #expDD [onclick^="fbakAhora"], #expDD [onclick^="fbakRestaurar"], #expDD [onclick^="diagGuardado"], #expDD [onclick^="copyConsultaLink"], #expDD [onclick^="exportForWeb"], #expDD [onclick*="_abHandle"] { display:none !important; }</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>HDS · Atlas — Consulta Web</title>
@@ -14682,6 +14682,18 @@ document.addEventListener('keydown',e=>{
 });
 
 
+// ── ROL EXPORTADOR DEL 🟡 (PM_CONFIG.EXPORTADORES) ─────────────────────────
+// Muestra el menú ⬇ Exportar solo a quienes descargan planillas (recintos,
+// señalética, camas, equipamiento, mobiliario, MNC·TI·MOA). El deploy oculta
+// siempre las opciones de dotación y las internas; esto solo abre el menú.
+(function(){
+  try{
+    if(!window.PM_CONFIG || typeof pmSession!=='function') return;
+    const s=pmSession();
+    if(s && (window.PM_CONFIG.EXPORTADORES||[]).indexOf(s.u)!==-1)
+      document.body.classList.add('pm-export');
+  }catch(e){}
+})();
 // ── ROL EDITOR ACOTADO: barra propia y línea base del delta ────────────────
 (function(){
   function armar(){
