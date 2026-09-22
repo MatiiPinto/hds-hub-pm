@@ -102,7 +102,10 @@ window.PM_CONFIG = {
     'cortiz':     '04f4ea706c4dae3e865e5eb3d0d699db20c7df21a3e91d4ea0fc154820f8013f',
     // Cynthia Soto Pérez · Departamento de Informática — exportadora del Atlas
     // (cubicación de impresoras y equipos TI por recinto)
-    'csoto':      '3d890c00eaf2e280de4c876efcdf90588ae463e1962ddea43a4df0a77922ff57'
+    'csoto':      '3d890c00eaf2e280de4c876efcdf90588ae463e1962ddea43a4df0a77922ff57',
+    // Elías Becerra Astorga · Departamento de Informática — exportador del Atlas
+    // (cubicación de impresoras y equipos TI por recinto)
+    'ebecerra':   '81c1cb19bc0b745f748185734aea04aa8df298b3754f1602fba580134e439e0e'
   }
 };
 
