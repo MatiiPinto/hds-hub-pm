@@ -140,6 +140,8 @@ footer{background:var(--panel2);border-top:1px solid var(--bd);color:var(--tx2);
   <section class="pane" id="p-hist"></section>
   <section class="pane" id="p-dosim"></section>
   <section class="pane" id="p-lev"></section>
+  <section class="pane" id="p-form"></section>
+  <section class="pane" id="p-eqaut"></section>
   <section class="pane" id="p-opr"></section>
   <section class="pane" id="p-cumpl"></section>
   <section class="pane" id="p-cot"></section>
@@ -166,6 +168,10 @@ footer{background:var(--panel2);border-top:1px solid var(--bd);color:var(--tx2);
 <!-- control de dosímetros y levantamiento por servicio: también nominados, solo 🔴 HUB local -->
 <script src="SHARED_DATA/pr_dosimetros.js"></script>
 <script src="SHARED_DATA/pr_levantamiento.js"></script>
+<!-- respuestas del formulario de autodeclaración (nominado, solo 🔴 HUB local) -->
+<script src="SHARED_DATA/pr_formulario.js"></script>
+<!-- autorizaciones de funcionamiento de los equipos emisores del HDS actual (sin datos personales) -->
+<script src="SHARED_DATA/pr_equipos_autorizacion.js"></script>
 <script>
 /* ════════════════════════════════════════════════════════════════════════════
    Estructura según lo que las BASES DEL CARGO encomiendan al OPR:
@@ -227,6 +233,8 @@ const PANES=[
   {id:'hist',  ic:'📈', t:'Historial CCHEN'},
   {id:'dosim', ic:'🎟', t:'Dosímetros'},
   {id:'lev',   ic:'📋', t:'Levantamiento AS'},
+  {id:'form',  ic:'🗳', t:'Formulario'},
+  {id:'eqaut', ic:'📜', t:'Autorización de equipos'},
   {id:'inst',  ic:'🏥', t:'Instalaciones y equipos'},
   {id:'epp',   ic:'🦺', t:'Elementos de protección'},
   {id:'guia',  ic:'🎬', t:'Guía rápida'},
@@ -249,6 +257,8 @@ function pintaTabs(){
     if(p.id==='cot'&&AG&&AG.cotejo_acciones) b=String(AG.resumen.con_nomina_servicio||'');
     if(p.id==='dosim'&&AG&&AG.resumen.dosimetros_no_devueltos) b='⚠ '+AG.resumen.dosimetros_no_devueltos;
     if(p.id==='lev'&&AG&&AG.resumen.levantamiento_sin_responder) b=String(AG.resumen.levantamiento_sin_responder);
+    if(p.id==='form'&&window.PR_FORM) b=String(window.PR_FORM.resumen.personas);
+    if(p.id==='eqaut'&&window.PR_EQ_AUT&&window.PR_EQ_AUT.resumen.vencidas) b='⛔ '+window.PR_EQ_AUT.resumen.vencidas;
     if(p.id==='opr'&&window.PR_OPR) b=String(window.PR_OPR.pendientes.length);
     if(p.id==='req'&&PR)   b=String(PR.requisitos_rrhh.filter(r=>r.estado==='falta').length);
     return '<button class="tab" id="tb-'+p.id+'" onclick="irA(\''+p.id+'\')">'+p.ic+' '+p.t
@@ -258,7 +268,7 @@ function pintaTabs(){
 function irA(id){
   PANES.forEach(p=>{ document.getElementById('p-'+p.id).classList.toggle('on',p.id===id);
     const t=document.getElementById('tb-'+p.id); if(t) t.classList.toggle('on',p.id===id); });
-  ({panel:vPanel,poe:vPoe,dosi:vDosi,inst:vInst,epp:vEpp,doc:vDoc,cargo:vCargo,cumpl:vCumpl,req:vReq,guia:vGuia,hist:vHist,cot:vCot,dosim:vDosim,lev:vLev,opr:vOpr})[id]();
+  ({panel:vPanel,poe:vPoe,dosi:vDosi,inst:vInst,epp:vEpp,doc:vDoc,cargo:vCargo,cumpl:vCumpl,req:vReq,guia:vGuia,hist:vHist,cot:vCot,dosim:vDosim,lev:vLev,form:vForm,eqaut:vEqAut,opr:vOpr})[id]();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -1038,6 +1048,90 @@ function vLev(){
       + '<td>' + x.expone_si + '</td><td>' + b(x.curso, x.personas, 'var(--info)') + '</td><td>' + b(x.dosimetro, x.personas, 'var(--vio)') + '</td></tr>').join('')
     + '</tbody></table></div>'
     + '<div class="d" style="margin-top:8px">Criterio que fijó la OPR para los dosímetros: deben quedar en quien hoy está expuesto. En rotaciones fuera del hospital, comisión de servicio, permiso sin goce de sueldo, pre o postnatal, o funciones administrativas sin exposición, se evalúa dar de baja el dosímetro y reasignarlo.</div></div>';
+}
+
+/* ══ 🗳 FORMULARIO · autodeclaración del personal ════════════════════════════
+   Datos nominados: viven solo en el 🔴 HUB local (pr_formulario.js no se publica). */
+function vForm(){
+  const box=document.getElementById('p-form');
+  const F=window.PR_FORM||null;
+  if(!F){ box.innerHTML='<div class="aviso a-warn">Falta <b>SHARED_DATA/pr_formulario.js</b> (se genera con <code>python3 _DEV/build_pr_formulario.py</code>).</div>'; return; }
+  const R=F.resumen, P=F.personas;
+  const si=v=>v?'<span class="pill p-ok">sí</span>':'<span class="pill p-bad">no</span>';
+  const bar=(v,t,c)=>'<div style="display:flex;align-items:center;gap:6px"><div class="bar" style="width:90px"><i style="width:'+Math.round(v*100/Math.max(1,t))+'%;background:'+c+'"></i></div><small>'+v+' / '+t+'</small></div>';
+  const cob=F.cobertura.slice().sort((a,b)=>(a.pct||0)-(b.pct||0));
+  const brecha=[['Sin dosímetro',R.exp_sin_dosimetro,'var(--vio)'],['Sin curso',R.exp_sin_curso,'var(--warn)'],['Sin licencia de desempeño',R.exp_sin_licencia,'var(--bad)']];
+  const alertas={}; (F.inconsistencias||[]).forEach(i=>{alertas[i.alerta]=(alertas[i.alerta]||0)+1;});
+  box.innerHTML='<div class="aviso a-info"><b>Formulario de autodeclaración del personal.</b> '
+    +R.respuestas+' respuestas de <b>'+R.personas+' personas</b> al '+esc(R.corte)+' ('+R.reenvios+' reenvíos, se toma la última). '
+    +'Los certificados y licencias adjuntos quedaron archivados en el Drive de la OPR, ordenados por servicio.'
+    +'<div style="margin-top:6px"><a class="btn xs" href="'+esc(F.fuente.formulario)+'" target="_blank">📝 Formulario</a> '
+    +'<a class="btn xs" href="'+esc(F.fuente.planilla)+'" target="_blank">📊 Respuestas</a> '
+    +'<a class="btn xs" href="'+esc(F.fuente.carpeta)+'" target="_blank">📂 Carpeta en Drive</a> '
+    +'<button class="btn xs" onclick="formExcel()">⬇ Nómina del formulario (CSV)</button></div></div>'
+    +kpis([['Respondieron',R.personas,'var(--tx)'],['Declaran exposición',R.expuestos,'var(--info)'],
+           ['Cumplen los 3 requisitos',R.exp_completos,R.exp_completos?'var(--ok)':'var(--tx2)'],
+           ['Expuestos sin nada de respaldo',R.exp_sin_nada,R.exp_sin_nada?'var(--bad)':'var(--ok)']])
+    +'<div class="card" style="margin-top:12px"><h2>🏥 Cobertura por servicio</h2>'
+    +'<div class="d">Cuántos de la nómina del levantamiento ya contestaron. El orden parte por el servicio más atrasado.</div>'
+    +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>Servicio</th><th>Nómina</th><th>Respondieron</th><th>%</th></tr></thead><tbody>'
+    +cob.map(c=>'<tr><td><b>'+esc(c.servicio)+'</b></td><td>'+c.nomina+'</td><td>'+bar(c.respondieron,c.nomina,c.pct>=25?'var(--ok)':'var(--warn)')+'</td>'
+      +'<td>'+(c.pct!=null?'<span class="pill '+(c.pct>=25?'p-ok':c.pct>=10?'p-warn':'p-bad')+'">'+c.pct+'%</span>':'—')+'</td></tr>').join('')
+    +'</tbody></table></div></div>'
+    +'<div class="card"><h2>🚨 Brechas de los '+R.expuestos+' que declaran exposición</h2><div class="grid g3" style="margin-top:10px">'
+    +brecha.map(([l,v,c])=>'<div class="kpi"><div class="n" style="color:'+c+'">'+v+'</div><div class="l">'+l+'</div></div>').join('')+'</div>'
+    +'<div class="d" style="margin-top:10px">Evidencia recibida: <b>'+R.adjuntos_curso+'</b> certificados de curso y <b>'+R.adjuntos_licencia+'</b> licencias de desempeño. '
+    +'De eso, <b>'+R.aportan_curso+'</b> cursos y <b>'+R.aportan_licencia+'</b> licencias son información que la matriz no tenía.</div></div>'
+    +'<div class="card"><h2>⚠ Respuestas que hay que confirmar</h2>'
+    +'<div class="tw" style="margin-top:8px"><table><thead><tr><th>Qué pasa</th><th style="text-align:right">Casos</th></tr></thead><tbody>'
+    +Object.entries(alertas).sort((a,b)=>b[1]-a[1]).map(([k,v])=>'<tr><td>'+esc(k)+'</td><td style="text-align:right"><b>'+v+'</b></td></tr>').join('')
+    +'</tbody></table></div>'
+    +(F.sin_enviar&&F.sin_enviar.length?'<div class="aviso a-warn" style="margin-top:10px"><b>'+F.sin_enviar.length+' documento(s) subido(s) sin enviar el formulario.</b> '
+      +'Quedan en la carpeta de adjuntos pero sin respuesta asociada: '+F.sin_enviar.map(x=>esc(x.quien||x.archivo)).join(', ')+'.</div>':'')
+    +(R.fuera_de_nomina?'<div class="d" style="margin-top:8px">'+R.fuera_de_nomina+' persona(s) respondieron sin estar en ninguna nómina del levantamiento: hay que decidir si corresponde incorporarlas.</div>':'')
+    +'</div>'
+    +'<div class="card"><h2>👥 Detalle por persona</h2><div class="d">'+P.length+' personas. Nominado: esta tabla no sale del 🔴 HUB local.</div>'
+    +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>Servicio</th><th>Persona</th><th>Estamento</th><th>Se expone</th><th>Dosímetro</th><th>Curso</th><th>Licencia</th><th>Adjuntos</th><th>Observación</th></tr></thead><tbody>'
+    +P.map(x=>'<tr><td>'+esc(x.servicio||'—')+'</td><td><b>'+esc(x.nombre||'—')+'</b><br><small style="color:var(--tx2)">'+esc(x.rut)+'</small></td>'
+      +'<td><small>'+esc(x.estamento||'')+(x.especialidad&&x.especialidad!=='No aplica'?' · '+esc(x.especialidad):'')+'</small></td>'
+      +'<td>'+si(x.expone)+'</td><td>'+si(x.dosimetro)+'</td><td>'+si(x.curso)+'</td>'
+      +'<td>'+si(x.licencia)+(x.licencia&&x.vigente?' <small>'+esc(x.vigente.toLowerCase()==='si'?'vigente':'no vigente')+'</small>':'')+'</td>'
+      +'<td>'+(x.evidencia.length?x.evidencia.map(e=>'<span class="pill p-info">'+(e.tipo==='curso'?'certificado':'licencia')+'</span>').join(' '):'<small style="color:var(--tx2)">—</small>')+'</td>'
+      +'<td><small>'+(x.alertas.length?esc(x.alertas.join('; ')):'')+'</small></td></tr>').join('')
+    +'</tbody></table></div></div>';
+}
+function formExcel(){
+  const F=window.PR_FORM; if(!F) return;
+  const cu=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const cab=['Servicio','Nombre','RUT','Estamento','Especialidad','Se expone','Dosímetro','Curso','Certificado adjunto','Licencia','Licencia adjunta','Vigente','Aporta a la matriz','Observación'].join(';')+'\n';
+  const cuerpo=F.personas.map(x=>[x.servicio,x.nombre,x.rut,x.estamento,x.especialidad,x.expone?'SI':'NO',x.dosimetro?'SI':'NO',
+    x.curso?'SI':'NO',x.evidencia.some(e=>e.tipo==='curso')?'SI':'',x.licencia?'SI':'NO',x.evidencia.some(e=>e.tipo==='licencia')?'SI':'',
+    x.vigente||'',(x.aporta||[]).join(' / '),(x.alertas||[]).join('; ')].map(cu).join(';')).join('\n');
+  bajar('formulario_PR_'+F.resumen.corte+'.csv','﻿'+cab+cuerpo,'text/csv;charset=utf-8');
+}
+
+/* ══ 📜 AUTORIZACIÓN DE EQUIPOS EMISORES (HDS actual) ════════════════════════ */
+function vEqAut(){
+  const box=document.getElementById('p-eqaut');
+  const Q=window.PR_EQ_AUT||null;
+  if(!Q){ box.innerHTML='<div class="aviso a-warn">Falta <b>SHARED_DATA/pr_equipos_autorizacion.js</b> (se genera con <code>python3 _DEV/build_pr_equipos_autorizacion.py</code>).</div>'; return; }
+  const R=Q.resumen;
+  const est=e=>e.estado==='vencida'?'<span class="pill p-bad">vencida</span>'
+    :e.estado==='vigente'?'<span class="pill p-ok">vigente</span>':'<span class="pill p-warn">sin fecha legible</span>';
+  box.innerHTML='<div class="aviso '+(R.vencidas?'a-bad':'a-info')+'"><b>Autorizaciones de funcionamiento de los equipos emisores · HDS actual.</b> '
+    +esc(Q.nota)+'</div>'
+    +kpis([['Equipos con resolución',R.equipos,'var(--tx)'],['Vencidas',R.vencidas,R.vencidas?'var(--bad)':'var(--ok)'],
+           ['Vigentes',R.vigentes,R.vigentes?'var(--ok)':'var(--tx2)'],['Sin fecha legible',R.sin_fecha,R.sin_fecha?'var(--warn)':'var(--ok)']])
+    +'<div class="card" style="margin-top:12px"><h2>📜 Resoluciones SEREMI</h2>'
+    +'<div class="d">Cada resolución autoriza un equipo en un recinto determinado. Al trasladarse al NHDS cambia el recinto, así que corresponde pedir autorización nueva.</div>'
+    +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>Servicio</th><th>Equipo</th><th>Marca y modelo</th><th>Año</th><th>Serie</th><th>Ubicación autorizada</th><th>Resolución</th><th>Vence</th><th>Estado</th></tr></thead><tbody>'
+    +Q.equipos.map(e=>'<tr><td><b>'+esc(e.servicio||'—')+'</b></td><td>'+esc(e.equipo)+(e.tipo?'<br><small style="color:var(--tx2)">'+esc(e.tipo)+'</small>':'')+'</td>'
+      +'<td>'+esc(e.marca||'—')+'<br><small>'+esc(e.modelo||'')+'</small></td><td>'+esc(e.anio||'—')+'</td>'
+      +'<td><small>'+esc(e.serie_equipo||'—')+'</small></td><td><small>'+esc(e.ubicacion||'—')+'</small></td>'
+      +'<td>'+(e.resolucion?'N° '+esc(e.resolucion)+'<br><small>'+esc(e.emision||'')+'</small>':'<small>—</small>')+'</td>'
+      +'<td>'+esc(e.vence||'—')+'</td><td>'+est(e)+'</td></tr>').join('')
+    +'</tbody></table></div>'
+    +'<div class="d" style="margin-top:8px">Fuente: '+esc(Q.fuente)+'. Los PDF están en el Drive de la OPR, en «00 EQUIPOS EMISORES · autorización de funcionamiento» y en la carpeta de resoluciones de cada servicio.</div></div>';
 }
 
 /* ══ 🗂 EXPEDIENTE OPR · documentos y Drive ══════════════════════════════════ */
