@@ -332,6 +332,7 @@ body{background:#0c1a2e;color:#cbd5e1;font-family:'Segoe UI',-apple-system,Blink
         <button class="pct-btn" id="pctZona" onclick="pcZonaSel()" disabled title="Fusionar por zona · aplica la zona elegida arriba a la selección">🎨</button>
         <button class="pct-btn warn" id="pctDel" onclick="pcDelSel()" disabled title="Eliminar la selección (Supr)">🗑</button>
         <div class="pct-sep"></div>
+        <button class="pct-btn" id="pctRep" onclick="repPisoToggle()" title="Replicar a otro piso · copia ascensores, escaleras, escaleras mecánicas y/o estacionamientos de un piso a otro (p. ej. P-2 → P-3) para ordenar y completar desde ahí · no duplica lo que ya está en el mismo lugar · se deshace con ⌘Z">⎘</button>
         <button class="pct-btn" id="pctEst" onclick="estOrdenToggle()" title="Ordenar estacionamientos (5) · toma todas las plazas del piso (o las de un tipo) y las alinea, reparte o enfila en batería · con la selección hecha se mueven todas juntas arrastrando o con las flechas">🅿</button>
       </div>
       <div class="pcirc-bar" id="pmarkBar"></div>
@@ -1354,6 +1355,7 @@ function pcToolsRefresh(){
   ['pctDup','pctSplit','pctZona','pctDel'].forEach(id=>{ if(q(id)) q(id).disabled=!has; });
   q('pctSnap')?.classList.toggle('on',pcSnap);
   q('pctEst')?.classList.toggle('on',typeof _estPanel!=='undefined'&&_estPanel);
+  q('pctRep')?.classList.toggle('on',typeof _repPanel!=='undefined'&&_repPanel);
   if(typeof renderCajaPanel==='function') renderCajaPanel();   // ficha de la caja seleccionada
   if(typeof renderEstPanel==='function') renderEstPanel();     // panel de orden de plazas
 }
@@ -1984,6 +1986,90 @@ function estMedidaSel(){
 }
 
 // ── Panel ───────────────────────────────────────────────────────────────────
+// ── REPLICAR A OTRO PISO (⎘) ─────────────────────────────────────────────────
+// Los núcleos verticales (ascensores, escaleras, escaleras mecánicas) ocupan el
+// mismo lugar en todos los pisos, y los subterráneos de estacionamiento repiten
+// la grilla de plazas. Copiar de un piso a otro deja la base para ordenar y
+// completar en el piso destino. Todos los pisos comparten el mismo sistema de
+// coordenadas (planos alineados), así que la caja cae en el mismo lugar.
+// No duplica: si en el destino ya hay una caja del mismo tipo que se superpone
+// en más de la mitad, se salta. Deshacer (⌘Z) restaura el piso destino.
+var _repPanel=false;
+var _repCfg={org:null, dst:null, cats:{asc:true, esc:true, escmec:true, est:true}};
+const REP_CATS=[['asc','🛗 Ascensores',z=>z==='asc'],['esc','🪜 Escaleras',z=>z==='esc'],
+  ['escmec','⤴ Escaleras mecánicas',z=>z==='escmec'],['est','🅿 Estacionamientos',z=>esEst(z)]];
+function _repCatDe(z){ const c=REP_CATS.find(x=>x[2](z)); return c?c[0]:null; }
+function _repSolapa(a,b){
+  const ix=Math.max(0,Math.min(a.x_m+a.w_m/2,b.x_m+b.w_m/2)-Math.max(a.x_m-a.w_m/2,b.x_m-b.w_m/2));
+  const iy=Math.max(0,Math.min(a.y_m+a.h_m/2,b.y_m+b.h_m/2)-Math.max(a.y_m-a.h_m/2,b.y_m-b.h_m/2));
+  const m=Math.min(a.w_m*a.h_m,b.w_m*b.h_m); return m>0 ? (ix*iy)/m : 0;
+}
+function repPisoToggle(){
+  _repPanel=!_repPanel;
+  if(_repPanel){
+    _repCfg.org=S.floorId;
+    const i=FLOORS.findIndex(f=>f.id===S.floorId);
+    _repCfg.dst=(FLOORS[i-1]||FLOORS[i+1]||{}).id;   // por defecto, el piso de abajo
+  }
+  renderRepPanel(); pcToolsRefresh&&pcToolsRefresh();
+}
+function renderRepPanel(){
+  let box=document.getElementById('repPiso');
+  if(!_repPanel){ if(box) box.style.display='none'; return; }
+  if(!box){
+    box=document.createElement('div'); box.id='repPiso';
+    box.style.cssText='position:fixed;left:18px;bottom:18px;z-index:9997;width:320px;background:#0e2233;border:1px solid #22d3ee;'
+      +'border-radius:12px;padding:12px 14px;box-shadow:0 10px 34px rgba(0,0,0,.45);color:#dbeafe;font-size:12px';
+    box.addEventListener('mousedown',e=>e.stopPropagation());
+    document.body.appendChild(box);
+  }
+  box.style.display='block';
+  const org=_repCfg.org, dst=_repCfg.dst;
+  const A=(pcircState.floors[org]||[]), B=(pcircState.floors[dst]||[]);
+  const opt=(sel)=>FLOORS.map(f=>'<option value="'+f.id+'"'+(f.id===sel?' selected':'')+'>'+f.name+'</option>').join('');
+  const fila=c=>{
+    const nO=A.filter(b=>c[2](b.zona)).length, nD=B.filter(b=>c[2](b.zona)).length;
+    return '<label style="display:flex;align-items:center;gap:7px;margin:4px 0;cursor:pointer">'
+      +'<input type="checkbox" '+(_repCfg.cats[c[0]]?'checked':'')+' onchange="_repCfg.cats[\''+c[0]+'\']=this.checked;renderRepPanel()">'
+      +'<span style="flex:1">'+c[1]+'</span><span style="color:#9fc4db">'+nO+' → '+nD+'</span></label>';
+  };
+  const selSty='background:#0b1a28;color:#dbeafe;border:1px solid #2b4a63;border-radius:6px;padding:4px 6px;font-size:12px';
+  box.innerHTML='<div style="display:flex;align-items:center;margin-bottom:8px"><strong style="font-size:13px;flex:1">⎘ Replicar a otro piso</strong>'
+    +'<button onclick="repPisoToggle()" style="background:none;border:0;color:#9fc4db;font-size:16px;cursor:pointer">×</button></div>'
+    +'<div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">'
+    +'<select style="'+selSty+'" onchange="_repCfg.org=this.value;renderRepPanel()">'+opt(org)+'</select><span>→</span>'
+    +'<select style="'+selSty+'" onchange="_repCfg.dst=this.value;renderRepPanel()">'+opt(dst)+'</select></div>'
+    +'<div style="color:#9fc4db;margin-bottom:2px">Qué copiar <span style="float:right">origen → destino</span></div>'
+    +REP_CATS.map(fila).join('')
+    +'<button onclick="repPisoEjecutar()" '+(org===dst?'disabled ':'')+'style="width:100%;margin-top:8px;background:#0891b2;border:1px solid #22d3ee;color:#fff;border-radius:8px;padding:7px;font-weight:700;cursor:pointer">'
+    +(org===dst?'Elegí dos pisos distintos':'Replicar '+(FLOORS.find(f=>f.id===org)||{}).name+' → '+(FLOORS.find(f=>f.id===dst)||{}).name)+'</button>'
+    +'<div style="color:#9fc4db;margin-top:7px;line-height:1.45">Se copian con su tipología, nombre y orientación, en la misma posición. Lo que ya existe en el destino en el mismo lugar no se duplica. Después de replicar quedan seleccionadas para moverlas o borrarlas; ⌘Z deshace.</div>';
+}
+function repPisoEjecutar(){
+  const org=_repCfg.org, dst=_repCfg.dst; if(!org||!dst||org===dst) return;
+  const A=(pcircState.floors[org]||[]);
+  const B=(pcircState.floors[dst]=pcircState.floors[dst]||[]);
+  const elegir=A.filter(b=>{ const c=_repCatDe(b.zona); return c && _repCfg.cats[c]; });
+  if(!elegir.length){ toast('⎘ No hay nada que copiar en '+org+' con esas categorías.'); return; }
+  // historial del piso destino (el deshacer vuelve a este estado)
+  _pcHistU.push({f:dst, j:JSON.stringify(B)}); if(_pcHistU.length>PC_HIST_MAX) _pcHistU.shift(); _pcHistR.length=0;
+  const nue=[], cuenta={}; let saltadas=0;
+  elegir.forEach(b=>{
+    if(B.some(x=>x.zona===b.zona && _repSolapa(x,b)>0.5)){ saltadas++; return; }
+    const c={...JSON.parse(JSON.stringify(b)), id:pcNuevoId(), replicado_de:org};
+    B.push(c); nue.push(c); const k=_repCatDe(b.zona); cuenta[k]=(cuenta[k]||0)+1;
+  });
+  saveAll();
+  if(S.floorId!==dst){ pcSel.clear(); loadFloor(dst); }
+  if(pcTool!=='edit' && S.mode==='pcirc') pcSetTool('edit');
+  pcSel=new Set(nue.map(b=>b.id));
+  renderOverlay(); updateStats&&updateStats(); renderZonaResumen&&renderZonaResumen(); pcToolsRefresh&&pcToolsRefresh();
+  _repCfg.org=org; renderRepPanel();
+  const det=REP_CATS.filter(c=>cuenta[c[0]]).map(c=>cuenta[c[0]]+' '+c[1].split(' ').slice(1).join(' ').toLowerCase()).join(' · ');
+  toast(nue.length ? '⎘ '+nue.length+' copiadas de '+org+' a '+dst+(det?' ('+det+')':'')+(saltadas?' · '+saltadas+' ya estaban':'')+' · quedan seleccionadas'
+                   : '⎘ Nada nuevo: las '+saltadas+' cajas ya estaban en '+dst+'.');
+}
+
 function estOrdenToggle(){
   _estPanel=!_estPanel;
   if(_estPanel && S.mode==='pcirc' && pcTool!=='edit') pcSetTool('edit');

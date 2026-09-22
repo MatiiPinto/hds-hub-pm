@@ -1,5 +1,5 @@
 // Glosario de acrónimos · Hospital Concesionado HDS
-// Generado desde glosario_acronimos_hospital_concesionado.xlsx — 102 entradas
+// Generado desde glosario_acronimos_hospital_concesionado.xlsx — 103 entradas
 window.SHARED_ACRONIMOS = [
   {
     "acronimo": "PINS",
@@ -40,6 +40,14 @@ window.SHARED_ACRONIMOS = [
     "definicion": "Instrumento que vincula la cartera clínica, producción esperada y requerimientos de infraestructura y recintos.",
     "uso": "Base para dimensionar áreas clínicas, apoyo diagnóstico, pabellones, camas y flujos.",
     "notas": "Puede usarse junto a estudios preinversionales."
+  },
+  {
+    "acronimo": "BIM",
+    "nombre": "Building Information Modeling (Modelado de Información de la Construcción)",
+    "categoria": "Diseño / Infraestructura",
+    "definicion": "Metodología de trabajo colaborativo que representa el edificio en un modelo digital 3D en el que cada elemento (recintos, muros, instalaciones, equipamiento, mobiliario) lleva información asociada: código, nombre, superficie, materiales, especialidad y otros atributos. Permite coordinar especialidades, detectar interferencias antes de construir y mantener un registro vivo del activo durante el diseño, la construcción y la operación.",
+    "uso": "En el Nuevo HDS, los modelos BIM de la Sociedad Concesionaria son la fuente de los códigos, nombres y superficies de los recintos que usan el Atlas, la Autorización Sanitaria, los catastros de recintos y el cruce con el PMA (datos «recintos PMA-BIM»).",
+    "notas": "Formatos habituales: Revit (.rvt, propietario) e IFC (estándar abierto). En Chile lo impulsa Planbim (CORFO); en obra pública concesionada se exige según las Bases de Licitación."
   },
   {
     "acronimo": "PSP",

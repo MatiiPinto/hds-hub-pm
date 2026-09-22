@@ -339,6 +339,10 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 #lblHint:hover{background:var(--n-800)}
 #ubicLegend{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:31;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-pill);padding:5px 14px;font-size:var(--fs-sm);color:var(--text);box-shadow:var(--shadow-2);white-space:nowrap}
 #ubicLegend b{margin-left:2px}
+#cpLegend{position:absolute;top:48px;left:50%;transform:translateX(-50%);z-index:31;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-pill);padding:5px 8px 5px 14px;font-size:var(--fs-sm);color:var(--text);box-shadow:var(--shadow-2);white-space:nowrap;display:flex;align-items:center;gap:8px}
+#cpLegend .cp-pt{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+#cpLegend button{border:1px solid var(--border);background:var(--surface);border-radius:var(--r-pill);padding:2px 10px;font-size:var(--fs-xs);font-weight:700;cursor:pointer;color:var(--text)}
+.cp-mk{cursor:pointer}
 
 /* ── Gestor de herramientas (#dock): vive en la pestaña Herramientas ───────
    del panel derecho como lista de filas. Los botones de la barra superior se
@@ -503,6 +507,20 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 #escTip .et-f{margin-top:6px;color:var(--text-2)}
 #escTip .et-tr{margin-top:8px;padding:6px 8px;border-radius:var(--r-md);background:var(--warn-soft);color:var(--warn)}
 #escTip .et-src{margin-top:8px;font-size:10px;color:var(--text-3)}
+/* bajas de la matriz (jubilación, renuncia…) */
+.modal-fondo{position:fixed;inset:0;background:rgba(15,22,34,.55);display:none;align-items:center;justify-content:center;z-index:9100;padding:20px}
+.modal-fondo.show{display:flex}
+.baja-tag{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:9px;font-size:9.5px;font-weight:var(--fw-medium);background:var(--n-100);color:var(--text-2);border:1px solid var(--border);white-space:nowrap}
+.dp-baja{flex:none;width:22px;height:22px;border:0;border-radius:6px;background:transparent;color:var(--text-3);cursor:pointer;font-size:12px;line-height:1;opacity:0}
+.dp-row:hover .dp-baja{opacity:1}
+.dp-baja:hover{background:var(--danger-soft);color:var(--danger)}
+.dp-row.baja{opacity:.6}
+.baja-row{display:flex;align-items:center;gap:8px;padding:8px 2px;border-top:1px solid var(--n-100)}
+.baja-row:first-child{border-top:0}
+.baja-row>div:first-child{flex:1;min-width:0;font-size:var(--fs-sm)}
+.baja-row .sub{font-size:var(--fs-xs);color:var(--text-2)}
+.dp-bajas-chip{background:transparent;border:0;color:var(--text-2);font-size:10px;cursor:pointer;white-space:nowrap;padding:0 2px}
+.dp-bajas-chip:hover{color:var(--danger)}
 /* funciones específicas de los TENS: chips (diálogo y filtro) e insignias (listas) */
 .func-chips{display:flex;flex-wrap:wrap;gap:6px}
 .func-chip{height:26px;padding:0 10px;border:1px solid var(--border);border-radius:var(--r-pill);background:var(--surface);color:var(--text);font-size:var(--fs-xs);cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
@@ -592,6 +610,39 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 .eqp-tabs{display:flex;flex-wrap:wrap;gap:0;padding:0 18px;background:var(--surface);border-bottom:1px solid var(--border)}
 .eqp-tab{border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:transparent;color:var(--text-2);border-radius:0;padding:9px 12px;font-size:var(--fs-sm);font-weight:var(--fw-regular);cursor:pointer}
 .eqp-tab.on{color:var(--accent-600);border-bottom-color:var(--accent-600);font-weight:var(--fw-medium)}
+/* ── Mobiliario de estares, residencias y salas de reuniones ───────────── */
+#mobModal{position:fixed;inset:0;background:rgba(15,22,34,.62);display:none;align-items:center;justify-content:center;z-index:150;padding:18px}
+#mobModal.show{display:flex}
+.mob-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);width:min(96vw,1180px);height:min(92vh,880px);display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--shadow-3)}
+.mob-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;border-bottom:1px solid var(--border)}
+.mob-filtros{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 18px;border-bottom:1px solid var(--border);background:var(--surface-sunken)}
+.mob-chip{border:1px solid var(--border);background:var(--surface);color:var(--text-2);border-radius:var(--r-pill);padding:4px 13px;font-size:var(--fs-sm);cursor:pointer}
+.mob-chip.on{background:var(--accent-600);border-color:var(--accent-600);color:#fff;font-weight:var(--fw-medium)}
+.mob-filtros select,.mob-filtros input{height:30px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface);color:var(--text);font-size:var(--fs-sm);padding:0 9px;max-width:230px}
+.mob-body{flex:1;overflow-y:auto;padding:16px 18px;background:var(--bg-page)}
+.mob-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.mob-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:12px 13px;cursor:pointer;transition:border-color var(--dur-fast) var(--ease)}
+.mob-card:hover{border-color:var(--accent-600)}
+.mob-card .t{font-size:var(--fs-md);font-weight:var(--fw-medium);color:var(--text);line-height:1.3}
+.mob-card .s{font-size:var(--fs-xs);color:var(--text-2);margin-top:3px}
+.mob-card .p{margin-top:9px;display:flex;gap:6px;flex-wrap:wrap}
+.mob-tag{font-size:10px;border-radius:6px;padding:1px 8px;background:var(--surface-sunken);color:var(--text-2)}
+.mob-tag.est{background:#ccfbf1;color:#0f766e}.mob-tag.res{background:#ede9fe;color:#6d28d9}.mob-tag.reu{background:#fef3c7;color:#92400e}
+.mob-slide{max-width:980px;margin:0 auto}
+.mob-slide h3{font-size:var(--fs-2xl);font-weight:var(--fw-bold);color:var(--text);margin:0 0 4px}
+.mob-slide .sub{font-size:var(--fs-sm);color:var(--text-2);margin-bottom:16px}
+.mob-items{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:12px}
+.mob-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;display:flex;flex-direction:column}
+.mob-foto{height:124px;background:#fff;border-bottom:1px solid var(--n-100);display:flex;align-items:center;justify-content:center;font-size:40px;color:var(--text-3)}
+.mob-foto img{width:100%;height:100%;object-fit:contain}
+.mob-item .d{padding:9px 11px}
+.mob-item .n{font-size:var(--fs-sm);font-weight:var(--fw-medium);color:var(--text);line-height:1.3}
+.mob-item .m{font-size:10px;color:var(--text-3);margin-top:3px;font-family:var(--font-mono)}
+.mob-item .q{margin-top:6px;font-size:var(--fs-lg);font-weight:var(--fw-bold);color:var(--accent-600)}
+.mob-nav{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 18px;border-top:1px solid var(--border);background:var(--surface)}
+.mob-tot{display:flex;gap:16px;flex-wrap:wrap}
+.mob-tot b{font-size:var(--fs-xl);color:var(--accent-600);display:block;line-height:1.1}
+.mob-tot span{font-size:10px;color:var(--text-2);text-transform:uppercase;letter-spacing:var(--tracking-caps)}
 .est-table{width:100%;border-collapse:collapse;font-size:var(--fs-sm)}
 .est-table th{background:var(--surface-sunken);text-align:left;padding:7px 9px;font-size:10px;text-transform:uppercase;letter-spacing:var(--tracking-caps);color:var(--text-2);font-weight:var(--fw-medium);border-bottom:1px solid var(--border)}
 .est-table td{padding:7px 9px;border-bottom:1px solid var(--n-100);color:var(--text)}
@@ -784,6 +835,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="tb-btn" id="btnFicha" onclick="toggleFichaMode()" title="Ver ficha del recinto: equipamiento, mobiliario y pauta de Autorización Sanitaria">🔍 Ficha recinto</button>
       <button class="tb-btn" id="btnAutSan" onclick="toggleAutSanMode()" title="Asignación de pautas de Autorización Sanitaria — dot por recinto/servicio: 🔴 sin pauta · 🟠 sugerida (por validar) · 🟢 validada · ⚪ no corresponde. Clic en el dot para asignar.">🩺 Aut. Sanitaria</button>
       <button class="tb-btn" id="btnEquip" onclick="toggleEquipMode()" title="Ver y reposicionar en el plano el equipamiento (EquiBox) de cada recinto">⚙️ Equipamiento</button>
+      <button class="tb-btn" id="btnMob" onclick="openMob()" title="Recorrer los estares, residencias y salas de reuniones del hospital con el mobiliario que tendrá cada uno: fotos, cantidades y ficha técnica">🪑 Estares y residencias</button>
       <button class="tb-btn" id="btnScen" onclick="toggleScenario()" title="Alternar entre el Despliegue 0 (catálogo oficial, sin traslados) y la Propuesta de reubicación (con los traslados aplicados)">📦 Despliegue 0</button>
       <button class="tb-btn" id="btnMoves" onclick="openMovesList()" style="display:none" title="Ver el listado completo de traslados propuestos">↪ 0</button>
       <span class="tb-div"></span>
@@ -811,6 +863,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
           <button class="tb-btn" id="btnAudit" onclick="toggleAudit()" title="Colorear cada recinto según la completitud de sus datos: tipo, código, BIM y señalética">✅ Auditoría de datos</button>
           <button class="tb-btn" id="btnMetas" onclick="toggleMetas()" title="Metas oficiales de recintos (Resumen Ejecutivo HDS): asignados vs meta">🎯 Metas</button>
           <button class="tb-btn" id="btnAsigN" onclick="toggleAsigNum()" title="Mostrar en cada recinto cuántos funcionarios tiene asignados (solo el número, abajo a la derecha)">🧑 N° asignados</button>
+          <button class="tb-btn" id="btnTiPrint" onclick="toggleTiPrint()" title="Mostrar en cada recinto (vista de servicio) las impresoras del HDS según el archivo Comodatos Jun-2026 cruzado con el PMA/BIM, abajo a la izquierda: 🖨 + 👤 láser monousuario · 👥 láser multiusuario · 📠 multifuncional multiusuario. Clic abre la ficha.">🖨 Impresoras</button>
         </div>
       </div>
       <button class="tb-btn" id="btnDraw" onclick="toggleDraw()" style="display:none">⬛ Dibujar</button>
@@ -826,7 +879,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
         <button class="struct-opt" data-kind="escalator" style="--c:#0891b2">⬆ <b>Escalera Mecánica</b></button>
         <button class="struct-opt" data-kind="circulation" style="--c:#475569">〰 <b>Línea de Circulación</b> <span style="opacity:.55">· dbl-click p/terminar</span></button>
         <div class="sm-h">Desde Navegación</div>
-        <button class="struct-opt" onclick="importarVerticalesNav()" style="--c:#0ea5e9" title="Trae los ascensores, escaleras y escaleras mecánicas dibujados en 8.Navegacion (siembra nav_verticales.js) a TODOS los pisos, a su tamaño real. Reemplaza los ascensores/escaleras que hubiera; las líneas de circulación se conservan. Después solo hay que ubicarlos y escalarlos.">⬇ <b>Importar de Navegación</b> <span style="opacity:.55">· reemplaza</span></button>
+        <button class="struct-opt" onclick="importarVerticalesNav()" style="--c:#0ea5e9" title="Trae los ascensores, escaleras y escaleras mecánicas dibujados en 8.Navegacion (siembra nav_verticales.js) a TODOS los pisos, a su tamaño real y YA CUADRADOS con el plano de cada piso: las escaleras sobre los rótulos «Escaleras» de Coordinación Mobiliario y los ascensores sobre el eje del ducto. Reemplaza los ascensores/escaleras que hubiera; las líneas de circulación se conservan.">⬇ <b>Importar de Navegación</b> <span style="opacity:.55">· reemplaza · calibrado</span></button>
         <div class="sm-note">En edición: arrastrar mueve · ⇧+arrastrar mueve TODOS los del piso · esquina ◢ escala · × borra</div>
       </div>
       <button class="tb-btn warn" id="btnMerge" onclick="doMerge()" style="display:none">🔗 Fusionar</button>
@@ -848,6 +901,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <div class="float-hint" id="bedHint">🛏 Modo puestos — en vista 2, clic DENTRO de un recinto: camillas/sillones en Recuperación, Habitación o Clínica; cupos (⭕) en Recuperación, Pre-Anestesia, Box Urgencia, Reanimador y Sala de Procedimiento; puestos de toma (🧪) solo en Laboratorio · ESC para salir</div>
       <div class="float-hint" id="propHint"></div>
       <div id="ubicLegend" style="display:none"></div>
+      <div id="cpLegend" style="display:none"></div>
       <button id="lblHint" style="display:none" onclick="toggleRoomLabels()" title="Los nombres y códigos de los recintos están ocultos. Clic para mostrarlos (también desde 🧰 → 🏷 Etiquetas de recintos).">🏷 Nombres de recinto ocultos · <b>mostrar</b></button>
       <div id="planLoading"><span class="pl-spin"></span> Cargando plano…</div>
       <div id="metasPanel" style="display:none">
@@ -889,8 +943,12 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
           <button class="dk-btn tog" id="dkUbicTotem" onclick="toggleUbic('totem')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van los TÓTEMS (círculo grande + icono)"><span class="ic">🎫</span><span class="lb">Tótems</span></button>
           <button class="dk-btn tog" id="dkUbicDea" onclick="toggleUbic('dea')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van los DEA"><span class="ic">💚</span><span class="lb">DEA</span></button>
           <button class="dk-btn tog" id="dkUbicPrinter" onclick="toggleUbic('printer')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van las IMPRESORAS"><span class="ic">🖨</span><span class="lb">Impresoras</span></button>
+          <button class="dk-btn tog" id="dkUbicCarro" onclick="toggleCarros()" title="Carros de paro: desfibrilador (130007 / 130008) + carro de paro (110032) del EMMC de cada recinto. Azul = completo · rojo = desfibrilador sin su carro. Se ve en todas las vistas y se exporta a Excel."><span class="ic">🚨</span><span class="lb">Carros de paro</span></button>
         </div>
+        <button class="dk-btn" id="dkCarrosXls" onclick="exportCarrosParo()" title="Excel de carros de paro: recinto por recinto (completo / desfibrilador sin carro / carro sin desfibrilador), resumen por piso y lo que el EMMC trae sin caja en el plano"><span class="ic">⬇</span><span class="lb">Exportar carros de paro</span></button>
         <button class="dk-btn tog" id="dkLabels" onclick="toggleRoomLabels()" title="Mostrar u ocultar el nombre y código de cada recinto sobre el plano"><span class="ic">🏷</span><span class="lb">Etiquetas de recintos</span></button>
+        <div class="dk-h">Apoyo TI</div>
+        <button class="dk-btn" id="dkTiReport" onclick="abrirReporteTI()" title="Impresoras del HDS (archivo Comodatos Jun-2026 × PMA): cuántas quedan ubicadas en cajas dibujadas contra el total del archivo, por tipo"><span class="ic">🖨</span><span class="lb">Reporte de impresoras</span><span class="n" id="dkTiN"></span></button>
         <div class="dk-sep"></div><div class="dk-h">Consultar</div><div id="dkCons"></div>
         <div class="dk-sep"></div><div class="dk-h">Editar</div><div id="dkEdit2"></div>
         <div class="dk-sep"></div><div class="dk-h">Agregar</div><div id="dkAdd"></div>
@@ -898,7 +956,6 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
         <button class="dk-btn prop" id="dkTotem" onclick="setPropMode('totem')" title="Tótem / gestor de fila (dispositivo TI para salas de espera). Clic coloca · clic derecho rota · arrastrar mueve · doble clic elimina"><span class="ic">🎫</span><span class="lb">Tótem / gestor de fila</span><span class="n" id="dkTotemN"></span></button>
         <button class="dk-btn prop" id="dkDea" onclick="setPropMode('dea')" title="DEA · desfibrilador externo automático (se exporta a Clave Azul). Clic coloca · arrastrar mueve · doble clic elimina"><span class="ic">💚</span><span class="lb">DEA · Clave Azul</span><span class="n" id="dkDeaN"></span></button>
         <button class="dk-btn prop" id="dkPrinter" onclick="setPropMode('printer')" title="Impresora (dispositivo TI). Clic coloca · clic derecho rota 90° · arrastrar mueve · doble clic elimina"><span class="ic">🖨</span><span class="lb">Impresora</span><span class="n" id="dkPrinterN"></span></button>
-        <button class="dk-btn" id="dkPrinterCupo" onclick="fijarCupo('printer')" title="Fijar el número total de impresoras adjudicadas al hospital y ver cuántas van colocadas en todos los pisos"><span class="ic">🔢</span><span class="lb" id="dkPrinterCupoLb">Cupo de impresoras</span><span class="n" id="dkPrinterCupoN"></span></button>
         <button class="dk-btn" id="dkPropImp" onclick="importarPropuestosPlano()" title="Traer los puestos de trabajo que el proyectista marcó en MAGENTA en el plano de Coordinación Mobiliario. Reemplaza los que ya se importaron antes; lo que colocaste a mano no se toca."><span class="ic">⬇</span><span class="lb">Importar del plano</span><span class="n" id="dkPropImpN"></span></button>
         <button class="dk-btn" id="dkPropDel" onclick="propBorrarCtx()" title="Borrar TODO lo propuesto del contexto en que estás trabajando (el recinto en vista 3, el área en vista 2, el piso en vista 1)"><span class="ic">🗑</span><span class="lb">Borrar propuestos de aquí</span></button>
         <div class="dk-sep"></div><div class="dk-h">Exportar</div><div id="dkExp"></div>
@@ -1075,6 +1132,20 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
     <div class="eqp-list" id="eqpList"></div>
   </div>
 </div>
+<div id="mobModal" onclick="if(event.target===this)closeMob()">
+  <div class="mob-box">
+    <div class="mob-head">
+      <div>
+        <div class="ficha-title">🪑 Estares, residencias y salas de reuniones</div>
+        <div class="ficha-sub" id="mobSub">Mobiliario con el que contará cada sala</div>
+      </div>
+      <button class="ficha-x" onclick="closeMob()" title="Cerrar">&times;</button>
+    </div>
+    <div class="mob-filtros" id="mobFiltros"></div>
+    <div class="mob-body" id="mobBody"></div>
+    <div class="mob-nav" id="mobNav"></div>
+  </div>
+</div>
 <div id="eqDetModal" onclick="if(event.target===this)closeEquipDetail()" style="position:fixed;inset:0;background:rgba(15,30,52,.62);display:none;align-items:center;justify-content:center;z-index:150;padding:20px">
   <div style="background:#fff;border-radius:12px;width:min(94vw,520px);max-height:86vh;overflow-y:auto;padding:18px 20px;box-shadow:0 18px 50px rgba(15,30,52,.4)">
     <div style="display:flex;align-items:flex-start;gap:10px">
@@ -1100,6 +1171,55 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="ficha-x" onclick="closePropReport()" title="Cerrar">×</button>
     </div>
     <div class="ficha-body" id="pmBody"></div>
+  </div>
+</div>
+<div id="bajaModal" class="modal-fondo" onclick="if(event.target===this)closeBaja()">
+  <div class="modal-box" style="width:460px">
+    <h3>⊘ Quitar de la matriz de dotación</h3>
+    <div style="margin:-8px 0 12px"><b id="bajaQuien" style="font-size:13px"></b><div id="bajaSub" style="font-size:11px;color:var(--text-2);margin-top:2px"></div></div>
+    <div class="form-row"><label>Motivo</label>
+      <select id="bajaMotivo" style="width:100%;height:30px;border:1px solid var(--border);border-radius:8px;padding:0 8px;font-size:13px">
+        <option value="jubilacion">Jubilación</option>
+        <option value="renuncia">Renuncia</option>
+        <option value="termino">Término de contrato</option>
+        <option value="traslado">Traslado a otro establecimiento</option>
+        <option value="fallecimiento">Fallecimiento</option>
+        <option value="otro">Otro motivo</option>
+      </select></div>
+    <div class="form-row"><label>Observación (opcional)</label><input id="bajaNota" placeholder="fecha, quién lo informó…" spellcheck="false"></div>
+    <div class="form-row" id="bajaPuesto" style="display:none">
+      <label>Puesto asignado</label>
+      <label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:var(--danger);cursor:pointer">
+        <input type="checkbox" id="bajaLibera" style="width:auto;margin:0"> <span id="bajaPuestoTxt"></span> · dejarlo libre</label>
+    </div>
+    <div class="rp-hint">Sale del conteo de la cabida (panel, avance y buscador) sin tocar la matriz original. Se puede restaurar cuando quieras.</div>
+    <div class="modal-actions">
+      <button class="btn-save" onclick="guardarBaja()">Guardar</button>
+      <button class="btn-del" id="bajaQuitar" onclick="restaurarBaja(_bajaCtx&&_bajaCtx.nombre);closeBaja()">↩ Restaurar</button>
+      <button class="btn-cancel" onclick="closeBaja()">Cancelar</button>
+    </div>
+  </div>
+</div>
+<div id="bajaListModal" class="modal-fondo" onclick="if(event.target===this)closeBajaLista()">
+  <div class="ficha-box" style="width:560px">
+    <div class="ficha-head">
+      <div><div class="ficha-title">⊘ Fuera de la matriz de dotación · <span id="bajaListN">0</span></div>
+      <div class="ficha-sub">Personas marcadas como jubiladas, renunciadas o dadas de baja: no cuentan en la cabida</div></div>
+      <button class="ficha-x" onclick="exportBajas()" title="Exportar a Excel">⬇</button>
+      <button class="ficha-x" onclick="closeBajaLista()" title="Cerrar">×</button>
+    </div>
+    <div class="ficha-body" id="bajaListBody"></div>
+  </div>
+</div>
+<div id="tiModal" class="modal-fondo" onclick="if(event.target===this)closeReporteTI()">
+  <div class="ficha-box" style="width:640px">
+    <div class="ficha-head">
+      <div><div class="ficha-title">🖨 Impresoras HDS · <span id="tiModalN">0</span></div>
+      <div class="ficha-sub">Comodatos y Traslados HDS-ING (Junio 2026) × PMA/BIM · láser monousuario, láser multiusuario y multifuncional</div></div>
+      <button class="ficha-x" onclick="exportImpresorasTI()" title="Exportar a Excel">⬇</button>
+      <button class="ficha-x" onclick="closeReporteTI()" title="Cerrar">×</button>
+    </div>
+    <div class="ficha-body" id="tiModalBody"></div>
   </div>
 </div>
 <div id="fichaModal" onclick="if(event.target===this)closeFicha()">
@@ -1208,8 +1328,11 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 <script src="SHARED_DATA/nav_verticales.js"></script>
 <script src="SHARED_DATA/propuestos_plano.js"></script>
 <script src="SHARED_DATA/paisajismo.js"></script>
+<script src="SHARED_DATA/impresoras_hds.js"></script>
 <script src="SHARED_DATA/planos_meta.js"></script>
 <script src="SHARED_DATA/recinto_mnc2.js"></script>
+<script src="SHARED_DATA/estar_residencias_atlas.js"></script>
+<script src="SHARED_DATA/fichas_tecnicas_mnc.js"></script>
 <script src="SHARED_DATA/senaletica.js"></script>
 <script src="SHARED_DATA/pautas_recintos.js"></script>
 <script src="SHARED_DATA/pauta_labels.js"></script>
@@ -1585,6 +1708,7 @@ let S = {
   editPM: _esEditorAtlas(),   // 🟡: asignar personas y corregir nombres
   showSen: (function(){try{return localStorage.getItem('cabida_show_sen')==='1';}catch(e){return false;}})(),
   showAsigN: (function(){try{return localStorage.getItem('cabida_show_asign')!=='0';}catch(e){return true;}})(),
+  showTI: (function(){try{return localStorage.getItem('cabida_show_ti')==='1';}catch(e){return false;}})(),
   planKind: (function(){try{return localStorage.getItem('cabida_plan_kind')||'mobiliario';}catch(e){return 'mobiliario';}})(),
   boxVis: (function(){try{return localStorage.getItem('cabida_box_vis')||'on';}catch(e){return 'on';}})(),
   showDotNames: (function(){try{return localStorage.getItem('cabida_show_dotnames')==='1';}catch(e){return false;}})(),
@@ -1914,6 +2038,103 @@ if(!nameState.bimRepRev) nameState.bimRepRev={};     // BIM repetidos revisados:
 if(!nameState.repartoRev) nameState.repartoRev={};   // repartos EMMC desparejos revisados (firma por código)
 if(!nameState.comisionRev) nameState.comisionRev={};
 if(!nameState.cdsRev) nameState.cdsRev={};
+// ── BAJAS DE LA MATRIZ (jubilación, renuncia…) ──────────────────────────────
+// La matriz de dotación llega del Excel de Personas y sigue trayendo a gente
+// que ya no está. Acá se marca la baja CON SU MOTIVO: la persona deja de
+// contar en la cabida (panel, avance, buscador) sin tocar la matriz original,
+// y si todavía tiene un puesto asignado sale en la Revisión para liberarlo.
+// Se guarda por NOMBRE normalizado (nunca por RUT: el snapshot web lo rechaza).
+if(!nameState.bajas) nameState.bajas={};
+const BAJA_MOTIVOS=[
+  {k:'jubilacion', lbl:'Jubilación'},
+  {k:'renuncia',   lbl:'Renuncia'},
+  {k:'termino',    lbl:'Término de contrato'},
+  {k:'traslado',   lbl:'Traslado a otro establecimiento'},
+  {k:'fallecimiento', lbl:'Fallecimiento'},
+  {k:'otro',       lbl:'Otro motivo'}
+];
+function _bajaDe(nombre){ return (nameState.bajas||{})[norm(nombre||'')]||null; }
+function _esBaja(nombre){ return !!_bajaDe(nombre); }
+function _bajaLbl(b){ const m=BAJA_MOTIVOS.find(x=>x.k===(b&&b.m)); return (m?m.lbl:(b&&b.m)||'Sin motivo')+((b&&b.nota)?(' · '+b.nota):''); }
+function _bajaTag(nombre){
+  const b=_bajaDe(nombre); if(!b) return '';
+  return '<span class="baja-tag" title="Fuera de la matriz · '+String(_bajaLbl(b)).replace(/"/g,'&quot;')+(b.ts?(' · marcada el '+new Date(b.ts).toLocaleDateString('es-CL')):'')+'">⊘ '+esc0(_bajaLbl(b).split(' · ')[0])+'</span>';
+}
+function esc0(x){ return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+// Diálogo de baja: marca (o corrige) el motivo y, si la persona tiene puesto,
+// ofrece dejarlo libre en el mismo paso.
+let _bajaCtx=null;
+function openBaja(nombre){
+  if(S.viewOnly && !S.editPM) return;
+  const s0=(dotDB&&dotDB.staff||[]).find(x=>norm(x.nombre)===norm(nombre));
+  _bajaCtx={nombre:(s0&&s0.nombre)||nombre};
+  const b=_bajaDe(nombre)||{};
+  const rid=_dpAsignados()[norm(nombre)];
+  _bajaCtx.rid=rid||null;
+  document.getElementById('bajaQuien').textContent=_bajaCtx.nombre;
+  document.getElementById('bajaSub').textContent=s0?[s0.cargo||s0.funcion,s0.estamento,s0.servicio].filter(Boolean).join(' · '):'No está en la matriz de dotación';
+  document.getElementById('bajaMotivo').value=b.m||'jubilacion';
+  document.getElementById('bajaNota').value=b.nota||'';
+  const pl=document.getElementById('bajaPuesto');
+  pl.style.display=rid?'':'none';
+  document.getElementById('bajaPuestoTxt').textContent=rid?('Tiene puesto asignado en '+(rName(rid)||rid)):'';
+  document.getElementById('bajaLibera').checked=!!rid;
+  document.getElementById('bajaQuitar').style.display=_esBaja(nombre)?'':'none';
+  document.getElementById('bajaModal').classList.add('show');
+}
+function closeBaja(){ document.getElementById('bajaModal').classList.remove('show'); _bajaCtx=null; }
+function guardarBaja(){
+  if(!_bajaCtx) return;
+  const n=_bajaCtx.nombre, k=norm(n);
+  const m=document.getElementById('bajaMotivo').value;
+  const nota=document.getElementById('bajaNota').value.trim();
+  nameState.bajas=nameState.bajas||{};
+  nameState.bajas[k]={n, m, nota, ts:Date.now()};
+  let libre=0;
+  if(_bajaCtx.rid && document.getElementById('bajaLibera').checked){ libre=_quitarDeSuPuesto(n,null); sWs(); }
+  _mtxSrc=null; _parecCache.clear(); _inMatrixCache.clear();
+  sNames(); flushAutosave(); closeBaja();
+  try{ renderDotPanel(); _mEstadoMatriz(); }catch(e){}
+  renderSVG(); updateStats(); try{ renderBimPending(); renderAvance(); _avBadge(); }catch(e){}
+  if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='⊘ '+n+' fuera de la matriz · '+_bajaLbl(nameState.bajas[k])+(libre?' · su puesto quedó libre':''); setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },6000); }
+}
+function restaurarBaja(nombre){
+  const k=norm(nombre); if(!(nameState.bajas||{})[k]) return;
+  delete nameState.bajas[k];
+  _mtxSrc=null; _parecCache.clear(); _inMatrixCache.clear();
+  sNames(); flushAutosave();
+  try{ renderDotPanel(); _mEstadoMatriz(); }catch(e){}
+  renderSVG(); updateStats(); try{ renderBimPending(); renderAvance(); _avBadge(); listaBajas(true); }catch(e){}
+}
+// Listado de todas las bajas, con su motivo y restauración.
+function listaBajas(soloRefrescar){
+  const cont=document.getElementById('bajaListBody'); if(!cont) return;
+  const B=Object.entries(nameState.bajas||{}).map(([k,v])=>({k,...v}))
+    .sort((a,b)=>(b.ts||0)-(a.ts||0));
+  cont.innerHTML=B.length?B.map(b=>'<div class="baja-row"><div><b>'+esc0(b.n)+'</b><div class="sub">'+esc0(_bajaLbl(b))
+      +(b.ts?(' · '+new Date(b.ts).toLocaleDateString('es-CL')):'')+'</div></div>'
+      +'<button class="btn-cancel" onclick="openBaja(\''+String(b.n).replace(/'/g,"\\'")+'\')">✏️ Motivo</button>'
+      +'<button class="btn-cancel" onclick="restaurarBaja(\''+String(b.n).replace(/'/g,"\\'")+'\')">↩ Restaurar</button></div>').join('')
+    :'<div class="fk-empty">Nadie está marcado fuera de la matriz.</div>';
+  document.getElementById('bajaListN').textContent=B.length;
+  if(!soloRefrescar) document.getElementById('bajaListModal').classList.add('show');
+}
+function closeBajaLista(){ document.getElementById('bajaListModal').classList.remove('show'); }
+function exportBajas(){
+  const B=Object.values(nameState.bajas||{});
+  if(!B.length){ alert('No hay personas marcadas fuera de la matriz.'); return; }
+  const asg=_dpAsignados();
+  const rows=[['Nombre','Motivo','Observación','Marcada el','Subdirección','Servicio','Unidad','Cargo','Estamento','¿Sigue con puesto?','Recinto']];
+  B.sort((a,b)=>String(a.n).localeCompare(String(b.n),'es')).forEach(b=>{
+    const s0=(dotDB&&dotDB.staff||[]).find(x=>norm(x.nombre)===norm(b.n))||{};
+    const rid=asg[norm(b.n)];
+    const m=BAJA_MOTIVOS.find(x=>x.k===b.m);
+    rows.push([b.n,(m?m.lbl:b.m||''),b.nota||'',b.ts?new Date(b.ts).toLocaleDateString('es-CL'):'',
+      s0.subdireccion||'',s0.servicio||'',s0.unidad||'',s0.cargo||'',s0.estamento||'',rid?'SÍ':'no',rid?(rName(rid)||''):'']);
+  });
+  xlsxDownload(rows,'Fuera de la matriz','Bajas_matriz_dotacion_'+new Date().toISOString().slice(0,10)+'.xlsx',
+    [{wch:34},{wch:22},{wch:34},{wch:12},{wch:32},{wch:32},{wch:28},{wch:28},{wch:18},{wch:12},{wch:28}]);
+}
 // ── Funciones específicas de los TENS (referencia: personal de pabellón) ─────
 // La matriz sólo dice «TENS»; en la práctica se diferencian por función y una
 // misma persona puede tener UNA O MÁS. Se guardan POR PERSONA (nombre
@@ -2943,8 +3164,14 @@ const FBAK_ESPERA=20000;   // manda 20 s después del último cambio…
 const FBAK_MIN=60000;      // …y como mucho una vez por minuto
 // Solo desde el equipo de trabajo y solo en modo edición: la versión web de
 // consulta (AtlasWeb, que puede estar publicada) no debe escribir NADA.
+// ⚠ SÓLO el Atlas de trabajo escribe el estado a disco. Antes bastaba con ser
+// localhost, así que cualquier copia servida en otro puerto (un preview con el
+// estado cargado) pisaba el archivo del usuario. Ahora se exige además el
+// puerto del servidor de trabajo (20-sep-2026).
+const FBAK_PUERTOS=['8790',''];
 const FBAK_APLICA=/^https?:$/.test(location.protocol)
-  && /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  && /^(localhost|127\.0\.0\.1)$/.test(location.hostname)
+  && FBAK_PUERTOS.indexOf(location.port)>=0;
 // _SELFTEST tiene que estar acá SÍ O SÍ: el selftest muta el estado en memoria
 // a propósito, y esta capa manda _backupPayload() (memoria) sin pasar por ls(),
 // así que sin este guarda una corrida de prueba pisaba el respaldo real.
@@ -4108,6 +4335,9 @@ function renderSVG(){
     svg.classList.toggle('ubic-mode', on);
     if(on) _ubicLayer(tipos);
     const lg=document.getElementById('ubicLegend'); if(lg && !on) lg.style.display='none'; }
+  // Carros de paro: marcadores que laten en el recinto (todas las vistas)
+  { const lg=document.getElementById('cpLegend');
+    if(_cpOn){ try{ _cpLayer(); }catch(e){ console.warn('carros de paro',e); } } else if(lg) lg.style.display='none'; }
   // Overlay de diagnóstico DXF (siempre encima de todo, no interactivo)
   if(_dxfOverlayOn && S.level<=2) paintDxfOverlay();
   try{ _dockSync(); }catch(e){}
@@ -4394,6 +4624,26 @@ function renderL2(){
       const _tt=el('title'); _tt.textContent=_na?(_na+' persona'+(_na===1?'':'s')+' asignada'+(_na===1?'':'s')+' a este recinto'):'Nadie asignado a este recinto todavía';
       _t.appendChild(_tt);
       svg.appendChild(_t);
+    }
+    // Testigo de impresoras del HDS (archivo Comodatos Jun-2026 × PMA/BIM): esquina
+    // inferior IZQUIERDA, en espejo con el N° de asignados (der.). 🖨 + un icono por
+    // tipo (👤 mono · 👥 multi · 📠 multifuncional) con la cantidad si es más de una.
+    // Sólo si S.showTI está activo y el recinto tiene alguna. Clic abre la ficha.
+    if(S.showTI){
+      const ti=_tiDeRecinto(room.id), tiN=Object.values(ti).reduce((a,v)=>a+v,0);
+      if(tiN){
+        const _tt=txt(b.x+fs*.42, b.y+b.h-fs*.95, _tiTestigo(ti),
+          {fill:'#0369a1', stroke:'#ffffff', 'stroke-width':fs*.30, 'paint-order':'stroke fill',
+           'font-size':fs*1.1, 'text-anchor':'start', cursor:'pointer',
+           'font-family':'Segoe UI,sans-serif', 'font-weight':'900'});
+        const ttl=el('title'); ttl.textContent='🖨 '+tiN+' impresora'+(tiN===1?'':'s')+' (archivo Comodatos Jun-2026 × PMA)\n'
+          +_tiTipos().filter(t=>ti[t.k]).map(t=>ti[t.k]+' × '+t.nombre+' '+t.ico).join('\n')
+          +(_tiManuales().some(m=>m.rid===room.id)?'\n(incluye '+_tiManuales().filter(m=>m.rid===room.id).length+' colocada(s) a mano)':'')+'\nclic = ver ficha del recinto';
+        _tt.appendChild(ttl);
+        _tt.addEventListener('mousedown',e=>e.stopPropagation());
+        _tt.addEventListener('click',e=>{ e.stopPropagation(); openFichaRecinto(room.id); });
+        svg.appendChild(_tt);
+      }
     }
     // Código BIM (del plano o manual), visible bajo el código de recinto.
     // Clic sobre la línea = edición en línea del BIM (sin abrir el diálogo completo).
@@ -5087,6 +5337,11 @@ function _propEnCtx(){
   return ids?items.filter(it=>it.rid&&ids.has(it.rid)):items.slice();
 }
 function _propHintTxt(k){
+  if(k==='printer' && _tiD().filas.length){
+    const C=_tiCuenta();
+    return '🖨 Impresora — clic coloca una (del tipo que falta en el recinto) · clic derecho rota 90° · arrastrar mueve · doble clic elimina · Esc sale · '
+      +C.auto+' automáticas + '+C.manual+' a mano de '+C.total+(C.faltan?(' · quedan '+C.faltan):(C.sobre?(' ⚠ '+C.sobre+' sobre el total'):' · completo'));
+  }
   const D=PROP_DEF[k], c=_propCupo(k), n=_propTotal(k);
   return D.ico+' '+D.lbl+' — clic en el plano coloca uno'+(D.rota?' · clic derecho rota 90°':'')+' · arrastrar mueve · doble clic elimina · Esc sale'
     +(c?(' · '+n+' de '+c+(n>=c?(n>c?(' ⚠ '+(n-c)+' sobre el cupo'):' · cupo completo'):(' · quedan '+(c-n)))):'');
@@ -5112,6 +5367,7 @@ function propAdd(k,x,y,rot){
   const D=PROP_DEF[k]; if(!D) return null;
   const rid=_roomAtPoint(x,y)||null;
   const it={id:'pp'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), k, x:Math.round(x), y:Math.round(y), rot:(rot||0)%360, rid, ts:Date.now()};
+  if(k==='printer' && typeof _tiTipoPendiente==='function') it.tipo=_tiTipoPendiente(rid);   // el tipo que falta en este recinto
   (propState[S.floorId]=propState[S.floorId]||[]).push(it);
   sProp(); return it;
 }
@@ -5192,7 +5448,7 @@ function _propLayer(){
       e.preventDefault(); e.stopPropagation();
       const p=s2i(e.clientX,e.clientY);
       const cupo=_propCupo(S.propMode), n=_propTotal(S.propMode);
-      if(cupo && n>=cupo){
+      if((cupo || (S.propMode==='printer' && cupo===0)) && n>=cupo){
         const D=PROP_DEF[S.propMode];
         if(!confirm('⚠ Ya se colocaron '+n+' '+D.lbl.toLowerCase()+'s y el cupo es '+cupo+'.\n\n¿Colocar igual y quedar '+(n+1-cupo)+' sobre el cupo?')) return;
       }
@@ -5236,7 +5492,10 @@ function _propDragUp(){
 // Atlas cuenta las colocadas en TODOS los pisos: el gestor muestra «12 / 40», el
 // modo colocar avisa cuántas quedan y, al llegar al cupo, pide confirmar antes de
 // pasarse. Sin cupo fijado, todo funciona como antes.
-function _propCupo(k){ const v=+((nameState.propCupos||{})[k]); return (Number.isFinite(v)&&v>0)?Math.floor(v):null; }
+function _propCupo(k){
+  // impresoras: el cupo ya no se fija a mano — es lo que falta para el total del archivo
+  if(k==='printer' && _tiD().filas.length){ const c=_tiCuenta(); return Math.max(0,c.total-c.auto); }
+  const v=+((nameState.propCupos||{})[k]); return (Number.isFinite(v)&&v>0)?Math.floor(v):null; }
 function _propTotal(k){ let n=0; Object.values(propState).forEach(a=>(a||[]).forEach(x=>{ if(x&&x.k===k) n++; })); return n; }
 function _propCupoTxt(k){ const c=_propCupo(k), n=_propTotal(k); return c?(n+' / '+c):String(n); }
 function fijarCupo(k){
@@ -5296,12 +5555,14 @@ function _ubicLayer(tipos){
     const c={}; items.forEach(it=>{ c[it.k]=(c[it.k]||0)+1; });
     lg.innerHTML='📍 '+(curFloor()?curFloor().label:S.floorId)+' · '
       +tipos.map(t=>PROP_DEF[t].ico+' '+PROP_DEF[t].lbl.split(' ·')[0].split(' /')[0]+' <b>'+(c[t]||0)+'</b>'
-        +(_propCupo(t)?(' <span style="color:'+(_propTotal(t)>_propCupo(t)?'#dc2626':'#64748b')+'">(hospital '+_propTotal(t)+'/'+_propCupo(t)+')</span>'):'')).join(' · ')
+        +(t==='printer'&&_tiD().filas.length?(()=>{ const C=_tiCuenta(); return ' <span style="color:'+(C.sobre?'#dc2626':'#64748b')+'">(hospital '+C.desp+'/'+C.total+')</span>'; })()
+          :(_propCupo(t)?(' <span style="color:'+(_propTotal(t)>_propCupo(t)?'#dc2626':'#64748b')+'">(hospital '+_propTotal(t)+'/'+_propCupo(t)+')</span>'):''))).join(' · ')
       +(items.length?'':' <span style="color:#b45309">— ninguno colocado en este piso</span>');
     lg.style.display='';
   }
 }
 function _ubicRescale(){
+  _cpRescale();
   if(!svg.classList.contains('ubic-mode')) return;
   const k=1/Math.max(S.zoom,1e-4);
   svg.querySelectorAll('.ubic-mk').forEach(m=>{
@@ -5312,6 +5573,393 @@ function _ubicIr(it){
   const ctx=it.rid?_findRoom(it.rid):null;
   if(ctx){ didPan=false; goArea(ctx.area.id); setTimeout(()=>{ try{ zoomTo({x:it.x-150,y:it.y-150,w:300,h:300},120); }catch(e){} },750); }
   else { try{ zoomTo({x:it.x-400,y:it.y-400,w:800,h:800},60); }catch(e){} }
+}
+// ═══ CARROS DE PARO ═════════════════════════════════════════════════════════
+// Un carro de paro son DOS elementos del EMMC en el mismo recinto: el monitor
+// desfibrilador (130007 Nihon Kohden TEC-5600 · 130008 ZOLL M2 con MPE) y su
+// mobiliario, el carro de paro (110032 Malvestio). Se cruzan por recinto con
+// equipForRoom() —la misma parte que le toca a cada instancia que ve la ficha— y
+// se marcan en el plano con el mismo pulso que ubica a una persona:
+//   azul = desfibrilador con su carro · rojo = desfibrilador sin carro (o menos
+//   carros que desfibriladores). Un carro sin desfibrilador no se pinta (no es
+//   un carro de paro operativo) pero sí sale en la exportación.
+const CP_DEF=['130007','130008'], CP_CARRO='110032';
+const CP_COL={ok:'#2563eb', solo:'#dc2626'};
+// var y no let: renderSVG/_dockSync pueden correr antes de esta línea (TDZ)
+var _cpOn=false; try{ _cpOn=localStorage.getItem('cabida_carros')==='1'; }catch(e){}
+function toggleCarros(){
+  _cpOn=!_cpOn; _lsPref('cabida_carros', _cpOn?'1':'0');
+  renderSVG(); try{ _dockSync(); }catch(e){}
+}
+// ── Reparto correcto por CAJA DIBUJADA (compartido) ─────────────────────────
+// Un código puede tener menos instancias en la PMA que cajas dibujadas (26.9.1:
+// 1 desfibrilador, 16 cajas) y el reparto de equipForRoom()/mncForRoom() le da
+// la unidad ENTERA a cada caja (82 desfibriladores en el plano contra 64 del
+// EMMC). Estas dos funciones reparten por caja: las ancladas por BIM a la PMA
+// van primero, en su orden, y el resto después, así la suma por código cuadra
+// con la fuente. Las usan Carros de paro e Impresoras TI (y cualquier capa
+// nueva que cruce un catálogo por código de recinto).
+function _repartoShare(rid, code){
+  const boxes=_codeBoxes(code)||[];
+  const pma=((window.PMA_BIM||{}).codeToBim||{})[code]||[];
+  const ix=r=>{ const bs=(rBim(r)||'').match(/[A-Za-z]\d{3,5}/g)||[];
+    const i=Math.min(...bs.map(b=>pma.indexOf(b)).filter(i=>i>=0)); return Number.isFinite(i)?i:1e9; };
+  const orden=boxes.slice().sort((a,b)=>ix(a)-ix(b) || boxes.indexOf(a)-boxes.indexOf(b));
+  const N=Math.max(1, codeInstances(code), boxes.length);
+  const k=Math.max(0, orden.indexOf(rid));
+  return {N, k:k%N};
+}
+// Cada código del catálogo se asigna a su código DIBUJADO más específico: 10.2.1
+// va a la caja 10.2.1 si existe y, si no, a la del padre 10.2 (equipOfCode()/
+// _mnc2CodeBase() lo sumarían en las dos). Sin padre dibujado queda sin ubicar.
+function _repartoDueno(k){
+  for(let p=k;p;){ if((_codeBoxes(p)||[]).length) return p; const i=p.lastIndexOf('.'); if(i<0) return null; p=p.slice(0,i); }
+  return null;
+}
+// sólo los ~90 códigos del EMMC que traen desfibrilador o carro (de 963)
+let _cpClavesMemo=null;
+function _cpClaves(){
+  if(!_cpClavesMemo){ const RE=window.RECINTO_EQUIP||{};
+    _cpClavesMemo=Object.keys(RE).filter(k=>RE[k].some(e=>{ const t=String(e.t||''); return CP_DEF.includes(t)||t===CP_CARRO; })); }
+  return _cpClavesMemo;
+}
+function _cpDeRecinto(rid){
+  const x={d:0,c:0,mod:{},porClave:{}};
+  const RE=window.RECINTO_EQUIP||{};
+  rCodeParts(rid).forEach(code=>{
+    const {N,k}=_repartoShare(rid, code);
+    _cpClaves().filter(kk=>(kk===code || kk.indexOf(code+'.')===0) && _repartoDueno(kk)===code).forEach(kk=>{
+      RE[kk].forEach(e=>{
+        const t=String(e.t||''); if(!CP_DEF.includes(t) && t!==CP_CARRO) return;
+        const q=_shareQty(N,k,Math.max(1,parseInt(e.c)||1)); if(q<=0) return;
+        const pc=(x.porClave[kk]=x.porClave[kk]||{d:0,c:0});
+        if(t===CP_CARRO){ x.c+=q; pc.c+=q; }
+        else { x.d+=q; pc.d+=q; x.mod[t+' '+(e.n||'')]=(x.mod[t+' '+(e.n||'')]||0)+q; }
+      });
+    });
+  });
+  return x;
+}
+function _cpEstado(x){ return x.d ? (x.c>=x.d ? 'ok' : 'solo') : (x.c ? 'carro' : null); }
+function _cpEstadoTxt(x){
+  const e=_cpEstado(x);
+  return e==='ok' ? 'Completo' : e==='carro' ? 'Carro sin desfibrilador'
+       : x.c ? ('Faltan '+(x.d-x.c)+' carro(s)') : 'Desfibrilador sin carro';
+}
+function _cpCentro(rid){
+  const sh=boxState.rooms[rid]||[]; if(!sh.length) return null;
+  const x0=Math.min(...sh.map(q=>q.x)), y0=Math.min(...sh.map(q=>q.y));
+  const x1=Math.max(...sh.map(q=>q.x+q.w)), y1=Math.max(...sh.map(q=>q.y+q.h));
+  return {x:(x0+x1)/2, y:(y0+y1)/2};
+}
+// Todos los recintos DIBUJADOS del edificio con desfibrilador o carro.
+function _cpRecintos(){
+  const out=[];
+  FLOORS.forEach(fl=>fl.areas.forEach(a=>(a.rooms||[]).forEach(r=>{
+    const c=_cpCentro(r.id); if(!c) return;
+    const x=_cpDeRecinto(r.id), est=_cpEstado(x); if(!est) return;
+    out.push({fl, area:a, r, x, est, cx:c.x, cy:c.y});
+  })));
+  return out;
+}
+// Unidades de píxel del plano por píxel de pantalla (igual que perHi).
+function _cpK(){
+  const vb=(svg.getAttribute('viewBox')||'').split(/\s+/).map(Number);
+  const w=svg.getBoundingClientRect().width||1;
+  return (vb.length===4 && vb[2]) ? vb[2]/w : 1/Math.max(S.zoom,1e-4);
+}
+function _cpLayer(){
+  const todos=_cpRecintos(), fl=curFloor();
+  let aqui=todos.filter(z=>fl && z.fl.id===fl.id && z.est!=='carro');
+  if(S.level>1 && S.areaId) aqui=aqui.filter(z=>z.area.id===S.areaId);
+  const g=el('g',{class:'cp-layer'}), k=_cpK();
+  aqui.forEach(z=>{
+    const col=CP_COL[z.est];
+    const mk=el('g',{class:'cp-mk cp-'+z.est,transform:`translate(${z.cx},${z.cy}) scale(${k})`});
+    // pulso SMIL (como el localizador de personas): late igual con el plano cerca o lejos
+    const an=el('circle',{cx:0,cy:0,r:15,fill:'none',stroke:col,'stroke-width':3});
+    [['r','15','38'],['opacity','.9','0']].forEach(([at,de,a])=>{
+      const m=document.createElementNS('http://www.w3.org/2000/svg','animate');
+      m.setAttribute('attributeName',at); m.setAttribute('from',de); m.setAttribute('to',a);
+      m.setAttribute('dur',z.est==='solo'?'0.9s':'1.4s'); m.setAttribute('repeatCount','indefinite'); an.appendChild(m);
+    });
+    mk.appendChild(an);
+    mk.appendChild(el('circle',{cx:0,cy:0,r:15,fill:'#fff',opacity:.92}));
+    mk.appendChild(el('circle',{cx:0,cy:0,r:12,fill:col,stroke:'#fff','stroke-width':2.5}));
+    mk.appendChild(txt(0,1,'🚨',{'font-size':12,'pointer-events':'none'}));
+    if(z.x.d>1) mk.appendChild(txt(13,-12,String(z.x.d),{'font-size':11,'font-weight':800,fill:col,'pointer-events':'none'}));
+    const t=el('title');
+    t.textContent='🚨 '+(rName(z.r.id)||'(sin nombre)')+' · '+aName(z.area.id)+'\n'
+      +Object.entries(z.x.mod).map(([m,q])=>q+' × '+m).join('\n')
+      +'\n'+z.x.c+' × 110032 Carro de paro\n→ '+_cpEstadoTxt(z.x)+' · clic = ir al recinto';
+    mk.appendChild(t);
+    mk.addEventListener('mousedown',e=>e.stopPropagation());
+    mk.addEventListener('click',e=>{ e.stopPropagation(); didPan=false; goRoom(z.r.id); });
+    g.appendChild(mk);
+  });
+  svg.appendChild(g);
+  const lg=document.getElementById('cpLegend');
+  if(lg){
+    const ok=aqui.filter(z=>z.est==='ok').length, solo=aqui.filter(z=>z.est==='solo').length;
+    const hOk=todos.filter(z=>z.est==='ok').length, hSolo=todos.filter(z=>z.est==='solo').length;
+    lg.innerHTML='<span>🚨 <b>'+(fl?fl.label:'')+'</b></span>'
+      +'<span><i class="cp-pt" style="background:'+CP_COL.ok+'"></i>completos <b>'+ok+'</b></span>'
+      +'<span><i class="cp-pt" style="background:'+CP_COL.solo+'"></i>sin carro <b>'+solo+'</b></span>'
+      +'<span style="color:#64748b">hospital '+hOk+' / '+hSolo+'</span>'
+      +'<button type="button" onclick="exportCarrosParo()" title="Todos los pisos, recinto por recinto">⬇ Excel</button>';
+    lg.style.display='';
+  }
+}
+function _cpRescale(){
+  const ms=svg.querySelectorAll('.cp-mk'); if(!ms.length) return;
+  const k=_cpK();
+  ms.forEach(m=>{ const t=m.getAttribute('transform')||''; m.setAttribute('transform', t.replace(/scale\([^)]*\)/,'scale('+k+')')); });
+}
+function exportCarrosParo(){
+  const hoy=new Date().toISOString().slice(0,10);
+  const todos=_cpRecintos();
+  const ORD={solo:0,ok:1,carro:2}, pisoIx=id=>FLOORS.findIndex(f=>f.id===id);
+  todos.sort((a,b)=>ORD[a.est]-ORD[b.est] || pisoIx(a.fl.id)-pisoIx(b.fl.id) || String(aName(a.area.id)).localeCompare(String(aName(b.area.id)),'es'));
+  const rows=[['Carros de paro por recinto · Atlas HDS · '+hoy],
+    ['Desfibrilador 130007 / 130008 + carro de paro 110032, según el EMMC de cada recinto dibujado (reparto por instancia, igual que la ficha).'],
+    ['Estado','Piso','Servicio','Recinto','Código','BIM','Desfibriladores','Modelo','Carros de paro 110032']];
+  todos.forEach(z=>rows.push([_cpEstadoTxt(z.x), z.fl.label, aName(z.area.id), rName(z.r.id)||'', rCode(z.r.id)||'',
+    ((rBim(z.r.id)||'').match(/[A-Za-z]\d{3,5}/g)||[]).join('\n'), z.x.d,
+    Object.entries(z.x.mod).map(([m,q])=>q+' × '+m).join('\n'), z.x.c]));
+  const COLR={'Completo':'FFDBEAFE','Carro sin desfibrilador':'FFF1F5F9'};
+  const estilo=(r,c,v)=>{ if(c!==0) return null; const f=COLR[v]||'FFFEE2E2';
+    return {fill:{patternType:'solid',fgColor:{rgb:f}},font:{bold:true,color:{rgb:v==='Completo'?'FF1D4ED8':v==='Carro sin desfibrilador'?'FF475569':'FFB91C1C'}}}; };
+  // resumen por piso
+  const res=[['Resumen por piso · '+hoy],[''],['Piso','Completos','Desfibrilador sin carro','Carro sin desfibrilador','Desfibriladores','Carros de paro']];
+  const T=[0,0,0,0,0];
+  FLOORS.forEach(fl=>{
+    const z=todos.filter(q=>q.fl.id===fl.id); if(!z.length) return;
+    const f=[z.filter(q=>q.est==='ok').length, z.filter(q=>q.est==='solo').length, z.filter(q=>q.est==='carro').length,
+             z.reduce((a,q)=>a+q.x.d,0), z.reduce((a,q)=>a+q.x.c,0)];
+    f.forEach((v,i)=>T[i]+=v); res.push([fl.label,...f]);
+  });
+  res.push(['Total',...T]);
+  // del EMMC pero sin recinto dibujado en el Atlas: no se pueden ubicar en el plano
+  // lo que el EMMC trae y el mapa no alcanza a ubicar: código sin caja dibujada,
+  // o con menos cajas que instancias en la PMA (9.2.2: 2 desfibriladores, 1 caja)
+  const sin=[['Sin recinto dibujado en el Atlas · '+hoy],['Unidades del EMMC que no quedan en ninguna caja del plano: el código no está dibujado o tiene menos cajas que instancias en la PMA.'],['Código EMMC','Desfibriladores sin ubicar','Carros sin ubicar','De un total EMMC de','Motivo']];
+  const RE=window.RECINTO_EQUIP||{}, ubic={};
+  todos.forEach(z=>Object.entries(z.x.porClave).forEach(([kk,v])=>{ const u=(ubic[kk]=ubic[kk]||{d:0,c:0}); u.d+=v.d; u.c+=v.c; }));
+  Object.keys(RE).sort().forEach(kk=>{
+    let d=0,c=0; RE[kk].forEach(e=>{ const t=String(e.t||''), q=Math.max(1,parseInt(e.c)||1);
+      if(CP_DEF.includes(t)) d+=q; else if(t===CP_CARRO) c+=q; });
+    if(!d && !c) return;
+    const u=ubic[kk]||{d:0,c:0}, fd=d-u.d, fc=c-u.c;
+    if(fd>0 || fc>0) sin.push([kk, fd, fc, d+' desfib. · '+c+' carros',
+      _repartoDueno(kk) ? ('dibujado en '+(_codeBoxes(_repartoDueno(kk))||[]).length+' caja(s), la PMA tiene '+codeInstances(_repartoDueno(kk))+' instancia(s)') : 'código sin caja en el plano']);
+  });
+  xlsxLibro([
+    {name:'Carros de paro', rows, hdr:2, freezeCols:1, estilo,
+     colW:[{wch:24},{wch:14},{wch:34},{wch:34},{wch:12},{wch:10},{wch:14},{wch:40},{wch:12}]},
+    {name:'Resumen por piso', rows:res, hdr:2, totalRow:true, colW:[{wch:18},{wch:12},{wch:22},{wch:22},{wch:15},{wch:15}]},
+    {name:'Sin recinto en el Atlas', rows:sin, hdr:2, colW:[{wch:20},{wch:14},{wch:12},{wch:22},{wch:52}]}
+  ], 'Carros_de_paro_'+hoy+'.xlsx');
+}
+// ═══ IMPRESORAS DEL HDS (archivo «Comodatos y Traslados HDS-ING · Junio 2026») ══
+// El foco son 3 tipos, los que trae la hoja Comodatos de ese archivo (SHARED_DATA/
+// impresoras_hds.js, la genera _DEV/build_impresoras_hds.py):
+//   👤 Láser monousuario · 👥 Láser multiusuario · 📠 Multifuncional multiusuario
+// Cada fila es «código de recinto + tipo + cantidad TOTAL del código», no por BIM.
+// Se cruza con el PMA: el código tiene N instancias físicas (BIM) y el Atlas la
+// reparte entre las cajas dibujadas de ese código (_repartoShare: las ancladas por
+// BIM a la PMA primero, en su orden). Así la suma cuadra con el archivo — el reparto
+// general de mncForRoom() sobrecontaba (785 contra 612 con el PMA anterior).
+// Con varias instancias y varios tipos en un mismo código, el archivo NO dice qué
+// tipo va en qué BIM: se asigna por orden PMA y queda marcado «por orden» en el Excel.
+function _tiD(){ return window.IMPRESORAS_HDS||{tipos:[],filas:[],totales:{}}; }
+function _tiTipos(){ return _tiD().tipos||[]; }
+function _tiTipo(k){ return _tiTipos().find(t=>t.k===k)||{k,nombre:k,ico:'🖨',corto:k}; }
+// unidades por código DIBUJADO ({código:[tipoK,…]}) y filas del archivo sin caja dibujada
+let _tiUnidMemo=null;
+function _tiUnidades(){
+  _codeBoxes('');                                        // fuerza a construir el índice de cajas
+  if(_tiUnidMemo && _tiUnidMemo.idx===_codeBoxIndex) return _tiUnidMemo;
+  const ord={}; _tiTipos().forEach((t,i)=>{ ord[t.k]=i; });
+  const por={}, sin=[], filas={};
+  _tiD().filas.forEach(f=>{
+    const code=[f.cod].concat(f.alt||[]).find(c=>(_codeBoxes(c)||[]).length);
+    if(!code){ sin.push(f); return; }
+    const a=(por[code]=por[code]||[]);
+    for(let i=0;i<f.cant;i++) a.push(f.tipo);
+    (filas[code+'|'+f.tipo]=filas[code+'|'+f.tipo]||[]).push(f);
+  });
+  Object.values(por).forEach(a=>a.sort((x,y)=>ord[x]-ord[y]));
+  _tiUnidMemo={idx:_codeBoxIndex, por, sin, filas};
+  return _tiUnidMemo;
+}
+// Lo que le toca a ESTE recinto: [{code,k,q,orden}] — la unidad u del código va a la
+// instancia u % N (N = instancias PMA o cajas dibujadas, la mayor; k = la de este recinto).
+function _tiAsigna(rid){
+  const U=_tiUnidades(), out=[];
+  rCodeParts(rid).forEach(code=>{
+    const us=U.por[code]; if(!us) return;
+    const {N,k}=_repartoShare(rid, code);
+    const orden=N>1 && new Set(us).size>1, q={};
+    us.forEach((t,u)=>{ if(u%N===k) q[t]=(q[t]||0)+1; });
+    Object.entries(q).forEach(([t,n])=>out.push({code, k:t, q:n, orden}));
+  });
+  return out;
+}
+// {tipoK: cantidad} para este recinto
+function _tiDeRecinto(rid){
+  const o={}; _tiAsigna(rid).forEach(a=>{ o[a.k]=(o[a.k]||0)+a.q; });
+  _tiManuales().forEach(m=>{ if(m.rid===rid) o[m.k]=(o[m.k]||0)+1; });     // colocadas a mano
+  return o;
+}
+// Sólo lo automático (archivo × PMA), memoizado: lo usan _propCupo y el dock en el camino
+// caliente del render y recorre todos los recintos. Se invalida solo cuando cambia el
+// índice de cajas (_codeBoxIndex se rehace al editar cajas o códigos).
+let _tiAutoMemo=null;
+function _tiRecintosAuto(){
+  _codeBoxes('');
+  if(_tiAutoMemo && _tiAutoMemo.idx===_codeBoxIndex) return _tiAutoMemo.v;
+  const out=[];
+  FLOORS.forEach(fl=>fl.areas.forEach(a=>(a.rooms||[]).forEach(r=>{
+    if(!(boxState.rooms[r.id]||[]).length) return;
+    const asig=_tiAsigna(r.id); if(!asig.length) return;
+    const items={}; asig.forEach(x=>{ items[x.k]=(items[x.k]||0)+x.q; });
+    out.push({fl, area:a, r, items, asig, total:asig.reduce((s,x)=>s+x.q,0), orden:asig.some(x=>x.orden)});
+  })));
+  _tiAutoMemo={idx:_codeBoxIndex, v:out}; return out;
+}
+// Las que se colocan a mano con la herramienta 🖨 Impresora: sirven para completar lo que el
+// archivo trae y no cayó en ninguna caja. Cada una lleva su TIPO (it.tipo, se asigna al colocar).
+function _tiManuales(){
+  const out=[]; const t0=(_tiTipos()[0]||{}).k;
+  Object.entries(propState).forEach(([fid,arr])=>(arr||[]).forEach(it=>{ if(it&&it.k==='printer') out.push({it,fid,rid:it.rid||null,k:it.tipo||t0}); }));
+  return out;
+}
+// Todos los recintos con al menos una impresora: automáticas + colocadas a mano.
+function _tiRecintos(){
+  const base=_tiRecintosAuto(), man=_tiManuales().filter(m=>m.rid);
+  if(!man.length) return base;
+  const por=new Map(base.map(z=>[z.r.id,{...z,items:{...z.items},asig:z.asig.slice()}]));
+  man.forEach(m=>{
+    let z=por.get(m.rid);
+    if(!z){ const c=_findRoom(m.rid); if(!c) return;
+      z={fl:c.floor, area:c.area, r:c.room, items:{}, asig:[], total:0, orden:false}; por.set(m.rid,z); }
+    z.items[m.k]=(z.items[m.k]||0)+1; z.total++; z.asig.push({code:'(a mano)', k:m.k, q:1, orden:false, manual:true});
+  });
+  return [...por.values()];
+}
+// Lo que el archivo trae y no cae en una caja: [{code,recinto,k,cant,motivo,rid}] menos lo ya cubierto a mano.
+function _tiFaltantes(){
+  const U=_tiUnidades(), auto=_tiRecintosAuto(), out=[];
+  U.sin.forEach(f=>out.push({code:f.cod_orig, recinto:f.recinto, k:f.tipo, cant:f.cant, rid:null, motivo:'código sin caja dibujada en el Atlas'}));
+  const placed={}; auto.forEach(z=>z.asig.forEach(x=>{ const kk=x.code+'|'+x.k; placed[kk]=(placed[kk]||0)+x.q; }));
+  Object.keys(U.por).sort().forEach(code=>{
+    const t={}; U.por[code].forEach(k=>{ t[k]=(t[k]||0)+1; });
+    Object.entries(t).forEach(([k,n])=>{ const falta=n-(placed[code+'|'+k]||0);
+      if(falta>0) out.push({code, recinto:((U.filas[code+'|'+k]||[])[0]||{}).recinto||'', k, cant:falta, rid:(_codeBoxes(code)||[])[0]||null,
+        motivo:'dibujado en '+(_codeBoxes(code)||[]).length+' caja(s); el PMA trae '+codeInstances(code)+' instancia(s)'}); });
+  });
+  // lo ya colocado a mano descuenta: primero del mismo código y tipo, si no de cualquiera del mismo tipo
+  _tiManuales().forEach(m=>{
+    const cods=m.rid?rCodeParts(m.rid):[];
+    const f=out.find(x=>x.k===m.k && x.cant>0 && cods.includes(x.code)) || out.find(x=>x.k===m.k && x.cant>0);
+    if(f) f.cant--;
+  });
+  return out.filter(x=>x.cant>0);
+}
+// Cuenta única de impresoras: total del archivo = automáticas + a mano + faltan.
+function _tiCuenta(){
+  const total=_tiTipos().reduce((a,t)=>a+(_tiD().totales[t.k]||0),0);
+  const auto=_tiRecintosAuto().reduce((a,z)=>a+z.total,0), manual=_tiManuales().length;
+  return {total, auto, manual, desp:auto+manual, faltan:Math.max(0,total-auto-manual), sobre:Math.max(0,auto+manual-total)};
+}
+// El tipo que le toca a una impresora colocada a mano en este recinto: el que falta de SU código;
+// si no, el del faltante más grande; si ya no falta ninguna, el primero (el cupo avisará).
+function _tiTipoPendiente(rid){
+  const fal=_tiFaltantes(), cods=rid?rCodeParts(rid):[];
+  const f=fal.find(x=>cods.includes(x.code)) || fal.slice().sort((a,b)=>b.cant-a.cant)[0];
+  return f?f.k:(_tiTipos()[0]||{}).k;
+}
+// Testigo de vista 2: 🖨 + el icono de cada tipo (con la cantidad si es más de una)
+function _tiTestigo(items){
+  return '🖨 '+_tiTipos().filter(t=>items[t.k]).map(t=>t.ico+(items[t.k]>1?items[t.k]:'')).join(' ');
+}
+// Toggle del testigo en vista 2 (esquina inferior izquierda de cada recinto).
+function toggleTiPrint(){
+  S.showTI=!S.showTI; _lsPref('cabida_show_ti', S.showTI?'1':'0');
+  const b=document.getElementById('btnTiPrint'); if(b) b.classList.toggle('active',S.showTI);
+  renderSVG();
+}
+// Reporte: desplegadas (en cajas dibujadas) contra el total del archivo, por tipo.
+function _tiResumen(){
+  const D=_tiD(), auto={}, man={}, tot={}, fact={};
+  _tiTipos().forEach(t=>{ auto[t.k]=0; man[t.k]=0; tot[t.k]=0; fact[t.k]={}; });
+  D.filas.forEach(f=>{ tot[f.tipo]+=f.cant; const c=f.fact||'(vacío)'; fact[f.tipo][c]=(fact[f.tipo][c]||0)+f.cant; });
+  _tiRecintosAuto().forEach(z=>Object.entries(z.items).forEach(([k,q])=>{ auto[k]+=q; }));
+  _tiManuales().forEach(m=>{ man[m.k]=(man[m.k]||0)+1; });
+  return _tiTipos().map(t=>({k:t.k, n:t.nombre, ico:t.ico, auto:auto[t.k], man:man[t.k], desp:auto[t.k]+man[t.k], total:tot[t.k], fact:fact[t.k]}));
+}
+function _tiBadge(){
+  const b=document.getElementById('dkTiN'); if(!b) return;
+  try{ const c=_tiCuenta(); b.textContent=c.desp+'/'+c.total; b.style.color=c.sobre?'#dc2626':(c.faltan?'':'#16a34a'); }catch(e){}
+}
+function abrirReporteTI(){
+  const res=_tiResumen(), C=_tiCuenta(), fal=_tiFaltantes();
+  const esc=x=>String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const nOrden=_tiRecintosAuto().filter(z=>z.orden).length;
+  document.getElementById('tiModalN').textContent=C.desp+' / '+C.total;
+  const filas=res.map(r=>{
+    const falta=r.total-r.desp, col=falta>0?'#b45309':(falta<0?'#dc2626':'#16a34a');
+    const fc=Object.entries(r.fact).map(([k,v])=>v+' '+k).join(' · ');
+    return '<div class="fk-eq"><span class="q" style="min-width:64px;color:'+col+'">'+r.desp+' / '+r.total+'</span>'
+      +'<span class="nm">'+r.ico+' '+esc(r.n)+'<br><span style="font-size:10.5px;color:#64748b;font-weight:400">'+r.auto+' automáticas (archivo × PMA)'
+      +(r.man?(' + '+r.man+' colocadas a mano'):'')+' · factibilidad Jun-2026: '+esc(fc)+'</span></span>'
+      +(falta>0?'<span class="fam" style="color:#b45309">faltan '+falta+'</span>':(falta<0?'<span class="fam" style="color:#dc2626">'+(-falta)+' sobre el total</span>':'<span class="fam" style="color:#16a34a">completo</span>'))+'</div>';
+  }).join('');
+  const lista=fal.length?('<div style="padding:12px 18px 2px;font-size:11px;font-weight:800;letter-spacing:.5px;color:#92400e;text-transform:uppercase">Faltan por ubicar · '+C.faltan+'</div>'
+    +fal.map(f=>{ const t=_tiTipo(f.k);
+      return '<div class="fk-eq'+(f.rid?' fk-click':'')+'"'+(f.rid?' onclick="closeReporteTI();didPan=false;goRoom(\''+f.rid+'\')" title="Ir al recinto"':'')+'>'
+        +'<span class="q">'+f.cant+'×</span><span class="nm">'+t.ico+' '+esc(t.nombre)+'<br><span style="font-size:10.5px;color:#64748b;font-weight:400">'
+        +esc(f.code)+' · '+esc(f.recinto)+' — '+esc(f.motivo)+'</span></span>'+(f.rid?'<span class="fk-go">›</span>':'')+'</div>'; }).join('')):'';
+  document.getElementById('tiModalBody').innerHTML=
+    '<div style="padding:4px 18px 10px;font-size:11.5px;color:#64748b">'
+    +'<b>Total</b> = lo que trae el archivo «Comodatos y Traslados HDS-ING (Junio 2026)» para el HDS. Se ubican solas en la caja que corresponde cruzando el código con el PMA (BIM); '
+    +'las que no caen en ninguna caja se completan <b>colocándolas a mano</b> con 🖨 Impresora y quedan sumadas acá, en el testigo del recinto y en el Excel. Una sola cuenta.</div>'
+    +'<div style="padding:0 18px 8px;font-size:12.5px;color:#0f172a"><b>'+C.auto+'</b> automáticas + <b>'+C.manual+'</b> a mano = <b>'+C.desp+'</b> de '+C.total
+    +(C.faltan?(' · quedan <b style="color:#b45309">'+C.faltan+'</b> por ubicar'):(C.sobre?(' · <b style="color:#dc2626">'+C.sobre+' sobre el total</b>'):' · <b style="color:#16a34a">completo</b>'))+'</div>'
+    +filas+lista
+    +'<div style="padding:8px 18px 0;font-size:11.5px;color:#475569"><b>Testigo en el plano:</b> 🖨 + 👤 monousuario · 👥 multiusuario · 📠 multifuncional (con la cantidad si es más de una).</div>'
+    +(nOrden?'<div style="padding:6px 18px 0;font-size:11.5px;color:#92400e">⚠ En '+nOrden+' recinto'+(nOrden===1?'':'s')+' el tipo se asignó <b>por orden PMA</b>: el archivo da el total por código de recinto, no por BIM, y ese código tiene varias instancias y más de un tipo.</div>':'')
+    +'<div style="padding:10px 18px 4px;display:flex;gap:8px;flex-wrap:wrap">'
+    +(C.faltan&&!(S.viewOnly&&!S.editPM)?'<button class="fk-open" onclick="closeReporteTI();setPropMode(\'printer\')" style="border:none;background:#ea580c;color:#fff;cursor:pointer" title="Entra a un servicio (vista 2) y haz clic en el plano: cada clic suma una, con el tipo que falta">🖨 Colocar las que faltan</button>':'')
+    +'<button class="fk-open" onclick="exportImpresorasTI()" style="border:none;background:#0f2547;color:#fff;cursor:pointer">⬇ Exportar a Excel</button></div>';
+  document.getElementById('tiModal').classList.add('show');
+}
+function closeReporteTI(){ document.getElementById('tiModal').classList.remove('show'); }
+function exportImpresorasTI(){
+  const hoy=new Date().toISOString().slice(0,10), U=_tiUnidades();
+  const todos=_tiRecintos().sort((a,b)=>FLOORS.findIndex(f=>f.id===a.fl.id)-FLOORS.findIndex(f=>f.id===b.fl.id)
+    || String(aName(a.area.id)).localeCompare(String(aName(b.area.id)),'es'));
+  const factDe=(code,k)=>[...new Set((U.filas[code+'|'+k]||[]).map(f=>f.fact||'(vacío)'))].join(' / ');
+  const rows=[['Impresoras del HDS por recinto · Atlas HDS · '+hoy],
+    ['Fuente: Comodatos y Traslados HDS-ING (Junio 2026), hoja Comodatos. Se reparte el total de cada código entre las cajas dibujadas con el PMA (BIM); las que no caían en ninguna caja se colocaron a mano.'],
+    ['Piso','Servicio','Recinto','Código','BIM','Tipo de impresora','Cantidad','Asignación','Factibilidad Jun-2026']];
+  todos.forEach(z=>z.asig.forEach(x=>rows.push([z.fl.label, aName(z.area.id), rName(z.r.id)||'', x.manual?rCode(z.r.id)||'':x.code,
+    ((rBim(z.r.id)||'').match(/[A-Za-z]\d{3,5}/g)||[]).join('\n'), _tiTipo(x.k).nombre, x.q,
+    x.manual?'Colocada a mano (faltante del archivo)':(x.orden?'Automática · tipo por orden PMA (el archivo no da el BIM)':'Automática · exacta'),
+    x.manual?'':factDe(x.code,x.k)])));
+  const res=_tiResumen(), C=_tiCuenta();
+  const resRows=[['Resumen por tipo · '+hoy],[''],['Tipo de impresora','Automáticas','A mano','Desplegadas','Total archivo','Faltan por ubicar','Factibilidad Jun-2026']];
+  res.forEach(r=>resRows.push([r.n, r.auto, r.man, r.desp, r.total, Math.max(0,r.total-r.desp), Object.entries(r.fact).map(([k,v])=>v+' '+k).join(' · ')]));
+  resRows.push(['Total', C.auto, C.manual, C.desp, C.total, C.faltan, '']);
+  const sin=[['Faltan por ubicar · '+hoy],
+    ['Unidades del archivo que no caen en ninguna caja del plano y que aún no se colocan a mano: el código no está dibujado, o el PMA trae más instancias (BIM) que cajas.'],
+    ['Código (archivo)','Recinto (archivo)','Tipo de impresora','Cantidad','Motivo']];
+  _tiFaltantes().forEach(f=>sin.push([f.code, f.recinto, _tiTipo(f.k).nombre, f.cant, f.motivo]));
+  xlsxLibro([
+    {name:'Impresoras por recinto', rows, hdr:2, freezeCols:1, colW:[{wch:14},{wch:34},{wch:34},{wch:12},{wch:10},{wch:34},{wch:10},{wch:44},{wch:22}]},
+    {name:'Resumen por tipo', rows:resRows, hdr:2, totalRow:true, colW:[{wch:38},{wch:13},{wch:10},{wch:13},{wch:13},{wch:16},{wch:34}]},
+    {name:'Faltan por ubicar', rows:sin, hdr:2, colW:[{wch:18},{wch:36},{wch:34},{wch:10},{wch:52}]}
+  ], 'Impresoras_HDS_'+hoy+'.xlsx');
 }
 // Siembra desde los planos de Coordinación Mobiliario: trae los puestos que el
 // proyectista marcó en magenta. Es idempotente — reemplaza SOLO lo que vino del
@@ -5394,10 +6042,10 @@ function openPropReport(){
     +'<div><b style="color:#d100b6">'+tot.desk+'</b><span>🖥 Puestos de trabajo nuevos</span></div>'
     +'<div><b style="color:#7c3aed">'+tot.totem+'</b><span>🎫 Tótems / gestores de fila</span></div>'
     +'<div><b style="color:#16a34a">'+tot.dea+'</b><span>💚 DEA para Clave Azul</span></div>'
-    +(()=>{ const cp=_propCupo('printer'), nt=_propTotal('printer');
-       return '<div><b style="color:'+(cp&&nt>cp?'#dc2626':'#ea580c')+'">'+(cp?(nt+' / '+cp):nt)+'</b><span>🖨 Impresoras'
-         +(cp?(nt>cp?(' · ⚠ '+(nt-cp)+' sobre el cupo'):(' · quedan '+(cp-nt))):'')
-         +' · <a href="#" onclick="fijarCupo(\'printer\');openPropReport();return false" style="color:#1d5fa0">'+(cp?'cambiar cupo':'fijar cupo')+'</a></span></div>'; })()
+    +(()=>{ const C=_tiCuenta();
+       return '<div><b style="color:'+(C.sobre?'#dc2626':'#ea580c')+'">'+C.desp+' / '+C.total+'</b><span>🖨 Impresoras · '+C.auto+' automáticas + '+C.manual+' a mano'
+         +(C.faltan?(' · quedan '+C.faltan):(C.sobre?(' · ⚠ '+C.sobre+' sobre el total'):' · completo'))
+         +' · <a href="#" onclick="closePropReport&&closePropReport();abrirReporteTI();return false" style="color:#1d5fa0">ver reporte</a></span></div>'; })()
     +'</div>';
   if(!filas.length){ h+='<div class="fk-empty">Coloca puestos nuevos, tótems o DEA desde el gestor lateral 🧰 (vista 2 o 3). Aquí aparecen agrupados por piso, área y recinto.</div>'; body.innerHTML=h; }
   else {
@@ -5455,7 +6103,7 @@ function exportDEA(){
 const DOCK_MAPA=[
   ['dkIr',    ['btnBuscaRec']],
   ['dkVer',   ['vwDD']],
-  ['dkCons',  ['btnFicha','btnAutSan','btnEquip','btnScen','btnMoves','btnServPuestos']],
+  ['dkCons',  ['btnFicha','btnAutSan','btnEquip','btnMob','btnScen','btnMoves','btnServPuestos']],
   ['dkEdit2', ['btnUndo','btnDraw','btnMerge','btnUnmerge','btnRename','btnDel','btnDelDot','btnOrdenarDots']],
   ['dkAdd',   ['btnPuertas','puertaTipoSel','btnPuertaDel','btnPuertaDelAll','btnPuertasAuto','btnDupMueble','btnStruct']],
   ['dkExp',   ['btnExpServ']]
@@ -5531,16 +6179,15 @@ function _dockSync(){
   { const p=document.getElementById('rightPanel'); on('dkPanel', p && !p.classList.contains('collapsed')); }
   ['desk','totem','dea','printer'].forEach(k=>on('dk'+k.charAt(0).toUpperCase()+k.slice(1),S.propMode===k));
   _UBIC().forEach(k=>on('dkUbic'+k.charAt(0).toUpperCase()+k.slice(1), S.ubic&&S.ubic.has(k)));
+  on('dkUbicCarro', _cpOn);
+  on('dkTiReport', S.showTI);
   const ro=S.viewOnly&&!S.editPM;
   dis('dkDesk',ro||S.level<2); dis('dkTotem',ro||S.level<2); dis('dkDea',ro||S.level<2); dis('dkPrinter',ro||S.level<2); dis('dkPropDel',ro||!_propEnCtx().length);
   // contadores del contexto (piso / área / recinto)
   const items=_propEnCtx(); const c={desk:0,totem:0,dea:0,printer:0}; items.forEach(it=>{ c[it.k]=(c[it.k]||0)+1; });
   const setN=(id,v)=>{ const e=document.getElementById(id); if(e) e.textContent=v?String(v):''; };
   setN('dkDeskN',c.desk); setN('dkTotemN',c.totem); setN('dkDeaN',c.dea); setN('dkPrinterN',c.printer);
-  { const cp=_propCupo('printer'), nt=_propTotal('printer');
-    const lb=document.getElementById('dkPrinterCupoLb'), nb=document.getElementById('dkPrinterCupoN');
-    if(lb) lb.textContent=cp?('Impresoras '+nt+' / '+cp+(nt>cp?' ⚠':'')):'Fijar cupo de impresoras';
-    if(nb){ nb.textContent=cp?(nt+'/'+cp):''; nb.style.color=cp?(nt>cp?'#dc2626':(nt===cp?'#d97706':'#16a34a')):''; }
+  { try{ _tiBadge(); const C=_tiCuenta(); setN('dkPrinterN', C.faltan?('faltan '+C.faltan):c.printer); }catch(e){}
     const h=document.getElementById('propHint'); if(h && S.propMode==='printer') h.textContent=_propHintTxt('printer'); }
   setN('dkPropImpN', ((window.PROPUESTOS_PLANO||{}).total)||0);
   { const b=document.getElementById('sbBimN'); const e=document.getElementById('railBimN'); if(b&&e){ e.textContent=b.textContent||''; e.classList.toggle('done',b.classList.contains('done')); } }
@@ -6348,13 +6995,17 @@ function _structDragUp(){
 // ── Importar desde Navegación (SHARED_DATA/nav_verticales.js) ─────────────
 // Reemplaza ascensores/escaleras/mecánicas de TODOS los pisos con lo dibujado
 // en 8.Navegacion, a tamaño real; las líneas de circulación se conservan.
+// La siembra viene CALIBRADA contra el plano de cada piso (_DEV/calibra_verticales.py):
+// las escaleras calzan sobre los rótulos «Escaleras» de Coordinación Mobiliario y los
+// ascensores sobre el eje del ducto (consenso entre pisos), así que ya no hay que
+// reubicarlas a mano; _meta.calibracion deja el desfase y el residuo de cada piso.
 function importarVerticalesNav(sinConfirmar){
   const NV=window.NAV_VERTICALES; if(!NV||!NV.floors){ alert('No se encontró la siembra SHARED_DATA/nav_verticales.js.\nGenerarla con _DEV/importa_verticales_navegacion.py'); return; }
   const pisos=Object.keys(NV.floors), total=pisos.reduce((a,p)=>a+NV.floors[p].length,0);
   const actuales=Object.values(structuresState).flat().filter(x=>x.kind!=='circulation').length;
   if(!sinConfirmar && !confirm('Importar '+total+' ascensores/escaleras desde Navegación ('+pisos.join(', ')+')?\n\n'
       +'Se REEMPLAZAN los '+actuales+' ascensores/escaleras que hay ahora en el Atlas (las líneas de circulación se conservan).\n'
-      +'Después solo queda ubicarlos y escalarlos: arrastrar mueve, ⇧+arrastrar mueve todos los del piso, la esquina ◢ escala.')) return;
+      +'Vienen cuadrados con el plano de cada piso, así que no hay que reubicarlos: si alguno quedó corrido, arrastrar mueve, ⇧+arrastrar mueve todos los del piso y la esquina ◢ escala.')) return;
   const pisosTodos=new Set([...pisos, ...Object.keys(structuresState)]);
   pisosTodos.forEach(p=>{
     const lineas=(structuresState[p]||[]).filter(x=>x.kind==='circulation');
@@ -6364,7 +7015,7 @@ function importarVerticalesNav(sinConfirmar){
   });
   sStruct(); renderSVG();
   if(typeof closeStructMenu==='function') try{ closeStructMenu(); }catch(e){}
-  if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🛗 '+total+' ascensores/escaleras importados de Navegación en '+pisos.length+' pisos — ahora ubicar y escalar'; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},7000); }
+  if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🛗 '+total+' ascensores/escaleras importados de Navegación en '+pisos.length+' pisos — cuadrados con el plano de cada piso'; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},7000); }
 }
 
 function renderStructLine(it, tdef){
@@ -8261,7 +8912,14 @@ function openFichaRecinto(roomId){
   const _notaComp='<div class="fk-empty" style="color:#92400e;background:#fffbeb;border:1px solid #fde68a;border-radius:7px;padding:7px 9px;margin-bottom:5px;font-style:normal">'
     +'⚠ El código '+esc(code)+' se reparte entre '+_inst+' recintos y las unidades quedaron en otro. '
     +'Abajo, en gris, el total del código.</div>';
-  const informatica=tiEmmc.concat(split.ti||[]);
+  // Los 3 tipos de impresora del archivo Comodatos Jun-2026 (láser mono/multi y
+  // multifuncional) se calculan con el reparto por caja dibujada — la misma fuente
+  // que el testigo 🖨 de vista 2 — en vez del reparto general de mncForRoom(), que
+  // sobrecontaba. Las demás impresoras del MNC (etiquetas, brazaletes…) no se tocan.
+  const _tiN3=new Set(_tiTipos().map(t=>t.nombre.toUpperCase()));
+  const _tiCorrecto=(typeof _tiDeRecinto==='function')?_tiDeRecinto(roomId):{};
+  const informatica=tiEmmc.concat((split.ti||[]).filter(e=>!_tiN3.has(String(e.n||'').trim().toUpperCase())))
+    .concat(_tiTipos().filter(t=>_tiCorrecto[t.k]).map(t=>({n:t.nombre, f:'TI', c:_tiCorrecto[t.k]})));
   const mobNc=split.mob||[];
   // filas: Equipamiento e Informática son clicables → detalle EquiBox
   const rowHtml=(e,click)=>{
@@ -9196,7 +9854,9 @@ let _dpNav={sd:null,sv:null,u:null}, _dpSug=null, _dpLinks=[], _dpPeople=[];
 // sobrevive a abrir puestos en otras áreas/pisos. La sugerencia del área solo
 // aplica mientras el usuario no haya elegido nada.
 let _dpNavFijo=null;
-function _dpStaffAll(){ return (dotDB&&dotDB.staff)?dotDB.staff.filter(s=>s&&s.nombre):[]; }
+// Dotación VIGENTE: la matriz sin las personas marcadas fuera (jubilación,
+// renuncia…). Todo lo que cubica (panel, avance, buscador) usa esta lista.
+function _dpStaffAll(){ return (dotDB&&dotDB.staff)?dotDB.staff.filter(s=>s&&s.nombre&&!_esBaja(s.nombre)):[]; }
 function _dpNodo(){
   return _dpStaffAll().filter(s=>
     (!_dpNav.sd || String(s.subdireccion||'')===_dpNav.sd) &&
@@ -9253,7 +9913,9 @@ function renderDotPanel(){
   // ── contenido ──
   const base=buscando?_dpStaffAll():_dpNodo();
   const c=_dpCnt(base,asg);
-  document.getElementById('dpSub').textContent=c.n+' personas · '+c.a+' asignadas · '+c.p+' por asignar';
+  { const nB=Object.keys(nameState.bajas||{}).length;
+    document.getElementById('dpSub').innerHTML=esc(c.n+' personas · '+c.a+' asignadas · '+c.p+' por asignar')
+      +(nB?(' · <button class="dp-bajas-chip" onclick="listaBajas()" title="Ver y restaurar a las personas marcadas fuera de la matriz">⊘ '+nB+' fuera de la matriz</button>'):''); }
   const filas=[];
   const personas=lista=>{
     const vis=lista.filter(s=>{
@@ -9273,10 +9935,12 @@ function renderDotPanel(){
           +' onclick="event.stopPropagation();dpSel(\''+String(s.nombre).replace(/'/g,"\\'")+'\',this.checked)" '
           +'style="margin:0 7px 0 0;flex-shrink:0;cursor:pointer">'
         : '';
+      const _q=String(s.nombre).replace(/'/g,"\\'");
       filas.push('<div class="dp-row '+(rid?'ok':'no')+'" onclick="dpPick('+_i+')">'
         +_chk
         +'<span class="nm">'+esc(s.nombre)+becaTag(s)+'<span class="sub">'+esc(sub||'—')
         +(rid?(' · en '+esc(rName(rid)||'')):(buscando&&s.servicio?(' · '+esc(corto(s.servicio))):''))+'</span></span>'
+        +((S.viewOnly&&!S.editPM)?'':'<button class="dp-baja" title="Quitar de la matriz: jubilación, renuncia…" onclick="event.stopPropagation();openBaja(\''+_q+'\')">⊘</button>')
         +'<span class="st">'+(rid?'✔':'○')+'</span></div>');
     });
   };
@@ -9871,7 +10535,9 @@ function _mEstadoMatriz(){
   if(!n){ box.textContent=''; box.style.display='none'; return; }
   if(isInMatrix(n)){
     if(ext) ext.checked=false; if(mc) mc.checked=false;
-    box.innerHTML='✔ <b>En la matriz de dotación</b> · al guardar se quita cualquier marca y se cierra su alerta';
+    const _b=_bajaDe(n);
+    box.innerHTML=(_b?('⊘ <b>Fuera de la matriz</b> · '+esc0(_bajaLbl(_b))):'✔ <b>En la matriz de dotación</b> · al guardar se quita cualquier marca y se cierra su alerta')
+      +((S.viewOnly&&!S.editPM)?'':' · <a href="#" onclick="event.preventDefault();openBaja(\''+String(n).replace(/'/g,"\\'")+'\')" style="font-weight:700">'+(_b?'cambiar motivo':'⊘ quitar de la matriz')+'</a>');
     box.style.cssText='display:block;color:#15803d;background:#f0fdf4;border:1px solid #86efac;border-radius:6px;padding:3px 8px;font-size:11px;margin-top:3px';
   } else {
     if(ext) ext.checked=true;
@@ -10502,6 +11168,21 @@ function _nombreClase(nombre){
   const propios=toks.filter(t=>t.length>=3 && !/\d/.test(t) && !_GENERICOS.test(t));
   return {propios:propios.length, genericos:toks.length-propios.length};
 }
+// Personas marcadas fuera de la matriz que TODAVÍA tienen puesto asignado.
+function _bajaConPuesto(){
+  const out=[];
+  if(!Object.keys(nameState.bajas||{}).length) return out;
+  FLOORS.forEach(fl=>fl.areas.forEach(a=>(a.rooms||[]).forEach(r=>{
+    if(!(boxState.rooms[r.id]||[]).length) return;
+    (wsState.dots[r.id]||[]).forEach((d,idx)=>{
+      const push=(nombre,tIx)=>{ if(nombre&&_esBaja(nombre)) out.push({fl,area:a,r,idx,d,tIx,nombre,_chk:'baja',
+        cargo:[d.cargo,d.estamento].filter(Boolean).join(' · ')}); };
+      if(d.tipo==='dinamico') (d.turnos||[]).forEach((t,i)=>push(t.nombre,i));
+      else push((d.nombre||'').trim(),null);
+    });
+  })));
+  return out;
+}
 function _clasePersonal(p){
   if(p._chk==='comision') return 'dot_comision';
   const g=_nombreClase(p.nombre);
@@ -10520,7 +11201,7 @@ function _subPersonal(p){ return [p.cargo,p.area?aName(p.area.id):'',p.fl&&p.fl.
 function _goPersonal(p){
   if(S.viewOnly && !S.editPM) return;
   let rid=null, ix=-1;
-  if(p._chk==='externa'){ rid=p.r.id; ix=p.idx; }
+  if(p._chk==='externa'||p._chk==='baja'){ rid=p.r.id; ix=p.idx; }
   else if(p.asignado && p.r){
     rid=p.r.id;
     ix=(wsState.dots[rid]||[]).findIndex(d=> d.tipo==='dinamico'
@@ -10534,7 +11215,7 @@ function _goPersonal(p){
   if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='👤 '+p.nombre+' no tiene puesto en el Atlas: su ficha quedó abierta en el buscador'; setTimeout(()=>{ if(tbInfo)tbInfo.textContent=''; },5000); }
 }
 function _goDestinoPersonal(p){
-  return p._chk==='externa' ? !!(p.r && (wsState.dots[p.r.id]||[])[p.idx])
+  return (p._chk==='externa'||p._chk==='baja') ? !!(p.r && (wsState.dots[p.r.id]||[])[p.idx])
        : (p.asignado ? !!p.r : !!document.getElementById('gSearchInput'));
 }
 function _dotacionPendientes(){
@@ -10765,6 +11446,15 @@ const REV_CHECKS={
     subText:p=>{ const m=_matrizParecidos(p.nombre); return '≈ parecido a '+m.cands.slice(0,2).map(x=>'«'+x.nombre+'»').join(' o ')+(m.nCands>2?(' (+'+(m.nCands-2)+')'):'')
       +' · clic: abre el puesto con los parecidos para elegir · '+_subPersonal(p); },
     done:'No hay nombres fuera de matriz parecidos a personas de la matriz.'},
+  dot_baja:{label:'Personal: fuera de la matriz (jubilación/renuncia) con puesto',
+    find:_bajaConPuesto, flat:true, delDot:true, saveWs:true,
+    approve:true, okIf:()=>false, allIf:()=>true,
+    delTitle:'Liberar el puesto: esta persona ya no es parte de la dotación',
+    allLabel:n=>'🗑 Liberar los '+n+' puestos',
+    allMsg:n=>'¿Liberar los '+n+' puestos visibles?\n\nSon personas marcadas fuera de la matriz (jubilación, renuncia…): se borra su puesto del plano. La marca de baja se mantiene.',
+    apply:p=>_borrarPuestoPendiente(p), go:p=>_goPersonal(p), goDestino:p=>_goDestinoPersonal(p),
+    subText:p=>'⊘ '+_bajaLbl(_bajaDe(p.nombre)||{})+' · sigue ocupando un puesto · ✕ lo libera · '+_subPersonal(p),
+    done:'Nadie marcado fuera de la matriz conserva un puesto asignado.'},
   dot_generico:{label:'Personal: rótulo que no es una persona (eliminar)',
     find:()=>_dotPorClase('dot_generico'), flat:true, delDot:true, saveWs:true,
     approve:true, okIf:()=>false, allIf:()=>true,
@@ -12335,11 +13025,21 @@ function exportAsignaciones(){
     const key = norm(s.nombre);
     const asigs = asigMap.get(key) || [];
     const isAsig = asigs.length > 0;
-    if(isAsig){ totalAsig++; _matched.add(key); }
+    if(isAsig){ _matched.add(key); if(!_esBaja(s.nombre)) totalAsig++; }
     const esCds = _esCdsStaff(s);
-    if(esCds) cdsMatrix++; else if(isAsig) verdes++; else rojosN++;
+    const baja = _bajaDe(s.nombre);          // jubilación/renuncia: informa, no cuenta
+    if(baja){ /* fuera de la cabida: no entra en verdes/rojos ni en los % */ }
+    else if(esCds) cdsMatrix++; else if(isAsig) verdes++; else rojosN++;
     const e = s.estamento || 'Sin estamento';
     const sd = s.subdireccion || 'Sin subdirección';
+    if(baja){
+      const flagB='⊘ FUERA DE LA MATRIZ · '+_bajaLbl(baja).toUpperCase();
+      const personB=[s.subdireccion||'', s.unidad||'', flagB, s.rut||s.id||'', s.nombre||'', s.estamento||'', s.calidad||'',
+                     s.turno||'', s.cargo||'', s.ley||'', s.horas||'', s.servicio||''];
+      if(isAsig) asigs.forEach(a=>dataRows.push({rank:4, nombre:s.nombre, row:personB.concat([a.piso||'', a.area||'', a.recinto||'', a.recintoCode||'', a.bim||'', _tipoAsig(a), _funcTexto(s.nombre)])}));
+      else dataRows.push({rank:4, nombre:s.nombre, row:personB.concat(['','','','','','', _funcTexto(s.nombre)])});
+      return;
+    }
     if(!byEst[e]) byEst[e] = {total:0, asig:0};
     if(!bySub[sd]) bySub[sd] = {total:0, asig:0};
     byEst[e].total++; bySub[sd].total++;
@@ -12381,7 +13081,7 @@ function exportAsignaciones(){
   const _nk = n => { n=String(n||'').trim(); return n||'\uffff'; };
   dataRows.sort((a,b)=>a.rank-b.rank||_nk(a.nombre).localeCompare(_nk(b.nombre),'es'));
   noAsigRows.sort((a,b)=>_nk(a.nombre).localeCompare(_nk(b.nombre),'es'));
-  const baseN = dotDB.staff.length - cdsMatrix;
+  const baseN = dotDB.staff.length - cdsMatrix - Object.keys(nameState.bajas||{}).length;
   const _pf = n => baseN ? (n*100/baseN).toFixed(1).replace('.',',') : '0';
   const sumRow = new Array(headers.length).fill('');
   sumRow[0]='✔ Asignados: '+verdes+' ('+_pf(verdes)+'%)';
@@ -12389,6 +13089,7 @@ function exportAsignaciones(){
     +(dotDB.genericos ? ' · fuera de selección (sin nombre): '+dotDB.genericos.compras
       +' compras y '+dotDB.genericos.becados+' becados' : '');
   sumRow[8]='✘ No asignados: '+rojosN+' ('+_pf(rojosN)+'%)';
+  { const nB=Object.keys(nameState.bajas||{}).length; if(nB) sumRow[11]='⊘ Fuera de la matriz (jubilación/renuncia…): '+nB; }
   const rows = [sumRow, headers, ...dataRows.map(d=>d.row)];
   const unassignedRows = [sumRow.slice(0,12), headers.slice(0,12), ...noAsigRows.map(d=>d.row)];
 
@@ -12620,6 +13321,7 @@ function init(){
   migrateBedsToArea();
   if(S.showSen){ const b=document.getElementById('btnSen'); if(b)b.classList.add('active'); }
   { const b=document.getElementById('btnAsigN'); if(b)b.classList.toggle('active',!!S.showAsigN); }
+  { const b=document.getElementById('btnTiPrint'); if(b)b.classList.toggle('active',!!S.showTI); }
   { const b=document.getElementById('btnPlanKind'); if(b){ const c=S.planKind==='color'; b.textContent=c?'🗺 Ver mobiliario':'🖌 Ver color'; b.classList.toggle('active',c); } }
   applyBoxVis();
   loadDotDB(); // async pero NO awaiteamos: el plano puede cargar en paralelo. Búsqueda queda lista cuando termine fetch.
@@ -13050,34 +13752,34 @@ async function runSelfTest(){
       S.showAsigN=prevN; S.level=nivel; S.areaId=aPrev; renderSVG();
     }
   });
-  T('Cupo de impresoras: cuenta en todos los pisos, avisa al llegar y no se pasa sin confirmar', ()=>{
-    const snapP=JSON.stringify(propState), cPrev=(nameState.propCupos||{}).printer, nivel=S.level, aPrev=S.areaId, mPrev=S.propMode, conf=window.confirm;
+  T('Impresoras: una sola cuenta (automáticas + a mano = total del archivo); el cupo es lo que falta y avisa al pasarse', ()=>{
+    const snapP=JSON.stringify(propState), nivel=S.level, aPrev=S.areaId, conf=window.confirm;
     try{
       Object.keys(propState).forEach(k=>delete propState[k]);
-      propState['PX']=[{id:'c0',k:'printer',x:1,y:1,rot:0,rid:null}];              // otro piso: también cuenta
-      nameState.propCupos.printer=2;
-      S.level=2; S.areaId='st_a'; renderSVG();
-      const total=_propTotal('printer')===1 && _propCupoTxt('printer')==='1 / 2';
-      setPropMode('printer');
-      const cap=svg.querySelector('.prop-layer rect[style*="copy"]');
-      const r=svg.getBoundingClientRect();
+      const C0=_tiCuenta(), gap=C0.total-C0.auto;
+      if(!(gap>0)) return false;
+      const inicio=C0.manual===0 && _propCupo('printer')===gap && _tiFaltantes().reduce((a,f)=>a+f.cant,0)===gap
+        && document.getElementById('dkTiN').textContent.split('/')[1]===String(C0.total);
+      // completar a mano: cada una toma el tipo que falta, y al final cuadra POR TIPO con el archivo
+      const ids=[]; for(let i=0;i<gap;i++){ ids.push(propAdd('printer',1+i,1,0)); }
+      const tipadas=ids.every(it=>it && _tiTipos().some(t=>t.k===it.tipo));
+      const C1=_tiCuenta();
+      const completo=C1.manual===gap && C1.faltan===0 && C1.sobre===0 && _tiResumen().every(r=>r.desp===r.total)
+        && _tiFaltantes().length===0;
+      // una más: pregunta, Cancelar no coloca; Aceptar la coloca y queda marcado «sobre el total»
+      S.level=2; S.areaId='st_a'; renderSVG(); setPropMode('printer');
+      const cap=svg.querySelector('.prop-layer rect[style*="copy"]'), r=svg.getBoundingClientRect();
       const click=()=>cap.dispatchEvent(new MouseEvent('mousedown',{bubbles:true,cancelable:true,button:0,clientX:r.left+5,clientY:r.top+5}));
       let preguntas=0; window.confirm=()=>{ preguntas++; return false; };
-      click();                                     // 2 de 2: entra sin preguntar
-      const segunda=_propTotal('printer')===2 && preguntas===0;
-      click();                                     // llegaría a 3: pregunta y Cancelar no coloca
-      const bloquea=_propTotal('printer')===2 && preguntas===1;
-      window.confirm=()=>true; click();            // Aceptar: se pasa y queda marcado
-      const pasa=_propTotal('printer')===3;
+      click(); const bloquea=_propTotal('printer')===gap && preguntas===1;
+      window.confirm=()=>true; click(); const pasa=_propTotal('printer')===gap+1 && _tiCuenta().sobre===1;
       _dockSync();
-      const rojo=document.getElementById('dkPrinterCupoN').textContent==='3/2' && /⚠/.test(document.getElementById('dkPrinterCupoLb').textContent);
-      const aviso=/sobre el cupo/.test(document.getElementById('propHint').textContent);
-      return total && segunda && bloquea && pasa && rojo && aviso;
+      const aviso=/sobre el total/.test(document.getElementById('propHint').textContent) && document.getElementById('dkTiN').style.color!=='';
+      return inicio && tipadas && completo && bloquea && pasa && aviso;
     } finally {
       window.confirm=conf; if(S.propMode) setPropMode(null);
       const sp=JSON.parse(snapP); Object.keys(propState).forEach(k=>delete propState[k]); Object.assign(propState,sp);
-      if(cPrev) nameState.propCupos.printer=cPrev; else delete nameState.propCupos.printer;
-      S.level=nivel; S.areaId=aPrev; renderSVG();
+      S.level=nivel; S.areaId=aPrev; renderSVG(); try{ _dockSync(); }catch(e){}
     }
   });
   T('Ubicación en planta: vista 1 esconde cajas y muestra sólo tótems/DEA/impresoras a tamaño fijo', ()=>{
@@ -13285,7 +13987,7 @@ async function runSelfTest(){
   });
   T('Dock: la barra superior se vacía y los botones de edición viven en el gestor', ()=>{
     const dock=document.getElementById('dock'); if(!dock) return false;
-    const ids=['btnDraw','btnPuertas','btnDupMueble','btnStruct','btnMerge','btnDel','btnFicha','btnExpServ','vwDD','puertaTipoSel'];
+    const ids=['btnDraw','btnPuertas','btnDupMueble','btnStruct','btnMerge','btnDel','btnFicha','btnMob','btnExpServ','vwDD','puertaTipoSel'];
     const dentro=ids.every(id=>{ const e=document.getElementById(id); return e && dock.contains(e); });
     // cajas · nombres · edición: acceso rápido en la barra de navegación
     const nav=document.getElementById('navBar');
@@ -13532,6 +14234,40 @@ async function runSelfTest(){
       return dentro && seis && img && mks.length===6 && k1 && k2 && ficha && cierra && apaga && prende && otro;
     } finally { S.floorId=fPrev; S.level=lPrev; S.areaId=aPrev; S.roomId=rPrev; S.jardines=jPrev; S.zoom=zPrev; _escTipOff(); renderSVG(); }
   });
+  T('Respaldo a archivo: sólo desde el Atlas de trabajo (un preview en otro puerto no pisa el estado)', ()=>{
+    return FBAK_PUERTOS.indexOf('8790')>=0 && FBAK_PUERTOS.length<=2
+      && (location.port==='8790'||location.port===''||FBAK_APLICA===false);
+  });
+  T('Bajas de la matriz: jubilación/renuncia sacan a la persona de la cabida y su puesto sale en la Revisión', ()=>{
+    const bPrev=JSON.stringify(nameState.bajas||{}), rid=_recintosDibujados()[0].rid;
+    const dPrev=wsState.dots[rid], fPrev=S.floorId, aPrev=S.areaId, lPrev=S.level;
+    try{
+      const _asg=_dpAsignados();
+      const s0=_dpStaffAll().find(x=>x.nombre && !x.beca && !_asg[norm(x.nombre)]); if(!s0) return false;
+      const n0=s0.nombre, antes=_dpStaffAll().length, avAntes=_avStaff().length;
+      wsState.dots[rid]=[{id:'st_bj',x:1,y:1,tipo:'fijo',nombre:n0,cargo:'',estamento:''}];
+      // marcar la baja con su motivo
+      nameState.bajas[norm(n0)]={n:n0,m:'jubilacion',nota:'prueba',ts:Date.now()};
+      _mtxSrc=null; _inMatrixCache.clear(); _parecCache.clear();
+      const fuera=_dpStaffAll().length===antes-1 && _avStaff().length===avAntes-1 && _esBaja(n0)
+        && /Jubilación/.test(_bajaLbl(_bajaDe(n0)));
+      // sigue en la matriz original (el archivo no se toca) y aparece en la Revisión
+      const enMatriz=isInMatrix(n0) && (dotDB.staff||[]).some(x=>norm(x.nombre)===norm(n0));
+      const pend=_bajaConPuesto().filter(x=>norm(x.nombre)===norm(n0));
+      const rev=pend.length===1 && _goDestinoPersonal(pend[0]) && /Jubilación/.test(REV_CHECKS.dot_baja.subText(pend[0]));
+      // ✕ libera el puesto
+      const borro=_borrarPuestoPendiente(pend[0]) && !(wsState.dots[rid]||[]).length;
+      // restaurar la devuelve a la cabida
+      delete nameState.bajas[norm(n0)]; _mtxSrc=null; _inMatrixCache.clear(); _parecCache.clear();
+      const vuelve=_dpStaffAll().length===antes && !_esBaja(n0) && !_bajaConPuesto().some(x=>norm(x.nombre)===norm(n0));
+      return fuera && enMatriz && rev && borro && vuelve;
+    } finally {
+      nameState.bajas=JSON.parse(bPrev);
+      if(dPrev===undefined) delete wsState.dots[rid]; else wsState.dots[rid]=dPrev;
+      S.floorId=fPrev; S.areaId=aPrev; S.level=lPrev;
+      _mtxSrc=null; _inMatrixCache.clear(); _parecCache.clear();
+    }
+  });
   T('Funciones TENS: una persona lleva una o más, la siguen por nombre y se ven en tarjeta, diálogo y Personas', ()=>{
     const fPrev=JSON.stringify(nameState.funcTens||{}), dPrev=wsState.dots['st_fn'], mPrev=mCtx;
     try{
@@ -13751,6 +14487,64 @@ async function runSelfTest(){
     if(cambiadas.length) console.warn('preferencias tocadas por el selftest:',cambiadas);
     return cambiadas.length===0;
   });
+  // Carros de paro: desfibrilador (130007/130008) + carro 110032 en el mismo recinto
+  T('Carros de paro: estados y cruce por recinto', ()=>{
+    const e=_cpEstado;
+    if(e({d:1,c:1})!=='ok' || e({d:1,c:0})!=='solo' || e({d:2,c:1})!=='solo' || e({d:0,c:1})!=='carro' || e({d:0,c:0})!==null) return false;
+    const L=_cpRecintos(); if(!L.length) return false;
+    // nunca más desfibriladores de los que tiene el EMMC completo (62 + 2)
+    let tot=0; Object.values(window.RECINTO_EQUIP||{}).forEach(a=>a.forEach(x=>{ if(CP_DEF.includes(String(x.t))) tot+=Math.max(1,parseInt(x.c)||1); }));
+    // cada código EMMC se cuenta en UNA sola caja: nunca más de lo que trae el EMMC
+    const porK={}; L.forEach(z=>Object.entries(z.x.porClave).forEach(([k,v])=>{ porK[k]=(porK[k]||0)+v.d; }));
+    const RE=window.RECINTO_EQUIP||{};
+    const sinExceso=Object.entries(porK).every(([k,v])=>v<=RE[k].reduce((a,x)=>a+(CP_DEF.includes(String(x.t))?Math.max(1,parseInt(x.c)||1):0),0));
+    return sinExceso && L.reduce((a,z)=>a+z.x.d,0)<=tot && L.every(z=>z.est===_cpEstado(z.x));
+  });
+  T('Carros de paro: capa con pulso azul/rojo y leyenda', ()=>{
+    const prev=_cpOn, fPrev=S.floorId, lPrev=S.level, aPrev=S.areaId;
+    const z=_cpRecintos().find(q=>q.est!=='carro'); if(!z) return false;
+    try{
+      _cpOn=true; S.floorId=z.fl.id; S.level=1; S.areaId=null; renderSVG();
+      const mks=[...svg.querySelectorAll('.cp-mk')];
+      const esp=_cpRecintos().filter(q=>q.fl.id===z.fl.id && q.est!=='carro').length;
+      const lg=document.getElementById('cpLegend');
+      const leyenda=lg.style.display!=='none' && /completos/.test(lg.innerHTML) && /Excel/.test(lg.innerHTML);
+      const colOk=mks.every(m=>{ const c=m.querySelectorAll('circle')[2].getAttribute('fill'); return m.classList.contains('cp-ok')?c===CP_COL.ok:c===CP_COL.solo; });
+      const pulso=mks.every(m=>m.querySelectorAll('animate').length===2);
+      _cpOn=false; renderSVG();
+      const apaga=!svg.querySelector('.cp-mk') && lg.style.display==='none';
+      return mks.length===esp && colOk && pulso && leyenda && apaga;
+    } finally { _cpOn=prev; S.floorId=fPrev; S.level=lPrev; S.areaId=aPrev; renderSVG(); }
+  });
+
+  // Impresoras del HDS: archivo Comodatos Jun-2026 (3 tipos) × PMA/BIM
+  T('Impresoras HDS: lo desplegado + lo sin ubicar cuadra exacto con el archivo, por tipo', ()=>{
+    if(!_tiD().filas.length || _tiTipos().length!==3) return false;
+    const U=_tiUnidades(), res=_tiResumen();
+    // desplegado nunca supera al archivo y el total del archivo se explica entero
+    const sinPorTipo={}; U.sin.forEach(f=>{ sinPorTipo[f.tipo]=(sinPorTipo[f.tipo]||0)+f.cant; });
+    const codigos={}; Object.entries(U.por).forEach(([c,us])=>us.forEach(k=>{ codigos[k]=(codigos[k]||0)+1; }));
+    const placed={}; _tiRecintos().forEach(z=>Object.entries(z.items).forEach(([k,q])=>{ placed[k]=(placed[k]||0)+q; }));
+    return res.every(r=>r.desp<=r.total && r.desp===(placed[r.k]||0)
+      && r.desp+(sinPorTipo[r.k]||0)<=r.total && (codigos[r.k]||0)+(sinPorTipo[r.k]||0)===r.total);
+  });
+  T('Impresoras HDS: testigo 🖨 + icono de tipo en vista 2, y reporte', ()=>{
+    const prev=S.showTI, fPrev=S.floorId, lPrev=S.level, aPrev=S.areaId;
+    const z=_tiRecintos()[0]; if(!z) return false;
+    try{
+      S.showTI=true; S.floorId=z.fl.id; S.level=2; S.areaId=z.area.id; renderSVG();
+      const esperadas=_tiRecintos().filter(q=>q.area.id===z.area.id);
+      const marcas=[...svg.querySelectorAll('text')].filter(t=>/^🖨 /.test(t.firstChild&&t.firstChild.textContent||''));
+      const iconosOk=esperadas.length===marcas.length && esperadas.every(q=>{
+        const txt=_tiTestigo(q.items); return marcas.some(t=>t.firstChild.textContent===txt); });
+      S.showTI=false; renderSVG();
+      const apagado=![...svg.querySelectorAll('text')].some(t=>/^🖨 /.test(t.firstChild&&t.firstChild.textContent||''));
+      abrirReporteTI();
+      const modalOk=document.getElementById('tiModal').classList.contains('show') && /\d+ \/ \d+/.test(document.getElementById('tiModalN').textContent);
+      closeReporteTI();
+      return iconosOk && apagado && modalOk && !document.getElementById('tiModal').classList.contains('show');
+    } finally { S.showTI=prev; S.floorId=fPrev; S.level=lPrev; S.areaId=aPrev; renderSVG(); }
+  });
   _stReport(out);
 }
 function _stReport(out){
@@ -13764,6 +14558,7 @@ function _stReport(out){
   document.body.appendChild(d);
 }
 window.addEventListener('load',()=>setTimeout(()=>{ try{ _avBadge(); }catch(e){} }, 1200));
+window.addEventListener('load',()=>setTimeout(()=>{ try{ _tiBadge(); }catch(e){} }, 1400));
 if(_SELFTEST) window.addEventListener('load',()=>setTimeout(runSelfTest,700));
 // El selftest desactiva TODO el guardado. Si alguien deja "?selftest=1" en la
 // URL y sigue trabajando, perdería el día entero en silencio: aviso permanente.
@@ -13805,6 +14600,87 @@ if(_SELFTEST) window.addEventListener('load',()=>{
 })();
 (function(){ const f=()=>{ const b=document.getElementById('btnDotNames'); if(b)b.classList.toggle('active',!!S.showDotNames); };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',f); else f(); })();
+
+/* ══ Mobiliario de estares, residencias y salas de reuniones ═══════════════
+   Datos: window.ESTAR_RESIDENCIAS (salas del Atlas + matriz MNC, 10-08-2026)
+          window.FICHAS_MNC        (proveedor/marca/modelo por código)
+   Fotos: mnc_imgs/<código>.png y las fotos de la presentación de junio.      */
+const MOB={tipo:'',servicio:'',piso:'',q:'',idx:null};
+const MOB_FOTO_ALIAS={'150036':'locker_bloque10.jpg','AR.1':'locker_ar1.jpg','KITC.2':'kitchenette.jpg','KITCH.2':'kitchenette.jpg','KITC.2.c':'kitchenette.jpg','150014':'cama.jpg'};
+const MOB_EMOJI=[[/sill[oó]n|butaca/i,'🛋'],[/silla/i,'🪑'],[/mesa|mes[oó]n|escritorio/i,'🪵'],[/locker|casillero|armario|estante|repisa|mueble/i,'🗄'],[/televisor|\bTV\b|pantalla/i,'📺'],[/notebook|computador|\bPC\b/i,'💻'],[/impresora/i,'🖨'],[/frigobar|refrigerador|c[aá]mara/i,'🧊'],[/hervidor|microondas|cafetera|kitchen/i,'🍽'],[/cama|camarote|velador/i,'🛏'],[/tel[oó]n|proyector/i,'🎦'],[/pizarra/i,'📋'],[/reloj/i,'🕐'],[/espejo/i,'🪞'],[/basurero|residuo/i,'🗑']];
+function _mobNorm(c){return String(c||'').replace(/[^0-9a-zA-Z]/g,'');}
+function _mobFoto(code,nombre){
+  const a=MOB_FOTO_ALIAS[String(code)]; if(a) return '<img src="mnc_imgs/'+a+'" alt="" loading="lazy" onerror="this.parentNode.textContent=\'🪑\'">';
+  const n=_mobNorm(code);
+  if(/^150/.test(n)) return '<img src="mnc_imgs/'+n+'.png" alt="" loading="lazy" onerror="this.parentNode.textContent=\''+_mobEmoji(nombre)+'\'">';
+  return _mobEmoji(nombre);
+}
+function _mobEmoji(nombre){ for(const [re,e] of MOB_EMOJI) if(re.test(nombre||'')) return e; return '🪑'; }
+function _mobFicha(code){
+  const f=(window.FICHAS_MNC&&window.FICHAS_MNC.items)||[]; const n=_mobNorm(code);
+  return f.find(x=>_mobNorm(x.clave||x.tipo)===n)||null;
+}
+function _mobSalas(){
+  const svs=(window.ESTAR_RESIDENCIAS&&window.ESTAR_RESIDENCIAS.servicios)||[]; const out=[];
+  svs.forEach(sv=>(sv.salas||[]).forEach(sa=>out.push(Object.assign({_servicio:sv.servicio_2026},sa))));
+  return out;
+}
+function _mobFiltradas(){
+  const q=MOB.q.trim().toLowerCase();
+  return _mobSalas().filter(s=>
+    (!MOB.tipo||s.tipo===MOB.tipo)&&(!MOB.servicio||s._servicio===MOB.servicio)&&(!MOB.piso||s.piso===MOB.piso)&&
+    (!q||((s.nombre_atlas||'')+' '+(s.nombre_pma||'')+' '+s._servicio+' '+(s.items||[]).map(i=>i.nombre).join(' ')).toLowerCase().includes(q))
+  );
+}
+const MOB_CLS={'Estar':'est','Residencia':'res','Reuniones':'reu'};
+function openMob(){ MOB.idx=null; document.getElementById('mobModal').classList.add('show'); renderMob(); }
+function closeMob(){ document.getElementById('mobModal').classList.remove('show'); }
+function mobSet(k,v){ MOB[k]=(MOB[k]===v&&k==='tipo')?'':v; MOB.idx=null; renderMob(); }
+function mobAbrir(i){ MOB.idx=i; renderMob(); document.getElementById('mobBody').scrollTop=0; }
+function mobPaso(d){ const n=_mobFiltradas().length; if(!n||MOB.idx===null) return; MOB.idx=(MOB.idx+d+n)%n; renderMob(); document.getElementById('mobBody').scrollTop=0; }
+function renderMob(){
+  const todas=_mobSalas(), lista=_mobFiltradas();
+  const servicios=[...new Set(todas.map(s=>s._servicio))].sort();
+  const pisos=[...new Set(todas.map(s=>s.piso).filter(Boolean))].sort();
+  const esc=t=>String(t==null?'':t).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+  document.getElementById('mobFiltros').innerHTML=
+    ['Estar','Residencia','Reuniones'].map(t=>'<button class="mob-chip'+(MOB.tipo===t?' on':'')+'" onclick="mobSet(\'tipo\',\''+t+'\')">'+t+'</button>').join('')+
+    '<select onchange="mobSet(\'servicio\',this.value)"><option value="">Todos los servicios</option>'+servicios.map(v=>'<option'+(MOB.servicio===v?' selected':'')+'>'+esc(v)+'</option>').join('')+'</select>'+
+    '<select onchange="mobSet(\'piso\',this.value)"><option value="">Todos los pisos</option>'+pisos.map(v=>'<option'+(MOB.piso===v?' selected':'')+'>'+esc(v)+'</option>').join('')+'</select>'+
+    '<input placeholder="Buscar sala o mueble…" value="'+esc(MOB.q)+'" oninput="MOB.q=this.value;MOB.idx=null;renderMob()">'+
+    (MOB.idx!==null?'<button class="mob-chip" onclick="mobAbrirIndice()">↩ Volver al índice</button>':'');
+  const piezas=l=>l.reduce((a,s)=>a+(s.items||[]).reduce((b,i)=>b+(parseInt(i.cant)||0),0),0);
+  const body=document.getElementById('mobBody');
+  if(MOB.idx===null){
+    body.innerHTML=lista.length?'<div class="mob-grid">'+lista.map((s,i)=>
+      '<div class="mob-card" onclick="mobAbrir('+i+')"><div class="t">'+esc(s.nombre_atlas||s.nombre_pma||'(sin nombre)')+'</div>'+
+      '<div class="s">'+esc(s._servicio)+' · '+esc(s.piso||'—')+'</div><div class="p"><span class="mob-tag '+(MOB_CLS[s.tipo]||'')+'">'+esc(s.tipo)+'</span>'+
+      '<span class="mob-tag">'+(s.items||[]).length+' tipos · '+(s.items||[]).reduce((b,i)=>b+(parseInt(i.cant)||0),0)+' piezas</span></div></div>').join('')+'</div>'
+      :'<p style="color:var(--text-2)">No hay salas con ese filtro.</p>';
+  }else{
+    const s=lista[Math.min(MOB.idx,lista.length-1)]; if(!s){ MOB.idx=null; return renderMob(); }
+    const items=(s.items||[]).slice().sort((a,b)=>(parseInt(b.cant)||0)-(parseInt(a.cant)||0));
+    body.innerHTML='<div class="mob-slide"><h3>'+esc(s.nombre_atlas||s.nombre_pma||'(sin nombre)')+'</h3>'+
+      '<div class="sub">'+esc(s._servicio)+' · piso '+esc(s.piso||'—')+' · '+esc(s.tipo)+(s.bim?' · BIM '+esc(s.bim):'')+(s.cod_mnc?' · '+esc(s.cod_mnc):'')+'</div>'+
+      (items.length?'<div class="mob-items">'+items.map(it=>{
+        const f=_mobFicha(it.tipo_item); const marca=f?[f.proveedor,f.marca,f.modelo].filter(Boolean).join(' · '):'';
+        return '<div class="mob-item"><div class="mob-foto">'+_mobFoto(it.tipo_item,it.nombre)+'</div><div class="d">'+
+          '<div class="n">'+esc(it.nombre)+'</div><div class="m">'+esc(it.tipo_item)+(marca?' · '+esc(marca):'')+'</div>'+
+          '<div class="q">'+(parseInt(it.cant)||0)+'</div></div></div>';}).join('')+'</div>'
+        :'<p style="color:var(--text-2)">Esta sala no tiene mobiliario declarado en la matriz MNC.</p>')+'</div>';
+  }
+  document.getElementById('mobSub').textContent=MOB.idx===null?'Mobiliario con el que contará cada sala · fuente: Atlas + matriz MNC':'Sala '+(MOB.idx+1)+' de '+lista.length;
+  document.getElementById('mobNav').innerHTML=
+    '<div class="mob-tot"><div><b>'+lista.length+'</b><span>salas</span></div><div><b>'+piezas(lista)+'</b><span>piezas</span></div>'+
+    '<div><b>'+[...new Set(lista.flatMap(s=>(s.items||[]).map(i=>i.tipo_item)))].length+'</b><span>tipos de mueble</span></div></div>'+
+    (MOB.idx!==null?'<div style="display:flex;gap:8px"><button class="mob-chip" onclick="mobPaso(-1)">← Anterior</button><button class="mob-chip" onclick="mobPaso(1)">Siguiente →</button></div>':'');
+}
+function mobAbrirIndice(){ MOB.idx=null; renderMob(); }
+document.addEventListener('keydown',e=>{
+  const m=document.getElementById('mobModal'); if(!m||!m.classList.contains('show')) return;
+  if(e.key==='Escape'){ closeMob(); } else if(MOB.idx!==null&&e.key==='ArrowRight'){ mobPaso(1); } else if(MOB.idx!==null&&e.key==='ArrowLeft'){ mobPaso(-1); }
+});
+
 
 // ── ROL EDITOR ACOTADO: barra propia y línea base del delta ────────────────
 (function(){
@@ -13889,6 +14765,7 @@ if(_SELFTEST) window.addEventListener('load',()=>{
   vw.addEventListener('touchend',()=>{ t1=null; pinch=null; },{passive:true});
 })();
 </script>
-<script src="hub-home.js"></script>
+<script src="hub-home.js">
+</script>
 </body>
 </html>
