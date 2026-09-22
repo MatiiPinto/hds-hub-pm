@@ -9,7 +9,7 @@ window.NAV_VERTICALES={
   "origen": "Navegacion_HDS_2026-08-24-2.json",
   "export_de": "2026-08-24T15:04:01.210Z",
   "total": 275,
-  "calibrado": "2026-09-22T15:05:40",
+  "calibrado": "2026-09-22T16:08:37",
   "calibracion": {
    "P-1": {
     "modo": "traslación",
@@ -22,10 +22,10 @@ window.NAV_VERTICALES={
     "calzan": 10,
     "bim": 412,
     "nucleos": 12,
-    "muros": 39,
+    "muros": 41,
     "escaleras_por_peldanos": 12,
     "gemelas_partidas": 12,
-    "gemelas": 14
+    "gemelas": 13
    },
    "P1": {
     "modo": "escala+traslación",
@@ -38,10 +38,10 @@ window.NAV_VERTICALES={
     "calzan": 14,
     "bim": 380,
     "nucleos": 17,
-    "muros": 48,
+    "muros": 51,
     "escaleras_por_peldanos": 14,
-    "gemelas_partidas": 13,
-    "gemelas": 16
+    "gemelas_partidas": 15,
+    "gemelas": 15
    },
    "P2": {
     "modo": "traslación",
@@ -54,10 +54,10 @@ window.NAV_VERTICALES={
     "calzan": 10,
     "bim": 444,
     "nucleos": 11,
-    "muros": 41,
+    "muros": 47,
     "escaleras_por_peldanos": 11,
-    "gemelas_partidas": 8,
-    "gemelas": 15
+    "gemelas_partidas": 16,
+    "gemelas": 16
    },
    "P3": {
     "modo": "escala+traslación",
@@ -70,9 +70,9 @@ window.NAV_VERTICALES={
     "calzan": 9,
     "bim": 328,
     "nucleos": 10,
-    "muros": 39,
+    "muros": 42,
     "escaleras_por_peldanos": 10,
-    "gemelas_partidas": 9,
+    "gemelas_partidas": 15,
     "gemelas": 15
    },
    "P4": {
@@ -86,9 +86,9 @@ window.NAV_VERTICALES={
     "calzan": 7,
     "bim": 328,
     "nucleos": 9,
-    "muros": 38,
+    "muros": 40,
     "escaleras_por_peldanos": 9,
-    "gemelas_partidas": 9,
+    "gemelas_partidas": 14,
     "gemelas": 14
    },
    "P-2": {
@@ -96,9 +96,9 @@ window.NAV_VERTICALES={
     "dx": -258.3404,
     "dy": -341.8768,
     "rotulos": 9,
-    "muros": 23,
+    "muros": 24,
     "escaleras_por_peldanos": 9,
-    "gemelas_partidas": 1,
+    "gemelas_partidas": 2,
     "gemelas": 3
    },
    "P5": {
@@ -120,7 +120,7 @@ window.NAV_VERTICALES={
     "ascensores_directorio": 7,
     "muros": 12,
     "escaleras_por_peldanos": 5,
-    "gemelas_partidas": 1,
+    "gemelas_partidas": 2,
     "gemelas": 2
    }
   }
@@ -236,7 +236,7 @@ window.NAV_VERTICALES={
     "etq": "E2",
     "salida": "n",
     "tipo": "servicio",
-    "muro": 0.08
+    "muro": 0.02
    },
    {
     "id": "P2-nav-1785787230364_3yi",
@@ -248,55 +248,55 @@ window.NAV_VERTICALES={
     "etq": "E1",
     "salida": "n",
     "tipo": "servicio",
-    "muro": 0.14
+    "muro": 0.1
    },
    {
     "id": "P2-nav-1785787253329_3a0",
     "kind": "asc-G",
-    "x": 362,
+    "x": 338,
     "y": 4335,
-    "w": 182,
+    "w": 165,
     "h": 130,
     "etq": "B1",
     "salida": "ns",
     "tipo": "publico",
-    "muro": 0.07
+    "muro": 0.0
    },
    {
     "id": "P2-nav-1785787259173_szk",
     "kind": "asc-G",
-    "x": 181,
+    "x": 172,
     "y": 4335,
-    "w": 182,
+    "w": 165,
     "h": 130,
     "etq": "B2",
     "salida": "ns",
     "tipo": "publico",
-    "muro": 0.07
+    "muro": 0.0
    },
    {
     "id": "P2-nav-1785787272048_swv",
     "kind": "asc-G",
-    "x": 334,
-    "y": 1896,
-    "w": 162,
-    "h": 286,
+    "x": 342,
+    "y": 1819,
+    "w": 168,
+    "h": 132,
     "etq": "A1",
-    "salida": "n",
+    "salida": "ns",
     "tipo": "publico",
-    "muro": 0.12
+    "muro": 0.0
    },
    {
     "id": "P2-nav-1785787277900_tqw",
     "kind": "asc-G",
-    "x": 171,
-    "y": 1896,
-    "w": 162,
-    "h": 286,
+    "x": 174,
+    "y": 1819,
+    "w": 168,
+    "h": 132,
     "etq": "A2",
-    "salida": "n",
+    "salida": "ns",
     "tipo": "publico",
-    "muro": 0.12
+    "muro": 0.0
    },
    {
     "id": "P2-nav-1785787310172_wxs",
@@ -325,26 +325,26 @@ window.NAV_VERTICALES={
    {
     "id": "P2-nav-1785787321543_71v",
     "kind": "asc-S",
-    "x": 4131,
-    "y": 2855,
-    "w": 211,
-    "h": 170,
+    "x": 4357,
+    "y": 2634,
+    "w": 292,
+    "h": 156,
     "etq": "H2",
-    "salida": "n",
+    "salida": "ns",
     "tipo": "servicio",
-    "muro": 0.62
+    "muro": 0.07
    },
    {
     "id": "P2-nav-1785787327318_06z",
     "kind": "asc-S",
     "x": 4357,
-    "y": 2855,
-    "w": 211,
-    "h": 170,
+    "y": 2791,
+    "w": 292,
+    "h": 156,
     "etq": "H1",
-    "salida": "n",
+    "salida": "ns",
     "tipo": "servicio",
-    "muro": 0.98
+    "muro": 0.07
    },
    {
     "id": "P2-nav-1785787344358_vtn",
@@ -356,7 +356,7 @@ window.NAV_VERTICALES={
     "etq": "L1",
     "salida": "w",
     "tipo": "publico",
-    "muro": 0.08
+    "muro": 0.02
    },
    {
     "id": "P2-nav-1785787348858_w5i",
@@ -368,51 +368,55 @@ window.NAV_VERTICALES={
     "etq": "L2",
     "salida": "w",
     "tipo": "publico",
-    "muro": 0.07
+    "muro": 0.0
    },
    {
     "id": "P2-nav-1785787373487_8ia",
     "kind": "asc-S",
-    "x": 4380,
-    "y": 6237,
-    "w": 148,
-    "h": 154,
+    "x": 4422,
+    "y": 6080,
+    "w": 168,
+    "h": 105,
     "etq": "J2",
     "salida": "s",
-    "tipo": "servicio"
+    "tipo": "servicio",
+    "muro": 0.57
    },
    {
     "id": "P2-nav-1785787378994_txu",
     "kind": "asc-S",
-    "x": 4231,
-    "y": 6237,
-    "w": 148,
-    "h": 154,
+    "x": 4253,
+    "y": 6080,
+    "w": 168,
+    "h": 105,
     "etq": "J1",
     "salida": "s",
-    "tipo": "servicio"
+    "tipo": "servicio",
+    "muro": 0.64
    },
    {
     "id": "P2-nav-1785787383164_4vl",
     "kind": "asc-P",
-    "x": 4068,
-    "y": 6238,
-    "w": 152,
-    "h": 179,
+    "x": 3794,
+    "y": 6193,
+    "w": 147,
+    "h": 112,
     "etq": "I2",
-    "salida": "s",
-    "tipo": "montacamas"
+    "salida": "sn",
+    "tipo": "montacamas",
+    "muro": 0.6
    },
    {
     "id": "P2-nav-1785787392179_pzr",
     "kind": "asc-P",
-    "x": 3916,
-    "y": 6238,
-    "w": 152,
-    "h": 179,
+    "x": 3794,
+    "y": 6306,
+    "w": 147,
+    "h": 112,
     "etq": "I1",
-    "salida": "s",
-    "tipo": "montacamas"
+    "salida": "sn",
+    "tipo": "montacamas",
+    "muro": 0.48
    },
    {
     "id": "P2-nav-1785787468178_fqo",
@@ -429,26 +433,26 @@ window.NAV_VERTICALES={
    {
     "id": "P2-nav-1785787474500_vjj",
     "kind": "asc-Pplus",
-    "x": 14812,
-    "y": 6938,
-    "w": 123,
-    "h": 148,
+    "x": 14950,
+    "y": 6754,
+    "w": 135,
+    "h": 213,
     "etq": "T2",
-    "salida": "w",
+    "salida": "we",
     "tipo": "montacamas_mayor",
-    "muro": 0.05
+    "muro": 0.04
    },
    {
     "id": "P2-nav-1785787479615_oyy",
     "kind": "asc-Pplus",
-    "x": 14936,
-    "y": 6938,
-    "w": 123,
-    "h": 148,
+    "x": 15084,
+    "y": 6754,
+    "w": 135,
+    "h": 213,
     "etq": "T1",
-    "salida": "w",
+    "salida": "we",
     "tipo": "montacamas_mayor",
-    "muro": 0.11
+    "muro": 0.03
    },
    {
     "id": "P2-nav-1785787487527_u1j",
@@ -460,7 +464,7 @@ window.NAV_VERTICALES={
     "etq": "R1",
     "salida": "w",
     "tipo": "publico",
-    "muro": 1.46
+    "muro": 0.05
    },
    {
     "id": "P2-nav-1785787491735_yr2",
@@ -472,30 +476,31 @@ window.NAV_VERTICALES={
     "etq": "R2",
     "salida": "we",
     "tipo": "publico",
-    "muro": 0.08
+    "muro": 0.01
    },
    {
     "id": "P2-nav-1785787506180_fr1",
     "kind": "asc-Pplus",
-    "x": 8928,
-    "y": 6800,
+    "x": 8964,
+    "y": 6948,
     "w": 160,
-    "h": 228,
+    "h": 160,
     "etq": "O1",
     "salida": "w",
-    "tipo": "montacamas_mayor"
+    "tipo": "montacamas_mayor",
+    "muro": 0.07
    },
    {
     "id": "P2-nav-1785787511096_h6j",
     "kind": "asc-Pplus",
-    "x": 8928,
-    "y": 7028,
+    "x": 8964,
+    "y": 7107,
     "w": 160,
-    "h": 228,
+    "h": 160,
     "etq": "O2",
     "salida": "w",
     "tipo": "montacamas_mayor",
-    "muro": 0.07
+    "muro": 0.01
    },
    {
     "id": "P2-nav-1785787517018_pby",
@@ -507,7 +512,7 @@ window.NAV_VERTICALES={
     "etq": "Ñ1",
     "salida": "w",
     "tipo": "montacamas",
-    "muro": 0.9
+    "muro": 0.62
    },
    {
     "id": "P2-nav-1785787521556_mje",
@@ -519,15 +524,15 @@ window.NAV_VERTICALES={
     "etq": "Ñ2",
     "salida": "w",
     "tipo": "montacamas",
-    "muro": 0.07
+    "muro": 0.0
    },
    {
     "id": "P2-nav-1785787570426_qzb",
     "kind": "asc-Pplus",
-    "x": 8514,
-    "y": 4074,
-    "w": 162,
-    "h": 216,
+    "x": 8504,
+    "y": 4076,
+    "w": 150,
+    "h": 145,
     "etq": "M2",
     "salida": "w",
     "tipo": "montacamas_mayor",
@@ -536,37 +541,38 @@ window.NAV_VERTICALES={
    {
     "id": "P2-nav-1785787575773_do2",
     "kind": "asc-Pplus",
-    "x": 8514,
-    "y": 4310,
-    "w": 162,
-    "h": 216,
+    "x": 8653,
+    "y": 4076,
+    "w": 150,
+    "h": 145,
     "etq": "M1",
-    "salida": "w",
+    "salida": "we",
     "tipo": "montacamas_mayor",
-    "muro": 0.07
+    "muro": 0.0
    },
    {
     "id": "P2-nav-1785787635346_ah8",
     "kind": "asc-P",
-    "x": 8565,
-    "y": 5189,
-    "w": 280,
-    "h": 152,
+    "x": 8538,
+    "y": 4467,
+    "w": 214,
+    "h": 308,
     "etq": "N2",
-    "salida": "w",
+    "salida": "we",
     "tipo": "montacamas",
-    "muro": 1.08
+    "muro": 0.59
    },
    {
     "id": "P2-nav-1785787640505_tct",
     "kind": "asc-P",
-    "x": 8613,
-    "y": 4684,
-    "w": 272,
-    "h": 229,
+    "x": 8751,
+    "y": 4467,
+    "w": 214,
+    "h": 308,
     "etq": "N1",
-    "salida": "w",
-    "tipo": "montacamas"
+    "salida": "we",
+    "tipo": "montacamas",
+    "muro": 0.51
    },
    {
     "id": "P2-nav-1785804576096_ne6",
@@ -592,34 +598,34 @@ window.NAV_VERTICALES={
    {
     "id": "P2-nav-1787055787695_m9v",
     "kind": "asc-P",
-    "x": 11941,
-    "y": 10288,
-    "w": 222,
-    "h": 142,
+    "x": 11960,
+    "y": 10282,
+    "w": 259,
+    "h": 145,
     "etq": "W2",
     "salida": "e",
     "tipo": "montacamas",
-    "muro": 0.04
+    "muro": 0.01
    },
    {
     "id": "P2-nav-1787055790135_621",
     "kind": "asc-P",
-    "x": 11941,
-    "y": 10429,
-    "w": 222,
-    "h": 142,
+    "x": 11960,
+    "y": 10428,
+    "w": 259,
+    "h": 145,
     "etq": "W1",
     "salida": "e",
     "tipo": "montacamas",
-    "muro": 1.21
+    "muro": 0.95
    },
    {
     "id": "P2-nav-1787055796126_tzl",
     "kind": "asc-Pplus",
-    "x": 11621,
-    "y": 10427,
-    "w": 195,
-    "h": 190,
+    "x": 11687,
+    "y": 10293,
+    "w": 258,
+    "h": 152,
     "etq": "V1",
     "salida": "w",
     "tipo": "montacamas_mayor",
@@ -628,38 +634,38 @@ window.NAV_VERTICALES={
    {
     "id": "P2-nav-1787055799465_wla",
     "kind": "asc-Pplus",
-    "x": 11816,
-    "y": 10427,
-    "w": 195,
-    "h": 190,
+    "x": 11687,
+    "y": 10446,
+    "w": 258,
+    "h": 152,
     "etq": "V2",
     "salida": "w",
     "tipo": "montacamas_mayor",
-    "muro": 0.98
+    "muro": 0.89
    },
    {
     "id": "P2-nav-1787055805808_w4y",
     "kind": "asc-G",
-    "x": 12458,
-    "y": 10432,
-    "w": 172,
-    "h": 235,
+    "x": 12518,
+    "y": 10610,
+    "w": 153,
+    "h": 143,
     "etq": "X2",
     "salida": "e",
     "tipo": "publico",
-    "muro": 0.05
+    "muro": 0.02
    },
    {
     "id": "P2-nav-1787055808588_8md",
     "kind": "asc-G",
-    "x": 12458,
-    "y": 10681,
-    "w": 172,
-    "h": 235,
+    "x": 12518,
+    "y": 10752,
+    "w": 153,
+    "h": 143,
     "etq": "X1",
     "salida": "e",
     "tipo": "publico",
-    "muro": 0.07
+    "muro": 0.0
    },
    {
     "id": "P2-nav-1787055821388_trl",
@@ -783,7 +789,7 @@ window.NAV_VERTICALES={
     "etq": "A1",
     "salida": "ns",
     "tipo": "publico",
-    "muro": 0.07
+    "muro": 0.0
    },
    {
     "id": "P3-nav-1785804254483_utq",
@@ -795,31 +801,31 @@ window.NAV_VERTICALES={
     "etq": "A2",
     "salida": "ns",
     "tipo": "publico",
-    "muro": 0.06
+    "muro": 0.0
    },
    {
     "id": "P3-nav-1785804265767_y0v",
     "kind": "asc-G",
-    "x": 326,
-    "y": 4410,
-    "w": 160,
-    "h": 287,
+    "x": 164,
+    "y": 4063,
+    "w": 171,
+    "h": 210,
     "etq": "B1",
-    "salida": "n",
+    "salida": "ns",
     "tipo": "publico",
-    "muro": 0.13
+    "muro": 0.07
    },
    {
     "id": "P3-nav-1785804270607_th1",
     "kind": "asc-G",
-    "x": 167,
-    "y": 4410,
-    "w": 160,
-    "h": 287,
+    "x": 164,
+    "y": 4273,
+    "w": 171,
+    "h": 210,
     "etq": "B2",
-    "salida": "n",
+    "salida": "ns",
     "tipo": "publico",
-    "muro": 0.12
+    "muro": 0.05
    },
    {
     "id": "P3-nav-1785804292210_0en",
@@ -831,7 +837,7 @@ window.NAV_VERTICALES={
     "etq": "L1",
     "salida": "w",
     "tipo": "publico",
-    "muro": 1.05
+    "muro": 0.7
    },
    {
     "id": "P3-nav-1785804297840_e07",
@@ -843,53 +849,55 @@ window.NAV_VERTICALES={
     "etq": "L2",
     "salida": "w",
     "tipo": "publico",
-    "muro": 0.07
+    "muro": 0.0
    },
    {
     "id": "P3-nav-1785804304110_vzz",
     "kind": "asc-P",
-    "x": 3990,
-    "y": 6238,
-    "w": 210,
-    "h": 227,
+    "x": 3790,
+    "y": 6308,
+    "w": 149,
+    "h": 168,
     "etq": "I1",
-    "salida": "s",
-    "tipo": "montacamas"
+    "salida": "sn",
+    "tipo": "montacamas",
+    "muro": 0.46
    },
    {
     "id": "P3-nav-1785804309660_u1q",
     "kind": "asc-P",
-    "x": 3990,
-    "y": 5992,
-    "w": 210,
-    "h": 227,
+    "x": 3790,
+    "y": 6139,
+    "w": 149,
+    "h": 168,
     "etq": "I2",
-    "salida": "s",
+    "salida": "sn",
     "tipo": "montacamas",
-    "muro": 1.46
+    "muro": 0.83
    },
    {
     "id": "P3-nav-1785804316395_ow0",
     "kind": "asc-S",
-    "x": 4413,
-    "y": 6220,
-    "w": 230,
-    "h": 144,
+    "x": 4428,
+    "y": 6203,
+    "w": 156,
+    "h": 136,
     "etq": "J2",
     "salida": "s",
     "tipo": "servicio",
-    "muro": 0.06
+    "muro": 0.01
    },
    {
     "id": "P3-nav-1785804321430_v0c",
     "kind": "asc-S",
-    "x": 4183,
-    "y": 6220,
-    "w": 230,
-    "h": 144,
+    "x": 4273,
+    "y": 6203,
+    "w": 156,
+    "h": 136,
     "etq": "J1",
     "salida": "s",
-    "tipo": "servicio"
+    "tipo": "servicio",
+    "muro": 0.83
    },
    {
     "id": "P3-nav-1785804348279_gko",
@@ -906,26 +914,26 @@ window.NAV_VERTICALES={
    {
     "id": "P3-nav-1785804352899_vtr",
     "kind": "asc-S",
-    "x": 4128,
-    "y": 2926,
-    "w": 210,
-    "h": 124,
+    "x": 4280,
+    "y": 2766,
+    "w": 145,
+    "h": 200,
     "etq": "H2",
-    "salida": "n",
+    "salida": "ns",
     "tipo": "servicio",
-    "muro": 0.9
+    "muro": 0.03
    },
    {
     "id": "P3-nav-1785804357348_4w1",
     "kind": "asc-S",
-    "x": 4353,
-    "y": 2926,
-    "w": 210,
-    "h": 124,
+    "x": 4426,
+    "y": 2766,
+    "w": 145,
+    "h": 200,
     "etq": "H1",
-    "salida": "n",
+    "salida": "ns",
     "tipo": "servicio",
-    "muro": 0.94
+    "muro": 0.03
    },
    {
     "id": "P3-nav-1785804372110_9ae",
@@ -942,26 +950,26 @@ window.NAV_VERTICALES={
    {
     "id": "P3-nav-1785804387521_b8h",
     "kind": "asc-P",
-    "x": 8499,
-    "y": 6716,
-    "w": 172,
-    "h": 268,
+    "x": 8531,
+    "y": 6920,
+    "w": 194,
+    "h": 159,
     "etq": "Ñ1",
-    "salida": "we",
+    "salida": "w",
     "tipo": "montacamas",
-    "muro": 0.0
+    "muro": 0.03
    },
    {
     "id": "P3-nav-1785804394640_ye5",
     "kind": "asc-P",
-    "x": 8499,
-    "y": 7000,
-    "w": 172,
-    "h": 268,
+    "x": 8531,
+    "y": 7080,
+    "w": 194,
+    "h": 159,
     "etq": "Ñ2",
     "salida": "w",
     "tipo": "montacamas",
-    "muro": 0.07
+    "muro": 0.0
    },
    {
     "id": "P3-nav-1785804402318_t0r",
@@ -973,7 +981,7 @@ window.NAV_VERTICALES={
     "etq": "O1",
     "salida": "w",
     "tipo": "montacamas_mayor",
-    "muro": 1.12
+    "muro": 0.01
    },
    {
     "id": "P3-nav-1785804409009_9by",
@@ -985,30 +993,31 @@ window.NAV_VERTICALES={
     "etq": "O2",
     "salida": "w",
     "tipo": "montacamas_mayor",
-    "muro": 0.07
+    "muro": 0.0
    },
    {
     "id": "P3-nav-1785804433766_yps",
     "kind": "asc-G",
-    "x": 13551,
-    "y": 6800,
+    "x": 13587,
+    "y": 6949,
     "w": 156,
-    "h": 236,
+    "h": 162,
     "etq": "R1",
     "salida": "e",
-    "tipo": "publico"
+    "tipo": "publico",
+    "muro": 0.03
    },
    {
     "id": "P3-nav-1785804437158_t0n",
     "kind": "asc-G",
-    "x": 13551,
-    "y": 7036,
+    "x": 13587,
+    "y": 7111,
     "w": 156,
-    "h": 236,
+    "h": 162,
     "etq": "R2",
     "salida": "e",
     "tipo": "publico",
-    "muro": 0.07
+    "muro": 0.01
    },
    {
     "id": "P3-nav-1785804447874_8a3",
@@ -1032,7 +1041,7 @@ window.NAV_VERTICALES={
     "etq": "T1",
     "salida": "we",
     "tipo": "montacamas_mayor",
-    "muro": 0.11
+    "muro": 0.05
    },
    {
     "id": "P3-nav-1785804459980_reu",
@@ -1044,31 +1053,31 @@ window.NAV_VERTICALES={
     "etq": "T2",
     "salida": "we",
     "tipo": "montacamas_mayor",
-    "muro": 0.13
+    "muro": 0.05
    },
    {
     "id": "P3-nav-1785804506010_c76",
     "kind": "asc-S",
-    "x": 1432,
-    "y": 6306,
-    "w": 423,
-    "h": 222,
+    "x": 1538,
+    "y": 6372,
+    "w": 212,
+    "h": 169,
     "etq": "E1",
     "salida": "ns",
     "tipo": "servicio",
-    "muro": 0.15
+    "muro": 0.11
    },
    {
     "id": "P3-nav-1785804510541_jkx",
     "kind": "asc-S",
-    "x": 1432,
-    "y": 6527,
-    "w": 423,
-    "h": 222,
+    "x": 1327,
+    "y": 6372,
+    "w": 212,
+    "h": 169,
     "etq": "E2",
-    "salida": "n",
+    "salida": "ns",
     "tipo": "servicio",
-    "muro": 0.15
+    "muro": 0.03
    },
    {
     "id": "P3-nav-1785804557041_sxf",
@@ -1123,7 +1132,7 @@ window.NAV_VERTICALES={
     "etq": "W2",
     "salida": "e",
     "tipo": "montacamas",
-    "muro": 0.1
+    "muro": 0.04
    },
    {
     "id": "P3-nav-1787055898821_3k7",
@@ -1135,7 +1144,7 @@ window.NAV_VERTICALES={
     "etq": "W1",
     "salida": "e",
     "tipo": "montacamas",
-    "muro": 1.05
+    "muro": 0.86
    },
    {
     "id": "P3-nav-1787055903756_e0h",
@@ -1147,7 +1156,7 @@ window.NAV_VERTICALES={
     "etq": "V2",
     "salida": "w",
     "tipo": "montacamas_mayor",
-    "muro": 0.96
+    "muro": 0.86
    },
    {
     "id": "P3-nav-1787055910288_j4y",
@@ -1159,31 +1168,31 @@ window.NAV_VERTICALES={
     "etq": "V1",
     "salida": "w",
     "tipo": "montacamas_mayor",
-    "muro": 0.04
+    "muro": 0.1
    },
    {
     "id": "P3-nav-1787055918614_j15",
     "kind": "asc-G",
-    "x": 12492,
-    "y": 10459,
-    "w": 130,
-    "h": 198,
+    "x": 12514,
+    "y": 10610,
+    "w": 153,
+    "h": 143,
     "etq": "X2",
     "salida": "e",
     "tipo": "publico",
-    "muro": 0.06
+    "muro": 0.11
    },
    {
     "id": "P3-nav-1787055922739_9ti",
     "kind": "asc-G",
-    "x": 12492,
-    "y": 10679,
-    "w": 130,
-    "h": 198,
+    "x": 12514,
+    "y": 10754,
+    "w": 153,
+    "h": 143,
     "etq": "X1",
     "salida": "e",
     "tipo": "publico",
-    "muro": 0.06
+    "muro": 0.0
    }
   ],
   "P4": [
@@ -1267,26 +1276,26 @@ window.NAV_VERTICALES={
    {
     "id": "P4-nav-1785798797202_6t8",
     "kind": "asc-Pplus",
-    "x": 15062,
-    "y": 6956,
-    "w": 153,
-    "h": 162,
+    "x": 15003,
+    "y": 6571,
+    "w": 198,
+    "h": 192,
     "etq": "T1",
     "salida": "w",
     "tipo": "montacamas_mayor",
-    "muro": 0.11
+    "muro": 0.05
    },
    {
     "id": "P4-nav-1785798803240_5ln",
     "kind": "asc-Pplus",
-    "x": 15062,
-    "y": 7119,
-    "w": 153,
-    "h": 162,
+    "x": 15003,
+    "y": 6763,
+    "w": 198,
+    "h": 192,
     "etq": "T2",
-    "salida": "w",
+    "salida": "we",
     "tipo": "montacamas_mayor",
-    "muro": 0.07
+    "muro": 0.09
    },
    {
     "id": "P4-nav-1785798808504_u3l",
@@ -1303,25 +1312,26 @@ window.NAV_VERTICALES={
    {
     "id": "P4-nav-1785798817047_lm7",
     "kind": "asc-G",
-    "x": 13546,
-    "y": 6805,
-    "w": 157,
-    "h": 236,
+    "x": 13579,
+    "y": 6959,
+    "w": 156,
+    "h": 162,
     "etq": "R1",
     "salida": "w",
-    "tipo": "publico"
+    "tipo": "publico",
+    "muro": 0.52
    },
    {
     "id": "P4-nav-1785798835931_15a",
     "kind": "asc-G",
-    "x": 13546,
-    "y": 7040,
-    "w": 157,
-    "h": 236,
+    "x": 13579,
+    "y": 7121,
+    "w": 156,
+    "h": 162,
     "etq": "R2",
     "salida": "w",
     "tipo": "publico",
-    "muro": 0.07
+    "muro": 0.01
    },
    {
     "id": "P4-nav-1785798865212_tjx",
@@ -1333,7 +1343,7 @@ window.NAV_VERTICALES={
     "etq": "O1",
     "salida": "w",
     "tipo": "montacamas_mayor",
-    "muro": 1.1
+    "muro": 0.03
    },
    {
     "id": "P4-nav-1785798869322_br8",
@@ -1345,78 +1355,79 @@ window.NAV_VERTICALES={
     "etq": "O2",
     "salida": "w",
     "tipo": "montacamas_mayor",
-    "muro": 0.07
+    "muro": 0.0
    },
    {
     "id": "P4-nav-1785798879103_zkp",
     "kind": "asc-P",
-    "x": 8502,
-    "y": 6752,
-    "w": 194,
-    "h": 244,
+    "x": 8524,
+    "y": 6932,
+    "w": 193,
+    "h": 159,
     "etq": "Ñ1",
-    "salida": "we",
+    "salida": "w",
     "tipo": "montacamas",
-    "muro": 0.01
+    "muro": 0.02
    },
    {
     "id": "P4-nav-1785798884413_vgh",
     "kind": "asc-P",
-    "x": 8502,
-    "y": 7011,
-    "w": 194,
-    "h": 244,
+    "x": 8524,
+    "y": 7090,
+    "w": 193,
+    "h": 159,
     "etq": "Ñ2",
     "salida": "w",
     "tipo": "montacamas",
-    "muro": 0.07
+    "muro": 0.01
    },
    {
     "id": "P4-nav-1785798903275_ewi",
     "kind": "asc-G",
-    "x": 4039,
+    "x": 4036,
     "y": 6948,
-    "w": 194,
+    "w": 200,
     "h": 143,
     "etq": "L1",
     "salida": "w",
     "tipo": "publico",
-    "muro": 0.08
+    "muro": 0.71
    },
    {
     "id": "P4-nav-1785798907708_r3b",
     "kind": "asc-G",
-    "x": 4039,
+    "x": 4036,
     "y": 7092,
-    "w": 194,
+    "w": 200,
     "h": 143,
     "etq": "L2",
     "salida": "w",
     "tipo": "publico",
-    "muro": 0.07
+    "muro": 0.0
    },
    {
     "id": "P4-nav-1785798922018_pi9",
     "kind": "asc-S",
-    "x": 4491,
-    "y": 6226,
-    "w": 298,
-    "h": 142,
+    "x": 4550,
+    "y": 6216,
+    "w": 224,
+    "h": 129,
     "etq": "J2",
     "salida": "sn",
     "tipo": "servicio",
-    "muro": 0.08
+    "muro": 0.02
    },
    {
     "id": "P4-nav-1785798928693_w3g",
     "kind": "asc-S",
-    "x": 4193,
-    "y": 6226,
-    "w": 298,
-    "h": 142,
+    "x": 4327,
+    "y": 6216,
+    "w": 224,
+    "h": 129,
     "etq": "J1",
     "salida": "s",
-    "tipo": "servicio"
+    "tipo": "servicio",
+    "muro": 0.02
    },
    {
     "id": "P4-nav-1785798933075_rcd",
@@ -1428,7 +1439,7 @@ window.NAV_VERTICALES={
     "etq": "I2",
     "salida": "s",
     "tipo": "montacamas",
-    "muro": 0.01
+    "muro": 0.05
    },
    {
     "id": "P4-nav-1785798939800_04l",
@@ -1440,55 +1451,55 @@ window.NAV_VERTICALES={
     "etq": "I1",
     "salida": "s",
     "tipo": "montacamas",
-    "muro": 0.02
+    "muro": 0.05
    },
    {
     "id": "P4-nav-1785798951967_w6x",
     "kind": "asc-S",
     "x": 1342,
-    "y": 6417,
+    "y": 6386,
     "w": 198,
-    "h": 102,
+    "h": 163,
     "etq": "E2",
-    "salida": "ns",
+    "salida": "n",
     "tipo": "servicio",
-    "muro": 0.04
+    "muro": 0.02
    },
    {
     "id": "P4-nav-1785798956917_nzf",
     "kind": "asc-S",
     "x": 1540,
-    "y": 6417,
+    "y": 6386,
     "w": 198,
-    "h": 102,
+    "h": 163,
     "etq": "E1",
-    "salida": "ns",
+    "salida": "n",
     "tipo": "servicio",
-    "muro": 0.05
+    "muro": 0.02
    },
    {
     "id": "P4-nav-1785798990196_6xh",
     "kind": "asc-G",
-    "x": 328,
+    "x": 342,
     "y": 4341,
-    "w": 166,
+    "w": 176,
     "h": 128,
     "etq": "B1",
-    "salida": "ns",
+    "salida": "n",
     "tipo": "publico",
-    "muro": 0.11
+    "muro": 0.05
    },
    {
     "id": "P4-nav-1785798995333_hel",
     "kind": "asc-G",
-    "x": 162,
+    "x": 167,
     "y": 4341,
-    "w": 166,
+    "w": 176,
     "h": 128,
     "etq": "B2",
     "salida": "ns",
     "tipo": "publico",
-    "muro": 0.05
+    "muro": 0.0
    },
    {
     "id": "P4-nav-1785799006723_c56",
@@ -1500,7 +1511,7 @@ window.NAV_VERTICALES={
     "etq": "A1",
     "salida": "ns",
     "tipo": "publico",
-    "muro": 0.11
+    "muro": 0.05
    },
    {
     "id": "P4-nav-1785799013940_8nn",
@@ -1512,7 +1523,7 @@ window.NAV_VERTICALES={
     "etq": "A2",
     "salida": "ns",
     "tipo": "publico",
-    "muro": 0.06
+    "muro": 0.0
    },
    {
     "id": "P4-nav-1785799028145_ez5",
@@ -1541,50 +1552,50 @@ window.NAV_VERTICALES={
    {
     "id": "P4-nav-1785799037145_91u",
     "kind": "asc-S",
-    "x": 4120,
-    "y": 2934,
-    "w": 210,
-    "h": 124,
+    "x": 4326,
+    "y": 2717,
+    "w": 223,
+    "h": 314,
     "etq": "H2",
-    "salida": "n",
+    "salida": "ns",
     "tipo": "servicio",
-    "muro": 0.96
+    "muro": 0.4
    },
    {
     "id": "P4-nav-1785799042285_z2s",
     "kind": "asc-S",
-    "x": 4346,
-    "y": 2934,
-    "w": 210,
-    "h": 124,
+    "x": 4550,
+    "y": 2717,
+    "w": 223,
+    "h": 314,
     "etq": "H1",
-    "salida": "n",
+    "salida": "ns",
     "tipo": "servicio",
-    "muro": 0.99
+    "muro": 0.1
    },
    {
     "id": "P4-nav-1787055939757_z2a",
     "kind": "asc-G",
-    "x": 12514,
-    "y": 10450,
-    "w": 169,
-    "h": 220,
+    "x": 12506,
+    "y": 10622,
+    "w": 153,
+    "h": 143,
     "etq": "X2",
     "salida": "e",
     "tipo": "publico",
-    "muro": 0.03
+    "muro": 0.02
    },
    {
     "id": "P4-nav-1787055944769_znn",
     "kind": "asc-G",
-    "x": 12514,
-    "y": 10691,
-    "w": 169,
-    "h": 220,
+    "x": 12506,
+    "y": 10766,
+    "w": 153,
+    "h": 143,
     "etq": "X1",
     "salida": "e",
     "tipo": "publico",
-    "muro": 0.06
+    "muro": 0.0
    },
    {
     "id": "P4-nav-1787055952755_odk",
@@ -1596,7 +1607,7 @@ window.NAV_VERTICALES={
     "etq": "W1",
     "salida": "e",
     "tipo": "montacamas",
-    "muro": 0.94
+    "muro": 0.74
    },
    {
     "id": "P4-nav-1787055956092_4cp",
@@ -1608,31 +1619,31 @@ window.NAV_VERTICALES={
     "etq": "W2",
     "salida": "e",
     "tipo": "montacamas",
-    "muro": 0.09
+    "muro": 0.03
    },
    {
     "id": "P4-nav-1787055960188_9sw",
     "kind": "asc-Pplus",
-    "x": 11609,
-    "y": 10397,
-    "w": 144,
-    "h": 92,
+    "x": 11608,
+    "y": 10586,
+    "w": 145,
+    "h": 196,
     "etq": "V1",
-    "salida": "w",
+    "salida": "we",
     "tipo": "montacamas_mayor",
-    "muro": 0.04
+    "muro": 0.1
    },
    {
     "id": "P4-nav-1787055965941_2b3",
     "kind": "asc-Pplus",
-    "x": 11609,
-    "y": 10488,
-    "w": 144,
-    "h": 92,
+    "x": 11608,
+    "y": 10782,
+    "w": 145,
+    "h": 196,
     "etq": "V2",
-    "salida": "w",
+    "salida": "we",
     "tipo": "montacamas_mayor",
-    "muro": 0.94
+    "muro": 0.04
    },
    {
     "id": "P4-nav-1787057103701_0z8",
@@ -1805,116 +1816,117 @@ window.NAV_VERTICALES={
    {
     "id": "P-1-nav-1785804894164_ort",
     "kind": "asc-S",
-    "x": 4012,
-    "y": 2789,
-    "w": 138,
-    "h": 230,
+    "x": 4180,
+    "y": 2726,
+    "w": 130,
+    "h": 123,
     "etq": "H2",
-    "salida": "ns",
+    "salida": "n",
     "tipo": "servicio",
-    "muro": 0.1
+    "muro": 0.03
    },
    {
     "id": "P-1-nav-1785804900672_mj4",
     "kind": "asc-S",
-    "x": 4149,
-    "y": 2789,
-    "w": 138,
-    "h": 230,
+    "x": 4180,
+    "y": 2850,
+    "w": 130,
+    "h": 123,
     "etq": "H1",
     "salida": "n",
     "tipo": "servicio",
-    "muro": 1.34
+    "muro": 0.04
    },
    {
     "id": "P-1-nav-1785804931298_j8z",
     "kind": "asc-S",
-    "x": 1222,
-    "y": 6311,
-    "w": 117,
-    "h": 126,
+    "x": 1220,
+    "y": 6417,
+    "w": 97,
+    "h": 184,
     "etq": "E2",
     "salida": "n",
     "tipo": "servicio",
-    "muro": 0.01
+    "muro": 0.04
    },
    {
     "id": "P-1-nav-1785804935120_lpk",
     "kind": "asc-S",
-    "x": 1222,
-    "y": 6437,
-    "w": 117,
-    "h": 126,
+    "x": 1220,
+    "y": 6602,
+    "w": 97,
+    "h": 184,
     "etq": "E1",
     "salida": "n",
     "tipo": "servicio",
-    "muro": 0.68
+    "muro": 0.05
    },
    {
     "id": "P-1-nav-1785804959762_7t6",
     "kind": "asc-G",
-    "x": 334,
-    "y": 4356,
-    "w": 131,
-    "h": 178,
+    "x": 386,
+    "y": 4364,
+    "w": 165,
+    "h": 175,
     "etq": "B1",
     "salida": "n",
     "tipo": "publico",
-    "muro": 0.08
+    "muro": 0.02
    },
    {
     "id": "P-1-nav-1785804963593_1sx",
     "kind": "asc-G",
-    "x": 204,
-    "y": 4356,
-    "w": 131,
-    "h": 178,
+    "x": 220,
+    "y": 4364,
+    "w": 165,
+    "h": 175,
     "etq": "B2",
-    "salida": "n",
+    "salida": "ns",
     "tipo": "publico",
-    "muro": 1.0
+    "muro": 0.02
    },
    {
     "id": "P-1-nav-1785804974551_da3",
     "kind": "asc-G",
-    "x": 345,
-    "y": 1879,
-    "w": 94,
-    "h": 114,
+    "x": 390,
+    "y": 1870,
+    "w": 168,
+    "h": 131,
     "etq": "A1",
     "salida": "ns",
     "tipo": "publico",
-    "muro": 0.0
+    "muro": 0.01
    },
    {
     "id": "P-1-nav-1785804981473_khg",
     "kind": "asc-G",
-    "x": 345,
-    "y": 1764,
-    "w": 94,
-    "h": 114,
+    "x": 222,
+    "y": 1870,
+    "w": 168,
+    "h": 131,
     "etq": "A2",
     "salida": "ns",
     "tipo": "publico",
-    "muro": 0.05
+    "muro": 0.07
    },
    {
     "id": "P-1-nav-1785805008767_rik",
     "kind": "asc-S",
-    "x": 4381,
-    "y": 6237,
-    "w": 151,
-    "h": 156,
+    "x": 4642,
+    "y": 6284,
+    "w": 153,
+    "h": 443,
     "etq": "J2",
     "salida": "s",
-    "tipo": "servicio"
+    "tipo": "servicio",
+    "muro": 0.97
    },
    {
     "id": "P-1-nav-1785805012276_6sh",
     "kind": "asc-S",
-    "x": 4230,
-    "y": 6237,
-    "w": 151,
+    "x": 4246,
+    "y": 6236,
+    "w": 147,
     "h": 156,
     "etq": "J1",
     "salida": "s",
@@ -1923,10 +1935,10 @@ window.NAV_VERTICALES={
    {
     "id": "P-1-nav-1785805016388_mdp",
     "kind": "asc-P",
-    "x": 4068,
-    "y": 6238,
-    "w": 153,
-    "h": 180,
+    "x": 4038,
+    "y": 6289,
+    "w": 154,
+    "h": 186,
     "etq": "I2",
     "salida": "s",
     "tipo": "montacamas"
@@ -1934,13 +1946,14 @@ window.NAV_VERTICALES={
    {
     "id": "P-1-nav-1785805021018_6xf",
     "kind": "asc-P",
-    "x": 3915,
-    "y": 6238,
-    "w": 153,
-    "h": 180,
+    "x": 3863,
+    "y": 6289,
+    "w": 154,
+    "h": 186,
     "etq": "I1",
-    "salida": "s",
-    "tipo": "montacamas"
+    "salida": "sn",
+    "tipo": "montacamas",
+    "muro": 0.5
    },
    {
     "id": "P-1-nav-1785805030676_wtg",
@@ -1952,7 +1965,7 @@ window.NAV_VERTICALES={
     "etq": "L1",
     "salida": "w",
     "tipo": "publico",
-    "muro": 1.19
+    "muro": 0.82
    },
    {
     "id": "P-1-nav-1785805033787_sce",
@@ -1964,31 +1977,31 @@ window.NAV_VERTICALES={
     "etq": "L2",
     "salida": "w",
     "tipo": "publico",
-    "muro": 0.07
+    "muro": 0.0
    },
    {
     "id": "P-1-nav-1785805051204_35o",
     "kind": "asc-P",
-    "x": 8727,
-    "y": 4624,
-    "w": 166,
-    "h": 199,
+    "x": 8641,
+    "y": 4840,
+    "w": 290,
+    "h": 210,
     "etq": "N1",
-    "salida": "we",
+    "salida": "w",
     "tipo": "montacamas",
-    "muro": 0.0
+    "muro": 0.06
    },
    {
     "id": "P-1-nav-1785805053955_p95",
     "kind": "asc-P",
-    "x": 8561,
-    "y": 4624,
-    "w": 166,
-    "h": 199,
+    "x": 8641,
+    "y": 5050,
+    "w": 290,
+    "h": 210,
     "etq": "N2",
     "salida": "w",
     "tipo": "montacamas",
-    "muro": 0.07
+    "muro": 0.0
    },
    {
     "id": "P-1-nav-1785805070479_321",
@@ -2000,7 +2013,7 @@ window.NAV_VERTICALES={
     "etq": "M2",
     "salida": "w",
     "tipo": "montacamas_mayor",
-    "muro": 1.15
+    "muro": 0.58
    },
    {
     "id": "P-1-nav-1785805075647_ygp",
@@ -2012,7 +2025,7 @@ window.NAV_VERTICALES={
     "etq": "M1",
     "salida": "w",
     "tipo": "montacamas_mayor",
-    "muro": 0.07
+    "muro": 0.0
    },
    {
     "id": "P-1-nav-1785805106877_5yi",
@@ -2024,7 +2037,7 @@ window.NAV_VERTICALES={
     "etq": "O1",
     "salida": "we",
     "tipo": "montacamas_mayor",
-    "muro": 1.26
+    "muro": 0.05
    },
    {
     "id": "P-1-nav-1785805113642_k81",
@@ -2036,7 +2049,7 @@ window.NAV_VERTICALES={
     "etq": "O2",
     "salida": "we",
     "tipo": "montacamas_mayor",
-    "muro": 0.06
+    "muro": 0.01
    },
    {
     "id": "P-1-nav-1785805129737_7vv",
@@ -2059,7 +2072,7 @@ window.NAV_VERTICALES={
     "etq": "W1",
     "salida": "e",
     "tipo": "montacamas",
-    "muro": 1.34
+    "muro": 1.05
    },
    {
     "id": "P-1-nav-1785805209528_bqo",
@@ -2071,7 +2084,7 @@ window.NAV_VERTICALES={
     "etq": "W2",
     "salida": "e",
     "tipo": "montacamas",
-    "muro": 1.06
+    "muro": 0.91
    },
    {
     "id": "P-1-nav-1785805215311_c57",
@@ -2087,14 +2100,14 @@ window.NAV_VERTICALES={
    {
     "id": "P-1-nav-1785805219795_z2o",
     "kind": "asc-Pplus",
-    "x": 11933,
+    "x": 11938,
     "y": 10226,
-    "w": 182,
+    "w": 173,
     "h": 259,
     "etq": "V1",
     "salida": "w",
     "tipo": "montacamas_mayor",
-    "muro": 1.45
+    "muro": 1.28
    },
    {
     "id": "P-1-nav-1785807338469_dkq",
@@ -2106,7 +2119,7 @@ window.NAV_VERTICALES={
     "etq": "T1",
     "salida": "w",
     "tipo": "montacamas_mayor",
-    "muro": 0.11
+    "muro": 0.05
    },
    {
     "id": "P-1-nav-1785807346644_886",
@@ -2118,7 +2131,7 @@ window.NAV_VERTICALES={
     "etq": "T2",
     "salida": "we",
     "tipo": "montacamas_mayor",
-    "muro": 0.09
+    "muro": 0.03
    },
    {
     "id": "P-1-nav-1785807634411_rnk",
@@ -2158,25 +2171,25 @@ window.NAV_VERTICALES={
     "id": "P-1-nav-1787057189781_8g3",
     "kind": "asc-G",
     "x": 12656,
-    "y": 9355,
+    "y": 9354,
     "w": 164,
-    "h": 288,
+    "h": 309,
     "etq": "U1",
     "salida": "w",
     "tipo": "publico",
-    "muro": 0.12
+    "muro": 0.08
    },
    {
     "id": "P-1-nav-1787057193731_igk",
     "kind": "asc-G",
     "x": 12493,
-    "y": 9355,
+    "y": 9354,
     "w": 164,
-    "h": 288,
+    "h": 309,
     "etq": "U2",
     "salida": "w",
     "tipo": "publico",
-    "muro": 0.13
+    "muro": 0.08
    }
   ],
   "P-2": [
@@ -2195,25 +2208,26 @@ window.NAV_VERTICALES={
    {
     "id": "P-2-nav-1787053395828_oyd",
     "kind": "asc-G",
-    "x": 248,
-    "y": 6750,
-    "w": 302,
-    "h": 272,
+    "x": 172,
+    "y": 7068,
+    "w": 196,
+    "h": 365,
     "etq": "C2",
     "salida": "e",
-    "tipo": "publico"
+    "tipo": "publico",
+    "muro": 1.01
    },
    {
     "id": "P-2-nav-1787053402237_3x5",
     "kind": "asc-G",
-    "x": 248,
-    "y": 7044,
-    "w": 302,
-    "h": 272,
+    "x": 367,
+    "y": 7068,
+    "w": 196,
+    "h": 365,
     "etq": "C1",
     "salida": "e",
     "tipo": "publico",
-    "muro": 0.11
+    "muro": 0.05
    },
    {
     "id": "P-2-nav-1787057313865_u9w",
@@ -2237,7 +2251,7 @@ window.NAV_VERTICALES={
     "etq": "U1",
     "salida": "w",
     "tipo": "publico",
-    "muro": 0.35
+    "muro": 0.26
    },
    {
     "id": "P-2-nav-1787057349113_ssz",
@@ -2249,7 +2263,7 @@ window.NAV_VERTICALES={
     "etq": "U2",
     "salida": "we",
     "tipo": "publico",
-    "muro": 0.06
+    "muro": 0.11
    },
    {
     "id": "P-2-nav-1787057408217_b82",
@@ -2472,43 +2486,45 @@ window.NAV_VERTICALES={
    {
     "id": "P1-nav-1785246506802_zyq",
     "kind": "asc-P",
-    "x": 4016,
-    "y": 6239,
-    "w": 144,
-    "h": 201,
+    "x": 3810,
+    "y": 6186,
+    "w": 135,
+    "h": 114,
     "etq": "I2",
     "salida": "s",
-    "tipo": "montacamas"
+    "tipo": "montacamas",
+    "muro": 0.93
    },
    {
     "id": "P1-nav-1785246510043_h2r",
     "kind": "asc-P",
-    "x": 3850,
-    "y": 6239,
-    "w": 144,
-    "h": 201,
+    "x": 3810,
+    "y": 6300,
+    "w": 135,
+    "h": 114,
     "etq": "I1",
     "salida": "s",
     "tipo": "montacamas",
-    "muro": 0.66
+    "muro": 0.43
    },
    {
     "id": "P1-nav-1785246512270_kkx",
     "kind": "asc-S",
-    "x": 4381,
-    "y": 6237,
-    "w": 152,
-    "h": 156,
+    "x": 4600,
+    "y": 6474,
+    "w": 163,
+    "h": 399,
     "etq": "J2",
     "salida": "s",
-    "tipo": "servicio"
+    "tipo": "servicio",
+    "muro": 1.13
    },
    {
     "id": "P1-nav-1785246514937_uqe",
     "kind": "asc-S",
-    "x": 4229,
-    "y": 6237,
-    "w": 152,
+    "x": 4246,
+    "y": 6236,
+    "w": 142,
     "h": 156,
     "etq": "J1",
     "salida": "s",
@@ -2524,7 +2540,7 @@ window.NAV_VERTICALES={
     "etq": "L1",
     "salida": "w",
     "tipo": "publico",
-    "muro": 1.03
+    "muro": 0.66
    },
    {
     "id": "P1-nav-1785246522703_yvb",
@@ -2536,103 +2552,103 @@ window.NAV_VERTICALES={
     "etq": "L2",
     "salida": "w",
     "tipo": "publico",
-    "muro": 0.07
+    "muro": 0.0
    },
    {
     "id": "P1-nav-1785246532986_yrr",
     "kind": "asc-G",
-    "x": 170,
-    "y": 6564,
-    "w": 152,
-    "h": 153,
+    "x": 249,
+    "y": 6549,
+    "w": 208,
+    "h": 162,
     "etq": "C2",
     "salida": "e",
     "tipo": "publico",
-    "muro": 0.03
+    "muro": 0.0
    },
    {
     "id": "P1-nav-1785246535161_wtn",
     "kind": "asc-G",
-    "x": 170,
-    "y": 6716,
-    "w": 152,
-    "h": 153,
+    "x": 249,
+    "y": 6712,
+    "w": 208,
+    "h": 162,
     "etq": "C1",
     "salida": "ew",
     "tipo": "publico",
-    "muro": 0.09
+    "muro": 0.03
    },
    {
     "id": "P1-nav-1785246542060_0se",
     "kind": "asc-S",
     "x": 1316,
-    "y": 6537,
+    "y": 6530,
     "w": 143,
-    "h": 178,
+    "h": 193,
     "etq": "E2",
     "salida": "n",
     "tipo": "servicio",
-    "muro": 0.06
+    "muro": 0.01
    },
    {
     "id": "P1-nav-1785246544251_gm7",
     "kind": "asc-S",
     "x": 1458,
-    "y": 6537,
+    "y": 6530,
     "w": 143,
-    "h": 178,
+    "h": 193,
     "etq": "E1",
     "salida": "n",
     "tipo": "servicio",
-    "muro": 0.11
+    "muro": 0.05
    },
    {
     "id": "P1-nav-1785246563886_275",
     "kind": "asc-G",
-    "x": 337,
-    "y": 4464,
-    "w": 160,
-    "h": 152,
+    "x": 248,
+    "y": 4174,
+    "w": 208,
+    "h": 128,
     "etq": "B1",
-    "salida": "n",
+    "salida": "ns",
     "tipo": "publico",
-    "muro": 0.93
+    "muro": 0.03
    },
    {
     "id": "P1-nav-1785246566392_izk",
     "kind": "asc-G",
-    "x": 178,
-    "y": 4464,
-    "w": 160,
-    "h": 152,
+    "x": 248,
+    "y": 4303,
+    "w": 208,
+    "h": 128,
     "etq": "B2",
-    "salida": "n",
+    "salida": "ns",
     "tipo": "publico",
-    "muro": 1.12
+    "muro": 0.05
    },
    {
     "id": "P1-nav-1785246590490_4oo",
     "kind": "asc-G",
-    "x": 342,
-    "y": 1953,
-    "w": 163,
-    "h": 164,
+    "x": 360,
+    "y": 1748,
+    "w": 176,
+    "h": 207,
     "etq": "A1",
-    "salida": "n",
+    "salida": "ns",
     "tipo": "publico",
-    "muro": 0.99
+    "muro": 0.05
    },
    {
     "id": "P1-nav-1785246592618_cxt",
     "kind": "asc-G",
-    "x": 178,
-    "y": 1953,
-    "w": 163,
-    "h": 164,
+    "x": 183,
+    "y": 1748,
+    "w": 176,
+    "h": 207,
     "etq": "A2",
-    "salida": "n",
+    "salida": "ns",
     "tipo": "publico",
-    "muro": 1.17
+    "muro": 0.05
    },
    {
     "id": "P1-nav-1785246638771_xaj",
@@ -2673,26 +2689,26 @@ window.NAV_VERTICALES={
    {
     "id": "P1-nav-1785246675199_lss",
     "kind": "asc-S",
-    "x": 4364,
-    "y": 2743,
-    "w": 292,
-    "h": 176,
+    "x": 4153,
+    "y": 2658,
+    "w": 158,
+    "h": 118,
     "etq": "H2",
     "salida": "ns",
     "tipo": "servicio",
-    "muro": 0.79
+    "muro": 0.02
    },
    {
     "id": "P1-nav-1785246676936_ku9",
     "kind": "asc-S",
-    "x": 4364,
-    "y": 2920,
-    "w": 292,
-    "h": 176,
+    "x": 4153,
+    "y": 2776,
+    "w": 158,
+    "h": 118,
     "etq": "H1",
     "salida": "n",
     "tipo": "servicio",
-    "muro": 0.13
+    "muro": 0.02
    },
    {
     "id": "P1-nav-1785246705086_uz9",
@@ -2704,7 +2720,7 @@ window.NAV_VERTICALES={
     "etq": "M1",
     "salida": "w",
     "tipo": "montacamas_mayor",
-    "muro": 0.08
+    "muro": 0.01
    },
    {
     "id": "P1-nav-1785246706834_vvd",
@@ -2716,30 +2732,31 @@ window.NAV_VERTICALES={
     "etq": "M2",
     "salida": "w",
     "tipo": "montacamas_mayor",
-    "muro": 1.14
+    "muro": 0.01
    },
    {
     "id": "P1-nav-1785246709879_r1m",
     "kind": "asc-P",
-    "x": 8334,
-    "y": 4988,
-    "w": 235,
-    "h": 249,
+    "x": 8352,
+    "y": 4529,
+    "w": 164,
+    "h": 156,
     "etq": "N2",
-    "salida": "w",
+    "salida": "we",
     "tipo": "montacamas",
-    "muro": 1.04
+    "muro": 0.73
    },
    {
     "id": "P1-nav-1785246712179_sd9",
     "kind": "asc-P",
-    "x": 8613,
-    "y": 4684,
-    "w": 279,
-    "h": 200,
+    "x": 8516,
+    "y": 4529,
+    "w": 164,
+    "h": 156,
     "etq": "N1",
-    "salida": "w",
-    "tipo": "montacamas"
+    "salida": "we",
+    "tipo": "montacamas",
+    "muro": 0.64
    },
    {
     "id": "P1-nav-1785246729457_anw",
@@ -2778,50 +2795,50 @@ window.NAV_VERTICALES={
    {
     "id": "P1-nav-1785246800258_2ed",
     "kind": "asc-Pplus",
-    "x": 14942,
-    "y": 6905,
-    "w": 125,
-    "h": 136,
+    "x": 14879,
+    "y": 6919,
+    "w": 250,
+    "h": 138,
     "etq": "T1",
-    "salida": "w",
-    "tipo": "montacamas_mayor",
-    "muro": 0.1
-   },
-   {
-    "id": "P1-nav-1785246802204_k3l",
-    "kind": "asc-Pplus",
-    "x": 14816,
-    "y": 6905,
-    "w": 125,
-    "h": 136,
-    "etq": "T2",
     "salida": "w",
     "tipo": "montacamas_mayor",
     "muro": 0.05
    },
    {
+    "id": "P1-nav-1785246802204_k3l",
+    "kind": "asc-Pplus",
+    "x": 14879,
+    "y": 7058,
+    "w": 250,
+    "h": 138,
+    "etq": "T2",
+    "salida": "we",
+    "tipo": "montacamas_mayor",
+    "muro": 0.04
+   },
+   {
     "id": "P1-nav-1785246811755_lfv",
     "kind": "asc-G",
-    "x": 13604,
-    "y": 6933,
-    "w": 155,
-    "h": 160,
+    "x": 13242,
+    "y": 7012,
+    "w": 188,
+    "h": 319,
     "etq": "R1",
-    "salida": "w",
+    "salida": "we",
     "tipo": "publico",
-    "muro": 0.83
+    "muro": 0.48
    },
    {
     "id": "P1-nav-1785246813646_9p4",
     "kind": "asc-G",
-    "x": 13604,
-    "y": 7092,
-    "w": 155,
-    "h": 160,
+    "x": 13430,
+    "y": 7012,
+    "w": 188,
+    "h": 319,
     "etq": "R2",
-    "salida": "w",
+    "salida": "we",
     "tipo": "publico",
-    "muro": 0.76
+    "muro": 0.09
    },
    {
     "id": "P1-nav-1785246817238_6zb",
@@ -2957,25 +2974,25 @@ window.NAV_VERTICALES={
     "id": "P1-nav-1785811678433_vhg",
     "kind": "asc-Pplus",
     "x": 8946,
-    "y": 7012,
+    "y": 7014,
     "w": 204,
-    "h": 323,
+    "h": 319,
     "etq": "O1",
     "salida": "w",
     "tipo": "montacamas_mayor",
-    "muro": 0.92
+    "muro": 0.12
    },
    {
     "id": "P1-nav-1785811682563_jdc",
     "kind": "asc-Pplus",
     "x": 8742,
-    "y": 7012,
+    "y": 7014,
     "w": 204,
-    "h": 323,
+    "h": 319,
     "etq": "O2",
     "salida": "w",
     "tipo": "montacamas_mayor",
-    "muro": 0.14
+    "muro": 0.09
    },
    {
     "id": "P1-nav-1787053048806_fmg",
@@ -2987,7 +3004,7 @@ window.NAV_VERTICALES={
     "etq": "X2",
     "salida": "e",
     "tipo": "publico",
-    "muro": 1.22
+    "muro": 0.66
    },
    {
     "id": "P1-nav-1787053052372_lwv",
@@ -2999,54 +3016,54 @@ window.NAV_VERTICALES={
     "etq": "X1",
     "salida": "e",
     "tipo": "publico",
-    "muro": 0.51
+    "muro": 0.26
    },
    {
     "id": "P1-nav-1787053064239_dt2",
     "kind": "asc-P",
-    "x": 12193,
-    "y": 10674,
-    "w": 235,
-    "h": 248,
+    "x": 12198,
+    "y": 10599,
+    "w": 212,
+    "h": 170,
     "etq": "W2",
     "salida": "e",
     "tipo": "montacamas",
-    "muro": 1.32
+    "muro": 1.06
    },
    {
     "id": "P1-nav-1787053067838_4ao",
     "kind": "asc-P",
-    "x": 11936,
-    "y": 10674,
-    "w": 235,
-    "h": 248,
+    "x": 12198,
+    "y": 10769,
+    "w": 212,
+    "h": 170,
     "etq": "W1",
     "salida": "e",
-    "tipo": "montacamas"
+    "tipo": "montacamas",
+    "muro": 0.87
    },
    {
     "id": "P1-nav-1787053072827_mv8",
     "kind": "asc-Pplus",
-    "x": 11462,
-    "y": 10764,
-    "w": 221,
-    "h": 159,
+    "x": 11619,
+    "y": 10955,
+    "w": 104,
+    "h": 156,
     "etq": "V2",
-    "salida": "w",
+    "salida": "we",
     "tipo": "montacamas_mayor",
-    "muro": 0.85
+    "muro": 1.09
    },
    {
     "id": "P1-nav-1787053077333_tyt",
     "kind": "asc-Pplus",
-    "x": 11462,
-    "y": 10604,
-    "w": 221,
-    "h": 159,
+    "x": 11667,
+    "y": 10495,
+    "w": 258,
+    "h": 154,
     "etq": "V1",
     "salida": "w",
-    "tipo": "montacamas_mayor",
-    "muro": 1.14
+    "tipo": "montacamas_mayor"
    },
    {
     "id": "P1-nav-1787053093445_i2y",
@@ -3091,7 +3108,7 @@ window.NAV_VERTICALES={
     "etq": "U2",
     "salida": "e",
     "tipo": "publico",
-    "muro": 0.08
+    "muro": 0.01
    },
    {
     "id": "P1-nav-1787057623178_sas",
@@ -3103,7 +3120,7 @@ window.NAV_VERTICALES={
     "etq": "U1",
     "salida": "e",
     "tipo": "publico",
-    "muro": 0.08
+    "muro": 0.01
    }
   ],
   "P5": [
@@ -3270,27 +3287,27 @@ window.NAV_VERTICALES={
     "id": "P-3-dir-A1",
     "kind": "asc-G",
     "x": 654,
-    "y": 1762,
-    "w": 172,
-    "h": 199,
+    "y": 1689,
+    "w": 157,
+    "h": 114,
     "etq": "A1",
     "salida": "n",
     "origen": "directorio",
     "tipo": "publico",
-    "muro": 0.05
+    "muro": 0.03
    },
    {
     "id": "P-3-dir-A2",
     "kind": "asc-G",
-    "x": 471,
-    "y": 1762,
-    "w": 172,
-    "h": 199,
+    "x": 654,
+    "y": 1575,
+    "w": 157,
+    "h": 114,
     "etq": "A2",
     "salida": "n",
     "origen": "directorio",
     "tipo": "publico",
-    "muro": 0.11
+    "muro": 0.06
    },
    {
     "id": "P-3-dir-C2",
@@ -3303,7 +3320,7 @@ window.NAV_VERTICALES={
     "salida": "ew",
     "origen": "directorio",
     "tipo": "publico",
-    "muro": 0.1
+    "muro": 0.05
    },
    {
     "id": "P-3-dir-C1",
@@ -3316,7 +3333,7 @@ window.NAV_VERTICALES={
     "salida": "e",
     "origen": "directorio",
     "tipo": "publico",
-    "muro": 0.11
+    "muro": 0.05
    },
    {
     "id": "P-3-dir-P",
