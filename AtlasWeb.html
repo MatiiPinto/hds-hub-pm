@@ -6955,6 +6955,7 @@ function renderStructMarker(it, tdef){
   const PUERTA={n:'norte',s:'sur',e:'este',w:'oeste',ns:'norte y sur (doble)',ew:'este y oeste (doble)',sn:'norte y sur (doble)',we:'este y oeste (doble)'};
   ttl.textContent = tdef.label + (it.etq?(' '+it.etq):'') + (sized&&mx ? ` · ${(bw*mx).toFixed(1)} × ${(bh*my).toFixed(1)} m` : '')
     + (it.kind.startsWith('asc-') ? (' · puerta: '+(PUERTA[it.salida]||it.salida||'sin dato')) : '')
+    + (it.tam==='tipologia' ? ' · ⚠ ducto no leído en el plano: tamaño por tipología, revisar posición' : '')
     + ((S.editMode&&S.level===1) ? ' · arrastrar mueve · ⇧ mueve todo el piso · ◢ escala · × borra'+(it.kind.startsWith('asc-')?' · clic derecho cambia la puerta'+(_gemelaDe(it)?' · la gemela sigue en espejo':''):'') : '');
   g.appendChild(ttl);
   g.addEventListener('click', e => { e.stopPropagation(); });
@@ -7083,7 +7084,8 @@ function importarVerticalesNav(sinConfirmar){
   });
   sStruct(); renderSVG();
   if(typeof closeStructMenu==='function') try{ closeStructMenu(); }catch(e){}
-  if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🛗 '+total+' ascensores/escaleras importados de Navegación en '+pisos.length+' pisos — cuadrados con el plano de cada piso'; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},7000); }
+  const rev=pisos.reduce((a,p)=>a+(NV.floors[p]||[]).filter(x=>x.tam==='tipologia').length,0);
+  if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🛗 '+total+' ascensores/escaleras importados de Navegación en '+pisos.length+' pisos — cuadrados con el plano'+(rev?(' · ⚠ '+rev+' sin ducto leído (tamaño por tipología): revisar posición, el tooltip los marca'):''); setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},9000); }
 }
 
 function renderStructLine(it, tdef){
@@ -9534,6 +9536,9 @@ function renderAvance(){
   const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
   const corto=s=>String(s||'').replace(/^SUBDIRECCION\s+(DE\s+)?/i,'').replace(/^DEPARTAMENTO\s+/i,'Depto. ').replace(/^SERVICIO\s+(DE\s+)?/i,'');
   const {asg,arbol,nBec,tN,tA}=_avArbol();
+  // La categoría de RRHH sólo existe mientras haya personas sin clasificar.
+  const PEND_RRHH='PENDIENTE DE CLASIFICAR POR RRHH';
+  const nPend=(arbol[PEND_RRHH]||{}).n||0;
   const badge=document.getElementById('sbAvN'); if(badge && !_avFiltro) badge.textContent=_avPct(tA,tN)+'%';
   const H=[];
   H.push('<div style="display:flex;align-items:center;gap:8px;padding:4px 4px 6px">'
@@ -9542,6 +9547,7 @@ function renderAvance(){
     +'<div style="padding:0 4px 6px">'+_avBarra(tA,tN,8)
     +'<div style="font-size:10.5px;color:#64748b;margin-top:3px">'+tA+' de '+tN+' personas · faltan '+(tN-tA)+'</div>'
     +((!_avFiltro&&nBec)?'<div style="font-size:10.5px;color:#94a3b8;margin-top:2px" title="Los becados en formación no pertenecen a una subdirección">🎓 '+nBec+' becados no considerados</div>':'')
+    +(nPend?'<div style="font-size:10.5px;color:#b45309;margin-top:2px" title="Personal contratado que RRHH aún no clasifica por departamento ni subdirección. La categoría desaparece cuando llegue la clasificación.">📋 '+nPend+' sin clasificar por RRHH ('+(tN? (nPend*100/tN<1 ? (nPend*100/tN).toFixed(1) : _avPct(nPend,tN)) : 0)+'% de la dotación)</div>':'')
     +(_avFiltro?'<div style="font-size:10.5px;color:#94a3b8;margin-top:2px">Grupo transversal · '+Object.keys(arbol).length+' subdirecciones</div>':'')+'</div>');
   // cada subdirección se abre a sus servicios/departamentos y éstos a sus
   // unidades, con el mismo avance; todo el árbol se puede abrir de una vez o exportar
@@ -12208,6 +12214,12 @@ function loadDotDB(){
         // Becados con nombre: vienen de la nómina de formación (beca_*). Sin esos
         // campos se usan fecha_inicio/fecha_termino de la matriz.
         grupos: Array.isArray(p.grupos) ? p.grupos.map(g=>({clave:g.clave, nombre:g.nombre, rol:g.rol||''})) : [],
+        // Personal confirmado por RRHH que todavía no está en el Excel de dotación:
+        // trae el recinto que RRHH informó y, si no está clasificado, su subdirección
+        // es la categoría «PENDIENTE DE CLASIFICAR POR RRHH» (existe sólo si hay gente).
+        sirh: p.sirh_estado ? {estado:p.sirh_estado, obs:p.sirh_observacion||'', pendiente:!!p.ingreso_pendiente,
+              recinto:p.recinto_sugerido||'', codigo:p.recinto_codigo||'', bim:p.recinto_bim||'',
+              area:p.area_atlas||'', piso:p.piso||'', sinClasificar:!!p.clasificacion_pendiente} : null,
         beca: (String(p.tipo_vinculo||'').toUpperCase()==='BECADO' || /BECAD/i.test(p.ley||'') || p.beca_origen==='nomina_becados')
           ? { tipo: String(p.beca_tipo||'').toUpperCase(),
               programa: p.beca_programa || p.especialidad || p.sp || '',
