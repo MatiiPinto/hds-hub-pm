@@ -9,7 +9,7 @@ window.NAV_VERTICALES={
   "origen": "Navegacion_HDS_2026-08-24-2.json",
   "export_de": "2026-08-24T15:04:01.210Z",
   "total": 275,
-  "calibrado": "2026-09-22T16:08:37",
+  "calibrado": "2026-09-22T23:05:38",
   "calibracion": {
    "P-1": {
     "modo": "traslación",
@@ -24,8 +24,8 @@ window.NAV_VERTICALES={
     "nucleos": 12,
     "muros": 41,
     "escaleras_por_peldanos": 12,
-    "gemelas_partidas": 12,
-    "gemelas": 13
+    "gemelas_partidas": 15,
+    "gemelas": 15
    },
    "P1": {
     "modo": "escala+traslación",
@@ -40,8 +40,8 @@ window.NAV_VERTICALES={
     "nucleos": 17,
     "muros": 51,
     "escaleras_por_peldanos": 14,
-    "gemelas_partidas": 15,
-    "gemelas": 15
+    "gemelas_partidas": 18,
+    "gemelas": 18
    },
    "P2": {
     "modo": "traslación",
@@ -56,8 +56,8 @@ window.NAV_VERTICALES={
     "nucleos": 11,
     "muros": 47,
     "escaleras_por_peldanos": 11,
-    "gemelas_partidas": 16,
-    "gemelas": 16
+    "gemelas_partidas": 17,
+    "gemelas": 17
    },
    "P3": {
     "modo": "escala+traslación",
@@ -88,8 +88,8 @@ window.NAV_VERTICALES={
     "nucleos": 9,
     "muros": 40,
     "escaleras_por_peldanos": 9,
-    "gemelas_partidas": 14,
-    "gemelas": 14
+    "gemelas_partidas": 15,
+    "gemelas": 15
    },
    "P-2": {
     "modo": "consenso de ascensores",
@@ -98,7 +98,7 @@ window.NAV_VERTICALES={
     "rotulos": 9,
     "muros": 24,
     "escaleras_por_peldanos": 9,
-    "gemelas_partidas": 2,
+    "gemelas_partidas": 3,
     "gemelas": 3
    },
    "P5": {
@@ -301,14 +301,14 @@ window.NAV_VERTICALES={
    {
     "id": "P2-nav-1785787310172_wxs",
     "kind": "asc-Pplus",
-    "x": 3970,
-    "y": 2963,
-    "w": 163,
-    "h": 202,
+    "x": 3942,
+    "y": 2494,
+    "w": 107,
+    "h": 210,
     "etq": "G1",
     "salida": "n",
     "tipo": "montacamas_mayor",
-    "muro": 0.65
+    "muro": 0.03
    },
    {
     "id": "P2-nav-1785787315417_v4d",
@@ -1540,14 +1540,14 @@ window.NAV_VERTICALES={
    {
     "id": "P4-nav-1785799032877_hsb",
     "kind": "asc-Pplus",
-    "x": 3914,
-    "y": 2729,
-    "w": 396,
-    "h": 290,
+    "x": 3932,
+    "y": 2491,
+    "w": 98,
+    "h": 205,
     "etq": "G1",
     "salida": "ns",
     "tipo": "montacamas_mayor",
-    "muro": 0.11
+    "muro": 0.05
    },
    {
     "id": "P4-nav-1785799037145_91u",
@@ -1913,9 +1913,9 @@ window.NAV_VERTICALES={
     "id": "P-1-nav-1785805008767_rik",
     "kind": "asc-S",
     "x": 4642,
-    "y": 6284,
+    "y": 6394,
     "w": 153,
-    "h": 443,
+    "h": 222,
     "etq": "J2",
     "salida": "s",
     "tipo": "servicio",
@@ -1924,32 +1924,33 @@ window.NAV_VERTICALES={
    {
     "id": "P-1-nav-1785805012276_6sh",
     "kind": "asc-S",
-    "x": 4246,
-    "y": 6236,
-    "w": 147,
-    "h": 156,
+    "x": 4642,
+    "y": 6173,
+    "w": 153,
+    "h": 222,
     "etq": "J1",
-    "salida": "s",
+    "salida": "sn",
     "tipo": "servicio"
    },
    {
     "id": "P-1-nav-1785805016388_mdp",
     "kind": "asc-P",
-    "x": 4038,
-    "y": 6289,
-    "w": 154,
-    "h": 186,
+    "x": 4006,
+    "y": 6341,
+    "w": 146,
+    "h": 190,
     "etq": "I2",
     "salida": "s",
-    "tipo": "montacamas"
+    "tipo": "montacamas",
+    "muro": 0.5
    },
    {
     "id": "P-1-nav-1785805021018_6xf",
     "kind": "asc-P",
-    "x": 3863,
-    "y": 6289,
-    "w": 154,
-    "h": 186,
+    "x": 3844,
+    "y": 6341,
+    "w": 146,
+    "h": 190,
     "etq": "I1",
     "salida": "sn",
     "tipo": "montacamas",
@@ -2089,10 +2090,10 @@ window.NAV_VERTICALES={
    {
     "id": "P-1-nav-1785805215311_c57",
     "kind": "asc-Pplus",
-    "x": 11668,
-    "y": 10665,
-    "w": 264,
-    "h": 155,
+    "x": 11938,
+    "y": 10291,
+    "w": 173,
+    "h": 130,
     "etq": "V2",
     "salida": "w",
     "tipo": "montacamas_mayor"
@@ -2101,9 +2102,9 @@ window.NAV_VERTICALES={
     "id": "P-1-nav-1785805219795_z2o",
     "kind": "asc-Pplus",
     "x": 11938,
-    "y": 10226,
+    "y": 10162,
     "w": 173,
-    "h": 259,
+    "h": 130,
     "etq": "V1",
     "salida": "w",
     "tipo": "montacamas_mayor",
@@ -2244,22 +2245,22 @@ window.NAV_VERTICALES={
    {
     "id": "P-2-nav-1787057345328_hui",
     "kind": "asc-G",
-    "x": 12640,
-    "y": 9158,
-    "w": 207,
-    "h": 114,
+    "x": 12670,
+    "y": 9160,
+    "w": 164,
+    "h": 117,
     "etq": "U1",
     "salida": "w",
     "tipo": "publico",
-    "muro": 0.26
+    "muro": 0.11
    },
    {
     "id": "P-2-nav-1787057349113_ssz",
     "kind": "asc-G",
-    "x": 12433,
-    "y": 9158,
-    "w": 207,
-    "h": 114,
+    "x": 12490,
+    "y": 9160,
+    "w": 164,
+    "h": 117,
     "etq": "U2",
     "salida": "we",
     "tipo": "publico",
@@ -2511,9 +2512,9 @@ window.NAV_VERTICALES={
     "id": "P1-nav-1785246512270_kkx",
     "kind": "asc-S",
     "x": 4600,
-    "y": 6474,
+    "y": 6574,
     "w": 163,
-    "h": 399,
+    "h": 200,
     "etq": "J2",
     "salida": "s",
     "tipo": "servicio",
@@ -2522,12 +2523,12 @@ window.NAV_VERTICALES={
    {
     "id": "P1-nav-1785246514937_uqe",
     "kind": "asc-S",
-    "x": 4246,
-    "y": 6236,
-    "w": 142,
-    "h": 156,
+    "x": 4600,
+    "y": 6375,
+    "w": 163,
+    "h": 200,
     "etq": "J1",
-    "salida": "s",
+    "salida": "sn",
     "tipo": "servicio"
    },
    {
@@ -2678,9 +2679,9 @@ window.NAV_VERTICALES={
     "id": "P1-nav-1785246673600_jfh",
     "kind": "asc-Pplus",
     "x": 3976,
-    "y": 2464,
+    "y": 2727,
     "w": 163,
-    "h": 194,
+    "h": 204,
     "etq": "G2",
     "salida": "s",
     "tipo": "montacamas_mayor",
@@ -3057,13 +3058,14 @@ window.NAV_VERTICALES={
    {
     "id": "P1-nav-1787053077333_tyt",
     "kind": "asc-Pplus",
-    "x": 11667,
-    "y": 10495,
-    "w": 258,
-    "h": 154,
+    "x": 11619,
+    "y": 10783,
+    "w": 104,
+    "h": 156,
     "etq": "V1",
     "salida": "w",
-    "tipo": "montacamas_mayor"
+    "tipo": "montacamas_mayor",
+    "muro": 1.09
    },
    {
     "id": "P1-nav-1787053093445_i2y",

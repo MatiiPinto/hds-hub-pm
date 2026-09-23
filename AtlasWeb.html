@@ -6955,7 +6955,7 @@ function renderStructMarker(it, tdef){
   const PUERTA={n:'norte',s:'sur',e:'este',w:'oeste',ns:'norte y sur (doble)',ew:'este y oeste (doble)',sn:'norte y sur (doble)',we:'este y oeste (doble)'};
   ttl.textContent = tdef.label + (it.etq?(' '+it.etq):'') + (sized&&mx ? ` · ${(bw*mx).toFixed(1)} × ${(bh*my).toFixed(1)} m` : '')
     + (it.kind.startsWith('asc-') ? (' · puerta: '+(PUERTA[it.salida]||it.salida||'sin dato')) : '')
-    + ((S.editMode&&S.level===1) ? ' · arrastrar mueve · ⇧ mueve todo el piso · ◢ escala · × borra'+(it.kind.startsWith('asc-')?' · clic derecho cambia la puerta':'') : '');
+    + ((S.editMode&&S.level===1) ? ' · arrastrar mueve · ⇧ mueve todo el piso · ◢ escala · × borra'+(it.kind.startsWith('asc-')?' · clic derecho cambia la puerta'+(_gemelaDe(it)?' · la gemela sigue en espejo':''):'') : '');
   g.appendChild(ttl);
   g.addEventListener('click', e => { e.stopPropagation(); });
   if(S.editMode && S.level===1 && !_structKind){
@@ -7027,8 +7027,37 @@ function _structDragMove(e){
 function _structDragUp(){
   window.removeEventListener('mousemove', _structDragMove);
   window.removeEventListener('mouseup', _structDragUp);
-  if(_stDrag && _stDrag.moved){ sStruct(); renderSVG(); }
+  if(_stDrag && _stDrag.moved){
+    // gemelas (A1/A2): al escalar o mover una, la otra queda en espejo
+    if(_stDrag.mode!=='all') _espejaGemela(_stDrag.it);
+    sStruct(); renderSVG();
+  }
   _stDrag=null;
+}
+// ── Cabinas gemelas (A1/A2, misma letra, contiguas): siempre del mismo tamaño,
+// alineadas y pegadas, una espejo de la otra, con la misma puerta.
+function _gemelaDe(it, fid){
+  const m=/^([A-ZÑ])(\d)$/.exec(String(it.etq||'')); if(!m || !String(it.kind||'').startsWith('asc-')) return null;
+  return structsOf(fid||S.floorId).find(x=>x!==it && String(x.kind||'').startsWith('asc-') && /^[A-ZÑ]\d$/.test(String(x.etq||''))
+    && x.etq[0]===m[1] && x.w && it.w && Math.hypot(x.x-it.x, x.y-it.y) < 8/0.0161) || null;
+}
+function _espejaGemela(it, fid){
+  const o=_gemelaDe(it, fid); if(!o) return false;
+  const horiz=Math.abs(o.x-it.x)>=Math.abs(o.y-it.y), sg=(horiz?o.x-it.x:o.y-it.y)>=0?1:-1;
+  o.w=it.w; o.h=it.h;
+  // pegadas: se conserva el muro que hubiera entre las dos (hasta 35 cm), nunca se traslapan
+  const gap=Math.max(0, Math.min(horiz?Math.abs(o.x-it.x)-it.w:Math.abs(o.y-it.y)-it.h, 0.35/0.0161));
+  if(horiz){ o.x=it.x+sg*(it.w+gap); o.y=it.y; } else { o.y=it.y+sg*(it.h+gap); o.x=it.x; }
+  o.kind=it.kind; if(it.salida) o.salida=it.salida; else delete o.salida;
+  return true;
+}
+function _espejaGemelasPiso(fid){
+  const arr=structsOf(fid), hecho=new Set(); let n=0;
+  arr.forEach(it=>{ if(hecho.has(it)) return; const o=_gemelaDe(it, fid); if(!o) return;
+    // manda la que tiene caja más cuadrada/plausible: la primera por etiqueta (X1)
+    const ref=(String(it.etq)<String(o.etq))?it:o, otra=ref===it?o:it;
+    if(_espejaGemela(ref, fid)){ n++; } hecho.add(ref); hecho.add(otra); });
+  return n;
 }
 // ── Importar desde Navegación (SHARED_DATA/nav_verticales.js) ─────────────
 // Reemplaza ascensores/escaleras/mecánicas de TODOS los pisos con lo dibujado
@@ -7050,6 +7079,7 @@ function importarVerticalesNav(sinConfirmar){
     const nuevos=(NV.floors[p]||[]).map(x=>({...x}));
     structuresState[p]=lineas.concat(nuevos);
     if(!structuresState[p].length) delete structuresState[p];
+    _espejaGemelasPiso(p);
   });
   sStruct(); renderSVG();
   if(typeof closeStructMenu==='function') try{ closeStructMenu(); }catch(e){}
@@ -14738,6 +14768,22 @@ async function runSelfTest(){
       return tip && en.every(Boolean) && enBarra && apaga && vuelve && c1 && c2 && c3;
     } finally {
       S.verticales=vPrev; S.editMode=false; S.level=nivel; S.areaId=aPrev; S.roomId=rPrev;
+      Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
+    }
+  });
+  T('Verticales: las cabinas gemelas quedan en espejo (mismo tamaño, pegadas) al importar y al escalar', ()=>{
+    const snap=JSON.stringify(structuresState), NVprev=window.NAV_VERTICALES, nivel=S.level;
+    try{
+      window.NAV_VERTICALES={floors:{[fl.id]:[{id:'g1',kind:'asc-G',x:1000,y:800,w:150,h:180,etq:'L1',salida:'w'},{id:'g2',kind:'asc-G',x:1000,y:1000,w:130,h:150,etq:'L2'},{id:'s1',kind:'asc-S',x:3000,y:800,w:100,h:100,etq:'D'}]}};
+      importarVerticalesNav(true);
+      const a=structsOf(fl.id).find(x=>x.id==='g1'), b=structsOf(fl.id).find(x=>x.id==='g2');
+      const igual=b.w===150 && b.h===180 && b.x===1000 && Math.abs((b.y-a.y)-180-Math.min(20,0.35/0.0161))<0.01 && b.salida==='w';
+      a.w=200; a.h=220; _stDrag={mode:'size',it:a,moved:true}; _structDragUp();
+      const escala=b.w===200 && b.h===220 && b.x===a.x && b.y>a.y+219;
+      const solo=!_gemelaDe(structsOf(fl.id).find(x=>x.id==='s1'));
+      return igual && escala && solo;
+    } finally {
+      window.NAV_VERTICALES=NVprev; S.level=nivel;
       Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
     }
   });
