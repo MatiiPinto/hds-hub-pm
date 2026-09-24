@@ -12221,6 +12221,14 @@ function loadDotDB(){
         // Becados con nombre: vienen de la nómina de formación (beca_*). Sin esos
         // campos se usan fecha_inicio/fecha_termino de la matriz.
         grupos: Array.isArray(p.grupos) ? p.grupos.map(g=>({clave:g.clave, nombre:g.nombre, rol:g.rol||''})) : [],
+        // Reemplazos (corte oficial de RRHH): un cargo es UNO. `reemplaza` = a quién
+        // está cubriendo esta persona; `cubierto` = quién la está cubriendo a ella
+        // mientras está ausente. Importa al asignar recintos: quien está ausente no
+        // está en el hospital, y quien lo reemplaza sí.
+        reemplaza: p.reemplaza_a ? {titular:p.reemplaza_a.titular_nombre||'', motivo:p.reemplaza_a.motivo||'',
+                   hasta:p.reemplaza_a.contrato_termino||'', vigente:!!p.reemplaza_a.vigente} : null,
+        cubierto: (p.reemplazado_por||[]).filter(x=>x.vigente).map(x=>({nombre:x.nombre||'', motivo:x.motivo||'', hasta:x.contrato_termino||''})),
+        ausencia: p.ausencia ? {motivo:p.ausencia.motivo||'', inicio:p.ausencia.inicio||'', termino:p.ausencia.termino||''} : null,
         // Personal confirmado por RRHH que todavía no está en el Excel de dotación:
         // trae el recinto que RRHH informó y, si no está clasificado, su subdirección
         // es la categoría «PENDIENTE DE CLASIFICAR POR RRHH» (existe sólo si hay gente).
@@ -12269,8 +12277,23 @@ function grupoTag(s){
   if(!s || !Array.isArray(s.grupos) || !s.grupos.length) return '';
   return s.grupos.map(g=>'<span class="beca-tag grupo-tag" title="'+String(g.nombre+(g.rol?' · '+g.rol:'')).replace(/"/g,'&quot;')+'">🖋️ '+esc(g.nombre.replace(/^Círculo de /,'Círculo '))+'</span>').join('');
 }
+function reempTag(s){
+  if(!s) return '';
+  let h='';
+  if(s.reemplaza && s.reemplaza.vigente){
+    h += '<span class="beca-tag grupo-tag" style="background:#dcfce7;color:#166534;border-color:#86efac" title="'
+      + String('Reemplaza a '+s.reemplaza.titular+' · '+s.reemplaza.motivo+' · hasta '+s.reemplaza.hasta).replace(/"/g,'&quot;')
+      + '">🔁 Reemplaza a '+esc(s.reemplaza.titular)+'</span>';
+  }
+  (s.cubierto||[]).forEach(x=>{
+    h += '<span class="beca-tag grupo-tag" style="background:#fef3c7;color:#92400e;border-color:#fcd34d" title="'
+      + String('Ausente: '+x.motivo+' · lo cubre '+x.nombre+' hasta '+x.hasta).replace(/"/g,'&quot;')
+      + '">🔁 Ausente · lo cubre '+esc(x.nombre)+'</span>';
+  });
+  return h;
+}
 function becaTag(s){
-  if(!s || !s.beca) return (typeof grupoTag==='function' ? grupoTag(s) : '');
+  if(!s || !s.beca) return (typeof grupoTag==='function' ? grupoTag(s) : '') + reempTag(s);
   const b = s.beca;
   const lbl = /SUB/.test(b.tipo) ? 'Becado subespecialidad'
             : /ESPEC/.test(b.tipo) ? 'Becado especialidad'
@@ -12280,7 +12303,7 @@ function becaTag(s){
   const tip = [b.programa, (b.inicio||fin) ? ('formación '+(b.inicio||'?')+' → '+(fin||'?')) : 'sin período informado']
     .filter(Boolean).join(' · ') + (vencido ? ' · PERÍODO VENCIDO: revisar si sigue en el hospital' : '');
   return '<span class="beca-tag'+(vencido?' vencido':'')+'" title="'+tip.replace(/"/g,'&quot;')+'">'
-    + '🎓 '+lbl+(vencido?' · vencido':'')+'</span>' + grupoTag(s);
+    + '🎓 '+lbl+(vencido?' · vencido':'')+'</span>' + grupoTag(s) + reempTag(s);
 }
 
 // Normaliza texto: minúsculas + sin acentos + sin caracteres especiales
