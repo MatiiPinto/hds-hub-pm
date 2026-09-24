@@ -40,7 +40,7 @@
   --danger:#c0262d; --danger-soft:#fdecec; --info:#1d5fa0; --info-soft:#eef5fb;
   --external:#6d42c7; --external-soft:#f1ecfb;
   /* estados de un puesto (vista 3) */
-  --state-assigned:#10b981; --state-free:#ef4444; --state-dynamic:#3b82f6; --state-outside:#f59e0b; --state-cds:#8b5cf6;
+  --state-assigned:#10b981; --state-free:#ef4444; --state-dynamic:#3b82f6; --state-outside:#f59e0b; --state-cds:#8b5cf6; --state-reemplazo:#16a34a;
   --asig-yes:#16a34a; --asig-zero:#dc2626;
   /* propuestos, puertas, estructuras */
   --prop-desk:#d100b6; --prop-totem:#7c3aed; --prop-dea:#16a34a; --prop-printer:#ea580c;
@@ -327,6 +327,7 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 /* ── Avisos flotantes sobre el plano: un solo patrón (pastilla oscura) ────── */
 .float-hint{position:absolute;bottom:var(--sp-5);left:50%;transform:translateX(-50%);display:none;align-items:center;gap:10px;max-width:min(940px,calc(100% - 40px));padding:8px 16px;background:var(--n-900);color:#fff;border:0;border-radius:var(--r-lg);box-shadow:var(--shadow-2);font-size:var(--fs-sm);line-height:1.4;text-align:center;z-index:10;pointer-events:none}
 .float-hint.show{display:block}
+.ws-dot .reemp-ring{fill:none;stroke:var(--state-reemplazo);stroke-width:2;stroke-dasharray:4 3}
 .float-hint::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--state-outside);margin-right:8px;vertical-align:middle}
 #mergeHint::before{background:#eab308}
 #delHint::before{background:#ef4444}
@@ -1260,6 +1261,11 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
     <div class="form-row"><label>Origen</label><label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:#92400e;cursor:pointer"><input type="checkbox" id="mExterna" style="width:auto;margin:0"> Persona fuera de la matriz de dotación</label></div>
     <div class="form-row"><label></label><label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:#5b21b6;cursor:pointer"><input type="checkbox" id="mCds" style="width:auto;margin:0"> 🛒 Compra de Servicio (función externalizada)</label></div>
     <div class="form-row"><label></label><label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:#0369a1;cursor:pointer"><input type="checkbox" id="mDinClin" style="width:auto;margin:0"> 🔄 Personal dinámico clínico (rota entre servicios, ej. 4º turno)</label></div>
+    <div class="form-row"><label></label><label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:#166534;cursor:pointer"><input type="checkbox" id="mReemp" style="width:auto;margin:0" onchange="_mReempToggle()"> 🔁 Puesto con reemplazo (el titular está ausente; el reemplazante no abre puesto)</label></div>
+    <div class="form-row" id="mReempRow" style="display:none"><label>Reemplazo</label><div style="flex:1;display:flex;flex-direction:column;gap:4px">
+      <input id="mReempQuien" placeholder="Quién lo cubre (reemplazante)" autocomplete="hds-reemp" spellcheck="false" oninput="_mReempManual()">
+      <div style="display:flex;gap:6px"><input id="mReempMotivo" placeholder="Motivo (licencia, postnatal, comisión…)" style="flex:1" oninput="_mReempManual()"><input id="mReempHasta" type="date" title="Hasta (fin del reemplazo)" style="width:150px" oninput="_mReempManual()"></div>
+      <div id="mReempInfo" style="font-size:11px;color:#475569"></div></div></div>
     <div class="form-row">
       <label>Tipo</label>
       <div class="tipo-toggle">
@@ -2192,6 +2198,7 @@ function _mFuncGuarda(nombre){
   try{ sNames(); }catch(e){}
 }
 if(!nameState.extRev) nameState.extRev={};        // fuera de matriz ya informado a RR.HH. (por nombre normalizado)
+if(!nameState.reempRev) nameState.reempRev={};    // reemplazo vigente revisado (por titular normalizado + reemplazante)
 if(!nameState.propCupos) nameState.propCupos={};  // cupo finito por tipo de propuesto (p.ej. {printer:40}); sin clave = sin cupo        // Compra de Servicio ya informada a RR.HH. (por nombre normalizado)  // coincidencias comisión de servicio revisadas (por RUT)
 if(!nameState.revDesc) nameState.revDesc={};
 if(!nameState.recintosRev) nameState.recintosRev={};   // avisos del catastro de recintos marcados como revisados (clave check|rid|valor)          // sugerencias de Revisión rechazadas ("queda como está"), clave check|item
@@ -2639,6 +2646,11 @@ function _webPayload(){
   const p=_backupPayload();
   const n={...nameState}; _WEB_SIN_PII.forEach(k=>{ delete n[k]; });
   p.cabida_cad_names=n;
+  // el motivo del reemplazo es dato de salud (licencias): en la web va sólo «con reemplazo vigente»
+  try{ const ws=JSON.parse(JSON.stringify(p.cabida_cad_ws||{}));
+    Object.values(ws.dots||{}).forEach(arr=>(arr||[]).forEach(d=>{ const q=o=>{ if(o&&o.reemplazo) o.reemplazo={...o.reemplazo, motivo:''}; if(o) delete o.reemplazoHist; };
+      q(d); (d&&d.turnos||[]).forEach(q); }));
+    p.cabida_cad_ws=ws; }catch(e){}
   return p;
 }
 // Publica el snapshot DIRECTO al 🟡 HUB-PM vía el servidor local de acciones
@@ -4791,6 +4803,7 @@ function renderL3(){
       ic.textContent=din?(turnos.length>0?String(turnos.length):'↻'):(asig?'●':'○');
       const ttl=el('title'); ttl.textContent=dotTitle(dot); g.appendChild(ttl);
       g.appendChild(c); g.appendChild(ic); if(dot.id)_renderedDotKeys.add(room.id+'§'+dot.id); _scheduleDotOverlays();
+      if(_dotConReemplazo(dot)) g.appendChild(el('circle',{r:DOT_R+3.5,class:'reemp-ring','pointer-events':'none'}));
       if(S.showDotNames && asig){
         // La tarjeta se coloca en una pasada global anti-solape (_placeDotCards).
         _dotCardQueue.push({dx:dot.x, dy:dot.y, lines:dotTitle(dot).split('\n'), col, nk:(dot.id||(room.id+':'+i)), defR:(i%2===0)});
@@ -4836,6 +4849,7 @@ function renderL3(){
     ic.textContent=din?(turnos.length>0?String(turnos.length):'↻'):(asig?'●':'○');
     const ttl=el('title'); ttl.textContent=dotTitle(dot); g.appendChild(ttl);
     g.appendChild(c); g.appendChild(ic); if(dot.id)_renderedDotKeys.add(room.id+'§'+dot.id); _scheduleDotOverlays();
+    if(_dotConReemplazo(dot)) g.appendChild(el('circle',{r:DOT_R+3.5,class:'reemp-ring','pointer-events':'none'}));
     if(S.showDotNames && asig){
       // La tarjeta se coloca en una pasada global anti-solape (_placeDotCards).
       _dotCardQueue.push({dx:dot.x, dy:dot.y, lines:dotTitle(dot).split('\n'), col, nk:(dot.id||(room.id+':'+i)), defR:(i%2===0)});
@@ -5007,14 +5021,20 @@ function _drawDotCard(e,r,C){
   });
   svg.appendChild(g2);
 }
+// ¿El puesto (o alguno de sus turnos) tiene un reemplazo vigente?
+function _dotConReemplazo(dot){
+  if(!dot) return false;
+  if(dot.tipo==='dinamico') return (dot.turnos||[]).some(t=>t.reemplazo&&_reempVigente(t.reemplazo));
+  return !!(dot.reemplazo&&_reempVigente(dot.reemplazo));
+}
 // Tooltip del puesto: persona asignada (o turnos) al dejar el mouse encima.
 function dotTitle(dot){
-  const _tag=x=>[(x.cds?'🛒 CdS':''),(x.externa&&!x.cds?'⚠ fuera de matriz':''),(x.dinClin?'🔄 din. clínico':'')].filter(Boolean).join(' · ');
+  const _tag=x=>[(x.cds?'🛒 CdS':''),(x.externa&&!x.cds?'⚠ fuera de matriz':''),(x.dinClin?'🔄 din. clínico':''),((x.reemplazo&&_reempVigente(x.reemplazo))?('🔁 ⇄ '+x.reemplazo.reemplazante):'')].filter(Boolean).join(' · ');
   if(dot.tipo==='dinamico'){
     const ts=(dot.turnos||[]);
     return ts.length?('🔄 Dinámico · '+ts.length+' en turno:\n'+ts.map(x=>'👤 '+x.nombre+(_funcCods(x.nombre).length?(' ['+_funcCods(x.nombre).join('·')+']'):'')+(_tag(x)?(' ('+_tag(x)+')'):'')).join('\n')):'🔄 Puesto dinámico · sin turnos';
   }
-  if(dot.nombre&&dot.nombre.trim()) return '👤 '+dot.nombre+(_funcCods(dot.nombre).length?('\n⚕ '+_funcCods(dot.nombre).join(' · ')):'')+(dot.cds?'\n🛒 Compra de Servicio':'')+(dot.externa&&!dot.cds?'\n⚠ Fuera de la matriz de dotación':'')+(dot.dinClin?'\n🔄 Dinámico clínico (rota entre servicios)':'')+([dot.cargo,dot.estamento].filter(Boolean).length?('\n'+[dot.cargo,dot.estamento].filter(Boolean).join(' · ')):'');
+  if(dot.nombre&&dot.nombre.trim()) return '👤 '+dot.nombre+((dot.reemplazo&&_reempVigente(dot.reemplazo))?('\n⇄ '+dot.reemplazo.reemplazante+'\n🔁 Reemplazo · '+(dot.reemplazo.motivo||'sin motivo')+(dot.reemplazo.hasta?(' · hasta '+_reempFechaLbl(dot.reemplazo.hasta)):'')+(dot.reemplazo.fuente==='manual'?' · informado en terreno':'')):'')+(_funcCods(dot.nombre).length?('\n⚕ '+_funcCods(dot.nombre).join(' · ')):'')+(dot.cds?'\n🛒 Compra de Servicio':'')+(dot.externa&&!dot.cds?'\n⚠ Fuera de la matriz de dotación':'')+(dot.dinClin?'\n🔄 Dinámico clínico (rota entre servicios)':'')+([dot.cargo,dot.estamento].filter(Boolean).length?('\n'+[dot.cargo,dot.estamento].filter(Boolean).join(' · ')):'');
   return dot.cargo?('Puesto disponible · '+dot.cargo):'Puesto disponible';
 }
 // Arrastre de puestos en vista 3 (clic sin mover = abrir asignación).
@@ -9270,11 +9290,13 @@ function _perLista(){
   for(const r of (area.rooms||[])){
     for(const d of ((wsState.dots||{})[r.id]||[])){
       const base={rid:r.id, recinto:rName(r.id)||'(sin nombre)', x:d.x, y:d.y};
+      const conR=(o,turno)=>{ const rv=o.reemplazo&&_reempVigente(o.reemplazo);
+        out.push({...base, nom:o.nombre, cargo:o.cargo||'', turno, cds:!!o.cds, est:_estDe(o.nombre), aus:!!rv});
+        if(rv) out.push({...base, nom:o.reemplazo.reemplazante, cargo:'⇄ reemplaza a '+o.nombre, turno, cds:false, est:_estDe(o.reemplazo.reemplazante), rmp:true}); };
       if(d.tipo==='dinamico'){
-        (d.turnos||[]).forEach(x=>{ if((x.nombre||'').trim())
-          out.push({...base, nom:x.nombre, cargo:x.cargo||'', turno:true, cds:!!x.cds, est:_estDe(x.nombre)}); });
+        (d.turnos||[]).forEach(x=>{ if((x.nombre||'').trim()) conR(x,true); });
       }else if((d.nombre||'').trim()){
-        out.push({...base, nom:d.nombre, cargo:d.cargo||'', turno:false, cds:!!d.cds, est:_estDe(d.nombre)});
+        conR(d,false);
       }
     }
   }
@@ -9379,7 +9401,9 @@ function renderPersonas(){
           +'font-size:11px;line-height:1.3">'
           +'<div style="font-weight:600;color:#0f172a">'+esc(g.nom)+_funcBadges(g.nom)
           +(g.turno?' <span style="color:#3b82f6;font-size:9.5px">🔄</span>':'')
-          +(g.cds?' <span style="color:#8b5cf6;font-size:9.5px">🛒</span>':'')+'</div>'
+          +(g.cds?' <span style="color:#8b5cf6;font-size:9.5px">🛒</span>':'')
+          +(g.aus?' <span style="color:#92400e;font-size:9.5px" title="ausente: lo cubre un reemplazo">🔁 ausente</span>':'')
+          +(g.rmp?' <span style="color:#166534;font-size:9.5px" title="reemplazo vigente: no abre puesto propio">🔁 reemplazo</span>':'')+'</div>'
           +(g.cargo?'<div style="color:#64748b;font-size:10px">'+esc(g.cargo)+'</div>':'')
           +'</div>');
       });
@@ -9768,9 +9792,12 @@ function _servPuestosData(){
     const gente=[];
     dd.forEach(d=>{
       if(d.tipo==='dinamico'){
-        (d.turnos||[]).forEach(x=>{ if(x.nombre) gente.push({n:x.nombre, c:[x.cargo,x.estamento].filter(Boolean).join(' · '), din:true, cds:!!x.cds, ext:!!x.externa, dc:!!x.dinClin}); });
+        (d.turnos||[]).forEach(x=>{ if(x.nombre){ const rv=x.reemplazo&&_reempVigente(x.reemplazo); gente.push({n:x.nombre, c:[x.cargo,x.estamento].filter(Boolean).join(' · '), din:true, cds:!!x.cds, ext:!!x.externa, dc:!!x.dinClin, aus:!!rv});
+          if(rv) gente.push({n:x.reemplazo.reemplazante, c:'reemplaza a '+x.nombre+(x.reemplazo.hasta?(' · hasta '+_reempFechaLbl(x.reemplazo.hasta)):''), din:true, rmp:true}); } });
       } else if(d.nombre && d.nombre.trim()){
-        gente.push({n:d.nombre, c:[d.cargo,d.estamento].filter(Boolean).join(' · '), din:false, cds:!!d.cds, ext:!!d.externa, dc:!!d.dinClin});
+        const rv=d.reemplazo&&_reempVigente(d.reemplazo);
+        gente.push({n:d.nombre, c:[d.cargo,d.estamento].filter(Boolean).join(' · '), din:false, cds:!!d.cds, ext:!!d.externa, dc:!!d.dinClin, aus:!!rv});
+        if(rv) gente.push({n:d.reemplazo.reemplazante, c:'reemplaza a '+d.nombre+(d.reemplazo.hasta?(' · hasta '+_reempFechaLbl(d.reemplazo.hasta)):''), din:false, rmp:true});
       }
     });
     const a=dd.filter(isDotAsignado).length;
@@ -9838,6 +9865,8 @@ function renderServPuestos(){
             +(g.dc?chip('din. clínico','#e0f2fe','#0369a1','#7dd3fc'):'')
             +(g.cds?chip('CdS','#f3e8ff','#5b21b6','#d8b4fe'):'')
             +(g.ext&&!g.cds?chip('fuera de matriz','#fef3c7','#92400e','#fcd34d'):'')
+            +(g.aus?chip('🔁 ausente','#fef3c7','#92400e','#fcd34d'):'')
+            +(g.rmp?chip('🔁 reemplazo','#dcfce7','#166534','#86efac'):'')
             +(g.c?'<div style="font-size:10.5px;color:#64748b">'+esc(g.c)+'</div>':'')+'</div>').join('')
           +'</div>'
         : '<div style="padding:8px 11px;font-size:11.5px;color:#94a3b8">Sin personal asignado ('+r.total+' disponibles).</div>';
@@ -9918,8 +9947,8 @@ function _dpAsignados(){
   const m={};
   for(const[rid,arr] of Object.entries(wsState.dots||{})) (arr||[]).forEach(d=>{
     const nn=[];
-    if(d.tipo==='dinamico') (d.turnos||[]).forEach(x=>x.nombre&&nn.push(x.nombre));
-    else if(d.nombre&&d.nombre.trim()) nn.push(d.nombre);
+    if(d.tipo==='dinamico') (d.turnos||[]).forEach(x=>{ if(x.nombre) nn.push(x.nombre); if(x.reemplazo&&_reempVigente(x.reemplazo)) nn.push(x.reemplazo.reemplazante); });
+    else if(d.nombre&&d.nombre.trim()){ nn.push(d.nombre); if(d.reemplazo&&_reempVigente(d.reemplazo)) nn.push(d.reemplazo.reemplazante); }
     nn.forEach(n2=>{ if(!m[norm(n2)]) m[norm(n2)]=rid; });
   });
   return m;
@@ -10486,6 +10515,7 @@ function openModal(roomId,idx){
   document.getElementById('mExterna').checked=!!dot.externa;
   const _mc=document.getElementById('mCds'); if(_mc)_mc.checked=!!dot.cds;
   const _md=document.getElementById('mDinClin'); if(_md)_md.checked=!!dot.dinClin;
+  try{ _mReempCarga(dot.reemplazo||null); }catch(e){}
   try{ _mFuncCarga(dot.nombre||''); }catch(e){}
   setTipo(dot.tipo||'fijo');
   renderTurnosList(dot);
@@ -10509,7 +10539,8 @@ function renderTurnosList(dot){
     const ext = t.externa ? '<span style="display:inline-block;margin-left:6px;font-size:9px;font-weight:700;color:#92400e;background:#fef3c7;border:1px solid #fcd34d;border-radius:6px;padding:1px 5px;vertical-align:middle">fuera de matriz</span>' : '';
     const cdsChip = t.cds ? '<span style="display:inline-block;margin-left:6px;font-size:9px;font-weight:700;color:#5b21b6;background:#f3e8ff;border:1px solid #d8b4fe;border-radius:6px;padding:1px 5px;vertical-align:middle">compra de servicio</span>' : '';
     const dcChip = t.dinClin ? '<span style="display:inline-block;margin-left:6px;font-size:9px;font-weight:700;color:#0369a1;background:#e0f2fe;border:1px solid #7dd3fc;border-radius:6px;padding:1px 5px;vertical-align:middle">dinámico clínico</span>' : '';
-    row.innerHTML=`<div style="flex:1"><div class="turno-name">👤 ${t.nombre}${ext}${cdsChip}${dcChip}</div><div class="turno-sub">${[t.cargo,t.estamento].filter(Boolean).join(' · ')}</div></div><button class="turno-del" onclick="removeTurno(${ti})" title="Quitar del turno">✕</button>`;
+    const rmChip = (t.reemplazo&&_reempVigente(t.reemplazo)) ? '<span style="display:inline-block;margin-left:6px;font-size:9px;font-weight:700;color:#166534;background:#dcfce7;border:1px solid #86efac;border-radius:6px;padding:1px 5px;vertical-align:middle">⇄ '+esc0(t.reemplazo.reemplazante)+'</span>' : '';
+    row.innerHTML=`<div style="flex:1"><div class="turno-name">👤 ${t.nombre}${ext}${cdsChip}${dcChip}${rmChip}</div><div class="turno-sub">${[t.cargo,t.estamento].filter(Boolean).join(' · ')}</div></div><button class="turno-del" onclick="removeTurno(${ti})" title="Quitar del turno">✕</button>`;
     list.appendChild(row);
   });
 }
@@ -10529,6 +10560,7 @@ function startAddTurno(){
   document.getElementById('mExterna').checked=false;
   if(document.getElementById('mCds')) document.getElementById('mCds').checked=false;
   if(document.getElementById('mDinClin')) document.getElementById('mDinClin').checked=false;
+  try{ _mReempCarga(null); }catch(e){}
   if(document.getElementById('mServInfo')) document.getElementById('mServInfo').textContent='';
   try{ _mFuncCarga(''); }catch(e){}
   document.getElementById('btnSaveWs').style.display='none';
@@ -10549,7 +10581,10 @@ function confirmAddTurno(){
   const _mk=_marcasPersona(nombre, document.getElementById('mCds')&&document.getElementById('mCds').checked);
   const externa=_mk.externa, cds=_mk.cds;
   const dinClin = !!(document.getElementById('mDinClin')&&document.getElementById('mDinClin').checked);
-  dot.turnos.push({nombre,cargo,estamento,externa,cds,dinClin});
+  const _tr={nombre,cargo,estamento,externa,cds,dinClin};
+  { const R=_mReempLeer(nombre,null); if(R) _tr.reemplazo=R; }
+  dot.turnos.push(_tr);
+  try{ _mReempCarga(null); }catch(e){}
   try{ _mFuncGuarda(nombre); _mFuncCarga(''); }catch(e){}
   sWs(); renderTurnosList(dot); renderSVG(); updateStats();
   try{ renderBimPending(); }catch(e){}
@@ -10601,6 +10636,108 @@ function _marcasPersona(nombre, cdsMarcado){
   const enM=isInMatrix(n);
   return {externa:!enM, cds:!enM && !!cdsMarcado};
 }
+// ═══ REEMPLAZO EN EL PUESTO (24-09-2026) ════════════════════════════════════
+// Un cargo es UNO: el del titular. Si está ausente, quien lo cubre comparte el
+// mismo puesto y no abre otro. La marca vive en el puesto (wsState), no en la
+// matriz: d.reemplazo = {titular, reemplazante, motivo, hasta, fuente, ts}.
+// La matriz (corte oficial de RRHH) trae por persona `cubierto[]` (quién la
+// cubre) y `reemplaza` (a quién cubre): con eso la marca se sugiere y se
+// sincroniza sola; `fuente:'manual'` es lo informado en terreno.
+function _staffDe(nombre){ try{ _estDe(nombre); }catch(e){} return (_estIdx||{})[norm(nombre||'')]||null; }
+function _hoyISO(){ return new Date().toISOString().slice(0,10); }
+function _fechaISO(v){ const m=/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/.exec(String(v||'').trim()); return m?(m[3]+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0')):String(v||'').trim().slice(0,10); }
+function _reempVigente(r){ return !!(r && r.reemplazante) && (!r.hasta || _fechaISO(r.hasta) >= _hoyISO()); }
+function _reempFechaLbl(v){ const i=_fechaISO(v); return i?(i.slice(8,10)+'-'+i.slice(5,7)+'-'+i.slice(0,4)):''; }
+let _mReempOrigen=null;                                  // 'matriz' si los campos los rellenó la matriz y no se tocaron
+function _mReempToggle(){
+  const on=!!(document.getElementById('mReemp')||{}).checked, row=document.getElementById('mReempRow');
+  if(row) row.style.display=on?'':'none';
+  if(on && !(document.getElementById('mReempQuien')||{}).value) setTimeout(()=>{ const q=document.getElementById('mReempQuien'); if(q) q.focus(); },0);
+}
+function _mReempManual(){ _mReempOrigen='manual'; }
+function _mReempCarga(r){
+  const chk=document.getElementById('mReemp'); if(!chk) return;
+  chk.checked=!!(r&&r.reemplazante);
+  document.getElementById('mReempQuien').value=(r&&r.reemplazante)||'';
+  document.getElementById('mReempMotivo').value=(r&&r.motivo)||'';
+  document.getElementById('mReempHasta').value=(r&&_fechaISO(r.hasta))||'';
+  document.getElementById('mReempInfo').innerHTML=r&&r.reemplazante?('🔁 '+(r.fuente==='matriz'?'según la matriz de RRHH':'informado en terreno, no confirmado por RRHH')+(_reempVigente(r)?'':' · <b style="color:#b45309">vencido</b>')):'';
+  _mReempOrigen=r?(r.fuente||'manual'):null; _mReempToggle();
+}
+// Del nombre escrito: si la matriz lo trae ausente, propone la marca con su
+// reemplazante; si lo trae como reemplazante, propone poner al titular como dueño.
+function _mReempSugerir(n){
+  const info=document.getElementById('mReempInfo'), chk=document.getElementById('mReemp'); if(!chk) return '';
+  const st=_staffDe(n); if(!st) return '';
+  const cub=(st.cubierto||[]).filter(x=>x.nombre && (!x.hasta || _fechaISO(x.hasta)>=_hoyISO()));
+  if(cub.length){
+    const q=document.getElementById('mReempQuien');
+    if(!chk.checked || !q.value){
+      chk.checked=true; q.value=cub[0].nombre; document.getElementById('mReempMotivo').value=cub[0].motivo||''; document.getElementById('mReempHasta').value=_fechaISO(cub[0].hasta)||'';
+      _mReempOrigen='matriz'; _mReempToggle();
+      if(info) info.innerHTML='🔁 según la matriz de RRHH: ausente ('+esc0(cub[0].motivo||'sin motivo')+'), lo cubre <b>'+esc0(cub[0].nombre)+'</b>'+(cub[0].hasta?(' hasta '+_reempFechaLbl(cub[0].hasta)):'')+' · marca propuesta, se guarda con el puesto';
+    }
+    return ' · 🔁 ausente según RRHH: lo cubre '+esc0(cub[0].nombre);
+  }
+  if(st.reemplaza && st.reemplaza.vigente && st.reemplaza.titular){
+    const t=st.reemplaza.titular;
+    return ' · 🔁 <b>es reemplazante</b> de '+esc0(t)+' ('+esc0(st.reemplaza.motivo||'')+(st.reemplaza.hasta?(' · hasta '+_reempFechaLbl(st.reemplaza.hasta)):'')+') — '
+      +'<a href="#" onclick="event.preventDefault();_mReempTitular(\''+String(t).replace(/'/g,"\\'")+'\',\''+String(n).replace(/'/g,"\\'")+'\')" style="font-weight:700">poner a '+esc0(t)+' como titular del puesto y a esta persona como reemplazante</a>';
+  }
+  return '';
+}
+function _mReempTitular(titular, reemplazante){
+  const st=_staffDe(reemplazante), r=st&&st.reemplaza;
+  document.getElementById('mNombre').value=titular;
+  const chk=document.getElementById('mReemp'); chk.checked=true;
+  document.getElementById('mReempQuien').value=reemplazante;
+  document.getElementById('mReempMotivo').value=(r&&r.motivo)||'';
+  document.getElementById('mReempHasta').value=(r&&_fechaISO(r.hasta))||'';
+  _mReempOrigen='matriz'; _mReempToggle();
+  try{ _mFuncCarga(titular); }catch(e){}
+  try{ _mEstadoMatriz(); }catch(e){}
+}
+// Lee el diálogo → objeto reemplazo (o null si la casilla está apagada / sin reemplazante)
+function _mReempLeer(titular, previo){
+  const chk=document.getElementById('mReemp'); if(!chk||!chk.checked) return null;
+  const quien=(document.getElementById('mReempQuien').value||'').trim(); if(!quien) return null;
+  const motivo=(document.getElementById('mReempMotivo').value||'').trim(), hasta=(document.getElementById('mReempHasta').value||'').trim();
+  const igual=previo && previo.reemplazante===quien && (previo.motivo||'')===motivo && (_fechaISO(previo.hasta)||'')===hasta;
+  return {titular:titular, reemplazante:quien, motivo, hasta, fuente:(igual?previo.fuente:(_mReempOrigen==='matriz'?'matriz':'manual')), ts:(igual?previo.ts:Date.now())};
+}
+// Sincronización con la matriz al cargar: (a) marca los puestos cuyo titular está
+// ausente según RRHH y no tienen marca; (b) apaga las marcas fuente:'matriz' cuyo
+// reemplazo ya no existe. Las marcas manuales no se tocan (el hospital sabe antes).
+function _sincronizaReemplazos(){
+  if(!dotDB||!dotDB.staff) return {altas:0,bajas:0};
+  let altas=0, bajas=0;
+  const sync=o=>{
+    if(!o||!o.nombre) return;
+    const st=_staffDe(o.nombre); const cub=st?(st.cubierto||[]).filter(x=>x.nombre&&(!x.hasta||_fechaISO(x.hasta)>=_hoyISO())):[];
+    if(!o.reemplazo && cub.length){ o.reemplazo={titular:o.nombre, reemplazante:cub[0].nombre, motivo:cub[0].motivo||'', hasta:_fechaISO(cub[0].hasta)||'', fuente:'matriz', ts:Date.now()}; altas++; }
+    else if(o.reemplazo && o.reemplazo.fuente==='matriz' && st && !cub.some(x=>norm(x.nombre)===norm(o.reemplazo.reemplazante))){
+      (o.reemplazoHist=o.reemplazoHist||[]).push({...o.reemplazo, fin:_hoyISO(), cierre:'matriz'}); delete o.reemplazo; bajas++;
+    }
+  };
+  Object.values(wsState.dots||{}).forEach(arr=>(arr||[]).forEach(d=>{ if(!d) return; if(d.tipo==='dinamico') (d.turnos||[]).forEach(sync); else sync(d); }));
+  if(altas||bajas){
+    console.info('Atlas HDS · reemplazos sincronizados con la matriz: '+altas+' marca(s) nueva(s), '+bajas+' cerrada(s)');
+    if(!S.viewOnly && !_SELFTEST) try{ sWs(); }catch(e){}
+  }
+  return {altas,bajas};
+}
+// Puestos con reemplazo (vigente o vencido), para la Revisión y la exportación.
+function _reempPendientes(vencidos){
+  const out=[];
+  FLOORS.forEach(fl=>fl.areas.forEach(a=>(a.rooms||[]).forEach(r=>{
+    (wsState.dots[r.id]||[]).forEach((d,idx)=>{
+      const mira=(o,tIx)=>{ const R=o&&o.reemplazo; if(!R||!R.reemplazante) return; if(_reempVigente(R)===!!vencidos) return;
+        out.push({fl,area:a,r,idx,d,tIx:(tIx==null?null:tIx),nombre:o.nombre,reemp:R,cargo:[o.cargo,o.estamento].filter(Boolean).join(' · ')}); };
+      if(d.tipo==='dinamico') (d.turnos||[]).forEach((t,i)=>mira(t,i)); else mira(d,null);
+    });
+  })));
+  return out;
+}
 // Estado vivo del nombre en el diálogo del puesto: sincroniza las casillas y dice
 // antes de guardar si la alerta se va a cerrar.
 function _mEstadoMatriz(){
@@ -10613,7 +10750,8 @@ function _mEstadoMatriz(){
     if(ext) ext.checked=false; if(mc) mc.checked=false;
     const _b=_bajaDe(n);
     box.innerHTML=(_b?('⊘ <b>Fuera de la matriz</b> · '+esc0(_bajaLbl(_b))):'✔ <b>En la matriz de dotación</b> · al guardar se quita cualquier marca y se cierra su alerta')
-      +((S.viewOnly&&!S.editPM)?'':' · <a href="#" onclick="event.preventDefault();openBaja(\''+String(n).replace(/'/g,"\\'")+'\')" style="font-weight:700">'+(_b?'cambiar motivo':'⊘ quitar de la matriz')+'</a>');
+      +((S.viewOnly&&!S.editPM)?'':' · <a href="#" onclick="event.preventDefault();openBaja(\''+String(n).replace(/'/g,"\\'")+'\')" style="font-weight:700">'+(_b?'cambiar motivo':'⊘ quitar de la matriz')+'</a>')
+      +(()=>{ try{ return _mReempSugerir(n); }catch(e){ return ''; } })();
     box.style.cssText='display:block;color:#15803d;background:#f0fdf4;border:1px solid #86efac;border-radius:6px;padding:3px 8px;font-size:11px;margin-top:3px';
   } else {
     if(ext) ext.checked=true;
@@ -10716,6 +10854,18 @@ function saveWs(){
       }
     }
   }
+  // Regla: un reemplazante no abre puesto propio. Si el nombre es reemplazante vigente
+  // según la matriz y este puesto no es el de su titular, se pregunta.
+  if(nombre && !(document.getElementById('mReemp')||{}).checked){
+    const st=_staffDe(nombre), rz=st&&st.reemplaza;
+    if(rz && rz.vigente && rz.titular && norm(d.nombre||'')!==norm(rz.titular)){
+      const cubre=confirm('🔁 Según RRHH, "'+nombre+'" está reemplazando a "'+rz.titular+'" ('+(rz.motivo||'')+(rz.hasta?(' · hasta '+_reempFechaLbl(rz.hasta)):'')+').\n\n'
+        +'¿Está cubriendo el puesto de '+rz.titular+' o tiene un puesto propio?\n\n'
+        +'Aceptar = es el puesto de '+rz.titular+' (queda como titular y '+nombre+' como reemplazante)\n'
+        +'Cancelar = puesto propio de '+nombre);
+      if(cubre){ _mReempTitular(rz.titular, nombre); return saveWs(); }
+    }
+  }
   d.nombre=nombre;
   d.cargo=document.getElementById('mCargo').value.trim();
   d.estamento=document.getElementById('mEst').value.trim();
@@ -10724,6 +10874,11 @@ function saveWs(){
   { const mk=_marcasPersona(nombre, document.getElementById('mCds') && document.getElementById('mCds').checked);
     d.externa=mk.externa; d.cds=mk.cds; }
   d.dinClin = !!(nombre && document.getElementById('mDinClin') && document.getElementById('mDinClin').checked);
+  // 🔁 reemplazo: se guarda con el puesto (el cargo sigue siendo del titular); si se
+  // desmarca, la marca vigente pasa al histórico y no queda residuo
+  { const R=nombre?_mReempLeer(nombre, d.reemplazo||null):null;
+    if(R) d.reemplazo=R;
+    else if(d.reemplazo){ (d.reemplazoHist=d.reemplazoHist||[]).push({...d.reemplazo, fin:_hoyISO(), cierre:'manual'}); delete d.reemplazo; } }
   d.tipo='fijo';
   sWs(); closeModal(); renderSVG(); updateStats();
   _trasGuardarPersonal(roomId, _antes);
@@ -11277,7 +11432,7 @@ function _subPersonal(p){ return [p.cargo,p.area?aName(p.area.id):'',p.fl&&p.fl.
 function _goPersonal(p){
   if(S.viewOnly && !S.editPM) return;
   let rid=null, ix=-1;
-  if(p._chk==='externa'||p._chk==='baja'){ rid=p.r.id; ix=p.idx; }
+  if(p._chk==='externa'||p._chk==='baja'||p._chk==='reemp'){ rid=p.r.id; ix=p.idx; }
   else if(p.asignado && p.r){
     rid=p.r.id;
     ix=(wsState.dots[rid]||[]).findIndex(d=> d.tipo==='dinamico'
@@ -11291,7 +11446,7 @@ function _goPersonal(p){
   if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='👤 '+p.nombre+' no tiene puesto en el Atlas: su ficha quedó abierta en el buscador'; setTimeout(()=>{ if(tbInfo)tbInfo.textContent=''; },5000); }
 }
 function _goDestinoPersonal(p){
-  return (p._chk==='externa'||p._chk==='baja') ? !!(p.r && (wsState.dots[p.r.id]||[])[p.idx])
+  return (p._chk==='externa'||p._chk==='baja'||p._chk==='reemp') ? !!(p.r && (wsState.dots[p.r.id]||[])[p.idx])
        : (p.asignado ? !!p.r : !!document.getElementById('gSearchInput'));
 }
 function _dotacionPendientes(){
@@ -11561,6 +11716,22 @@ const REV_CHECKS={
     apply:p=>{ nameState.cdsRev[norm(p.nombre)]=1; }, go:p=>_goPersonal(p), goDestino:p=>_goDestinoPersonal(p),
     subText:p=>'🛒 función externalizada: no es dotación · ✓ cuando esté informada a RR.HH. · '+_subPersonal(p),
     done:'Todas las Compras de Servicio están informadas.'},
+  dot_reemplazo:{label:'Personal: puestos con reemplazo vigente',
+    find:()=>_reempPendientes(false).map(p=>({...p,_chk:'reemp'})).filter(p=>!nameState.reempRev[norm(p.nombre)+'|'+norm(p.reemp.reemplazante)]), flat:true, approve:true,
+    okTitle:'Reemplazo revisado (el titular sigue siendo el dueño del cargo)',
+    allLabel:n=>'✓ Marcar los '+n+' reemplazos como revisados',
+    apply:p=>{ nameState.reempRev[norm(p.nombre)+'|'+norm(p.reemp.reemplazante)]=1; }, go:p=>_goPersonal(p), goDestino:p=>_goDestinoPersonal(p),
+    subText:p=>'🔁 lo cubre '+p.reemp.reemplazante+' · '+(p.reemp.motivo||'sin motivo')+(p.reemp.hasta?(' · hasta '+_reempFechaLbl(p.reemp.hasta)):' · sin fecha')+(p.reemp.fuente==='manual'?' · informado en terreno, no confirmado por RRHH':' · según RRHH')+' · '+_subPersonal(p),
+    done:'Todos los reemplazos vigentes están revisados.'},
+  dot_reemplazo_fin:{label:'Personal: reemplazo terminado (confirmar que el titular volvió)',
+    find:()=>_reempPendientes(true).map(p=>({...p,_chk:'reemp'})), flat:true, approve:true,
+    okTitle:'El titular volvió: la marca pasa al histórico del puesto',
+    allLabel:n=>'✓ Confirmar los '+n+' regresos',
+    allMsg:n=>'¿Confirmar que los '+n+' titulares volvieron a su puesto?\n\nLa marca de reemplazo pasa al histórico de cada puesto; el puesto sigue siendo del titular.',
+    apply:p=>{ const o=(p.tIx==null)?p.d:(p.d.turnos||[])[p.tIx]; if(o&&o.reemplazo){ (o.reemplazoHist=o.reemplazoHist||[]).push({...o.reemplazo, fin:_hoyISO(), cierre:'confirmado'}); delete o.reemplazo; sWs(); } },
+    go:p=>_goPersonal(p), goDestino:p=>_goDestinoPersonal(p),
+    subText:p=>'🔁 lo cubría '+p.reemp.reemplazante+' hasta '+_reempFechaLbl(p.reemp.hasta)+' · '+(p.reemp.motivo||'')+' · ✓ = el titular volvió · '+_subPersonal(p),
+    done:'No hay reemplazos vencidos por confirmar.'},
   dot_comision:{label:'Personal: comisiones de servicio',
     find:()=>_dotPorClase('dot_comision'), flat:true, approve:true, allIf:()=>false,
     okTitle:'Comisión revisada (vigente o ya cumplida)',
@@ -13215,12 +13386,17 @@ function exportAsignaciones(){
               if(!t.nombre) return;
               const key = norm(t.nombre);
               if(!asigMap.has(key)) asigMap.set(key, []);
-              asigMap.get(key).push({ ...base, tipo: 'dinámico', turno: t.turno || '', externa: !!t.externa, cds: !!t.cds, dinClin: !!t.dinClin, nombreOrig: t.nombre, cargo: t.cargo||'', estamento: t.estamento||'' });
+              asigMap.get(key).push({ ...base, tipo: 'dinámico', turno: t.turno || '', externa: !!t.externa, cds: !!t.cds, dinClin: !!t.dinClin, nombreOrig: t.nombre, cargo: t.cargo||'', estamento: t.estamento||'', reemp:(t.reemplazo&&_reempVigente(t.reemplazo))?t.reemplazo:null });
+              if(t.reemplazo&&_reempVigente(t.reemplazo)){ const k2=norm(t.reemplazo.reemplazante); if(!asigMap.has(k2)) asigMap.set(k2,[]);
+                asigMap.get(k2).push({ ...base, tipo:'dinámico', turno:'', externa:false, cds:false, dinClin:false, nombreOrig:t.reemplazo.reemplazante, cargo:'', estamento:'', reemp:t.reemplazo, comoReemplazante:true }); }
             });
           } else if(d.nombre && d.nombre.trim()){
             const key = norm(d.nombre);
             if(!asigMap.has(key)) asigMap.set(key, []);
-            asigMap.get(key).push({ ...base, tipo: 'fijo', turno: '', externa: !!d.externa, cds: !!d.cds, dinClin: !!d.dinClin, nombreOrig: d.nombre, cargo: d.cargo||'', estamento: d.estamento||'' });
+            asigMap.get(key).push({ ...base, tipo: 'fijo', turno: '', externa: !!d.externa, cds: !!d.cds, dinClin: !!d.dinClin, nombreOrig: d.nombre, cargo: d.cargo||'', estamento: d.estamento||'', reemp:(d.reemplazo&&_reempVigente(d.reemplazo))?d.reemplazo:null });
+            // el reemplazante comparte el puesto del titular: misma fila de puesto, sin abrir otro
+            if(d.reemplazo&&_reempVigente(d.reemplazo)){ const k2=norm(d.reemplazo.reemplazante); if(!asigMap.has(k2)) asigMap.set(k2,[]);
+              asigMap.get(k2).push({ ...base, tipo:'fijo', turno:'', externa:false, cds:false, dinClin:false, nombreOrig:d.reemplazo.reemplazante, cargo:'', estamento:'', reemp:d.reemplazo, comoReemplazante:true }); }
           }
         });
       }
@@ -13233,6 +13409,7 @@ function exportAsignaciones(){
   const headers = ['Subdirección','Unidad','Asignado','RUT','Nombre','Estamento','Calidad',
                    'Turno','Cargo','Ley de contrato','Horas Contratadas','Servicio',
                    'Piso','Servicio (Atlas)','Recinto','Código recinto','BIM','Tipo de puesto',
+                   'Reemplazo','Titular del cargo','Motivo / hasta',
                    'Funciones específicas (TENS · enfermería)'];
   const SEP_COL = 11;   // borde grueso a la derecha de "Servicio"
   let totalAsig = 0;
@@ -13240,7 +13417,10 @@ function exportAsignaciones(){
   const _matched = new Set();
   // Tipo del puesto: dinámico (sin nombre) · dinámico clínico (asignado que
   // rota entre servicios, ej. 4º turno) · fijo
-  const _tipoAsig = a => a.tipo==='dinámico' ? 'Dinámico' : (a.dinClin ? 'Dinámico clínico' : 'Fijo');
+  const _tipoAsig = a => a.comoReemplazante ? 'Fijo · en reemplazo' : (a.tipo==='dinámico' ? 'Dinámico' : (a.dinClin ? 'Dinámico clínico' : 'Fijo'));
+  // columnas de reemplazo: Reemplazo (quién cubre / a quién cubre) · Titular del cargo · Motivo / hasta
+  const _reempCols = a => !a.reemp ? ['','',''] : [a.comoReemplazante ? ('Reemplaza a '+a.reemp.titular) : ('Lo cubre '+a.reemp.reemplazante), a.reemp.titular||'',
+    [(a.reemp.motivo||''), a.reemp.hasta?('hasta '+_reempFechaLbl(a.reemp.hasta)):''].filter(Boolean).join(' · ')+(a.reemp.fuente==='manual'?' (informado en terreno)':'')];
   // Grupos (orden en la hoja): 0 verdes · 1 naranjos (fuera de matriz) ·
   // 2 violetas (Compra de Servicio) · 3 rojos (sin asignar). Alfabético en cada grupo.
   const _esCdsStaff = s => /COMPRA/i.test(String(s.calidad||''))||/COMPRA/i.test(String(s.ley||''));
@@ -13262,15 +13442,15 @@ function exportAsignaciones(){
       const flagB='⊘ FUERA DE LA MATRIZ · '+_bajaLbl(baja).toUpperCase();
       const personB=[s.subdireccion||'', s.unidad||'', flagB, s.rut||s.id||'', s.nombre||'', s.estamento||'', s.calidad||'',
                      s.turno||'', s.cargo||'', s.ley||'', s.horas||'', s.servicio||''];
-      if(isAsig) asigs.forEach(a=>dataRows.push({rank:4, nombre:s.nombre, row:personB.concat([a.piso||'', a.area||'', a.recinto||'', a.recintoCode||'', a.bim||'', _tipoAsig(a), _funcTexto(s.nombre)])}));
-      else dataRows.push({rank:4, nombre:s.nombre, row:personB.concat(['','','','','','', _funcTexto(s.nombre)])});
+      if(isAsig) asigs.forEach(a=>dataRows.push({rank:4, nombre:s.nombre, row:personB.concat([a.piso||'', a.area||'', a.recinto||'', a.recintoCode||'', a.bim||'', _tipoAsig(a), ..._reempCols(a), _funcTexto(s.nombre)])}));
+      else dataRows.push({rank:4, nombre:s.nombre, row:personB.concat(['','','','','','','','','', _funcTexto(s.nombre)])});
       return;
     }
     if(!byEst[e]) byEst[e] = {total:0, asig:0};
     if(!bySub[sd]) bySub[sd] = {total:0, asig:0};
     byEst[e].total++; bySub[sd].total++;
     if(isAsig){ byEst[e].asig++; bySub[sd].asig++; }
-    const flag = (isAsig ? 'SÍ' : 'NO') + (esCds ? ' · COMPRA DE SERVICIO' : '');
+    const flag = (isAsig ? 'SÍ' : 'NO') + (esCds ? ' · COMPRA DE SERVICIO' : '') + (isAsig && asigs.every(a=>a.comoReemplazante) ? ' · EN REEMPLAZO' : '');
     const person = [
       s.subdireccion || '', s.unidad || '',
       flag,
@@ -13279,9 +13459,9 @@ function exportAsignaciones(){
     ];
     const rank = esCds ? 2 : (isAsig ? 0 : 3);
     if(isAsig){
-      asigs.forEach(a => dataRows.push({rank, nombre:s.nombre, row:person.concat([a.piso||'', a.area||'', a.recinto||'', a.recintoCode||'', a.bim||'', _tipoAsig(a), _funcTexto(s.nombre)])}));
+      asigs.forEach(a => dataRows.push({rank, nombre:s.nombre, row:person.concat([a.piso||'', a.area||'', a.recinto||'', a.recintoCode||'', a.bim||'', _tipoAsig(a), ..._reempCols(a), _funcTexto(s.nombre)])}));
     } else {
-      dataRows.push({rank, nombre:s.nombre, row:person.concat(['','','','','','', _funcTexto(s.nombre)])});
+      dataRows.push({rank, nombre:s.nombre, row:person.concat(['','','','','','','','','', _funcTexto(s.nombre)])});
       if(rank===3) noAsigRows.push({nombre:s.nombre, row:person.slice(0,12)});
     }
   });
@@ -13300,7 +13480,7 @@ function exportAsignaciones(){
       '', a0.nombreOrig || '', a0.estamento || '', '',
       '', a0.cargo || '', esCds ? 'COMPRA DE SERVICIO' : '', '', ''
     ];
-    asigs.forEach(a => dataRows.push({rank: esCds?2:1, nombre:a0.nombreOrig||'', row:person.concat([a.piso||'', a.area||'', a.recinto||'', a.recintoCode||'', a.bim||'', _tipoAsig(a), _funcTexto(a0.nombreOrig)])}));
+    asigs.forEach(a => dataRows.push({rank: esCds?2:1, nombre:a0.nombreOrig||'', row:person.concat([a.piso||'', a.area||'', a.recinto||'', a.recintoCode||'', a.bim||'', _tipoAsig(a), ..._reempCols(a), _funcTexto(a0.nombreOrig)])}));
   });
 
   // 2c) Orden final + fila 1 de resumen (los % excluyen las Compras de Servicio)
@@ -13322,7 +13502,7 @@ function exportAsignaciones(){
   // 3) Crear hojas con estilos
   const COL_W = [{wch:32},{wch:26},{wch:12},{wch:13},{wch:34},{wch:18},{wch:14},
                  {wch:12},{wch:32},{wch:18},{wch:9},{wch:38},
-                 {wch:11},{wch:28},{wch:28},{wch:13},{wch:12},{wch:16},{wch:40}];
+                 {wch:11},{wch:28},{wch:28},{wch:13},{wch:12},{wch:18},{wch:30},{wch:30},{wch:34},{wch:40}];
   const HDR_STYLE = {
     font: {bold:true, color:{rgb:'FFFFFFFF'}, sz:11},
     fill: {patternType:'solid', fgColor:{rgb:'FF1D5FA0'}},
@@ -13551,6 +13731,7 @@ function init(){
   { const b=document.getElementById('btnPlanKind'); if(b){ const c=S.planKind==='color'; b.textContent=c?'🗺 Ver mobiliario':'🖌 Ver color'; b.classList.toggle('active',c); } }
   applyBoxVis();
   loadDotDB(); // async pero NO awaiteamos: el plano puede cargar en paralelo. Búsqueda queda lista cuando termine fetch.
+  try{ setTimeout(()=>{ try{ if(dotDB&&dotDB.staff){ _sincronizaReemplazos(); renderSVG(); try{ renderBimPending(); }catch(e){} } }catch(e){} }, 2500); }catch(e){}
   try{ const nl=_normalizaMarcasDotacion();
     if(nl) setTimeout(()=>{ if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🧹 '+nl+' asignaciones marcadas fuera de matriz ya estaban en la matriz: se quitó la marca'; setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },7000); } },1500);
   }catch(e){ console.warn('normalización de marcas de dotación',e); }
@@ -14829,6 +15010,71 @@ async function runSelfTest(){
       window.NAV_VERTICALES=NVprev; S.level=nivel;
       Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
     }
+  });
+  // 🔁 Reemplazo en el puesto (spec _DOCS/ATLAS_MARCA_REEMPLAZO.md). El recinto de
+  // prueba st_r1 ya se limpió más arriba: estas pruebas montan y desmontan el suyo.
+  const _rpFix=on=>{ if(on){ if(!fl.areas.some(a=>a.id==='st_a')) fl.areas.push({id:'st_a', name:'ST', rooms:[{id:'st_r1'},{id:'st_r2'}]}); boxState.areas['st_a']=[{x:800,y:800,w:2600,h:2000}]; boxState.rooms['st_r1']=[{x:900,y:900,w:1100,h:900}]; }
+    else { fl.areas=fl.areas.filter(a=>a.id!=='st_a'); delete boxState.areas['st_a']; delete boxState.rooms['st_r1']; delete wsState.dots['st_r1']; } _codeBoxIndex=null; };
+  T('Reemplazo: marcar y desmarcar deja el puesto igual, no crea puesto ni cambia la cabida; vencido no es vigente', ()=>{
+    const snapW=JSON.stringify(wsState.dots), rid='st_r1', fPrev=S.floorId;
+    try{
+      _rpFix(true); S.floorId=fl.id;       // el recinto de prueba vive en fl
+      wsState.dots[rid]=[{id:'rp1',x:950,y:950,tipo:'fijo',nombre:'ZZQ TITULAR PRUEBA',cargo:'',estamento:''}];
+      const d=wsState.dots[rid][0], orig=JSON.stringify(d);
+      const tot0=Object.values(wsState.dots).reduce((a,x)=>a+x.length,0);
+      mCtx={roomId:rid,idx:0,addingTurno:false}; openModal(rid,0);
+      document.getElementById('mReemp').checked=true; _mReempToggle();
+      document.getElementById('mReempQuien').value='ZZQ REEMPLAZANTE PRUEBA'; document.getElementById('mReempMotivo').value='licencia'; document.getElementById('mReempHasta').value='2099-12-31'; _mReempManual();
+      saveWs();
+      const marcado=d.reemplazo && d.reemplazo.reemplazante==='ZZQ REEMPLAZANTE PRUEBA' && d.reemplazo.titular==='ZZQ TITULAR PRUEBA' && d.reemplazo.fuente==='manual' && _reempVigente(d.reemplazo) && d.nombre==='ZZQ TITULAR PRUEBA';
+      const tot1=Object.values(wsState.dots).reduce((a,x)=>a+x.length,0);
+      S.level=3; S.roomId=rid; S.areaId='st_a'; renderSVG();
+      const anillo=!!svg.querySelector('.ws-dot .reemp-ring') && /⇄ ZZQ REEMPLAZANTE/.test(dotTitle(d));
+      const vig=_reempVigente({reemplazante:'x',hasta:'2000-01-01'})===false && _reempVigente({reemplazante:'x',hasta:'31-12-2099'})===true && _reempVigente({reemplazante:'x'})===true;
+      const rev=_reempPendientes(false).some(p=>p.nombre==='ZZQ TITULAR PRUEBA') && !_reempPendientes(true).length;
+      d.reemplazo.hasta='2000-01-01'; const vencido=!_dotConReemplazo(d) && _reempPendientes(true).some(p=>p.nombre==='ZZQ TITULAR PRUEBA');
+      d.reemplazo.hasta='2099-12-31';
+      // el reemplazante cuenta como ubicado en el avance, en el puesto del titular
+      const av=_dpAsignados()[norm('ZZQ REEMPLAZANTE PRUEBA')]===rid;
+      openModal(rid,0); document.getElementById('mReemp').checked=false; saveWs();
+      // sin residuos: sólo quedan las marcas normales de saveWs (externa/cds/dinClin) y el histórico
+      const o0=JSON.parse(orig), esencial=x=>JSON.stringify([x.id,x.x,x.y,x.tipo,x.nombre,x.cargo,x.estamento]);
+      const limpio=!d.reemplazo && (d.reemplazoHist||[]).length===1 && esencial(d)===esencial(o0) && Object.keys(d).every(k=>['externa','cds','dinClin','reemplazoHist'].includes(k)||k in o0);
+      return marcado && tot1===tot0 && anillo && vig && rev && vencido && av && limpio;
+    } finally { closeModal(); wsState.dots=JSON.parse(snapW); _rpFix(false); S.floorId=fPrev; S.level=1; S.roomId=null; S.areaId=null; renderSVG(); }
+  });
+  T('Reemplazo: la matriz lo sugiere en el diálogo y la sincronización no pisa una marca manual', ()=>{
+    if(!dotDB||!dotDB.staff||!dotDB.staff.length) return false;
+    const snapW=JSON.stringify(wsState.dots), rid='st_r1'; _rpFix(true);
+    const st=dotDB.staff.find(x=>x&&x.nombre&&(x.cubierto||[]).some(c=>c.nombre&&(!c.hasta||_fechaISO(c.hasta)>=_hoyISO())));
+    const inv={nombre:'ZZQ INVENTADA SIN MATRIZ', cubierto:[{nombre:'ZZQ CUBRE',motivo:'m',hasta:'2099-01-01'}]};
+    try{
+      // a) sugerencia: escribir el nombre de un ausente rellena reemplazante/motivo/fecha
+      let sug=true;
+      if(st){
+        wsState.dots[rid]=[{id:'rp2',x:950,y:950,tipo:'fijo',nombre:'',cargo:'',estamento:''}];
+        openModal(rid,0); document.getElementById('mNombre').value=st.nombre; _mEstadoMatriz();
+        const c=st.cubierto[0];
+        sug=document.getElementById('mReemp').checked && document.getElementById('mReempQuien').value===c.nombre && _mReempOrigen==='matriz';
+        saveWs(); const d=wsState.dots[rid][0];
+        sug=sug && d.reemplazo && d.reemplazo.fuente==='matriz' && d.reemplazo.reemplazante===c.nombre;
+        // b) un reemplazante conocido escrito en otro puesto: al aceptar, el titular queda como dueño
+        const conf=window.confirm; window.confirm=()=>true;
+        try{ wsState.dots[rid].push({id:'rp3',x:1000,y:1000,tipo:'fijo',nombre:'',cargo:'',estamento:''});
+          openModal(rid,1); document.getElementById('mNombre').value=c.nombre; document.getElementById('mReemp').checked=false; saveWs(); }
+        finally{ window.confirm=conf; }
+        const d2=wsState.dots[rid][1];
+        sug=sug && d2 && norm(d2.nombre)===norm(st.nombre) && d2.reemplazo && norm(d2.reemplazo.reemplazante)===norm(c.nombre);
+      }
+      // c) sincronización: la marca manual sobrevive aunque la matriz no la traiga
+      wsState.dots[rid]=[{id:'rp4',x:950,y:950,tipo:'fijo',nombre:'ZZQ TITULAR PRUEBA',reemplazo:{titular:'ZZQ TITULAR PRUEBA',reemplazante:'ZZQ R',motivo:'',hasta:'',fuente:'manual',ts:1}}];
+      _sincronizaReemplazos();
+      const manual=wsState.dots[rid][0].reemplazo && wsState.dots[rid][0].reemplazo.reemplazante==='ZZQ R';
+      // d) una marca fuente:'matriz' que la matriz ya no trae se cierra al histórico
+      wsState.dots[rid]=[{id:'rp5',x:950,y:950,tipo:'fijo',nombre:(dotDB.staff.find(x=>x&&x.nombre&&!(x.cubierto||[]).length)||{}).nombre||'',reemplazo:{titular:'t',reemplazante:'ZZQ R2',motivo:'',hasta:'',fuente:'matriz',ts:1}}];
+      const cierra=!wsState.dots[rid][0].nombre || (_sincronizaReemplazos().bajas===1 && !wsState.dots[rid][0].reemplazo && wsState.dots[rid][0].reemplazoHist.length===1);
+      return sug && manual && cierra;
+    } finally { closeModal(); wsState.dots=JSON.parse(snapW); _rpFix(false); renderSVG(); }
   });
 
   _stReport(out);
