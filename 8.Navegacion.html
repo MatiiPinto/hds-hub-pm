@@ -283,7 +283,6 @@ body{background:#0c1a2e;color:#cbd5e1;font-family:'Segoe UI',-apple-system,Blink
       <button class="tb-btn" id="btnPmark" onclick="toggleMode('pmark')" title="Colocar marcadores sobre la circulación: puerta, corredera automática, escalera, escalera mecánica, rampa, control de acceso">⚑ Marcadores</button>
       <button class="tb-btn" id="btnMedir" onclick="toggleMode('medir')" title="Medir el largo de un recorrido: clic en cada punto y se acumula la distancia en metros">📏 Medir largo</button>
       <button class="tb-btn" id="btnShape" onclick="toggleMode('shape')" title="Editar formas: clic en un cuadro para seleccionarlo, arrastra las manijas (esquinas/aristas) para redimensionar o el cuadro para moverlo. Clic en la flecha para girar la salida.">◱ Redimensionar</button>
-      <button class="tb-btn" id="btnCalibPlano" onclick="calibrarTodosLosPlanos()" title="Calibrar los planos de TODOS los pisos usando como referencia los ascensores que dibujaste manualmente en cada piso: con todos los que existan también en el Piso 1 se calcula (mínimos cuadrados) la escala y el corrimiento del plano para que quede en el mismo registro que el Piso 1. Los pisos sin ajustes quedan igual.">📐 Calibrar planos</button>
       <button class="tb-btn" id="btnPoi" onclick="toggleMode('poi')" title="Marcar puntos de interés y flujo: accesos, llegada de pacientes/familiares, REAS, logística, medicamentos, laboratorio, vestidores, reloj control…">📍 Puntos de flujo</button>
       <button class="tb-btn warn" id="btnDel" onclick="toggleMode('del')">🗑 Eliminar</button>
       <span class="vista-seg" id="vistaSeg"><button id="vsServ" onclick="setVista('servicios')" title="Vista general: servicios de Atlas">🏥 Servicios</button><button id="vsCirc" onclick="setVista('circulaciones')" title="Vista 2: circulaciones fusionadas por zona; los servicios quedan de fondo">🚶 Circulaciones</button></span>
@@ -465,6 +464,9 @@ body{background:#0c1a2e;color:#cbd5e1;font-family:'Segoe UI',-apple-system,Blink
 <script>document.write('<scr'+'ipt src="SHARED_DATA/nav_base.js?v='+Date.now()+'"></scr'+'ipt>');</script>
 <script src="SHARED_DATA/nav_central.js"></script>
 <script src="SHARED_DATA/cabida_web_snapshot.js"></script>
+<!-- Calibración común con el Atlas (px ↔ «metros» de Navegación ↔ metros reales ↔ piso a piso).
+     La genera _DEV/calibra_planos.py; ver ahí qué es exacto y qué es registro. -->
+<script src="SHARED_DATA/planos_calibracion.js"></script>
 <!-- recintos de Atlas (vista 2) ya convertidos a metros DXF, y la propuesta de
      relleno inverso de circulación; ambos con URL única por carga (anti-caché) -->
 <script>document.write('<scr'+'ipt src="SHARED_DATA/recintos_nav.js?v='+Date.now()+'"></scr'+'ipt>');</script>
@@ -1074,6 +1076,19 @@ window.addEventListener('pagehide',flushSave);
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushSave();});
 
 // ── COORDS ──────────────────────────────────────────────────────────────────
+// ── Medidas REALES (SHARED_DATA/planos_calibracion.js) ────────────────────────
+// Los «metros» de Navegación son unidades del encuadre _EXT, que sobre los planos
+// del Atlas quedó anisotrópico: 1 «m» ≈ 0,94 m reales en X y ≈ 0,88 m en Y. Para
+// MEDIR se pasa por el píxel del plano, que tiene escala real conocida. Si la
+// calibración no cargó, se mide como antes.
+function _largoReal(fl,x1,y1,x2,y2){
+  const C=window.PLANOS_CALIB, r=C&&C.largoNav(fl,x1,y1,x2,y2,planXform[fl]);
+  return r==null ? Math.hypot(x2-x1,y2-y1) : r;
+}
+function _factorArea(fl){
+  const C=window.PLANOS_CALIB, r=C&&C.areaNav(fl,1,1,planXform[fl]);
+  return r==null ? 1 : r;
+}
 function dxfToSvg(fId,cx_m,cy_m){
   const ext=DXF_EXT[fId];if(!ext)return null;
   const d=SVG_DIMS[fId];if(!d)return null;
@@ -1507,7 +1522,7 @@ function pcSectores(floorId){
     const zonas=Object.keys(zc).sort((x,y)=>zc[y]-zc[x]);
     let sx=0, sy=0, sa=0;
     c.forEach(b=>{ const a=b.w_m*b.h_m; sx+=b.x_m*a; sy+=b.y_m*a; sa+=a; });
-    return {sec:c[0].sec||'', n:c.length, area:sa, zona:zonas[0]||'general',
+    return {sec:c[0].sec||'', n:c.length, area:sa*_factorArea(floorId), zona:zonas[0]||'general',
             mezcla:zonas.length>1, cx:sa?sx/sa:0, cy:sa?sy/sa:0, ids:c.map(b=>b.id)};
   }).sort((a,b)=>b.area-a.area);
 }
@@ -2045,18 +2060,41 @@ function renderRepPanel(){
     +(org===dst?'Elegí dos pisos distintos':'Replicar '+(FLOORS.find(f=>f.id===org)||{}).name+' → '+(FLOORS.find(f=>f.id===dst)||{}).name)+'</button>'
     +'<div style="color:#9fc4db;margin-top:7px;line-height:1.45">Se copian con su tipología, nombre y orientación, en la misma posición. Lo que ya existe en el destino en el mismo lugar no se duplica. Después de replicar quedan seleccionadas para moverlas o borrarlas; ⌘Z deshace.</div>';
 }
+// Lleva una caja de un piso a otro por el marco del edificio. Devuelve null si
+// alguno de los dos pisos no tiene registro confiable.
+function _repMapeador(org,dst){
+  const C=window.PLANOS_CALIB;
+  if(!C || !C.hayRegistro(org) || !C.hayRegistro(dst)) return null;
+  return b=>{
+    const esq=[[b.x_m,b.y_m],[b.x_m+b.w_m,b.y_m],[b.x_m,b.y_m-b.h_m],[b.x_m+b.w_m,b.y_m-b.h_m]].map(([x,y])=>{
+      const p=C.navAPx(org,x,y,planXform[org]), q=C.pisoAPiso(org,dst,p.x,p.y);
+      return C.pxANav(dst,q.x,q.y,planXform[dst]); });
+    const xs=esq.map(e=>e.x_m), ys=esq.map(e=>e.y_m);
+    const x0=Math.min(...xs), x1=Math.max(...xs), y0=Math.min(...ys), y1=Math.max(...ys);
+    return {x_m:x0, y_m:y1, w_m:x1-x0, h_m:y1-y0};
+  };
+}
 function repPisoEjecutar(){
   const org=_repCfg.org, dst=_repCfg.dst; if(!org||!dst||org===dst) return;
   const A=(pcircState.floors[org]||[]);
   const B=(pcircState.floors[dst]=pcircState.floors[dst]||[]);
   const elegir=A.filter(b=>{ const c=_repCatDe(b.zona); return c && _repCfg.cats[c]; });
   if(!elegir.length){ toast('⎘ No hay nada que copiar en '+org+' con esas categorías.'); return; }
+  // Cada piso tiene su propio encuadre de plano: la MISMA coordenada cae en otro
+  // lugar del edificio. Se pasa por el marco del edificio (planos_calibracion.js);
+  // si algún piso no tiene registro confiable, se avisa en vez de ubicar mal.
+  const lleva=_repMapeador(org,dst);
+  if(!lleva && !confirm('⚠ '+org+' y '+dst+' no tienen registro entre sí en la calibración de planos:\n'
+      +'la misma coordenada NO es el mismo lugar del edificio.\n\n'
+      +'Si copiás igual, las cajas quedan en la coordenada de origen y hay que ubicarlas a mano.\n\n¿Copiar igual?')) return;
   // historial del piso destino (el deshacer vuelve a este estado)
   _pcHistU.push({f:dst, j:JSON.stringify(B)}); if(_pcHistU.length>PC_HIST_MAX) _pcHistU.shift(); _pcHistR.length=0;
   const nue=[], cuenta={}; let saltadas=0;
   elegir.forEach(b=>{
-    if(B.some(x=>x.zona===b.zona && _repSolapa(x,b)>0.5)){ saltadas++; return; }
+    const bd=lleva ? {...b, ...lleva(b)} : b;
+    if(B.some(x=>x.zona===b.zona && _repSolapa(x,bd)>0.5)){ saltadas++; return; }
     const c={...JSON.parse(JSON.stringify(b)), id:pcNuevoId(), replicado_de:org};
+    if(lleva) Object.assign(c, lleva(b));
     B.push(c); nue.push(c); const k=_repCatDe(b.zona); cuenta[k]=(cuenta[k]||0)+1;
   });
   saveAll();
@@ -2529,7 +2567,8 @@ function zonaResumen(floorId){
   // m² solo de ZONAS de circulación; los elementos (ascensor/escalera/esc.
   // mecánica) se cuentan por unidades en elemResumen()
   const arr=(pcircState.floors||{})[floorId||S.floorId]||[];
-  const r={}; arr.forEach(b=>{ if(!esCaja(b.zona)) r[b.zona]=(r[b.zona]||0)+(b.w_m*b.h_m); });
+  const k=_factorArea(floorId||S.floorId);
+  const r={}; arr.forEach(b=>{ if(!esCaja(b.zona)) r[b.zona]=(r[b.zona]||0)+(b.w_m*b.h_m*k); });
   return r;
 }
 function elemResumen(floorId){
@@ -2634,7 +2673,7 @@ function aplicarRelleno(){
   if(!prop.length){ alert('No hay propuesta de relleno para '+S.floorId+'.'); return; }
   const arr=(pcircState.floors[S.floorId]=pcircState.floors[S.floorId]||[]);
   const previos=arr.length;
-  const area=Math.round(prop.reduce((a,b)=>a+b.w_m*b.h_m,0));
+  const area=Math.round(prop.reduce((a,b)=>a+b.w_m*b.h_m,0)*_factorArea(S.floorId));
   if(!confirm('Aplicar el relleno inverso a '+S.floorId+':\n\n'
     +'• '+prop.length+' cuadros nuevos ('+area.toLocaleString('es-CL')+' m²) como zona "'
     +ZONA_CIRC[_pcircZona in ZONA_CIRC ? _pcircZona : 'general'].label+'".\n'
@@ -2947,7 +2986,7 @@ function buildPmarkBar(){
 function setPmarkTipo(t){ _pmarkTipo=t; buildPmarkBar(); }
 // ── Medición de largo (regla): clic para cada punto, largo acumulado en metros ─
 let _measure={pts:[]};
-function measureLen(){ let L=0; for(let i=1;i<_measure.pts.length;i++){ L+=Math.hypot(_measure.pts[i].x_m-_measure.pts[i-1].x_m,_measure.pts[i].y_m-_measure.pts[i-1].y_m); } return L; }
+function measureLen(){ let L=0; for(let i=1;i<_measure.pts.length;i++){ L+=_largoReal(S.floorId,_measure.pts[i-1].x_m,_measure.pts[i-1].y_m,_measure.pts[i].x_m,_measure.pts[i].y_m); } return L; }
 function handleMeasureClick(e){
   if(didPan) return;
   const c=planCoords(e); if(!c.inside) return;
@@ -3781,7 +3820,7 @@ function renderOverlay(){
       if(i>0){ const b=dxfToSvg(S.floorId,_measure.pts[i-1].x_m,_measure.pts[i-1].y_m);
         const ln=document.createElementNS(SVGNS,'line'); ln.setAttribute('x1',b.x);ln.setAttribute('y1',b.y);ln.setAttribute('x2',a.x);ln.setAttribute('y2',a.y);
         ln.setAttribute('stroke','#fbbf24');ln.setAttribute('stroke-width','4');ln.setAttribute('stroke-dasharray','12 7');ln.setAttribute('stroke-linecap','round');ln.setAttribute('pointer-events','none'); overlay.appendChild(ln);
-        const d=Math.hypot(_measure.pts[i].x_m-_measure.pts[i-1].x_m,_measure.pts[i].y_m-_measure.pts[i-1].y_m);
+        const d=_largoReal(S.floorId,_measure.pts[i-1].x_m,_measure.pts[i-1].y_m,_measure.pts[i].x_m,_measure.pts[i].y_m);
         const t=document.createElementNS(SVGNS,'text'); t.setAttribute('x',(a.x+b.x)/2);t.setAttribute('y',(a.y+b.y)/2-10);
         t.setAttribute('fill','#7c2d12');t.setAttribute('stroke','#fff');t.setAttribute('stroke-width','6');t.setAttribute('paint-order','stroke');t.setAttribute('text-anchor','middle');t.setAttribute('font-size','130');t.setAttribute('font-weight','800');t.textContent=d.toFixed(1)+' m'; overlay.appendChild(t);
       }

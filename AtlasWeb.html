@@ -327,6 +327,8 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 /* ── Avisos flotantes sobre el plano: un solo patrón (pastilla oscura) ────── */
 .float-hint{position:absolute;bottom:var(--sp-5);left:50%;transform:translateX(-50%);display:none;align-items:center;gap:10px;max-width:min(940px,calc(100% - 40px));padding:8px 16px;background:var(--n-900);color:#fff;border:0;border-radius:var(--r-lg);box-shadow:var(--shadow-2);font-size:var(--fs-sm);line-height:1.4;text-align:center;z-index:10;pointer-events:none}
 .float-hint.show{display:block}
+#vertHint{pointer-events:auto}
+#vertHint .vh-btn{cursor:pointer;text-decoration:underline;font-weight:600;margin-left:4px}
 .ws-dot .reemp-ring{fill:none;stroke:var(--state-reemplazo);stroke-width:2;stroke-dasharray:4 3}
 .float-hint::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--state-outside);margin-right:8px;vertical-align:middle}
 #mergeHint::before{background:#eab308}
@@ -578,6 +580,25 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 .fk-sec{margin-bottom:18px}
 .fk-sec-t{font-size:var(--fs-xs);font-weight:var(--fw-medium);color:var(--text-2);text-transform:uppercase;letter-spacing:var(--tracking-caps);display:flex;align-items:center;gap:7px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border)}
 .fk-sec-t .cnt{margin-left:auto;font-size:var(--fs-xs);font-weight:var(--fw-medium);color:var(--text-2);background:var(--surface-sunken);border-radius:10px;padding:1px 9px}
+.fk-inst-meta{font-size:11px;color:var(--text-2);margin-bottom:6px;line-height:1.45}
+.fk-inst-t{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:8px}
+.fk-inst-t th{font-size:10.5px;font-weight:600;color:var(--text-2);text-align:center;padding:3px 4px;border-bottom:1px solid var(--border)}
+.fk-inst-t th:first-child,.fk-inst-t td:first-child{text-align:left}
+.fk-inst-t td{padding:4px;border-bottom:1px solid var(--border);text-align:center;font-variant-numeric:tabular-nums}
+.fk-inst-t td.z{color:#b6c2cf}
+.fk-inst-t td small{display:block;font-size:10px;color:var(--text-2);font-weight:400}
+.fk-inst-sub{font-size:11px;font-weight:700;color:var(--text-1,#1e293b);margin:8px 0 4px}
+.fk-inst-chips{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:6px}
+.fk-inst-chip{border:1px solid #cfdcea;background:#f5f9fd;border-radius:7px;padding:2px 8px;font-size:12px}
+.fk-inst-chip b{font-size:13px}
+.fk-inst-chip i{font-style:normal;font-size:10px;color:var(--text-2)}
+.fk-inst-obs{font-size:11px;color:#6b4f00;background:#fffbeb;border:1px solid #fde68a;border-radius:7px;padding:5px 8px;margin-bottom:6px}
+.fk-inst-fte{font-size:10px;color:var(--text-2);margin-top:4px}
+.fk-ccdd-cat{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.fk-inst-chip.pc{border-style:dashed}
+.ccdd-pt{cursor:help}
+#ccddLegend{position:absolute;right:12px;bottom:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-2);padding:8px 10px;font-size:11px;line-height:1.5;z-index:9;display:none;max-width:260px}
+#ccddLegend b{display:block;margin-bottom:3px}
 .fk-eq{display:flex;align-items:baseline;gap:8px;padding:5px 0;border-bottom:1px dashed var(--n-100);font-size:var(--fs-md)}
 .fk-eq.fk-click{cursor:pointer;transition:background .12s}
 .fk-eq.fk-click:hover{background:var(--accent-50)}
@@ -857,6 +878,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="tb-btn tog" id="btnBoxVis" onclick="cycleBoxVis()" title="Ver u ocultar las cajas dibujadas y su información (para ver el plano de fondo)">👁 Cajas</button>
       <button class="tb-btn tog" id="btnJardines" onclick="toggleJardines()" title="Mostrar u ocultar los jardines y las esculturas del piso 1 (lámina de Paisajismo PAI-PL-GEN-X-P-E-081, calibrada contra el plano). Pasa el mouse por una 🗿 para ver su ficha y fechas de traslado.">🌳 Jardines</button>
       <button class="tb-btn tog" id="btnVert" onclick="toggleVerticales()" title="Mostrar u ocultar los ascensores, escaleras y escaleras mecánicas (se ven en todas las vistas). Las líneas de circulación no se tocan.">🛗 Ascensores</button>
+      <button class="tb-btn tog" id="btnReloj" onclick="toggleRelojes()" title="Mostrar u ocultar los relojes control (lectores biométricos del control horario, ORD SSMO 5040029-145). Se ven en todas las vistas.">⏱ Relojes</button>
       <button class="tb-btn tog" id="btnDotNames" onclick="toggleDotNames()" title="Mostrar u ocultar el nombre de las personas asignadas a los puestos en vista 3 (útil en recintos con muchos funcionarios)">👤 Nombres</button>
       <div class="vw-dd" id="vwDD">
         <button class="tb-btn" id="btnVista" onclick="toggleVwMenu(event)" title="Opciones de visualización del plano">🎛 Vista ▾</button>
@@ -867,6 +889,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
           <button class="tb-btn" id="btnMetas" onclick="toggleMetas()" title="Metas oficiales de recintos (Resumen Ejecutivo HDS): asignados vs meta">🎯 Metas</button>
           <button class="tb-btn" id="btnAsigN" onclick="toggleAsigNum()" title="Mostrar en cada recinto cuántos funcionarios tiene asignados (solo el número, abajo a la derecha)">🧑 N° asignados</button>
           <button class="tb-btn" id="btnTiPrint" onclick="toggleTiPrint()" title="Mostrar en cada recinto (vista de servicio) las impresoras del HDS según el archivo Comodatos Jun-2026 cruzado con el PMA/BIM, abajo a la izquierda: 🖨 + 👤 láser monousuario · 👥 láser multiusuario · 📠 multifuncional · 🎨 multifuncional color. Clic abre la ficha.">🖨 Impresoras</button>
+          <button class="tb-btn" id="btnCcdd" onclick="toggleCcdd()" title="Mostrar sobre el plano los puntos de corrientes débiles (CE y CCDD) leídos de los planos CDE rev. 20-03-2020: llamada enfermera, seguridad y control de accesos, CCTV, megafonía, gestión de turnos, telefonía, WiFi/celular. Pasa el mouse por un punto para ver qué es. Las clases «por confirmar» se muestran con su letra del plano.">📡 Corrientes débiles</button>
         </div>
       </div>
       <button class="tb-btn" id="btnDraw" onclick="toggleDraw()" style="display:none">⬛ Dibujar</button>
@@ -881,9 +904,14 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
         <button class="struct-opt" data-kind="stair"     style="--c:#7c3aed">🪜 <b>Escalera</b></button>
         <button class="struct-opt" data-kind="escalator" style="--c:#0891b2">⬆ <b>Escalera Mecánica</b></button>
         <button class="struct-opt" data-kind="circulation" style="--c:#475569">〰 <b>Línea de Circulación</b> <span style="opacity:.55">· dbl-click p/terminar</span></button>
+        <div class="sm-h">Reloj control</div>
+        <button class="struct-opt" data-kind="reloj" style="--c:#C026D3" title="Colocar a mano un reloj control (lector biométrico del control horario). Se ve en todas las vistas; se enciende y apaga con el botón ⏱ Relojes de la barra superior.">⏱ <b>Reloj control</b> <span style="opacity:.55">· lector biométrico</span></button>
+        <button class="struct-opt" onclick="importarRelojesORD()" style="--c:#C026D3" title="Trae los 10 lectores biométricos propuestos en el ORD SSMO 5040029-145 (04-ago-2026, planos P1 · PS2 · PS3), ubicados en el Atlas por los rótulos comunes de los planos. Reemplaza los relojes que hubiera; los ascensores, escaleras y líneas no se tocan. Después se arrastran hasta su posición final.">⬇ <b>Importar del ORD 1441</b> <span style="opacity:.55">· 10 lectores · reemplaza</span></button>
         <div class="sm-h">Desde Navegación</div>
-        <button class="struct-opt" onclick="importarVerticalesNav()" style="--c:#0ea5e9" title="Trae los ascensores, escaleras y escaleras mecánicas dibujados en 8.Navegacion (siembra nav_verticales.js) a TODOS los pisos, a su tamaño real y YA CUADRADOS con el plano de cada piso: las escaleras sobre los rótulos «Escaleras» de Coordinación Mobiliario y los ascensores sobre el eje del ducto. Reemplaza los ascensores/escaleras que hubiera; las líneas de circulación se conservan.">⬇ <b>Importar de Navegación</b> <span style="opacity:.55">· reemplaza · calibrado</span></button>
-        <div class="sm-note">En edición: arrastrar mueve · ⇧+arrastrar mueve TODOS los del piso · esquina ◢ escala · × borra</div>
+        <button class="struct-opt" onclick="importarVerticalesNav()" style="--c:#0ea5e9" title="Trae los ascensores, escaleras y escaleras mecánicas dibujados en 8.Navegacion (siembra nav_verticales.js) a TODOS los pisos, con conversión exacta: cada uno queda en el mismo píxel que en Navegación. Reemplaza los ascensores/escaleras que hubiera; las líneas de circulación se conservan.">⬇ <b>Importar de Navegación</b> <span style="opacity:.55">· reemplaza · al píxel</span></button>
+        <div class="sm-h">Ajustar el piso</div>
+        <button class="struct-opt" onclick="toggleVertAjuste()" style="--c:#f59e0b" title="Toma TODOS los ascensores, escaleras y escaleras mecánicas del piso activo y los mueve en bloque con las flechas del teclado: 1 px por pulsación · ⌘ (o Ctrl) + flecha = 5 px · ⇧ + flecha = 20 px. Cada paso se guarda de inmediato y el desplazamiento acumulado del piso se recuerda: al reimportar de Navegación se vuelve a aplicar solo. Cambia de piso y sigue ajustando; Esc o ✓ para salir.">🎯 <b>Mover todos con las flechas</b> <span style="opacity:.55">· 1 px · ⌘ 5 px</span></button>
+        <div class="sm-note">En edición: arrastrar mueve · ⇧+arrastrar mueve TODOS los del piso · esquina ◢ escala · × borra · 🎯 flechas mueven todos los del piso (⌘ = 5 px) · los ⏱ relojes se arrastran uno a uno</div>
       </div>
       <button class="tb-btn warn" id="btnMerge" onclick="doMerge()" style="display:none">🔗 Fusionar</button>
       <button class="tb-btn warn" id="btnUnmerge" onclick="doUnmerge()" style="display:none" title="Separar los bloques de este recinto en recintos independientes">✂ Des-fusionar</button>
@@ -900,6 +928,8 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <div class="float-hint" id="mergeHint"></div>
       <div class="float-hint" id="delHint">Modo eliminar — clic en dot para eliminar · ESC para salir</div>
       <div class="float-hint" id="puertaHint">🚪 Puertas — elige el tipo en la barra (90 · 120 · 200) y haz clic en el borde del recinto · atajos: Alt+clic=120, Shift+clic=200 · ⌘+clic sobre una puerta rota el tipo · arrastrar mueve · doble clic elimina · ⚡ Auto completa el área y ↩ lo deshace · ✕ borra 1 a 1 · 🗑 borra todas las del servicio · ESC sale</div>
+      <div class="float-hint" id="vertHint"></div>
+      <div id="ccddLegend"></div>
       <div class="float-hint" id="stampHint">🪑 Duplicar mueble — arrastra un rectángulo sobre el mueble a copiar (como una captura de pantalla); al soltar, la copia queda junto al original · muévela arrastrándola · doble clic la elimina · ESC para salir</div>
       <div class="float-hint" id="bedHint">🛏 Modo puestos — en vista 2, clic DENTRO de un recinto: camillas/sillones en Recuperación, Habitación o Clínica; cupos (⭕) en Recuperación, Pre-Anestesia, Box Urgencia, Reanimador y Sala de Procedimiento; puestos de toma (🧪) solo en Laboratorio · ESC para salir</div>
       <div class="float-hint" id="propHint"></div>
@@ -1330,10 +1360,13 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 <script src="SHARED_DATA/recinto_bim.js"></script>
 <script src="SHARED_DATA/recinto_bim_cajas.js"></script>
 <script src="SHARED_DATA/recinto_pma_bim.js"></script>
+<script src="SHARED_DATA/instalaciones_recinto.js"></script>
+<script src="SHARED_DATA/ccdd_recinto.js"></script>
 <script src="SHARED_DATA/recintos_revisar.js"></script>
 <script src="SHARED_DATA/consulta_subtipos.js"></script>
 <script src="SHARED_DATA/emmc_pendientes.js"></script>
 <script src="SHARED_DATA/nav_verticales.js"></script>
+<script src="SHARED_DATA/relojes_control.js"></script>
 <script src="SHARED_DATA/propuestos_plano.js"></script>
 <script src="SHARED_DATA/paisajismo.js"></script>
 <script src="SHARED_DATA/impresoras_hds.js"></script>
@@ -3667,6 +3700,13 @@ function toggleVerticales(){
   const b=document.getElementById('btnVert'); if(b) b.classList.toggle('active',S.verticales!==false);
   renderSVG();
 }
+// Relojes control: visibles siempre (vista 1, 2 y 3) salvo que se apaguen acá.
+function toggleRelojes(){
+  S.relojes=(S.relojes===false);
+  _lsPref('cabida_relojes', S.relojes?'1':'0');
+  const b=document.getElementById('btnReloj'); if(b) b.classList.toggle('active',S.relojes!==false);
+  renderSVG();
+}
 function toggleJardines(){
   S.jardines=(S.jardines===false);
   _lsPref('cabida_jardines', S.jardines?'1':'0');
@@ -3701,6 +3741,8 @@ function _jardinesSync(){
   if(S.jardines===undefined){ let v=null; try{ v=localStorage.getItem('cabida_jardines'); }catch(e){} S.jardines=(v!=='0'); }
   if(S.verticales===undefined){ let v=null; try{ v=localStorage.getItem('cabida_verticales'); }catch(e){} S.verticales=(v!=='0');
     const b=document.getElementById('btnVert'); if(b) b.classList.toggle('active',S.verticales!==false); }
+  if(S.relojes===undefined){ let v=null; try{ v=localStorage.getItem('cabida_relojes'); }catch(e){} S.relojes=(v!=='0');
+    const b=document.getElementById('btnReloj'); if(b) b.classList.toggle('active',S.relojes!==false); }
   const P=_pais(), on=!!P && S.jardines!==false;
   { const b=document.getElementById('btnJardines'); if(b){ b.classList.toggle('active',S.jardines!==false); b.classList.toggle('dis',!P);
       b.title=P?'Mostrar u ocultar los jardines y las esculturas de este piso (lámina de Paisajismo, calibrada contra el plano). Pasa el mouse por una 🗿 para ver su ficha y fechas de traslado.'
@@ -3856,7 +3898,9 @@ viewer.addEventListener('wheel',e=>{
 },{passive:false});
 // ESC key
 window.addEventListener('keydown',e=>{
+  if(typeof _vertAjusteTecla==='function' && _vertAjusteTecla(e)) return;
   if(e.key==='Escape'){
+    if(S.vertAjuste){ vertAjusteFin(); return; }
     { const eqm=document.getElementById('equipModal'); if(eqm&&eqm.classList.contains('show')){ closeEquipPanel(); return; } }
     if(document.getElementById('fichaModal').classList.contains('show')){ closeFicha(); return; }
     if(S.fichaMode)toggleFichaMode();
@@ -4353,6 +4397,8 @@ function renderSVG(){
   // interactiva solo en vista 1 (en 2 y 3 no captura clics, para no tapar
   // recintos ni puestos).
   paintStructures();
+  { if(S.showCcdd===undefined){ let v=null; try{ v=localStorage.getItem('cabida_show_ccdd'); }catch(e){} S.showCcdd=(v==='1'); const b=document.getElementById('btnCcdd'); if(b) b.classList.toggle('active',!!S.showCcdd); }
+    try{ _ccddLayer(); }catch(e){} }
   // Modo ubicación: en vista 1, sólo los marcadores de los tipos elegidos
   { const tipos=_ubicTipos(), on=S.level===1 && tipos.length>0;
     svg.classList.toggle('ubic-mode', on);
@@ -5915,6 +5961,84 @@ function _tiTestigo(items){
   return '🖨 '+_tiTipos().filter(t=>items[t.k]).map(t=>t.ico+(items[t.k]>1?items[t.k]:'')).join(' ');
 }
 // Toggle del testigo en vista 2 (esquina inferior izquierda de cada recinto).
+// ── Corrientes débiles (CE y CCDD) por recinto ───────────────────────────
+// Fuente: SHARED_DATA/ccdd_recinto.js (_DEV/build_ccdd_recinto.py): símbolos de los
+// planos CDE-PL-GEN-<piso>-C-G «CE y CCDD GEN G» (rev. 20-03-2020) ubicados en px del
+// Atlas y asignados al recinto dibujado que los contiene (o al más cercano a ≤ 1 m,
+// para los que van en el muro). Las clases «por confirmar» conservan la letra del
+// plano. Sin plano de P4 ni P5; P-3 y P-2 casi no tienen recintos dibujados.
+const _CCDD_CAT_COL={'Llamada enfermera':'#f59e0b','Seguridad':'#dc2626','Control de accesos':'#b91c1c','CCTV':'#7f1d1d',
+  'Megafonía':'#16a34a','Gestión de turnos':'#0891b2','Telefonía':'#1d4ed8','Comunicación':'#7c3aed','Cableado':'#475569','Otros':'#6b7280'};
+function _ccddD(){ const D=window.CCDD_RECINTO; return (D&&D.rooms)?D:null; }
+function _ccddClase(t){ const D=_ccddD(); const c=D&&D._meta&&D._meta.clases&&D._meta.clases[t]; return c||{nombre:t,cat:'Otros',nota:''}; }
+function _ccddDeRecinto(roomId){
+  const D=_ccddD(); if(!D) return null;
+  if(D.rooms[roomId]) return {r:D.rooms[roomId], via:'id'};
+  // el id del recinto pudo cambiar desde el snapshot: buscar por piso + código
+  const ctx=_findRoom(roomId); if(!ctx) return null;
+  const code=rCode(roomId), fid=ctx.floor.id;
+  const cand=Object.entries(D.rooms).filter(([k,r])=>r.piso===fid && code && r.code===code);
+  if(cand.length===1) return {r:cand[0][1], via:'código'};
+  if(cand.length>1){ // varios recintos con el mismo código: se suman y se avisa
+    const n={}; cand.forEach(([k,r])=>Object.entries(r.n).forEach(([t,q])=>{ n[t]=(n[t]||0)+q; }));
+    return {r:{n, code, piso:fid}, via:'código ('+cand.length+' recintos, sumados)'}; }
+  return null;
+}
+function _ccddHtml(roomId){
+  const D=_ccddD(); if(!D) return '';
+  const ctx=_findRoom(roomId); const fid=ctx?ctx.floor.id:S.floorId;
+  const M=D._meta||{};
+  let h='';
+  if((M.pisos_sin_plano||[]).indexOf(fid)>=0 || !D.pisos || !D.pisos[fid]){
+    h='<div class="fk-empty">No hay plano de corrientes débiles para este piso (vinieron PS3, PS2, PS1, P1, P2 y P3).</div>';
+  } else {
+    const R=_ccddDeRecinto(roomId);
+    if(!R || !R.r.n || !Object.keys(R.r.n).length){
+      h='<div class="fk-empty">El plano no marca elementos de corrientes débiles dentro de este recinto (los del pasillo se cuentan aparte por piso).</div>';
+    } else {
+      const cats={};
+      Object.entries(R.r.n).forEach(([t,q])=>{ const c=_ccddClase(t); (cats[c.cat]=cats[c.cat]||[]).push({t,q,c}); });
+      const tot=Object.values(R.r.n).reduce((a,b)=>a+b,0);
+      h+=`<div class="fk-inst-meta">${tot} elemento${tot>1?'s':''} en el recinto${R.via!=='id'?(' · cruce por '+esc(R.via)):''}${R.r.cam&&R.r.cam.length?(' · tipos de cámara: '+esc(R.r.cam.join(', '))):''}</div>`;
+      Object.entries(cats).forEach(([cat,items])=>{
+        h+=`<div class="fk-inst-sub"><span class="fk-ccdd-cat" style="background:${_CCDD_CAT_COL[cat]||'#6b7280'}"></span>${esc(cat)}</div><div class="fk-inst-chips">`+
+          items.map(({t,q,c})=>{ const pc=/por confirmar/i.test(c.nota||''); return `<span class="fk-inst-chip${pc?' pc':''}" title="${esc(c.nota||'')}">${esc(c.nombre)} <b>${q}</b>${pc?' <i>(por confirmar · '+esc(t)+')</i>':''}</span>`; }).join('')+'</div>';
+      });
+    }
+  }
+  h+=`<div class="fk-inst-fte">Fuente: planos CDE-PL-GEN «CE y CCDD GEN G» rev. 20-03-2020 (control de cambios ORD 1450), leídos por símbolo y ubicados sobre el Atlas. `+
+     `Es una lectura automática para REVISAR Y CORREGIR: las clases con letra entre paréntesis no calzan 1:1 con la lámina de simbología. `+
+     `Verlos en el plano: 🎛 Vista → 📡 Corrientes débiles.</div>`;
+  return `<div class="fk-sec"><div class="fk-sec-t">📡 Corrientes débiles · CE y CCDD</div>${h}</div>`;
+}
+function toggleCcdd(){
+  S.showCcdd=!S.showCcdd; _lsPref('cabida_show_ccdd', S.showCcdd?'1':'0');
+  const b=document.getElementById('btnCcdd'); if(b) b.classList.toggle('active',!!S.showCcdd);
+  renderSVG();
+}
+function _ccddLayer(){
+  const lg=document.getElementById('ccddLegend');
+  const D=_ccddD(); const pts=(D && D.puntos && D.puntos[S.floorId])||[];
+  if(!S.showCcdd || !pts.length){ if(lg) lg.style.display='none'; return; }
+  const g=el('g',{class:'ccdd-layer', ...(S.level>1?{}:{})});
+  const r=Math.max(9, Math.min(16, 12/Math.max(S.zoom,0.2)*0.6));
+  const cnt={};
+  pts.forEach(p=>{
+    const c=_ccddClase(p.t), col=_CCDD_CAT_COL[c.cat]||'#6b7280'; cnt[c.cat]=(cnt[c.cat]||0)+1;
+    const m=el('g',{class:'ccdd-pt',transform:`translate(${p.x},${p.y})`});
+    m.appendChild(el('circle',{cx:0,cy:0,r,fill:col,stroke:'#fff','stroke-width':2,opacity:0.92}));
+    const t=el('text',{x:0,y:1,'text-anchor':'middle','dominant-baseline':'middle','font-size':r*0.95,'font-weight':800,fill:'#fff','font-family':'system-ui,-apple-system,sans-serif','pointer-events':'none'});
+    t.textContent=(p.t.length>3?p.t.slice(0,3):p.t); m.appendChild(t);
+    const ttl=el('title'); ttl.textContent=c.nombre+(p.tipo?(' · tipo '+p.tipo):'')+' · '+c.cat+(c.nota?(' · '+c.nota):'')+(p.r?'':' · fuera de recinto (pasillo/shaft)'); m.appendChild(ttl);
+    m.addEventListener('click',e=>{ e.stopPropagation(); if(p.r && typeof openFichaRecinto==='function') try{ openFichaRecinto(p.r); }catch(x){} });
+    g.appendChild(m);
+  });
+  svg.appendChild(g);
+  if(lg){ lg.style.display='block';
+    lg.innerHTML='<b>📡 Corrientes débiles · '+pts.length+' en '+esc(curFloor()?curFloor().label:S.floorId)+'</b>'+
+      Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(([k,n])=>`<span class="fk-ccdd-cat" style="background:${_CCDD_CAT_COL[k]||'#6b7280'}"></span>${esc(k)} <b>${n}</b>`).join('<br>')+
+      '<div style="color:var(--text-2);margin-top:3px">Pasa el mouse por un punto · clic abre la ficha del recinto</div>'; }
+}
 function toggleTiPrint(){
   S.showTI=!S.showTI; _lsPref('cabida_show_ti', S.showTI?'1':'0');
   const b=document.getElementById('btnTiPrint'); if(b) b.classList.toggle('active',S.showTI);
@@ -6169,7 +6293,7 @@ function _dockMonta(){
   // funcionarios y modo edición quedan SIEMPRE a la vista en la barra superior.
   if(nav){
     const q=document.createElement('div'); q.id='navQuick';
-    ['btnBoxVis','btnDotNames','btnJardines','btnVert','btnEdit'].forEach(id=>{
+    ['btnBoxVis','btnDotNames','btnJardines','btnVert','btnReloj','btnEdit'].forEach(id=>{
       const e=document.getElementById(id); if(!e) return;
       const m=ICO.exec(e.textContent||''); e.setAttribute('data-ic', m?m[1]:(e.textContent||'?').trim().slice(0,2));
       q.appendChild(e);
@@ -6768,6 +6892,10 @@ const STRUCT_TYPES = {
   'asc-Pplus':   {label:'Montacamas mayor',         short:'M+',  col:'#0B2A6B', symbol:'🛗', kind:'point'},
   'stair':       {label:'Escalera',             short:'',    col:'#7c3aed', symbol:'🪜', kind:'point'},
   'escalator':   {label:'Escalera Mecánica',    short:'',    col:'#0891b2', symbol:'⬆',  kind:'point'},
+  // Reloj control (lector biométrico): marcador redondo «Rc» como en los planos del
+  // ORD 5040029-145. Es un punto, pero NO pertenece al grupo de ascensores/escaleras:
+  // tiene su propio botón ⏱ y no lo mueven ni el 🎯 ni el ⇧+arrastrar de los verticales.
+  'reloj':       {label:'Reloj control · lector biométrico', short:'Rc', col:'#C026D3', symbol:'⏱', kind:'point', grupo:'reloj'},
   'circulation': {label:'Circulación',          short:'',    col:'#475569', symbol:'〰', kind:'line'}
 };
 let structuresState = {};
@@ -6789,7 +6917,7 @@ function toggleStructMenu(){
     if(!m._inited){
       m._inited = true;
       m.querySelectorAll('.struct-opt').forEach(b => b.addEventListener('click', () => {
-        const k = b.dataset.kind;
+        const k = b.dataset.kind; if(!k) return;
         startStructMode(k);
       }));
       // Cerrar al click afuera
@@ -6898,7 +7026,9 @@ function deleteStruct(id){
 }
 
 function paintStructures(){
-  const items = structsOf(S.floorId).filter(it=>S.verticales!==false || !STRUCT_TYPES[it.kind] || STRUCT_TYPES[it.kind].kind!=='point');
+  if(S.vertAjuste && typeof _vertAjusteHint==='function') _vertAjusteHint();
+  const items = structsOf(S.floorId).filter(it=>{ const t=STRUCT_TYPES[it.kind]; if(!t || t.kind!=='point') return true;
+    return t.grupo==='reloj' ? S.relojes!==false : S.verticales!==false; });
   if(!items.length && !_structLine) return;
   const g = el('g', {class:'structures-layer',
     ...(S.level>1?{'pointer-events':'none'}:{})});
@@ -6939,7 +7069,11 @@ function renderStructMarker(it, tdef){
   const R = sized ? Math.min(bw, bh) / 1.7 : 56;
   const g = el('g', {class:'struct-marker', transform:`translate(${it.x},${it.y})`});
   const baseStrokeW = Math.max(2, Math.min(5, R / 11));
-  g.appendChild(el('rect',{x:-bw/2,y:-bh/2,width:bw,height:bh,rx:Math.min(14,R*0.25),fill:tdef.col,stroke:'#fff','stroke-width':baseStrokeW,opacity:0.95}));
+  if(tdef.grupo==='reloj'){
+    g.appendChild(el('circle',{class:'struct-reloj',cx:0,cy:0,r:Math.min(bw,bh)/2,fill:tdef.col,stroke:'#fff','stroke-width':baseStrokeW,opacity:0.95}));
+    const t = el('text',{x:0,y:R*0.06,'text-anchor':'middle','dominant-baseline':'middle','font-size':R*0.78,'font-weight':900,fill:'#fff','font-family':'system-ui,-apple-system,sans-serif'});
+    t.textContent = it.etq || tdef.short; g.appendChild(t);
+  } else g.appendChild(el('rect',{x:-bw/2,y:-bh/2,width:bw,height:bh,rx:Math.min(14,R*0.25),fill:tdef.col,stroke:'#fff','stroke-width':baseStrokeW,opacity:0.95}));
   if(it.kind.startsWith('asc-')){
     g.appendChild(el('path',{d:`M ${-R*0.55} ${-R*0.25} l ${R*0.18} ${-R*0.32} l ${R*0.18} ${R*0.32} Z`,fill:'#fff'}));
     g.appendChild(el('path',{d:`M ${-R*0.55} ${R*0.25} l ${R*0.18} ${R*0.32} l ${R*0.18} ${-R*0.32} Z`,fill:'#fff'}));
@@ -6973,7 +7107,11 @@ function renderStructMarker(it, tdef){
   const ext = DXF_EXT[S.floorId], dim = FLOOR_DIMS[S.floorId];
   const mx = (ext&&dim) ? ((ext.xmax-ext.xmin)/dim.w) : 0, my = (ext&&dim) ? ((ext.ymax-ext.ymin)/dim.h) : 0;
   const PUERTA={n:'norte',s:'sur',e:'este',w:'oeste',ns:'norte y sur (doble)',ew:'este y oeste (doble)',sn:'norte y sur (doble)',we:'este y oeste (doble)'};
-  ttl.textContent = tdef.label + (it.etq?(' '+it.etq):'') + (sized&&mx ? ` · ${(bw*mx).toFixed(1)} × ${(bh*my).toFixed(1)} m` : '')
+  ttl.textContent = tdef.grupo==='reloj'
+    ? (tdef.label + (it.n?(' N°'+it.n):'') + (it.edificio?(' · '+it.edificio):'') + (it.acceso?(' · '+it.acceso):'') + (it.obs?(' · '+it.obs):'')
+       + (it.origen?(' · '+it.origen+' (propuesta de los hospitales, pendiente de factibilidad)'):' · colocado a mano')
+       + ((S.editMode&&S.level===1) ? ' · arrastrar mueve · ◢ escala · × borra' : ''))
+    : tdef.label + (it.etq?(' '+it.etq):'') + (sized&&mx ? ` · ${(bw*mx).toFixed(1)} × ${(bh*my).toFixed(1)} m` : '')
     + (it.kind.startsWith('asc-') ? (' · puerta: '+(PUERTA[it.salida]||it.salida||'sin dato')) : '')
     + (it.tam==='tipologia' ? ' · ⚠ ducto no leído en el plano: tamaño por tipología, revisar posición' : '')
     + ((S.editMode&&S.level===1) ? ' · arrastrar mueve · ⇧ mueve todo el piso · ◢ escala · × borra'+(it.kind.startsWith('asc-')?' · clic derecho cambia la puerta'+(_gemelaDe(it)?' · la gemela sigue en espejo':''):'') : '');
@@ -7023,7 +7161,7 @@ function _startStructDrag(e, it, mode){
   if(!(S.editMode && S.level===1) || _structKind) return;
   if(e.button!==0) return;
   e.preventDefault(); e.stopPropagation();
-  const puntos = structsOf(S.floorId).filter(x=>STRUCT_TYPES[x.kind] && STRUCT_TYPES[x.kind].kind==='point');
+  const puntos = structsOf(S.floorId).filter(x=>STRUCT_TYPES[x.kind] && STRUCT_TYPES[x.kind].kind==='point' && STRUCT_TYPES[x.kind].grupo!=='reloj');
   _stDrag={ mode:(mode==='move'&&e.shiftKey)?'all':mode, it, sx:e.clientX, sy:e.clientY,
             o:{w:it.w||95, h:it.h||95}, all:puntos.map(x=>({x, ox:x.x, oy:x.y})), moved:false };
   window.addEventListener('mousemove', _structDragMove);
@@ -7051,6 +7189,7 @@ function _structDragUp(){
   if(_stDrag && _stDrag.moved){
     // gemelas (A1/A2): al escalar o mover una, la otra queda en espejo
     if(_stDrag.mode!=='all') _espejaGemela(_stDrag.it);
+    else { const a0=_stDrag.all[0]; if(a0) _vertAjusteRegistra(S.floorId, a0.x.x-a0.ox, a0.x.y-a0.oy); }
     sStruct(); renderSVG();
   }
   _stDrag=null;
@@ -7080,32 +7219,126 @@ function _espejaGemelasPiso(fid){
     if(_espejaGemela(ref, fid)){ n++; } hecho.add(ref); hecho.add(otra); });
   return n;
 }
+// ── Ajuste fino por piso con el teclado (flechas) ─────────────────────────
+// La importación deja los ascensores/escaleras de un piso corridos en bloque unos
+// píxeles. Este modo toma TODOS los ascensores/escaleras/mecánicas del piso activo
+// y los mueve con las flechas: 1 px · ⌘/Ctrl 5 px · ⇧ 20 px. Cada pulsación se
+// guarda de inmediato (cabida_cad_structures). El desplazamiento acumulado de cada
+// piso queda además en cabida_vert_ajuste, y importarVerticalesNav() lo vuelve a
+// aplicar: reimportar no pierde el ajuste hecho a mano. Las líneas de circulación
+// dibujadas en el Atlas no se tocan.
+let _VA=null;
+function _vertAjusteStore(){ if(!_VA) _VA=lg('cabida_vert_ajuste',{})||{}; return _VA; }
+function _vertAjusteRegistra(fid,dx,dy){
+  if(!dx && !dy) return;
+  const A=_vertAjusteStore(), a=A[fid]||{dx:0,dy:0};
+  a.dx=Math.round(a.dx+dx); a.dy=Math.round(a.dy+dy); a.ts=new Date().toISOString().slice(0,16);
+  if(!a.dx && !a.dy) delete A[fid]; else A[fid]=a;
+  _lsPref('cabida_vert_ajuste', JSON.stringify(A));
+}
+function _vertPuntos(fid){ return structsOf(fid||S.floorId).filter(x=>STRUCT_TYPES[x.kind] && STRUCT_TYPES[x.kind].kind==='point' && STRUCT_TYPES[x.kind].grupo!=='reloj'); }
+function toggleVertAjuste(){ if(S.vertAjuste) vertAjusteFin(); else vertAjusteIni(); }
+function vertAjusteIni(){
+  if(!S.editMode){ if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🎯 Entra a ✏ Editar para ajustar los ascensores del piso'; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},3000); } return; }
+  S.vertAjuste={fid:S.floorId, dx:0, dy:0};
+  if(typeof closeStructMode==='function') try{ closeStructMode(); }catch(e){}
+  if(typeof closeStructMenu==='function') try{ closeStructMenu(); }catch(e){}
+  if(S.verticales===false) toggleVerticales();
+  _vertAjusteHint();
+}
+function vertAjusteFin(){
+  S.vertAjuste=null;
+  const h=document.getElementById('vertHint'); if(h) h.classList.remove('show');
+  if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🎯 Ajuste guardado'; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},2000); }
+}
+// Mueve en bloque los ascensores/escaleras del piso; devuelve cuántos movió.
+function vertMover(dx,dy,fid){
+  fid=fid||S.floorId; const pts=_vertPuntos(fid); if(!pts.length) return 0;
+  pts.forEach(x=>{ x.x=Math.round(x.x+dx); x.y=Math.round(x.y+dy); });
+  _vertAjusteRegistra(fid,dx,dy);
+  if(S.vertAjuste && S.vertAjuste.fid===fid){ S.vertAjuste.dx+=dx; S.vertAjuste.dy+=dy; }
+  sStruct(); renderSVGThrottled(); _vertAjusteHint();
+  return pts.length;
+}
+// ↩ deshace lo movido en ESTA pasada por el piso (no lo guardado en pasadas anteriores)
+function vertAjusteDeshacer(){ const v=S.vertAjuste; if(!v || (!v.dx && !v.dy)) return; const dx=v.dx, dy=v.dy; vertMover(-dx,-dy,v.fid); v.dx=0; v.dy=0; _vertAjusteHint(); }
+function _vertAjusteTecla(e){
+  if(!S.vertAjuste) return false;
+  const t=e.target, tag=t&&t.tagName; if(tag==='INPUT'||tag==='TEXTAREA'||tag==='SELECT'||(t&&t.isContentEditable)) return false;
+  const D={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key]; if(!D) return false;
+  const paso=(e.metaKey||e.ctrlKey)?5:(e.shiftKey?20:1);
+  if(e.preventDefault) e.preventDefault(); if(e.stopPropagation) e.stopPropagation();
+  if(S.vertAjuste.fid!==S.floorId) S.vertAjuste={fid:S.floorId,dx:0,dy:0};
+  vertMover(D[0]*paso, D[1]*paso);
+  return true;
+}
+function _vertAjusteHint(){
+  const h=document.getElementById('vertHint'); if(!h) return;
+  if(!S.vertAjuste){ h.classList.remove('show'); return; }
+  if(S.vertAjuste.fid!==S.floorId) S.vertAjuste={fid:S.floorId,dx:0,dy:0};
+  const fid=S.floorId, n=_vertPuntos(fid).length, A=_vertAjusteStore()[fid]||{dx:0,dy:0}, v=S.vertAjuste;
+  const fmt=(x,y)=>(x>=0?'+':'')+x+', '+(y>=0?'+':'')+y+' px';
+  const nom=(typeof curFloor==='function'&&curFloor())?(curFloor().label||curFloor().name||fid):fid;
+  h.innerHTML='🎯 <b>Ajustando '+n+' ascensores/escaleras de '+esc(nom)+'</b> — flechas 1 px · ⌘ 5 px · ⇧ 20 px · cada paso se guarda'
+    +' · ahora '+fmt(v.dx,v.dy)+' · total del piso '+fmt(A.dx,A.dy)
+    +' · <span class="vh-btn" onclick="vertAjusteDeshacer()">↩ volver</span> <span class="vh-btn" onclick="vertAjusteFin()">✓ listo (Esc)</span>';
+  h.classList.add('show');
+}
 // ── Importar desde Navegación (SHARED_DATA/nav_verticales.js) ─────────────
 // Reemplaza ascensores/escaleras/mecánicas de TODOS los pisos con lo dibujado
 // en 8.Navegacion, a tamaño real; las líneas de circulación se conservan.
-// La siembra viene CALIBRADA contra el plano de cada piso (_DEV/calibra_verticales.py):
-// las escaleras calzan sobre los rótulos «Escaleras» de Coordinación Mobiliario y los
-// ascensores sobre el eje del ducto (consenso entre pisos), así que ya no hay que
-// reubicarlas a mano; _meta.calibracion deja el desfase y el residuo de cada piso.
+// 24-09-2026: Navegación es la FUENTE. La siembra se genera con conversión EXACTA
+// (SHARED_DATA/planos_calibracion.json, mismo archivo de plano en ambas plataformas):
+// cada caja cae en el mismo píxel que en Navegación. Se importa TAL CUAL: ya no se
+// «espejan» las gemelas (pegaba X2 contra X1 y la sacaba de su puerta) ni se aplican
+// las correcciones de _DEV/calibra_verticales.py, que corrían los ascensores.
 function importarVerticalesNav(sinConfirmar){
   const NV=window.NAV_VERTICALES; if(!NV||!NV.floors){ alert('No se encontró la siembra SHARED_DATA/nav_verticales.js.\nGenerarla con _DEV/importa_verticales_navegacion.py'); return; }
   const pisos=Object.keys(NV.floors), total=pisos.reduce((a,p)=>a+NV.floors[p].length,0);
-  const actuales=Object.values(structuresState).flat().filter(x=>x.kind!=='circulation').length;
+  const actuales=Object.values(structuresState).flat().filter(x=>x.kind!=='circulation' && x.kind!=='reloj').length;
   if(!sinConfirmar && !confirm('Importar '+total+' ascensores/escaleras desde Navegación ('+pisos.join(', ')+')?\n\n'
       +'Se REEMPLAZAN los '+actuales+' ascensores/escaleras que hay ahora en el Atlas (las líneas de circulación se conservan).\n'
-      +'Vienen cuadrados con el plano de cada piso (circunscritos a sus muros), con tipología por color, lado de puerta y las gemelas del mismo tamaño; P5 y P-3 salen del directorio de ascensores. Si alguno quedó corrido: arrastrar mueve, ⇧+arrastrar mueve todo el piso, ◢ escala, clic derecho cambia la puerta.')) return;
+      +'Vienen de Navegación con conversión exacta: cada uno queda en el mismo píxel que allá, con su tipología y lado de puerta. '
+      +'Lo que Navegación no tiene (P5, P-3 y las escaleras de P-2) se conserva de antes y queda para revisar.'
+      +(Object.keys(_vertAjusteStore()).length?'\n\nEl ajuste hecho con 🎯 flechas en '+Object.keys(_vertAjusteStore()).join(', ')+' se vuelve a aplicar solo.':''))) return;
   const pisosTodos=new Set([...pisos, ...Object.keys(structuresState)]);
   pisosTodos.forEach(p=>{
-    const lineas=(structuresState[p]||[]).filter(x=>x.kind==='circulation');
+    const lineas=(structuresState[p]||[]).filter(x=>x.kind==='circulation' || x.kind==='reloj');   // se conservan
     const nuevos=(NV.floors[p]||[]).map(x=>({...x}));
     structuresState[p]=lineas.concat(nuevos);
     if(!structuresState[p].length) delete structuresState[p];
-    _espejaGemelasPiso(p);
   });
+  // ajuste manual por piso (🎯 flechas / ⇧+arrastrar): se vuelve a aplicar a lo importado
+  const AJ=_vertAjusteStore(); let reap=0;
+  Object.keys(AJ).forEach(p=>{ const a=AJ[p]; if(!NV.floors[p] || !a || (!a.dx && !a.dy)) return;
+    (structuresState[p]||[]).filter(x=>x.kind!=='circulation' && x.kind!=='reloj').forEach(x=>{ x.x=Math.round(x.x+a.dx); x.y=Math.round(x.y+a.dy); }); reap++; });
   sStruct(); renderSVG();
   if(typeof closeStructMenu==='function') try{ closeStructMenu(); }catch(e){}
   const rev=pisos.reduce((a,p)=>a+(NV.floors[p]||[]).filter(x=>x.tam==='tipologia').length,0);
-  if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🛗 '+total+' ascensores/escaleras importados de Navegación en '+pisos.length+' pisos — cuadrados con el plano'+(rev?(' · ⚠ '+rev+' sin ducto leído (tamaño por tipología): revisar posición, el tooltip los marca'):''); setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},9000); }
+  const ant=pisos.reduce((a,p)=>a+(NV.floors[p]||[]).filter(x=>x.origen==='anterior').length,0);
+  if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🛗 '+total+' ascensores/escaleras importados de Navegación en '+pisos.length+' pisos — mismo píxel que allá'+(reap?(' · 🎯 ajuste manual re-aplicado en '+reap+' piso'+(reap>1?'s':'')):'')+(ant?(' · ⚠ '+ant+' no están en Navegación (se conservaron): revisar'):''); setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},9000); }
+}
+
+// ── Relojes control desde el ORD 5040029-145 (SHARED_DATA/relojes_control.js) ──
+// Reemplaza los relojes de TODOS los pisos con la siembra; ascensores, escaleras y
+// líneas no se tocan. Se generan con _DEV/build_relojes_control.py.
+function importarRelojesORD(sinConfirmar){
+  const RC=window.RELOJES_CONTROL; if(!RC||!RC.floors){ alert('No se encontró la siembra SHARED_DATA/relojes_control.js.\nGenerarla con _DEV/build_relojes_control.py'); return; }
+  const pisos=Object.keys(RC.floors), total=pisos.reduce((a,p)=>a+RC.floors[p].length,0);
+  const actuales=Object.values(structuresState).flat().filter(x=>x.kind==='reloj').length;
+  if(!sinConfirmar && !confirm('Importar '+total+' relojes control del ORD 5040029-145 ('+pisos.join(', ')+')?\n\n'
+      +'Se REEMPLAZAN los '+actuales+' relojes que hay ahora en el Atlas; ascensores, escaleras y líneas no se tocan.\n'
+      +'Quedan donde los marcaron los hospitales en los planos del oficio: después se arrastran hasta su posición final.')) return;
+  const pisosTodos=new Set([...pisos, ...Object.keys(structuresState)]);
+  pisosTodos.forEach(p=>{
+    const resto=(structuresState[p]||[]).filter(x=>x.kind!=='reloj');
+    structuresState[p]=resto.concat((RC.floors[p]||[]).map(x=>({...x})));
+    if(!structuresState[p].length) delete structuresState[p];
+  });
+  if(S.relojes===false) toggleRelojes();
+  sStruct(); renderSVG();
+  if(typeof closeStructMenu==='function') try{ closeStructMenu(); }catch(e){}
+  if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='⏱ '+total+' relojes control importados del ORD en '+pisos.length+' pisos — arrástralos hasta su posición final'; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},9000); }
 }
 
 function renderStructLine(it, tdef){
@@ -8124,7 +8357,7 @@ function delSelected(){
 function toggleEdit(){
   if(S.viewOnly){ if(typeof tbInfo!=='undefined'&&tbInfo){tbInfo.textContent='👁 Modo consulta: solo lectura';setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},2000);} return; }
   S.editMode=!S.editMode;
-  if(!S.editMode){S.drawMode=false;S.moveMode=false;S.selIds.clear();viewer.classList.remove('move-mode');}
+  if(!S.editMode){S.drawMode=false;S.moveMode=false;S.selIds.clear();viewer.classList.remove('move-mode'); if(S.vertAjuste) vertAjusteFin();}
   btnEdit.classList.toggle('active',S.editMode);
   btnDraw.style.display=(S.editMode&&S.level<3)?'':'none';
   { const bu=document.getElementById('btnUndo'); if(bu) bu.style.display=S.editMode?'':'none'; }
@@ -8146,6 +8379,7 @@ function exitEdit(){
   btnEdit.classList.remove('active'); btnDraw.style.display='none'; btnMove.style.display='none'; btnStruct.style.display='none'; btnDraw.classList.remove('active'); btnMove.classList.remove('active'); btnStruct.classList.remove('active');
   // Cerrar herramienta de estructura si quedó abierta
   if(typeof closeStructMode==='function') closeStructMode();
+  if(S.vertAjuste && typeof vertAjusteFin==='function') vertAjusteFin();
   btnMerge.style.display='none'; if(btnUnmerge)btnUnmerge.style.display='none'; btnDel.style.display='none'; mergeHint.classList.remove('show'); tbInfo.textContent='';
 }
 function toggleDraw(){
@@ -8962,6 +9196,64 @@ function pmRenombrarRecinto(roomId){
   sNames();
   try{ renderSVG(); renderSidebar(); openFichaRecinto(roomId); }catch(e){}
 }
+// ── Instalaciones del recinto: enchufes (PE 01 · ELE-AM-003) y gases clínicos (PE 13 · GCL-AM-003) ──
+// Fuente: SHARED_DATA/instalaciones_recinto.js (build_instalaciones_recinto.py). Por código PMA:
+// los enchufes vienen POR RECINTO; los gases vienen como TOTAL del código y se dividen por los recintos del código.
+const _GAS_TXT={O2:'O₂',AM:'AM',AD:'AD',AI:'AI',VAC:'VAC',VACD:'VAC dental',N2O:'N₂O',CO2:'CO₂',EGA:'EGA',N2:'N₂'};
+function _instalacionesHtml(roomId){ return _instalacionesHtmlCod(rCode(roomId), rCodeParts(roomId), roomAAC(roomId)) + (typeof _ccddHtml==='function'?_ccddHtml(roomId):''); }
+function _instalacionesHtmlCod(code, partes, aac){
+  const I=window.INSTALACIONES_RECINTO; if(!I||!I.ele) return '';
+  const M=I._meta||{}, LG=M.leyenda_gas||{};
+  const ed=aac==='AA'?'AA':(aac==='AC'?'HDS':'');
+  const buscar=t=>{ const out=[], vis=new Set();
+    [code].concat(partes).forEach(c=>(t[c]||[]).forEach(r=>{ const k=JSON.stringify(r); if(!vis.has(k)){ vis.add(k); out.push({...r,_c:c}); } }));
+    return out; };
+  let ele=buscar(I.ele); if(ed&&ele.some(r=>r.ed===ed)) ele=ele.filter(r=>r.ed===ed||!r.ed);
+  const gas=buscar(I.gas);
+  const v=n=>n?`<td>${n}</td>`:'<td class="z">—</td>';
+  let h='';
+  // Enchufes
+  if(ele.length){
+    ele.forEach(r=>{
+      const nRec=r.cant||1;
+      h+=`<div class="fk-inst-sub">⚡ Enchufes por recinto</div>`+
+        `<div class="fk-inst-meta">Anexo: <b>${esc(r.nombre||'')}</b> · código ${esc(r._c)} · tipología ${esc(r.tipologia||'—')}`+
+        `${r.estandar?(' · recinto estándar '+esc(r.estandar)):''} · ${nRec} recinto${nRec>1?'s':''} con este código en el anexo</div>`;
+      const tot=[].concat(r.gm,r.comp,r.fz).reduce((a,b)=>a+b,0);
+      if(!tot){ h+='<div class="fk-empty">El anexo no indica enchufes para este recinto.</div>'; }
+      else h+=`<table class="fk-inst-t"><tr><th></th><th>Triple</th><th>Doble</th><th>Simple</th><th>Arranques</th></tr>`+
+        `<tr><td><b>Grado médico</b><small>NEMA 6-20R</small></td>${v(r.gm[0])}${v(r.gm[1])}${v(r.gm[2])}${v(r.gm[3])}</tr>`+
+        `<tr><td><b>Computación</b><small>red UPS · tipo L</small></td>${v(r.comp[0])}${v(r.comp[1])}${v(r.comp[2])}<td class="z"></td></tr>`+
+        `<tr><td><b>Fuerza</b><small>red normal · tipo L</small></td>${v(r.fz[0])}${v(r.fz[1])}${v(r.fz[2])}<td class="z"></td></tr></table>`;
+      if(r.obs) h+=`<div class="fk-inst-obs">${/sch?u?c?k?o|shucko|shuko/i.test(r.obs)?'🔌 <b>Incluye toma Schuko</b> · ':''}Observación del anexo: ${esc(r.obs)}</div>`;
+    });
+  }
+  // Gases clínicos
+  if(gas.length){
+    gas.forEach(r=>{
+      const eleCod=(I.ele[r._c]||[])[0];
+      const N=(r.codigo_fila&&r.codigo_fila.indexOf('/')>=0)?1:Math.max(1,(eleCod&&eleCod.cant)||codeInstances(r._c)||1);
+      const grupos=[['mur','Tomas murales'],['cpi','Panel de cabecera (CPI)'],['col','Columnas quirúrgicas']].filter(([k])=>r[k]&&Object.keys(r[k]).length);
+      h+=`<div class="fk-inst-sub">🫁 Gases clínicos${N>1?' por recinto':''}</div>`+
+        `<div class="fk-inst-meta">Anexo: <b>${esc(r.nombre||'')}</b> · código ${esc(r.codigo_fila||r._c)}${r.unidad?(' · '+esc(r.unidad)):''}`+
+        (N>1?` · el anexo da el total del código; se divide por ${N} recintos`:'')+
+        (r.codigo_fila&&r.codigo_fila.indexOf('/')>=0?' · fila compartida por varios códigos: total de la fila':'')+`</div>`;
+      grupos.forEach(([k,lbl])=>{
+        h+=`<div class="fk-inst-meta" style="margin:2px 0 3px"><b>${lbl}</b></div><div class="fk-inst-chips">`+
+          Object.entries(r[k]).map(([g,t])=>{
+            const por=t/N, ok=Number.isInteger(por);
+            // si no se reparte parejo entre los recintos, se muestra el total del código
+            return `<span class="fk-inst-chip" title="${esc(LG[g]||g)}">${_GAS_TXT[g]||g} <b>${ok?por:t}</b>${N>1?(ok?` <i>(${t} en ${N})</i>`:` <i>para los ${N} recintos</i>`):''}</span>`;
+          }).join('')+`</div>`;
+      });
+    });
+  }
+  if(!h) h='<div class="fk-empty">Las memorias de cálculo no traen enchufes ni gases para el código '+esc(code||'(sin código)')+'.</div>';
+  const ley=Object.entries(LG).map(([k,t])=>`${_GAS_TXT[k]||k} ${t.toLowerCase()}`).join(' · ');
+  h+=`<div class="fk-inst-fte">Fuente: memorias de cálculo PE 01 Eléctrica (ELE-AM-003) y PE 13 Gases clínicos (GCL-AM-003), rev. 20-03-2020. `+
+     `Gases: ${esc(ley)}. Corrientes débiles: ver la sección 📡 siguiente.</div>`;
+  return `<div class="fk-sec"><div class="fk-sec-t">🔌 Instalaciones · enchufes y gases clínicos</div>${h}</div>`;
+}
 function openFichaRecinto(roomId){
   const ctx=_findRoom(roomId); if(!ctx) return;
   const code=rCode(roomId), nm=rName(roomId), tp=(ROOM_TYPES[rType(roomId)]||ROOM_TYPES['']).label;
@@ -9065,6 +9357,7 @@ function openFichaRecinto(roomId){
     `<div class="fk-sec"><div class="fk-sec-t">🛏️ Mobiliario Clínico <span class="cnt">${mobCli.length}</span></div>${mobCliHtml}</div>`+
     `<div class="fk-sec"><div class="fk-sec-t">🖥️ Informática <span class="cnt">${informatica.length}</span></div>${tiHtml}</div>`+
     `<div class="fk-sec"><div class="fk-sec-t">🪑 Mobiliario No Clínico <span class="cnt">${mobNc.length}</span></div>${mobNcHtml}</div>`+
+    _instalacionesHtml(roomId)+
     `<div class="fk-sec"><div class="fk-sec-t">📋 Pauta de Autorización Sanitaria</div>${pautaHtml}</div>`;
   document.getElementById('fichaModal').classList.add('show');
 }
@@ -13728,6 +14021,7 @@ function init(){
   if(S.showSen){ const b=document.getElementById('btnSen'); if(b)b.classList.add('active'); }
   { const b=document.getElementById('btnAsigN'); if(b)b.classList.toggle('active',!!S.showAsigN); }
   { const b=document.getElementById('btnTiPrint'); if(b)b.classList.toggle('active',!!S.showTI); }
+  { const b=document.getElementById('btnCcdd'); if(b)b.classList.toggle('active',!!S.showCcdd); }
   { const b=document.getElementById('btnPlanKind'); if(b){ const c=S.planKind==='color'; b.textContent=c?'🗺 Ver mobiliario':'🖌 Ver color'; b.classList.toggle('active',c); } }
   applyBoxVis();
   loadDotDB(); // async pero NO awaiteamos: el plano puede cargar en paralelo. Búsqueda queda lista cuando termine fetch.
@@ -13774,7 +14068,7 @@ async function runSelfTest(){
   // Testigo: al terminar, NINGUNA preferencia del usuario puede haber cambiado.
   const _PREFS=['cabida_room_labels','cabida_show_dotnames','cabida_box_vis','cabida_plan_kind',
                 'cabida_show_asign','cabida_show_sen','cabida_scenario','cabida_rp_collapsed',
-                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures','cabida_ubic','cabida_jardines','cabida_verticales'];
+                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures','cabida_ubic','cabida_jardines','cabida_verticales','cabida_relojes','cabida_show_ccdd'];
   const _PREV={}; _PREFS.forEach(k=>{ try{ _PREV[k]=localStorage.getItem(k); }catch(e){ _PREV[k]=null; } });
   const out=[]; const T=(nm,fn)=>{ try{ const r=fn(); if(r===false) out.push([0,nm,'aserción falsa']); else out.push([1,nm,'']); }catch(e){ out.push([0,nm,e.message]); } };
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -13784,6 +14078,15 @@ async function runSelfTest(){
   T('Datos base: pisos y planos', ()=>FLOORS.length>0);
   T('Datos base: matriz de dotación', ()=>dotDB&&dotDB.staff&&dotDB.staff.length>100);
   T('Datos base: catálogo EMMC', ()=>Object.keys(window.RECINTO_EQUIP||{}).length>100);
+  // Ficha 🔌 Instalaciones: memorias de cálculo PE 01 / PE 13 por código PMA
+  T('Instalaciones: enchufes y gases en la ficha', ()=>{
+    const I=window.INSTALACIONES_RECINTO; if(!I||Object.keys(I.ele||{}).length<500) return false;
+    // pabellón 27.6.3 (5 recintos): enchufes por recinto + gases del código divididos por 5
+    const h=_instalacionesHtmlCod('27.6.3',['27.6.3'],'AC');
+    const h2=_instalacionesHtmlCod('9.9.9.9',['9.9.9.9'],'AC');
+    return /Grado médico/.test(h) && /Columnas quirúrgicas/.test(h) && /O₂ <b>3<\/b>/.test(h) && /ELE-AM-003/.test(h)
+      && /no traen enchufes ni gases/.test(h2);
+  });
 
   // aislamiento: guardar en selftest NO toca localStorage
   const rawAntes=localStorage.getItem('cabida_cad_ws');
@@ -14995,13 +15298,14 @@ async function runSelfTest(){
       Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
     }
   });
-  T('Verticales: las cabinas gemelas quedan en espejo (mismo tamaño, pegadas) al importar y al escalar', ()=>{
+  T('Verticales: importar respeta la posición de Navegación (gemelas incluidas); escalar a mano sigue espejando', ()=>{
     const snap=JSON.stringify(structuresState), NVprev=window.NAV_VERTICALES, nivel=S.level;
     try{
       window.NAV_VERTICALES={floors:{[fl.id]:[{id:'g1',kind:'asc-G',x:1000,y:800,w:150,h:180,etq:'L1',salida:'w'},{id:'g2',kind:'asc-G',x:1000,y:1000,w:130,h:150,etq:'L2'},{id:'s1',kind:'asc-S',x:3000,y:800,w:100,h:100,etq:'D'}]}};
       importarVerticalesNav(true);
       const a=structsOf(fl.id).find(x=>x.id==='g1'), b=structsOf(fl.id).find(x=>x.id==='g2');
-      const igual=b.w===150 && b.h===180 && b.x===1000 && Math.abs((b.y-a.y)-180-Math.min(20,0.35/0.0161))<0.01 && b.salida==='w';
+      // al importar NO se toca nada: cada cabina queda en su puerta, tal como en Navegación
+      const igual=b.w===130 && b.h===150 && b.x===1000 && b.y===1000 && !b.salida && a.w===150 && a.y===800;
       a.w=200; a.h=220; _stDrag={mode:'size',it:a,moved:true}; _structDragUp();
       const escala=b.w===200 && b.h===220 && b.x===a.x && b.y>a.y+219;
       const solo=!_gemelaDe(structsOf(fl.id).find(x=>x.id==='s1'));
@@ -15010,6 +15314,77 @@ async function runSelfTest(){
       window.NAV_VERTICALES=NVprev; S.level=nivel;
       Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
     }
+  });
+  T('Verticales: 🎯 flechas mueven todos los del piso (1 px · ⌘ 5 · ⇧ 20), acumulan por piso, ↩ vuelve y el ajuste se re-aplica al importar', ()=>{
+    const snap=JSON.stringify(structuresState), NVprev=window.NAV_VERTICALES, nivel=S.level, ed=S.editMode, va=S.vertAjuste, VAprev=_VA;
+    try{
+      _VA={};
+      structuresState[fl.id]=[{id:'v1',kind:'asc-G',x:1000,y:800,w:150,h:180,etq:'L1'},{id:'v2',kind:'stair',x:2000,y:900,w:200,h:300},{id:'ln',kind:'circulation',points:[{x:0,y:0},{x:9,y:9}]}];
+      S.editMode=true; S.level=1; S.vertAjuste={fid:fl.id,dx:0,dy:0};
+      const ev=(k,o)=>Object.assign({key:k,target:document.body},o||{});
+      const t1=_vertAjusteTecla(ev('ArrowRight')), t2=_vertAjusteTecla(ev('ArrowDown',{metaKey:true})), t3=_vertAjusteTecla(ev('ArrowLeft',{shiftKey:true}));
+      const a=structsOf(fl.id).find(x=>x.id==='v1'), b=structsOf(fl.id).find(x=>x.id==='v2'), l=structsOf(fl.id).find(x=>x.id==='ln');
+      const movio=t1&&t2&&t3 && a.x===981 && a.y===805 && b.x===1981 && b.y===905 && l.points[0].x===0;
+      const acum=S.vertAjuste.dx===-19 && S.vertAjuste.dy===5 && _VA[fl.id].dx===-19 && _VA[fl.id].dy===5;
+      const ignora=!_vertAjusteTecla(ev('ArrowUp',{target:{tagName:'INPUT'}})) && !_vertAjusteTecla(ev('a')) && a.y===805;
+      const hint=document.getElementById('vertHint'), conHint=!!hint && hint.classList.contains('show') && /-19, \+5/.test(hint.textContent);
+      vertAjusteDeshacer(); const vuelve=a.x===1000 && a.y===800 && S.vertAjuste.dx===0 && !_VA[fl.id];
+      // reimportar de Navegación re-aplica el ajuste guardado del piso
+      _VA={[fl.id]:{dx:3,dy:-2}};
+      window.NAV_VERTICALES={floors:{[fl.id]:[{id:'g1',kind:'asc-G',x:1000,y:800,w:150,h:180,etq:'L1'}]}};
+      importarVerticalesNav(true);
+      const g=structsOf(fl.id).find(x=>x.id==='g1'), reap=!!g && g.x===1003 && g.y===798 && structsOf(fl.id).some(x=>x.id==='ln');
+      vertAjusteFin(); const fin=!S.vertAjuste && !hint.classList.contains('show');
+      return movio && acum && ignora && conHint && vuelve && reap && fin;
+    } finally {
+      _VA=VAprev; window.NAV_VERTICALES=NVprev; S.level=nivel; S.editMode=ed; S.vertAjuste=va;
+      Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
+    }
+  });
+  T('Relojes control: importar del ORD, marcador redondo Rc en todas las vistas, botón ⏱ los oculta solo a ellos, y ni 🎯 ni Navegación los tocan', ()=>{
+    const snap=JSON.stringify(structuresState), RCprev=window.RELOJES_CONTROL, NVprev=window.NAV_VERTICALES, nivel=S.level, ed=S.editMode, rPrev=S.relojes, vPrev=S.verticales, VAprev=_VA, va=S.vertAjuste;
+    try{
+      _VA={}; S.editMode=true; S.level=1; S.relojes=true; S.verticales=true; S.vertAjuste=null;
+      structuresState[fl.id]=[{id:'v1',kind:'asc-G',x:1000,y:800,w:150,h:180,etq:'L1'},{id:'rc-viejo',kind:'reloj',x:50,y:50}];
+      window.RELOJES_CONTROL={floors:{[fl.id]:[{id:'rc1',kind:'reloj',x:2000,y:900,etq:'Rc',n:1,edificio:'AA',acceso:'Acceso CCEE',obs:'entre mamparas',origen:'ORD X'}]}};
+      importarRelojesORD(true);
+      const arr=structsOf(fl.id), rc=arr.find(x=>x.id==='rc1');
+      const importo=!!rc && !arr.some(x=>x.id==='rc-viejo') && arr.some(x=>x.id==='v1');
+      const m=[...svg.querySelectorAll('.struct-marker')].find(g=>g.querySelector('.struct-reloj') && /Rc/.test(g.textContent));
+      const pinta=!!m && m.querySelector('.struct-reloj').getAttribute('fill')==='#C026D3' && /AA · Acceso CCEE/.test(m.querySelector('title').textContent);
+      // 🎯 y ⇧ no lo mueven; Navegación lo conserva
+      S.vertAjuste={fid:fl.id,dx:0,dy:0}; _vertAjusteTecla({key:'ArrowRight',target:document.body,metaKey:true});
+      const quieto=rc.x===2000 && arr.find(x=>x.id==='v1').x===1005 && !_vertPuntos(fl.id).some(x=>x.kind==='reloj');
+      S.vertAjuste=null;
+      window.NAV_VERTICALES={floors:{[fl.id]:[{id:'g1',kind:'asc-G',x:1000,y:800,w:150,h:180,etq:'L1'}]}}; importarVerticalesNav(true);
+      const conserva=structsOf(fl.id).some(x=>x.id==='rc1') && structsOf(fl.id).some(x=>x.id==='g1');
+      // ⏱ oculta solo los relojes
+      toggleRelojes(); const oculto=S.relojes===false && !svg.querySelector('.struct-reloj') && !!svg.querySelector('.struct-marker rect');
+      toggleRelojes(); const vuelve=S.relojes!==false && !!svg.querySelector('.struct-reloj');
+      // en vista 2 y 3 sigue visible
+      S.level=2; S.areaId=null; renderSVG(); const v2=!!svg.querySelector('.struct-reloj');
+      return importo && pinta && quieto && conserva && oculto && vuelve && v2;
+    } finally {
+      _VA=VAprev; S.vertAjuste=va; window.RELOJES_CONTROL=RCprev; window.NAV_VERTICALES=NVprev; S.level=nivel; S.editMode=ed; S.relojes=rPrev; S.verticales=vPrev;
+      Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
+    }
+  });
+  T('Corrientes débiles: sección 📡 en la ficha (por id o por código) y capa de puntos del piso con leyenda', ()=>{
+    const D=window.CCDD_RECINTO; if(!D||!D.rooms||Object.keys(D.rooms).length<500) return false;
+    const rid=Object.keys(D.rooms).find(k=>D.rooms[k].piso==='P2' && Object.keys(D.rooms[k].n).length>=2); if(!rid) return false;
+    const prevFR=_findRoom; let ok1=false;
+    // ficha por id: el recinto del snapshot puede no existir hoy: se prueba directo con el id de la siembra
+    const h=_ccddHtml(rid); ok1=/Corrientes débiles/.test(h) && /fk-inst-chip/.test(h) && new RegExp('<b>'+Object.values(D.rooms[rid].n)[0]+'</b>').test(h);
+    // capa: puntos del piso actual
+    const fid=S.floorId, nivel=S.level, prev=S.showCcdd, pts=(D.puntos[fid]||[]).length;
+    try{
+      S.showCcdd=true; S.level=1; renderSVG();
+      const n=svg.querySelectorAll('.ccdd-pt').length, lg=document.getElementById('ccddLegend');
+      const ok2=(pts===0) ? n===0 : (n===pts && lg && lg.style.display==='block' && /Corrientes débiles/.test(lg.textContent));
+      S.showCcdd=false; renderSVG();
+      const ok3=!svg.querySelector('.ccdd-pt') && (!lg || lg.style.display==='none');
+      return ok1 && ok2 && ok3;
+    } finally { S.showCcdd=prev; S.level=nivel; renderSVG(); }
   });
   // 🔁 Reemplazo en el puesto (spec _DOCS/ATLAS_MARCA_REEMPLAZO.md). El recinto de
   // prueba st_r1 ya se limpió más arriba: estas pruebas montan y desmontan el suyo.
