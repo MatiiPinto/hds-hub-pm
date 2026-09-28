@@ -287,6 +287,7 @@ body{background:#0c1a2e;color:#cbd5e1;font-family:'Segoe UI',-apple-system,Blink
       <button class="tb-btn warn" id="btnDel" onclick="toggleMode('del')">🗑 Eliminar</button>
       <span class="vista-seg" id="vistaSeg"><button id="vsServ" onclick="setVista('servicios')" title="Vista general: servicios de Atlas">🏥 Servicios</button><button id="vsCirc" onclick="setVista('circulaciones')" title="Vista 2: circulaciones fusionadas por zona; los servicios quedan de fondo">🚶 Circulaciones</button></span>
       <button class="tb-btn active" id="btnAreas" onclick="toggleAreas()" title="Mostrar / ocultar las áreas de servicios importadas de Atlas — deja el plano limpio para dibujar circulaciones, escaleras y ascensores · tecla A">👁 Áreas</button>
+      <button class="tb-btn" id="btnRed" onclick="toggleRed()" title="Circulación como LÍNEAS: el eje de cada pasillo, por zona de acceso, unido a ascensores y escaleras. Reemplaza los bloques pintados al consultar; al editar la circulación peatonal los bloques vuelven a verse para dibujar.">〰 Líneas</button>
       <button class="tb-btn" onclick="reloadServicios()" title="Recargar los servicios generales dibujados en Atlas HDS (sin recintos pequeños)">📐 Recargar servicios</button>
       <button class="tb-btn" id="btnRecintos" onclick="toggleRecintos()" title="Mostrar los RECINTOS dibujados en Atlas (vista 2) sobre el plano — misma geometría que en Atlas · tecla R">🚪 Recintos</button>
       <button class="tb-btn" id="btnRelleno" onclick="toggleRelleno()" title="Propuesta de relleno inverso: pinta como circulación todo lo que no es recinto, para corregir borrando lo que no corresponde">🪣 Relleno</button>
@@ -467,6 +468,9 @@ body{background:#0c1a2e;color:#cbd5e1;font-family:'Segoe UI',-apple-system,Blink
 <!-- Calibración común con el Atlas (px ↔ «metros» de Navegación ↔ metros reales ↔ piso a piso).
      La genera _DEV/calibra_planos.py; ver ahí qué es exacto y qué es registro. -->
 <script src="SHARED_DATA/planos_calibracion.js"></script>
+<!-- Red de circulación: ejes de los pasillos (líneas) sacados del plano real dentro de lo
+     pintado acá. La genera _DEV/red_circulacion.py; px del plano, igual que el Atlas. -->
+<script src="SHARED_DATA/circulacion_red.js"></script>
 <!-- recintos de Atlas (vista 2) ya convertidos a metros DXF, y la propuesta de
      relleno inverso de circulación; ambos con URL única por carga (anti-caché) -->
 <script>document.write('<scr'+'ipt src="SHARED_DATA/recintos_nav.js?v='+Date.now()+'"></scr'+'ipt>');</script>
@@ -500,7 +504,12 @@ const DXF_EXT={'P-3':_EXT,'P-2':_EXT,'P-1':_EXT,'P1':_EXT,'P2':_EXT,'P3':_EXT,'P
 // Atlas HDS (áreas de servicios) usa su propio PNG; tras re-renderizar los
 // planos, las áreas importadas requieren re-sincronizarse desde Atlas.
 const _PNG_DIM={w:16000,h:11663};
-const CABIDA_PNG_DIMS={'P-3':{..._PNG_DIM},'P-2':{..._PNG_DIM},'P-1':{..._PNG_DIM},'P1':{..._PNG_DIM},'P2':{..._PNG_DIM},'P3':{..._PNG_DIM},'P4':{..._PNG_DIM},'P5':{..._PNG_DIM}};
+// Las áreas del Atlas vienen en px del plano de CADA piso (su tamaño real, ver
+// planos_calibracion.js). Antes se suponía 16000×11663 en todos: corría hasta 4 px
+// en P1 y en P-2 (16208×12337) estiraba las áreas un 5,8 % en vertical.
+const CABIDA_PNG_DIMS=(()=>{ const C=window.PLANOS_CALIB, o={};
+  ['P-3','P-2','P-1','P1','P2','P3','P4','P5'].forEach(f=>{ const q=C&&C.pisos&&C.pisos[f]; o[f]=q?{w:q.w,h:q.h}:{..._PNG_DIM}; });
+  return o; })();
 
 const CIRC_TYPES={
   'asc-pub':{label:'Asc. Públicos',color:'#3b82f6',short:'PB',shape:'circle'},
@@ -1173,6 +1182,7 @@ function loadFloor(fId){
   renderSidebar();
   updateStats();
   if(typeof sincBotonesCapas==='function') sincBotonesCapas();
+  if(typeof sincBotonRed==='function') sincBotonRed();
   // el botón "Identificar desde P1" depende del piso actual
   if(typeof buildPcircBar==='function' && S.mode==='pcirc') buildPcircBar();
   if(typeof pcSectorPanel==='function') pcSectorPanel();
@@ -2065,13 +2075,15 @@ function renderRepPanel(){
 function _repMapeador(org,dst){
   const C=window.PLANOS_CALIB;
   if(!C || !C.hayRegistro(org) || !C.hayRegistro(dst)) return null;
+  // x_m, y_m son el CENTRO de la caja (así se crean y se dibujan)
   return b=>{
-    const esq=[[b.x_m,b.y_m],[b.x_m+b.w_m,b.y_m],[b.x_m,b.y_m-b.h_m],[b.x_m+b.w_m,b.y_m-b.h_m]].map(([x,y])=>{
+    const hw=b.w_m/2, hh=b.h_m/2;
+    const esq=[[b.x_m-hw,b.y_m-hh],[b.x_m+hw,b.y_m-hh],[b.x_m-hw,b.y_m+hh],[b.x_m+hw,b.y_m+hh]].map(([x,y])=>{
       const p=C.navAPx(org,x,y,planXform[org]), q=C.pisoAPiso(org,dst,p.x,p.y);
       return C.pxANav(dst,q.x,q.y,planXform[dst]); });
     const xs=esq.map(e=>e.x_m), ys=esq.map(e=>e.y_m);
     const x0=Math.min(...xs), x1=Math.max(...xs), y0=Math.min(...ys), y1=Math.max(...ys);
-    return {x_m:x0, y_m:y1, w_m:x1-x0, h_m:y1-y0};
+    return {x_m:(x0+x1)/2, y_m:(y0+y1)/2, w_m:x1-x0, h_m:y1-y0};
   };
 }
 function repPisoEjecutar(){
@@ -3581,6 +3593,49 @@ function unionRectsToPath(rects){
   return d;
 }
 
+// ── RED DE CIRCULACIÓN (líneas) ──────────────────────────────────────────────
+// SHARED_DATA/circulacion_red.js trae el eje de cada pasillo en px del plano. Con
+// la capa activa, fuera del modo de edición de circulación, los bloques pintados
+// se reemplazan por estas líneas finas (el pintado sigue siendo la fuente: al
+// editar vuelve a verse).
+S.redLineas = lg('nav_red_lineas', true);
+function toggleRed(force){
+  S.redLineas = force!==undefined ? !!force : !S.redLineas;
+  ls('nav_red_lineas', S.redLineas);
+  sincBotonRed(); renderOverlay();
+}
+function sincBotonRed(){
+  const b=document.getElementById('btnRed'); if(!b) return;
+  const hay=!!(window.CIRC_RED&&window.CIRC_RED.pisos);
+  b.style.display=hay?'':'none';
+  b.classList.toggle('active', !!S.redLineas);
+}
+function dibujaRed(){
+  const R=window.CIRC_RED, P=R&&R.pisos&&R.pisos[S.floorId];
+  if(!S.redLineas || !P) return;
+  const SVGNS='http://www.w3.org/2000/svg';
+  const g=document.createElementNS(SVGNS,'g');
+  g.setAttribute('class','red-circ'); g.setAttribute('pointer-events','none');
+  // la red está en px del plano; si el plano tiene ajuste fino, se le aplica igual
+  const m=planXform[S.floorId];
+  if(Array.isArray(m)&&m.length===6) g.setAttribute('transform','matrix('+m.join(' ')+')');
+  const linea=(pts,col,ancho,op,dash)=>{
+    const pl=document.createElementNS(SVGNS,'polyline');
+    pl.setAttribute('points',pts.map(p=>p[0]+','+p[1]).join(' '));
+    pl.setAttribute('fill','none'); pl.setAttribute('stroke',col);
+    pl.setAttribute('stroke-width',ancho); pl.setAttribute('stroke-opacity',op);
+    pl.setAttribute('stroke-linecap','round'); pl.setAttribute('stroke-linejoin','round');
+    pl.setAttribute('vector-effect','non-scaling-stroke');
+    if(dash) pl.setAttribute('stroke-dasharray',dash);
+    g.appendChild(pl);
+  };
+  // halo blanco muy suave debajo: la línea se lee sobre el mobiliario sin pesar
+  P.tramos.forEach(t=>linea(t.pts,'#ffffff',5,0.55));
+  P.tramos.forEach(t=>linea(t.pts,(ZONA_CIRC[t.zona]||ZONA_CIRC.general).color,2.2,0.85));
+  (P.accesos||[]).forEach(a=>linea([a.desde,a.hasta],'#64748b',1.6,0.8,'4 4'));
+  overlay.appendChild(g);
+}
+
 // ── MOSTRAR / OCULTAR ÁREAS ─────────────────────────────────────────────────
 function toggleAreas(force){
   S.showAreas = force!==undefined ? !!force : S.showAreas===false;
@@ -3693,6 +3748,8 @@ function renderOverlay(){
         });
         return;
       }
+      // con la red en líneas, al consultar no se pintan los bloques (sí al editar)
+      if(S.redLineas && S.mode!=='pcirc' && window.CIRC_RED && window.CIRC_RED.pisos && window.CIRC_RED.pisos[S.floorId]) return;
       const zc=ZONA_CIRC[z]||ZONA_CIRC.general;
       const rects=byZ[z].map(b=>{ const p=dxfToSvg(S.floorId,b.x_m,b.y_m); const s=dxfSizeToSvg(S.floorId,b.w_m,b.h_m);
         return p&&s?{x:p.x-s.w/2,y:p.y-s.h/2,w:s.w,h:s.h}:null; }).filter(Boolean);
@@ -3734,6 +3791,9 @@ function renderOverlay(){
   }
   // Capa de edición de circulación (contornos + manijas de la selección)
   pcRenderEditLayer();
+
+  // 1.55) Red de circulación (líneas)
+  dibujaRed();
 
   // 1.6) Marcadores físicos de circulación (puertas, escaleras, control…)
   const _pmk=(pcircState.markers||{})[S.floorId]||[];
