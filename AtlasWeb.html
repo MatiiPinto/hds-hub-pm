@@ -1410,6 +1410,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 <script src="SHARED_DATA/emmc_pendientes.js"></script>
 <script src="SHARED_DATA/nav_verticales.js"></script>
 <script src="SHARED_DATA/relojes_control.js"></script>
+<script src="SHARED_DATA/verticales_parches.js"></script>
 <script src="SHARED_DATA/circulacion_red.js"></script>
 <script src="SHARED_DATA/propuestos_plano.js"></script>
 <script src="SHARED_DATA/paisajismo.js"></script>
@@ -7732,6 +7733,31 @@ function importarVerticalesNav(sinConfirmar){
   if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🛗 '+total+' ascensores/escaleras importados de Navegación en '+pisos.length+' pisos — mismo píxel que allá'+(reap?(' · 🎯 ajuste manual re-aplicado en '+reap+' piso'+(reap>1?'s':'')):'')+(ant?(' · ⚠ '+ant+' no están en Navegación (se conservaron): revisar'):''); setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},9000); }
 }
 
+// ── Parches puntuales de verticales (SHARED_DATA/verticales_parches.js) ────────
+// Correcciones por piso (p. ej. los ascensores de P5 del 28-09-2026) que se aplican
+// UNA vez al abrir el Atlas, sin reimportar todo: quitan lo indicado y suman lo
+// nuevo (sin duplicar por id). Quedan anotadas en cabida_parches_vert.
+function _aplicaParchesVerticales(forzar){
+  const L=window.VERTICALES_PARCHES; if(!Array.isArray(L)||!L.length) return [];
+  let hechos=[]; try{ hechos=JSON.parse(localStorage.getItem('cabida_parches_vert')||'[]'); }catch(e){}
+  const aplicados=[];
+  L.forEach(pz=>{
+    if(!pz||!pz.id||!pz.piso) return; if(!forzar && hechos.includes(pz.id)) return;
+    const arr=(structuresState[pz.piso]=structuresState[pz.piso]||[]);
+    const fam=k=>String(k||'').startsWith('asc-')?'asc':String(k||'');
+    let q=0, a=0;
+    (pz.quitar||[]).forEach(c=>{ for(let i=arr.length-1;i>=0;i--){ const x=arr[i]; if((c.id&&x.id===c.id) || (c.etq!==undefined && String(x.etq||'')===String(c.etq) && (!c.familia||fam(x.kind)===c.familia))){ arr.splice(i,1); q++; } } });
+    (pz.agregar||[]).forEach(it=>{ if(!arr.some(x=>x.id===it.id)){ arr.push({...it}); a++; } });
+    hechos.push(pz.id); aplicados.push({id:pz.id,piso:pz.piso,quitados:q,agregados:a});
+  });
+  if(aplicados.length){
+    _lsPref('cabida_parches_vert', JSON.stringify([...new Set(hechos)]));
+    sStruct(); try{ renderSVG(); }catch(e){}
+    if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🛗 '+aplicados.map(x=>x.piso+': +'+x.agregados+(x.quitados?(' −'+x.quitados):'')).join(' · ')+' (parche de ascensores aplicado)'; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},8000); }
+  }
+  return aplicados;
+}
+window.addEventListener('load',()=>setTimeout(()=>{ if(typeof _SELFTEST!=='undefined'&&_SELFTEST) return; try{ _aplicaParchesVerticales(); }catch(e){} }, 1200));
 // ── Relojes control desde el ORD 5040029-145 (SHARED_DATA/relojes_control.js) ──
 // Reemplaza los relojes de TODOS los pisos con la siembra; ascensores, escaleras y
 // líneas no se tocan. Se generan con _DEV/build_relojes_control.py.
@@ -15824,6 +15850,22 @@ async function runSelfTest(){
       return movio && acum && ignora && conHint && vuelve && reap && fin;
     } finally {
       _VA=VAprev; window.NAV_VERTICALES=NVprev; S.level=nivel; S.editMode=ed; S.vertAjuste=va;
+      Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
+    }
+  });
+  T('Verticales: parche puntual de piso quita el S y suma cabinas una sola vez, sin tocar otros pisos', ()=>{
+    const snap=JSON.stringify(structuresState), Lprev=window.VERTICALES_PARCHES; let prevHechos=null; try{ prevHechos=localStorage.getItem('cabida_parches_vert'); }catch(e){}
+    try{
+      structuresState[fl.id]=[{id:'s1',kind:'stair',x:10,y:10},{id:'old',kind:'asc-P',x:20,y:20,etq:'S'}];
+      const otro=Object.keys(structuresState).find(k=>k!==fl.id), otroAntes=JSON.stringify(structuresState[otro]||[]);
+      window.VERTICALES_PARCHES=[{id:'pz-test',piso:fl.id,quitar:[{etq:'S',familia:'asc'}],agregar:[{id:'n1',kind:'asc-S',x:100,y:100,w:120,h:110,etq:'O1',salida:'w'},{id:'n2',kind:'asc-Pplus',x:200,y:100,w:120,h:150,etq:'G1'}]}];
+      const r1=_aplicaParchesVerticales(true), arr=structsOf(fl.id);
+      const ok1=r1.length===1 && r1[0].quitados===1 && r1[0].agregados===2 && !arr.some(x=>x.etq==='S') && arr.some(x=>x.id==='n1') && arr.some(x=>x.id==='s1');
+      const r2=_aplicaParchesVerticales(true); const sinDup=r2[0].agregados===0 && structsOf(fl.id).filter(x=>x.id==='n1').length===1;
+      const intacto=JSON.stringify(structuresState[otro]||[])===otroAntes;
+      return ok1 && sinDup && intacto;
+    } finally {
+      window.VERTICALES_PARCHES=Lprev; try{ if(prevHechos===null) localStorage.removeItem('cabida_parches_vert'); else _lsSet('cabida_parches_vert',prevHechos); }catch(e){}
       Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
     }
   });
