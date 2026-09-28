@@ -7762,6 +7762,8 @@ function _aplicaParchesVerticales(forzar){
     let q=0, a=0;
     (pz.quitar||[]).forEach(c=>{ for(let i=arr.length-1;i>=0;i--){ const x=arr[i]; if((c.id&&x.id===c.id) || (c.etq!==undefined && String(x.etq||'')===String(c.etq) && (!c.familia||fam(x.kind)===c.familia))){ arr.splice(i,1); q++; } } });
     (pz.agregar||[]).forEach(it=>{ if(!arr.some(x=>x.id===it.id)){ arr.push({...it}); a++; } });
+    // completar: suma datos a un elemento existente por id, sin moverlo ni cambiar su tamaño
+    (pz.completar||[]).forEach(c=>{ const x=arr.find(y=>y.id===c.id); if(x){ const k={...(c.campos||{})}; delete k.x; delete k.y; delete k.w; delete k.h; Object.assign(x,k); a++; } });
     hechos.push(pz.id); aplicados.push({id:pz.id,piso:pz.piso,quitados:q,agregados:a});
   });
   if(aplicados.length){
@@ -16021,7 +16023,11 @@ async function runSelfTest(){
       const ok1=r1.length===1 && r1[0].quitados===1 && r1[0].agregados===2 && !arr.some(x=>x.etq==='S') && arr.some(x=>x.id==='n1') && arr.some(x=>x.id==='s1');
       const r2=_aplicaParchesVerticales(true); const sinDup=r2[0].agregados===0 && structsOf(fl.id).filter(x=>x.id==='n1').length===1;
       const intacto=JSON.stringify(structuresState[otro]||[])===otroAntes;
-      return ok1 && sinDup && intacto;
+      structuresState[fl.id].push({id:'rm',kind:'reloj',x:500,y:600});
+      window.VERTICALES_PARCHES=[{id:'pz-c',piso:fl.id,completar:[{id:'rm',campos:{n:3,edificio:'HDS',acceso:'Acceso Visitas',x:1,y:1}}]}];
+      _aplicaParchesVerticales(true); const rm=structsOf(fl.id).find(x=>x.id==='rm');
+      const completa=rm.n===3 && rm.edificio==='HDS' && rm.x===500 && rm.y===600;
+      return ok1 && sinDup && intacto && completa;
     } finally {
       window.VERTICALES_PARCHES=Lprev; try{ if(prevHechos===null) localStorage.removeItem('cabida_parches_vert'); else _lsSet('cabida_parches_vert',prevHechos); }catch(e){}
       Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
