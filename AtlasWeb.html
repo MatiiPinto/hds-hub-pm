@@ -149,6 +149,25 @@ code,.mono{font-family:var(--font-mono)}
 .sb-tab:hover{color:var(--text)}
 .sb-tab.on{color:var(--accent-600);font-weight:var(--fw-medium);border-bottom-color:var(--accent-600)}
 #floorList{flex:1;overflow-y:auto;padding:6px 8px 8px}
+#srvList{flex:1;overflow-y:auto;padding:10px 10px 8px}
+.srv-vacio{font-size:var(--fs-sm);color:var(--text-2);line-height:1.5;padding:10px 4px}
+.srv-cab{padding:2px 2px 8px;border-bottom:1px solid var(--border);margin-bottom:6px}
+.srv-cab .nm{font-size:13px;font-weight:800;color:var(--text);line-height:1.25}
+.srv-cab .sub{font-size:10.5px;color:var(--text-2);margin-top:2px}
+.srv-cab .tot{display:flex;align-items:baseline;gap:6px;margin-top:6px}
+.srv-cab .tot b{font-size:20px;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+.srv-cab .tot span{font-size:11px;color:var(--text-2)}
+.srv-cab .pst{font-size:10.5px;margin-top:3px}
+.srv-row{display:flex;align-items:center;gap:7px;width:100%;padding:5px 6px;border:0;border-radius:6px;background:none;cursor:pointer;text-align:left;font-size:var(--fs-sm);color:var(--text)}
+.srv-row:hover{background:var(--surface-sunken,#f1f5f9)}
+.srv-row .sw{width:9px;height:9px;border-radius:3px;flex-shrink:0}
+.srv-row .lb{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.srv-row .pd{font-size:9.5px;color:#b45309;font-weight:600}
+.srv-row .n{font-weight:800;font-variant-numeric:tabular-nums}
+.srv-row .ar{font-size:8px;color:var(--text-2);transition:transform .15s}
+.srv-row.open .ar{transform:rotate(90deg)}
+.srv-rooms{margin:0 0 6px 14px}
+.srv-pie{font-size:10px;color:var(--text-2);margin-top:8px;font-style:italic}
 .fl-item{margin-bottom:2px}
 .fl-hdr{display:flex;align-items:flex-start;gap:4px;width:100%;background:none;border:0;border-radius:var(--r-md);padding:8px 8px;cursor:pointer;text-align:left;color:var(--text);transition:background .15s}
 .fl-hdr:hover{background:var(--surface-sunken)}
@@ -866,9 +885,11 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
   <aside id="sidebar">
     <div id="sbTabs">
       <button id="sbTabPisos" class="sb-tab on" onclick="sbShowTab('pisos')">Pisos</button>
+      <button id="sbTabServ" class="sb-tab" onclick="sbShowTab('serv')" title="El servicio que estás mirando: cuántos recintos tiene de cada tipo y, al desplegar un tipo, cuáles son">Servicio</button>
       <button id="sbTabTipos" class="sb-tab" onclick="sbShowTab('tipos')">Tipologías</button>
     </div>
     <div id="floorList"></div>
+    <div id="srvList" style="display:none"></div>
     <div id="typeList" style="display:none"></div>
     <div id="dataStamp" title="Fechas de las fuentes cargadas en la plataforma"></div>
   </aside>
@@ -10460,6 +10481,8 @@ function renderAvance(){
 // hecho": 30 box de consulta, 1 sala de procedimiento, 2 baños…
 function renderSrvTipos(){
   const card=document.getElementById('rpSrvCard'); if(!card) return;
+  // 28-09-2026: el resumen del servicio pasó a la pestaña «Servicio» de la barra izquierda
+  card.style.display='none'; return;
   const area=(S.level>=2 && S.areaId)?curArea():null;
   if(!area){ card.style.display='none'; return; }
   card.style.display='';
@@ -11905,9 +11928,65 @@ function sbShowTab(tab){
   _sbTab=tab;
   document.getElementById('sbTabPisos').classList.toggle('on',tab==='pisos');
   document.getElementById('sbTabTipos').classList.toggle('on',tab==='tipos');
+  { const b=document.getElementById('sbTabServ'); if(b) b.classList.toggle('on',tab==='serv'); }
   document.getElementById('floorList').style.display=tab==='pisos'?'':'none';
   document.getElementById('typeList').style.display=tab==='tipos'?'':'none';
+  { const l=document.getElementById('srvList'); if(l) l.style.display=tab==='serv'?'':'none'; }
   if(tab==='tipos') renderTypeFilter();
+  if(tab==='serv') renderSrvPanel();
+}
+// ── Pestaña «Servicio» (barra izquierda, 28-09-2026) ─────────────────────────
+// El servicio que se está mirando: total de recintos, cuántos hay de cada tipo
+// (consultas, box, administrativos…) y, al desplegar un tipo, cuáles son. Es la
+// información que antes estaba en la tarjeta de servicio del panel derecho y el
+// detalle de recintos que colgaba del árbol de Pisos.
+const _srvAbiertos=new Set();
+function srvToggleTipo(t){ if(_srvAbiertos.has(t)) _srvAbiertos.delete(t); else _srvAbiertos.add(t); renderSrvPanel(); }
+function renderSrvPanel(){
+  const box=document.getElementById('srvList'); if(!box) return;
+  const esc0=x=>String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  const area=(S.level>=2 && S.areaId)?curArea():null;
+  const tb=document.getElementById('sbTabServ');
+  if(!area){
+    if(tb) tb.textContent='Servicio';
+    box.innerHTML='<div class="srv-vacio">Entra a un servicio (desde <b>Pisos</b> o haciendo clic en el plano) para ver cuántos recintos tiene de cada tipo.</div>';
+    return;
+  }
+  const fl=curFloor();
+  const cnt={}; let tot=0, dib=0, camas=0;
+  (area.rooms||[]).forEach(r=>{
+    const t=rType(r.id), hay=(boxState.rooms[r.id]||[]).length>0;
+    (cnt[t]=cnt[t]||{n:0,d:0,rooms:[]}).n++; if(hay){ cnt[t].d++; cnt[t].rooms.push(r); }
+    tot++; if(hay) dib++;
+    camas+=((wsState.beds||{})[r.id]||[]).filter(b=>b.kind!=='cupo'&&b.kind!=='puesto').length;
+  });
+  const ws=areaWsStats(area);
+  const filas=Object.entries(cnt).sort((a,b)=>b[1].n-a[1].n ||
+      String((ROOM_TYPES[a[0]]||{}).label||a[0]).localeCompare(String((ROOM_TYPES[b[0]]||{}).label||b[0]),'es'));
+  let h='<div class="srv-cab"><div class="nm">'+esc0(aName(area.id))+'</div><div class="sub">'+esc0(fl?fl.label:S.floorId)+'</div>'
+    +'<div class="tot"><b>'+tot+'</b><span>recintos'+(dib<tot?(' · '+(tot-dib)+' sin dibujar'):'')+'</span></div>'
+    +(ws.total?('<div class="pst"><span class="taw-asig">'+ws.asig+' asignados</span> · <span class="'+(ws.disp>0?'taw-disp':'taw-zero')+'">'+ws.disp+' disponibles</span> <span class="taw-tot">/ '+ws.total+' puestos</span></div>'):'')
+    +'</div>';
+  if(!filas.length) h+='<div class="srv-vacio">Este servicio aún no tiene recintos.</div>';
+  filas.forEach(([t,v])=>{
+    const m=ROOM_TYPES[t]||ROOM_TYPES[''], abierto=_srvAbiertos.has(t), pend=v.n-v.d;
+    h+='<button class="srv-row'+(abierto?' open':'')+'" data-tipo="'+esc0(t)+'" onclick="srvToggleTipo(\''+esc0(t)+'\')" title="Ver los recintos de este tipo">'
+      +'<span class="ar">▶</span><span class="sw" style="background:'+m.col+'"></span><span class="lb">'+esc0(m.label)+(pend?' <span class="pd">('+pend+' sin dibujar)</span>':'')+'</span><span class="n">'+v.n+'</span></button>';
+    if(abierto){
+      h+='<div class="srv-rooms">';
+      v.rooms.slice().sort((a,b)=>rName(a.id).localeCompare(rName(b.id),'es',{numeric:true,sensitivity:'base'})).forEach(r=>{
+        const nd=((wsState.dots||{})[r.id]||[]).length, cur=S.roomId===r.id;
+        const btn='<button class="tree-room'+(cur?' cur':'')+'" title="'+esc0(rName(r.id))+'" onclick="sidebarGoRoom(\''+fl.id+'\',\''+area.id+'\',\''+r.id+'\')"><span class="rtype-badge" style="background:'+rColor(r.id)+'"></span>'+esc0(rName(r.id))+(nd?' <span style="opacity:.6;font-size:9px">('+nd+')</span>':'')+'</button>';
+        h+=(S.editMode && S.level===2)
+          ? '<div class="tree-room-row">'+btn+'<button class="tree-room-del" title="Eliminar recinto" onclick="event.stopPropagation();quickDeleteRoom(\''+r.id+'\')">✕</button></div>'
+          : btn;
+      });
+      h+='</div>';
+    }
+  });
+  if(camas) h+='<div class="srv-pie">'+camas+(camas===1?' cama colocada':' camas colocadas')+'</div>';
+  box.innerHTML=h;
+  if(tb) tb.textContent='Servicio';
 }
 // ── Filtro de tipologías (barra izquierda): recintos por tipo, alfabético y por piso ──
 let _tfType='';
@@ -12989,6 +13068,7 @@ function renderDataStamp(){
 function renderSidebar(){
   try{ renderDataStamp(); }catch(e){}
   try{ if(_sbTab==='tipos') renderTypeFilter(); }catch(e){}
+  try{ if(_sbTab==='serv') renderSrvPanel(); }catch(e){}
   try{ renderBimPending(); }catch(e){}
   const list=document.getElementById('floorList'); list.innerHTML='';
   FLOORS.forEach(fl=>{
@@ -13024,7 +13104,7 @@ function renderSidebar(){
       const areasEl=document.createElement('div');
       areasEl.className='tree-areas';
       activeAreas.forEach(area=>{
-        const isAreaExp=_sb.area===area.id;
+        const isAreaExp=false;              // el detalle de recintos vive en la pestaña «Servicio»
         const isCurArea=S.areaId===area.id;
         // Only show rooms that have been drawn
         const activeRooms=area.rooms.filter(r=>(boxState.rooms[r.id]||[]).length>0);
@@ -13037,21 +13117,14 @@ function renderSidebar(){
         aHdr.className='tree-area-hdr'+(isCurArea?' cur':'');
         const aTog=document.createElement('span');
         aTog.className='tree-area-toggle'+(isAreaExp?' open':'');
-        aTog.style.visibility=activeRooms.length?'visible':'hidden';
-        aTog.textContent='▶';
-        aTog.onclick=e=>{e.stopPropagation(); if(activeRooms.length)toggleArea(area.id);};
+        aTog.style.display='none';
         const aInfo=document.createElement('div');
         aInfo.className='tree-area-info';
         const aName_=document.createElement('span');
         aName_.className='tree-area-name';
         aName_.textContent=aName(area.id);
         aInfo.appendChild(aName_);
-        if(ws.total>0){
-          const aCnt=document.createElement('span');
-          aCnt.className='tree-area-ws';
-          aCnt.innerHTML=`<span class="taw-asig">${ws.asig} asig.</span> · <span class="${ws.disp>0?'taw-disp':'taw-zero'}">${ws.disp} disp.</span> <span class="taw-tot">/ ${ws.total}</span>`;
-          aInfo.appendChild(aCnt);
-        }
+        // (puestos y recintos: pestaña «Servicio»)
         aHdr.append(aTog,aInfo);
         aHdr.title=ws.total?`${ws.asig} asignados · ${ws.disp} disponibles de ${ws.total} puestos`:aName(area.id);
         aHdr.onclick=()=>sidebarGoArea(fl.id,area.id);
@@ -16196,6 +16269,21 @@ async function runSelfTest(){
     try{ _navAnim={pasos:_navPasos(r2),i:0,t:0,fid:r2.o.fid,x:r2.o.x,y:r2.o.y,last:0,on:true}; const x0=_navAnim.x; _navAnimTick(2); const movio=Math.hypot(_navAnim.x-x0,_navAnim.y-r2.o.y)>0; _navAnimTick(3600); const llego=!_navAnim.on && cambios>=1; _navAnim=null;
       return enPiso1 && entrePisos && camilla && falla && movio && llego;
     } finally { window.goFloor=gf; S.floorId=fPrev; _navRes=sPrev; _navAnim=null; renderSVG(); }
+  });
+  T('Barra izquierda: Pisos muestra solo los servicios; la pestaña Servicio da recintos por tipo y el detalle al desplegar', ()=>{
+    const nivel=S.level, a0=S.areaId, tab=_sbTab, abiertos=new Set(_srvAbiertos); _rpFix(true);
+    try{
+      nameState.types=nameState.types||{}; const t0=nameState.types['st_r1'];
+      S.floorId=fl.id; _sb.floor=fl.id; S.level=2; S.areaId='st_a'; sbShowTab('pisos'); renderSidebar();
+      const L=document.getElementById('floorList');
+      const soloServ=!!L.querySelector('.tree-area-hdr') && !L.querySelector('.tree-room') && !L.querySelector('.tree-area-ws');
+      sbShowTab('serv'); const B=document.getElementById('srvList');
+      const fila=B.querySelector('.srv-row'); const tiene=!!fila && /ST/.test(B.querySelector('.srv-cab .nm').textContent) && B.style.display!=='none' && L.style.display==='none';
+      fila.click(); const det=!!B.querySelector('.srv-rooms .tree-room');
+      const der=document.getElementById('rpSrvCard'); renderSrvTipos(); const sinDerecha=!der || der.style.display==='none';
+      S.level=1; S.areaId=null; renderSrvPanel(); const vacio=/Entra a un servicio/.test(B.textContent);
+      return soloServ && tiene && det && sinDerecha && vacio;
+    } finally { S.level=nivel; S.areaId=a0; _srvAbiertos.clear(); abiertos.forEach(x=>_srvAbiertos.add(x)); sbShowTab(tab); _rpFix(false); renderSidebar(); }
   });
   T('Relojes: en edición se toman y arrastran a su posición final (vista 1 y 2), se guarda, y ⇧ no arrastra los ascensores', ()=>{
     const snap=JSON.stringify(structuresState), nivel=S.level, ed=S.editMode, a0=S.areaId; _rpFix(true);
