@@ -387,7 +387,8 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 .vw-menu .tb-btn{width:100%;text-align:left;justify-content:flex-start;border:0;height:32px;background:transparent;color:var(--text-2)}
 .vw-menu .tb-btn:hover{background:var(--surface-sunken);color:var(--text)}
 .vw-menu .tb-btn.active{background:var(--accent-50);color:var(--accent-700)}
-#structMenu{position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-2);padding:8px;min-width:240px}
+#structMenu{position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-2);padding:8px;min-width:240px;width:320px;max-width:calc(100vw - 24px);max-height:min(76vh,700px);overflow-y:auto}
+#structMenu .sm-note .ayuda{cursor:help;text-decoration:underline dotted}
 #structMenu .sm-h{font-size:10px;font-weight:var(--fw-medium);color:var(--text-3);text-transform:uppercase;letter-spacing:var(--tracking-caps);padding:8px 8px 4px}
 #structEdit{position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-2);padding:10px 12px;min-width:270px;font-size:12px;z-index:30;display:none}
 #structEdit .se-t{font-weight:700;font-size:12.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
@@ -950,7 +951,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
         <button class="struct-opt" onclick="aplicarSalidasSiembra()" style="--c:#0ea5e9" title="Solo las PUERTAS: toma el lado de salida de cada ascensor y escalera desde la siembra (dibujado en Navegación o inferido desde las zonas de circulación) y lo aplica a los elementos de todos los pisos SIN moverlos ni cambiarles el tamaño.">🚪 <b>Solo puertas desde la siembra</b> <span style="opacity:.55">· no mueve nada</span></button>
         <div class="sm-h">Ajustar el piso</div>
         <button class="struct-opt" onclick="toggleVertAjuste()" style="--c:#f59e0b" title="Toma TODOS los ascensores, escaleras y escaleras mecánicas del piso activo y los mueve en bloque con las flechas del teclado: 1 px por pulsación · ⌘ (o Ctrl) + flecha = 5 px · ⇧ + flecha = 20 px. Cada paso se guarda de inmediato y el desplazamiento acumulado del piso se recuerda: al reimportar de Navegación se vuelve a aplicar solo. Cambia de piso y sigue ajustando; Esc o ✓ para salir.">🎯 <b>Mover todos con las flechas</b> <span style="opacity:.55">· 1 px · ⌘ 5 px</span></button>
-        <div class="sm-note">En edición: arrastrar mueve · ⇧+arrastrar mueve TODOS los del piso · arrastrar un vértice escala con el opuesto fijo (⇧ mantiene la proporción) · × borra · 🎯 flechas mueven todos los del piso (⌘ = 5 px) · clic en uno lo selecciona y abre su panel (tipo · salida · tamaño · etiqueta) · con uno seleccionado las flechas lo mueven solo a él (⌘ 5 px · ⇧ 20 px) · ⌥+arrastrar mueve una gemela sin su pareja · los ⏱ relojes se arrastran uno a uno</div>
+        <div class="sm-note">Arrastrar mueve · vértices escalan · clic abre el panel · × borra <span class="ayuda" title="En edición: arrastrar mueve · ⇧+arrastrar mueve TODOS los del piso · arrastrar un vértice escala con el opuesto fijo (⇧ mantiene la proporción) · × borra · 🎯 flechas mueven todos los del piso (⌘ = 5 px) · clic en uno lo selecciona y abre su panel (tipo · salida · tamaño · etiqueta) · con uno seleccionado las flechas lo mueven solo a él (⌘ 5 px · ⇧ 20 px) · ⌥+arrastrar mueve una gemela sin su pareja · los ⏱ relojes se arrastran uno a uno">más ayuda</span></div>
       </div>
       <button class="tb-btn warn" id="btnMerge" onclick="doMerge()" style="display:none">🔗 Fusionar</button>
       <button class="tb-btn warn" id="btnUnmerge" onclick="doUnmerge()" style="display:none" title="Separar los bloques de este recinto en recintos independientes">✂ Des-fusionar</button>
@@ -7275,6 +7276,7 @@ function _structOutsideClick(e){
 
 function startStructMode(kind){
   closeStructMode(); // limpiar cualquier modo previo
+  if(typeof closeStructMenu==='function') try{ closeStructMenu(); }catch(e){}   // el menú no tapa el plano mientras se coloca
   _structKind = kind;
   document.querySelectorAll('.struct-opt').forEach(b => b.classList.toggle('active', b.dataset.kind === kind));
   viewer.style.cursor = 'crosshair';
@@ -7658,7 +7660,7 @@ function _vertAjusteRegistra(fid,dx,dy){
 }
 function _vertPuntos(fid){ return structsOf(fid||S.floorId).filter(x=>STRUCT_TYPES[x.kind] && STRUCT_TYPES[x.kind].kind==='point' && STRUCT_TYPES[x.kind].grupo!=='reloj'); }
 function toggleVertAjuste(){ if(S.vertAjuste) vertAjusteFin(); else vertAjusteIni(); }
-function vertAjusteIni(){
+function vertAjusteIni(){ if(typeof closeStructMenu==='function') try{ closeStructMenu(); }catch(e){}
   if(!S.editMode){ if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🎯 Entra a ✏ Editar para ajustar los ascensores del piso'; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},3000); } return; }
   S.vertAjuste={fid:S.floorId, dx:0, dy:0}; if(S.structSel) structEditClose();
   if(typeof closeStructMode==='function') try{ closeStructMode(); }catch(e){}
@@ -16018,6 +16020,14 @@ async function runSelfTest(){
       window.VERTICALES_PARCHES=Lprev; try{ if(prevHechos===null) localStorage.removeItem('cabida_parches_vert'); else _lsSet('cabida_parches_vert',prevHechos); }catch(e){}
       Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
     }
+  });
+  T('Estructura: el menú es angosto con scroll propio, la ayuda cabe en una línea y se cierra al elegir qué colocar', ()=>{
+    const m=document.getElementById('structMenu'); if(!m) return false;
+    const cs=getComputedStyle(m); const angosto=parseFloat(cs.width)<=340 && cs.overflowY==='auto';
+    const nota=m.querySelector('.sm-note'); const corta=nota && nota.textContent.length<120 && !!nota.querySelector('.ayuda[title]');
+    const prev=m.style.display; m.style.display='block';
+    try{ startStructMode('reloj'); const cerrado=m.style.display==='none'; closeStructMode(); return angosto && corta && cerrado; }
+    finally{ m.style.display=prev||'none'; }
   });
   T('Verticales: doble salida en cualquier combinación de lados (opuestos o contiguos) desde el panel; dos flechas y la gemela copia', ()=>{
     const snap=JSON.stringify(structuresState), nivel=S.level, ed=S.editMode, sel=S.structSel, mir=S.structMirror;
