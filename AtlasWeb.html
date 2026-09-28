@@ -7506,7 +7506,8 @@ function _startStructDrag(e, it, mode, vertice){
   if(e.button!==0) return;
   e.preventDefault(); e.stopPropagation();
   const puntos = structsOf(S.floorId).filter(x=>STRUCT_TYPES[x.kind] && STRUCT_TYPES[x.kind].kind==='point' && STRUCT_TYPES[x.kind].grupo!=='reloj');
-  _stDrag={ mode:(mode==='move'&&e.shiftKey)?'all':mode, it, sx:e.clientX, sy:e.clientY, noMirror:!!e.altKey,
+  const esReloj=(STRUCT_TYPES[it.kind]||{}).grupo==='reloj';
+  _stDrag={ mode:(mode==='move'&&e.shiftKey&&!esReloj)?'all':mode, it, sx:e.clientX, sy:e.clientY, noMirror:!!e.altKey,
             o:{w:it.w||95, h:it.h||95, x:it.x, y:it.y}, v:vertice||{sx:1,sy:1}, all:puntos.map(x=>({x, ox:x.x, oy:x.y})), moved:false };
   window.addEventListener('mousemove', _structDragMove);
   window.addEventListener('mouseup', _structDragUp);
@@ -7527,8 +7528,8 @@ function _structDragMove(e){
   } else if(_stDrag.mode==='all'){
     _stDrag.all.forEach(a=>{ a.x.x=Math.round(a.ox+dx); a.x.y=Math.round(a.oy+dy); });
   } else {
-    const a=_stDrag.all.find(a=>a.x===_stDrag.it);
-    if(a){ _stDrag.it.x=Math.round(a.ox+dx); _stDrag.it.y=Math.round(a.oy+dy); }
+    // mover UNO: desde su propia posición de origen (los relojes no están en la lista de «todos»)
+    _stDrag.it.x=Math.round(_stDrag.o.x+dx); _stDrag.it.y=Math.round(_stDrag.o.y+dy);
   }
   renderSVGThrottled();
 }
@@ -16170,6 +16171,21 @@ async function runSelfTest(){
     try{ _navAnim={pasos:_navPasos(r2),i:0,t:0,fid:r2.o.fid,x:r2.o.x,y:r2.o.y,last:0,on:true}; const x0=_navAnim.x; _navAnimTick(2); const movio=Math.hypot(_navAnim.x-x0,_navAnim.y-r2.o.y)>0; _navAnimTick(3600); const llego=!_navAnim.on && cambios>=1; _navAnim=null;
       return enPiso1 && entrePisos && camilla && falla && movio && llego;
     } finally { window.goFloor=gf; S.floorId=fPrev; _navRes=sPrev; _navAnim=null; renderSVG(); }
+  });
+  T('Relojes: en edición se toman y arrastran a su posición final (vista 1 y 2), se guarda, y ⇧ no arrastra los ascensores', ()=>{
+    const snap=JSON.stringify(structuresState), nivel=S.level, ed=S.editMode, a0=S.areaId; _rpFix(true);
+    try{
+      S.editMode=true;
+      const prueba=(lv)=>{ S.level=lv; S.areaId=lv>1?'st_a':null;
+        structuresState[fl.id]=[{id:'r1',kind:'reloj',x:1200,y:1200,etq:'Rc'},{id:'a1',kind:'asc-G',x:2500,y:1200,w:150,h:180,etq:'L1'}]; renderSVG();
+        const r=structsOf(fl.id).find(x=>x.id==='r1'), a=structsOf(fl.id).find(x=>x.id==='a1'), z=S.zoom;
+        _startStructDrag({button:0,clientX:0,clientY:0,shiftKey:true,preventDefault(){},stopPropagation(){}}, r, 'move');
+        _structDragMove({clientX:300*z, clientY:-120*z}); _structDragUp();
+        return r.x===1500 && r.y===1080 && a.x===2500; };
+      const v1=prueba(1), v2=prueba(2);
+      return v1 && v2;
+    } finally { S.level=nivel; S.editMode=ed; S.areaId=a0; _stDrag=null; window.removeEventListener('mousemove', _structDragMove); window.removeEventListener('mouseup', _structDragUp);
+      _rpFix(false); Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG(); }
   });
   T('Relojes transversales: en vista 2 el reloj se edita (arrastrable) y el ascensor no captura clics; colocar no selecciona el recinto de abajo', ()=>{
     const snap=JSON.stringify(structuresState), nivel=S.level, ed=S.editMode, a0=S.areaId; _rpFix(true);
