@@ -7401,8 +7401,10 @@ function renderStructMarker(it, tdef){
   // Caja a tamaño real cuando el elemento trae w/h (importados de Navegación
   // o redimensionados); si no, el icono fijo de siempre (R=56 → 95×95 px).
   const sized = !!(it.w && it.h);
-  const bw = sized ? Math.max(30, it.w) : 95, bh = sized ? Math.max(30, it.h) : 95;
-  const R = sized ? Math.min(bw, bh) / 1.7 : 56;
+  // reloj control al DOBLE (190 px ≈ 3 m) por visibilidad (28-09-2026); el resto, 95 px
+  const base = tdef.grupo==='reloj' ? 190 : 95;
+  const bw = sized ? Math.max(30, it.w) : base, bh = sized ? Math.max(30, it.h) : base;
+  const R = sized ? Math.min(bw, bh) / 1.7 : base*56/95;
   const g = el('g', {class:'struct-marker', transform:`translate(${it.x},${it.y})`});
   const baseStrokeW = Math.max(2, Math.min(5, R / 11));
   if(tdef.grupo==='reloj'){
@@ -16111,7 +16113,7 @@ async function runSelfTest(){
       const arr=structsOf(fl.id), rc=arr.find(x=>x.id==='rc1');
       const importo=!!rc && !arr.some(x=>x.id==='rc-viejo') && arr.some(x=>x.id==='v1');
       const m=[...svg.querySelectorAll('.struct-marker')].find(g=>g.querySelector('.struct-reloj') && /Rc/.test(g.textContent));
-      const pinta=!!m && m.querySelector('.struct-reloj').getAttribute('fill')==='#C026D3' && /AA · Acceso CCEE/.test(m.querySelector('title').textContent);
+      const pinta=!!m && m.querySelector('.struct-reloj').getAttribute('fill')==='#C026D3' && parseFloat(m.querySelector('.struct-reloj').getAttribute('r'))===95 && /AA · Acceso CCEE/.test(m.querySelector('title').textContent);
       // 🎯 y ⇧ no lo mueven; Navegación lo conserva
       S.vertAjuste={fid:fl.id,dx:0,dy:0}; _vertAjusteTecla({key:'ArrowRight',target:document.body,metaKey:true});
       const quieto=rc.x===2000 && arr.find(x=>x.id==='v1').x===1005 && !_vertPuntos(fl.id).some(x=>x.kind==='reloj');
