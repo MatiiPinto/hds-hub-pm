@@ -897,6 +897,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <span class="tb-div"></span>
       <button class="tb-btn" id="btnExpServ" onclick="exportServicioHTML()" style="display:none" title="Exportar este servicio como HTML autónomo: imagen del plano recortada al contorno punteado, recintos clicables con su ficha (equipamiento, mobiliario, TI, MNC) y opción de ocultar las cajas. No incluye información de funcionarios.">📄 Exportar servicio</button>
       <button class="tb-btn" id="btnMapaServ" onclick="exportMapaServicio()" style="display:none" title="Mapa de navegación de este servicio en página carta: plano a página completa, recintos numerados y leyenda con nombre, código y señalética. Se guarda el HTML y se abre el diálogo de impresión para Guardar como PDF. Sin funcionarios.">🗺 Mapa carta (PDF)</button>
+      <button class="tb-btn" id="btnMurosServ" onclick="exportMurosServicio()" style="display:none" title="Medidas de muros del servicio en hoja carta, para instalar mobiliario: cada recinto con su contorno sobre el plano, cada muro numerado con su largo, y tabla por muro (orientación, largo, puertas y tramo libre). Portada con el plano del servicio numerado. Se abre el diálogo de impresión para Guardar como PDF.">📐 Muros carta (PDF)</button>
       <button class="tb-btn" id="btnOrdenarDots" onclick="ordenarDots()" style="display:none" title="Ordenar los puestos del recinto en una cuadrícula alineada, con espacio suficiente para que las tarjetas de nombre no se superpongan">⊞ Ordenar puestos</button>
       <button class="tb-btn" id="btnPuertas" onclick="togglePuertaMode()" style="display:none" title="Puertas de acceso y salida de cada recinto: flecha sobre el muro que indica la salida. Clic en el borde de un recinto coloca puerta normal (90 cm); Alt+clic camilla (120 cm); Shift+clic pabellón (200 cm). ⌘+clic sobre una puerta rota el tipo (90→120→200) · arrastrar la mueve · doble clic la elimina.">🚪 Puertas</button>
       <span id="puertaTipoSel" style="display:none;align-items:center;gap:2px">
@@ -6594,7 +6595,7 @@ const DOCK_MAPA=[
   ['dkCons',  ['btnFicha','btnAutSan','btnEquip','btnMob','btnScen','btnMoves','btnServPuestos']],
   ['dkEdit2', ['btnUndo','btnDraw','btnMerge','btnUnmerge','btnRename','btnDel','btnDelDot','btnOrdenarDots']],
   ['dkAdd',   ['btnPuertas','puertaTipoSel','btnPuertaDel','btnPuertaDelAll','btnPuertasAuto','btnDupMueble','btnStruct']],
-  ['dkExp',   ['btnExpServ','btnMapaServ']]
+  ['dkExp',   ['btnExpServ','btnMapaServ','btnMurosServ']]
 ];
 function _dockMonta(){
   const dock=document.getElementById('dock'); if(!dock||dock._montado) return;
@@ -13123,7 +13124,8 @@ function updateUI(){
     if(S.level<2&&S.puertaMode){ S.puertaMode=false; if(bpu)bpu.classList.remove('active'); const ph=document.getElementById('puertaHint'); if(ph)ph.classList.remove('show'); svg.style.cursor=''; }
     if(S.level!==3&&S.stampMode){ S.stampMode=false; if(bdm)bdm.classList.remove('active'); const sh=document.getElementById('stampHint'); if(sh)sh.classList.remove('show'); svg.style.cursor=''; }
     const bxs=document.getElementById('btnExpServ'); if(bxs) bxs.style.display=(S.level===2)?'':'none';
-    const bms=document.getElementById('btnMapaServ'); if(bms) bms.style.display=(S.level===2)?'':'none'; }
+    const bms=document.getElementById('btnMapaServ'); if(bms) bms.style.display=(S.level===2)?'':'none';
+    const bmu=document.getElementById('btnMurosServ'); if(bmu) bmu.style.display=(S.level===2)?'':'none'; }
   // Area jump selector: show at level 1 so user can navigate to any area (even without drawn shape)
   if(S.level===1 && fl){
     const undrawn=fl.areas.filter(a=>(boxState.areas[a.id]||[]).length===0 && a.rooms && a.rooms.length>0);
@@ -13805,6 +13807,149 @@ function exportMapaServicio(soloHtml){
   const w=window.open('', '_blank');
   if(w){ w.document.open(); w.document.write(html); w.document.close(); w.onload=()=>setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){} },400); }
   else if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🗺 Mapa guardado en Servicios/'+nom+' — el navegador bloqueó la ventana: ábrelo y usa Imprimir → Guardar PDF'; setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },7000); }
+  return html;
+}
+// ═══ 📐 MUROS DEL SERVICIO EN HOJA CARTA (28-sep-2026) ══════════════════════
+// Para instalar mobiliario: el largo de CADA muro del perímetro de cada recinto.
+// El contorno sale de la unión exacta de las cajas del recinto (formas en L o U
+// incluidas): cada lado es un muro, numerado en sentido horario desde el de más
+// arriba a la izquierda, con su orientación en el plano (N arriba). Las puertas
+// dibujadas (🚪) se asignan al muro más cercano y se descuentan del tramo libre.
+// Medidas a la caja del recinto (según el CAD): verificar en terreno.
+function _murosDeRecinto(rid){
+  const sh=boxState.rooms[rid]||[]; if(!sh.length) return null;
+  const ctx=_findRoom(rid), fid=ctx?ctx.floor.id:S.floorId, mpx=_mPx(fid);
+  // coordenadas casi iguales (< 3 px ≈ 5 cm) son el mismo muro
+  const agrupa=vals=>{ const v=[...vals].sort((a,b)=>a-b), rep={}; let g=[]; const cierra=()=>{ if(!g.length) return; const m=g.reduce((a,b)=>a+b,0)/g.length; g.forEach(x=>rep[x]=m); g=[]; };
+    v.forEach(x=>{ if(g.length && x-g[g.length-1]>3) cierra(); g.push(x); }); cierra(); return rep; };
+  const RX=agrupa(sh.flatMap(q=>[q.x,q.x+q.w])), RY=agrupa(sh.flatMap(q=>[q.y,q.y+q.h]));
+  const rs=sh.map(q=>({x0:RX[q.x],x1:RX[q.x+q.w],y0:RY[q.y],y1:RY[q.y+q.h]}));
+  const xs=[...new Set(Object.values(RX))].sort((a,b)=>a-b), ys=[...new Set(Object.values(RY))].sort((a,b)=>a-b);
+  const nx=xs.length-1, ny=ys.length-1;
+  const cov=(i,j)=>{ if(i<0||j<0||i>=nx||j>=ny) return false; const cx=(xs[i]+xs[i+1])/2, cy=(ys[j]+ys[j+1])/2; return rs.some(r=>cx>r.x0&&cx<r.x1&&cy>r.y0&&cy<r.y1); };
+  const segs=[]; let area=0;
+  for(let i=0;i<nx;i++) for(let j=0;j<ny;j++){ if(!cov(i,j)) continue; area+=(xs[i+1]-xs[i])*(ys[j+1]-ys[j]);
+    if(!cov(i,j-1)) segs.push({o:'N',a:[xs[i],ys[j]],b:[xs[i+1],ys[j]]});
+    if(!cov(i+1,j)) segs.push({o:'E',a:[xs[i+1],ys[j]],b:[xs[i+1],ys[j+1]]});
+    if(!cov(i,j+1)) segs.push({o:'S',a:[xs[i+1],ys[j+1]],b:[xs[i],ys[j+1]]});
+    if(!cov(i-1,j)) segs.push({o:'O',a:[xs[i],ys[j+1]],b:[xs[i],ys[j]]}); }
+  // encadenar en lazos (sentido horario) y fundir los tramos colineales
+  const k=p=>p[0].toFixed(2)+','+p[1].toFixed(2), desde={}; segs.forEach(g=>{ (desde[k(g.a)]=desde[k(g.a)]||[]).push(g); });
+  const usado=new Set(), lazos=[];
+  while(usado.size<segs.length){
+    const libres=segs.filter(g=>!usado.has(g)); const ini=libres.filter(g=>g.o==='N').sort((p,q)=>p.a[1]-q.a[1]||p.a[0]-q.a[0])[0]||libres[0];
+    const L=[]; let g=ini;
+    while(g && !usado.has(g)){ usado.add(g); L.push(g); const sig=(desde[k(g.b)]||[]).filter(x=>!usado.has(x)); g=sig.find(x=>x.o!==g.o)||sig[0]; }
+    const F=[]; L.forEach(g=>{ const u=F[F.length-1]; if(u && u.o===g.o && k(u.b)===k(g.a)) u.b=g.b; else F.push({o:g.o,a:g.a.slice(),b:g.b.slice()}); });
+    if(F.length>1 && F[0].o===F[F.length-1].o && k(F[F.length-1].b)===k(F[0].a)){ F[0].a=F[F.length-1].a; F.pop(); }
+    lazos.push(F);
+  }
+  let n=0; const muros=[];
+  lazos.forEach((F,li)=>F.forEach(g=>{ const px=Math.hypot(g.b[0]-g.a[0],g.b[1]-g.a[1]); muros.push({n:++n, o:g.o, a:g.a, b:g.b, px, m:px*mpx, lazo:li, puertas:[]}); }));
+  // puertas → muro más cercano (≤ 1 m)
+  const dseg=(p,a,b)=>{ const dx=b[0]-a[0],dy=b[1]-a[1],L2=dx*dx+dy*dy||1; let t=((p[0]-a[0])*dx+(p[1]-a[1])*dy)/L2; t=Math.max(0,Math.min(1,t)); return Math.hypot(p[0]-a[0]-t*dx,p[1]-a[1]-t*dy); };
+  (((typeof puertaState!=='undefined'&&puertaState)||{})[rid]||[]).forEach(pt=>{ let best=null,bd=1/mpx; muros.forEach(w=>{ const d=dseg([pt.x,pt.y],w.a,w.b); if(d<bd){bd=d;best=w;} }); if(best) best.puertas.push((PUERTA_DEF[pt.t]||PUERTA_DEF.n).cm); });
+  muros.forEach(w=>{ w.libre=Math.max(0, w.m-w.puertas.reduce((a,c)=>a+c/100,0)); });
+  return {rid, fid, mpx, muros, lazos:lazos.length, area_m2:area*mpx*mpx, perim_m:muros.reduce((a,w)=>a+w.m,0), bb:bounds(sh), sh};
+}
+const _MURO_O={N:'Norte',E:'Este',S:'Sur',O:'Oeste'}, _MURO_NRM={N:[0,-1],E:[1,0],S:[0,1],O:[-1,0]};
+function _fmtM(v){ return v.toFixed(2).replace('.',','); }
+function _murosCardSVG(M){
+  const pad=1.4/M.mpx, bb=M.bb, b={x:Math.max(0,bb.x-pad), y:Math.max(0,bb.y-pad)}; b.w=Math.min(IMG_W,bb.x+bb.w+pad)-b.x; b.h=Math.min(IMG_H,bb.y+bb.h+pad)-b.y;
+  let url=null; try{ const sc=Math.min(1,1300/Math.max(b.w,b.h)); const cv=document.createElement('canvas'); cv.width=Math.round(b.w*sc); cv.height=Math.round(b.h*sc);
+    const cx=cv.getContext('2d'); cx.fillStyle='#fff'; cx.fillRect(0,0,cv.width,cv.height); cx.globalAlpha=0.55; cx.drawImage(floorImg,b.x,b.y,b.w,b.h,0,0,cv.width,cv.height); url=cv.toDataURL('image/jpeg',0.82); }catch(e){}
+  const fs=Math.max(0.16/M.mpx, Math.min(0.42/M.mpx, Math.max(bb.w,bb.h)/20));
+  const rel=p=>[p[0]-b.x,p[1]-b.y];
+  let g='<svg viewBox="0 0 '+b.w.toFixed(1)+' '+b.h.toFixed(1)+'" preserveAspectRatio="xMidYMid meet">';
+  if(url) g+='<image href="'+url+'" x="0" y="0" width="'+b.w.toFixed(1)+'" height="'+b.h.toFixed(1)+'"/>';
+  g+='<path d="'+unionPath(M.sh.map(q=>({x:q.x-b.x,y:q.y-b.y,w:q.w,h:q.h})))+'" fill="#1d5fa0" fill-opacity=".07" stroke="none"/>';
+  M.muros.forEach((w,i)=>{
+    const a=rel(w.a), c=rel(w.b), nrm=_MURO_NRM[w.o], col=i%2?'#0f766e':'#1d5fa0';
+    const mx=(a[0]+c[0])/2, my=(a[1]+c[1])/2, off=fs*0.9;
+    g+='<line x1="'+a[0].toFixed(1)+'" y1="'+a[1].toFixed(1)+'" x2="'+c[0].toFixed(1)+'" y2="'+c[1].toFixed(1)+'" stroke="'+col+'" stroke-width="'+(fs*0.22).toFixed(1)+'" stroke-linecap="square"/>';
+    // cota exterior con topes
+    const oa=[a[0]+nrm[0]*off,a[1]+nrm[1]*off], oc=[c[0]+nrm[0]*off,c[1]+nrm[1]*off], tk=fs*0.28;
+    g+='<line x1="'+oa[0].toFixed(1)+'" y1="'+oa[1].toFixed(1)+'" x2="'+oc[0].toFixed(1)+'" y2="'+oc[1].toFixed(1)+'" stroke="#334155" stroke-width="'+(fs*0.06).toFixed(1)+'"/>';
+    [oa,oc].forEach(q=>{ g+='<line x1="'+(q[0]-nrm[0]*tk).toFixed(1)+'" y1="'+(q[1]-nrm[1]*tk).toFixed(1)+'" x2="'+(q[0]+nrm[0]*tk).toFixed(1)+'" y2="'+(q[1]+nrm[1]*tk).toFixed(1)+'" stroke="#334155" stroke-width="'+(fs*0.06).toFixed(1)+'"/>'; });
+    const tx=mx+nrm[0]*(off+fs*0.75), ty=my+nrm[1]*(off+fs*0.75), rot=(w.o==='E'||w.o==='O')?' transform="rotate('+(w.o==='E'?90:-90)+' '+tx.toFixed(1)+' '+ty.toFixed(1)+')"':'';
+    g+='<text x="'+tx.toFixed(1)+'" y="'+ty.toFixed(1)+'" text-anchor="middle" dominant-baseline="middle" font-size="'+(fs*0.78).toFixed(1)+'" font-weight="800" fill="#0f172a" stroke="#fff" stroke-width="'+(fs*0.18).toFixed(1)+'" paint-order="stroke"'+rot+'>'+_fmtM(w.m)+' m</text>';
+    const ix=mx-nrm[0]*fs*0.95, iy=my-nrm[1]*fs*0.95;
+    g+='<circle cx="'+ix.toFixed(1)+'" cy="'+iy.toFixed(1)+'" r="'+(fs*0.52).toFixed(1)+'" fill="#fff" stroke="'+col+'" stroke-width="'+(fs*0.1).toFixed(1)+'"/><text x="'+ix.toFixed(1)+'" y="'+(iy+fs*0.02).toFixed(1)+'" text-anchor="middle" dominant-baseline="middle" font-size="'+(fs*0.62).toFixed(1)+'" font-weight="800" fill="'+col+'">'+w.n+'</text>';
+  });
+  // flecha del norte del plano
+  g+='<g transform="translate('+(b.w-fs*1.4).toFixed(1)+','+(fs*1.6).toFixed(1)+')"><path d="M0 '+(-fs)+' L'+(fs*0.45)+' '+(fs*0.5)+' L0 '+(fs*0.2)+' L'+(-fs*0.45)+' '+(fs*0.5)+'Z" fill="#334155"/><text y="'+(fs*1.3)+'" text-anchor="middle" font-size="'+(fs*0.6)+'" font-weight="800" fill="#334155">N</text></g>';
+  return g+'</svg>';
+}
+function _murosServicioHTML(R){
+  const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const nomServ=aName(R.area.id), piso=(curFloor()||{}).label||S.floorId;
+  const fecha=new Date().toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const cards=R.rooms.map((r,i)=>({r,i,M:_murosDeRecinto(r.id)})).filter(x=>x.M);
+  // portada: plano del servicio con los recintos numerados (mismo orden que las fichas)
+  const ms=Math.max(30,Math.min(70,Math.min(R.b.w,R.b.h)/26));
+  let sv='<svg viewBox="0 0 '+R.b.w+' '+R.b.h+'" preserveAspectRatio="xMidYMid meet"><defs><clipPath id="cp"><path d="'+R.guiaD+'"/></clipPath></defs>';
+  sv+=R.dataURL?('<image href="'+R.dataURL+'" x="0" y="0" width="'+R.b.w+'" height="'+R.b.h+'" clip-path="url(#cp)"/>'):'';
+  sv+='<path d="'+R.guiaD+'" fill="none" stroke="#e11d48" stroke-width="'+(ms*.12)+'" stroke-dasharray="'+(ms*.6)+' '+(ms*.3)+'"/>';
+  R.rooms.forEach(r=>{ sv+='<path d="'+r.d+'" fill-rule="evenodd" fill="'+r.col+'" fill-opacity=".14" stroke="'+r.col+'" stroke-width="'+(ms*.07)+'"/>'; });
+  R.rooms.forEach((r,i)=>{ sv+='<circle cx="'+r.cx.toFixed(1)+'" cy="'+r.cy.toFixed(1)+'" r="'+(ms/2)+'" fill="#fff" stroke="'+r.col+'" stroke-width="'+(ms*.11)+'"/><text x="'+r.cx.toFixed(1)+'" y="'+(r.cy+ms*.02).toFixed(1)+'" text-anchor="middle" dominant-baseline="middle" font-size="'+(ms*.55)+'" font-weight="800" fill="#0f172a">'+(i+1)+'</text>'; });
+  sv+='</svg>';
+  const totP=cards.reduce((a,c)=>a+c.M.perim_m,0), totA=cards.reduce((a,c)=>a+c.M.area_m2,0);
+  const indice=cards.map(c=>'<tr><td>'+(c.i+1)+'</td><td>'+esc(c.r.nm)+'</td><td>'+esc(c.r.code)+'</td><td class="n">'+_fmtM(c.M.area_m2)+'</td><td class="n">'+_fmtM(c.M.perim_m)+'</td><td class="n">'+c.M.muros.length+'</td></tr>').join('');
+  const ficha=c=>{ const M=c.M;
+    const filas=M.muros.map(w=>'<tr><td class="c"><b>'+w.n+'</b></td><td>'+_MURO_O[w.o]+'</td><td class="n"><b>'+_fmtM(w.m)+'</b></td><td>'+(w.puertas.length?w.puertas.map(x=>x+' cm').join(' + '):'—')+'</td><td class="n">'+_fmtM(w.libre)+'</td></tr>').join('');
+    return '<section class="card"><h2><span class="nro">'+(c.i+1)+'</span>'+esc(c.r.nm)+(c.r.code?' <span class="cod">'+esc(c.r.code)+'</span>':'')+'</h2>'
+      +'<div class="sub">'+esc(c.r.tipo||'')+' · área '+_fmtM(M.area_m2)+' m² · perímetro '+_fmtM(M.perim_m)+' m · '+M.muros.length+' muros'+(M.lazos>1?' · incluye '+(M.lazos-1)+' contorno(s) interior(es)':'')+'</div>'
+      +'<div class="cuerpo"><div class="dib">'+_murosCardSVG(M)+'</div><table><tr><th>Muro</th><th>Orient.</th><th>Largo (m)</th><th>Puertas</th><th>Libre (m)</th></tr>'+filas
+      +'<tr class="tot"><td></td><td>Total</td><td class="n">'+_fmtM(M.perim_m)+'</td><td></td><td class="n">'+_fmtM(M.muros.reduce((a,w)=>a+w.libre,0))+'</td></tr></table></div></section>'; };
+  return ['<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Muros '+esc(nomServ)+' · '+esc(piso)+' · Atlas HDS</title><style>',
+'@page{size:letter portrait;margin:0.45in}',
+'*{margin:0;padding:0;box-sizing:border-box}',
+'html,body{background:#fff;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}',
+'body{width:7.6in;margin:0 auto;padding:0.2in 0}',
+'header{border-bottom:2px solid #1d5fa0;padding-bottom:4px;margin-bottom:8px}',
+'header h1{font-size:15pt;font-weight:800;color:#1d5fa0}',
+'header .sub{font-size:8.5pt;color:#475569;margin-top:2px}',
+'.portada .mapa{width:7.6in;height:5.2in;border:1px solid #cbd5e1;border-radius:6px;overflow:hidden}',
+'.portada .mapa svg,.dib svg{width:100%;height:100%;display:block}',
+'table{border-collapse:collapse;font-size:8pt}',
+'th{background:#1d5fa0;color:#fff;font-weight:700;padding:3px 5px;text-align:left}',
+'td{padding:2.5px 5px;border-bottom:1px solid #e2e8f0}',
+'td.n{text-align:right;font-variant-numeric:tabular-nums}',
+'td.c{text-align:center}',
+'tr.tot td{font-weight:800;background:#eef2f7}',
+'.portada table{width:100%;margin-top:8px}',
+'.card{height:4.85in;break-inside:avoid;border-top:1px solid #cbd5e1;padding-top:6px;margin-top:4px}',
+'.card:nth-of-type(2n+1){break-before:page}',
+'.card h2{font-size:11.5pt;font-weight:800;color:#0f172a;display:flex;align-items:center;gap:6px}',
+'.card h2 .nro{display:inline-flex;align-items:center;justify-content:center;min-width:22px;height:22px;border:2px solid #1d5fa0;border-radius:50%;font-size:9pt;color:#1d5fa0}',
+'.card h2 .cod{font-size:9pt;color:#64748b;font-weight:600}',
+'.card .sub{font-size:8pt;color:#475569;margin:2px 0 5px}',
+'.cuerpo{display:flex;gap:0.15in;align-items:flex-start}',
+'.dib{width:4.5in;height:3.95in;border:1px solid #cbd5e1;border-radius:6px;overflow:hidden;flex-shrink:0;background:#fff}',
+'.cuerpo table{width:2.95in}',
+'footer{margin-top:6px;font-size:7pt;color:#64748b}',
+'#ctl{position:fixed;top:10px;right:10px}#ctl button{background:#1d5fa0;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer}',
+'@media print{#ctl{display:none}body{padding:0}}',
+'</style></head><body><div id="ctl"><button onclick="window.print()">🖨 Imprimir / Guardar PDF</button></div>',
+'<div class="portada"><header><h1>📐 Muros · '+esc(nomServ)+'</h1><div class="sub">'+esc(piso)+' · '+cards.length+' recintos · perímetro total '+_fmtM(totP)+' m · área '+_fmtM(totA)+' m² · Atlas HDS · '+fecha+'</div></header>',
+'<div class="mapa">'+sv+'</div>',
+'<table><tr><th>N°</th><th>Recinto</th><th>Código</th><th style="text-align:right">Área (m²)</th><th style="text-align:right">Perímetro (m)</th><th style="text-align:right">Muros</th></tr>'+indice+'</table>',
+'<footer>Medidas al contorno de la caja de cada recinto en el Atlas (derivada del CAD), a ±5 cm; verificar en terreno antes de fabricar o instalar. Muros numerados en sentido horario desde el de más arriba a la izquierda; orientación según el plano (N arriba). «Libre» = largo del muro menos las puertas dibujadas en el Atlas.</footer></div>',
+cards.map(ficha).join(''),
+'</body></html>'].join('\n');
+}
+function exportMurosServicio(soloHtml){
+  const R=_servRecorte();
+  if(!R){ alert('Entra a un servicio (vista 2) para exportar sus muros.'); return null; }
+  if(R.error){ alert(R.error); return null; }
+  if(!R.rooms.length){ alert('Este servicio no tiene recintos dibujados.'); return null; }
+  const html=_murosServicioHTML(R);
+  if(soloHtml) return html;
+  const nom='Muros_'+String(aName(R.area.id)).replace(/[^A-Za-z0-9Ññ]+/g,'_').replace(/^_|_$/g,'')+'_'+new Date().toISOString().slice(0,10)+'.html';
+  guardarArchivo('Servicios', nom, html, 'text/html');
+  const w=window.open('', '_blank');
+  if(w){ w.document.open(); w.document.write(html); w.document.close(); w.onload=()=>setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){} },500); }
+  else if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='📐 Muros guardados en Servicios/'+nom+' — el navegador bloqueó la ventana: ábrelo y usa Imprimir → Guardar PDF'; setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },7000); }
   return html;
 }
 // ═══ EXPORTS DE RECINTOS Y DE PUESTOS DE TRABAJO (18-sep-2026) ══════════════
@@ -15986,6 +16131,20 @@ async function runSelfTest(){
     try{ _navAnim={pasos:_navPasos(r2),i:0,t:0,fid:r2.o.fid,x:r2.o.x,y:r2.o.y,last:0,on:true}; const x0=_navAnim.x; _navAnimTick(2); const movio=Math.hypot(_navAnim.x-x0,_navAnim.y-r2.o.y)>0; _navAnimTick(3600); const llego=!_navAnim.on && cambios>=1; _navAnim=null;
       return enPiso1 && entrePisos && camilla && falla && movio && llego;
     } finally { window.goFloor=gf; S.floorId=fPrev; _navRes=sPrev; _navAnim=null; renderSVG(); }
+  });
+  T('📐 Muros: rectángulo = 4 muros; forma en L = 6 muros con perímetro exacto; la puerta se asigna a su muro y se descuenta', ()=>{
+    _rpFix(true); const mpx=_mPx(fl.id), bk=JSON.stringify(boxState.rooms['st_r1']), pk=JSON.stringify(puertaState['st_r1']||null);
+    try{
+      boxState.rooms['st_r1']=[{x:900,y:900,w:1100,h:900}];
+      const A=_murosDeRecinto('st_r1'); const rect=A.muros.length===4 && A.muros[0].o==='N' && Math.abs(A.muros[0].px-1100)<0.5 && Math.abs(A.perim_m-4000*A.mpx)<0.01;
+      // L: 1100×900 + 400×500 pegado abajo a la izquierda (con 2 px de holgura que se funden)
+      boxState.rooms['st_r1']=[{x:900,y:900,w:1100,h:900},{x:902,y:1800,w:400,h:500}];
+      puertaState['st_r1']=[{x:1450,y:900,ang:0,t:'c'}];
+      const B=_murosDeRecinto('st_r1'); const esperado=(1100+900+700+500+400+1400)*B.mpx;
+      const ele=B.muros.length===6 && Math.abs(B.perim_m-esperado)<0.1 && Math.abs(B.area_m2-(1100*900+400*500)*B.mpx*B.mpx)<0.5;
+      const n=B.muros.find(w=>w.o==='N'); const puerta=n.puertas.length===1 && n.puertas[0]===120 && Math.abs(n.libre-(n.m-1.2))<0.001;
+      return rect && ele && puerta;
+    } finally { boxState.rooms['st_r1']=JSON.parse(bk); if(pk==='null') delete puertaState['st_r1']; else puertaState['st_r1']=JSON.parse(pk); _rpFix(false); }
   });
   T('Reparto por caja: un código con 1 instancia PMA y 2 cajas reparte (no duplica); el hijo sin caja va al padre; 💻 computadores cuenta desde ese reparto', ()=>{
     const RE=window.RECINTO_EQUIP=window.RECINTO_EQUIP||{}, PB=window.PMA_BIM=window.PMA_BIM||{}; PB.codeToBim=PB.codeToBim||{};
