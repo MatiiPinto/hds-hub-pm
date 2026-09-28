@@ -7426,6 +7426,14 @@ function renderStructMarker(it, tdef){
       g.appendChild(el('line',{x1:-R*0.6,y1:yT,x2:xR,y2:yT,stroke:'#fff','stroke-width':Math.max(2,R*0.1),'stroke-linecap':'round'}));
       g.appendChild(el('line',{x1:xR,y1:yT,x2:xR,y2:yT+R*0.32,stroke:'#fff','stroke-width':Math.max(2,R*0.1),'stroke-linecap':'round'}));
     }
+    // número de la escalera (el mismo hueco lleva el mismo número en todos los pisos)
+    if(it.etq){
+      const rb=Math.max(22, Math.min(bw,bh)*0.26);
+      const bx=bw/2-rb*1.15, by=-bh/2+rb*1.15;
+      g.appendChild(el('circle',{class:'struct-num',cx:bx,cy:by,r:rb,fill:'#fff',stroke:tdef.col,'stroke-width':Math.max(2,rb*0.14)}));
+      const tn=el('text',{x:bx,y:by+rb*0.05,'text-anchor':'middle','dominant-baseline':'middle','font-size':rb*(String(it.etq).length>1?1.05:1.3),'font-weight':900,fill:tdef.col,'font-family':'system-ui,-apple-system,sans-serif'});
+      tn.textContent=it.etq; g.appendChild(tn);
+    }
   } else if(it.kind === 'escalator'){
     g.appendChild(el('path',{d:`M ${-R*0.55} ${R*0.55} L ${R*0.55} ${-R*0.55} M ${R*0.55} ${-R*0.55} L ${R*0.1} ${-R*0.55} M ${R*0.55} ${-R*0.55} L ${R*0.55} ${-R*0.1}`,stroke:'#fff','stroke-width':Math.max(3,R*0.14),fill:'none','stroke-linecap':'round','stroke-linejoin':'round'}));
   }
@@ -16040,6 +16048,17 @@ async function runSelfTest(){
     const prev=m.style.display; m.style.display='block';
     try{ startStructMode('reloj'); const cerrado=m.style.display==='none'; closeStructMode(); return angosto && corta && cerrado; }
     finally{ m.style.display=prev||'none'; }
+  });
+  T('Escaleras: el número (etq) se dibuja sobre la escalera y el parche lo pone sin moverla', ()=>{
+    const snap=JSON.stringify(structuresState), Lprev=window.VERTICALES_PARCHES, nivel=S.level;
+    try{
+      S.level=1; structuresState[fl.id]=[{id:'e1',kind:'stair',x:1500,y:900,w:300,h:400}];
+      window.VERTICALES_PARCHES=[{id:'pz-esc',piso:fl.id,completar:[{id:'e1',campos:{etq:'7'}}]}];
+      _aplicaParchesVerticales(true); renderSVG();
+      const e=structsOf(fl.id)[0], m=svg.querySelector('.struct-marker');
+      const num=!!m && !!m.querySelector('.struct-num') && [...m.querySelectorAll('text')].some(t=>t.textContent==='7') && /Escalera 7/.test(m.querySelector('title').textContent);
+      return e.etq==='7' && e.x===1500 && e.y===900 && num;
+    } finally { window.VERTICALES_PARCHES=Lprev; S.level=nivel; Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG(); }
   });
   T('Verticales: doble salida en cualquier combinación de lados (opuestos o contiguos) desde el panel; dos flechas y la gemela copia', ()=>{
     const snap=JSON.stringify(structuresState), nivel=S.level, ed=S.editMode, sel=S.structSel, mir=S.structMirror;
