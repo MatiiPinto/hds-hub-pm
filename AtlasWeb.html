@@ -949,7 +949,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
         <button class="struct-opt" onclick="aplicarSalidasSiembra()" style="--c:#0ea5e9" title="Solo las PUERTAS: toma el lado de salida de cada ascensor y escalera desde la siembra (dibujado en Navegación o inferido desde las zonas de circulación) y lo aplica a los elementos de todos los pisos SIN moverlos ni cambiarles el tamaño.">🚪 <b>Solo puertas desde la siembra</b> <span style="opacity:.55">· no mueve nada</span></button>
         <div class="sm-h">Ajustar el piso</div>
         <button class="struct-opt" onclick="toggleVertAjuste()" style="--c:#f59e0b" title="Toma TODOS los ascensores, escaleras y escaleras mecánicas del piso activo y los mueve en bloque con las flechas del teclado: 1 px por pulsación · ⌘ (o Ctrl) + flecha = 5 px · ⇧ + flecha = 20 px. Cada paso se guarda de inmediato y el desplazamiento acumulado del piso se recuerda: al reimportar de Navegación se vuelve a aplicar solo. Cambia de piso y sigue ajustando; Esc o ✓ para salir.">🎯 <b>Mover todos con las flechas</b> <span style="opacity:.55">· 1 px · ⌘ 5 px</span></button>
-        <div class="sm-note">En edición: arrastrar mueve · ⇧+arrastrar mueve TODOS los del piso · esquina ◢ escala · × borra · 🎯 flechas mueven todos los del piso (⌘ = 5 px) · clic en uno lo selecciona y abre su panel (tipo · salida · tamaño · etiqueta) · con uno seleccionado las flechas lo mueven solo a él (⌘ 5 px · ⇧ 20 px) · ⌥+arrastrar mueve una gemela sin su pareja · los ⏱ relojes se arrastran uno a uno</div>
+        <div class="sm-note">En edición: arrastrar mueve · ⇧+arrastrar mueve TODOS los del piso · arrastrar un vértice escala con el opuesto fijo (⇧ mantiene la proporción) · × borra · 🎯 flechas mueven todos los del piso (⌘ = 5 px) · clic en uno lo selecciona y abre su panel (tipo · salida · tamaño · etiqueta) · con uno seleccionado las flechas lo mueven solo a él (⌘ 5 px · ⇧ 20 px) · ⌥+arrastrar mueve una gemela sin su pareja · los ⏱ relojes se arrastran uno a uno</div>
       </div>
       <button class="tb-btn warn" id="btnMerge" onclick="doMerge()" style="display:none">🔗 Fusionar</button>
       <button class="tb-btn warn" id="btnUnmerge" onclick="doUnmerge()" style="display:none" title="Separar los bloques de este recinto en recintos independientes">✂ Des-fusionar</button>
@@ -7442,25 +7442,28 @@ function renderStructMarker(it, tdef){
   ttl.textContent = tdef.grupo==='reloj'
     ? (tdef.label + (it.n?(' N°'+it.n):'') + (it.edificio?(' · '+it.edificio):'') + (it.acceso?(' · '+it.acceso):'') + (it.obs?(' · '+it.obs):'')
        + (it.origen?(' · '+it.origen+' (propuesta de los hospitales, pendiente de factibilidad)'):' · colocado a mano')
-       + ((S.editMode&&S.level===1) ? ' · arrastrar mueve · ◢ escala · × borra' : ''))
+       + ((S.editMode&&S.level===1) ? ' · arrastrar mueve · vértices escalan · × borra' : ''))
     : tdef.label + (it.etq?(' '+it.etq):'') + (sized&&mx ? ` · ${(bw*mx).toFixed(1)} × ${(bh*my).toFixed(1)} m` : '')
     + (it.kind.startsWith('asc-') ? (' · puerta: '+(PUERTA[it.salida]||it.salida||'sin dato')) : '')
     + (it.tam==='tipologia' ? ' · ⚠ ducto no leído en el plano: tamaño por tipología, revisar posición' : '')
-    + ((S.editMode&&S.level===1) ? ' · clic: panel (tipo · salida · tamaño) · arrastrar mueve · ⇧ mueve todo el piso · ⌥ sin espejo · ◢ escala · × borra'+(it.kind.startsWith('asc-')?' · clic derecho rota la salida'+(_gemelaDe(it)?' · la gemela sigue en espejo':''):'') : '');
+    + ((S.editMode&&S.level===1) ? ' · clic: panel (tipo · salida · tamaño) · arrastrar mueve · ⇧ mueve todo el piso · ⌥ sin espejo · vértices escalan (⇧ proporción) · × borra'+(it.kind.startsWith('asc-')?' · clic derecho rota la salida'+(_gemelaDe(it)?' · la gemela sigue en espejo':''):'') : '');
   g.appendChild(ttl);
   g.addEventListener('click', e => { e.stopPropagation(); if(S.editMode && S.level===1 && !_structKind && !_stJustDragged) structSelect(it.id); });
   if(S.editMode && S.level===1 && !_structKind){
     g.style.cursor = 'grab';
     g.addEventListener('mousedown', e => _startStructDrag(e, it, 'move'));
     if(it.kind.startsWith('asc-')) g.addEventListener('contextmenu', e => { e.preventDefault(); e.stopPropagation(); ciclarPuerta(it.id); });
-    // esquina de escala ◢
-    const hs = Math.max(10, Math.min(18, R*0.3));
-    const hz = el('rect',{x:bw/2-hs,y:bh/2-hs,width:hs,height:hs,fill:'#fff',stroke:tdef.col,'stroke-width':2,class:'struct-resize'});
-    hz.style.cursor = 'nwse-resize';
-    hz.addEventListener('mousedown', e => _startStructDrag(e, it, 'size'));
-    g.appendChild(hz);
+    // tiradores en los 4 VÉRTICES: arrastrar uno escala con el vértice opuesto fijo
+    // (⇧ mantiene la proporción). Tamaño casi constante en pantalla.
+    const hs = Math.max(8, Math.min(Math.min(bw,bh)*0.3, 11/Math.max(S.zoom,0.02)));
+    [[-1,-1,'nwse-resize'],[1,-1,'nesw-resize'],[1,1,'nwse-resize'],[-1,1,'nesw-resize']].forEach(([cx,cy,cur])=>{
+      const hz = el('rect',{x:cx*bw/2-hs/2,y:cy*bh/2-hs/2,width:hs,height:hs,rx:hs*0.18,fill:'#fff',stroke:tdef.col,'stroke-width':Math.max(1.5,hs*0.16),class:'struct-resize','data-v':(cy<0?'n':'s')+(cx<0?'w':'e')});
+      hz.style.cursor = cur;
+      hz.addEventListener('mousedown', e => _startStructDrag(e, it, 'size', {sx:cx, sy:cy}));
+      g.appendChild(hz);
+    });
     const dbR = Math.max(10, Math.min(14, R*0.25));
-    const del = el('g',{class:'struct-delbtn',transform:`translate(${bw/2+8},${-bh/2-8})`});
+    const del = el('g',{class:'struct-delbtn',transform:`translate(${bw/2+hs+dbR},${-bh/2-hs-dbR})`});
     // zona de clic invisible más grande que el botón: la × se acierta aunque el
     // puntero tiemble o el marcador quede pequeño en pantalla
     del.appendChild(el('circle',{cx:0,cy:0,r:dbR*1.9,class:'hit'}));
@@ -7477,7 +7480,7 @@ function renderStructMarker(it, tdef){
 }
 // ── Ubicar y escalar (vista 1 · modo edición) ────────────────────────────
 // arrastrar = mover · ⇧+arrastrar = mover TODOS los del piso (corrige un
-// desfase sistemático de la importación) · esquina ◢ = escalar.
+// desfase sistemático de la importación) · vértices = escalar (opuesto fijo).
 let _stDrag=null, _stJustDragged=false;
 // Clic derecho sobre un ascensor (edición, vista 1): rota el lado de la puerta
 // n → e → s → w → ns → ew → sin dato.
@@ -7489,13 +7492,13 @@ function ciclarPuerta(id){
   sStruct(); renderSVG();
   if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🛗 '+(it.etq||'')+' puerta: '+({n:'norte',e:'este',s:'sur',w:'oeste',ns:'norte y sur',ew:'este y oeste'}[it.salida]||'sin dato'); setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },2500); }
 }
-function _startStructDrag(e, it, mode){
+function _startStructDrag(e, it, mode, vertice){
   if(!(S.editMode && S.level===1) || _structKind) return;
   if(e.button!==0) return;
   e.preventDefault(); e.stopPropagation();
   const puntos = structsOf(S.floorId).filter(x=>STRUCT_TYPES[x.kind] && STRUCT_TYPES[x.kind].kind==='point' && STRUCT_TYPES[x.kind].grupo!=='reloj');
   _stDrag={ mode:(mode==='move'&&e.shiftKey)?'all':mode, it, sx:e.clientX, sy:e.clientY, noMirror:!!e.altKey,
-            o:{w:it.w||95, h:it.h||95}, all:puntos.map(x=>({x, ox:x.x, oy:x.y})), moved:false };
+            o:{w:it.w||95, h:it.h||95, x:it.x, y:it.y}, v:vertice||{sx:1,sy:1}, all:puntos.map(x=>({x, ox:x.x, oy:x.y})), moved:false };
   window.addEventListener('mousemove', _structDragMove);
   window.addEventListener('mouseup', _structDragUp);
 }
@@ -7505,8 +7508,13 @@ function _structDragMove(e){
   if(!_stDrag.moved && Math.hypot(e.clientX-_stDrag.sx, e.clientY-_stDrag.sy)<3) return;
   _stDrag.moved=true;
   if(_stDrag.mode==='size'){
-    _stDrag.it.w=Math.max(30, Math.round(_stDrag.o.w+dx));
-    _stDrag.it.h=Math.max(30, Math.round(_stDrag.o.h+dy));
+    // el vértice arrastrado sigue al puntero; el opuesto queda fijo (el centro se corre la mitad)
+    const v=_stDrag.v||{sx:1,sy:1}, o=_stDrag.o;
+    let nw=Math.max(30, o.w+v.sx*dx), nh=Math.max(30, o.h+v.sy*dy);
+    if(e.shiftKey){ const k=Math.max(nw/o.w, nh/o.h); nw=Math.max(30,o.w*k); nh=Math.max(30,o.h*k); }
+    nw=Math.round(nw); nh=Math.round(nh);
+    _stDrag.it.w=nw; _stDrag.it.h=nh;
+    _stDrag.it.x=Math.round(o.x+v.sx*(nw-o.w)/2); _stDrag.it.y=Math.round(o.y+v.sy*(nh-o.h)/2);
   } else if(_stDrag.mode==='all'){
     _stDrag.all.forEach(a=>{ a.x.x=Math.round(a.ox+dx); a.x.y=Math.round(a.oy+dy); });
   } else {
@@ -15816,6 +15824,33 @@ async function runSelfTest(){
       return movio && acum && ignora && conHint && vuelve && reap && fin;
     } finally {
       _VA=VAprev; window.NAV_VERTICALES=NVprev; S.level=nivel; S.editMode=ed; S.vertAjuste=va;
+      Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
+    }
+  });
+  T('Verticales: 4 vértices en edición; arrastrar uno escala con el opuesto fijo, ⇧ mantiene la proporción y la gemela sigue', ()=>{
+    const snap=JSON.stringify(structuresState), nivel=S.level, ed=S.editMode, mir=S.structMirror;
+    try{
+      S.editMode=true; S.level=1; S.structMirror=true;
+      structuresState[fl.id]=[{id:'v1',kind:'asc-G',x:1000,y:800,w:150,h:180,etq:'L1'},{id:'v2',kind:'asc-G',x:1000,y:990,w:150,h:180,etq:'L2'},{id:'s1',kind:'stair',x:3000,y:800,w:200,h:300}];
+      renderSVG();
+      const m=[...svg.querySelectorAll('.struct-marker')].find(g=>g.querySelectorAll('.struct-resize').length===4);
+      const cuatro=!!m && [...svg.querySelectorAll('.struct-marker')].every(g=>g.querySelectorAll('.struct-resize').length===4);
+      const it=structsOf(fl.id).find(x=>x.id==='v1'), z=S.zoom;
+      // vértice superior izquierdo, 50 px de plano hacia afuera: esquina inferior derecha fija
+      const br0=[it.x+it.w/2, it.y+it.h/2];
+      _startStructDrag({button:0,clientX:0,clientY:0,preventDefault(){},stopPropagation(){}}, it, 'size', {sx:-1,sy:-1});
+      _stDrag.moved=true;                     // a zoom bajo 50 px de plano son < 3 px de pantalla
+      _structDragMove({clientX:-50*z, clientY:-40*z});
+      const fijo=Math.abs(it.x+it.w/2-br0[0])<=1 && Math.abs(it.y+it.h/2-br0[1])<=1 && it.w===200 && it.h===220;
+      _structDragMove({clientX:-50*z, clientY:0, shiftKey:true});
+      const prop=Math.abs(it.w/it.h-150/180)<0.02;
+      _structDragUp();
+      const gem=structsOf(fl.id).find(x=>x.id==='v2'); const sigue=gem.w===it.w && gem.h===it.h;
+      const s1=structsOf(fl.id).find(x=>x.id==='s1'); const otro=s1.w===200 && s1.x===3000;
+      return cuatro && fijo && prop && sigue && otro;
+    } finally {
+      S.level=nivel; S.editMode=ed; S.structMirror=mir; _stDrag=null;
+      window.removeEventListener('mousemove', _structDragMove); window.removeEventListener('mouseup', _structDragUp);
       Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
     }
   });
