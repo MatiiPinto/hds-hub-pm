@@ -7280,7 +7280,7 @@ function startStructMode(kind){
   _structKind = kind;
   document.querySelectorAll('.struct-opt').forEach(b => b.classList.toggle('active', b.dataset.kind === kind));
   viewer.style.cursor = 'crosshair';
-  svg.addEventListener('click', _structClickHandler);
+  svg.addEventListener('click', _structClickHandler, true);   // captura: el recinto de abajo no recibe el clic
   svg.addEventListener('dblclick', _structDblClickHandler);
   document.addEventListener('keydown', _structKeyHandler);
   showStructBanner(kind);
@@ -7289,7 +7289,7 @@ function closeStructMode(){
   _structKind = null;
   _structLine = null;
   viewer.style.cursor = '';
-  svg.removeEventListener('click', _structClickHandler);
+  svg.removeEventListener('click', _structClickHandler, true);
   svg.removeEventListener('dblclick', _structDblClickHandler);
   document.removeEventListener('keydown', _structKeyHandler);
   document.querySelectorAll('.struct-opt').forEach(b => b.classList.remove('active'));
@@ -7298,8 +7298,8 @@ function closeStructMode(){
 }
 function _structClickHandler(e){
   if(!_structKind) return;
+  e.stopPropagation(); e.preventDefault();      // mientras se coloca, ningún clic selecciona el recinto de abajo
   if(didPan) return;
-  e.stopPropagation(); e.preventDefault();
   const p = s2i(e.clientX, e.clientY);
   const tdef = STRUCT_TYPES[_structKind];
   if(!tdef) return;
@@ -7366,8 +7366,9 @@ function paintStructures(){
   const items = structsOf(S.floorId).filter(it=>{ const t=STRUCT_TYPES[it.kind]; if(!t || t.kind!=='point') return true;
     return t.grupo==='reloj' ? S.relojes!==false : S.verticales!==false; });
   if(!items.length && !_structLine) return;
+  const relojEditable = S.editMode && items.some(it=>(STRUCT_TYPES[it.kind]||{}).grupo==='reloj');
   const g = el('g', {class:'structures-layer',
-    ...(S.level>1?{'pointer-events':'none'}:{})});
+    ...(S.level>1 && !relojEditable ?{'pointer-events':'none'}:{})});
   // Renderizar todos los elementos persistidos
   items.forEach(it => {
     const tdef = STRUCT_TYPES[it.kind]; if(!tdef) return;
@@ -7448,14 +7449,16 @@ function renderStructMarker(it, tdef){
   ttl.textContent = tdef.grupo==='reloj'
     ? (tdef.label + (it.n?(' N°'+it.n):'') + (it.edificio?(' · '+it.edificio):'') + (it.acceso?(' · '+it.acceso):'') + (it.obs?(' · '+it.obs):'')
        + (it.origen?(' · '+it.origen+' (propuesta de los hospitales, pendiente de factibilidad)'):' · colocado a mano')
-       + ((S.editMode&&S.level===1) ? ' · arrastrar mueve · vértices escalan · × borra' : ''))
+       + (S.editMode ? ' · arrastrar mueve · vértices escalan · × borra (en cualquier vista)' : ''))
     : tdef.label + (it.etq?(' '+it.etq):'') + (sized&&mx ? ` · ${(bw*mx).toFixed(1)} × ${(bh*my).toFixed(1)} m` : '')
     + (it.kind.startsWith('asc-') ? (' · puerta: '+(it.salida?_salidaTxt(it.salida):'sin dato')) : '')
     + (it.tam==='tipologia' ? ' · ⚠ ducto no leído en el plano: tamaño por tipología, revisar posición' : '')
     + ((S.editMode&&S.level===1) ? ' · clic: panel (tipo · salida · tamaño) · arrastrar mueve · ⇧ mueve todo el piso · ⌥ sin espejo · vértices escalan (⇧ proporción) · × borra'+(it.kind.startsWith('asc-')?' · clic derecho rota la salida'+(_gemelaDe(it)?' · la gemela sigue en espejo':''):'') : '');
   g.appendChild(ttl);
-  g.addEventListener('click', e => { e.stopPropagation(); if(S.editMode && S.level===1 && !_structKind && !_stJustDragged) structSelect(it.id); });
-  if(S.editMode && S.level===1 && !_structKind){
+  const editable = S.editMode && (S.level===1 || tdef.grupo==='reloj');
+  if(S.level>1 && !editable) g.setAttribute('pointer-events','none');
+  g.addEventListener('click', e => { e.stopPropagation(); if(editable && !_structKind && !_stJustDragged) structSelect(it.id); });
+  if(editable && !_structKind){
     g.style.cursor = 'grab';
     g.addEventListener('mousedown', e => _startStructDrag(e, it, 'move'));
     if(it.kind.startsWith('asc-')) g.addEventListener('contextmenu', e => { e.preventDefault(); e.stopPropagation(); ciclarPuerta(it.id); });
@@ -7499,7 +7502,7 @@ function ciclarPuerta(id){
   if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🛗 '+(it.etq||'')+' puerta: '+(it.salida?_salidaTxt(it.salida):'sin dato'); setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },2500); }
 }
 function _startStructDrag(e, it, mode, vertice){
-  if(!(S.editMode && S.level===1) || _structKind) return;
+  if(!(S.editMode && (S.level===1 || (STRUCT_TYPES[it.kind]||{}).grupo==='reloj')) || _structKind) return;
   if(e.button!==0) return;
   e.preventDefault(); e.stopPropagation();
   const puntos = structsOf(S.floorId).filter(x=>STRUCT_TYPES[x.kind] && STRUCT_TYPES[x.kind].kind==='point' && STRUCT_TYPES[x.kind].grupo!=='reloj');
@@ -8810,7 +8813,7 @@ function toggleEdit(){
   btnEdit.classList.toggle('active',S.editMode);
   btnDraw.style.display=(S.editMode&&S.level<3)?'':'none';
   { const bu=document.getElementById('btnUndo'); if(bu) bu.style.display=S.editMode?'':'none'; }
-  btnStruct.style.display=(S.editMode&&S.level===1)?'':'none';
+  btnStruct.style.display=S.editMode?'':'none';
   btnMove.style.display=(S.editMode&&S.level<3)?'':'none';
   btnDraw.classList.remove('active');
   btnMerge.style.display='none'; if(btnUnmerge)btnUnmerge.style.display='none'; btnDel.style.display='none';
@@ -16167,6 +16170,24 @@ async function runSelfTest(){
     try{ _navAnim={pasos:_navPasos(r2),i:0,t:0,fid:r2.o.fid,x:r2.o.x,y:r2.o.y,last:0,on:true}; const x0=_navAnim.x; _navAnimTick(2); const movio=Math.hypot(_navAnim.x-x0,_navAnim.y-r2.o.y)>0; _navAnimTick(3600); const llego=!_navAnim.on && cambios>=1; _navAnim=null;
       return enPiso1 && entrePisos && camilla && falla && movio && llego;
     } finally { window.goFloor=gf; S.floorId=fPrev; _navRes=sPrev; _navAnim=null; renderSVG(); }
+  });
+  T('Relojes transversales: en vista 2 el reloj se edita (arrastrable) y el ascensor no captura clics; colocar no selecciona el recinto de abajo', ()=>{
+    const snap=JSON.stringify(structuresState), nivel=S.level, ed=S.editMode, a0=S.areaId; _rpFix(true);
+    try{
+      S.editMode=true; S.level=2; S.areaId='st_a';
+      structuresState[fl.id]=[{id:'r1',kind:'reloj',x:1200,y:1200,etq:'Rc'},{id:'a1',kind:'asc-G',x:2500,y:1200,w:150,h:180,etq:'L1'}];
+      renderSVG();
+      const ms=[...svg.querySelectorAll('.struct-marker')]; const rel=ms.find(m=>m.querySelector('.struct-reloj')), asc=ms.find(m=>!m.querySelector('.struct-reloj'));
+      const editable=!!rel && rel.getAttribute('pointer-events')!=='none' && rel.querySelectorAll('.struct-resize').length===4;
+      const inerte=!!asc && asc.getAttribute('pointer-events')==='none';
+      // colocar: el clic en captura se detiene en el svg (no llega al recinto)
+      startStructMode('reloj'); const S0=structsOf(fl.id).length; didPan=false;   // (startStructMode redibuja: el recinto se busca después)
+      let llegoAlRecinto=false; const room=svg.querySelector('rect.room-box')||svg.firstChild;
+      const esp=ev=>{ llegoAlRecinto=true; }; room.addEventListener('click', esp);
+      const r=svg.getBoundingClientRect(); room.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true,clientX:r.left+r.width/2,clientY:r.top+r.height/2}));
+      const puso=structsOf(fl.id).length===S0+1; closeStructMode(); room.removeEventListener('click', esp);
+      return editable && inerte && puso && !llegoAlRecinto;
+    } finally { S.level=nivel; S.editMode=ed; S.areaId=a0; _rpFix(false); Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG(); }
   });
   T('📐 Muros: rectángulo = 4 muros; forma en L = 6 muros con perímetro exacto; la puerta se asigna a su muro y se descuenta', ()=>{
     _rpFix(true); const mpx=_mPx(fl.id), bk=JSON.stringify(boxState.rooms['st_r1']), pk=JSON.stringify(puertaState['st_r1']||null);
