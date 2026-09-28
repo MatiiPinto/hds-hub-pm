@@ -7440,13 +7440,13 @@ function renderStructMarker(it, tdef){
   const ttl = el('title');
   const ext = DXF_EXT[S.floorId], dim = FLOOR_DIMS[S.floorId];
   const mx = (ext&&dim) ? ((ext.xmax-ext.xmin)/dim.w) : 0, my = (ext&&dim) ? ((ext.ymax-ext.ymin)/dim.h) : 0;
-  const PUERTA={n:'norte',s:'sur',e:'este',w:'oeste',ns:'norte y sur (doble)',ew:'este y oeste (doble)',sn:'norte y sur (doble)',we:'este y oeste (doble)'};
+  const PUERTA={};
   ttl.textContent = tdef.grupo==='reloj'
     ? (tdef.label + (it.n?(' N°'+it.n):'') + (it.edificio?(' · '+it.edificio):'') + (it.acceso?(' · '+it.acceso):'') + (it.obs?(' · '+it.obs):'')
        + (it.origen?(' · '+it.origen+' (propuesta de los hospitales, pendiente de factibilidad)'):' · colocado a mano')
        + ((S.editMode&&S.level===1) ? ' · arrastrar mueve · vértices escalan · × borra' : ''))
     : tdef.label + (it.etq?(' '+it.etq):'') + (sized&&mx ? ` · ${(bw*mx).toFixed(1)} × ${(bh*my).toFixed(1)} m` : '')
-    + (it.kind.startsWith('asc-') ? (' · puerta: '+(PUERTA[it.salida]||it.salida||'sin dato')) : '')
+    + (it.kind.startsWith('asc-') ? (' · puerta: '+(it.salida?_salidaTxt(it.salida):'sin dato')) : '')
     + (it.tam==='tipologia' ? ' · ⚠ ducto no leído en el plano: tamaño por tipología, revisar posición' : '')
     + ((S.editMode&&S.level===1) ? ' · clic: panel (tipo · salida · tamaño) · arrastrar mueve · ⇧ mueve todo el piso · ⌥ sin espejo · vértices escalan (⇧ proporción) · × borra'+(it.kind.startsWith('asc-')?' · clic derecho rota la salida'+(_gemelaDe(it)?' · la gemela sigue en espejo':''):'') : '');
   g.appendChild(ttl);
@@ -7486,13 +7486,13 @@ function renderStructMarker(it, tdef){
 let _stDrag=null, _stJustDragged=false;
 // Clic derecho sobre un ascensor (edición, vista 1): rota el lado de la puerta
 // n → e → s → w → ns → ew → sin dato.
-const _PUERTAS=['n','e','s','w','ns','ew',''];
+const _PUERTAS=['n','e','s','w','ns','ew',''];   // dobles contiguas (N+E…): desde el panel
 function ciclarPuerta(id){
   const it=structsOf(S.floorId).find(x=>x.id===id); if(!it) return;
   const i=_PUERTAS.indexOf(it.salida||''); it.salida=_PUERTAS[(i+1)%_PUERTAS.length];
   if(!it.salida) delete it.salida;
   sStruct(); renderSVG();
-  if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🛗 '+(it.etq||'')+' puerta: '+({n:'norte',e:'este',s:'sur',w:'oeste',ns:'norte y sur',ew:'este y oeste'}[it.salida]||'sin dato'); setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },2500); }
+  if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🛗 '+(it.etq||'')+' puerta: '+(it.salida?_salidaTxt(it.salida):'sin dato'); setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },2500); }
 }
 function _startStructDrag(e, it, mode, vertice){
   if(!(S.editMode && S.level===1) || _structKind) return;
@@ -7565,6 +7565,8 @@ function _espejaGemelasPiso(fid){
 // ── Selección de un elemento y panel de edición (tipo · salida · tamaño · etiqueta) ──
 // Clic en edición (vista 1) selecciona; las flechas mueven SOLO el seleccionado
 // (1 px · ⌘ 5 px · ⇧ 20 px); si es gemela y el espejo está activo, la pareja sigue.
+const _SAL_NOM={n:'norte',e:'este',s:'sur',w:'oeste'};
+function _salidaTxt(sal){ const L=String(sal||'').split('').filter(l=>_SAL_NOM[l]).map(l=>_SAL_NOM[l]); if(!L.length) return 'sin salida'; return L.length===1?L[0]:(L.slice(0,-1).join(', ')+' y '+L[L.length-1]+(L.length===2?' (doble)':' ('+L.length+' salidas)')); }
 function _mPx(fid){ const ext=DXF_EXT[fid||S.floorId], dim=FLOOR_DIMS[fid||S.floorId]; return (ext&&dim)?((ext.xmax-ext.xmin)/dim.w):0.0161; }
 function _structSelIt(){ return S.structSel ? structsOf(S.floorId).find(x=>x.id===S.structSel) : null; }
 function structSelect(id){
@@ -7578,11 +7580,12 @@ function structEditRender(){
   if(!it){ m.style.display='none'; return; }
   const td=STRUCT_TYPES[it.kind]||{}, mpx=_mPx(), w=it.w||95, h=it.h||95, gem=_gemelaDe(it);
   const tipos=Object.entries(STRUCT_TYPES).filter(([k,t])=>t.kind==='point').map(([k,t])=>`<option value="${k}"${k===it.kind?' selected':''}>${esc(t.label)}</option>`).join('');
-  const SAL=[['n','▲ N'],['e','► E'],['s','▼ S'],['w','◄ O'],['ns','▲▼ N+S'],['ew','◄► E+O'],['','sin salida']];
+  const LADOS=[['n','▲ N'],['e','► E'],['s','▼ S'],['w','◄ O']], sal0=String(it.salida||'');
   m.innerHTML=`<div class="se-t">${td.symbol||''} ${esc(td.label||it.kind)}${it.etq?(' · '+esc(it.etq)):''}<span class="x" onclick="structEditClose()">✕</span></div>
     <div class="se-row"><label>Etiqueta</label><input id="seEtq" value="${esc(it.etq||'')}" onchange="structEditApply('etq',this.value)" style="width:70px"></div>
     <div class="se-row"><label>Tipo · color</label><select id="seKind" onchange="structEditApply('kind',this.value)">${tipos}</select></div>
-    <div class="se-row"><label>Salida</label><div class="se-sal">${SAL.map(([v,l])=>`<button class="${(it.salida||'')===v?'on':''}" onclick="structEditApply('salida','${v}')">${l}</button>`).join('')}</div></div>
+    <div class="se-row"><label>Salida</label><div class="se-sal">${LADOS.map(([v,l])=>`<button class="${sal0.includes(v)?'on':''}" title="Encender o apagar la salida por el lado ${_SAL_NOM[v]}: se pueden combinar dos o más (doble salida)" onclick="structEditApply('salidaLado','${v}')">${l}</button>`).join('')}<button class="${sal0?'':'on'}" style="grid-column:span 4" onclick="structEditApply('salida','')">sin salida</button></div></div>
+    <div class="se-row"><label></label><span style="color:var(--text-2);font-size:10.5px">${sal0.length>1?('Doble salida: '+_salidaTxt(sal0)):'Toca dos lados para una doble salida (opuestos o contiguos).'}</span></div>
     <div class="se-row"><label>Tamaño (m)</label><input type="number" step="0.05" min="0.3" id="seW" value="${(w*mpx).toFixed(2)}" onchange="structEditApply('w',this.value)"> × <input type="number" step="0.05" min="0.3" id="seH" value="${(h*mpx).toFixed(2)}" onchange="structEditApply('h',this.value)"></div>
     <div class="se-row"><label>Posición</label><span style="color:var(--text-2)">flechas mueven este elemento · ⌘ 5 px · ⇧ 20 px</span></div>
     ${gem?`<div class="se-row"><label>Gemela ${esc(gem.etq||'')}</label><label style="width:auto;display:flex;align-items:center;gap:5px;cursor:pointer"><input type="checkbox" ${S.structMirror!==false?'checked':''} onchange="structEditApply('mirror',this.checked)"> sigue en espejo (tamaño, tipo, salida y posición)</label></div>`:''}
@@ -7596,6 +7599,8 @@ function structEditApply(campo, val){
   if(campo==='etq'){ it.etq=String(val||'').trim(); if(!it.etq) delete it.etq; }
   else if(campo==='kind'){ if(STRUCT_TYPES[val]) it.kind=val; }
   else if(campo==='salida'){ if(val) it.salida=val; else delete it.salida; delete it.salida_fuente; }
+  else if(campo==='salidaLado'){ const set=new Set(String(it.salida||'').split('')); if(set.has(val)) set.delete(val); else set.add(val);
+    const v='nesw'.split('').filter(l=>set.has(l)).join(''); if(v) it.salida=v; else delete it.salida; delete it.salida_fuente; }
   else if(campo==='w'||campo==='h'){ const px=Math.max(19, Math.round(parseFloat(val)/mpx)); if(isFinite(px)) it[campo]=px; if(!it.w) it.w=95; if(!it.h) it.h=95; }
   else if(campo==='mirror'){ S.structMirror=!!val; _lsPref('cabida_struct_mirror', val?'1':'0'); }
   if(mirror && campo!=='etq' && campo!=='mirror') _espejaGemela(it);
@@ -16011,6 +16016,25 @@ async function runSelfTest(){
       return ok1 && sinDup && intacto;
     } finally {
       window.VERTICALES_PARCHES=Lprev; try{ if(prevHechos===null) localStorage.removeItem('cabida_parches_vert'); else _lsSet('cabida_parches_vert',prevHechos); }catch(e){}
+      Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
+    }
+  });
+  T('Verticales: doble salida en cualquier combinación de lados (opuestos o contiguos) desde el panel; dos flechas y la gemela copia', ()=>{
+    const snap=JSON.stringify(structuresState), nivel=S.level, ed=S.editMode, sel=S.structSel, mir=S.structMirror;
+    try{
+      S.editMode=true; S.level=1; S.structMirror=true;
+      structuresState[fl.id]=[{id:'v1',kind:'asc-G',x:1000,y:800,w:150,h:180,etq:'L1',salida:'w'},{id:'v2',kind:'asc-G',x:1000,y:990,w:150,h:180,etq:'L2'}];
+      structSelect('v1'); structEditApply('salidaLado','n');
+      const v1=()=>structsOf(fl.id).find(x=>x.id==='v1'), v2=()=>structsOf(fl.id).find(x=>x.id==='v2');
+      const contigua=v1().salida==='nw' && v2().salida==='nw';
+      renderSVG(); const g=[...svg.querySelectorAll('.struct-marker')].find(m=>/L1/.test(m.textContent)); const dos=g && g.querySelectorAll('.struct-puerta').length===2;
+      const txt=/norte y oeste \(doble\)/.test(_salidaTxt(v1().salida));
+      structEditApply('salidaLado','w'); const una=v1().salida==='n';
+      structEditApply('salidaLado','s'); const opuesta=v1().salida==='ns';
+      structEditApply('salida',''); const sin=!v1().salida;
+      return contigua && dos && txt && una && opuesta && sin;
+    } finally {
+      S.level=nivel; S.editMode=ed; S.structSel=sel; S.structMirror=mir; const m=document.getElementById('structEdit'); if(m) m.style.display='none';
       Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
     }
   });
