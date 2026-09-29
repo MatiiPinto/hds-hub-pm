@@ -1567,6 +1567,19 @@ let _planCurId = null;
 // Plano siempre en WebP (liviano, misma resolución). Si el navegador no soporta
 // WebP, cae automáticamente al JPG original. Sin opción manual: evita cargas
 // pesadas accidentales y simplifica la barra.
+// ── Plano liviano para iPhone/iPad (29-09-2026) ───────────────────────────────
+// Los planos miden ~16.000 × 11.700 px (~750 MB decodificados): Safari en iOS se
+// queda sin memoria y recarga la página. En iOS/iPadOS y equipos con ≤ 4 GB se usa
+// CABIDA_DATA/lite/ (4.096 px, _DEV/genera_planos_livianos.py), estirado por CSS al
+// tamaño del piso: recintos, cotas y marcas calzan igual. ?plano=full / ?plano=lite fuerzan.
+const PLANO_LIVIANO=(function(){
+  try{ const q=new URLSearchParams(location.search).get('plano'); if(q==='full') return false; if(q==='lite') return true;
+    const ios=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+    return ios || ((navigator.deviceMemory||8)<=4);
+  }catch(e){ return false; }
+})();
+// escala entre la imagen cargada y el marco del piso (1 con el plano completo)
+function _imgK(){ return (floorImg && floorImg.naturalWidth && IMG_W) ? floorImg.naturalWidth/IMG_W : 1; }
 function setFloorPlan(id){
   _planCurId = id;
   const myId=++_planLoadId;
@@ -1577,11 +1590,13 @@ function setFloorPlan(id){
   const color = (S.planKind==='color');
   // Cada modo prefiere su tipo y cae al otro si el piso no lo tiene (p. ej. P-3/P5
   // sólo tienen color; P-2 sólo mobiliario).
-  const chain = color ? ['_color.webp','_color.jpg','.webp','.jpg'] : ['.webp','.jpg','_color.webp','_color.jpg'];
+  const chain = PLANO_LIVIANO
+    ? (color ? ['lite/|_color.webp','lite/|.webp'] : ['lite/|.webp','lite/|_color.webp'])   // nunca el plano completo en iOS
+    : (color ? ['_color.webp','_color.jpg','.webp','.jpg'] : ['.webp','.jpg','_color.webp','_color.jpg']);
   const tryNext=(i)=>{
     if(myId!==_planLoadId) return;
     if(i>=chain.length){ if(ov) ov.classList.remove('show'); return; }
-    const src='CABIDA_DATA/plan_'+id+chain[i];
+    const pz=chain[i].split('|'), src=pz.length>1?('CABIDA_DATA/'+pz[0]+'plan_'+id+pz[1]):('CABIDA_DATA/plan_'+id+chain[i]);
     const pre=new Image(); pre.decoding='async';
     pre.onload=()=>{ if(myId!==_planLoadId) return; floorImg.src=src; if(ov) ov.classList.remove('show'); };
     pre.onerror=()=>{ if(myId!==_planLoadId) return; tryNext(i+1); };
@@ -3823,7 +3838,8 @@ function _jardinesSync(){
       im=document.createElement('img'); im.id='jardinImg'; im.alt=''; im.draggable=false;
       const fi=document.getElementById('floorImg'); fi.parentNode.insertBefore(im, fi.nextSibling);   // sobre el plano, bajo el SVG
     }
-    if(im.dataset.src!==P.img){ im.dataset.src=P.img; im.src=P.img; }
+    const jsrc=PLANO_LIVIANO?String(P.img).replace(/(^|\/)(jardines_[^\/]+)$/,'$1lite/$2'):P.img;
+    if(im.dataset.src!==jsrc){ im.dataset.src=jsrc; im.src=jsrc; }
     im.style.left=P.x+'px'; im.style.top=P.y+'px'; im.style.width=P.w+'px'; im.style.height=P.h+'px'; im.style.display='';
   } else if(im) im.style.display='none';
   if(typeof svg==='undefined'||!svg) return;
@@ -5221,7 +5237,7 @@ function _stampImgURL(sx,sy,w,h){
   if(!floorImg.complete||!floorImg.naturalWidth) return null;
   try{
     const cv=document.createElement('canvas'); cv.width=w; cv.height=h;
-    cv.getContext('2d').drawImage(floorImg, sx,sy,w,h, 0,0,w,h);
+    const k=_imgK(); cv.getContext('2d').drawImage(floorImg, sx*k,sy*k,w*k,h*k, 0,0,w,h);
     return (_stampCache[key]=cv.toDataURL('image/png'));
   }catch{ return null; }
 }
@@ -13641,7 +13657,7 @@ function exportServicioHTML(){
     cx.save(); cx.beginPath();
     aSh.forEach(s=>cx.rect((s.x-b.x)*sc,(s.y-b.y)*sc,s.w*sc,s.h*sc));
     cx.clip();
-    cx.drawImage(floorImg, b.x,b.y,b.w,b.h, 0,0,cv.width,cv.height);
+    { const k=_imgK(); cx.drawImage(floorImg, b.x*k,b.y*k,b.w*k,b.h*k, 0,0,cv.width,cv.height); }
     cx.restore();
     dataURL=cv.toDataURL('image/jpeg',0.85);
   }catch(e){ taintErr=e; }
@@ -13812,7 +13828,7 @@ function _servRecorte(){
     cx.fillStyle='#ffffff'; cx.fillRect(0,0,cv.width,cv.height);
     cx.save(); cx.beginPath();
     aSh.forEach(s=>cx.rect((s.x-b.x)*sc,(s.y-b.y)*sc,s.w*sc,s.h*sc));
-    cx.clip(); cx.drawImage(floorImg, b.x,b.y,b.w,b.h, 0,0,cv.width,cv.height); cx.restore();
+    cx.clip(); { const k=_imgK(); cx.drawImage(floorImg, b.x*k,b.y*k,b.w*k,b.h*k, 0,0,cv.width,cv.height); } cx.restore();
     dataURL=cv.toDataURL('image/jpeg',0.86);
   }catch(e){}
   const rel=q=>({x:q.x-b.x, y:q.y-b.y, w:q.w, h:q.h});
@@ -13953,7 +13969,7 @@ function _fmtM(v){ return v.toFixed(2).replace('.',','); }
 function _murosCardSVG(M){
   const pad=1.4/M.mpx, bb=M.bb, b={x:Math.max(0,bb.x-pad), y:Math.max(0,bb.y-pad)}; b.w=Math.min(IMG_W,bb.x+bb.w+pad)-b.x; b.h=Math.min(IMG_H,bb.y+bb.h+pad)-b.y;
   let url=null; try{ const sc=Math.min(1,1300/Math.max(b.w,b.h)); const cv=document.createElement('canvas'); cv.width=Math.round(b.w*sc); cv.height=Math.round(b.h*sc);
-    const cx=cv.getContext('2d'); cx.fillStyle='#fff'; cx.fillRect(0,0,cv.width,cv.height); cx.globalAlpha=0.55; cx.drawImage(floorImg,b.x,b.y,b.w,b.h,0,0,cv.width,cv.height); url=cv.toDataURL('image/jpeg',0.82); }catch(e){}
+    const cx=cv.getContext('2d'); cx.fillStyle='#fff'; cx.fillRect(0,0,cv.width,cv.height); cx.globalAlpha=0.55; { const k=_imgK(); cx.drawImage(floorImg,b.x*k,b.y*k,b.w*k,b.h*k,0,0,cv.width,cv.height); } url=cv.toDataURL('image/jpeg',0.82); }catch(e){}
   const fs=Math.max(0.16/M.mpx, Math.min(0.42/M.mpx, Math.max(bb.w,bb.h)/20));
   const rel=p=>[p[0]-b.x,p[1]-b.y];
   let g='<svg viewBox="0 0 '+b.w.toFixed(1)+' '+b.h.toFixed(1)+'" preserveAspectRatio="xMidYMid meet">';
@@ -16269,6 +16285,11 @@ async function runSelfTest(){
     try{ _navAnim={pasos:_navPasos(r2),i:0,t:0,fid:r2.o.fid,x:r2.o.x,y:r2.o.y,last:0,on:true}; const x0=_navAnim.x; _navAnimTick(2); const movio=Math.hypot(_navAnim.x-x0,_navAnim.y-r2.o.y)>0; _navAnimTick(3600); const llego=!_navAnim.on && cambios>=1; _navAnim=null;
       return enPiso1 && entrePisos && camilla && falla && movio && llego;
     } finally { window.goFloor=gf; S.floorId=fPrev; _navRes=sPrev; _navAnim=null; renderSVG(); }
+  });
+  T('Plano liviano (iOS): existe para cada plano, _imgK escala los recortes al tamaño real de la imagen', ()=>{
+    const k0=_imgK(); const nw=floorImg.naturalWidth;
+    const esperado = nw ? nw/IMG_W : 1;
+    return typeof PLANO_LIVIANO==='boolean' && Math.abs(k0-esperado)<1e-9 && (PLANO_LIVIANO ? k0<0.5 : true);
   });
   T('Barra izquierda: Pisos muestra solo los servicios; la pestaña Servicio da recintos por tipo y el detalle al desplegar', ()=>{
     const nivel=S.level, a0=S.areaId, tab=_sbTab, abiertos=new Set(_srvAbiertos); _rpFix(true);
