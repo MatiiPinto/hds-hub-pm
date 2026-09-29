@@ -1593,12 +1593,30 @@ function setFloorPlan(id){
   const chain = PLANO_LIVIANO
     ? (color ? ['lite/|_color.webp','lite/|.webp'] : ['lite/|.webp','lite/|_color.webp'])   // nunca el plano completo en iOS
     : (color ? ['_color.webp','_color.jpg','.webp','.jpg'] : ['.webp','.jpg','_color.webp','_color.jpg']);
+  // iOS: Safari cambiaba el src pero seguía pintando el plano anterior (capa
+  // compuesta gigante que no se invalida). En modo liviano el plano se oculta
+  // mientras carga, se decodifica antes y el <img> se re-inserta (mismo nodo:
+  // conserva listeners y la referencia floorImg) para forzar una capa nueva.
+  if(PLANO_LIVIANO && floorImg && floorImg.getAttribute('src')) floorImg.style.visibility='hidden';
+  const _ponPlano=(src)=>{
+    if(!PLANO_LIVIANO){ floorImg.src=src; return; }
+    const par=floorImg.parentNode, nx=floorImg.nextSibling;
+    floorImg.src=src;
+    if(par){ par.removeChild(floorImg); par.insertBefore(floorImg,nx); }
+    floorImg.style.visibility='';
+  };
   const tryNext=(i)=>{
     if(myId!==_planLoadId) return;
     if(i>=chain.length){ if(ov) ov.classList.remove('show'); return; }
     const pz=chain[i].split('|'), src=pz.length>1?('CABIDA_DATA/'+pz[0]+'plan_'+id+pz[1]):('CABIDA_DATA/plan_'+id+chain[i]);
     const pre=new Image(); pre.decoding='async';
-    pre.onload=()=>{ if(myId!==_planLoadId) return; floorImg.src=src; if(ov) ov.classList.remove('show'); };
+    pre.onload=()=>{ if(myId!==_planLoadId) return;
+      const listo=()=>{ if(myId!==_planLoadId) return; _ponPlano(src); if(ov) ov.classList.remove('show'); };
+      // decode() no resuelve con la pestaña oculta: tope de 1 s para no quedar sin plano
+      if(PLANO_LIVIANO && pre.decode){ let hecho=false; const una=()=>{ if(!hecho){ hecho=true; listo(); } };
+        pre.decode().then(una,una); setTimeout(una,1000); }
+      else listo();
+    };
     pre.onerror=()=>{ if(myId!==_planLoadId) return; tryNext(i+1); };
     pre.src=src;
   };
