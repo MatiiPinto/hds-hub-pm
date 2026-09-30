@@ -109,7 +109,10 @@ window.PM_CONFIG = {
     'csoto':      '3d890c00eaf2e280de4c876efcdf90588ae463e1962ddea43a4df0a77922ff57',
     // Elías Becerra Astorga · Departamento de Informática — exportador del Atlas
     // (cubicación de impresoras y equipos TI por recinto)
-    'ebecerra':   '81c1cb19bc0b745f748185734aea04aa8df298b3754f1602fba580134e439e0e'
+    'ebecerra':   '81c1cb19bc0b745f748185734aea04aa8df298b3754f1602fba580134e439e0e',
+    // Dra. Gabriella Brignardello Garrido · médica de Medicina Familiar,
+    // Unidad de Puesta en Marcha
+    'gbrignardello': '4d605ea08497f067cf03dac710513d59eb17cb14b56bb7317faf35d3222ad8d9'
   }
 };
 
