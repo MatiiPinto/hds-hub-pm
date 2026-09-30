@@ -412,6 +412,9 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 #structEdit{position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-2);padding:10px 12px;min-width:270px;font-size:12px;z-index:30;display:none}
 #structEdit .se-t{font-weight:700;font-size:12.5px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
 #structEdit .se-t .x{margin-left:auto;cursor:pointer;opacity:.6}
+.fk-cn{display:flex;gap:8px;align-items:flex-start;margin:6px 0;font-size:12px;line-height:1.35}
+.fk-cn-cap{display:inline-flex;align-items:center;justify-content:center;flex:none;width:16px;height:24px;border-radius:8px;color:#fff;font-weight:900;font-size:11px}
+.fk-cn-sub{color:var(--text-2);font-size:10.5px}
 #structEdit .se-row{display:flex;align-items:center;gap:6px;margin:5px 0}
 #structEdit .se-row label{width:64px;color:var(--text-2);font-size:11px}
 #structEdit input,#structEdit select{font:inherit;font-size:12px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text)}
@@ -937,6 +940,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="tb-btn" id="btnNav" onclick="toggleNavPanel()" title="🧭 Ruta animada de un recinto a otro sobre la red de circulación (ejes reales del plano) y los ascensores/escaleras, con restricciones: perfil (público, camilla, clínico, logística), zonas a evitar, sin escaleras, ascensores o servicios a evitar.">🧭 Ruta</button>
       <button class="tb-btn tog" id="btnVert" onclick="toggleVerticales()" title="Mostrar u ocultar los ascensores, escaleras y escaleras mecánicas (se ven en todas las vistas). Las líneas de circulación no se tocan.">🛗 Ascensores</button>
       <button class="tb-btn tog" id="btnReloj" onclick="toggleRelojes()" title="Mostrar u ocultar los relojes control (lectores biométricos del control horario, ORD SSMO 5040029-145). Se ven en todas las vistas.">⏱ Relojes</button>
+      <button class="tb-btn tog" id="btnCorreoN" onclick="toggleCorreoN()" title="Mostrar u ocultar las estaciones de correo neumático (planos de tuberías CNE-PL-GEN, PE 17). Cápsula del color del sistema: azul T1 Atención Abierta · magenta T2 Hospital 1 · ámbar T3 Hospital 2 · verde línea del Laboratorio. Letra = tipo: P paso · F final · M masivo · R recepción masiva · C central. Se ven en todas las vistas.">📮 Correo N.</button>
       <button class="tb-btn tog" id="btnDotNames" onclick="toggleDotNames()" title="Mostrar u ocultar el nombre de las personas asignadas a los puestos en vista 3 (útil en recintos con muchos funcionarios)">👤 Nombres</button>
       <div class="vw-dd" id="vwDD">
         <button class="tb-btn" id="btnVista" onclick="toggleVwMenu(event)" title="Opciones de visualización del plano">🎛 Vista ▾</button>
@@ -967,6 +971,9 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
         <div class="sm-h">Reloj control</div>
         <button class="struct-opt" data-kind="reloj" style="--c:#C026D3" title="Colocar a mano un reloj control (lector biométrico del control horario). Se ve en todas las vistas; se enciende y apaga con el botón ⏱ Relojes de la barra superior.">⏱ <b>Reloj control</b> <span style="opacity:.55">· lector biométrico</span></button>
         <button class="struct-opt" onclick="importarRelojesORD()" style="--c:#C026D3" title="Trae los 10 lectores biométricos propuestos en el ORD SSMO 5040029-145 (04-ago-2026, planos P1 · PS2 · PS3), ubicados en el Atlas por los rótulos comunes de los planos. Reemplaza los relojes que hubiera; los ascensores, escaleras y líneas no se tocan. Después se arrastran hasta su posición final.">⬇ <b>Importar del ORD 1441</b> <span style="opacity:.55">· 10 lectores · reemplaza</span></button>
+        <div class="sm-h">Correo neumático</div>
+        <button class="struct-opt" data-kind="cn" style="--c:#DB2777" title="Colocar a mano una estación de correo neumático. Después, clic sobre ella abre el panel para elegir sistema, tipo y la estación del directorio. Se ve en todas las vistas; se enciende y apaga con el botón 📮 Correo N.">📮 <b>Estación</b> <span style="opacity:.55">· a mano</span></button>
+        <button class="struct-opt" onclick="importarCorreoCNE()" style="--c:#DB2777" title="Trae las estaciones de los planos de tuberías CNE-PL-GEN (PS1, P1, P2, P3, P4), ubicadas en el Atlas por el símbolo del plano y cruzadas con el directorio. Reemplaza las estaciones que hubiera; lo demás no se toca.">⬇ <b>Importar de los planos CNE</b> <span style="opacity:.55">· reemplaza</span></button>
         <div class="sm-h">Desde Navegación</div>
         <button class="struct-opt" onclick="importarVerticalesNav()" style="--c:#0ea5e9" title="Trae los ascensores, escaleras y escaleras mecánicas dibujados en 8.Navegacion (siembra nav_verticales.js) a TODOS los pisos, con conversión exacta: cada uno queda en el mismo píxel que en Navegación. Reemplaza los ascensores/escaleras que hubiera; las líneas de circulación se conservan.">⬇ <b>Importar de Navegación</b> <span style="opacity:.55">· reemplaza · al píxel</span></button>
         <button class="struct-opt" onclick="aplicarSalidasSiembra()" style="--c:#0ea5e9" title="Solo las PUERTAS: toma el lado de salida de cada ascensor y escalera desde la siembra (dibujado en Navegación o inferido desde las zonas de circulación) y lo aplica a los elementos de todos los pisos SIN moverlos ni cambiarles el tamaño.">🚪 <b>Solo puertas desde la siembra</b> <span style="opacity:.55">· no mueve nada</span></button>
@@ -1433,6 +1440,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 <script src="SHARED_DATA/emmc_pendientes.js"></script>
 <script src="SHARED_DATA/nav_verticales.js"></script>
 <script src="SHARED_DATA/relojes_control.js"></script>
+<script src="SHARED_DATA/correo_estaciones.js"></script>
 <script src="SHARED_DATA/verticales_parches.js"></script>
 <script src="SHARED_DATA/circulacion_red.js"></script>
 <script src="SHARED_DATA/propuestos_plano.js"></script>
@@ -3846,6 +3854,8 @@ function _jardinesSync(){
     const b=document.getElementById('btnVert'); if(b) b.classList.toggle('active',S.verticales!==false); }
   if(S.relojes===undefined){ let v=null; try{ v=localStorage.getItem('cabida_relojes'); }catch(e){} S.relojes=(v!=='0');
     const b=document.getElementById('btnReloj'); if(b) b.classList.toggle('active',S.relojes!==false); }
+  if(S.correoN===undefined){ let v=null; try{ v=localStorage.getItem('cabida_correo_n'); }catch(e){} S.correoN=(v!=='0');
+    const b=document.getElementById('btnCorreoN'); if(b) b.classList.toggle('active',S.correoN!==false); }
   const P=_pais(), on=!!P && S.jardines!==false;
   { const b=document.getElementById('btnJardines'); if(b){ b.classList.toggle('active',S.jardines!==false); b.classList.toggle('dis',!P);
       b.title=P?'Mostrar u ocultar los jardines y las esculturas de este piso (lámina de Paisajismo, calibrada contra el plano). Pasa el mouse por una 🗿 para ver su ficha y fechas de traslado.'
@@ -6683,7 +6693,7 @@ function _dockMonta(){
   // funcionarios y modo edición quedan SIEMPRE a la vista en la barra superior.
   if(nav){
     const q=document.createElement('div'); q.id='navQuick';
-    ['btnBoxVis','btnDotNames','btnJardines','btnVert','btnReloj','btnNav','btnEdit'].forEach(id=>{
+    ['btnBoxVis','btnDotNames','btnJardines','btnVert','btnReloj','btnCorreoN','btnNav','btnEdit'].forEach(id=>{
       const e=document.getElementById(id); if(!e) return;
       const m=ICO.exec(e.textContent||''); e.setAttribute('data-ic', m?m[1]:(e.textContent||'?').trim().slice(0,2));
       q.appendChild(e);
@@ -7285,9 +7295,19 @@ const STRUCT_TYPES = {
   // Reloj control (lector biométrico): marcador redondo «Rc» como en los planos del
   // ORD 5040029-145. Es un punto, pero NO pertenece al grupo de ascensores/escaleras:
   // tiene su propio botón ⏱ y no lo mueven ni el 🎯 ni el ⇧+arrastrar de los verticales.
-  'reloj':       {label:'Reloj control · lector biométrico', short:'Rc', col:'#C026D3', symbol:'⏱', kind:'point', grupo:'reloj'},
+  'reloj':       {label:'Reloj control · lector biométrico', short:'Rc', col:'#C026D3', symbol:'⏱', kind:'point', grupo:'reloj', marca:true},
+  // Estación de correo neumático: cápsula del color de su SISTEMA (T1/T2/T3/Laboratorio)
+  // con la letra del tipo (P paso · F final · M masivo · R recepción masiva · C central).
+  // Igual que el reloj es una «marca» transversal: se ve y se mueve en todas las vistas,
+  // tiene su botón 📮 y no la tocan las herramientas de ascensores/escaleras.
+  'cn':          {label:'Estación de correo neumático', short:'CN', col:'#2563EB', symbol:'📮', kind:'point', grupo:'cn', marca:true},
   'circulation': {label:'Circulación',          short:'',    col:'#475569', symbol:'〰', kind:'line'}
 };
+function _esMarca(kind){ return !!(STRUCT_TYPES[kind]||{}).marca; }
+// Correo neumático: sistemas (color del plano de tuberías CNE, lámina de simbología) y tipos de estación
+const CN_SIS={T1:{n:'T1 · Atención Abierta',col:'#2563EB'},T2:{n:'T2 · Hospital 1',col:'#DB2777'},T3:{n:'T3 · Hospital 2',col:'#D97706'},LAB:{n:'Línea Laboratorio',col:'#16A34A'}};
+const CN_TIPO={paso:['P','Estación de paso'],final:['F','Estación final'],masivo:['M','Estación de envío masivo'],recepcion_masiva:['R','Recepción masiva horizontal'],central:['C','Equipo central · transfer y bombas']};
+function _cnCol(it){ return (CN_SIS[it.sis]||{}).col || STRUCT_TYPES.cn.col; }
 let structuresState = {};
 try { structuresState = JSON.parse(localStorage.getItem('cabida_cad_structures') || '{}'); } catch {}
 function sStruct(){ if(_lsPref('cabida_cad_structures', JSON.stringify(structuresState))) _markSaved(); }
@@ -7359,7 +7379,9 @@ function _structClickHandler(e){
   const tdef = STRUCT_TYPES[_structKind];
   if(!tdef) return;
   if(tdef.kind === 'point'){
-    addStruct({ id: S.floorId+'-st-'+Date.now(), kind: _structKind, x: p.x, y: p.y });
+    const nuevo={ id: S.floorId+'-st-'+Date.now(), kind: _structKind, x: p.x, y: p.y };
+    if(_structKind==='cn'){ nuevo.sis=S.cnSisDef||'T2'; nuevo.tipo='paso'; if(S.correoN===false) toggleCorreoN(); }
+    addStruct(nuevo);
     // Mantener modo activo para colocar varios; pulsar Esc para salir
   } else if(tdef.kind === 'line'){
     if(!_structLine){
@@ -7419,9 +7441,9 @@ function deleteStruct(id){
 function paintStructures(){
   if(S.vertAjuste && typeof _vertAjusteHint==='function') _vertAjusteHint();
   const items = structsOf(S.floorId).filter(it=>{ const t=STRUCT_TYPES[it.kind]; if(!t || t.kind!=='point') return true;
-    return t.grupo==='reloj' ? S.relojes!==false : S.verticales!==false; });
+    return t.grupo==='reloj' ? S.relojes!==false : (t.grupo==='cn' ? S.correoN!==false : S.verticales!==false); });
   if(!items.length && !_structLine) return;
-  const relojEditable = S.editMode && items.some(it=>(STRUCT_TYPES[it.kind]||{}).grupo==='reloj');
+  const relojEditable = S.editMode && items.some(it=>_esMarca(it.kind));
   const g = el('g', {class:'structures-layer',
     ...(S.level>1 && !relojEditable ?{'pointer-events':'none'}:{})});
   // Renderizar todos los elementos persistidos
@@ -7458,7 +7480,7 @@ function renderStructMarker(it, tdef){
   // o redimensionados); si no, el icono fijo de siempre (R=56 → 95×95 px).
   const sized = !!(it.w && it.h);
   // reloj control al DOBLE (190 px ≈ 3 m) por visibilidad (28-09-2026); el resto, 95 px
-  const base = tdef.grupo==='reloj' ? 190 : 95;
+  const base = tdef.grupo==='reloj' ? 190 : (tdef.grupo==='cn' ? 180 : 95);
   const bw = sized ? Math.max(30, it.w) : base, bh = sized ? Math.max(30, it.h) : base;
   const R = sized ? Math.min(bw, bh) / 1.7 : base*56/95;
   const g = el('g', {class:'struct-marker', transform:`translate(${it.x},${it.y})`});
@@ -7467,6 +7489,13 @@ function renderStructMarker(it, tdef){
     g.appendChild(el('circle',{class:'struct-reloj',cx:0,cy:0,r:Math.min(bw,bh)/2,fill:tdef.col,stroke:'#fff','stroke-width':baseStrokeW,opacity:0.95}));
     const t = el('text',{x:0,y:R*0.06,'text-anchor':'middle','dominant-baseline':'middle','font-size':R*0.78,'font-weight':900,fill:'#fff','font-family':'system-ui,-apple-system,sans-serif'});
     t.textContent = it.etq || tdef.short; g.appendChild(t);
+  } else if(tdef.grupo==='cn'){
+    // cápsula (como la del correo neumático) del color del sistema, con la letra del tipo
+    const cw=bw*0.72, col=_cnCol(it), tp=CN_TIPO[it.tipo]||CN_TIPO.paso;
+    g.appendChild(el('rect',{class:'struct-cn',x:-cw/2,y:-bh/2,width:cw,height:bh,rx:cw/2,fill:col,stroke:'#fff','stroke-width':baseStrokeW,opacity:0.96}));
+    g.appendChild(el('line',{x1:-cw/2+baseStrokeW,y1:-bh*0.2,x2:cw/2-baseStrokeW,y2:-bh*0.2,stroke:'#fff','stroke-width':Math.max(1.5,baseStrokeW*0.6),opacity:0.85,'pointer-events':'none'}));
+    const t = el('text',{x:0,y:bh*0.14,'text-anchor':'middle','dominant-baseline':'middle','font-size':Math.min(cw,bh)*0.62,'font-weight':900,fill:'#fff','font-family':'system-ui,-apple-system,sans-serif','pointer-events':'none'});
+    t.textContent = tp[0]; g.appendChild(t);
   } else g.appendChild(el('rect',{x:-bw/2,y:-bh/2,width:bw,height:bh,rx:Math.min(14,R*0.25),fill:tdef.col,stroke:'#fff','stroke-width':baseStrokeW,opacity:0.95}));
   if(it.kind.startsWith('asc-')){
     g.appendChild(el('path',{d:`M ${-R*0.55} ${-R*0.25} l ${R*0.18} ${-R*0.32} l ${R*0.18} ${R*0.32} Z`,fill:'#fff'}));
@@ -7494,7 +7523,7 @@ function renderStructMarker(it, tdef){
   }
   // Salida(s): triángulo CLARO apuntando hacia afuera en el lado por donde se entra
   // y sale (n/s/e/w; doble = 'ns' / 'ew'). Vale para ascensores, escaleras y mecánicas.
-  if(it.salida && tdef.grupo!=='reloj'){
+  if(it.salida && !tdef.marca){
     const L = Math.max(16, Math.min(bw,bh)*0.5), T = Math.max(12, L*0.75);
     String(it.salida).split('').forEach(lado=>{
       const p = {n:[0,-bh/2,0], s:[0,bh/2,180], e:[bw/2,0,90], w:[-bw/2,0,-90]}[lado]; if(!p) return;
@@ -7509,7 +7538,8 @@ function renderStructMarker(it, tdef){
   const ext = DXF_EXT[S.floorId], dim = FLOOR_DIMS[S.floorId];
   const mx = (ext&&dim) ? ((ext.xmax-ext.xmin)/dim.w) : 0, my = (ext&&dim) ? ((ext.ymax-ext.ymin)/dim.h) : 0;
   const PUERTA={};
-  ttl.textContent = tdef.grupo==='reloj'
+  ttl.textContent = tdef.grupo==='cn' ? (_cnTitulo(it) + (S.editMode ? ' · clic: panel (sistema · tipo · estación del directorio) · arrastrar mueve · × borra (en cualquier vista)' : ''))
+    : tdef.grupo==='reloj'
     ? (tdef.label + (it.n?(' N°'+it.n):'') + (it.edificio?(' · '+it.edificio):'') + (it.acceso?(' · '+it.acceso):'') + (it.obs?(' · '+it.obs):'')
        + (it.origen?(' · '+it.origen+' (propuesta de los hospitales, pendiente de factibilidad)'):' · colocado a mano')
        + (S.editMode ? ' · arrastrar mueve · vértices escalan · × borra (en cualquier vista)' : ''))
@@ -7518,9 +7548,10 @@ function renderStructMarker(it, tdef){
     + (it.tam==='tipologia' ? ' · ⚠ ducto no leído en el plano: tamaño por tipología, revisar posición' : '')
     + ((S.editMode&&S.level===1) ? ' · clic: panel (tipo · salida · tamaño) · arrastrar mueve · ⇧ mueve todo el piso · ⌥ sin espejo · vértices escalan (⇧ proporción) · × borra'+(it.kind.startsWith('asc-')?' · clic derecho rota la salida'+(_gemelaDe(it)?' · la gemela sigue en espejo':''):'') : '');
   g.appendChild(ttl);
-  const editable = S.editMode && (S.level===1 || tdef.grupo==='reloj');
+  const editable = S.editMode && (S.level===1 || !!tdef.marca);
   if(S.level>1 && !editable) g.setAttribute('pointer-events','none');
-  g.addEventListener('click', e => { e.stopPropagation(); if(editable && !_structKind && !_stJustDragged) structSelect(it.id); });
+  g.addEventListener('click', e => { e.stopPropagation(); if(editable && !_structKind && !_stJustDragged) structSelect(it.id);
+    else if(!editable && tdef.grupo==='cn' && typeof tbInfo!=='undefined' && tbInfo){ tbInfo.textContent=_cnTitulo(it); setTimeout(()=>{ if(tbInfo && tbInfo.textContent===_cnTitulo(it)) tbInfo.textContent=''; },9000); } });
   if(editable && !_structKind){
     g.style.cursor = 'grab';
     g.addEventListener('mousedown', e => _startStructDrag(e, it, 'move'));
@@ -7565,11 +7596,11 @@ function ciclarPuerta(id){
   if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🛗 '+(it.etq||'')+' puerta: '+(it.salida?_salidaTxt(it.salida):'sin dato'); setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },2500); }
 }
 function _startStructDrag(e, it, mode, vertice){
-  if(!(S.editMode && (S.level===1 || (STRUCT_TYPES[it.kind]||{}).grupo==='reloj')) || _structKind) return;
+  if(!(S.editMode && (S.level===1 || _esMarca(it.kind))) || _structKind) return;
   if(e.button!==0) return;
   e.preventDefault(); e.stopPropagation();
-  const puntos = structsOf(S.floorId).filter(x=>STRUCT_TYPES[x.kind] && STRUCT_TYPES[x.kind].kind==='point' && STRUCT_TYPES[x.kind].grupo!=='reloj');
-  const esReloj=(STRUCT_TYPES[it.kind]||{}).grupo==='reloj';
+  const puntos = structsOf(S.floorId).filter(x=>STRUCT_TYPES[x.kind] && STRUCT_TYPES[x.kind].kind==='point' && !_esMarca(x.kind));
+  const esReloj=_esMarca(it.kind);
   _stDrag={ mode:(mode==='move'&&e.shiftKey&&!esReloj)?'all':mode, it, sx:e.clientX, sy:e.clientY, noMirror:!!e.altKey,
             o:{w:it.w||95, h:it.h||95, x:it.x, y:it.y}, v:vertice||{sx:1,sy:1}, all:puntos.map(x=>({x, ox:x.x, oy:x.y})), moved:false };
   window.addEventListener('mousemove', _structDragMove);
@@ -7649,6 +7680,7 @@ function structEditClose(){ S.structSel=null; const m=document.getElementById('s
 function structEditRender(){
   const m=document.getElementById('structEdit'), it=_structSelIt(); if(!m) return;
   if(!it){ m.style.display='none'; return; }
+  if(it.kind==='cn'){ _cnEditRender(m, it); return; }
   const td=STRUCT_TYPES[it.kind]||{}, mpx=_mPx(), w=it.w||95, h=it.h||95, gem=_gemelaDe(it);
   const tipos=Object.entries(STRUCT_TYPES).filter(([k,t])=>t.kind==='point').map(([k,t])=>`<option value="${k}"${k===it.kind?' selected':''}>${esc(t.label)}</option>`).join('');
   const LADOS=[['n','▲ N'],['e','► E'],['s','▼ S'],['w','◄ O']], sal0=String(it.salida||'');
@@ -7672,10 +7704,113 @@ function structEditApply(campo, val){
   else if(campo==='salida'){ if(val) it.salida=val; else delete it.salida; delete it.salida_fuente; }
   else if(campo==='salidaLado'){ const set=new Set(String(it.salida||'').split('')); if(set.has(val)) set.delete(val); else set.add(val);
     const v='nesw'.split('').filter(l=>set.has(l)).join(''); if(v) it.salida=v; else delete it.salida; delete it.salida_fuente; }
-  else if(campo==='w'||campo==='h'){ const px=Math.max(19, Math.round(parseFloat(val)/mpx)); if(isFinite(px)) it[campo]=px; if(!it.w) it.w=95; if(!it.h) it.h=95; }
+  else if(campo==='w'||campo==='h'){ const px=Math.max(19, Math.round(parseFloat(val)/mpx)); if(isFinite(px)) it[campo]=px; const b0=it.kind==='cn'?180:(it.kind==='reloj'?190:95); if(!it.w) it.w=b0; if(!it.h) it.h=b0; }
   else if(campo==='mirror'){ S.structMirror=!!val; _lsPref('cabida_struct_mirror', val?'1':'0'); }
+  else if(campo==='cnSis'){ if(CN_SIS[val]){ it.sis=val; S.cnSisDef=val; } }
+  else if(campo==='cnTipo'){ if(CN_TIPO[val]) it.tipo=val; }
+  else if(campo==='cnE'){ it.e=String(val||'').trim(); if(!it.e) delete it.e; }
+  else if(campo==='cnNombre'){ it.nombre=String(val||'').trim(); if(!it.nombre) delete it.nombre; }
+  else if(campo==='cnDir'){ ['dir','servicio','ubic'].forEach(k=>delete it[k]);
+    const d=_cnDirectorio().find(x=>x.id===val);
+    if(d){ it.dir=d.id; it.nombre=d.nombre; it.servicio=d.servicio; it.ubic=d.ubic; if(CN_SIS[d.sis]) it.sis=d.sis; } }
   if(mirror && campo!=='etq' && campo!=='mirror') _espejaGemela(it);
   sStruct(); renderSVG(); structEditRender();
+}
+// ── Correo neumático ─────────────────────────────────────────────────────────
+// Siembra SHARED_DATA/correo_estaciones.js (_DEV/build_correo_estaciones.py): estaciones
+// leídas de los planos de tuberías CNE-PL-GEN, con su sistema (color), tipo y, cuando
+// calza, la estación del directorio de 25.CorreoNeumatico (id CN-…).
+function _cnD(){ return window.CORREO_ESTACIONES||null; }
+// directorio: las ya ubicadas por la siembra + las que el plano no trae (sin_ubicar)
+function _cnDirectorio(){
+  const D=_cnD(); if(!D) return []; const out=[], visto=new Set();
+  Object.entries(D.floors||{}).forEach(([p,arr])=>arr.forEach(x=>{ if(x.dir && !visto.has(x.dir)){ visto.add(x.dir); out.push({id:x.dir,piso:p,sis:x.sis,nombre:x.nombre,servicio:x.servicio,ubic:x.ubic}); } }));
+  (D.sin_ubicar||[]).forEach(x=>{ if(!visto.has(x.id)){ visto.add(x.id); out.push({...x, sinUbicar:true}); } });
+  return out;
+}
+function _cnTitulo(it){
+  const tp=CN_TIPO[it.tipo]||CN_TIPO.paso, ss=CN_SIS[it.sis];
+  return '📮 '+tp[1]+(it.e?(' '+it.e):'')+(ss?(' · '+ss.n):'')+(it.nombre?(' · '+it.nombre):'')+(it.servicio?(' · '+it.servicio):'')
+    +(it.dir?(' · '+it.dir):'')+(it.origen?(' · plano '+it.origen):' · colocada a mano');
+}
+// Recinto dibujado más cercano a la estación (dentro o a ≤ 1,5 m del borde): las
+// estaciones van en el muro, así que casi nunca caen «dentro» de la caja.
+function _cnRecinto(it, fid){
+  const fl=FLOORS.find(f=>f.id===(fid||S.floorId)); if(!fl) return null;
+  const lim=1.5/_mPx(fl.id); let best=null, bd=lim;
+  for(const a of fl.areas) for(const r of a.rooms) for(const b of rShapes(r)){
+    const d=Math.max(b.x-it.x, it.x-(b.x+b.w), 0, b.y-it.y, it.y-(b.y+b.h));
+    if(d<bd || (d===bd && !best)){ bd=d; best={room:r, area:a, d}; }
+  }
+  return best;
+}
+function _cnDeRecinto(roomId){
+  const ctx=_findRoom(roomId); if(!ctx) return [];
+  return structsOf(ctx.floor.id).filter(x=>x.kind==='cn').filter(x=>{ const r=_cnRecinto(x, ctx.floor.id); return r && r.room.id===roomId; });
+}
+function _cnHtml(roomId){
+  const L=_cnDeRecinto(roomId); if(!L.length) return '';
+  const h=L.map(it=>{ const tp=CN_TIPO[it.tipo]||CN_TIPO.paso, ss=CN_SIS[it.sis]||{n:'sistema sin dato',col:'#64748b'};
+    return `<div class="fk-cn"><span class="fk-cn-cap" style="background:${ss.col}">${tp[0]}</span><div><b>${esc(tp[1])}${it.e?(' · '+esc(it.e)):''}</b> · <span style="color:${ss.col};font-weight:700">${esc(ss.n)}</span>`
+      +`${it.nombre?('<div>'+esc(it.nombre)+(it.ubic?(' · '+esc(it.ubic)):'')+'</div>'):''}`
+      +`<div class="fk-cn-sub">${it.dir?('Directorio: '+esc(it.dir)+(it.servicio?(' · '+esc(it.servicio)):'')):'Sin estación del directorio asociada'}${it.origen?(' · plano '+esc(it.origen)):' · colocada a mano'}</div></div></div>`; }).join('');
+  return `<div class="fk-sec"><div class="fk-sec-t">📮 Correo neumático</div>${h}<div class="fk-inst-fte">Estación ubicada desde el plano de tuberías CNE-PL-GEN (PE 17, rev. 20-03-2020) y ajustable a mano en el Atlas. Cápsula Ø110 × 330 mm, carga máxima 1 kg.</div></div>`;
+}
+function toggleCorreoN(){
+  S.correoN=(S.correoN===false);
+  _lsPref('cabida_correo_n', S.correoN?'1':'0');
+  const b=document.getElementById('btnCorreoN'); if(b) b.classList.toggle('active',S.correoN!==false);
+  renderSVG();
+}
+// Reemplaza las estaciones de TODOS los pisos con la siembra; lo demás no se toca.
+function importarCorreoCNE(sinConfirmar){
+  const D=_cnD(); if(!D||!D.floors){ if(!sinConfirmar) alert('No se encontró la siembra SHARED_DATA/correo_estaciones.js.\nGenerarla con _DEV/build_correo_estaciones.py'); return 0; }
+  const pisos=Object.keys(D.floors), total=pisos.reduce((a,p)=>a+D.floors[p].length,0);
+  const actuales=Object.values(structuresState).flat().filter(x=>x.kind==='cn').length;
+  if(!sinConfirmar && !confirm('Importar '+total+' estaciones de correo neumático desde los planos CNE ('+pisos.join(', ')+')?\n\n'
+      +(actuales?('Se REEMPLAZAN las '+actuales+' estaciones que hay ahora en el Atlas (se pierde lo que hayas movido); '):'')
+      +'ascensores, escaleras, relojes y líneas no se tocan.\nQuedan donde las dibuja el plano de tuberías: después se arrastran hasta su posición final.')) return 0;
+  new Set([...pisos, ...Object.keys(structuresState)]).forEach(p=>{
+    const resto=(structuresState[p]||[]).filter(x=>x.kind!=='cn');
+    structuresState[p]=resto.concat((D.floors[p]||[]).map(x=>{ const c={...x}; ['r','rcode','rname','area'].forEach(k=>delete c[k]); return c; }));
+    if(!structuresState[p].length) delete structuresState[p];
+  });
+  if(S.correoN===false) toggleCorreoN();
+  sStruct(); renderSVG();
+  if(typeof closeStructMenu==='function') try{ closeStructMenu(); }catch(e){}
+  if(!sinConfirmar && typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='📮 '+total+' estaciones de correo neumático importadas en '+pisos.length+' pisos — arrástralas hasta su posición final'; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},9000); }
+  return total;
+}
+// Primera vez: si el Atlas no tiene ninguna estación, entra sola la siembra (una vez
+// por versión; si después se borran todas a mano, no vuelven).
+function _cnAutoImport(){
+  const D=_cnD(); if(!D||!D.floors) return 0;
+  if(Object.values(structuresState).flat().some(x=>x.kind==='cn')) return 0;
+  // en la versión de consulta (AtlasWeb) el estado viene del snapshot publicado y no se
+  // guarda: mientras el snapshot no traiga estaciones, se muestran siempre las de la siembra
+  if(S.viewOnly) return importarCorreoCNE(true);
+  let v=null; try{ v=localStorage.getItem('cabida_cn_siembra'); }catch(e){}
+  if(v===D.generado) return 0;
+  const n=importarCorreoCNE(true); _lsPref('cabida_cn_siembra', D.generado||'1');
+  return n;
+}
+window.addEventListener('load',()=>setTimeout(()=>{ if(typeof _SELFTEST!=='undefined'&&_SELFTEST) return; try{ _cnAutoImport(); }catch(e){ console.warn('correo neumático: importación automática',e); } }, 1400));
+function _cnEditRender(m, it){
+  const mpx=_mPx(), w=it.w||180, h=it.h||180, rc=_cnRecinto(it);
+  const usadas=new Set(Object.values(structuresState).flat().filter(x=>x.kind==='cn' && x!==it && x.dir).map(x=>x.dir));
+  const dirs=_cnDirectorio().filter(d=>d.id===it.dir || !usadas.has(d.id)).sort((a,b)=>((a.piso===S.floorId?0:1)-(b.piso===S.floorId?0:1)) || String(a.id).localeCompare(String(b.id)));
+  const opt=(o,sel)=>Object.entries(o).map(([k,v])=>`<option value="${k}"${k===sel?' selected':''}>${esc(Array.isArray(v)?(v[0]+' · '+v[1]):v.n)}</option>`).join('');
+  m.innerHTML=`<div class="se-t"><span class="fk-cn-cap" style="background:${_cnCol(it)}">${(CN_TIPO[it.tipo]||CN_TIPO.paso)[0]}</span> Estación de correo neumático${it.e?(' · '+esc(it.e)):''}<span class="x" onclick="structEditClose()">✕</span></div>
+    <div class="se-row"><label>Sistema</label><select onchange="structEditApply('cnSis',this.value)">${opt(CN_SIS,it.sis)}</select></div>
+    <div class="se-row"><label>Tipo</label><select onchange="structEditApply('cnTipo',this.value)">${opt(CN_TIPO,it.tipo||'paso')}</select></div>
+    <div class="se-row"><label>N° plano</label><input value="${esc(it.e||'')}" placeholder="E 3.4" onchange="structEditApply('cnE',this.value)" style="width:80px"></div>
+    <div class="se-row"><label>Directorio</label><select onchange="structEditApply('cnDir',this.value)" style="max-width:215px"><option value="">— sin asociar —</option>${dirs.map(d=>`<option value="${esc(d.id)}"${d.id===it.dir?' selected':''}>${d.sinUbicar?'◌ ':''}${esc(d.piso+' · '+d.nombre)}</option>`).join('')}</select></div>
+    <div class="se-row"><label>Nombre</label><input value="${esc(it.nombre||'')}" onchange="structEditApply('cnNombre',this.value)" style="flex:1;min-width:0"></div>
+    <div class="se-row"><label>Recinto</label><span style="color:var(--text-2)">${rc?(esc(rName(rc.room.id))+(rCode(rc.room.id)?(' · '+esc(rCode(rc.room.id))):'')+' · '+esc(aName(rc.area.id))):'fuera de todo recinto dibujado (pasillo o shaft)'}</span></div>
+    <div class="se-row"><label>Tamaño (m)</label><input type="number" step="0.1" min="0.3" value="${(w*mpx).toFixed(2)}" onchange="structEditApply('w',this.value)"> × <input type="number" step="0.1" min="0.3" value="${(h*mpx).toFixed(2)}" onchange="structEditApply('h',this.value)"></div>
+    <div class="se-note">Arrastrar o flechas mueven la estación (⌘ 5 px · ⇧ 20 px), en cualquier vista. ◌ = estación del directorio que el plano de tuberías no trae.${it.servicio?(' Servicio: '+esc(it.servicio)+'.'):''}</div>
+    <div class="se-btns"><button class="danger" onclick="const id=S.structSel; structEditClose(); deleteStruct(id);">⌫ Borrar</button><button onclick="structEditClose()">Cerrar</button></div>`;
+  m.style.display='block'; m.style.right='16px'; m.style.top='14px'; m.style.left='auto';
 }
 // Flechas con un elemento seleccionado: mueve solo ese (y su gemela si el espejo está activo).
 function _structSelTecla(e){
@@ -7697,7 +7832,7 @@ function aplicarSalidasSiembra(sinAviso){
   Object.keys(structuresState).forEach(p=>{
     const semilla=(NV.floors[p]||[]).filter(x=>x.salida);
     (structuresState[p]||[]).forEach(it=>{
-      if(it.kind==='circulation' || it.kind==='reloj' || !STRUCT_TYPES[it.kind]) return;
+      if(it.kind==='circulation' || _esMarca(it.kind) || !STRUCT_TYPES[it.kind]) return;
       let s=semilla.find(x=>x.id===it.id);
       if(!s){ const fam=k=>String(k).startsWith('asc-')?'asc':k;
         const cand=semilla.filter(x=>fam(x.kind)===fam(it.kind) && String(x.etq||'')===String(it.etq||'') && Math.hypot(x.x-it.x, x.y-it.y)<120);
@@ -7727,7 +7862,7 @@ function _vertAjusteRegistra(fid,dx,dy){
   if(!a.dx && !a.dy) delete A[fid]; else A[fid]=a;
   _lsPref('cabida_vert_ajuste', JSON.stringify(A));
 }
-function _vertPuntos(fid){ return structsOf(fid||S.floorId).filter(x=>STRUCT_TYPES[x.kind] && STRUCT_TYPES[x.kind].kind==='point' && STRUCT_TYPES[x.kind].grupo!=='reloj'); }
+function _vertPuntos(fid){ return structsOf(fid||S.floorId).filter(x=>STRUCT_TYPES[x.kind] && STRUCT_TYPES[x.kind].kind==='point' && !_esMarca(x.kind)); }
 function toggleVertAjuste(){ if(S.vertAjuste) vertAjusteFin(); else vertAjusteIni(); }
 function vertAjusteIni(){ if(typeof closeStructMenu==='function') try{ closeStructMenu(); }catch(e){}
   if(!S.editMode){ if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🎯 Entra a ✏ Editar para ajustar los ascensores del piso'; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},3000); } return; }
@@ -7786,7 +7921,7 @@ function _vertAjusteHint(){
 function importarVerticalesNav(sinConfirmar){
   const NV=window.NAV_VERTICALES; if(!NV||!NV.floors){ alert('No se encontró la siembra SHARED_DATA/nav_verticales.js.\nGenerarla con _DEV/importa_verticales_navegacion.py'); return; }
   const pisos=Object.keys(NV.floors), total=pisos.reduce((a,p)=>a+NV.floors[p].length,0);
-  const actuales=Object.values(structuresState).flat().filter(x=>x.kind!=='circulation' && x.kind!=='reloj').length;
+  const actuales=Object.values(structuresState).flat().filter(x=>x.kind!=='circulation' && !_esMarca(x.kind)).length;
   if(!sinConfirmar && !confirm('Importar '+total+' ascensores/escaleras desde Navegación ('+pisos.join(', ')+')?\n\n'
       +'Se REEMPLAZAN los '+actuales+' ascensores/escaleras que hay ahora en el Atlas (las líneas de circulación se conservan).\n'
       +'Vienen de Navegación con conversión exacta: cada uno queda en el mismo píxel que allá, con su tipología y lado de puerta. '
@@ -7794,7 +7929,7 @@ function importarVerticalesNav(sinConfirmar){
       +(Object.keys(_vertAjusteStore()).length?'\n\nEl ajuste hecho con 🎯 flechas en '+Object.keys(_vertAjusteStore()).join(', ')+' se vuelve a aplicar solo.':''))) return;
   const pisosTodos=new Set([...pisos, ...Object.keys(structuresState)]);
   pisosTodos.forEach(p=>{
-    const lineas=(structuresState[p]||[]).filter(x=>x.kind==='circulation' || x.kind==='reloj');   // se conservan
+    const lineas=(structuresState[p]||[]).filter(x=>x.kind==='circulation' || _esMarca(x.kind));   // se conservan (líneas, relojes, correo neumático)
     const nuevos=(NV.floors[p]||[]).map(x=>({...x}));
     structuresState[p]=lineas.concat(nuevos);
     if(!structuresState[p].length) delete structuresState[p];
@@ -7802,7 +7937,7 @@ function importarVerticalesNav(sinConfirmar){
   // ajuste manual por piso (🎯 flechas / ⇧+arrastrar): se vuelve a aplicar a lo importado
   const AJ=_vertAjusteStore(); let reap=0;
   Object.keys(AJ).forEach(p=>{ const a=AJ[p]; if(!NV.floors[p] || !a || (!a.dx && !a.dy)) return;
-    (structuresState[p]||[]).filter(x=>x.kind!=='circulation' && x.kind!=='reloj').forEach(x=>{ x.x=Math.round(x.x+a.dx); x.y=Math.round(x.y+a.dy); }); reap++; });
+    (structuresState[p]||[]).filter(x=>x.kind!=='circulation' && !_esMarca(x.kind)).forEach(x=>{ x.x=Math.round(x.x+a.dx); x.y=Math.round(x.y+a.dy); }); reap++; });
   sStruct(); renderSVG();
   if(typeof closeStructMenu==='function') try{ closeStructMenu(); }catch(e){}
   const rev=pisos.reduce((a,p)=>a+(NV.floors[p]||[]).filter(x=>x.tam==='tipologia').length,0);
@@ -9756,7 +9891,7 @@ function pmRenombrarRecinto(roomId){
 // Fuente: SHARED_DATA/instalaciones_recinto.js (build_instalaciones_recinto.py). Por código PMA:
 // los enchufes vienen POR RECINTO; los gases vienen como TOTAL del código y se dividen por los recintos del código.
 const _GAS_TXT={O2:'O₂',AM:'AM',AD:'AD',AI:'AI',VAC:'VAC',VACD:'VAC dental',N2O:'N₂O',CO2:'CO₂',EGA:'EGA',N2:'N₂'};
-function _instalacionesHtml(roomId){ return _instalacionesHtmlCod(rCode(roomId), rCodeParts(roomId), roomAAC(roomId)) + (typeof _ccddHtml==='function'?_ccddHtml(roomId):'') + _telIpHtml(roomId); }
+function _instalacionesHtml(roomId){ return _instalacionesHtmlCod(rCode(roomId), rCodeParts(roomId), roomAAC(roomId)) + (typeof _ccddHtml==='function'?_ccddHtml(roomId):'') + _telIpHtml(roomId) + (typeof _cnHtml==='function'?_cnHtml(roomId):''); }
 // ── Telefonía IP del recinto (por BIM) ────────────────────────────────────
 // Fuente: SHARED_DATA/telefonia_ip.js = planilla CDE-052 de la Concesionaria (oct-2025): por recinto/BIM,
 // cuántos teléfonos IP van y de qué tipo (Básico / Avanzado). Filas sin tipo = recinto registrado sin teléfono.
@@ -14849,7 +14984,7 @@ async function runSelfTest(){
   // Testigo: al terminar, NINGUNA preferencia del usuario puede haber cambiado.
   const _PREFS=['cabida_room_labels','cabida_show_dotnames','cabida_box_vis','cabida_plan_kind',
                 'cabida_show_asign','cabida_show_sen','cabida_scenario','cabida_rp_collapsed',
-                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures','cabida_ubic','cabida_jardines','cabida_verticales','cabida_relojes','cabida_show_ccdd','cabida_solo_reemp','cabida_show_pc'];
+                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures','cabida_ubic','cabida_jardines','cabida_verticales','cabida_relojes','cabida_correo_n','cabida_cn_siembra','cabida_show_ccdd','cabida_solo_reemp','cabida_show_pc'];
   const _PREV={}; _PREFS.forEach(k=>{ try{ _PREV[k]=localStorage.getItem(k); }catch(e){ _PREV[k]=null; } });
   // r==='omitir' ⇒ la prueba necesita recintos dibujados y este navegador no tiene ninguno (p. ej. un preview con
   // almacenamiento vacío): se informa como ⚪ omitida, ni verde ni roja. Con dibujo, la prueba corre completa.
@@ -16337,6 +16472,40 @@ async function runSelfTest(){
       const v1=prueba(1), v2=prueba(2);
       return v1 && v2;
     } finally { S.level=nivel; S.editMode=ed; S.areaId=a0; _stDrag=null; window.removeEventListener('mousemove', _structDragMove); window.removeEventListener('mouseup', _structDragUp);
+      _rpFix(false); Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG(); }
+  });
+  T('Correo neumático: importa de la siembra sin tocar ascensores ni relojes, cápsula del color del sistema con la letra del tipo, 📮 las oculta, se mueve en vista 2, ficha del recinto y panel', ()=>{
+    const snap=JSON.stringify(structuresState), Dprev=window.CORREO_ESTACIONES, nivel=S.level, ed=S.editMode, a0=S.areaId, cPrev=S.correoN, sel=S.structSel, sd=S.cnSisDef; _rpFix(true);
+    try{
+      S.editMode=true; S.level=1; S.areaId=null; S.correoN=true;
+      structuresState[fl.id]=[{id:'a1',kind:'asc-G',x:2500,y:1200,w:150,h:180,etq:'L1'},{id:'r1',kind:'reloj',x:3000,y:1200,etq:'Rc'},{id:'cn-viejo',kind:'cn',x:50,y:50,sis:'T1',tipo:'paso'}];
+      window.CORREO_ESTACIONES={generado:'st', floors:{[fl.id]:[{id:'cn1',kind:'cn',x:950,y:890,e:'E 9.1',sis:'T3',tipo:'final',dir:'CN-X-1',nombre:'Prueba',servicio:'SERV',ubic:'Est. Enfermería',origen:'CNE-PL-GEN-P9',r:'zz',rname:'zz'}]},
+        sin_ubicar:[{id:'CN-X-2',piso:fl.id,sis:'T1',tipo:'paso',nombre:'Otra',servicio:'S2',ubic:'U'}]};
+      const n=importarCorreoCNE(true), arr=structsOf(fl.id), c=arr.find(x=>x.id==='cn1');
+      const imp=n===1 && arr.length===3 && !arr.some(x=>x.id==='cn-viejo') && !!arr.find(x=>x.id==='a1') && !!arr.find(x=>x.id==='r1') && !!c && c.r===undefined;
+      renderSVG();
+      const cap=svg.querySelector('.struct-cn'), m=cap&&cap.parentNode;
+      const pinta=!!cap && cap.getAttribute('fill')==='#D97706' && /F/.test(m.textContent) && /E 9\.1/.test(m.querySelector('title').textContent) && /CN-X-1/.test(m.querySelector('title').textContent);
+      const fuera=!_vertPuntos(fl.id).some(x=>x.kind==='cn') && _cnAutoImport()===0;
+      toggleCorreoN(); const oculto=S.correoN===false && !svg.querySelector('.struct-cn') && !!svg.querySelector('.struct-reloj');
+      toggleCorreoN(); const vuelve=!!svg.querySelector('.struct-cn');
+      // vista 2: sigue visible y se arrastra
+      S.level=2; S.areaId='st_a'; renderSVG(); const z=S.zoom;
+      _startStructDrag({button:0,clientX:0,clientY:0,shiftKey:true,preventDefault(){},stopPropagation(){}}, c, 'move');
+      _structDragMove({clientX:40*z, clientY:20*z}); _structDragUp();
+      const mueve=!!svg.querySelector('.struct-cn') && c.x===990 && c.y===910 && arr.find(x=>x.id==='a1').x===2500;
+      // ficha del recinto: la estación pegada al muro (10 px afuera → dentro tras moverla) cuenta para st_r1
+      const rc=_cnRecinto(c, fl.id), h=_cnHtml('st_r1');
+      const ficha=!!rc && rc.room.id==='st_r1' && /Correo neumático/.test(h) && /E 9\.1/.test(h) && /T3 · Hospital 2/.test(h) && /CN-X-1/.test(h) && _cnHtml('st_r2')==='';
+      // panel: asociar a una estación del directorio que el plano no trae
+      S.structSel='cn1'; structEditRender(); const pan=document.getElementById('structEdit');
+      const panel=/Estación de correo neumático/.test(pan.textContent) && /◌/.test(pan.innerHTML) && /ST/.test(pan.textContent);
+      structEditApply('cnDir','CN-X-2'); const asoc=c.dir==='CN-X-2' && c.sis==='T1' && c.nombre==='Otra';
+      structEditApply('cnTipo','masivo'); renderSVG(); const tipo=c.tipo==='masivo' && svg.querySelector('.struct-cn').getAttribute('fill')==='#2563EB';
+      return imp && pinta && fuera && oculto && vuelve && mueve && ficha && panel && asoc && tipo;
+    } finally { window.CORREO_ESTACIONES=Dprev; S.level=nivel; S.editMode=ed; S.areaId=a0; S.correoN=cPrev; S.structSel=sel; S.cnSisDef=sd; _stDrag=null;
+      window.removeEventListener('mousemove', _structDragMove); window.removeEventListener('mouseup', _structDragUp);
+      { const pe=document.getElementById('structEdit'); if(pe) pe.style.display='none'; const b=document.getElementById('btnCorreoN'); if(b) b.classList.toggle('active',S.correoN!==false); }
       _rpFix(false); Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG(); }
   });
   T('Relojes transversales: en vista 2 el reloj se edita (arrastrable) y el ascensor no captura clics; colocar no selecciona el recinto de abajo', ()=>{
