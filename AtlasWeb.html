@@ -228,14 +228,26 @@ code,.mono{font-family:var(--font-mono)}
 .tb-info{margin-left:auto;font-size:var(--fs-sm);color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
 .tb-info:not(:empty)::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:7px;vertical-align:middle}
 .tb-div,.tb-sep{display:none}
-/* acceso rápido en la barra de navegación: cajas · nombres · edición */
-#navQuick{display:flex;align-items:center;gap:6px;flex-shrink:0;margin-left:10px}
+/* ── Barra de CAPAS (30-09-2026): todo lo que se enciende o apaga sobre el plano,
+   en un solo lugar y agrupado; al final 🧭 Ruta y ✏️ Editar. Dos filas si no cabe. */
+#capasBar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 0;padding:4px 12px;background:var(--surface);border-bottom:1px solid var(--panel-border);flex-shrink:0;z-index:5;min-height:33px}
+#capasBar .tb-btn,#capasBar .dk-btn{display:inline-flex;align-items:center;gap:0;width:auto;height:23px;padding:0 7px;margin:0;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--text-2);font-size:0;font-weight:var(--fw-regular);cursor:pointer;white-space:nowrap;flex-shrink:0;line-height:1;overflow:visible;text-align:center;justify-content:center}
+#capasBar .dk-btn>span{display:none}
+#capasBar .tb-btn::before,#capasBar .dk-btn::before{content:attr(data-ic);font-size:12px;line-height:1}
+#capasBar .tb-btn::after,#capasBar .dk-btn::after{content:attr(data-lb);font-size:10.5px;line-height:1;width:auto;height:auto;margin:0 0 0 4px;border-radius:0;background:none;flex-shrink:0}
+#capasBar .tb-btn:hover,#capasBar .dk-btn:hover{background:var(--surface-sunken);border-color:var(--border-strong);color:var(--text)}
+#capasBar .tb-btn.active,#capasBar .dk-btn.on{background:var(--accent-50);border-color:var(--accent-300);color:var(--accent-700);font-weight:var(--fw-medium)}
+#capasBar .dis{opacity:.4}
+#capasBar .cp-g{display:inline-flex;align-items:center;gap:3px;flex-shrink:0;padding-right:7px;margin-right:4px;border-right:1px solid var(--border)}
+#capasBar .cp-g:last-of-type{border-right:0}
+#capasBar .cp-fin{margin-left:auto;display:inline-flex;align-items:center;gap:4px;padding-left:8px}
+#capasBar .cp-fin .tb-btn{border-radius:var(--r-md);color:var(--text)}
+#capasBar #btnEdit.active{background:var(--accent-600);border-color:var(--accent-600);color:#fff}
+@media (max-width:840px){#capasBar{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch}#capasBar .cp-fin{margin-left:0}}
 #navBar .tb-btn.dis{opacity:.45}
 #navBar .tb-btn{height:26px;padding:0 8px;font-size:var(--fs-xs);gap:5px}
 #navBar .tog::after{width:22px;height:13px;margin-left:6px;background:radial-gradient(circle at 6.5px 50%,#fff 4px,transparent 4.6px) var(--n-200)}
 #navBar .tog.on::after,#navBar .tog.active::after{background:radial-gradient(circle at 15.5px 50%,#fff 4px,transparent 4.6px) var(--accent-600)}
-/* ventana angosta: los 4 interruptores quedan sólo con su icono (el rótulo va en el tooltip) */
-@media (max-width:1360px){#navQuick .tb-btn{font-size:0;gap:0;padding:0 7px}#navQuick .tb-btn::before{content:attr(data-ic);font-size:13px;line-height:1}}
 
 /* ── Botones de herramienta (.tb-btn) ────────────────────────────────────── */
 .tb-btn{display:inline-flex;align-items:center;gap:6px;height:var(--control-h);padding:0 var(--sp-3);border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface);color:var(--text);font-size:var(--fs-sm);font-weight:var(--fw-regular);cursor:pointer;white-space:nowrap;flex-shrink:0;line-height:1;transition:background .15s,border-color .15s,color .15s;font-variant-numeric:tabular-nums}
@@ -942,20 +954,18 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="tb-btn tog" id="btnReloj" onclick="toggleRelojes()" title="Mostrar u ocultar los relojes control (lectores biométricos del control horario, ORD SSMO 5040029-145). Se ven en todas las vistas.">⏱ Relojes</button>
       <button class="tb-btn tog" id="btnCorreoN" onclick="toggleCorreoN()" title="Mostrar u ocultar las estaciones de correo neumático (planos de tuberías CNE-PL-GEN, PE 17). Cápsula del color del sistema: azul T1 Atención Abierta · magenta T2 Hospital 1 · ámbar T3 Hospital 2 · verde línea del Laboratorio. Letra = tipo: P paso · F final · M masivo · R recepción masiva · C central. Se ven en todas las vistas.">📮 Correo N.</button>
       <button class="tb-btn tog" id="btnDotNames" onclick="toggleDotNames()" title="Mostrar u ocultar el nombre de las personas asignadas a los puestos en vista 3 (útil en recintos con muchos funcionarios)">👤 Nombres</button>
-      <div class="vw-dd" id="vwDD">
-        <button class="tb-btn" id="btnVista" onclick="toggleVwMenu(event)" title="Opciones de visualización del plano">🎛 Vista ▾</button>
-        <div class="vw-menu" id="vwMenu">
-          <button class="tb-btn" id="btnPlanKind" onclick="togglePlanKind()" title="Alternar entre el plano de mobiliario y el plano a color (los recintos calzan en ambos)">🖌 Ver color</button>
-          <button class="tb-btn" id="btnSen" onclick="toggleSenaletica()" title="Mostrar el nombre y N° de señalética de cada recinto bajo el código">🪧 Señalética</button>
-          <button class="tb-btn" id="btnAudit" onclick="toggleAudit()" title="Colorear cada recinto según la completitud de sus datos: tipo, código, BIM y señalética">✅ Auditoría de datos</button>
-          <button class="tb-btn" id="btnMetas" onclick="toggleMetas()" title="Metas oficiales de recintos (Resumen Ejecutivo HDS): asignados vs meta">🎯 Metas</button>
-          <button class="tb-btn" id="btnAsigN" onclick="toggleAsigNum()" title="Mostrar en cada recinto cuántos funcionarios tiene asignados (solo el número, abajo a la derecha)">🧑 N° asignados</button>
-          <button class="tb-btn" id="btnTiPrint" onclick="toggleTiPrint()" title="Mostrar en cada recinto (vista de servicio) las impresoras del HDS según el archivo Comodatos Jun-2026 cruzado con el PMA/BIM, abajo a la izquierda: 🖨 + 👤 láser monousuario · 👥 láser multiusuario · 📠 multifuncional · 🎨 multifuncional color. Clic abre la ficha.">🖨 Impresoras</button>
-          <button class="tb-btn" id="btnCcdd" onclick="toggleCcdd()" title="Mostrar sobre el plano los puntos de corrientes débiles (CE y CCDD) leídos de los planos CDE rev. 20-03-2020: llamada enfermera, seguridad y control de accesos, CCTV, megafonía, gestión de turnos, telefonía, WiFi/celular. Pasa el mouse por un punto para ver qué es. Las clases «por confirmar» se muestran con su letra del plano.">📡 Corrientes débiles</button>
-          <button class="tb-btn" id="btnSoloReemp" onclick="toggleSoloReemp()" title="Filtro del plano: resaltar SOLO los puestos con reemplazo vigente (titular ausente según RRHH o informado en terreno). En vista 3 los demás puestos se atenúan; en vista 2 cada recinto muestra 🔁 y cuántos reemplazos tiene.">🔁 Sólo reemplazos</button>
-          <button class="tb-btn" id="btnShowPC" onclick="toggleShowPC()" title="Mostrar en cada recinto (vista de servicio) los computadores del catálogo EMMC repartidos por caja dibujada: 💻 + cantidad (bajo y alto rendimiento, notebooks). Clic abre la ficha. Reporte y Excel en el gestor: Apoyo TI → Reporte de computadores.">💻 Computadores</button>
-        </div>
-      </div>
+      <button class="tb-btn" id="btnPlanKind" onclick="togglePlanKind()" title="Alternar entre el plano de mobiliario y el plano a color (los recintos calzan en ambos)">🖌 Ver color</button>
+      <button class="tb-btn" id="btnSen" onclick="toggleSenaletica()" title="Mostrar el nombre y N° de señalética de cada recinto bajo el código">🪧 Señalética</button>
+      <button class="tb-btn" id="btnAudit" onclick="toggleAudit()" title="Colorear cada recinto según la completitud de sus datos: tipo, código, BIM y señalética">✅ Auditoría de datos</button>
+      <button class="tb-btn" id="btnMetas" onclick="toggleMetas()" title="Metas oficiales de recintos (Resumen Ejecutivo HDS): asignados vs meta">🎯 Metas</button>
+      <button class="tb-btn" id="btnAsigN" onclick="toggleAsigNum()" title="Mostrar en cada recinto cuántos funcionarios tiene asignados (solo el número, abajo a la derecha)">🧑 N° asignados</button>
+      <button class="tb-btn" id="btnTiPrint" onclick="toggleTiPrint()" title="Mostrar en cada recinto (vista de servicio) las impresoras del HDS según el archivo Comodatos Jun-2026 cruzado con el PMA/BIM, abajo a la izquierda: 🖨 + 👤 láser monousuario · 👥 láser multiusuario · 📠 multifuncional · 🎨 multifuncional color. Clic abre la ficha.">🖨 Impresoras</button>
+      <button class="tb-btn" id="btnCcdd" onclick="toggleCcdd()" title="Mostrar sobre el plano los puntos de corrientes débiles (CE y CCDD) leídos de los planos CDE rev. 20-03-2020: llamada enfermera, seguridad y control de accesos, CCTV, megafonía, gestión de turnos, telefonía, WiFi/celular. Pasa el mouse por un punto para ver qué es. Las clases «por confirmar» se muestran con su letra del plano.">📡 Corrientes débiles</button>
+      <button class="tb-btn" id="btnSoloReemp" onclick="toggleSoloReemp()" title="Filtro del plano: resaltar SOLO los puestos con reemplazo vigente (titular ausente según RRHH o informado en terreno). En vista 3 los demás puestos se atenúan; en vista 2 cada recinto muestra 🔁 y cuántos reemplazos tiene.">🔁 Sólo reemplazos</button>
+      <button class="tb-btn" id="btnShowPC" onclick="toggleShowPC()" title="Mostrar en cada recinto (vista de servicio) los computadores del catálogo EMMC repartidos por caja dibujada: 💻 + cantidad (bajo y alto rendimiento, notebooks). Clic abre la ficha. Reporte y Excel en el gestor: Apoyo TI → Reporte de computadores.">💻 Computadores</button>
+      <button class="tb-btn" id="btnPuertasVis" onclick="togglePuertasVis()" title="Mostrar u ocultar las puertas de los recintos (flecha de salida sobre el muro, vistas 2 y 3). Mientras se colocan puertas se ven siempre.">🚪 Puertas</button>
+      <button class="tb-btn" id="btnShowTomas" onclick="toggleShowTomas()" title="Mostrar en cada recinto (vista de servicio) las tomas de corriente de la memoria eléctrica PE 01: 🔌 + total de tomas (triple = 3, doble = 2, simple = 1), sumando grado médico, computación (UPS) y fuerza. El detalle por red va en el tooltip y en la ficha.">🔌 Tomas</button>
+      <button class="tb-btn" id="btnShowGases" onclick="toggleShowGases()" title="Mostrar en cada recinto (vista de servicio) las salidas de gases clínicos de la memoria PE 13: O₂ oxígeno · AM aire medicinal · VAC vacío y los demás, con su cantidad por recinto (tomas murales + panel de cabecera + columnas).">🫁 Gases</button>
       <button class="tb-btn" id="btnDraw" onclick="toggleDraw()" style="display:none">⬛ Dibujar</button>
       <button class="tb-btn" id="btnStruct" onclick="toggleStructMenu()" title="Agregar elementos transversales al piso: ascensores, escaleras, escalera mecánica, líneas de circulación." style="display:none">🛗 Estructura</button>
       <div id="structMenu" style="display:none">
@@ -1040,16 +1050,13 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
            barra superior se montan acá en _dockMonta(). -->
       <div id="dock">
         <div class="dk-h">Ir a</div><div id="dkIr"></div>
-        <div class="dk-sep"></div><div class="dk-h">Ver</div><div id="dkVer"></div>
-        <div class="dk-h">Ubicación en planta</div>
-        <div class="dk-sub">
+        <div id="capasSrc" style="display:none">
           <button class="dk-btn tog" id="dkUbicTotem" onclick="toggleUbic('totem')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van los TÓTEMS (círculo grande + icono)"><span class="ic">🎫</span><span class="lb">Tótems</span></button>
           <button class="dk-btn tog" id="dkUbicDea" onclick="toggleUbic('dea')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van los DEA"><span class="ic">💚</span><span class="lb">DEA</span></button>
           <button class="dk-btn tog" id="dkUbicPrinter" onclick="toggleUbic('printer')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van las IMPRESORAS"><span class="ic">🖨</span><span class="lb">Impresoras</span></button>
           <button class="dk-btn tog" id="dkUbicCarro" onclick="toggleCarros()" title="Carros de paro: desfibrilador (130007 / 130008) + carro de paro (110032) del EMMC de cada recinto. Azul = completo · rojo = desfibrilador sin su carro. Se ve en todas las vistas y se exporta a Excel."><span class="ic">🚨</span><span class="lb">Carros de paro</span></button>
+          <button class="dk-btn tog" id="dkLabels" onclick="toggleRoomLabels()" title="Mostrar u ocultar el nombre y código de cada recinto sobre el plano"><span class="ic">🏷</span><span class="lb">Etiquetas de recintos</span></button>
         </div>
-        <button class="dk-btn" id="dkCarrosXls" onclick="exportCarrosParo()" title="Excel de carros de paro: recinto por recinto (completo / desfibrilador sin carro / carro sin desfibrilador), resumen por piso y lo que el EMMC trae sin caja en el plano"><span class="ic">⬇</span><span class="lb">Exportar carros de paro</span></button>
-        <button class="dk-btn tog" id="dkLabels" onclick="toggleRoomLabels()" title="Mostrar u ocultar el nombre y código de cada recinto sobre el plano"><span class="ic">🏷</span><span class="lb">Etiquetas de recintos</span></button>
         <div class="dk-h">Apoyo TI</div>
         <button class="dk-btn" id="dkTiReport" onclick="abrirReporteTI()" title="Impresoras del HDS (archivo Comodatos Jun-2026 × PMA): cuántas quedan ubicadas en cajas dibujadas contra el total del archivo, por tipo"><span class="ic">🖨</span><span class="lb">Reporte de impresoras</span><span class="n" id="dkTiN"></span></button>
         <button class="dk-btn" id="dkPcReport" onclick="abrirReportePC()" title="Computadores del catálogo EMMC por piso y servicio (bajo/alto rendimiento, notebooks), con Excel por recinto"><span class="ic">💻</span><span class="lb">Reporte de computadores</span></button>
@@ -1063,6 +1070,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
         <button class="dk-btn" id="dkPropImp" onclick="importarPropuestosPlano()" title="Traer los puestos de trabajo que el proyectista marcó en MAGENTA en el plano de Coordinación Mobiliario. Reemplaza los que ya se importaron antes; lo que colocaste a mano no se toca."><span class="ic">⬇</span><span class="lb">Importar del plano</span><span class="n" id="dkPropImpN"></span></button>
         <button class="dk-btn" id="dkPropDel" onclick="propBorrarCtx()" title="Borrar TODO lo propuesto del contexto en que estás trabajando (el recinto en vista 3, el área en vista 2, el piso en vista 1)"><span class="ic">🗑</span><span class="lb">Borrar propuestos de aquí</span></button>
         <div class="dk-sep"></div><div class="dk-h">Exportar</div><div id="dkExp"></div>
+        <button class="dk-btn" id="dkCarrosXls" onclick="exportCarrosParo()" title="Excel de carros de paro: recinto por recinto (completo / desfibrilador sin carro / carro sin desfibrilador), resumen por piso y lo que el EMMC trae sin caja en el plano"><span class="ic">⬇</span><span class="lb">Exportar carros de paro</span></button>
         <button class="dk-btn" id="dkPmDelta" onclick="pmImportarDeltaArchivo()" title="Incorporar al Atlas maestro un archivo Atlas_cambios_<usuario>_<fecha>.json exportado desde el 🟡 HUB-PM (por ejemplo, los DEA colocados desde el iPad): nombres y dotación se aplican, los propuestos se suman o actualizan por id"><span class="ic">⬇</span><span class="lb">Importar cambios del 🟡</span></button>
         <button class="dk-btn" id="dkReport" onclick="openPropReport()" title="Resumen de todo lo propuesto (puestos, tótems, DEA) por piso, área y recinto, con exportación a Excel y a Clave Azul"><span class="ic">📊</span><span class="lb">Reporte de propuestos</span><span class="n" id="dkReportN"></span></button>
       </div>
@@ -1734,18 +1742,6 @@ function _popJunto(m,btn){
   m._ubica=ubica;
   requestAnimationFrame(ubica); setTimeout(ubica,60); setTimeout(ubica,200);
 }
-// Menú Vista (agrupa los toggles de visualización)
-function toggleVwMenu(e){
-  if(e)e.stopPropagation();
-  const m=document.getElementById('vwMenu'); if(!m) return;
-  const abrir=!m.classList.contains('show');
-  m.classList.toggle('show',abrir);
-  if(abrir) _popJunto(m,document.getElementById('btnVista'));
-}
-document.addEventListener('click',function(e){
-  const m=document.getElementById('vwMenu'), b=document.getElementById('btnVista');
-  if(m && m.classList.contains('show') && !m.contains(e.target) && !(b&&b.contains(e.target))) m.classList.remove('show');
-});
 // Visibilidad de las cajas y su información (vista 1 y 2): visibles →
 // translúcidas → ocultas → visibles. Permite mirar el plano de fondo sin
 // perder el trabajo; se recuerda entre sesiones.
@@ -1756,7 +1752,7 @@ function applyBoxVis(){
   el.classList.toggle('vis-off', S.boxVis==='off');
   const b=document.getElementById('btnBoxVis');
   if(b){ b.textContent = S.boxVis==='off' ? '🙈 Cajas' : '👁 Cajas';
-    b.classList.toggle('active', S.boxVis==='off'); }
+    b.classList.toggle('active', S.boxVis!=='off'); }
 }
 // Lado preferido de la tarjeta de nombre por puesto (clic en la tarjeta lo cambia).
 let _dotNameSide={};
@@ -4818,6 +4814,33 @@ function renderL2(){
         svg.appendChild(_tp);
       }
     }
+    if(S.showTomas || S.showGases){
+      const IR=_instResumen(room.id);
+      // apilados en la esquina inferior izquierda, sobre los testigos de 🖨 y 💻 si están
+      let fila=((S.showTI&&_tiCuentaRecinto(room.id))?1:0)+((S.showPC&&_pcDeRecinto(room.id).total)?1:0);
+      const testigo=(cls,texto,color,titulo)=>{
+        const t=txt(b.x+fs*.42, b.y+b.h-fs*(.95+1.3*fila), texto,
+          {class:cls, fill:color, stroke:'#ffffff', 'stroke-width':fs*.30, 'paint-order':'stroke fill',
+           'font-size':fs*1.0, 'text-anchor':'start', cursor:'pointer', 'font-family':'Segoe UI,sans-serif', 'font-weight':'900'});
+        const ttl=el('title'); ttl.textContent=titulo+'\nclic = ver ficha del recinto'; t.appendChild(ttl);
+        t.addEventListener('mousedown',e=>e.stopPropagation());
+        t.addEventListener('click',e=>{ e.stopPropagation(); openFichaRecinto(room.id); });
+        svg.appendChild(t); fila++;
+      };
+      if(IR && S.showTomas && IR.tomas){
+        testigo('inst-tomas','🔌'+IR.tomas,'#b45309',
+          '🔌 '+IR.tomas+' tomas de corriente en '+IR.ench+' enchufe'+(IR.ench===1?'':'s')+' (memoria PE 01, por recinto)\n'
+          +[['Grado médico (NEMA 6-20R)',IR.gm],['Computación (UPS)',IR.comp],['Fuerza (red normal)',IR.fz]].filter(x=>x[1]).map(x=>x[1]+' × '+x[0]).join('\n')
+          +(IR.arr?('\n+ '+IR.arr+' arranque'+(IR.arr===1?'':'s')):'')+(IR.schuko?'\nIncluye toma Schuko':''));
+      }
+      if(IR && S.showGases && IR.gasTot){
+        const orden=['O2','AM','VAC','AD','AI','VACD','N2O','CO2','EGA','N2'];
+        const gs=Object.entries(IR.gas).sort((a,c)=>(orden.indexOf(a[0])+99)%99-(orden.indexOf(c[0])+99)%99);
+        testigo('inst-gases','🫁'+(IR.aprox?'≈':'')+gs.map(([g,n])=>(_GAS_TXT[g]||g)+n).join(' '),'#0e7490',
+          '🫁 Gases clínicos del recinto (memoria PE 13)\n'+gs.map(([g,n])=>n+' × '+((((window.INSTALACIONES_RECINTO||{})._meta||{}).leyenda_gas||{})[g]||g)).join('\n')
+          +(IR.aprox?'\n≈ el anexo da el total del código y no se reparte parejo entre sus recintos: se muestra el total':''));
+      }
+    }
     if(S.showAsigN && (_na || _dd.length)){
       // txt() centra en vertical (dominant-baseline:middle): con el número al
       // doble, un centro a 0,26·fs del borde dejaba medio dígito pisando la línea.
@@ -5440,7 +5463,14 @@ function togglePuertaMode(){
   svg.style.cursor=S.puertaMode?'crosshair':'';
   renderSVG();
 }
+function togglePuertasVis(){
+  S.showPuertas=(S.showPuertas===false);
+  _lsPref('cabida_show_puertas', S.showPuertas?'1':'0');
+  const b=document.getElementById('btnPuertasVis'); if(b) b.classList.toggle('active',S.showPuertas!==false);
+  renderSVG();
+}
 function _puertasLayer(){
+  if(S.showPuertas===false && !S.puertaMode) return;      // capa apagada (colocando puertas se ven siempre)
   const rooms=_puertaCtxRooms(); if(!rooms.length) return;
   const g=el('g',{class:'puertas-layer'});
   rooms.forEach(r=>{
@@ -5449,10 +5479,14 @@ function _puertasLayer(){
       const pg=el('g',{class:'puerta-g',transform:`translate(${pt.x},${pt.y}) rotate(${pt.ang})`});
       // vano sobre el muro (perpendicular a la flecha) + flecha de salida
       pg.appendChild(el('rect',{x:-6,y:-D.px/2,width:12,height:D.px,fill:'#fff',stroke:D.col,'stroke-width':3,rx:3}));
-      pg.appendChild(el('line',{x1:6,y1:0,x2:D.px*0.95,y2:0,stroke:D.col,'stroke-width':pt.t==='p'?14:(pt.t==='c'?11:8),'stroke-linecap':'round'}));
-      pg.appendChild(el('path',{d:`M ${D.px*0.95} 0 l -22 -15 v 30 z`,fill:D.col}));
-      const tx=el('text',{x:D.px*0.55,y:-14,'text-anchor':'middle','font-size':22,'font-weight':800,fill:D.col,
-        'pointer-events':'none',transform:(Math.abs(pt.ang)===90?`rotate(${-pt.ang} ${D.px*0.55} -14)`:'')});
+      // flecha a la MITAD del largo (30-09-2026: tapaba el recinto vecino); la punta se achica en proporción
+      const L=D.px*0.475, pn=Math.min(22, L*0.6);
+      pg.appendChild(el('line',{class:'puerta-fl',x1:6,y1:0,x2:L-pn*0.5,y2:0,stroke:D.col,'stroke-width':pt.t==='p'?14:(pt.t==='c'?11:8),'stroke-linecap':'round'}));
+      pg.appendChild(el('path',{class:'puerta-pn',d:`M ${L} 0 l ${-pn} ${-pn*0.68} v ${pn*1.36} z`,fill:D.col}));
+      const tx=el('text',{x:L*0.6,y:(Math.abs(pt.ang)===180?-20:-14),'text-anchor':'middle','font-size':22,'font-weight':800,fill:D.col,
+        'pointer-events':'none','dominant-baseline':(Math.abs(pt.ang)===180?'middle':'auto'),
+        // el rótulo siempre derecho: ±90° se endereza y a 180° se gira sobre sí mismo (antes quedaba de cabeza)
+        transform:(Math.abs(pt.ang)===90?`rotate(${-pt.ang} ${L*0.6} -14)`:(Math.abs(pt.ang)===180?`rotate(180 ${L*0.6} -20)`:''))});
       tx.textContent=D.lbl; pg.appendChild(tx);
       const ttl=el('title'); ttl.textContent='🚪 Salida · puerta '+(pt.t==='p'?'pabellón 200':(pt.t==='c'?'camilla 120':'normal 90'))+' cm · ⌘+clic rota el tipo · arrastrar mueve · doble clic elimina'; pg.appendChild(ttl);
       if(!S.viewOnly||S.editPM){
@@ -6655,9 +6689,18 @@ function exportDEA(){
 // superior se MUEVEN acá (no se duplican), así conservan sus manejadores y toda
 // la lógica de mostrar/ocultar que ya existía. La barra superior queda sólo con
 // el mensaje de estado.
+// Barra de capas: [id del botón, rótulo corto]; '|' separa los grupos
+// (plano · personas · planta · equipos · instalaciones · revisión).
+const CAPAS_BARRA=[
+  ['btnBoxVis','Cajas'],['dkLabels','Etiquetas'],['btnSen','Señalética'],['btnPlanKind','Color'],'|',
+  ['btnDotNames','Nombres'],['btnAsigN','N° asignados'],['btnSoloReemp','Reemplazos'],'|',
+  ['btnVert','Ascensores'],['btnReloj','Relojes'],['btnCorreoN','Correo N.'],['btnPuertasVis','Puertas'],['btnJardines','Jardines'],'|',
+  ['dkUbicCarro','Carros de paro'],['dkUbicDea','DEA'],['dkUbicTotem','Tótems'],['dkUbicPrinter','Impresoras'],['btnTiPrint','Impr. por recinto'],['btnShowPC','PC'],'|',
+  ['btnShowTomas','Tomas'],['btnShowGases','Gases'],['btnCcdd','C. débiles'],'|',
+  ['btnAudit','Auditoría'],['btnMetas','Metas']
+];
 const DOCK_MAPA=[
   ['dkIr',    ['btnBuscaRec']],
-  ['dkVer',   ['vwDD']],
   ['dkCons',  ['btnFicha','btnAutSan','btnEquip','btnMob','btnScen','btnMoves','btnServPuestos']],
   ['dkEdit2', ['btnUndo','btnDraw','btnMerge','btnUnmerge','btnRename','btnDel','btnDelDot','btnOrdenarDots']],
   ['dkAdd',   ['btnPuertas','puertaTipoSel','btnPuertaDel','btnPuertaDelAll','btnPuertasAuto','btnDupMueble','btnStruct']],
@@ -6681,7 +6724,7 @@ function _dockMonta(){
   });
   // los desplegables se cuelgan del body (el dock los recortaría) y se ubican
   // al vuelo junto a su botón, hacia la izquierda del gestor
-  ['structMenu','vwMenu'].forEach(id=>{
+  ['structMenu'].forEach(id=>{
     const m=document.getElementById(id);
     if(m){ m.classList.add('dock-pop'); document.body.appendChild(m); }
   });
@@ -6689,16 +6732,21 @@ function _dockMonta(){
   // el mensaje de estado pasa a la barra de navegación (la de edición queda vacía)
   const nav=document.getElementById('navBar'), ti=document.getElementById('tbInfo');
   if(nav&&ti) nav.appendChild(ti);
-  // Acceso rápido (petición 15-sep-2026): ver/ocultar cajas, nombres de
-  // funcionarios y modo edición quedan SIEMPRE a la vista en la barra superior.
-  if(nav){
-    const q=document.createElement('div'); q.id='navQuick';
-    ['btnBoxVis','btnDotNames','btnJardines','btnVert','btnReloj','btnCorreoN','btnNav','btnEdit'].forEach(id=>{
-      const e=document.getElementById(id); if(!e) return;
+  // Barra de capas (30-09-2026): TODOS los interruptores de mostrar/ocultar quedan arriba,
+  // agrupados, y al final 🧭 Ruta y ✏️ Editar. Se MUDAN los botones que ya existían
+  // (menú Vista, «Ubicación en planta», acceso rápido): conservan manejadores y estado.
+  if(nav && !document.getElementById('capasBar')){
+    const bar2=document.createElement('div'); bar2.id='capasBar';
+    const pon=(cont,id,lb)=>{ const e=document.getElementById(id); if(!e) return;
       const m=ICO.exec(e.textContent||''); e.setAttribute('data-ic', m?m[1]:(e.textContent||'?').trim().slice(0,2));
-      q.appendChild(e);
-    });
-    nav.appendChild(q);
+      e.setAttribute('data-lb', lb); e.setAttribute('aria-label', lb); cont.appendChild(e); };
+    // cada grupo es un bloque que no se parte: si no cabe, baja entero a la fila siguiente
+    let grp=null; const nuevoGrupo=()=>{ grp=document.createElement('span'); grp.className='cp-g'; bar2.appendChild(grp); }; nuevoGrupo();
+    CAPAS_BARRA.forEach(x=>{ if(x==='|') nuevoGrupo(); else pon(grp,x[0],x[1]); });
+    const fin=document.createElement('div'); fin.className='cp-fin';
+    pon(fin,'btnNav','Ruta'); pon(fin,'btnEdit','Editar'); bar2.appendChild(fin);
+    // a todo el ancho de la ventana, entre la cabecera y el plano (caben más interruptores por fila)
+    const lay=document.getElementById('layout'); if(lay&&lay.parentNode) lay.parentNode.insertBefore(bar2, lay); else nav.parentNode.insertBefore(bar2, nav.nextSibling);
   }
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',_dockMonta); else _dockMonta();
@@ -9919,6 +9967,45 @@ function _telIpHtmlBims(bims){
 }
 function _telIpHtml(roomId){ return _telIpHtmlBims((rBim(roomId)||'').match(/[A-Za-z]\d{3,5}/g)||[]); }
 
+// Resumen para el plano (capas 🔌 Tomas y 🫁 Gases): mismas reglas que la ficha.
+// Tomas = puntos de conexión (triple ×3 + doble ×2 + simple) por red; gases = salidas
+// por recinto (total del código ÷ recintos; si no divide parejo, el total con «≈»).
+function _instResumen(roomId){
+  const I=window.INSTALACIONES_RECINTO; if(!I||!I.ele) return null;
+  const code=rCode(roomId), partes=rCodeParts(roomId), aac=roomAAC(roomId);
+  const ed=aac==='AA'?'AA':(aac==='AC'?'HDS':'');
+  const buscar=t=>{ const out=[], vis=new Set();
+    [code].concat(partes).forEach(c=>(t[c]||[]).forEach(r=>{ const k=JSON.stringify(r); if(!vis.has(k)){ vis.add(k); out.push({...r,_c:c}); } }));
+    return out; };
+  let ele=buscar(I.ele); if(ed&&ele.some(r=>r.ed===ed)) ele=ele.filter(r=>r.ed===ed||!r.ed);
+  const tomas=a=>(a[0]||0)*3+(a[1]||0)*2+(a[2]||0);
+  const R={gm:0,comp:0,fz:0,arr:0,ench:0,tomas:0,schuko:false,gas:{},gasTot:0,aprox:false};
+  ele.forEach(r=>{ R.gm+=tomas(r.gm); R.comp+=tomas(r.comp); R.fz+=tomas(r.fz); R.arr+=(r.gm[3]||0);
+    R.ench+=[0,1,2].reduce((a,i)=>a+(r.gm[i]||0)+(r.comp[i]||0)+(r.fz[i]||0),0);
+    if(/sch?u?c?k?o|shucko|shuko/i.test(r.obs||'')) R.schuko=true; });
+  R.tomas=R.gm+R.comp+R.fz;
+  buscar(I.gas).forEach(r=>{
+    const eleCod=(I.ele[r._c]||[])[0];
+    const N=(r.codigo_fila&&r.codigo_fila.indexOf('/')>=0)?1:Math.max(1,(eleCod&&eleCod.cant)||codeInstances(r._c)||1);
+    ['mur','cpi','col'].forEach(k=>Object.entries(r[k]||{}).forEach(([g,t])=>{
+      const por=t/N, ok=Number.isInteger(por); if(!ok) R.aprox=true;
+      R.gas[g]=(R.gas[g]||0)+(ok?por:t); }));
+  });
+  R.gasTot=Object.values(R.gas).reduce((a,b)=>a+b,0);
+  return R;
+}
+function toggleShowTomas(){
+  S.showTomas=!S.showTomas; _lsPref('cabida_show_tomas', S.showTomas?'1':'0');
+  const b=document.getElementById('btnShowTomas'); if(b) b.classList.toggle('active',S.showTomas);
+  if(S.showTomas && S.level===1 && typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🔌 Las tomas de corriente se ven sobre cada recinto al entrar a un servicio (vista 2)'; setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },5000); }
+  renderSVG();
+}
+function toggleShowGases(){
+  S.showGases=!S.showGases; _lsPref('cabida_show_gases', S.showGases?'1':'0');
+  const b=document.getElementById('btnShowGases'); if(b) b.classList.toggle('active',S.showGases);
+  if(S.showGases && S.level===1 && typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🫁 Los gases clínicos se ven sobre cada recinto al entrar a un servicio (vista 2)'; setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },5000); }
+  renderSVG();
+}
 function _instalacionesHtmlCod(code, partes, aac){
   const I=window.INSTALACIONES_RECINTO; if(!I||!I.ele) return '';
   const M=I._meta||{}, LG=M.leyenda_gas||{};
@@ -10090,7 +10177,8 @@ function toggleRightPanel(force){
   _lsPref('cabida_rp_collapsed', collapsed?'1':'0');
 }
 (function initRightPanelState(){
-  try{ if(localStorage.getItem('cabida_rp_collapsed')==='1') toggleRightPanel(true); }catch{}
+  // en pantallas angostas (teléfono) el panel tapa el plano: parte cerrado salvo que ya se haya elegido
+  try{ const v=localStorage.getItem('cabida_rp_collapsed'); if(v==='1' || (v===null && window.innerWidth<=840)) toggleRightPanel(true); }catch{}
 })();
 // ── Contadores del panel derecho (proyecto + desglose por piso) ─────────────
 let _otrosOpen=false;
@@ -14938,6 +15026,9 @@ function init(){
   { const b=document.getElementById('btnCcdd'); if(b)b.classList.toggle('active',!!S.showCcdd); }
   { const b=document.getElementById('btnSoloReemp'); if(b)b.classList.toggle('active',!!S.soloReemp); }
   { const b=document.getElementById('btnShowPC'); if(b)b.classList.toggle('active',!!S.showPC); }
+  { let v=null; try{ v=localStorage.getItem('cabida_show_tomas'); }catch(e){} S.showTomas=(v==='1'); const b=document.getElementById('btnShowTomas'); if(b)b.classList.toggle('active',S.showTomas); }
+  { let v=null; try{ v=localStorage.getItem('cabida_show_gases'); }catch(e){} S.showGases=(v==='1'); const b=document.getElementById('btnShowGases'); if(b)b.classList.toggle('active',S.showGases); }
+  { let v=null; try{ v=localStorage.getItem('cabida_show_puertas'); }catch(e){} S.showPuertas=(v!=='0'); const b=document.getElementById('btnPuertasVis'); if(b)b.classList.toggle('active',S.showPuertas!==false); }
   { const b=document.getElementById('btnPlanKind'); if(b){ const c=S.planKind==='color'; b.textContent=c?'🗺 Ver mobiliario':'🖌 Ver color'; b.classList.toggle('active',c); } }
   applyBoxVis();
   loadDotDB(); // async pero NO awaiteamos: el plano puede cargar en paralelo. Búsqueda queda lista cuando termine fetch.
@@ -14984,7 +15075,7 @@ async function runSelfTest(){
   // Testigo: al terminar, NINGUNA preferencia del usuario puede haber cambiado.
   const _PREFS=['cabida_room_labels','cabida_show_dotnames','cabida_box_vis','cabida_plan_kind',
                 'cabida_show_asign','cabida_show_sen','cabida_scenario','cabida_rp_collapsed',
-                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures','cabida_ubic','cabida_jardines','cabida_verticales','cabida_relojes','cabida_correo_n','cabida_cn_siembra','cabida_show_ccdd','cabida_solo_reemp','cabida_show_pc'];
+                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures','cabida_ubic','cabida_jardines','cabida_verticales','cabida_relojes','cabida_correo_n','cabida_cn_siembra','cabida_show_tomas','cabida_show_gases','cabida_show_puertas','cabida_show_ccdd','cabida_solo_reemp','cabida_show_pc'];
   const _PREV={}; _PREFS.forEach(k=>{ try{ _PREV[k]=localStorage.getItem(k); }catch(e){ _PREV[k]=null; } });
   // r==='omitir' ⇒ la prueba necesita recintos dibujados y este navegador no tiene ninguno (p. ej. un preview con
   // almacenamiento vacío): se informa como ⚪ omitida, ni verde ni roja. Con dibujo, la prueba corre completa.
@@ -15600,31 +15691,18 @@ async function runSelfTest(){
       window.confirm=cPrev; wsState.dots=dPrev; mCtx=mPrev;
     }
   });
-  T('Dock: los desplegables (Vista, Estructura) se ven fuera del gestor y no quedan recortados', ()=>{
+  T('Dock: el desplegable de Estructura vive fuera del gestor (no queda recortado) y el menú Vista ya no existe', ()=>{
     const dock=document.getElementById('dock');
-    const fuera=['vwMenu','structMenu'].every(id=>{ const m=document.getElementById(id); return m && !dock.contains(m) && m.classList.contains('dock-pop'); });
-    const m=document.getElementById('vwMenu');
-    if(m.classList.contains('show')) toggleVwMenu();
-    toggleVwMenu();
-    const r=m.getBoundingClientRect(), d=dock.getBoundingClientRect();
-    const abre=getComputedStyle(m).display!=='none';
-    // La geometría sólo se juzga si la ventana está realmente pintando: con el
-    // panel del navegador oculto todos los rects salen en cero y sería un falso
-    // negativo. Lo estructural (fuera del dock, abre y cierra) se exige siempre.
-    const vivo=document.getElementById('viewer').getBoundingClientRect().width>50;
-    const geo=!vivo || (r.width>60 && r.height>40 && r.left>=0 && r.top>=0
-      && r.right<=window.innerWidth+1 && r.bottom<=window.innerHeight+1 && r.right<=d.left+1);
-    toggleVwMenu();
-    const cierra=!m.classList.contains('show');
-    return fuera && abre && geo && cierra;
+    const m=document.getElementById('structMenu');
+    return !!m && !dock.contains(m) && m.classList.contains('dock-pop') && !document.getElementById('vwMenu') && !document.getElementById('btnVista');
   });
   T('Dock: la barra superior se vacía y los botones de edición viven en el gestor', ()=>{
     const dock=document.getElementById('dock'); if(!dock) return false;
-    const ids=['btnDraw','btnPuertas','btnDupMueble','btnStruct','btnMerge','btnDel','btnFicha','btnMob','btnExpServ','vwDD','puertaTipoSel'];
+    const ids=['btnDraw','btnPuertas','btnDupMueble','btnStruct','btnMerge','btnDel','btnFicha','btnMob','btnExpServ','puertaTipoSel'];
     const dentro=ids.every(id=>{ const e=document.getElementById(id); return e && dock.contains(e); });
-    // cajas · nombres · edición: acceso rápido en la barra de navegación
-    const nav=document.getElementById('navBar');
-    const rapidos=['btnBoxVis','btnDotNames','btnJardines','btnEdit'].every(id=>{ const e=document.getElementById(id); return e && nav.contains(e) && !dock.contains(e); });
+    // cajas · nombres · edición: en la barra de capas, bajo la de navegación
+    const nav=document.getElementById('capasBar');
+    const rapidos=!!nav && ['btnBoxVis','btnDotNames','btnJardines','btnEdit'].every(id=>{ const e=document.getElementById(id); return e && nav.contains(e) && !dock.contains(e); });
     const bar=document.getElementById('editBar');
     const barSinBotones=![...bar.querySelectorAll('.tb-btn')].length;
     const conIcono=['btnEdit','btnPuertas','btnScen'].every(id=>(document.getElementById(id).getAttribute('data-ic')||'').length>0);
@@ -16204,8 +16282,8 @@ async function runSelfTest(){
       structuresState[fl.id]=[{id:'st_v1',kind:'asc-Pplus',x:1000,y:800,w:150,h:180,etq:'G1',salida:'ns'},{id:'st_line',kind:'circulation',points:[{x:0,y:0},{x:9,y:9}]}];
       S.verticales=true;
       const en=[1,2,3].map(lv=>{ S.level=lv; if(lv>1) S.areaId='st_a'; if(lv===3) S.roomId='st_r1'; renderSVG(); const m=svg.querySelector('.struct-marker'); return m && m.querySelectorAll('.struct-puerta').length===2 && m.querySelector('rect').getAttribute('fill')==='#0B2A6B'; });
-      const nav=document.getElementById('navBar'), b=document.getElementById('btnVert');
-      const enBarra=!!b && nav.contains(b);
+      const nav=document.getElementById('capasBar'), b=document.getElementById('btnVert');
+      const enBarra=!!b && !!nav && nav.contains(b);
       toggleVerticales();
       const apaga=S.verticales===false && !svg.querySelector('.struct-marker') && !!svg.querySelector('.struct-circ-path') && !b.classList.contains('active');
       toggleVerticales();
@@ -16492,14 +16570,16 @@ async function runSelfTest(){
       // vista 2: sigue visible y se arrastra
       S.level=2; S.areaId='st_a'; renderSVG(); const z=S.zoom;
       _startStructDrag({button:0,clientX:0,clientY:0,shiftKey:true,preventDefault(){},stopPropagation(){}}, c, 'move');
-      _structDragMove({clientX:40*z, clientY:20*z}); _structDragUp();
-      const mueve=!!svg.querySelector('.struct-cn') && c.x===990 && c.y===910 && arr.find(x=>x.id==='a1').x===2500;
+      _structDragMove({clientX:400*z, clientY:200*z}); _structDragUp();   // (gesto largo: con zoom chico, pocos px no superan el umbral de arrastre)
+      const mueve=!!svg.querySelector('.struct-cn') && c.x===1350 && c.y===1090 && arr.find(x=>x.id==='a1').x===2500;
       // ficha del recinto: la estación pegada al muro (10 px afuera → dentro tras moverla) cuenta para st_r1
-      const rc=_cnRecinto(c, fl.id), h=_cnHtml('st_r1');
-      const ficha=!!rc && rc.room.id==='st_r1' && /Correo neumático/.test(h) && /E 9\.1/.test(h) && /T3 · Hospital 2/.test(h) && /CN-X-1/.test(h) && _cnHtml('st_r2')==='';
+      // (solo con el área de prueba en el piso: los recintos reales del Atlas pueden caer en las mismas coordenadas)
+      const areas0=fl.areas; fl.areas=areas0.filter(a=>a.id==='st_a'); let rc, h, h2;
+      try{ rc=_cnRecinto(c, fl.id); h=_cnHtml('st_r1'); h2=_cnHtml('st_r2'); } finally { fl.areas=areas0; }
+      const ficha=!!rc && rc.room.id==='st_r1' && /Correo neumático/.test(h) && /E 9\.1/.test(h) && /T3 · Hospital 2/.test(h) && /CN-X-1/.test(h) && h2==='';
       // panel: asociar a una estación del directorio que el plano no trae
       S.structSel='cn1'; structEditRender(); const pan=document.getElementById('structEdit');
-      const panel=/Estación de correo neumático/.test(pan.textContent) && /◌/.test(pan.innerHTML) && /ST/.test(pan.textContent);
+      const panel=/Estación de correo neumático/.test(pan.textContent) && /◌/.test(pan.innerHTML) && /Recinto/.test(pan.textContent);
       structEditApply('cnDir','CN-X-2'); const asoc=c.dir==='CN-X-2' && c.sis==='T1' && c.nombre==='Otra';
       structEditApply('cnTipo','masivo'); renderSVG(); const tipo=c.tipo==='masivo' && svg.querySelector('.struct-cn').getAttribute('fill')==='#2563EB';
       return imp && pinta && fuera && oculto && vuelve && mueve && ficha && panel && asoc && tipo;
@@ -16558,6 +16638,58 @@ async function runSelfTest(){
       if(c1===undefined) delete nameState.codes['st_r1']; else nameState.codes['st_r1']=c1;
       if(c2===undefined) delete nameState.codes['st_r2']; else nameState.codes['st_r2']=c2;
       delete boxState.rooms['st_r2']; _rpFix(false); _codeBoxIndex=null; _clavesMemo=new WeakMap();
+    }
+  });
+  T('Barra de capas: todos los interruptores de mostrar/ocultar arriba, agrupados, con ✏️ Editar al final; el gestor ya no los repite', ()=>{
+    const bar=document.getElementById('capasBar'), dock=document.getElementById('dock'); if(!bar) return false;
+    const ids=CAPAS_BARRA.filter(x=>x!=='|').map(x=>x[0]);
+    const todos=ids.length>=23 && ids.every(id=>{ const e=document.getElementById(id); return e && bar.contains(e) && !dock.contains(e) && (e.getAttribute('data-lb')||'').length>0 && (e.getAttribute('data-ic')||'').length>0; });
+    const bts=[...bar.querySelectorAll('button')];
+    const alFinal=bts[bts.length-1].id==='btnEdit' && bts[bts.length-2].id==='btnNav';
+    const grupos=bar.querySelectorAll('.cp-g').length===6;
+    const sinRepetir=!document.getElementById('dkVer') && !/Ubicación en planta/.test(dock.textContent) && dock.contains(document.getElementById('dkCarrosXls'));
+    // «Cajas» encendido = cajas visibles, como el resto
+    const bv=S.boxVis; S.boxVis='on'; applyBoxVis(); const on=document.getElementById('btnBoxVis').classList.contains('active');
+    S.boxVis='off'; applyBoxVis(); const off=!document.getElementById('btnBoxVis').classList.contains('active'); S.boxVis=bv; applyBoxVis();
+    return todos && alFinal && grupos && sinRepetir && on && off;
+  });
+  T('🔌 Tomas y 🫁 Gases sobre el recinto (vista 2): cuentan como la ficha, se apagan por separado y el clic abre la ficha', ()=>{
+    const I=window.INSTALACIONES_RECINTO=window.INSTALACIONES_RECINTO||{ele:{},gas:{},_meta:{}}; I.ele=I.ele||{}; I.gas=I.gas||{};
+    const c1=nameState.codes['st_r1'], nivel=S.level, a0=S.areaId, f0=S.floorId, t0=S.showTomas, g0=S.showGases; _rpFix(true);
+    try{
+      I.ele['zq.7']=[{nombre:'ST',cant:2,gm:[1,2,0,1],comp:[0,1,1],fz:[0,0,2],obs:'Rx con toma schuko'}];
+      I.gas['zq.7']=[{nombre:'ST',mur:{O2:4,VAC:2},cpi:{AM:3}}];
+      nameState.codes['st_r1']='zq.7'; _codeBoxIndex=null;
+      const R=_instResumen('st_r1');
+      // tomas: GM 1×3+2×2=7 · comp 1×2+1=3 · fuerza 2 → 12 en 7 enchufes; gases ÷2 recintos: O2 2, VAC 1, AM 3 (no divide → total, ≈)
+      const cuenta=R.tomas===12 && R.gm===7 && R.comp===3 && R.fz===2 && R.ench===7 && R.arr===1 && R.schuko && R.gas.O2===2 && R.gas.VAC===1 && R.gas.AM===3 && R.aprox;
+      S.floorId=fl.id; S.level=2; S.areaId='st_a'; S.showTomas=true; S.showGases=true; renderSVG();
+      const tt=svg.querySelector('.inst-tomas'), tg=svg.querySelector('.inst-gases');
+      const pinta=!!tt && /🔌12/.test(tt.textContent) && !!tg && /O₂2/.test(tg.textContent) && /≈/.test(tg.textContent) && /Schuko/.test(tt.querySelector('title').textContent);
+      S.showGases=false; renderSVG(); const solo=!!svg.querySelector('.inst-tomas') && !svg.querySelector('.inst-gases');
+      S.showTomas=false; renderSVG(); const nada=!svg.querySelector('.inst-tomas');
+      return cuenta && pinta && solo && nada;
+    } finally {
+      delete I.ele['zq.7']; delete I.gas['zq.7']; _codeBoxIndex=null;
+      if(c1===undefined) delete nameState.codes['st_r1']; else nameState.codes['st_r1']=c1;
+      S.level=nivel; S.areaId=a0; S.floorId=f0; S.showTomas=t0; S.showGases=g0; _rpFix(false); renderSVG();
+    }
+  });
+  T('🚪 Puertas: la flecha mide la mitad (punta a 0,475 del ancho) y el interruptor las oculta, salvo colocando', ()=>{
+    const snap=JSON.stringify(puertaState), nivel=S.level, a0=S.areaId, f0=S.floorId, v0=S.showPuertas, pm=S.puertaMode; _rpFix(true);
+    try{
+      S.floorId=fl.id; S.level=2; S.areaId='st_a'; S.showPuertas=true; S.puertaMode=false;
+      puertaState['st_r1']=[{x:900,y:1200,ang:180,t:'n'},{x:2000,y:1200,ang:0,t:'p'}]; renderSVG();
+      const gs=[...svg.querySelectorAll('.puerta-g')];
+      const punta=g=>parseFloat(/^M ([\d.]+)/.exec(g.querySelector('.puerta-pn').getAttribute('d'))[1]);
+      const mitad=gs.length===2 && Math.abs(punta(gs[0])-56*0.475)<0.01 && Math.abs(punta(gs[1])-125*0.475)<0.01
+        && parseFloat(gs[0].querySelector('.puerta-fl').getAttribute('x2'))<punta(gs[0]);
+      S.showPuertas=false; renderSVG(); const oculta=!svg.querySelector('.puerta-g');
+      S.puertaMode=true; renderSVG(); const colocando=svg.querySelectorAll('.puerta-g').length===2;
+      return mitad && oculta && colocando;
+    } finally {
+      S.puertaMode=pm; S.showPuertas=v0; S.level=nivel; S.areaId=a0; S.floorId=f0;
+      Object.keys(puertaState).forEach(k=>delete puertaState[k]); Object.assign(puertaState, JSON.parse(snap)); _rpFix(false); renderSVG();
     }
   });
   T('🔁 Sólo reemplazos: atenúa los puestos sin reemplazo en vista 3 y marca 🔁 n en vista 2', ()=>{
