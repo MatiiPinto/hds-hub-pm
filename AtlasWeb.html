@@ -111,6 +111,8 @@ code,.mono{font-family:var(--font-mono)}
 .hdr-prog .hdr-bar{width:72px;height:5px;background:var(--n-150);border-radius:3px;overflow:hidden;display:inline-block}
 .hdr-prog .hdr-bar i{display:block;height:100%;width:0;background:var(--ok);border-radius:3px;transition:width .3s}
 .hdr-prog strong{font-size:var(--fs-sm);font-weight:var(--fw-medium);color:var(--ok)}
+.hdr-prog .hdr-det{font-size:var(--fs-xs);color:var(--text-3);font-variant-numeric:tabular-nums}
+#sbAvN{display:none!important}   /* el % vive sólo en la cabecera (30-09-2026) */
 #gSearch{position:relative;flex:1;max-width:320px;min-width:150px}
 #gSearchInput{width:100%;height:var(--control-h);background:var(--surface-sunken);border:1px solid var(--border);border-radius:var(--r-md);color:var(--text);padding:0 12px 0 30px;font-size:var(--fs-sm);outline:none;transition:border-color .15s,box-shadow .15s,background .15s}
 #gSearchInput::placeholder{color:var(--text-3)}
@@ -202,6 +204,12 @@ code,.mono{font-family:var(--font-mono)}
 .tree-room-del{flex-shrink:0;width:18px;height:18px;margin-right:4px;border:none;background:none;color:var(--danger);font-size:11px;font-weight:700;line-height:1;cursor:pointer;border-radius:4px;display:flex;align-items:center;justify-content:center;opacity:.6}
 .tree-room-del:hover{background:var(--danger-soft);opacity:1}
 #typeList{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:0 8px 8px}
+#tipoResumen{flex-shrink:0;max-height:55%;overflow-y:auto;margin:6px 8px 0;border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface)}
+#tipoResumen>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:6px;padding:8px 10px;font-size:var(--fs-sm);font-weight:var(--fw-medium);color:var(--text)}
+#tipoResumen>summary::-webkit-details-marker{display:none}
+#tipoResumen>summary::before{content:"▸";font-size:9px;color:var(--text-3);transition:transform .15s}
+#tipoResumen[open]>summary::before{transform:rotate(90deg)}
+#tipoResumen .rp-card{padding:0 10px 10px;border-top:0}
 #tfHead{flex-shrink:0}
 #tfScroll{flex:1;overflow-y:auto}
 .tf-n{flex-shrink:0;font-size:var(--fs-xs);font-variant-numeric:tabular-nums;color:var(--ok);font-weight:var(--fw-medium);margin-left:6px}
@@ -491,6 +499,11 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 .rp-tabs .sb-tab[data-tab="per"].on{color:var(--tab-personas-dark);border-bottom-color:var(--tab-personas)}
 #sbBimN{display:inline-flex;align-items:center;padding:0 5px;height:15px;border-radius:8px;background:var(--warn);color:#fff;font-size:10px;font-weight:var(--fw-bold);line-height:1}
 #sbBimN.done{background:var(--ok)}
+.rev-resumen{font-size:var(--fs-xs);color:var(--text-2);margin:2px 0 6px;line-height:1.4}
+.rev-resumen b{color:var(--text)}
+#revCapas{display:flex;flex-wrap:wrap;align-items:center;gap:4px;margin:0 0 10px;padding-bottom:10px;border-bottom:1px solid var(--n-100)}
+#revCapas .rc-t{width:100%;font-size:10px;font-weight:var(--fw-medium);letter-spacing:var(--tracking-caps);text-transform:uppercase;color:var(--text-3)}
+#revCapas .tb-btn{height:26px;font-size:var(--fs-xs);padding:0 9px}
 #sbAvN,#sbPerN{font-size:var(--fs-xs);color:var(--text-3);font-weight:var(--fw-medium);font-variant-numeric:tabular-nums}
 .rp-collapse{align-self:center;flex:none;width:24px;height:24px;border:0;border-radius:6px;background:transparent;color:var(--text-2);cursor:pointer;font-size:15px;line-height:1;display:flex;align-items:center;justify-content:center;padding:0;margin-left:2px}
 .rp-collapse:hover{background:rgba(15,22,34,.06);color:var(--text)}
@@ -647,6 +660,12 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 .ficha-x:hover{background:var(--surface-sunken);color:var(--text);border-color:var(--border-strong)}
 .ficha-body{padding:16px 18px 20px;overflow-y:auto}
 .fk-sec{margin-bottom:18px}
+.fk-sec-t.fk-plegable{cursor:pointer;user-select:none}
+.fk-sec-t.fk-plegable::before{content:"▾";font-size:10px;color:var(--text-3);width:10px;display:inline-block}
+.fk-sec.cerrada{margin-bottom:8px}
+.fk-sec.cerrada>.fk-sec-t::before{content:"▸"}
+.fk-sec.cerrada>*:not(.fk-sec-t){display:none!important}
+.fk-sin-datos{font-size:var(--fs-xs);color:var(--text-3);border-top:1px solid var(--n-100);padding-top:8px;margin-top:4px}
 .fk-sec-t{font-size:var(--fs-xs);font-weight:var(--fw-medium);color:var(--text-2);text-transform:uppercase;letter-spacing:var(--tracking-caps);display:flex;align-items:center;gap:7px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border)}
 .fk-sec-t .cnt{margin-left:auto;font-size:var(--fs-xs);font-weight:var(--fw-medium);color:var(--text-2);background:var(--surface-sunken);border-radius:10px;padding:1px 9px}
 .fk-inst-meta{font-size:11px;color:var(--text-2);margin-bottom:6px;line-height:1.45}
@@ -857,9 +876,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
   </a>
   <div class="hdr-sep"></div>
   <h1><span class="logo">A</span><span class="t">Atlas HDS</span><span class="t" style="font-weight:400;color:#536174">· consulta</span></h1>
-  <div class="hdr-stat"><strong id="statTotal">0</strong>puestos</div>
-  <div class="hdr-stat"><strong id="statAsig">0</strong>asignados</div>
-  <div class="hdr-stat hdr-prog" title="Puestos con persona asignada"><span class="hdr-bar"><i id="statBar"></i></span><strong id="statPct">0%</strong></div>
+  <div class="hdr-stat hdr-prog" id="hdrAvance" title="Dotación asignada a un recinto (sin becados en formación ni personas de otra institución). Es el avance del proyecto; el desglose está en la pestaña Avance del panel derecho."><span>Dotación en recintos</span><span class="hdr-bar"><i id="statBar"></i></span><strong id="statPct">—</strong><span id="statDet" class="hdr-det"></span></div>
   <div id="gSearch">
     <span id="gSearchIcon">🔍</span>
     <input id="gSearchInput" placeholder="Buscar funcionario..." autocomplete="off" type="search" spellcheck="false">
@@ -905,6 +922,22 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
     </div>
     <div id="floorList"></div>
     <div id="srvList" style="display:none"></div>
+    <details id="tipoResumen" style="display:none">
+      <summary>🚪 Recintos dibujados <span class="rp-total-badge">Total <b id="cntTotal">0</b></span></summary>
+      <div class="rp-card">
+      
+      <div class="rp-count expandable" onclick="rpToggle('cntBoxBreak')" title="Expandir desglose"><span class="lbl"><span class="sw" style="background:#4f46e5"></span>Box Consulta</span><span class="num" id="cntBox">0</span></div>
+      <div class="rp-break exp" id="cntBoxBreak">—</div>
+      <div class="rp-count expandable" style="margin-top:6px" onclick="rpToggle('cntProcBreak')" title="Expandir: generales vs específicas"><span class="lbl"><span class="sw" style="background:#c026d3"></span>Sala Procedimiento</span><span class="num" id="cntProc">0</span></div>
+      <div class="rp-break exp" id="cntProcBreak">—</div>
+      <div class="rp-count expandable" style="margin-top:6px" onclick="rpToggle('cntPabBreak')" title="Expandir: cirugía mayor vs menor"><span class="lbl"><span class="sw" style="background:#0f766e"></span>Pabellones</span><span class="num" id="cntPab">0</span></div>
+      <div class="rp-break exp" id="cntPabBreak">—</div>
+      <div class="rp-count expandable" style="margin-top:6px" onclick="rpToggle('cntBedBreak')" title="Expandir: camas por servicio"><span class="lbl"><span class="sw" style="background:#0284c7"></span>Camas colocadas</span><span class="num" id="cntBed">0</span></div>
+      <div class="rp-break exp" id="cntBedBreak">—</div>
+      <button class="rp-otros-tog" id="otrosTog" onclick="toggleOtros()"><span class="rp-otros-car">▶</span> Otros tipos<span class="rp-otros-n" id="otrosCount"></span></button>
+      <div class="rp-otros" id="cntOtros" style="display:none"></div>
+    </div>
+    </details>
     <div id="typeList" style="display:none"></div>
     <div id="dataStamp" title="Fechas de las fuentes cargadas en la plataforma"></div>
   </aside>
@@ -963,6 +996,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="tb-btn" id="btnCcdd" onclick="toggleCcdd()" title="Mostrar sobre el plano los puntos de corrientes débiles (CE y CCDD) leídos de los planos CDE rev. 20-03-2020: llamada enfermera, seguridad y control de accesos, CCTV, megafonía, gestión de turnos, telefonía, WiFi/celular. Pasa el mouse por un punto para ver qué es. Las clases «por confirmar» se muestran con su letra del plano.">📡 Corrientes débiles</button>
       <button class="tb-btn" id="btnSoloReemp" onclick="toggleSoloReemp()" title="Filtro del plano: resaltar SOLO los puestos con reemplazo vigente (titular ausente según RRHH o informado en terreno). En vista 3 los demás puestos se atenúan; en vista 2 cada recinto muestra 🔁 y cuántos reemplazos tiene.">🔁 Sólo reemplazos</button>
       <button class="tb-btn" id="btnShowPC" onclick="toggleShowPC()" title="Mostrar en cada recinto (vista de servicio) los computadores del catálogo EMMC repartidos por caja dibujada: 💻 + cantidad (bajo y alto rendimiento, notebooks). Clic abre la ficha. Reporte y Excel en el gestor: Apoyo TI → Reporte de computadores.">💻 Computadores</button>
+      <button class="tb-btn" id="btnImpresoras" onclick="toggleImpresoras()" title="Impresoras: en el piso (vista 1) muestra dónde van las propuestas; dentro de un servicio (vista 2) pone en cada recinto el testigo 🖨 con las del archivo Comodatos Jun-2026 por tipo. Una sola capa para ambas.">🖨 Impresoras</button>
       <button class="tb-btn" id="btnPuertasVis" onclick="togglePuertasVis()" title="Mostrar u ocultar las puertas de los recintos (flecha de salida sobre el muro, vistas 2 y 3). Mientras se colocan puertas se ven siempre.">🚪 Puertas</button>
       <button class="tb-btn" id="btnShowTomas" onclick="toggleShowTomas()" title="Mostrar en cada recinto (vista de servicio) las tomas de corriente de la memoria eléctrica PE 01: 🔌 + total de tomas (triple = 3, doble = 2, simple = 1), sumando grado médico, computación (UPS) y fuerza. El detalle por red va en el tooltip y en la ficha.">🔌 Tomas</button>
       <button class="tb-btn" id="btnShowGases" onclick="toggleShowGases()" title="Mostrar en cada recinto (vista de servicio) las salidas de gases clínicos de la memoria PE 13: O₂ oxígeno · AM aire medicinal · VAC vacío y los demás, con su cantidad por recinto (tomas murales + panel de cabecera + columnas).">🫁 Gases</button>
@@ -1043,6 +1077,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
     <div id="rpScroll">
       <div id="avBody" class="rp-body" style="display:none"></div>
       <div id="perBody" class="rp-body" style="display:none"></div>
+      <div id="revCapas" style="display:none"><span class="rc-t">Ver sobre el plano</span></div>
       <div id="bimList" style="display:none"></div>
       <div id="toolsBody" style="display:none">
       <!-- Gestor de herramientas: ÚNICO lugar de edición y acciones. Vive en la
@@ -1061,7 +1096,8 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
         <button class="dk-btn" id="dkTiReport" onclick="abrirReporteTI()" title="Impresoras del HDS (archivo Comodatos Jun-2026 × PMA): cuántas quedan ubicadas en cajas dibujadas contra el total del archivo, por tipo"><span class="ic">🖨</span><span class="lb">Reporte de impresoras</span><span class="n" id="dkTiN"></span></button>
         <button class="dk-btn" id="dkPcReport" onclick="abrirReportePC()" title="Computadores del catálogo EMMC por piso y servicio (bajo/alto rendimiento, notebooks), con Excel por recinto"><span class="ic">💻</span><span class="lb">Reporte de computadores</span></button>
         <div class="dk-sep"></div><div class="dk-h">Consultar</div><div id="dkCons"></div>
-        <div class="dk-sep"></div><div class="dk-h">Editar</div><div id="dkEdit2"></div>
+        <div id="dkGrpEdit" style="display:none"><div class="dk-sep"></div><div class="dk-h">Editar</div><div id="dkEdit2"></div></div>
+        <div id="dkGrpAdd" style="display:none">
         <div class="dk-sep"></div><div class="dk-h">Agregar</div><div id="dkAdd"></div>
         <button class="dk-btn prop" id="dkDesk" onclick="setPropMode('desk')" title="Puesto de trabajo NUEVO: escritorio con computador a escala del plano (150 × 160 cm). Clic coloca · clic derecho rota 90° · arrastrar mueve · doble clic elimina"><span class="ic">🖥</span><span class="lb">Puesto de trabajo nuevo</span><span class="n" id="dkDeskN"></span></button>
         <button class="dk-btn prop" id="dkTotem" onclick="setPropMode('totem')" title="Tótem / gestor de fila (dispositivo TI para salas de espera). Clic coloca · clic derecho rota · arrastrar mueve · doble clic elimina"><span class="ic">🎫</span><span class="lb">Tótem / gestor de fila</span><span class="n" id="dkTotemN"></span></button>
@@ -1069,12 +1105,13 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
         <button class="dk-btn prop" id="dkPrinter" onclick="setPropMode('printer')" title="Impresora (dispositivo TI). Clic coloca · clic derecho rota 90° · arrastrar mueve · doble clic elimina"><span class="ic">🖨</span><span class="lb">Impresora</span><span class="n" id="dkPrinterN"></span></button>
         <button class="dk-btn" id="dkPropImp" onclick="importarPropuestosPlano()" title="Traer los puestos de trabajo que el proyectista marcó en MAGENTA en el plano de Coordinación Mobiliario. Reemplaza los que ya se importaron antes; lo que colocaste a mano no se toca."><span class="ic">⬇</span><span class="lb">Importar del plano</span><span class="n" id="dkPropImpN"></span></button>
         <button class="dk-btn" id="dkPropDel" onclick="propBorrarCtx()" title="Borrar TODO lo propuesto del contexto en que estás trabajando (el recinto en vista 3, el área en vista 2, el piso en vista 1)"><span class="ic">🗑</span><span class="lb">Borrar propuestos de aquí</span></button>
+        </div>
         <div class="dk-sep"></div><div class="dk-h">Exportar</div><div id="dkExp"></div>
         <button class="dk-btn" id="dkCarrosXls" onclick="exportCarrosParo()" title="Excel de carros de paro: recinto por recinto (completo / desfibrilador sin carro / carro sin desfibrilador), resumen por piso y lo que el EMMC trae sin caja en el plano"><span class="ic">⬇</span><span class="lb">Exportar carros de paro</span></button>
         <button class="dk-btn" id="dkPmDelta" onclick="pmImportarDeltaArchivo()" title="Incorporar al Atlas maestro un archivo Atlas_cambios_<usuario>_<fecha>.json exportado desde el 🟡 HUB-PM (por ejemplo, los DEA colocados desde el iPad): nombres y dotación se aplican, los propuestos se suman o actualizan por id"><span class="ic">⬇</span><span class="lb">Importar cambios del 🟡</span></button>
         <button class="dk-btn" id="dkReport" onclick="openPropReport()" title="Resumen de todo lo propuesto (puestos, tótems, DEA) por piso, área y recinto, con exportación a Excel y a Clave Azul"><span class="ic">📊</span><span class="lb">Reporte de propuestos</span><span class="n" id="dkReportN"></span></button>
       </div>
-      <div class="rp-card">
+      <div class="rp-card" id="rpEditCard" style="display:none">
       <div class="rp-t" style="margin-top:2px">✏️ Nombres de recinto</div>
       <button class="rp-bedbtn sec" onclick="revisarNombres()" title="Revisa la ortografía de todos los nombres de recinto y quita las tildes (la Ñ se mantiene). Muestra los cambios antes de aplicarlos.">✏️ Revisar ortografía</button>
       <button class="rp-bedbtn sec" onclick="revisarCodigos()" title="Busca códigos de recinto mal escritos (puntos dobles, punto final, caracteres raros) y propone la corrección solo cuando el código corregido existe de verdad en el PMA o en el catálogo de equipamiento">🔢 Revisar códigos</button>
@@ -1108,21 +1145,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <div id="srvBody" style="font-size:11px"></div>
       <div id="srvFoot" style="font-size:10px;color:#94a3b8;margin-top:7px;font-style:italic"></div>
     </div>
-    <div class="rp-card">
-      <div class="rp-t">🚪 Recintos dibujados <span class="rp-total-badge">Total <b id="cntTotal">0</b></span></div>
-      <div class="rp-puestos" id="rpPuestos" style="display:none"></div>
-      <div class="rp-count expandable" onclick="rpToggle('cntBoxBreak')" title="Expandir desglose"><span class="lbl"><span class="sw" style="background:#4f46e5"></span>Box Consulta</span><span class="num" id="cntBox">0</span></div>
-      <div class="rp-break exp" id="cntBoxBreak">—</div>
-      <div class="rp-count expandable" style="margin-top:6px" onclick="rpToggle('cntProcBreak')" title="Expandir: generales vs específicas"><span class="lbl"><span class="sw" style="background:#c026d3"></span>Sala Procedimiento</span><span class="num" id="cntProc">0</span></div>
-      <div class="rp-break exp" id="cntProcBreak">—</div>
-      <div class="rp-count expandable" style="margin-top:6px" onclick="rpToggle('cntPabBreak')" title="Expandir: cirugía mayor vs menor"><span class="lbl"><span class="sw" style="background:#0f766e"></span>Pabellones</span><span class="num" id="cntPab">0</span></div>
-      <div class="rp-break exp" id="cntPabBreak">—</div>
-      <div class="rp-count expandable" style="margin-top:6px" onclick="rpToggle('cntBedBreak')" title="Expandir: camas por servicio"><span class="lbl"><span class="sw" style="background:#0284c7"></span>Camas colocadas</span><span class="num" id="cntBed">0</span></div>
-      <div class="rp-break exp" id="cntBedBreak">—</div>
-      <button class="rp-otros-tog" id="otrosTog" onclick="toggleOtros()"><span class="rp-otros-car">▶</span> Otros tipos<span class="rp-otros-n" id="otrosCount"></span></button>
-      <div class="rp-otros" id="cntOtros" style="display:none"></div>
-    </div>
-    <div class="rp-card">
+    <div class="rp-card" id="rpWpCard" style="display:none">
       <div class="rp-t">💼 Puestos de trabajo <span class="rp-total-badge">Total <b id="wpTotal">0</b></span></div>
       <div id="wpBody" style="font-size:11px"></div>
     </div>
@@ -6473,6 +6496,15 @@ function toggleShowPC(){
   const b=document.getElementById('btnShowPC'); if(b) b.classList.toggle('active',S.showPC);
   renderSVG();
 }
+// Una sola capa «Impresoras» (30-09-2026): enciende y apaga juntas la ubicación en
+// planta (vista 1) y el testigo por recinto (vista 2), que antes eran dos interruptores.
+function _impresorasOn(){ return !!S.showTI || !!(S.ubic && S.ubic.has('printer')); }
+function toggleImpresoras(){
+  const on=!_impresorasOn();
+  if(!!S.showTI!==on) toggleTiPrint();
+  if(!!(S.ubic && S.ubic.has('printer'))!==on) toggleUbic('printer');
+  const b=document.getElementById('btnImpresoras'); if(b) b.classList.toggle('active',_impresorasOn());
+}
 function toggleTiPrint(){
   S.showTI=!S.showTI; _lsPref('cabida_show_ti', S.showTI?'1':'0');
   const b=document.getElementById('btnTiPrint'); if(b) b.classList.toggle('active',S.showTI);
@@ -6695,9 +6727,8 @@ const CAPAS_BARRA=[
   ['btnBoxVis','Cajas'],['dkLabels','Etiquetas'],['btnSen','Señalética'],['btnPlanKind','Color'],'|',
   ['btnDotNames','Nombres'],['btnAsigN','N° asignados'],['btnSoloReemp','Reemplazos'],'|',
   ['btnVert','Ascensores'],['btnReloj','Relojes'],['btnCorreoN','Correo N.'],['btnPuertasVis','Puertas'],['btnJardines','Jardines'],'|',
-  ['dkUbicCarro','Carros de paro'],['dkUbicDea','DEA'],['dkUbicTotem','Tótems'],['dkUbicPrinter','Impresoras'],['btnTiPrint','Impr. por recinto'],['btnShowPC','PC'],'|',
-  ['btnShowTomas','Tomas'],['btnShowGases','Gases'],['btnCcdd','C. débiles'],'|',
-  ['btnAudit','Auditoría'],['btnMetas','Metas']
+  ['dkUbicCarro','Carros de paro'],['dkUbicDea','DEA'],['dkUbicTotem','Tótems'],['btnImpresoras','Impresoras'],['btnShowPC','PC'],'|',
+  ['btnShowTomas','Tomas'],['btnShowGases','Gases'],['btnCcdd','C. débiles']
 ];
 const DOCK_MAPA=[
   ['dkIr',    ['btnBuscaRec']],
@@ -6748,6 +6779,10 @@ function _dockMonta(){
     // a todo el ancho de la ventana, entre la cabecera y el plano (caben más interruptores por fila)
     const lay=document.getElementById('layout'); if(lay&&lay.parentNode) lay.parentNode.insertBefore(bar2, lay); else nav.parentNode.insertBefore(bar2, nav.nextSibling);
   }
+  { const rc=document.getElementById('revCapas');
+    if(rc) ['btnAudit','btnMetas'].forEach(id=>{ const e=document.getElementById(id); if(e) rc.appendChild(e); }); }
+  // los interruptores que la capa «Impresoras» reemplaza quedan guardados (ocultos) junto a los demás de origen
+  { const src=document.getElementById('capasSrc'), tp=document.getElementById('btnTiPrint'); if(src&&tp) src.appendChild(tp); }
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',_dockMonta); else _dockMonta();
 function dockToggle(){
@@ -6779,6 +6814,12 @@ function _dockSync(){
   const on=(id,v)=>{ const b=document.getElementById(id); if(b) b.classList.toggle('on',!!v); };
   const dis=(id,v)=>{ const b=document.getElementById(id); if(b) b.classList.toggle('dis',!!v); };
   on('dkLabels',S.roomLabels!==false);
+  { const b=document.getElementById('btnImpresoras'); if(b) b.classList.toggle('active',_impresorasOn()); }
+  // 4 · 5: herramientas de edición sólo con ✏️ Editar (el editor acotado del 🟡 conserva «Agregar»)
+  { const ed=!!S.editMode && !S.viewOnly, pm=!!(S.viewOnly && S.editPM);
+    const ge=document.getElementById('dkGrpEdit'); if(ge) ge.style.display=ed?'':'none';
+    const ga=document.getElementById('dkGrpAdd'); if(ga) ga.style.display=(ed||pm)?'':'none';
+    const ec=document.getElementById('rpEditCard'); if(ec) ec.style.display=ed?'':'none'; }
   { const p=document.getElementById('rightPanel'); on('dkPanel', p && !p.classList.contains('collapsed')); }
   ['desk','totem','dea','printer'].forEach(k=>on('dk'+k.charAt(0).toUpperCase()+k.slice(1),S.propMode===k));
   _UBIC().forEach(k=>on('dkUbic'+k.charAt(0).toUpperCase()+k.slice(1), S.ubic&&S.ubic.has(k)));
@@ -9058,7 +9099,7 @@ function delSelected(){
 function toggleEdit(){
   if(S.viewOnly){ if(typeof tbInfo!=='undefined'&&tbInfo){tbInfo.textContent='👁 Modo consulta: solo lectura';setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},2000);} return; }
   S.editMode=!S.editMode;
-  if(!S.editMode){S.drawMode=false;S.moveMode=false;S.selIds.clear();viewer.classList.remove('move-mode'); if(S.vertAjuste) vertAjusteFin(); if(S.structSel) structEditClose();}
+  if(!S.editMode){S.drawMode=false;S.moveMode=false;S.selIds.clear();viewer.classList.remove('move-mode'); if(S.vertAjuste) vertAjusteFin(); if(S.structSel) structEditClose(); _cierraModosColocar();}
   btnEdit.classList.toggle('active',S.editMode);
   btnDraw.style.display=(S.editMode&&S.level<3)?'':'none';
   { const bu=document.getElementById('btnUndo'); if(bu) bu.style.display=S.editMode?'':'none'; }
@@ -9075,7 +9116,15 @@ function toggleEdit(){
   }
   renderSVG(); renderSidebar();
 }
+// Las herramientas de colocar viven en modo edición: al salir de él se apagan.
+function _cierraModosColocar(){
+  try{ if(S.propMode && !(S.viewOnly&&S.editPM)) setPropMode(S.propMode); }catch(e){}
+  try{ if(S.bedMode) toggleBedMode(); }catch(e){}
+  try{ if(S.puertaMode) togglePuertaMode(); }catch(e){}
+  try{ if(S.stampMode) toggleStampMode(); }catch(e){}
+}
 function exitEdit(){
+  _cierraModosColocar();
   S.editMode=false; S.drawMode=false; S.moveMode=false; S.selIds.clear(); viewer.classList.remove('move-mode');
   btnEdit.classList.remove('active'); btnDraw.style.display='none'; btnMove.style.display='none'; btnStruct.style.display='none'; btnDraw.classList.remove('active'); btnMove.classList.remove('active'); btnStruct.classList.remove('active');
   // Cerrar herramienta de estructura si quedó abierta
@@ -10059,6 +10108,30 @@ function _instalacionesHtmlCod(code, partes, aac){
      `Gases: ${esc(ley)}. Corrientes débiles: ver la sección 📡 siguiente.</div>`;
   return `<div class="fk-sec"><div class="fk-sec-t">🔌 Instalaciones · enchufes y gases clínicos</div>${h}</div>`;
 }
+// Ficha más corta (30-09-2026): las secciones sin datos para el recinto se quitan
+// (quedan nombradas en una línea al pie) y cada título pliega/despliega su sección;
+// lo plegado se recuerda.
+function _fkSecClave(sec){ const t=sec.querySelector('.fk-sec-t'); return t?t.textContent.replace(/\d+/g,'').replace(/\s+/g,' ').trim():''; }
+function _fkCerradas(){ try{ return new Set(JSON.parse(localStorage.getItem('cabida_fk_cerradas')||'[]')); }catch(e){ return new Set(); } }
+function _fkOrganiza(body){
+  if(!body) return;
+  const cerr=_fkCerradas(), vacias=[];
+  [...body.querySelectorAll(':scope > .fk-sec')].forEach(sec=>{
+    const hijos=[...sec.children].filter(c=>!c.classList.contains('fk-sec-t'));
+    const vacia=hijos.some(c=>c.classList.contains('fk-empty')) && hijos.every(c=>c.classList.contains('fk-empty')||c.classList.contains('fk-inst-fte'));
+    const tit=sec.querySelector('.fk-sec-t');
+    if(vacia){ vacias.push(_fkSecClave(sec)); sec.remove(); return; }
+    if(!tit) return;
+    const k=_fkSecClave(sec);
+    sec.classList.toggle('cerrada', cerr.has(k));
+    tit.classList.add('fk-plegable'); tit.title='Clic para plegar o desplegar';
+    tit.addEventListener('click',()=>{ const c=_fkCerradas(); sec.classList.toggle('cerrada');
+      if(sec.classList.contains('cerrada')) c.add(k); else c.delete(k); _lsPref('cabida_fk_cerradas', JSON.stringify([...c])); });
+  });
+  if(vacias.length){ const d=document.createElement('div'); d.className='fk-sin-datos';
+    d.textContent='Sin datos para este recinto: '+vacias.map(v=>v.replace(/^[^A-Za-zÁÉÍÓÚÑáéíóúñ]+/,'').split(' · ')[0]).join(', ')+'.';
+    body.appendChild(d); }
+}
 function openFichaRecinto(roomId){
   const ctx=_findRoom(roomId); if(!ctx) return;
   const code=rCode(roomId), nm=rName(roomId), tp=(ROOM_TYPES[rType(roomId)]||ROOM_TYPES['']).label;
@@ -10164,6 +10237,7 @@ function openFichaRecinto(roomId){
     `<div class="fk-sec"><div class="fk-sec-t">🪑 Mobiliario No Clínico <span class="cnt">${mobNc.length}</span></div>${mobNcHtml}</div>`+
     _instalacionesHtml(roomId)+
     `<div class="fk-sec"><div class="fk-sec-t">📋 Pauta de Autorización Sanitaria</div>${pautaHtml}</div>`;
+  _fkOrganiza(document.getElementById('fkBody'));
   document.getElementById('fichaModal').classList.add('show');
 }
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
@@ -10332,6 +10406,10 @@ function rpShowTab(tab){
   document.getElementById('rpTabAv')?.classList.toggle('on',av);
   document.getElementById('toolsBody').style.display=herr?'':'none';
   document.getElementById('bimList').style.display=rev?'':'none';
+  { const rc=document.getElementById('revCapas'); if(rc) rc.style.display=rev?'':'none'; }
+  { const wc=document.getElementById('rpWpCard'); if(wc) wc.style.display=av?'':'none'; }
+  // Revisión: si la categoría elegida está al día y hay otras con pendientes, abre la primera de ésas
+  if(rev && !_revElegida){ try{ if(!_revPend(_revCheck).length){ const c=Object.keys(REV_CHECKS).find(k=>_revPend(k).length); if(c) _revCheck=c; } }catch(e){} }
   const ab=document.getElementById('avBody'); if(ab) ab.style.display=av?'':'none';
   document.getElementById('rpTabPer')?.classList.toggle('on',per);
   const pb=document.getElementById('perBody'); if(pb) pb.style.display=per?'':'none';
@@ -10542,6 +10620,14 @@ function _avBadge(){
   const asg=_dpAsignados(), all=_avStaff();
   let a=0; all.forEach(s=>{ if(asg[norm(s.nombre)]) a++; });
   b.textContent=_avPct(a,all.length)+'%';
+  _hdrAvance(a,all.length);
+}
+// Único % de avance a la vista (cabecera): dotación asignada a un recinto.
+function _hdrAvance(a,n){
+  const p=_avPct(a,n), f=x=>Number(x).toLocaleString('es-CL');
+  const pe=document.getElementById('statPct'); if(pe) pe.textContent=p+'%';
+  const be=document.getElementById('statBar'); if(be) be.style.width=Math.min(100,p)+'%';
+  const de=document.getElementById('statDet'); if(de) de.textContent=f(a)+' de '+f(n);
 }
 function avToggle(k){ _avAbierto[k]=!_avAbierto[k]; renderAvance(); }
 // Abre (o cierra) todas las subdirecciones y sus servicios de una vez; los
@@ -10663,7 +10749,7 @@ function renderAvance(){
   // La categoría de RRHH sólo existe mientras haya personas sin clasificar.
   const PEND_RRHH='PENDIENTE DE CLASIFICAR POR RRHH';
   const nPend=(arbol[PEND_RRHH]||{}).n||0;
-  const badge=document.getElementById('sbAvN'); if(badge && !_avFiltro) badge.textContent=_avPct(tA,tN)+'%';
+  const badge=document.getElementById('sbAvN'); if(badge && !_avFiltro){ badge.textContent=_avPct(tA,tN)+'%'; _hdrAvance(tA,tN); }
   const H=[];
   H.push('<div style="display:flex;align-items:center;gap:8px;padding:4px 4px 6px">'
     +'<b style="font-size:12px">'+(_avFiltro?('🖋️ '+esc(_avGrupoNombre(_avFiltro))+' · asignadas a recinto'):'Dotación asignada a recinto')+'</b>'
@@ -12091,11 +12177,6 @@ function updateStats(){
     total+=dd.length;
     asig+=dd.filter(d=>d.tipo==='dinamico'?(d.turnos&&d.turnos.length>0):(d.nombre&&d.nombre.trim())).length;
   }
-  const pct=total?Math.round(asig/total*100):0;
-  document.getElementById('statTotal').textContent=total;
-  document.getElementById('statAsig').textContent=asig;
-  document.getElementById('statPct').textContent=pct+'%';
-  { const b=document.getElementById('statBar'); if(b) b.style.width=pct+'%'; }
   renderSidebar();
   if(typeof renderRightPanel==='function') renderRightPanel();
   if(typeof renderMetas==='function') renderMetas();
@@ -12188,6 +12269,7 @@ function sbShowTab(tab){
   { const b=document.getElementById('sbTabServ'); if(b) b.classList.toggle('on',tab==='serv'); }
   document.getElementById('floorList').style.display=tab==='pisos'?'':'none';
   document.getElementById('typeList').style.display=tab==='tipos'?'':'none';
+  { const t=document.getElementById('tipoResumen'); if(t) t.style.display=tab==='tipos'?'':'none'; }
   { const l=document.getElementById('srvList'); if(l) l.style.display=tab==='serv'?'':'none'; }
   if(tab==='tipos') renderTypeFilter();
   if(tab==='serv') renderSrvPanel();
@@ -13019,7 +13101,8 @@ function _revPieDesc(){
   });
   return h;
 }
-function revSetCheck(c){ _revCheck=c; renderBimPending(); }
+let _revElegida=false;   // el usuario eligió una categoría a mano: no se cambia sola
+function revSetCheck(c){ _revCheck=c; _revElegida=true; renderBimPending(); }
 // ARNÉS DE LA REVISIÓN. Recorre cada categoría con los datos vivos y responde,
 // fila por fila: ¿apunta a un recinto dibujado (o abre un diálogo propio)? ¿tiene
 // al menos una salida (✓, ✕, diálogo o 🚫)? ¿el ✓ la hace desaparecer de verdad?
@@ -13231,7 +13314,9 @@ function renderBimPending(){
   if(!_revOpen) return;
   const box=document.getElementById('bimList'); if(!box) return;
   const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
-  let html='<select id="revSel" onchange="revSetCheck(this.value)">'
+  const nCat=Object.keys(REV_CHECKS).filter(c=>counts[c]).length;
+  let html='<div class="rev-resumen">'+(total?('<b>'+total+'</b> pendiente'+(total===1?'':'s')+' en '+nCat+' categoría'+(nCat===1?'':'s')+' · el número de la pestaña es este total. Elige la categoría:'):'✅ Sin pendientes en ninguna categoría.')+'</div>'
+    +'<select id="revSel" onchange="revSetCheck(this.value)">'
     +(()=>{ const opt=c=>'<option value="'+c+'"'+(c===_revCheck?' selected':'')+'>'+REV_CHECKS[c].label+' ('+counts[c]+')</option>';
             const con=Object.keys(REV_CHECKS).filter(c=>counts[c]), sin=Object.keys(REV_CHECKS).filter(c=>!counts[c]);
             return '<optgroup label="Con pendientes">'+con.map(opt).join('')+'</optgroup>'
@@ -13352,7 +13437,7 @@ function renderSidebar(){
     const info=document.createElement('div');
     info.className='fl-info';
     info.innerHTML=`<span class="fl-name">${fl.id}</span><span class="fl-sub">${fl.label}</span>`
-      +(total?`<div class="fl-pct" title="${asig}/${total} puestos">${pct}%</div><div class="fl-bar"><div class="fl-fill${pct>=85?' done':''}" style="width:${pct}%"></div></div>`:'');
+      ;   // sin % por piso: el único avance a la vista es el de la cabecera (30-09-2026)
     hdr.append(tog,info);
     hdr.onclick=()=>{ if(S.floorId===fl.id){ if(activeAreas.length)toggleFloor(fl.id); } else goFloor(fl.id); };
     item.appendChild(hdr);
@@ -15075,7 +15160,7 @@ async function runSelfTest(){
   // Testigo: al terminar, NINGUNA preferencia del usuario puede haber cambiado.
   const _PREFS=['cabida_room_labels','cabida_show_dotnames','cabida_box_vis','cabida_plan_kind',
                 'cabida_show_asign','cabida_show_sen','cabida_scenario','cabida_rp_collapsed',
-                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures','cabida_ubic','cabida_jardines','cabida_verticales','cabida_relojes','cabida_correo_n','cabida_cn_siembra','cabida_show_tomas','cabida_show_gases','cabida_show_puertas','cabida_show_ccdd','cabida_solo_reemp','cabida_show_pc'];
+                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures','cabida_ubic','cabida_jardines','cabida_verticales','cabida_relojes','cabida_correo_n','cabida_cn_siembra','cabida_show_tomas','cabida_show_gases','cabida_show_puertas','cabida_fk_cerradas','cabida_show_ccdd','cabida_solo_reemp','cabida_show_pc'];
   const _PREV={}; _PREFS.forEach(k=>{ try{ _PREV[k]=localStorage.getItem(k); }catch(e){ _PREV[k]=null; } });
   // r==='omitir' ⇒ la prueba necesita recintos dibujados y este navegador no tiene ninguno (p. ej. un preview con
   // almacenamiento vacío): se informa como ⚪ omitida, ni verde ni roja. Con dibujo, la prueba corre completa.
@@ -16643,15 +16728,57 @@ async function runSelfTest(){
   T('Barra de capas: todos los interruptores de mostrar/ocultar arriba, agrupados, con ✏️ Editar al final; el gestor ya no los repite', ()=>{
     const bar=document.getElementById('capasBar'), dock=document.getElementById('dock'); if(!bar) return false;
     const ids=CAPAS_BARRA.filter(x=>x!=='|').map(x=>x[0]);
-    const todos=ids.length>=23 && ids.every(id=>{ const e=document.getElementById(id); return e && bar.contains(e) && !dock.contains(e) && (e.getAttribute('data-lb')||'').length>0 && (e.getAttribute('data-ic')||'').length>0; });
+    const todos=ids.length>=20 && ids.every(id=>{ const e=document.getElementById(id); return e && bar.contains(e) && !dock.contains(e) && (e.getAttribute('data-lb')||'').length>0 && (e.getAttribute('data-ic')||'').length>0; });
     const bts=[...bar.querySelectorAll('button')];
     const alFinal=bts[bts.length-1].id==='btnEdit' && bts[bts.length-2].id==='btnNav';
-    const grupos=bar.querySelectorAll('.cp-g').length===6;
+    const grupos=bar.querySelectorAll('.cp-g').length===5;
     const sinRepetir=!document.getElementById('dkVer') && !/Ubicación en planta/.test(dock.textContent) && dock.contains(document.getElementById('dkCarrosXls'));
     // «Cajas» encendido = cajas visibles, como el resto
     const bv=S.boxVis; S.boxVis='on'; applyBoxVis(); const on=document.getElementById('btnBoxVis').classList.contains('active');
     S.boxVis='off'; applyBoxVis(); const off=!document.getElementById('btnBoxVis').classList.contains('active'); S.boxVis=bv; applyBoxVis();
     return todos && alFinal && grupos && sinRepetir && on && off;
+  });
+  T('Menos repetición: un solo % (cabecera, dotación), resúmenes una sola vez, edición y «Agregar» sólo editando, Auditoría/Metas en Revisión, una capa de impresoras', ()=>{
+    const ed=S.editMode, tab=_rpTab, sb=_sbTab, ti=S.showTI, ub=new Set(S.ubic||[]);
+    try{
+      // 2 · un solo porcentaje a la vista
+      _avBadge(); const pct=document.getElementById('statPct').textContent, av=document.getElementById('sbAvN');
+      const unPct=!document.getElementById('statTotal') && /^\d+%$/.test(pct) && pct===av.textContent && getComputedStyle(av).display==='none'
+        && !document.querySelector('#floorList .fl-pct') && /Dotación en recintos/.test(document.getElementById('hdrAvance').textContent);
+      // 1 · recintos dibujados: una vez, en Tipologías; puestos de trabajo: sólo en Avance
+      const res=document.getElementById('tipoResumen'), wc=document.getElementById('rpWpCard');
+      sbShowTab('tipos'); const enTipos=document.getElementById('sidebar').contains(res) && res.style.display==='' && !!res.querySelector('#cntBox') && !document.getElementById('rpPuestos');
+      sbShowTab(sb||'pisos'); const fueraTipos=res.style.display==='none';
+      _rpTab=''; rpShowTab('herr'); const wHerr=wc.style.display==='none';
+      _rpTab=''; rpShowTab('av');   const wAv=wc.style.display==='';
+      // 9 · Auditoría y Metas en Revisión
+      _rpTab=''; rpShowTab('rev'); const rc=document.getElementById('revCapas');
+      const enRev=rc.style.display==='' && rc.contains(document.getElementById('btnAudit')) && rc.contains(document.getElementById('btnMetas')) && !document.getElementById('capasBar').contains(document.getElementById('btnAudit'));
+      // 8 · la pestaña explica su número
+      const expl=/pendiente|Sin pendientes/.test((document.querySelector('#bimList .rev-resumen')||{}).textContent||'');
+      // 4 · 5 · edición
+      S.editMode=false; _dockSync(); const off=['dkGrpEdit','dkGrpAdd','rpEditCard'].every(id=>document.getElementById(id).style.display==='none');
+      S.editMode=true; _dockSync(); const on=['dkGrpEdit','dkGrpAdd','rpEditCard'].every(id=>document.getElementById(id).style.display==='');
+      S.editMode=ed; _dockSync();
+      // 6 · una sola capa de impresoras que mueve las dos
+      S.showTI=false; S.ubic=new Set(); toggleImpresoras(); const imp1=S.showTI && S.ubic.has('printer') && document.getElementById('btnImpresoras').classList.contains('active');
+      toggleImpresoras(); const imp0=!S.showTI && !S.ubic.has('printer');
+      const unaImp=!CAPAS_BARRA.some(x=>x[0]==='btnTiPrint'||x[0]==='dkUbicPrinter');
+      return unPct && enTipos && fueraTipos && wHerr && wAv && enRev && expl && off && on && imp1 && imp0 && unaImp;
+    } finally { S.editMode=ed; S.showTI=ti; S.ubic=ub; _rpTab=''; rpShowTab(tab||'herr'); sbShowTab(sb||'pisos'); _dockSync(); renderSVG(); }
+  });
+  T('Ficha del recinto: quita las secciones sin datos (y las nombra al pie) y cada título pliega su sección', ()=>{
+    const b=document.createElement('div');
+    b.innerHTML='<div class="fk-sec"><div class="fk-sec-t">⚙️ Equipamiento <span class="cnt">2</span></div><div class="fk-eq">x</div></div>'
+      +'<div class="fk-sec"><div class="fk-sec-t">📞 Telefonía IP</div><div class="fk-empty">no registra</div><div class="fk-inst-fte">fuente</div></div>'
+      +'<div class="fk-sec"><div class="fk-sec-t">📋 Pauta</div><div class="fk-pauta"><div class="fk-empty">sin pauta</div><button>asignar</button></div></div>';
+    _fkOrganiza(b);
+    const secs=b.querySelectorAll('.fk-sec'), pie=b.querySelector('.fk-sin-datos');
+    const quita=secs.length===2 && !!pie && /Telefonía IP/.test(pie.textContent) && /Equipamiento/.test(secs[0].textContent) && /Pauta/.test(secs[1].textContent);
+    const t0=secs[0].querySelector('.fk-sec-t');
+    t0.click(); const plega=secs[0].classList.contains('cerrada');
+    t0.click(); const abre=!secs[0].classList.contains('cerrada');
+    return quita && t0.classList.contains('fk-plegable') && plega && abre;
   });
   T('🔌 Tomas y 🫁 Gases sobre el recinto (vista 2): cuentan como la ficha, se apagan por separado y el clic abre la ficha', ()=>{
     const I=window.INSTALACIONES_RECINTO=window.INSTALACIONES_RECINTO||{ele:{},gas:{},_meta:{}}; I.ele=I.ele||{}; I.gas=I.gas||{};
