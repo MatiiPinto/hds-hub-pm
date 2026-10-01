@@ -1001,7 +1001,9 @@ function vDosim(){
         + '<td>' + esc(x.asignacion || '—') + '</td><td>' + esc(x.recambio || '—') + '</td><td>' + (x.fin_control ? esc(x.fin_control) : '<span class="pill p-bad">sin lectura</span>') + '</td></tr>').join('')
       + '</tbody></table></div></div>';
   }
-  box.innerHTML = '<div class="aviso a-bad"><b>⚠ ' + total + ' dosímetros sin devolver a la CCHEN</b> al corte del ' + esc(corte) + '. '
+  const devs = (D_ && D_.devueltos_despues_del_corte) ? D_.devueltos_despues_del_corte.length : 0;
+  box.innerHTML = '<div class="aviso a-bad"><b>⚠ ' + total + ' dosímetros sin devolver a la CCHEN</b> al corte del ' + esc(corte)
+    + (devs ? ' (descontados ' + devs + ' que ya tienen lectura del mismo período en informes posteriores)' : '') + '. '
     + 'Cada uno es un período sin lectura: esas personas quedan con un vacío en el historial dosimétrico que pide la Autorización Sanitaria. '
     + 'La CCHEN comprometió una nueva revisión oficial de faltantes.</div>'
     + kpis([['Sin devolver', total, 'var(--bad)'], ['Personas afectadas', (AG && AG.resumen.personas_con_dosimetro_no_devuelto) || '—', 'var(--warn)'],
@@ -1141,7 +1143,7 @@ function vOpr(){
   if(!O){ box.innerHTML = '<div class="aviso a-warn">Falta <b>SHARED_DATA/pr_opr.js</b> (se genera con <code>python3 _DEV/build_pr_opr.py</code>).</div>'; return; }
   const pr = { alta: 'p-bad', media: 'p-warn', baja: 'p-mute' };
   box.innerHTML = '<div class="aviso a-info"><b>Expediente del Oficial de Protección Radiológica.</b> ' + esc(O.origen) + '. '
-    + 'Los archivos están en el Drive del hospital, ordenados en seis carpetas; acá queda el índice de qué es cada documento.'
+    + 'Los archivos están en el Drive del hospital, ordenados en ' + O.carpetas.length + ' carpetas; acá queda el índice de qué es cada documento.'
     + '<div style="margin-top:6px"><a class="btn xs" href="' + esc(O.drive.raiz) + '" target="_blank">📂 Abrir la carpeta en Drive</a> '
     + '<a class="btn xs" href="' + esc(O.drive.indice) + '" target="_blank">📄 Índice completo (LEEME)</a></div></div>'
     + '<div class="card"><h2>🗂 Carpetas</h2><div class="grid g3" style="margin-top:10px">'
@@ -1151,6 +1153,7 @@ function vOpr(){
       + c.detalle.slice(0, 60).map(a => '<tr><td>' + esc(a.archivo) + (a.sub ? ' <span class="pill p-mute">' + esc(a.sub) + '</span>' : '') + '</td>'
         + '<td><small>' + esc(a.que_es || '—') + '</small></td><td style="text-align:right">' + a.kb + '</td></tr>').join('')
       + (c.detalle.length > 60 ? '<tr><td colspan="3"><small style="color:var(--tx2)">… y ' + (c.detalle.length - 60) + ' archivo(s) más en la carpeta de Drive</small></td></tr>' : '')
+      + (c.no_listados ? '<tr><td colspan="3"><small style="color:var(--tx2)">' + c.no_listados + ' archivo(s) personales (licencias, diplomas, nóminas o informes): se ven en la <a href="' + esc(c.url) + '" target="_blank">carpeta de Drive</a>, no se listan aquí.</small></td></tr>' : '')
       + '</tbody></table></div>').join('')
     + '</div>'
     + '<div class="card"><h2>📌 Pendientes del traspaso</h2><div class="tw" style="margin-top:8px"><table><thead><tr><th>#</th><th>Pendiente</th><th>Quién</th><th>Prioridad</th></tr></thead><tbody>'
