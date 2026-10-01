@@ -996,6 +996,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="tb-btn" id="btnCcdd" onclick="toggleCcdd()" title="Mostrar sobre el plano los puntos de corrientes débiles (CE y CCDD) leídos de los planos CDE rev. 20-03-2020: llamada enfermera, seguridad y control de accesos, CCTV, megafonía, gestión de turnos, telefonía, WiFi/celular. Pasa el mouse por un punto para ver qué es. Las clases «por confirmar» se muestran con su letra del plano.">📡 Corrientes débiles</button>
       <button class="tb-btn" id="btnSoloReemp" onclick="toggleSoloReemp()" title="Filtro del plano: resaltar SOLO los puestos con reemplazo vigente (titular ausente según RRHH o informado en terreno). En vista 3 los demás puestos se atenúan; en vista 2 cada recinto muestra 🔁 y cuántos reemplazos tiene.">🔁 Sólo reemplazos</button>
       <button class="tb-btn" id="btnShowPC" onclick="toggleShowPC()" title="Mostrar en cada recinto (vista de servicio) los computadores del catálogo EMMC repartidos por caja dibujada: 💻 + cantidad (bajo y alto rendimiento, notebooks). Clic abre la ficha. Reporte y Excel en el gestor: Apoyo TI → Reporte de computadores.">💻 Computadores</button>
+      <button class="tb-btn tog" id="btnEstac" onclick="toggleEstac()" title="Mostrar u ocultar los estacionamientos (plazas importadas de 8.Navegacion, a tamaño real, del color de su categoría: 🅿 público · ♿ discapacitados · 🚑 ambulancias · ★ directivos · 👥 funcionarios). Se ven en todas las vistas.">🅿 Estacionamientos</button>
       <button class="tb-btn" id="btnImpresoras" onclick="toggleImpresoras()" title="Impresoras: en el piso (vista 1) muestra dónde van las propuestas; dentro de un servicio (vista 2) pone en cada recinto el testigo 🖨 con las del archivo Comodatos Jun-2026 por tipo. Una sola capa para ambas.">🖨 Impresoras</button>
       <button class="tb-btn" id="btnPuertasVis" onclick="togglePuertasVis()" title="Mostrar u ocultar las puertas de los recintos (flecha de salida sobre el muro, vistas 2 y 3). Mientras se colocan puertas se ven siempre.">🚪 Puertas</button>
       <button class="tb-btn" id="btnShowTomas" onclick="toggleShowTomas()" title="Mostrar en cada recinto (vista de servicio) las tomas de corriente de la memoria eléctrica PE 01: 🔌 + total de tomas (triple = 3, doble = 2, simple = 1), sumando grado médico, computación (UPS) y fuerza. El detalle por red va en el tooltip y en la ficha.">🔌 Tomas</button>
@@ -1015,6 +1016,10 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
         <div class="sm-h">Reloj control</div>
         <button class="struct-opt" data-kind="reloj" style="--c:#C026D3" title="Colocar a mano un reloj control (lector biométrico del control horario). Se ve en todas las vistas; se enciende y apaga con el botón ⏱ Relojes de la barra superior.">⏱ <b>Reloj control</b> <span style="opacity:.55">· lector biométrico</span></button>
         <button class="struct-opt" onclick="importarRelojesORD()" style="--c:#C026D3" title="Trae los 10 lectores biométricos propuestos en el ORD SSMO 5040029-145 (04-ago-2026, planos P1 · PS2 · PS3), ubicados en el Atlas por los rótulos comunes de los planos. Reemplaza los relojes que hubiera; los ascensores, escaleras y líneas no se tocan. Después se arrastran hasta su posición final.">⬇ <b>Importar del ORD 1441</b> <span style="opacity:.55">· 10 lectores · reemplaza</span></button>
+        <div class="sm-h">Estacionamientos</div>
+        <button class="struct-opt" data-kind="est" style="--c:#38bdf8" title="Colocar a mano una plaza de estacionamiento (2,5 × 5 m). Después, clic sobre ella abre el panel: categoría, girar, tamaño.">🅿 <b>Plaza</b> <span style="opacity:.55">· a mano</span></button>
+        <button class="struct-opt" onclick="importarEstacionamientosNav()" style="--c:#38bdf8" title="Trae las plazas dibujadas en 8.Navegacion (siembra nav_verticales.js), en el mismo lugar y con su categoría. Reemplaza los estacionamientos que hubiera; lo demás no se toca.">⬇ <b>Importar de Navegación</b> <span style="opacity:.55">· reemplaza</span></button>
+        <button class="struct-opt" onclick="replicarEstacionamientos()" style="--c:#38bdf8" title="Copia las plazas del piso en que estás al piso de abajo (p. ej. -2 → -3), en el mismo lugar del edificio. No duplica las que ya están.">⎘ <b>Replicar al piso de abajo</b> <span style="opacity:.55">· p. ej. -2 → -3</span></button>
         <div class="sm-h">Correo neumático</div>
         <button class="struct-opt" data-kind="cn" style="--c:#DB2777" title="Colocar a mano una estación de correo neumático. Después, clic sobre ella abre el panel para elegir sistema, tipo y la estación del directorio. Se ve en todas las vistas; se enciende y apaga con el botón 📮 Correo N.">📮 <b>Estación</b> <span style="opacity:.55">· a mano</span></button>
         <button class="struct-opt" onclick="importarCorreoCNE()" style="--c:#DB2777" title="Trae las estaciones de los planos de tuberías CNE-PL-GEN (PS1, P1, P2, P3, P4), ubicadas en el Atlas por el símbolo del plano y cruzadas con el directorio. Reemplaza las estaciones que hubiera; lo demás no se toca.">⬇ <b>Importar de los planos CNE</b> <span style="opacity:.55">· reemplaza</span></button>
@@ -1472,6 +1477,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 <script src="SHARED_DATA/nav_verticales.js"></script>
 <script src="SHARED_DATA/relojes_control.js"></script>
 <script src="SHARED_DATA/correo_estaciones.js"></script>
+<script src="SHARED_DATA/planos_calibracion.js"></script>
 <script src="SHARED_DATA/verticales_parches.js"></script>
 <script src="SHARED_DATA/circulacion_red.js"></script>
 <script src="SHARED_DATA/propuestos_plano.js"></script>
@@ -3873,6 +3879,8 @@ function _jardinesSync(){
     const b=document.getElementById('btnVert'); if(b) b.classList.toggle('active',S.verticales!==false); }
   if(S.relojes===undefined){ let v=null; try{ v=localStorage.getItem('cabida_relojes'); }catch(e){} S.relojes=(v!=='0');
     const b=document.getElementById('btnReloj'); if(b) b.classList.toggle('active',S.relojes!==false); }
+  if(S.estac===undefined){ let v=null; try{ v=localStorage.getItem('cabida_estac'); }catch(e){} S.estac=(v!=='0');
+    const b=document.getElementById('btnEstac'); if(b) b.classList.toggle('active',S.estac!==false); }
   if(S.correoN===undefined){ let v=null; try{ v=localStorage.getItem('cabida_correo_n'); }catch(e){} S.correoN=(v!=='0');
     const b=document.getElementById('btnCorreoN'); if(b) b.classList.toggle('active',S.correoN!==false); }
   const P=_pais(), on=!!P && S.jardines!==false;
@@ -6726,7 +6734,7 @@ function exportDEA(){
 const CAPAS_BARRA=[
   ['btnBoxVis','Cajas'],['dkLabels','Etiquetas'],['btnSen','Señalética'],['btnPlanKind','Color'],'|',
   ['btnDotNames','Nombres'],['btnAsigN','N° asignados'],['btnSoloReemp','Reemplazos'],'|',
-  ['btnVert','Ascensores'],['btnReloj','Relojes'],['btnCorreoN','Correo N.'],['btnPuertasVis','Puertas'],['btnJardines','Jardines'],'|',
+  ['btnVert','Ascensores'],['btnReloj','Relojes'],['btnCorreoN','Correo N.'],['btnEstac','Estacionam.'],['btnPuertasVis','Puertas'],['btnJardines','Jardines'],'|',
   ['dkUbicCarro','Carros de paro'],['dkUbicDea','DEA'],['dkUbicTotem','Tótems'],['btnImpresoras','Impresoras'],['btnShowPC','PC'],'|',
   ['btnShowTomas','Tomas'],['btnShowGases','Gases'],['btnCcdd','C. débiles']
 ];
@@ -7389,6 +7397,10 @@ const STRUCT_TYPES = {
   // con la letra del tipo (P paso · F final · M masivo · R recepción masiva · C central).
   // Igual que el reloj es una «marca» transversal: se ve y se mueve en todas las vistas,
   // tiene su botón 📮 y no la tocan las herramientas de ascensores/escaleras.
+  // Estacionamiento (plaza): caja a tamaño real del color de su categoría, como en
+  // 8.Navegacion (de donde se importa). Marca propia: botón 🅿, no la tocan las
+  // herramientas de ascensores/escaleras.
+  'est':         {label:'Estacionamiento', short:'P', col:'#38bdf8', symbol:'🅿', kind:'point', grupo:'est', marca:true},
   'cn':          {label:'Estación de correo neumático', short:'CN', col:'#2563EB', symbol:'📮', kind:'point', grupo:'cn', marca:true},
   'circulation': {label:'Circulación',          short:'',    col:'#475569', symbol:'〰', kind:'line'}
 };
@@ -7396,6 +7408,10 @@ function _esMarca(kind){ return !!(STRUCT_TYPES[kind]||{}).marca; }
 // Correo neumático: sistemas (color del plano de tuberías CNE, lámina de simbología) y tipos de estación
 const CN_SIS={T1:{n:'T1 · Atención Abierta',col:'#2563EB'},T2:{n:'T2 · Hospital 1',col:'#DB2777'},T3:{n:'T3 · Hospital 2',col:'#D97706'},LAB:{n:'Línea Laboratorio',col:'#16A34A'}};
 const CN_TIPO={paso:['P','Estación de paso'],final:['F','Estación final'],masivo:['M','Estación de envío masivo'],recepcion_masiva:['R','Recepción masiva horizontal'],central:['C','Equipo central · transfer y bombas']};
+// Categorías de plaza = las de 8.Navegacion (EST_CIRC), medidas del estándar chileno en metros
+const EST_CAT={pub:{n:'Público general',col:'#38bdf8',ic:'🅿',w:2.5,h:5.0},disc:{n:'Discapacitados',col:'#2563eb',ic:'♿',w:3.6,h:5.0},
+  amb:{n:'Ambulancias',col:'#ef4444',ic:'🚑',w:3.5,h:7.0},dir:{n:'Directivos',col:'#f59e0b',ic:'★',w:2.5,h:5.0},func:{n:'Funcionarios',col:'#14b8a6',ic:'👥',w:2.5,h:5.0}};
+function _estCat(it){ return EST_CAT[it.cat]||EST_CAT.pub; }
 function _cnCol(it){ return (CN_SIS[it.sis]||{}).col || STRUCT_TYPES.cn.col; }
 let structuresState = {};
 try { structuresState = JSON.parse(localStorage.getItem('cabida_cad_structures') || '{}'); } catch {}
@@ -7470,6 +7486,7 @@ function _structClickHandler(e){
   if(tdef.kind === 'point'){
     const nuevo={ id: S.floorId+'-st-'+Date.now(), kind: _structKind, x: p.x, y: p.y };
     if(_structKind==='cn'){ nuevo.sis=S.cnSisDef||'T2'; nuevo.tipo='paso'; if(S.correoN===false) toggleCorreoN(); }
+    if(_structKind==='est'){ const c=EST_CAT[S.estCatDef]||EST_CAT.pub, k=_mPx(); nuevo.cat=S.estCatDef||'pub'; nuevo.w=Math.round(c.w/k); nuevo.h=Math.round(c.h/k); if(S.estac===false) toggleEstac(); }
     addStruct(nuevo);
     // Mantener modo activo para colocar varios; pulsar Esc para salir
   } else if(tdef.kind === 'line'){
@@ -7530,7 +7547,7 @@ function deleteStruct(id){
 function paintStructures(){
   if(S.vertAjuste && typeof _vertAjusteHint==='function') _vertAjusteHint();
   const items = structsOf(S.floorId).filter(it=>{ const t=STRUCT_TYPES[it.kind]; if(!t || t.kind!=='point') return true;
-    return t.grupo==='reloj' ? S.relojes!==false : (t.grupo==='cn' ? S.correoN!==false : S.verticales!==false); });
+    return t.grupo==='reloj' ? S.relojes!==false : (t.grupo==='cn' ? S.correoN!==false : (t.grupo==='est' ? S.estac!==false : S.verticales!==false)); });
   if(!items.length && !_structLine) return;
   const relojEditable = S.editMode && items.some(it=>_esMarca(it.kind));
   const g = el('g', {class:'structures-layer',
@@ -7578,6 +7595,13 @@ function renderStructMarker(it, tdef){
     g.appendChild(el('circle',{class:'struct-reloj',cx:0,cy:0,r:Math.min(bw,bh)/2,fill:tdef.col,stroke:'#fff','stroke-width':baseStrokeW,opacity:0.95}));
     const t = el('text',{x:0,y:R*0.06,'text-anchor':'middle','dominant-baseline':'middle','font-size':R*0.78,'font-weight':900,fill:'#fff','font-family':'system-ui,-apple-system,sans-serif'});
     t.textContent = it.etq || tdef.short; g.appendChild(t);
+  } else if(tdef.grupo==='est'){
+    // plaza a tamaño real: caja translúcida del color de la categoría con su icono
+    const c=_estCat(it);
+    g.appendChild(el('rect',{class:'struct-est',x:-bw/2,y:-bh/2,width:bw,height:bh,rx:Math.min(10,Math.min(bw,bh)*0.08),fill:c.col,'fill-opacity':0.42,stroke:c.col,'stroke-width':Math.max(2,baseStrokeW*0.8)}));
+    const t=el('text',{x:0,y:0,'text-anchor':'middle','dominant-baseline':'central','font-size':Math.min(bw,bh)*0.55,'font-weight':900,fill:'#fff',stroke:c.col,'stroke-width':Math.max(1.5,Math.min(bw,bh)*0.03),'paint-order':'stroke fill','pointer-events':'none','font-family':'system-ui,-apple-system,sans-serif'});
+    t.textContent=c.ic; g.appendChild(t);
+    if(it.etq){ const te=el('text',{x:0,y:bh/2-Math.min(bw,bh)*0.16,'text-anchor':'middle','font-size':Math.min(bw,bh)*0.22,'font-weight':800,fill:'#0f172a','pointer-events':'none'}); te.textContent=it.etq; g.appendChild(te); }
   } else if(tdef.grupo==='cn'){
     // cápsula (como la del correo neumático) del color del sistema, con la letra del tipo
     const cw=bw*0.72, col=_cnCol(it), tp=CN_TIPO[it.tipo]||CN_TIPO.paso;
@@ -7627,7 +7651,9 @@ function renderStructMarker(it, tdef){
   const ext = DXF_EXT[S.floorId], dim = FLOOR_DIMS[S.floorId];
   const mx = (ext&&dim) ? ((ext.xmax-ext.xmin)/dim.w) : 0, my = (ext&&dim) ? ((ext.ymax-ext.ymin)/dim.h) : 0;
   const PUERTA={};
-  ttl.textContent = tdef.grupo==='cn' ? (_cnTitulo(it) + (S.editMode ? ' · clic: panel (sistema · tipo · estación del directorio) · arrastrar mueve · × borra (en cualquier vista)' : ''))
+  ttl.textContent = tdef.grupo==='est' ? ('🅿 Estacionamiento · '+_estCat(it).n+(it.etq?(' · '+it.etq):'')+(sized&&mx?` · ${(bw*mx).toFixed(1)} × ${(bh*my).toFixed(1)} m`:'')+(it.origen==='navegacion'?' · de Navegación':(it.origen==='replica'?' · replicada de '+(it.de||'otro piso'):''))
+      + (S.editMode ? ' · clic: panel (categoría · girar · tamaño) · arrastrar mueve · × borra' : ''))
+    : tdef.grupo==='cn' ? (_cnTitulo(it) + (S.editMode ? ' · clic: panel (sistema · tipo · estación del directorio) · arrastrar mueve · × borra (en cualquier vista)' : ''))
     : tdef.grupo==='reloj'
     ? (tdef.label + (it.n?(' N°'+it.n):'') + (it.edificio?(' · '+it.edificio):'') + (it.acceso?(' · '+it.acceso):'') + (it.obs?(' · '+it.obs):'')
        + (it.origen?(' · '+it.origen+' (propuesta de los hospitales, pendiente de factibilidad)'):' · colocado a mano')
@@ -7770,6 +7796,7 @@ function structEditRender(){
   const m=document.getElementById('structEdit'), it=_structSelIt(); if(!m) return;
   if(!it){ m.style.display='none'; return; }
   if(it.kind==='cn'){ _cnEditRender(m, it); return; }
+  if(it.kind==='est'){ _estEditRender(m, it); return; }
   const td=STRUCT_TYPES[it.kind]||{}, mpx=_mPx(), w=it.w||95, h=it.h||95, gem=_gemelaDe(it);
   const tipos=Object.entries(STRUCT_TYPES).filter(([k,t])=>t.kind==='point').map(([k,t])=>`<option value="${k}"${k===it.kind?' selected':''}>${esc(t.label)}</option>`).join('');
   const LADOS=[['n','▲ N'],['e','► E'],['s','▼ S'],['w','◄ O']], sal0=String(it.salida||'');
@@ -7795,6 +7822,9 @@ function structEditApply(campo, val){
     const v='nesw'.split('').filter(l=>set.has(l)).join(''); if(v) it.salida=v; else delete it.salida; delete it.salida_fuente; }
   else if(campo==='w'||campo==='h'){ const px=Math.max(19, Math.round(parseFloat(val)/mpx)); if(isFinite(px)) it[campo]=px; const b0=it.kind==='cn'?180:(it.kind==='reloj'?190:95); if(!it.w) it.w=b0; if(!it.h) it.h=b0; }
   else if(campo==='mirror'){ S.structMirror=!!val; _lsPref('cabida_struct_mirror', val?'1':'0'); }
+  else if(campo==='estCat'){ if(EST_CAT[val]){ it.cat=val; S.estCatDef=val; } }
+  else if(campo==='estStd'){ const c=_estCat(it), k=_mPx(), vert=(it.h||0)>=(it.w||0); it.w=Math.round((vert?c.w:c.h)/k); it.h=Math.round((vert?c.h:c.w)/k); }
+  else if(campo==='estGira'){ const w=it.w; it.w=it.h; it.h=w; }
   else if(campo==='cnSis'){ if(CN_SIS[val]){ it.sis=val; S.cnSisDef=val; } }
   else if(campo==='cnTipo'){ if(CN_TIPO[val]) it.tipo=val; }
   else if(campo==='cnE'){ it.e=String(val||'').trim(); if(!it.e) delete it.e; }
@@ -7884,6 +7914,77 @@ function _cnAutoImport(){
   return n;
 }
 window.addEventListener('load',()=>setTimeout(()=>{ if(typeof _SELFTEST!=='undefined'&&_SELFTEST) return; try{ _cnAutoImport(); }catch(e){ console.warn('correo neumático: importación automática',e); } }, 1400));
+function _estEditRender(m, it){
+  const mpx=_mPx(), c=_estCat(it), w=it.w||Math.round(c.w/mpx), h=it.h||Math.round(c.h/mpx);
+  m.innerHTML=`<div class="se-t"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:${c.col}"></span> Estacionamiento · ${esc(c.n)}<span class="x" onclick="structEditClose()">✕</span></div>
+    <div class="se-row"><label>Categoría</label><select onchange="structEditApply('estCat',this.value)">${Object.entries(EST_CAT).map(([k,v])=>`<option value="${k}"${k===(it.cat||'pub')?' selected':''}>${v.ic} ${esc(v.n)}</option>`).join('')}</select></div>
+    <div class="se-row"><label>Etiqueta</label><input value="${esc(it.etq||'')}" placeholder="N° de plaza" onchange="structEditApply('etq',this.value)" style="width:90px"></div>
+    <div class="se-row"><label>Tamaño (m)</label><input type="number" step="0.1" min="0.5" value="${(w*mpx).toFixed(2)}" onchange="structEditApply('w',this.value)"> × <input type="number" step="0.1" min="0.5" value="${(h*mpx).toFixed(2)}" onchange="structEditApply('h',this.value)"></div>
+    <div class="se-row"><label></label><button onclick="structEditApply('estGira')" title="Plaza en batería ↔ en cordón">⟲ Girar 90°</button><button onclick="structEditApply('estStd')" title="Medida estándar de la categoría (${c.w} × ${c.h} m)">Medida estándar</button></div>
+    <div class="se-note">Arrastrar o flechas mueven la plaza (⌘ 5 px · ⇧ 20 px). Los vértices cambian el tamaño.</div>
+    <div class="se-btns"><button class="danger" onclick="const id=S.structSel; structEditClose(); deleteStruct(id);">⌫ Borrar</button><button onclick="structEditClose()">Cerrar</button></div>`;
+  m.style.display='block'; m.style.right='16px'; m.style.top='14px'; m.style.left='auto';
+}
+function toggleEstac(){
+  S.estac=(S.estac===false);
+  _lsPref('cabida_estac', S.estac?'1':'0');
+  const b=document.getElementById('btnEstac'); if(b) b.classList.toggle('active',S.estac!==false);
+  renderSVG();
+}
+// ── Estacionamientos desde 8.Navegacion (SHARED_DATA/nav_verticales.js, kind 'est') ──
+// Reemplaza las plazas de TODOS los pisos con las de la siembra; lo demás no se toca.
+function importarEstacionamientosNav(sinConfirmar){
+  const NV=window.NAV_VERTICALES; if(!NV||!NV.floors){ if(!sinConfirmar) alert('No se encontró la siembra SHARED_DATA/nav_verticales.js'); return 0; }
+  const por={}; Object.entries(NV.floors).forEach(([p,arr])=>{ const e=arr.filter(x=>x.kind==='est'); if(e.length) por[p]=e; });
+  const pisos=Object.keys(por), total=pisos.reduce((a,p)=>a+por[p].length,0);
+  if(!total){ if(!sinConfirmar) alert('La siembra de Navegación no trae estacionamientos.\nExporta los datos de 8.Navegacion (💾 Respaldar) y regenera con _DEV/importa_verticales_navegacion.py'); return 0; }
+  const actuales=Object.values(structuresState).flat().filter(x=>x.kind==='est').length;
+  if(!sinConfirmar && !confirm('Importar '+total+' estacionamientos desde Navegación ('+pisos.map(p=>p+': '+por[p].length).join(' · ')+')?\n\n'
+      +(actuales?('Se REEMPLAZAN los '+actuales+' estacionamientos que hay ahora en el Atlas; '):'')+'ascensores, escaleras, relojes y lo demás no se tocan.')) return 0;
+  new Set([...pisos, ...Object.keys(structuresState)]).forEach(p=>{
+    const resto=(structuresState[p]||[]).filter(x=>x.kind!=='est');
+    structuresState[p]=resto.concat((por[p]||[]).map(x=>({...x})));
+    if(!structuresState[p].length) delete structuresState[p];
+  });
+  if(S.estac===false) toggleEstac();
+  sStruct(); renderSVG();
+  if(typeof closeStructMenu==='function') try{ closeStructMenu(); }catch(e){}
+  if(!sinConfirmar && typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🅿 '+total+' estacionamientos importados de Navegación ('+pisos.join(', ')+')'; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},8000); }
+  return total;
+}
+// ── Replicar estacionamientos a otro piso (⎘, como en Navegación) ─────────────
+// Mismo lugar FÍSICO del edificio: px del piso de origen → metros comunes →
+// px del destino con planos_calibracion (los planos de cada piso tienen otra escala).
+// No duplica: si en el destino ya hay una plaza a menos de 1 m, esa se salta.
+function _calibM(fid){ const C=((window.PLANOS_CALIB||{}).pisos||{})[fid]; return C&&C.nav&&C.nav.m_a_px; }
+function _pxAMetros(fid,x,y){ const m=_calibM(fid); if(!m) return null; const det=m[0]*m[3]-m[1]*m[2], X=x-m[4], Y=y-m[5]; return {xm:(m[3]*X-m[2]*Y)/det, ym:(-m[1]*X+m[0]*Y)/det}; }
+function _metrosAPx(fid,xm,ym){ const m=_calibM(fid); if(!m) return null; return {x:m[0]*xm+m[2]*ym+m[4], y:m[1]*xm+m[3]*ym+m[5]}; }
+function _pisoDeAbajo(fid){ const i=FLOORS.findIndex(f=>f.id===fid); return (i>=0 && i<FLOORS.length-1)?FLOORS[i+1].id:null; }
+function replicarEstacionamientos(org, dst, sinConfirmar){
+  org=org||S.floorId; dst=dst||_pisoDeAbajo(org);
+  const src=structsOf(org).filter(x=>x.kind==='est');
+  if(!dst || dst===org){ if(!sinConfirmar) alert('No hay un piso de destino debajo de '+org+'.'); return 0; }
+  if(!src.length){ if(!sinConfirmar) alert('El piso '+org+' no tiene estacionamientos para replicar.'); return 0; }
+  const mo=_calibM(org), md=_calibM(dst);
+  if(!mo||!md){ if(!sinConfirmar) alert('Falta la calibración de '+(!mo?org:dst)+' (SHARED_DATA/planos_calibracion.js).'); return 0; }
+  const kx=Math.abs(md[0]/mo[0]), ky=Math.abs(md[3]/mo[3]), lim=1/_mPx(dst);
+  const yaHay=structsOf(dst).filter(x=>x.kind==='est');
+  const nuevos=[]; let salt=0;
+  src.forEach((x,i)=>{
+    const mt=_pxAMetros(org,x.x,x.y), p=mt&&_metrosAPx(dst,mt.xm,mt.ym); if(!p) return;
+    if(yaHay.some(y=>Math.hypot(y.x-p.x,y.y-p.y)<lim) || nuevos.some(y=>Math.hypot(y.x-p.x,y.y-p.y)<lim)){ salt++; return; }
+    nuevos.push({...x, id:dst+'-est-'+Date.now().toString(36)+'-'+i, x:Math.round(p.x), y:Math.round(p.y),
+      w:Math.round((x.w||EST_CAT.pub.w/_mPx(org))*kx), h:Math.round((x.h||EST_CAT.pub.h/_mPx(org))*ky), origen:'replica', de:org});
+  });
+  if(!sinConfirmar && !confirm('Replicar '+nuevos.length+' estacionamientos de '+org+' a '+dst+' en el mismo lugar del edificio?'
+      +(salt?('\n\n'+salt+' se saltan porque '+dst+' ya tiene una plaza en ese lugar.'):'')+'\n\nQuedan como copia: después se ajustan o borran a mano.')) return 0;
+  (structuresState[dst]=structuresState[dst]||[]).push(...nuevos);
+  if(S.estac===false) toggleEstac();
+  sStruct(); renderSVG();
+  if(typeof closeStructMenu==='function') try{ closeStructMenu(); }catch(e){}
+  if(!sinConfirmar && typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='⎘ '+nuevos.length+' estacionamientos replicados de '+org+' a '+dst+(salt?(' · '+salt+' ya estaban'):''); setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},8000); }
+  return nuevos.length;
+}
 function _cnEditRender(m, it){
   const mpx=_mPx(), w=it.w||180, h=it.h||180, rc=_cnRecinto(it);
   const usadas=new Set(Object.values(structuresState).flat().filter(x=>x.kind==='cn' && x!==it && x.dir).map(x=>x.dir));
@@ -8009,7 +8110,7 @@ function _vertAjusteHint(){
 // las correcciones de _DEV/calibra_verticales.py, que corrían los ascensores.
 function importarVerticalesNav(sinConfirmar){
   const NV=window.NAV_VERTICALES; if(!NV||!NV.floors){ alert('No se encontró la siembra SHARED_DATA/nav_verticales.js.\nGenerarla con _DEV/importa_verticales_navegacion.py'); return; }
-  const pisos=Object.keys(NV.floors), total=pisos.reduce((a,p)=>a+NV.floors[p].length,0);
+  const pisos=Object.keys(NV.floors), total=pisos.reduce((a,p)=>a+NV.floors[p].filter(x=>x.kind!=='est').length,0);
   const actuales=Object.values(structuresState).flat().filter(x=>x.kind!=='circulation' && !_esMarca(x.kind)).length;
   if(!sinConfirmar && !confirm('Importar '+total+' ascensores/escaleras desde Navegación ('+pisos.join(', ')+')?\n\n'
       +'Se REEMPLAZAN los '+actuales+' ascensores/escaleras que hay ahora en el Atlas (las líneas de circulación se conservan).\n'
@@ -8019,7 +8120,7 @@ function importarVerticalesNav(sinConfirmar){
   const pisosTodos=new Set([...pisos, ...Object.keys(structuresState)]);
   pisosTodos.forEach(p=>{
     const lineas=(structuresState[p]||[]).filter(x=>x.kind==='circulation' || _esMarca(x.kind));   // se conservan (líneas, relojes, correo neumático)
-    const nuevos=(NV.floors[p]||[]).map(x=>({...x}));
+    const nuevos=(NV.floors[p]||[]).filter(x=>x.kind!=='est').map(x=>({...x}));   // las plazas tienen su propio importar
     structuresState[p]=lineas.concat(nuevos);
     if(!structuresState[p].length) delete structuresState[p];
   });
@@ -15160,7 +15261,7 @@ async function runSelfTest(){
   // Testigo: al terminar, NINGUNA preferencia del usuario puede haber cambiado.
   const _PREFS=['cabida_room_labels','cabida_show_dotnames','cabida_box_vis','cabida_plan_kind',
                 'cabida_show_asign','cabida_show_sen','cabida_scenario','cabida_rp_collapsed',
-                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures','cabida_ubic','cabida_jardines','cabida_verticales','cabida_relojes','cabida_correo_n','cabida_cn_siembra','cabida_show_tomas','cabida_show_gases','cabida_show_puertas','cabida_fk_cerradas','cabida_show_ccdd','cabida_solo_reemp','cabida_show_pc'];
+                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures','cabida_ubic','cabida_jardines','cabida_verticales','cabida_relojes','cabida_correo_n','cabida_cn_siembra','cabida_show_tomas','cabida_show_gases','cabida_show_puertas','cabida_fk_cerradas','cabida_estac','cabida_show_ccdd','cabida_solo_reemp','cabida_show_pc'];
   const _PREV={}; _PREFS.forEach(k=>{ try{ _PREV[k]=localStorage.getItem(k); }catch(e){ _PREV[k]=null; } });
   // r==='omitir' ⇒ la prueba necesita recintos dibujados y este navegador no tiene ninguno (p. ej. un preview con
   // almacenamiento vacío): se informa como ⚪ omitida, ni verde ni roja. Con dibujo, la prueba corre completa.
@@ -16636,6 +16737,33 @@ async function runSelfTest(){
       return v1 && v2;
     } finally { S.level=nivel; S.editMode=ed; S.areaId=a0; _stDrag=null; window.removeEventListener('mousemove', _structDragMove); window.removeEventListener('mouseup', _structDragUp);
       _rpFix(false); Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG(); }
+  });
+  T('🅿 Estacionamientos: importar de Navegación (sólo plazas; el de verticales no las toca), ⎘ replicar -2 → -3 en el mismo lugar físico sin duplicar, 🅿 las oculta', ()=>{
+    const snap=JSON.stringify(structuresState), NVprev=window.NAV_VERTICALES, eP=S.estac, f0=S.floorId, l0=S.level, VAprev=_VA;
+    try{
+      _VA={}; S.estac=true;
+      structuresState['P-2']=[{id:'v1',kind:'asc-G',x:5000,y:5000,w:150,h:180,etq:'C1'},{id:'est-viejo',kind:'est',cat:'pub',x:10,y:10,w:155,h:310}];
+      structuresState['P-3']=[];
+      window.NAV_VERTICALES={floors:{'P-2':[{id:'n1',kind:'asc-G',x:5000,y:5000,w:150,h:180,etq:'C1'},
+        {id:'e1',kind:'est',cat:'disc',x:6000,y:4000,w:224,h:310,origen:'navegacion'},{id:'e2',kind:'est',cat:'pub',x:6300,y:4000,w:155,h:310,origen:'navegacion'}]}};
+      const n=importarEstacionamientosNav(true), a2=structsOf('P-2');
+      const imp=n===2 && a2.filter(x=>x.kind==='est').length===2 && !a2.some(x=>x.id==='est-viejo') && a2.some(x=>x.id==='v1');
+      importarVerticalesNav(true); const sigue=structsOf('P-2').filter(x=>x.kind==='est').length===2 && structsOf('P-2').some(x=>x.id==='n1');
+      // replicar: misma posición física con la calibración de cada piso
+      const r=replicarEstacionamientos('P-2','P-3',true), a3=structsOf('P-3').filter(x=>x.kind==='est');
+      const e1=structsOf('P-2').find(x=>x.id==='e1'), c1=a3.find(x=>x.cat==='disc');
+      const m=_pxAMetros('P-2',e1.x,e1.y), q=_metrosAPx('P-3',m.xm,m.ym);
+      const mismo=r===2 && a3.length===2 && Math.abs(c1.x-q.x)<=1 && Math.abs(c1.y-q.y)<=1 && c1.origen==='replica' && c1.w<e1.w;   // P-3 tiene menos px por metro
+      const otraVez=replicarEstacionamientos('P-2','P-3',true)===0 && structsOf('P-3').filter(x=>x.kind==='est').length===2;
+      const abajo=_pisoDeAbajo('P-2')==='P-3';
+      // dibujo y botón
+      S.floorId='P-2'; S.level=1; renderSVG(); const dib=svg.querySelectorAll('.struct-est').length===2 && /♿/.test(svg.textContent);
+      toggleEstac(); const oculta=S.estac===false && !svg.querySelector('.struct-est') && !!svg.querySelector('.struct-marker'); toggleEstac();
+      return imp && sigue && mismo && otraVez && abajo && dib && oculta && !_vertPuntos('P-2').some(x=>x.kind==='est');
+    } finally {
+      window.NAV_VERTICALES=NVprev; S.estac=eP; S.floorId=f0; S.level=l0; _VA=VAprev;
+      Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
+    }
   });
   T('Correo neumático: importa de la siembra sin tocar ascensores ni relojes, cápsula del color del sistema con la letra del tipo, 📮 las oculta, se mueve en vista 2, ficha del recinto y panel', ()=>{
     const snap=JSON.stringify(structuresState), Dprev=window.CORREO_ESTACIONES, nivel=S.level, ed=S.editMode, a0=S.areaId, cPrev=S.correoN, sel=S.structSel, sd=S.cnSisDef; _rpFix(true);
