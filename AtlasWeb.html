@@ -1478,6 +1478,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 <script src="SHARED_DATA/relojes_control.js"></script>
 <script src="SHARED_DATA/correo_estaciones.js"></script>
 <script src="SHARED_DATA/planos_calibracion.js"></script>
+<script src="SHARED_DATA/bim_plano.js"></script>
 <script src="SHARED_DATA/verticales_parches.js"></script>
 <script src="SHARED_DATA/circulacion_red.js"></script>
 <script src="SHARED_DATA/propuestos_plano.js"></script>
@@ -12955,7 +12956,34 @@ function _variosSvPendientes(){
   });
   return out;
 }
+// BIM según el rótulo del plano (SHARED_DATA/bim_plano.js, planos CRA): un recinto
+// dibujado que contiene el rótulo de un BIM que no es el suyo. Sólo rótulos de
+// recintos con uso (no circulaciones, shafts, pozos, escaleras ni rampas).
+function _bimPlanoPendientes(){
+  const B=(window.BIM_PLANO||{}).floors||{}, out=[];
+  Object.entries(B).forEach(([fid,labs])=>{
+    const fl=FLOORS.find(f=>f.id===fid); if(!fl) return;
+    fl.areas.forEach(a=>(a.rooms||[]).forEach(r=>{
+      const sh=rShapes(r); if(!sh.length) return;
+      const dentro=labs.filter(l=>l.uso && sh.some(q=>l.x>=q.x&&l.x<=q.x+q.w&&l.y>=q.y&&l.y<=q.y+q.h)); if(!dentro.length) return;
+      const cur=new Set(((rBim(r.id)||'').toUpperCase().match(/[AHI]\d{4}/g))||[]);
+      if(dentro.some(l=>cur.has(l.bim))) return;                  // ya tiene uno de los BIM rotulados ahí
+      const cod=rCode(r.id), l=dentro.find(x=>x.c&&x.c===cod)||dentro[0];
+      if(nameState.recintosRev['bimplano|'+r.id+'|'+l.bim]) return;
+      out.push({fl,area:a,r,bim:l.bim,actual:[...cur].join(' / ')||'(sin BIM)',nombrePlano:l.n,codigoPlano:l.c});
+    }));
+  });
+  return out;
+}
 const REV_CHECKS={
+  bimplano:{label:'Catastro: BIM según el rótulo del plano',
+    find:_bimPlanoPendientes, approve:true, noDialog:true, flat:true,
+    okTitle:'Reemplazar el BIM del recinto por el que rotula el plano en ese lugar',
+    allLabel:n=>'✓ Tomar el BIM del plano en los '+n,
+    allMsg:n=>'¿Reemplazar el BIM de los '+n+' recintos visibles por el que rotula el plano de fondo en ese lugar?\n\nSi alguno está bien como está, usá 🚫 en esa fila.',
+    apply:p=>{ nameState.bim=nameState.bim||{}; nameState.bim[p.r.id]=p.bim; nameState.recintosRev['bimplano|'+p.r.id+'|'+p.bim]=1; },
+    subText:p=>'hoy '+p.actual+' → el plano rotula '+p.bim+' «'+(p.nombrePlano||'')+'»'+(p.codigoPlano?(' '+p.codigoPlano):'')+' · '+p.fl.label,
+    done:'Cada recinto dibujado tiene el BIM que rotula el plano en su lugar.'},
   bimcod:{label:'Catastro: BIM por código (completar)',
     find:_bimCodigoPendientes, approve:true, noDialog:true, flat:true,
     okTitle:'Escribir este BIM en el recinto (viene del mapa PMA por el código)',
@@ -16737,6 +16765,19 @@ async function runSelfTest(){
       return v1 && v2;
     } finally { S.level=nivel; S.editMode=ed; S.areaId=a0; _stDrag=null; window.removeEventListener('mousemove', _structDragMove); window.removeEventListener('mouseup', _structDragUp);
       _rpFix(false); Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG(); }
+  });
+  T('Revisión · BIM según el plano: el recinto que contiene el rótulo de otro BIM se propone corregir; ✓ lo reemplaza y sale de la lista', ()=>{
+    const Bp=window.BIM_PLANO, b0=nameState.bim['st_r1'], c0=nameState.codes['st_r1'], rv={...nameState.recintosRev}; _rpFix(true);
+    try{
+      nameState.bim['st_r1']='H9001'; nameState.codes['st_r1']='99.1';
+      window.BIM_PLANO={floors:{[fl.id]:[{bim:'H9002',n:'Prueba',c:'99.1',x:1000,y:1000,uso:1},{bim:'H9003',n:'Circulación',c:'',x:1500,y:1500,uso:0}]}};
+      const P=_bimPlanoPendientes().filter(p=>p.r.id==='st_r1');
+      const propone=P.length===1 && P[0].bim==='H9002' && /H9001/.test(REV_CHECKS.bimplano.subText(P[0]));
+      REV_CHECKS.bimplano.apply(P[0]); const aplica=rBim('st_r1')==='H9002' && !_bimPlanoPendientes().some(p=>p.r.id==='st_r1');
+      return propone && aplica;
+    } finally { window.BIM_PLANO=Bp; if(b0===undefined) delete nameState.bim['st_r1']; else nameState.bim['st_r1']=b0;
+      if(c0===undefined) delete nameState.codes['st_r1']; else nameState.codes['st_r1']=c0;
+      Object.keys(nameState.recintosRev).forEach(k=>{ if(!(k in rv)) delete nameState.recintosRev[k]; }); _rpFix(false); }
   });
   T('🅿 Estacionamientos: importar de Navegación (sólo plazas; el de verticales no las toca), ⎘ replicar -2 → -3 en el mismo lugar físico sin duplicar, 🅿 las oculta', ()=>{
     const snap=JSON.stringify(structuresState), NVprev=window.NAV_VERTICALES, eP=S.estac, f0=S.floorId, l0=S.level, VAprev=_VA;
