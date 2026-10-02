@@ -1016,6 +1016,8 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
         <div class="sm-h">Reloj control</div>
         <button class="struct-opt" data-kind="reloj" style="--c:#C026D3" title="Colocar a mano un reloj control (lector biométrico del control horario). Se ve en todas las vistas; se enciende y apaga con el botón ⏱ Relojes de la barra superior.">⏱ <b>Reloj control</b> <span style="opacity:.55">· lector biométrico</span></button>
         <button class="struct-opt" onclick="importarRelojesORD()" style="--c:#C026D3" title="Trae los 10 lectores biométricos propuestos en el ORD SSMO 5040029-145 (04-ago-2026, planos P1 · PS2 · PS3), ubicados en el Atlas por los rótulos comunes de los planos. Reemplaza los relojes que hubiera; los ascensores, escaleras y líneas no se tocan. Después se arrastran hasta su posición final.">⬇ <b>Importar del ORD 1441</b> <span style="opacity:.55">· 10 lectores · reemplaza</span></button>
+        <div class="sm-h">Numeración de recintos</div>
+        <button class="struct-opt" onclick="importarNumeracionREV5()" style="--c:#0E7C66" title="Trae el N° de señalética oficial (REV 5, SSMO) a cada recinto por su código BIM. Sólo escribe donde el recinto no tiene N°; los distintos quedan en Revisión.">🔢 <b>Numeración REV 5</b> <span style="opacity:.55">· sólo vacíos</span></button>
         <div class="sm-h">Estacionamientos</div>
         <button class="struct-opt" data-kind="est" style="--c:#38bdf8" title="Colocar a mano una plaza de estacionamiento (2,5 × 5 m). Después, clic sobre ella abre el panel: categoría, girar, tamaño.">🅿 <b>Plaza</b> <span style="opacity:.55">· a mano</span></button>
         <button class="struct-opt" onclick="importarEstacionamientosNav()" style="--c:#38bdf8" title="Trae las plazas dibujadas en 8.Navegacion (siembra nav_verticales.js), en el mismo lugar y con su categoría. Reemplaza los estacionamientos que hubiera; lo demás no se toca.">⬇ <b>Importar de Navegación</b> <span style="opacity:.55">· reemplaza</span></button>
@@ -1479,6 +1481,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 <script src="SHARED_DATA/correo_estaciones.js"></script>
 <script src="SHARED_DATA/planos_calibracion.js"></script>
 <script src="SHARED_DATA/bim_plano.js"></script>
+<script src="SHARED_DATA/numeracion_recintos.js"></script>
 <script src="SHARED_DATA/verticales_parches.js"></script>
 <script src="SHARED_DATA/circulacion_red.js"></script>
 <script src="SHARED_DATA/propuestos_plano.js"></script>
@@ -4761,12 +4764,16 @@ function renderL2(){
     const b=bounds(sh);
     const rStyle=`fill:${rc}22;stroke:${rc};stroke-width:3;`;
 
+    // tooltip con la señalética oficial (REV 5): N°, camas, cupos, esclusa
+    const _n5=_numREV5(room.id), _n5t=_n5?('🔢 Señalética REV 5: '+(_numValor(_n5.e)||'sin N°')+(_numInfo(_n5.e)?(' · '+_numInfo(_n5.e)):'')
+      +(rSenNum(room.id)&&_numNorm(rSenNum(room.id))!==_numNorm(_numValor(_n5.e))?(' · el Atlas tiene '+rSenNum(room.id)):'')):'';
+    const _ttR=n=>{ if(_n5t){ const t=el('title'); t.textContent=(rName(room.id)||'')+'\n'+_n5t; n.appendChild(t); } return n; };
     if(sh.length>1 && !S.editMode){
       const p=el('path',{d:unionPath(sh),class:'room-box'+(sel2?' sel':''),'fill-rule':'evenodd',style:rStyle.replace('stroke-width:3','stroke-width:4')});
-      p.addEventListener('click',onCk); svg.appendChild(p);
+      p.addEventListener('click',onCk); svg.appendChild(_ttR(p));
     } else {
       sh.forEach((s,si)=>{
-        const r=el('rect',{x:s.x,y:s.y,width:s.w,height:s.h,class:'room-box'+(sel2?' sel':''),style:rStyle});
+        const r=_ttR(el('rect',{x:s.x,y:s.y,width:s.w,height:s.h,class:'room-box'+(sel2?' sel':''),style:rStyle}));
         r.addEventListener('click',onCk);
         if(S.editMode&&S.moveMode) r.addEventListener('mousedown',e=>{e.stopPropagation();startMoveBox(e,'room',room.id,si);});
         svg.appendChild(r);
@@ -4947,7 +4954,8 @@ function renderL2(){
     // superponerse con el nombre/código centrados del recinto.
     if(rType(room.id)==='pabellon'){
       const pb=rPabellon(room.id)||'mayor';
-      svg.appendChild(txt(b.x+b.w/2, b.y+b.h - fs*1.7, `🔪 ${PABELLON_LBL[pb]||pb}`,
+      const _pn=rSenNum(room.id), _pnum=/^\d{1,2}$/.test(String(_pn).trim())?(' · Pab. '+String(_pn).trim().padStart(2,'0')):'';
+      svg.appendChild(txt(b.x+b.w/2, b.y+b.h - fs*1.7, `🔪 ${PABELLON_LBL[pb]||pb}${_pnum}`,
         {fill:'#115e59', stroke:'#ffffff', 'stroke-width':fs*.2, 'paint-order':'stroke fill',
          'font-size':fs*.6, 'pointer-events':'none', 'font-family':'Segoe UI,sans-serif', 'font-weight':'900'}));
     }
@@ -12956,6 +12964,74 @@ function _variosSvPendientes(){
   });
   return out;
 }
+// ── Numeración oficial de señalética · RDI 1361 REV 5 (SHARED_DATA/numeracion_recintos.js) ──
+// Amarre SOLO por BIM (rBim). El número manda desde la REV 5, pero nunca pisa lo que el
+// Atlas ya tenga distinto: eso queda en Revisión («Señalética: N° del Atlas ≠ REV 5»).
+function _numREV5(rid){
+  const N=window.NUMERACION_RECINTOS; if(!N||!N.por_bim) return null;
+  const bs=((rBim(rid)||'').toUpperCase().match(/[AHI]\d{4}/g))||[];
+  for(const b of bs){ const e=N.por_bim[b]; if(e) return {bim:b,e}; }
+  return null;
+}
+// valor a escribir: el N°; en salas con cupos, su rótulo («RECUPERACIÓN 1») si lo trae
+function _numValor(e){
+  if(!e) return '';
+  if(e.numero) return String(e.numero).trim();
+  if(e.clase==='sala con cupos' && e.sala && /^[A-ZÁÉÍÓÚÑ.\- ]+\s\d+$/.test(String(e.sala).trim())) return String(e.sala).trim();
+  return '';
+}
+function _numNorm(v){ return String(v==null?'':v).trim().toUpperCase().replace(/\s+/g,' ').replace(/^0+(?=\d)/,''); }
+function _numInfo(e){
+  if(!e) return '';
+  const p=[];
+  if(e.camas&&e.camas.length) p.push('camas '+e.camas.join(' · '));
+  if(e.cupos&&e.cupos.length) p.push('cupos '+e.cupos.join(', '));
+  if(e.esclusa) p.push('letrero en la esclusa '+e.esclusa);
+  return p.join(' · ');
+}
+function importarNumeracionREV5(sinConfirmar){
+  const N=window.NUMERACION_RECINTOS; if(!N||!N.por_bim){ if(!sinConfirmar) alert('No se encontró SHARED_DATA/numeracion_recintos.js'); return null; }
+  const R={escritos:0,iguales:0,distintos:0,sinMatriz:0,sinBim:0,sinValor:0}, nuevos=[];
+  FLOORS.forEach(fl=>fl.areas.forEach(a=>(a.rooms||[]).forEach(r=>{
+    if(!(rBim(r.id)||'').trim()){ R.sinBim++; return; }
+    const m=_numREV5(r.id); if(!m){ R.sinMatriz++; return; }
+    const v=_numValor(m.e); if(!v){ R.sinValor++; return; }
+    const cur=rSenNum(r.id);
+    if(!String(cur).trim()) nuevos.push([r.id,v]);
+    else if(_numNorm(cur)===_numNorm(v)) R.iguales++;
+    else R.distintos++;
+  })));
+  R.escritos=nuevos.length;
+  if(S.viewOnly) return R;                                   // consulta: no escribe
+  if(!sinConfirmar && !confirm('Importar la numeración oficial de señalética (RDI 1361 REV 5, SSMO)?\n\n'
+      +R.escritos+' recintos sin N° lo reciben · '+R.iguales+' ya coinciden · '+R.distintos+' tienen OTRO N° en el Atlas y no se tocan (quedan en Revisión).\nEl amarre es por código BIM.')) return null;
+  nameState.senalNum=nameState.senalNum||{}; nameState.recintosRev=nameState.recintosRev||{};
+  nuevos.forEach(([rid,v])=>{ nameState.senalNum[rid]=v; nameState.recintosRev['senalnum|'+rid+'|'+v]=1; });
+  if(nuevos.length){ sNames(); renderSVG(); }
+  try{ renderBimPending(); }catch(e){}
+  if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🔢 '+R.escritos+' números de señalética importados (REV 5) · '+R.iguales+' iguales · '+R.distintos+' con otro número en el Atlas (ver Revisión) · '+R.sinMatriz+' recintos con BIM fuera de la matriz'; setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },12000); }
+  return R;
+}
+// Una vez por versión de la siembra (como el correo neumático); en consulta no escribe.
+function _numAutoImport(){
+  const N=window.NUMERACION_RECINTOS; if(!N||!N.por_bim||S.viewOnly) return null;
+  let v=null; try{ v=localStorage.getItem('cabida_senalnum_siembra'); }catch(e){}
+  if(v===N.generado) return null;
+  const R=importarNumeracionREV5(true); _lsPref('cabida_senalnum_siembra', N.generado||'1');
+  return R;
+}
+window.addEventListener('load',()=>setTimeout(()=>{ if(typeof _SELFTEST!=='undefined'&&_SELFTEST) return; try{ _numAutoImport(); }catch(e){ console.warn('numeración REV 5: importación automática',e); } }, 1600));
+function _senalNumPendientes(){
+  const out=[];
+  FLOORS.forEach(fl=>fl.areas.forEach(a=>(a.rooms||[]).forEach(r=>{
+    const cur=rSenNum(r.id); if(!String(cur).trim()) return;
+    const m=_numREV5(r.id); if(!m) return;
+    const v=_numValor(m.e); if(!v || _numNorm(cur)===_numNorm(v)) return;
+    if(nameState.recintosRev['senalnum|'+r.id+'|'+v]) return;
+    out.push({fl,area:a,r,bim:m.bim,actual:cur,rev5:v,nombre:m.e.nombre||''});
+  })));
+  return out;
+}
 // BIM según el rótulo del plano (SHARED_DATA/bim_plano.js, planos CRA): un recinto
 // dibujado que contiene el rótulo de un BIM que no es el suyo. Sólo rótulos de
 // recintos con uso (no circulaciones, shafts, pozos, escaleras ni rampas).
@@ -12976,6 +13052,14 @@ function _bimPlanoPendientes(){
   return out;
 }
 const REV_CHECKS={
+  senalnum:{label:'Señalética: N° del Atlas ≠ REV 5',
+    find:_senalNumPendientes, approve:true, noDialog:true, flat:true,
+    okTitle:'Escribir el N° oficial de la REV 5 (el 🚫 deja el del Atlas)',
+    allLabel:n=>'✓ Tomar el N° de la REV 5 en los '+n,
+    allMsg:n=>'¿Reemplazar el N° del Atlas por el de la REV 5 en los '+n+' recintos visibles?\n\nEs la numeración oficial del SSMO; si el Atlas tiene razón, usá 🚫 en cada uno.',
+    apply:p=>{ nameState.senalNum=nameState.senalNum||{}; nameState.senalNum[p.r.id]=p.rev5; nameState.recintosRev['senalnum|'+p.r.id+'|'+p.rev5]=1; },
+    subText:p=>'BIM '+p.bim+' · Atlas '+p.actual+' vs REV 5 '+p.rev5+' («'+p.nombre+'») · '+p.fl.label,
+    done:'Todos los N° de señalética coinciden con la REV 5, o quedaron confirmados.'},
   bimplano:{label:'Catastro: BIM según el rótulo del plano',
     find:_bimPlanoPendientes, approve:true, noDialog:true, flat:true,
     okTitle:'Reemplazar el BIM del recinto por el que rotula el plano en ese lugar',
@@ -15289,7 +15373,7 @@ async function runSelfTest(){
   // Testigo: al terminar, NINGUNA preferencia del usuario puede haber cambiado.
   const _PREFS=['cabida_room_labels','cabida_show_dotnames','cabida_box_vis','cabida_plan_kind',
                 'cabida_show_asign','cabida_show_sen','cabida_scenario','cabida_rp_collapsed',
-                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures','cabida_ubic','cabida_jardines','cabida_verticales','cabida_relojes','cabida_correo_n','cabida_cn_siembra','cabida_show_tomas','cabida_show_gases','cabida_show_puertas','cabida_fk_cerradas','cabida_estac','cabida_show_ccdd','cabida_solo_reemp','cabida_show_pc'];
+                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures','cabida_ubic','cabida_jardines','cabida_verticales','cabida_relojes','cabida_correo_n','cabida_cn_siembra','cabida_show_tomas','cabida_show_gases','cabida_show_puertas','cabida_fk_cerradas','cabida_estac','cabida_senalnum_siembra','cabida_show_ccdd','cabida_solo_reemp','cabida_show_pc'];
   const _PREV={}; _PREFS.forEach(k=>{ try{ _PREV[k]=localStorage.getItem(k); }catch(e){ _PREV[k]=null; } });
   // r==='omitir' ⇒ la prueba necesita recintos dibujados y este navegador no tiene ninguno (p. ej. un preview con
   // almacenamiento vacío): se informa como ⚪ omitida, ni verde ni roja. Con dibujo, la prueba corre completa.
@@ -16765,6 +16849,21 @@ async function runSelfTest(){
       return v1 && v2;
     } finally { S.level=nivel; S.editMode=ed; S.areaId=a0; _stDrag=null; window.removeEventListener('mousemove', _structDragMove); window.removeEventListener('mouseup', _structDragUp);
       _rpFix(false); Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG(); }
+  });
+  T('Numeración REV 5: importar escribe sólo donde senalNum está vacío, deja intacto lo distinto (queda en Revisión) y no repite', ()=>{
+    const Np=window.NUMERACION_RECINTOS, snap=JSON.stringify({b:nameState.bim,n:nameState.senalNum,rv:nameState.recintosRev}); _rpFix(true);
+    try{
+      nameState.bim['st_r1']='H9101'; nameState.bim['st_r2']='H9102 / H9103';
+      nameState.senalNum['st_r1']='999'; delete nameState.senalNum['st_r2'];
+      window.NUMERACION_RECINTOS={generado:'st',por_bim:{H9101:{numero:'301',nombre:'Hab',camas:['301-01']},H9103:{numero:'',clase:'sala con cupos',sala:'RECUPERACIÓN 1',cupos:['1','2'],nombre:'Sala'}}};
+      const R=importarNumeracionREV5(true);
+      const escribe=rSenNum('st_r2')==='RECUPERACIÓN 1' && rSenNum('st_r1')==='999' && R.escritos>=1 && R.distintos>=1;
+      const P=_senalNumPendientes().filter(p=>p.r.id==='st_r1'); const rev=P.length===1 && P[0].rev5==='301' && /Atlas 999 vs REV 5 301/.test(REV_CHECKS.senalnum.subText(P[0]));
+      const R2=importarNumeracionREV5(true); const noRepite=R2.escritos===0 && rSenNum('st_r1')==='999';
+      REV_CHECKS.senalnum.apply(P[0]); const aplica=rSenNum('st_r1')==='301' && !_senalNumPendientes().some(p=>p.r.id==='st_r1');
+      const norm=_numNorm(' 014 ')===_numNorm('14') && _numInfo({camas:['301-01'],cupos:['1']})==='camas 301-01 · cupos 1';
+      return escribe && rev && noRepite && aplica && norm;
+    } finally { window.NUMERACION_RECINTOS=Np; const o=JSON.parse(snap); nameState.bim=o.b; nameState.senalNum=o.n; nameState.recintosRev=o.rv; _rpFix(false); }
   });
   T('Revisión · BIM según el plano: el recinto que contiene el rótulo de otro BIM se propone corregir; ✓ lo reemplaza y sale de la lista', ()=>{
     const Bp=window.BIM_PLANO, b0=nameState.bim['st_r1'], c0=nameState.codes['st_r1'], rv={...nameState.recintosRev}; _rpFix(true);
