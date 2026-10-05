@@ -3,7 +3,7 @@
 <head>
 <script src="pm_config.js"></script>
 <script src="pm_gate.js"></script>
-<style>/*HUB-PM*/ body:not(.pm-export) #expDD, body:not(.pm-editor) #wsModal, body:not(.pm-export-dot) #expDD [onclick^="exportPuestosTrabajo"], body:not(.pm-export-dot) #expDD [onclick^="exportAsignaciones"], #expDD [onclick^="exportBackup"], #expDD [onclick^="exportWebData"], #expDD [onclick^="publicarAtlasPM"], #expDD [onclick^="fbakAhora"], #expDD [onclick^="fbakRestaurar"], #expDD [onclick^="diagGuardado"], #expDD [onclick^="copyConsultaLink"], #expDD [onclick^="exportForWeb"], #expDD [onclick*="_abHandle"] { display:none !important; }</style>
+<style>/*HUB-PM*/ body:not(.pm-export) #expDD, body:not(.pm-editor) #wsModal, body:not(.pm-export-dot) #expDD [onclick^="exportPuestosTrabajo"], body:not(.pm-export-dot) #expDD [onclick^="exportAsignaciones"], body:not(.pm-export-dot) #btnDotServ, #expDD [onclick^="exportBackup"], #expDD [onclick^="exportWebData"], #expDD [onclick^="publicarAtlasPM"], #expDD [onclick^="fbakAhora"], #expDD [onclick^="fbakRestaurar"], #expDD [onclick^="diagGuardado"], #expDD [onclick^="copyConsultaLink"], #expDD [onclick^="exportForWeb"], #expDD [onclick*="_abHandle"] { display:none !important; }</style>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>HDS · Atlas — Consulta Web</title>
@@ -642,7 +642,14 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 
 /* ── Modales: un solo estilo (encabezado blanco, sin degradado) ──────────── */
 #fichaModal,#estadoModal,#equipModal{position:fixed;inset:0;background:rgba(15,22,34,.5);display:none;align-items:center;justify-content:center;z-index:120;padding:20px}
-#fichaModal.show,#estadoModal.show,#equipModal.show,#dgModal.show{display:flex}
+#fichaModal.show,#estadoModal.show,#equipModal.show,#dgModal.show,#dsModal.show{display:flex}
+#dsModal{position:fixed;inset:0;background:rgba(15,30,52,.55);display:none;align-items:center;justify-content:center;z-index:150;padding:16px}
+.ds-modos{display:flex;flex-direction:column;gap:6px;font-size:13px;margin-bottom:12px}
+.ds-t{font-size:11px;font-weight:var(--fw-medium);color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.ds-us{display:flex;flex-direction:column;gap:5px;font-size:12px;max-height:260px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r-md);padding:8px 10px}
+.ds-us small{color:var(--text-3);margin-left:4px}
+.ds-n{font-size:12px;color:var(--text-2);margin:10px 0}
+.ds-btns{display:flex;gap:8px}
 #dgModal{position:fixed;inset:0;background:rgba(15,30,52,.55);display:none;align-items:center;justify-content:center;z-index:150;padding:16px}
 .ficha-box.dg-box{width:1000px}
 .srv-dg{display:block;width:100%;margin:6px 0 10px;padding:8px 10px;border:1px solid var(--accent-300);border-radius:var(--r-md);background:var(--accent-50);color:var(--accent-700);font:inherit;font-size:12px;font-weight:var(--fw-medium);cursor:pointer;text-align:left}
@@ -1007,6 +1014,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <span class="tb-div"></span>
       <button class="tb-btn" id="btnExpServ" onclick="exportServicioHTML()" style="display:none" title="Exportar este servicio como HTML autónomo: imagen del plano recortada al contorno punteado, recintos clicables con su ficha (equipamiento, mobiliario, TI, MNC) y opción de ocultar las cajas. No incluye información de funcionarios.">📄 Exportar servicio</button>
       <button class="tb-btn" id="btnMapaServ" onclick="exportMapaServicio()" style="display:none" title="Mapa de navegación de este servicio en página carta: plano a página completa, recintos numerados y leyenda con nombre, código y señalética. Se guarda el HTML y se abre el diálogo de impresión para Guardar como PDF. Sin funcionarios.">🗺 Mapa carta (PDF)</button>
+      <button class="tb-btn" id="btnDotServ" onclick="openDotServicio()" style="display:none" title="Dotación de ESTE servicio, como la exportación general de cubicación pero sólo del servicio: completa, cubicada (con puesto en el Atlas) o no cubicada (sin puesto). PDF carta para imprimir o Excel.">👥 Dotación del servicio</button>
       <button class="tb-btn" id="btnMurosServ" onclick="exportMurosServicio()" style="display:none" title="Medidas de muros del servicio en hoja carta, para instalar mobiliario: cada recinto con su contorno sobre el plano, cada muro numerado con su largo, y tabla por muro (orientación, largo, puertas y tramo libre). Portada con el plano del servicio numerado. Se abre el diálogo de impresión para Guardar como PDF.">📐 Muros carta (PDF)</button>
       <button class="tb-btn" id="btnOrdenarDots" onclick="ordenarDots()" style="display:none" title="Ordenar los puestos del recinto en una cuadrícula alineada, con espacio suficiente para que las tarjetas de nombre no se superpongan">⊞ Ordenar puestos</button>
       <button class="tb-btn" id="btnPuertas" onclick="togglePuertaMode()" style="display:none" title="Puertas de acceso y salida de cada recinto: flecha sobre el muro que indica la salida. Clic en el borde de un recinto coloca puerta normal (90 cm); Alt+clic camilla (120 cm); Shift+clic pabellón (200 cm). ⌘+clic sobre una puerta rota el tipo (90→120→200) · arrastrar la mueve · doble clic la elimina.">🚪 Puertas</button>
@@ -1208,6 +1216,15 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="ficha-x" onclick="closeEstado()" title="Cerrar">×</button>
     </div>
     <div class="ficha-body" id="estadoBody"></div>
+  </div>
+</div>
+<div id="dsModal" onclick="if(event.target===this)closeDotServicio()">
+  <div class="ficha-box">
+    <div class="ficha-head">
+      <div><div class="ficha-title">👥 Dotación del servicio</div><div class="ficha-sub" id="dsSub"></div></div>
+      <button class="ficha-x" onclick="closeDotServicio()" title="Cerrar">×</button>
+    </div>
+    <div class="ficha-body" id="dsBody"></div>
   </div>
 </div>
 <div id="dgModal" onclick="if(event.target===this)closeDigedep()">
@@ -6802,7 +6819,7 @@ const DOCK_MAPA=[
   ['dkCons',  ['btnFicha','btnAutSan','btnEquip','btnMob','btnScen','btnMoves','btnServPuestos']],
   ['dkEdit2', ['btnUndo','btnDraw','btnMerge','btnUnmerge','btnRename','btnDel','btnDelDot','btnOrdenarDots']],
   ['dkAdd',   ['btnPuertas','puertaTipoSel','btnPuertaDel','btnPuertaDelAll','btnPuertasAuto','btnDupMueble','btnStruct']],
-  ['dkExp',   ['btnExpServ','btnMapaServ','btnMurosServ']]
+  ['dkExp',   ['btnExpServ','btnMapaServ','btnMurosServ','btnDotServ']]
 ];
 function _dockMonta(){
   const dock=document.getElementById('dock'); if(!dock||dock._montado) return;
@@ -14086,7 +14103,8 @@ function updateUI(){
     if(S.level!==3&&S.stampMode){ S.stampMode=false; if(bdm)bdm.classList.remove('active'); const sh=document.getElementById('stampHint'); if(sh)sh.classList.remove('show'); svg.style.cursor=''; }
     const bxs=document.getElementById('btnExpServ'); if(bxs) bxs.style.display=(S.level===2)?'':'none';
     const bms=document.getElementById('btnMapaServ'); if(bms) bms.style.display=(S.level===2)?'':'none';
-    const bmu=document.getElementById('btnMurosServ'); if(bmu) bmu.style.display=(S.level===2)?'':'none'; }
+    const bmu=document.getElementById('btnMurosServ'); if(bmu) bmu.style.display=(S.level===2)?'':'none';
+    const bds=document.getElementById('btnDotServ'); if(bds) bds.style.display=(S.level===2)?'':'none'; }
   // Area jump selector: show at level 1 so user can navigate to any area (even without drawn shape)
   if(S.level===1 && fl){
     const undrawn=fl.areas.filter(a=>(boxState.areas[a.id]||[]).length===0 && a.rooms && a.rooms.length>0);
@@ -14912,6 +14930,126 @@ function exportMurosServicio(soloHtml){
   if(w){ w.document.open(); w.document.write(html); w.document.close(); w.onload=()=>setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){} },500); }
   else if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='📐 Muros guardados en Servicios/'+nom+' — el navegador bloqueó la ventana: ábrelo y usa Imprimir → Guardar PDF'; setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },7000); }
   return html;
+}
+// ══ DOTACIÓN DEL SERVICIO (vista 2) · cubicada / no cubicada ══════════════════
+// La misma lógica que la exportación general «Cubicación Dotación HDS», pero sólo del
+// servicio abierto. El servicio del Atlas (área) no es una unidad de la matriz: se toman
+// las UNIDADES de la dotación que tienen gente en este servicio (preseleccionadas las que
+// tienen aquí al menos 2 personas y la mitad o más de su gente con puesto) y, además,
+// quien tiene puesto en el servicio siendo de otra unidad, fuera de matriz o compra de
+// servicio. Cubicada = con puesto en el Atlas; no cubicada = sin puesto.
+// Formato del PDF: el de «Cubicación Dotación HDS · Unidad de Cuidados en Pabellón»
+// (carta vertical, una fila por persona, Funciones específicas al final).
+function _dsAsigMap(){
+  const M=new Map();
+  for(const fl of FLOORS) for(const area of fl.areas) for(const room of (area.rooms||[])){
+    ((wsState.dots||{})[room.id]||[]).forEach(d=>{
+      const base={piso:fl.label, areaId:area.id, area:aName(area.id), recinto:rName(room.id), rid:room.id};
+      const add=(nom,extra)=>{ if(!nom||!String(nom).trim()) return; const k=norm(nom); if(!M.has(k)) M.set(k,[]); M.get(k).push({...base,nombre:nom,...extra}); };
+      if(d.tipo==='dinamico') (d.turnos||[]).forEach(t=>{ add(t.nombre,{cargo:t.cargo,estamento:t.estamento,cds:!!t.cds,externa:!!t.externa}); if(t.reemplazo&&_reempVigente(t.reemplazo)) add(t.reemplazo.reemplazante,{reemplazo:true}); });
+      else { add(d.nombre,{cargo:d.cargo,estamento:d.estamento,cds:!!d.cds,externa:!!d.externa}); if(d.reemplazo&&_reempVigente(d.reemplazo)) add(d.reemplazo.reemplazante,{reemplazo:true}); }
+    });
+  }
+  return M;
+}
+function _dsUnidades(area, M){
+  M=M||_dsAsigMap(); const aqui={}, asig={}, tam={};
+  ((dotDB&&dotDB.staff)||[]).forEach(s=>{ if(_esBaja(s.nombre)) return; const u=s.unidad||'(sin unidad)', a=M.get(norm(s.nombre))||[];
+    tam[u]=(tam[u]||0)+1; if(a.length){ asig[u]=(asig[u]||0)+1; if(a.some(x=>x.areaId===area.id)) aqui[u]=(aqui[u]||0)+1; } });
+  return Object.keys(aqui).map(u=>({u, aqui:aqui[u], asig:asig[u]||0, tam:tam[u]||0, sel:aqui[u]>=2 && aqui[u]/(asig[u]||1)>=0.5}))
+    .sort((a,b)=>b.aqui-a.aqui || a.u.localeCompare(b.u,'es'));
+}
+// Filas: una por persona (si tiene puestos en este servicio, una por cada uno)
+function _dsFilas(area, unidades, modo, M){
+  M=M||_dsAsigMap(); const U=new Set(unidades), filas=[], visto=new Set();
+  const fila=(s,a,asignado,origen)=>({sd:s.subdireccion||'', unidad:s.unidad||'', asignado, origen, rut:s.rut||'', nombre:s.nombre||'', estamento:s.estamento||'',
+    calidad:s.calidad||'', turno:s.turno||'', cargo:s.cargo||'', piso:a?String(a.piso).replace(/^Piso\s*/i,''):'', recinto:a?a.recinto:'', area:a?a.area:'', func:_funcTexto(s.nombre||'')});
+  ((dotDB&&dotDB.staff)||[]).forEach(s=>{
+    if(!U.has(s.unidad||'(sin unidad)') || _esBaja(s.nombre)) return;
+    const k=norm(s.nombre)+'|'+(s.unidad||'')+'|'+(s.cargo||''); if(visto.has(k)) return; visto.add(k);
+    const a=M.get(norm(s.nombre))||[], aqui=a.filter(x=>x.areaId===area.id), cds=/COMPRA/i.test(String(s.calidad||'')+String(s.ley||''));
+    const flag=(a.length?'SÍ':'NO')+(cds?' · COMPRA DE SERVICIO':'')+(a.length&&!aqui.length?' · OTRO SERVICIO':'');
+    if(modo==='cub' && !a.length) return; if(modo==='nocub' && a.length) return;
+    if(aqui.length) aqui.forEach(x=>filas.push(fila(s,x,flag,'unidad'))); else filas.push(fila(s,a[0]||null,flag,'unidad'));
+  });
+  // con puesto en el servicio pero de otra unidad, fuera de matriz o compra de servicio
+  const idx=new Map(); ((dotDB&&dotDB.staff)||[]).forEach(x=>{ const kk=norm(x.nombre); if(!idx.has(kk)||U.has(x.unidad||'(sin unidad)')) idx.set(kk,x); });
+  if(modo!=='nocub') M.forEach((arr,k)=>{
+    const aqui=arr.filter(x=>x.areaId===area.id); if(!aqui.length) return;
+    const st=idx.get(k)||null; if(st && U.has(st.unidad||'(sin unidad)')) return;
+    const s=st||{nombre:arr[0].nombre, estamento:aqui[0].estamento||'', cargo:aqui[0].cargo||''};
+    const flag='SÍ · '+(st?'OTRA UNIDAD':(aqui.some(x=>x.cds)?'COMPRA DE SERVICIO':'FUERA DE MATRIZ'));
+    aqui.forEach(x=>filas.push(fila(s,x,flag,st?'otra':'fuera')));
+  });
+  const ord=['MEDICOS','PROFESIONALES','TECNICOS','AUXILIARES','ADMINISTRATIVOS'];
+  const oi=e=>{ const i=ord.indexOf(String(e||'').toUpperCase()); return i<0?99:i; };
+  filas.sort((x,y)=>(x.origen==='unidad'?0:1)-(y.origen==='unidad'?0:1) || String(x.unidad).localeCompare(String(y.unidad),'es') || oi(x.estamento)-oi(y.estamento)
+    || String(x.estamento).localeCompare(String(y.estamento),'es') || String(x.nombre).localeCompare(String(y.nombre),'es'));
+  return filas;
+}
+function _dsResumen(area, unidades, M){
+  M=M||_dsAsigMap(); const U=new Set(unidades), r={};
+  ((dotDB&&dotDB.staff)||[]).forEach(s=>{ const u=s.unidad||'(sin unidad)'; if(!U.has(u)||_esBaja(s.nombre)) return; const o=r[u]=r[u]||{sd:s.subdireccion||'',n:0,a:0,aqui:0};
+    const a=M.get(norm(s.nombre))||[]; o.n++; if(a.length) o.a++; if(a.some(x=>x.areaId===area.id)) o.aqui++; });
+  return r;
+}
+const _DS_MODO={todo:'Dotación completa',cub:'Dotación cubicada (con puesto)',nocub:'Dotación no cubicada (sin puesto)'};
+function _dsHTML(area, unidades, modo){
+  const M=_dsAsigMap(), F=_dsFilas(area,unidades,modo,M), Rz=_dsResumen(area,unidades,M), conRut=F.some(f=>f.rut);
+  const e=x=>String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;'), hoy=new Date().toLocaleDateString('es-CL'), srv=aName(area.id), fl=curFloor();
+  const cols=['Subdirección','Unidad','Asignado'].concat(conRut?['RUT']:[]).concat(['Nombre','Estamento','Calidad','Turno','Cargo','Piso','Recinto','Funciones específicas (TENS · enfermería)']);
+  const res=Object.entries(Rz).map(([u,o])=>'<div>Subdirección: '+e(o.sd)+' · Unidad: <b>'+e(u)+'</b> · '+o.n+' personas · asignadas '+o.a+' · sin asignar '+(o.n-o.a)+' · con puesto en este servicio '+o.aqui+'</div>').join('');
+  const extra=F.filter(f=>f.origen!=='unidad').length;
+  return '<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Dotación '+e(srv)+' · Atlas HDS</title><style>'
+    +'@page{size:letter portrait;margin:12mm 10mm}body{font-family:Helvetica,Arial,sans-serif;font-size:7.6pt;color:#111;margin:0}'
+    +'.cab{font-size:7pt;color:#555;margin-bottom:4px}h1{font-size:13pt;margin:2px 0 4px}.res{font-size:7.6pt;margin-bottom:8px;line-height:1.5}'
+    +'table{width:100%;border-collapse:collapse;table-layout:fixed}thead{display:table-header-group}th{background:#1e3a5f;color:#fff;font-weight:bold;text-align:left;padding:3px 3px;font-size:7pt;vertical-align:bottom}'
+    +'td{border-bottom:.5pt solid #c9d3df;padding:2.5px 3px;vertical-align:top;word-wrap:break-word}tr{page-break-inside:avoid}'
+    +'tr.no td{background:#fdecec}tr.otra td{background:#fff7e6}.pie{margin-top:8px;font-size:6.8pt;color:#666}'
+    +'</style></head><body><div class="cab">Cubicación Dotación HDS · '+e(hoy)+' · '+e(srv)+(fl?(' · '+e(fl.label)):'')+' · Atlas HDS</div>'
+    +'<h1>'+e(_DS_MODO[modo])+' · '+e(srv)+'</h1><div class="res">'+res+(extra?('<div>Además, '+extra+' puesto(s) del servicio con personas de otra unidad, fuera de la matriz o compra de servicio (al final, en ámbar).</div>'):'')
+    +'<div><b>'+F.length+'</b> filas en este listado.</div></div>'
+    +'<table><colgroup>'+[10,10,7].concat(conRut?[8]:[]).concat([15,9,8,6,10,4,(conRut?8:11),(conRut?5:10)]).map(w=>'<col style="width:'+w+'%">').join('')+'</colgroup><thead><tr>'+cols.map(c=>'<th>'+e(c)+'</th>').join('')+'</tr></thead><tbody>'
+    +F.map(f=>'<tr class="'+(/^NO/.test(f.asignado)?'no':(f.origen!=='unidad'?'otra':''))+'"><td>'+e(f.sd)+'</td><td>'+e(f.unidad)+'</td><td>'+e(f.asignado)+'</td>'+(conRut?('<td>'+e(f.rut)+'</td>'):'')
+      +'<td><b>'+e(f.nombre)+'</b></td><td>'+e(f.estamento)+'</td><td>'+e(f.calidad)+'</td><td>'+e(f.turno)+'</td><td>'+e(f.cargo)+'</td><td>'+e(f.piso)+'</td><td>'+e(f.recinto)+(f.area&&f.area!==srv?(' <i>('+e(f.area)+')</i>'):'')+'</td><td>'+e(f.func)+'</td></tr>').join('')
+    +'</tbody></table><div class="pie">Fuente: matriz de dotación y asignaciones de puestos del Atlas HDS. Unidades incluidas: '+e(unidades.join(' · '))+'.</div></body></html>';
+}
+let _dsModo='todo', _dsSel=null;
+function openDotServicio(){
+  if(S.level!==2||!curArea()){ alert('Entra a un servicio (vista 2) para exportar su dotación.'); return; }
+  if(!dotDB||!dotDB.staff||!dotDB.staff.length){ alert('La base de dotación no está cargada.'); return; }
+  _dsSel=null; document.getElementById('dsModal').classList.add('show'); renderDotServicio();
+}
+function closeDotServicio(){ document.getElementById('dsModal').classList.remove('show'); }
+function dsModo(m){ _dsModo=m; renderDotServicio(); }
+function dsUnidad(u,on){ if(on) _dsSel.add(u); else _dsSel.delete(u); renderDotServicio(); }
+function renderDotServicio(){
+  const a=curArea(), body=document.getElementById('dsBody'); if(!a||!body) return;
+  const e=x=>String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  const M=_dsAsigMap(), U=_dsUnidades(a,M); if(!_dsSel) _dsSel=new Set(U.filter(x=>x.sel).map(x=>x.u));
+  const F=_dsFilas(a,[..._dsSel],_dsModo,M);
+  document.getElementById('dsSub').textContent=aName(a.id)+' · '+(curFloor()?curFloor().label:'');
+  body.innerHTML='<div class="ds-modos">'+Object.entries(_DS_MODO).map(([k,l])=>'<label><input type="radio" name="dsm" '+(_dsModo===k?'checked':'')+' onchange="dsModo(\''+k+'\')"> '+l+'</label>').join('')+'</div>'
+    +'<div class="ds-t">Unidades de la dotación con gente en este servicio</div><div class="ds-us">'
+    +U.map(x=>'<label><input type="checkbox" '+(_dsSel.has(x.u)?'checked':'')+' onchange="dsUnidad(\''+e(x.u).replace(/'/g,"\\'")+'\',this.checked)"> <b>'+e(x.u)+'</b> <small>'+x.aqui+' con puesto aquí · '+x.asig+' con puesto en el Atlas · '+x.tam+' en la unidad</small></label>').join('')+'</div>'
+    +'<div class="ds-n">'+F.length+' filas · '+F.filter(f=>/^SÍ/.test(f.asignado)).length+' con puesto · '+F.filter(f=>/^NO/.test(f.asignado)).length+' sin puesto</div>'
+    +'<div class="ds-btns"><button class="tb-btn" onclick="exportDotServicio(\'pdf\')">📄 PDF carta (imprimir)</button><button class="tb-btn" onclick="exportDotServicio(\'xlsx\')">⬇ Excel</button></div>';
+}
+function exportDotServicio(fmt){
+  const a=curArea(); if(!a) return; const U=[...(_dsSel||[])]; if(!U.length){ alert('Elige al menos una unidad.'); return; }
+  const base='Dotacion_'+(_dsModo==='cub'?'cubicada_':_dsModo==='nocub'?'no_cubicada_':'')+String(aName(a.id)).replace(/[^A-Za-z0-9Ññ]+/g,'_').replace(/^_|_$/g,'')+'_'+new Date().toISOString().slice(0,10);
+  if(fmt==='xlsx'){
+    const F=_dsFilas(a,U,_dsModo), conRut=F.some(f=>f.rut);
+    const rows=[['Subdirección','Unidad','Asignado'].concat(conRut?['RUT']:[]).concat(['Nombre','Estamento','Calidad','Turno','Cargo','Piso','Recinto','Servicio (Atlas)','Funciones específicas (TENS · enfermería)'])];
+    F.forEach(f=>rows.push([f.sd,f.unidad,f.asignado].concat(conRut?[f.rut]:[]).concat([f.nombre,f.estamento,f.calidad,f.turno,f.cargo,f.piso,f.recinto,f.area,f.func])));
+    xlsxDownload(rows,'Dotación servicio',base+'.xlsx',[{wch:30},{wch:30},{wch:16}].concat(conRut?[{wch:12}]:[]).concat([{wch:34},{wch:16},{wch:14},{wch:10},{wch:26},{wch:6},{wch:24},{wch:22},{wch:30}]));
+    return;
+  }
+  const html=_dsHTML(a,U,_dsModo);
+  try{ guardarArchivo('Servicios', base+'.html', html, 'text/html'); }catch(e){}
+  const w=window.open('', '_blank');
+  if(w){ w.document.open(); w.document.write(html); w.document.close(); w.onload=()=>setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){} },400); }
+  else if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='👥 Dotación guardada en Servicios/'+base+'.html — el navegador bloqueó la ventana: ábrelo y usa Imprimir → Guardar PDF'; setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },9000); }
 }
 // ═══ EXPORTS DE RECINTOS Y DE PUESTOS DE TRABAJO (18-sep-2026) ══════════════
 // Libro XLSX de varias hojas. Cada hoja: {name, rows, colW, hdr (fila de
@@ -17180,6 +17318,22 @@ async function runSelfTest(){
       const zona=_dgZonaAuto('st_r1')==='quir' && _dgZonaAuto('st_r2')==='recup';
       return cupos && req && tiene && manual && zona && DG_T7.length===20;
     } finally { const o=JSON.parse(snap); wsState.dots=o.d; wsState.beds=o.b; nameState.types=o.t; nameState.rooms=o.n; if(o.z===undefined) delete nameState.digedepZona; else nameState.digedepZona=o.z; delete boxState.rooms['st_r2']; _rpFix(false); }
+  });
+  T('👥 Dotación del servicio: unidades del servicio, cubicada / no cubicada / completa y los de otra unidad o fuera de matriz', ()=>{
+    const stPrev=dotDB.staff, dPrev=JSON.stringify(wsState.dots); _rpFix(true);
+    try{
+      dotDB.staff=stPrev.concat([{nombre:'ZZ UNO',unidad:'ZZ UNIDAD',subdireccion:'ZZ SD',estamento:'TECNICOS',cargo:'TENS',rut:'1-9'},
+        {nombre:'ZZ DOS',unidad:'ZZ UNIDAD',subdireccion:'ZZ SD',estamento:'PROFESIONALES',cargo:'ENFERMERA',rut:'2-7'},
+        {nombre:'ZZ TRES',unidad:'ZZ UNIDAD',subdireccion:'ZZ SD',estamento:'AUXILIARES',cargo:'AUXILIAR',rut:'3-5'}]);
+      wsState.dots['st_r1']=[{id:'a',x:1,y:1,tipo:'fijo',nombre:'ZZ UNO'},{id:'b',x:1,y:1,tipo:'fijo',nombre:'ZZ DOS'},{id:'c',x:1,y:1,tipo:'fijo',nombre:'ZZ EXTERNO',cargo:'TENS',estamento:'TECNICOS'}];
+      const area=fl.areas.find(a=>a.id==='st_a'), U=_dsUnidades(area); const u=U.find(x=>x.u==='ZZ UNIDAD');
+      const unidad=!!u && u.sel && u.aqui===2 && u.tam===3;
+      const todo=_dsFilas(area,['ZZ UNIDAD'],'todo'), cub=_dsFilas(area,['ZZ UNIDAD'],'cub'), no=_dsFilas(area,['ZZ UNIDAD'],'nocub');
+      const cuenta=todo.length===4 && cub.length===3 && no.length===1 && no[0].nombre==='ZZ TRES' && /^NO/.test(no[0].asignado)
+        && todo.some(f=>f.nombre==='ZZ EXTERNO' && /FUERA DE MATRIZ/.test(f.asignado)) && todo.find(f=>f.nombre==='ZZ UNO').recinto===rName('st_r1');
+      const html=_dsHTML(area,['ZZ UNIDAD'],'cub'); const pdf=/Dotación cubicada/.test(html) && /ZZ DOS/.test(html) && !/ZZ TRES/.test(html) && /size:letter portrait/.test(html);
+      return unidad && cuenta && pdf;
+    } finally { dotDB.staff=stPrev; wsState.dots=JSON.parse(dPrev); _rpFix(false); }
   });
   T('Recinto compuesto: la estación «Recu 1 Est Eu» es parte de «Recu 1 (General)» (zona, servicio, estándar) y se corrige a mano', ()=>{
     const snap=JSON.stringify({d:wsState.dots,b:wsState.beds,t:nameState.types,n:nameState.rooms,p:nameState.recintoParte}); _rpFix(true);
