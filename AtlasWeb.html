@@ -642,8 +642,16 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 
 /* ── Modales: un solo estilo (encabezado blanco, sin degradado) ──────────── */
 #fichaModal,#estadoModal,#equipModal{position:fixed;inset:0;background:rgba(15,22,34,.5);display:none;align-items:center;justify-content:center;z-index:120;padding:20px}
-#fichaModal.show,#estadoModal.show,#equipModal.show,#dgModal.show,#dsModal.show{display:flex}
-#dsModal{position:fixed;inset:0;background:rgba(15,30,52,.55);display:none;align-items:center;justify-content:center;z-index:150;padding:16px}
+#fichaModal.show,#estadoModal.show,#equipModal.show,#dgModal.show,#dsModal.show,#eoModal.show{display:flex}
+#dsModal,#eoModal{position:fixed;inset:0;background:rgba(15,30,52,.55);display:none;align-items:center;justify-content:center;z-index:150;padding:16px}
+.eo-tab{width:100%;border-collapse:collapse;font-size:12.5px;margin:4px 0 12px;font-variant-numeric:tabular-nums}
+.eo-tab th,.eo-tab td{padding:4px 6px;border-bottom:1px solid var(--border,#e2e8f0);text-align:right}
+.eo-tab th:first-child,.eo-tab td:first-child{text-align:left}
+.eo-tab th{font-size:11px;color:var(--text-2);font-weight:var(--fw-medium);text-transform:uppercase;letter-spacing:.04em}
+.eo-dif.neg{color:#b91c1c;font-weight:700}.eo-dif.pos{color:#b45309;font-weight:700}.eo-dif.ok{color:#15803d;font-weight:700}
+.eo-lista{font-size:12px;line-height:1.55;color:var(--text-1);margin:2px 0 12px;word-break:break-word}
+.eo-nota{font-size:11.5px;color:var(--text-2);margin:2px 0 8px}
+.eo-sw{display:inline-block;width:11px;height:11px;border-radius:2px;vertical-align:-1px;margin-right:4px}
 .ds-modos{display:flex;flex-direction:column;gap:6px;font-size:13px;margin-bottom:12px}
 .ds-t{font-size:11px;font-weight:var(--fw-medium);color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
 .ds-us{display:flex;flex-direction:column;gap:5px;font-size:12px;max-height:260px;overflow-y:auto;border:1px solid var(--border);border-radius:var(--r-md);padding:8px 10px}
@@ -1069,6 +1077,8 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
         <div class="sm-h">Estacionamientos</div>
         <button class="struct-opt" data-kind="est" style="--c:#38bdf8" title="Colocar a mano una plaza de estacionamiento (2,5 × 5 m). Después, clic sobre ella abre el panel: categoría, girar, tamaño.">🅿 <b>Plaza</b> <span style="opacity:.55">· a mano</span></button>
         <button class="struct-opt" onclick="importarEstacionamientosNav()" style="--c:#38bdf8" title="Trae las plazas dibujadas en 8.Navegacion (siembra nav_verticales.js), en el mismo lugar y con su categoría. Reemplaza los estacionamientos que hubiera; lo demás no se toca.">⬇ <b>Importar de Navegación</b> <span style="opacity:.55">· reemplaza</span></button>
+        <button class="struct-opt" onclick="importarNumeracionEstac()" style="--c:#2776bb" title="Pone en cada plaza dibujada su N° oficial y su zona (funcionarios o visitas) leídos de los planos de la PAPS de Estacionamiento (ORD 0960/0961). Sólo escribe el N° donde la plaza no tiene uno.">🔢 <b>N° y zona oficiales</b> <span style="opacity:.55">· PAPS</span></button>
+        <button class="struct-opt" onclick="openEstacOficial()" style="--c:#f26722" title="Cupos oficiales (PAPS) contra las plazas dibujadas, por piso y zona; números que faltan dibujar y plazas sin número.">📊 <b>Oficial vs dibujado</b></button>
         <button class="struct-opt" onclick="replicarEstacionamientos()" style="--c:#38bdf8" title="Copia las plazas del piso en que estás al piso de abajo (p. ej. -2 → -3), en el mismo lugar del edificio. No duplica las que ya están.">⎘ <b>Replicar al piso de abajo</b> <span style="opacity:.55">· p. ej. -2 → -3</span></button>
         <div class="sm-h">Correo neumático</div>
         <button class="struct-opt" data-kind="cn" style="--c:#DB2777" title="Colocar a mano una estación de correo neumático. Después, clic sobre ella abre el panel para elegir sistema, tipo y la estación del directorio. Se ve en todas las vistas; se enciende y apaga con el botón 📮 Correo N.">📮 <b>Estación</b> <span style="opacity:.55">· a mano</span></button>
@@ -1225,6 +1235,15 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="ficha-x" onclick="closeDotServicio()" title="Cerrar">×</button>
     </div>
     <div class="ficha-body" id="dsBody"></div>
+  </div>
+</div>
+<div id="eoModal" onclick="if(event.target===this)closeEstacOficial()">
+  <div class="ficha-box">
+    <div class="ficha-head">
+      <div><div class="ficha-title">🅿 Estacionamientos · oficial vs dibujado</div><div class="ficha-sub" id="eoSub"></div></div>
+      <button class="ficha-x" onclick="closeEstacOficial()" title="Cerrar">×</button>
+    </div>
+    <div class="ficha-body" id="eoBody"></div>
   </div>
 </div>
 <div id="dgModal" onclick="if(event.target===this)closeDigedep()">
@@ -1549,6 +1568,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 <script src="SHARED_DATA/planos_calibracion.js"></script>
 <script src="SHARED_DATA/bim_plano.js"></script>
 <script src="SHARED_DATA/numeracion_recintos.js"></script>
+<script src="SHARED_DATA/estacionamientos_oficial.js"></script>
 <script src="SHARED_DATA/verticales_parches.js"></script>
 <script src="SHARED_DATA/circulacion_red.js"></script>
 <script src="SHARED_DATA/propuestos_plano.js"></script>
@@ -3951,6 +3971,8 @@ function _jardinesSync(){
   if(S.relojes===undefined){ let v=null; try{ v=localStorage.getItem('cabida_relojes'); }catch(e){} S.relojes=(v!=='0');
     const b=document.getElementById('btnReloj'); if(b) b.classList.toggle('active',S.relojes!==false); }
   // estacionamientos APAGADOS por defecto (~1.460 plazas sobrecargan el plano): se encienden con 🅿 en la barra
+  if(S.estZona===undefined){ let v=null; try{ v=localStorage.getItem('cabida_est_zona'); }catch(e){} S.estZona=(v==='1'); }
+  if(S.estFaltan===undefined){ let v=null; try{ v=localStorage.getItem('cabida_est_faltan'); }catch(e){} S.estFaltan=(v!=='0'); }
   if(S.estac===undefined){ let v=null; try{ v=localStorage.getItem('cabida_estac'); }catch(e){} S.estac=(v==='1');
     const b=document.getElementById('btnEstac'); if(b) b.classList.toggle('active',S.estac!==false); }
   if(S.correoN===undefined){ let v=null; try{ v=localStorage.getItem('cabida_correo_n'); }catch(e){} S.correoN=(v!=='0');
@@ -5133,7 +5155,7 @@ function renderL3(){
       if(_dotConReemplazo(dot)) g.appendChild(el('circle',{r:DOT_R+3.5,class:'reemp-ring','pointer-events':'none'}));
       if(S.showDotNames && asig){
         // La tarjeta se coloca en una pasada global anti-solape (_placeDotCards).
-        _dotCardQueue.push({dx:dot.x, dy:dot.y, lines:dotTitle(dot).split('\n'), col, nk:(dot.id||(room.id+':'+i)), defR:(i%2===0)});
+        _dotCardQueue.push({dx:dot.x, dy:dot.y, lines:dotTitle(dot).split('\n'), col, nk:(dot.id||(room.id+':'+i)), defR:(i%2===0), rol:_rolFondoDot(dot)});
       }
       g.addEventListener('mousedown',e=>startDotDrag(e,room.id,i));
     g.addEventListener('contextmenu',e=>{ e.preventDefault(); e.stopPropagation(); dotClicDerecho(room.id,i); });
@@ -5180,7 +5202,7 @@ function renderL3(){
     if(_dotConReemplazo(dot)) g.appendChild(el('circle',{r:DOT_R+3.5,class:'reemp-ring','pointer-events':'none'}));
     if(S.showDotNames && asig){
       // La tarjeta se coloca en una pasada global anti-solape (_placeDotCards).
-      _dotCardQueue.push({dx:dot.x, dy:dot.y, lines:dotTitle(dot).split('\n'), col, nk:(dot.id||(room.id+':'+i)), defR:(i%2===0)});
+      _dotCardQueue.push({dx:dot.x, dy:dot.y, lines:dotTitle(dot).split('\n'), col, nk:(dot.id||(room.id+':'+i)), defR:(i%2===0), rol:_rolFondoDot(dot)});
     }
     g.addEventListener('mousedown',e=>startDotDrag(e,room.id,i));
     g.addEventListener('contextmenu',e=>{ e.preventDefault(); e.stopPropagation(); dotClicDerecho(room.id,i); });
@@ -5328,6 +5350,30 @@ function _placeDotCards(){
     _drawDotCard(e,rect,{fs,lh,padX,padY});
   });
 }
+// Fondo suave de la tarjeta del nombre según el rol de la persona (05-10-2026, pedido para
+// el personal de Pabellón): médicos, enfermeras, TENS de rayos, TENS de endoscopia,
+// auxiliares y tecnólogos médicos (burdeo, como en la 37). El resto queda en blanco.
+// Rayos/endoscopia = TENS de Imagenología / Endoscopia (por unidad o rol operativo).
+const ROL_FONDO={med:['Médico(a)','#dbeafe'],enf:['Enfermera(o) / matrona','#dcfce7'],tens_rx:['TENS de rayos (Imagenología)','#fef3c7'],
+  tens_endo:['TENS de endoscopia','#ede9fe'],aux:['Auxiliar','#ffe4e6'],tm:['Tecnólogo(a) médico','#f3d6dc']};
+function _rolFondoClase(nombre, p){
+  // la matriz manda; si la persona no está, se usa el cargo/estamento guardado en el puesto
+  const s=_staffDe(nombre) || (p&&(p.cargo||p.estamento) ? {estamento:p.estamento, cargo:p.cargo, unidad:p.unidad||'', rol:''} : null); if(!s) return '';
+  const e=String(s.estamento||'').toUpperCase(), c=String(s.cargo||'').toUpperCase(), u=String(s.unidad||'').toUpperCase(), r=String(s.rol||'').toUpperCase();
+  const tens=/TECNIC|TENS|PARAMEDIC/.test(e+' '+c+' '+r);
+  if(/MEDIC/.test(e) || (/^MEDIC|ANESTESI|CIRUJAN/.test(c) && !tens)) return 'med';
+  if(/TECNOLOG/.test(c+' '+r)) return 'tm';
+  if(tens && /IMAGEN|RADIOL|RAYOS/.test(u+' '+r)) return 'tens_rx';
+  if(tens && /ENDOSC/.test(u+' '+r)) return 'tens_endo';
+  if(!tens && /ENFERMER|MATRON/.test(c)) return 'enf';
+  if(!tens && (/AUXILIAR/.test(e) || /^AUX/.test(c) || /AUXILIAR/.test(r))) return 'aux';
+  return '';
+}
+// puesto con varias personas (dinámico): color sólo si todas tienen el mismo rol
+function _rolFondoDot(dot){
+  const ps=(dot.tipo==='dinamico' ? (dot.turnos||[]) : [dot]).filter(p=>p&&p.nombre);
+  const cl=new Set(ps.map(p=>_rolFondoClase(p.nombre, p))); return cl.size===1 ? [...cl][0] : '';
+}
 function _drawDotCard(e,r,C){
   const g2=el('g',{class:'ws-card',transform:`translate(${e.dx},${e.dy}) rotate(${r.rot})`});
   // línea continua a lo largo del rayo si la tarjeta quedó lejos del puesto
@@ -5336,9 +5382,10 @@ function _drawDotCard(e,r,C){
     g2.appendChild(el('line',{x1:sg*(DOT_R+1),y1:0,x2:near,y2:0,
       stroke:e.col,'stroke-width':1.2,opacity:.9,'pointer-events':'none'}));
   }
-  const bg=el('rect',{x:r.x0,y:-r.ch/2,width:r.cw,height:r.ch,rx:4,fill:'#ffffff','fill-opacity':0.93,
-    stroke:e.col,'stroke-width':1,style:'cursor:pointer'});
-  const bt=el('title'); bt.textContent='Clic: pasa la tarjeta al otro lado del puesto (derecha ↔ izquierda)'; bg.appendChild(bt);
+  const RF=ROL_FONDO[e.rol];
+  const bg=el('rect',{x:r.x0,y:-r.ch/2,width:r.cw,height:r.ch,rx:4,fill:RF?RF[1]:'#ffffff','fill-opacity':RF?0.97:0.93,
+    stroke:e.col,'stroke-width':1,style:'cursor:pointer',class:'ws-card-bg'+(RF?' rol-'+e.rol:'')});
+  const bt=el('title'); bt.textContent=(RF?(RF[0]+' · '):'')+'Clic: pasa la tarjeta al otro lado del puesto (derecha ↔ izquierda)'; bg.appendChild(bt);
   bg.addEventListener('mousedown',ev=>ev.stopPropagation());
   bg.addEventListener('click',ev=>{ ev.stopPropagation(); flipDotName(e.nk,e.defR,ev.shiftKey); });
   g2.appendChild(bg);
@@ -7728,6 +7775,8 @@ function paintStructures(){
   const relojEditable = S.editMode && items.some(it=>_esMarca(it.kind));
   const g = el('g', {class:'structures-layer',
     ...(S.level>1 && !relojEditable ?{'pointer-events':'none'}:{})});
+  // plazas oficiales (PAPS) sin dibujar: debajo de todo lo dibujado
+  if(S.estac!==false) try{ _eoFaltantesLayer(g); }catch(e){ console.warn('plazas oficiales',e); }
   // Renderizar todos los elementos persistidos. Orden de dibujo: plazas abajo (la TIPO
   // encima de las que se le superponen), después lo demás y el seleccionado arriba de todo.
   const _rk = it => it.id===S.structSel ? 3 : (it.kind==='est' ? (it.estTipo ? 1 : 0) : 2);
@@ -7775,7 +7824,7 @@ function renderStructMarker(it, tdef){
     t.textContent = it.etq || tdef.short; g.appendChild(t);
   } else if(tdef.grupo==='est'){
     // plaza a tamaño real: caja translúcida del color de la categoría con su icono
-    const c=_estCat(it), tc=it.estTipo?(EST_TIPO_COL[_estCatId(it)]||'#c026d3'):c.col;
+    const c=_estCat(it), tc=it.estTipo?(EST_TIPO_COL[_estCatId(it)]||'#c026d3'):((S.estZona&&EO_ZONA[it.zona])?EO_ZONA[it.zona][1]:c.col);
     g.appendChild(el('rect',{class:'struct-est'+(it.estTipo?' struct-est-tipo':''),x:-bw/2,y:-bh/2,width:bw,height:bh,rx:Math.min(10,Math.min(bw,bh)*0.08),fill:tc,'fill-opacity':it.estTipo?0.6:0.42,stroke:tc,'stroke-width':Math.max(2,baseStrokeW*(it.estTipo?1.6:0.8))}));
     if(it.estTipo){ const tt=el('text',{x:0,y:-bh/2+Math.min(bw,bh)*0.2,'text-anchor':'middle','dominant-baseline':'central','font-size':Math.min(bw,bh)*0.2,'font-weight':900,fill:'#fff','pointer-events':'none','font-family':'system-ui,-apple-system,sans-serif'}); tt.textContent='TIPO'; g.appendChild(tt); }
     const t=el('text',{x:0,y:0,'text-anchor':'middle','dominant-baseline':'central','font-size':Math.min(bw,bh)*0.55,'font-weight':900,fill:'#fff',stroke:tc,'stroke-width':Math.max(1.5,Math.min(bw,bh)*0.03),'paint-order':'stroke fill','pointer-events':'none','font-family':'system-ui,-apple-system,sans-serif'});
@@ -7830,7 +7879,7 @@ function renderStructMarker(it, tdef){
   const ext = DXF_EXT[S.floorId], dim = FLOOR_DIMS[S.floorId];
   const mx = (ext&&dim) ? ((ext.xmax-ext.xmin)/dim.w) : 0, my = (ext&&dim) ? ((ext.ymax-ext.ymin)/dim.h) : 0;
   const PUERTA={};
-  ttl.textContent = tdef.grupo==='est' ? ('🅿 Estacionamiento · '+_estCat(it).n+(it.estTipo?' · ⭐ PLAZA TIPO (su tamaño se replica a toda la categoría)':'')+(it.etq?(' · '+it.etq):'')+(sized?` · ${(Math.min(bw,bh)*_mPxEst()).toFixed(2)} × ${(Math.max(bw,bh)*_mPxEst()).toFixed(2)} m`:'')+(it.origen==='navegacion'?' · de Navegación':(it.origen==='replica'?' · replicada de '+(it.de||'otro piso'):''))
+  ttl.textContent = tdef.grupo==='est' ? ('🅿 Estacionamiento · '+_estCat(it).n+(it.estTipo?' · ⭐ PLAZA TIPO (su tamaño se replica a toda la categoría)':'')+(it.etq?(' · '+it.etq):'')+(it.ofi?(' · N° oficial '+it.ofi+(EO_ZONA[it.zona]?(' · '+EO_ZONA[it.zona][0]):'')+' (PAPS)'):'')+(sized?` · ${(Math.min(bw,bh)*_mPxEst()).toFixed(2)} × ${(Math.max(bw,bh)*_mPxEst()).toFixed(2)} m`:'')+(it.origen==='navegacion'?' · de Navegación':(it.origen==='replica'?' · replicada de '+(it.de||'otro piso'):''))
       + (S.editMode ? ' · clic: panel (categoría · girar · tamaño) · arrastrar mueve · × borra' : ''))
     : tdef.grupo==='cn' ? (_cnTitulo(it) + (S.editMode ? ' · clic: panel (sistema · tipo · estación del directorio) · arrastrar mueve · × borra (en cualquier vista)' : ''))
     : tdef.grupo==='reloj'
@@ -8115,6 +8164,7 @@ function _estEditRender(m, it){
   m.innerHTML=`<div class="se-t"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:${c.col}"></span> Estacionamiento · ${esc(c.n)}<span class="x" onclick="structEditClose()">✕</span></div>
     <div class="se-row"><label>Categoría</label><select onchange="structEditApply('estCat',this.value)">${Object.entries(EST_CAT).map(([k,v])=>`<option value="${k}"${k===(it.cat||'pub')?' selected':''}>${v.ic} ${esc(v.n)}</option>`).join('')}</select></div>
     <div class="se-row"><label>Etiqueta</label><input value="${esc(it.etq||'')}" placeholder="N° de plaza" onchange="structEditApply('etq',this.value)" style="width:90px"></div>
+    <div class="se-row"><label>Oficial</label><span style="color:var(--text-2)">${it.ofi?('N° '+it.ofi+' · <b style="color:'+(EO_ZONA[it.zona]||EO_ZONA.func)[1]+'">'+(EO_ZONA[it.zona]||['¿zona?'])[0]+'</b>'+(it.ofiEsp?' · ♿/preferencial':'')+' (PAPS)'):'sin N° oficial en la PAPS'}</span></div>
     <div class="se-row"><label>Tamaño (m)</label><input type="number" step="0.1" min="0.5" value="${(w*mpx).toFixed(2)}" onchange="structEditApply('w',this.value)"> × <input type="number" step="0.1" min="0.5" value="${(h*mpx).toFixed(2)}" onchange="structEditApply('h',this.value)"></div>
     <div class="se-row"><label></label><button onclick="structEditApply('estGira')" title="Plaza en batería ↔ en cordón">⟲ Girar 90°</button><button onclick="structEditApply('estStd')" title="Medida estándar de la categoría (${c.w} × ${c.h} m)">Medida estándar</button></div>
     ${_estTipoPanel(it)}
@@ -8155,11 +8205,163 @@ function importarEstacionamientosNav(sinConfirmar){
     if(!structuresState[p].length) delete structuresState[p];
   });
   if(S.estac===false) toggleEstac();
-  if(!sinConfirmar) _estTipoAuto('P-2');
+  if(!sinConfirmar){ _estTipoAuto('P-2'); try{ importarNumeracionEstac(true); }catch(e){} }
   sStruct(); renderSVG();
   if(typeof closeStructMenu==='function') try{ closeStructMenu(); }catch(e){}
   if(!sinConfirmar && typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🅿 '+total+' estacionamientos importados de Navegación ('+pisos.join(', ')+')'; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},8000); }
   return total;
+}
+// ── Plazas OFICIALES (PAPS de Estacionamiento HDS 0960 / INGER 0961) ─────────────
+// SHARED_DATA/estacionamientos_oficial.js (_DEV/build_estacionamientos_oficial.py): cada N°
+// de plaza de los planos de la PAPS, en px del Atlas, con su zona (color del número en el
+// plano: azul = funcionarios y directivos, naranjo = visitas; ♿/preferencial en blanco).
+// P-2 calza por la grilla (≈ 0,2 pt); P-3 sale de un plano de 2020 y sólo se usan los N°
+// de confianza alta. El pareo N° ↔ plaza dibujada es uno a uno y no inventa nada.
+const EO_ZONA={func:['Funcionarios y directivos','#2776bb'],visita:['Visitas','#f26722']};
+function _eoD(){ return window.ESTAC_OFICIAL||null; }
+let _eoMemo={};
+function _eoAsignar(fid){
+  const D=_eoD(), todos=((D&&D.floors)||{})[fid]||[], ofi=todos.filter(o=>o.conf!=='baja');
+  const dib=structsOf(fid).filter(x=>x.kind==='est'&&x.w&&x.h);
+  const key=fid+'|'+dib.length+'|'+dib.reduce((a,x)=>a+x.x*3+x.y*7+x.w+x.h,0).toFixed(0)+'|'+(D&&D.generado);
+  if(_eoMemo[fid]&&_eoMemo[fid].key===key) return _eoMemo[fid].r;
+  // costo = distancia al rectángulo en anchos de plaza (el N° del plano suele ir en el
+  // extremo de la plaza) + 5 % de la distancia al centro; tope 0,45
+  const cand=[];
+  for(let i=0;i<ofi.length;i++){ const o=ofi[i];
+    for(let j=0;j<dib.length;j++){ const x=dib[j];
+      const dx=Math.max(0,Math.abs(o.x-x.x)-x.w/2), dy=Math.max(0,Math.abs(o.y-x.y)-x.h/2);
+      if(dx>x.w||dy>x.h) continue;
+      const c=Math.hypot(dx,dy)/Math.min(x.w,x.h)+0.05*Math.hypot(o.x-x.x,o.y-x.y)/Math.max(x.w,x.h);
+      if(c<=0.45) cand.push([c,i,j]); } }
+  cand.sort((a,b)=>a[0]-b[0]);
+  const ui=new Set(), uj=new Set(), par=new Map();
+  cand.forEach(([c,i,j])=>{ if(ui.has(i)||uj.has(j)) return; ui.add(i); uj.add(j); par.set(dib[j], ofi[i]); });
+  const r={par, sinPlaza:ofi.filter((_,i)=>!ui.has(i)), sinNum:dib.filter((_,j)=>!uj.has(j)), bajas:todos.filter(o=>o.conf==='baja')};
+  _eoMemo[fid]={key, r}; return r;
+}
+// Escribe en cada plaza pareada su N° oficial (sólo si no tiene etiqueta) y su zona.
+function importarNumeracionEstac(sinConfirmar){
+  const D=_eoD(); if(!D||!D.floors){ if(!sinConfirmar) alert('No se encontró SHARED_DATA/estacionamientos_oficial.js.\nGenerarla con _DEV/build_estacionamientos_oficial.py'); return null; }
+  const r={escritos:0, iguales:0, distintos:0, zonas:0, sinPlaza:0, sinNum:0};
+  _eoMemo={};
+  Object.keys(D.floors).forEach(fid=>{
+    const A=_eoAsignar(fid);
+    A.par.forEach((o,x)=>{ const n=String(o.n);
+      if(!x.etq){ x.etq=n; r.escritos++; } else if(String(x.etq)===n) r.iguales++; else r.distintos++;
+      x.ofi=o.n; if(x.zona!==o.zona){ x.zona=o.zona; r.zonas++; } if(o.esp) x.ofiEsp=o.esp; else delete x.ofiEsp; });
+    A.sinNum.forEach(x=>{ delete x.ofi; delete x.ofiEsp; });
+    r.sinPlaza+=A.sinPlaza.length; r.sinNum+=A.sinNum.length;
+  });
+  _eoMemo={}; sStruct(); renderSVG();
+  if(typeof closeStructMenu==='function') try{ closeStructMenu(); }catch(e){}
+  if(!sinConfirmar && typeof tbInfo!=='undefined'&&tbInfo){
+    tbInfo.textContent='🔢 '+r.escritos+' N° oficiales puestos · '+r.iguales+' iguales'+(r.distintos?(' · '+r.distintos+' con otro N° (se dejó el tuyo)'):'')+' · '+r.sinPlaza+' N° sin plaza dibujada · '+r.sinNum+' plazas sin N° (ver 📊)';
+    setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },12000); }
+  return r;
+}
+// Una vez por versión del dato (en la de consulta, siempre en memoria si el snapshot no los trae)
+function _eoAutoImport(){
+  const D=_eoD(); if(!D||!D.floors) return null;
+  const tiene=Object.values(structuresState).flat().some(x=>x.kind==='est'&&x.ofi);
+  if(S.viewOnly){ return tiene?null:importarNumeracionEstac(true); }
+  let v=null; try{ v=localStorage.getItem('cabida_eo_siembra'); }catch(e){}
+  if(v===D.generado) return null;
+  if(!Object.values(structuresState).flat().some(x=>x.kind==='est')) return null;
+  const r=importarNumeracionEstac(true); _lsPref('cabida_eo_siembra', D.generado||'1'); return r;
+}
+window.addEventListener('load',()=>setTimeout(()=>{ if(typeof _SELFTEST!=='undefined'&&_SELFTEST) return; try{ _eoAutoImport(); }catch(e){ console.warn('estacionamientos oficiales',e); } }, 1900));
+// Medida de una plaza «que falta» en el piso: la mediana de las públicas dibujadas (o la tipo)
+function _eoMedida(fid, esp){
+  if(esp==='disc'){ const m=_estTipoMedida('disc', fid); if(m) return m; }
+  const L=structsOf(fid).filter(x=>x.kind==='est'&&_estCatId(x)==='pub'&&x.w&&x.h); if(!L.length) return null;
+  const med=a=>{ a=a.slice().sort((p,q)=>p-q); return a[Math.floor(a.length/2)]; };
+  return {corto:med(L.map(x=>Math.min(x.w,x.h))), largo:med(L.map(x=>Math.max(x.w,x.h)))};
+}
+// Plazas oficiales que no están dibujadas: rectángulo punteado con su N° (orientación de la
+// plaza dibujada más cercana). En edición, clic = dibujarla ahí con su N° y zona.
+function _eoFaltantesLayer(g){
+  const fid=S.floorId, D=_eoD(); if(!D||!(D.floors||{})[fid]||S.estFaltan===false) return;
+  const A=_eoAsignar(fid); if(!A.sinPlaza.length) return;
+  const dib=structsOf(fid).filter(x=>x.kind==='est'&&x.w&&x.h), editable=S.editMode&&S.level===1;
+  A.sinPlaza.forEach(o=>{
+    const med=_eoMedida(fid,o.esp); if(!med) return;
+    let near=null, bd=Infinity; dib.forEach(x=>{ const d=Math.hypot(x.x-o.x,x.y-o.y); if(d<bd){ bd=d; near=x; } });
+    const vert=!near || near.h>=near.w, w=vert?med.corto:med.largo, h=vert?med.largo:med.corto;
+    const z=EO_ZONA[o.zona]||EO_ZONA.func;
+    const gg=el('g',{class:'eo-falta',transform:`translate(${o.x},${o.y})`});
+    gg.appendChild(el('rect',{x:-w/2,y:-h/2,width:w,height:h,rx:6,fill:z[1],'fill-opacity':0.08,stroke:'#dc2626','stroke-width':Math.max(3,Math.min(w,h)*0.04),'stroke-dasharray':'14,9'}));
+    const t=el('text',{x:0,y:0,'text-anchor':'middle','dominant-baseline':'central','font-size':Math.min(w,h)*0.26,'font-weight':900,fill:'#dc2626','pointer-events':'none','font-family':'system-ui,-apple-system,sans-serif'});
+    t.textContent=(o.esp?'♿ ':'')+o.n; gg.appendChild(t);
+    const tt=el('title'); tt.textContent='Plaza oficial N° '+o.n+' ('+z[0]+(o.esp?' · ♿/preferencial':'')+') sin dibujar'+(editable?' · clic: dibujarla aquí':' · entra a Editar para dibujarla'); gg.appendChild(tt);
+    if(editable){ gg.style.cursor='copy';
+      gg.addEventListener('mousedown',e=>e.stopPropagation());
+      gg.addEventListener('click',e=>{ e.stopPropagation(); e.preventDefault(); _eoDibujar(o, w, h); }); }
+    else gg.setAttribute('pointer-events','none');
+    g.appendChild(gg);
+  });
+}
+function _eoDibujar(o, w, h){
+  const nuevo={id:S.floorId+'-st-'+Date.now(), kind:'est', cat:o.esp?'disc':'pub', x:o.x, y:o.y, w:Math.round(w), h:Math.round(h), etq:String(o.n), ofi:o.n, zona:o.zona};
+  if(o.esp) nuevo.ofiEsp=o.esp;
+  (structuresState[S.floorId]=structuresState[S.floorId]||[]).push(nuevo);
+  _eoMemo={}; sStruct(); renderSVG();
+  if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🅿 Plaza oficial N° '+o.n+' dibujada ('+(EO_ZONA[o.zona]||EO_ZONA.func)[0]+')'; setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },6000); }
+  return nuevo;
+}
+function toggleEstZona(){ S.estZona=!S.estZona; _lsPref('cabida_est_zona', S.estZona?'1':'0'); renderSVG(); if(document.getElementById('eoModal').classList.contains('show')) renderEstacOficial(); }
+function toggleEstFaltan(){ S.estFaltan=(S.estFaltan===false); _lsPref('cabida_est_faltan', S.estFaltan?'1':'0'); renderSVG(); if(document.getElementById('eoModal').classList.contains('show')) renderEstacOficial(); }
+// ── 📊 Oficial vs dibujado ──
+function _eoResumen(){
+  const D=_eoD(), O=(D&&D.oficial)||{}, out={};
+  ['P-2','P-3'].forEach(fid=>{
+    const dib=structsOf(fid).filter(x=>x.kind==='est'), A=_eoAsignar(fid);
+    const z=k=>dib.filter(x=>x.zona===k).length;
+    out[fid]={dib:dib.length, func:z('func'), visita:z('visita'), sinZona:dib.filter(x=>!x.zona).length,
+      disc:dib.filter(x=>_estCatId(x)==='disc').length, amb:dib.filter(x=>_estCatId(x)==='amb'),
+      pareadas:A.par.size, sinPlaza:A.sinPlaza, sinNum:A.sinNum, bajas:A.bajas.length, oficialesPlano:(((D&&D.floors)||{})[fid]||[]).length};
+  });
+  return {O, F:out};
+}
+function openEstacOficial(){
+  if(typeof closeStructMenu==='function') try{ closeStructMenu(); }catch(e){}
+  if(!_eoD()){ alert('No se encontró SHARED_DATA/estacionamientos_oficial.js'); return; }
+  document.getElementById('eoModal').classList.add('show'); renderEstacOficial();
+}
+function closeEstacOficial(){ document.getElementById('eoModal').classList.remove('show'); }
+function renderEstacOficial(){
+  const {O,F}=_eoResumen(), P2=O['P-2']||{}, P3=O['P-3']||{}, f2=F['P-2'], f3=F['P-3'];
+  const dif=(a,b)=>{ const d=a-b; return `<td class="eo-dif ${d===0?'ok':(d<0?'neg':'pos')}">${d>0?'+':''}${d}</td>`; };
+  const fila=(lbl,of,db,nota)=>`<tr><td>${lbl}${nota?` <span class="eo-nota">${nota}</span>`:''}</td><td>${of}</td><td>${db}</td>${dif(db,of)}</tr>`;
+  const sw=c=>`<span class="eo-sw" style="background:${c}"></span>`;
+  const lista=(arr,f)=>arr.length?arr.map(f).join(' · '):'—';
+  const sec=O.inger_sectores||{};
+  document.getElementById('eoSub').textContent='PAPS de Estacionamiento aprobados · HDS ORD IF-HSG 0960 · INGER 0961 · dato '+((_eoD()||{}).generado||'');
+  document.getElementById('eoBody').innerHTML=`
+    <div class="ds-t">Totales por piso y zona</div>
+    <table class="eo-tab"><tr><th>Piso · zona</th><th>Oficial</th><th>Dibujado</th><th>Dif.</th></tr>
+      ${fila('<b>P-3</b> · funcionarios HDS', P3.funcionarios_hds||0, f3.dib)}
+      ${fila(sw(EO_ZONA.func[1])+'<b>P-2</b> · funcionarios y directivos', P2.funcionarios||0, f2.func, `HDS ${(P2.hds||{}).total||0} · INGER ${(P2.inger||{}).total||0}`)}
+      ${fila(sw(EO_ZONA.visita[1])+'<b>P-2</b> · visitas', P2.visitas||0, f2.visita)}
+      ${f2.sinZona?`<tr><td>P-2 · plazas sin N° oficial (sin zona)</td><td>—</td><td>${f2.sinZona}</td><td></td></tr>`:''}
+      ${fila('<b>Total subterráneos</b>', O.total_concesionado||0, f2.dib+f3.dib)}
+      ${fila('♿ P-3', P3.disc||0, f3.disc)}
+      ${fila('♿ P-2 (funcionarios + visitas)', (P2.disc_funcionarios||0)+(P2.disc_visitas||0), f2.disc, `+ ${P2.preferenciales_visitas||0} preferenciales en visitas`)}
+    </table>
+    <div class="ds-t">Cruce por N° de plaza</div>
+    <div class="eo-nota">P-2: ${f2.oficialesPlano} N° en el plano oficial (22-06-2021) · ${f2.pareadas} con plaza dibujada. P-3: plano de 2020, ${f3.oficialesPlano} N° · ${f3.pareadas} pareados (${f3.bajas} de confianza baja no se usan).</div>
+    <div class="eo-nota"><b>P-2 · N° oficiales sin dibujar (${f2.sinPlaza.length})</b> — se ven en el plano como rectángulos rojos punteados; en ✏️ Editar, clic los dibuja:</div>
+    <div class="eo-lista">${lista(f2.sinPlaza,o=>`<span style="color:${(EO_ZONA[o.zona]||EO_ZONA.func)[1]};font-weight:700">${o.esp?'♿':''}${o.n}</span>`)}</div>
+    <div class="eo-nota"><b>P-2 · plazas dibujadas sin N° oficial (${f2.sinNum.length})</b>${f2.amb.length?` — incluye ${f2.amb.length} 🚑: la PAPS ubica las ${O.emergencia_p1_pm1||21} plazas de emergencia en pisos 1 y -1, no en -2`:''}.</div>
+    <div class="eo-nota"><b>P-3 · plazas sin N° (${f3.sinNum.length}) y N° sin plaza (${f3.sinPlaza.length})</b>: el plano oficial es de 2020 y el sector poniente no calza; revisar con un plano numerado vigente.</div>
+    <div class="ds-t">INGER · sectores del S2 (tabla de la PAPS 0961)</div>
+    <table class="eo-tab"><tr>${Object.keys(sec).map(k=>`<th>${k}</th>`).join('')}<th>Total</th></tr><tr>${Object.values(sec).map(v=>`<td>${v}</td>`).join('')}<td><b>${Object.values(sec).reduce((a,b)=>a+b,0)}</b></td></tr></table>
+    <div class="eo-nota">${(O.notas||[]).map(esc).join('<br>')}</div>
+    <div class="ds-modos" style="flex-direction:row;flex-wrap:wrap;gap:14px;margin-top:10px">
+      <label><input type="checkbox" ${S.estZona?'checked':''} onchange="toggleEstZona()"> Colorear plazas por zona (${sw(EO_ZONA.func[1])}funcionarios · ${sw(EO_ZONA.visita[1])}visitas)</label>
+      <label><input type="checkbox" ${S.estFaltan!==false?'checked':''} onchange="toggleEstFaltan()"> Mostrar N° oficiales sin dibujar</label>
+      <button class="tb-btn" onclick="importarNumeracionEstac()">🔢 Volver a cruzar N° y zona</button>
+    </div>`;
 }
 // ── Replicar estacionamientos a otro piso (⎘, como en Navegación) ─────────────
 // Mismo lugar FÍSICO del edificio: px del piso de origen → metros comunes →
@@ -14295,6 +14497,8 @@ function loadDotDB(){
         // disponible para selección, esté o no en comisión (decisión 2026-09-01).
         comision: String(p.comision_servicio||'').trim().toUpperCase().startsWith('SI'),
         vinculo: p.tipo_vinculo || '',
+        // rol operativo (overlay de dotación: TENS imagenología, auxiliar de pabellón…)
+        rol: (p.rol_operativo && p.rol_operativo!=='NO APLICA') ? p.rol_operativo : '',
         // Personal de otra institución que trabaja en el hospital (hoy, secretarias de
         // la U. de Chile): está en la matriz para poder ubicarlo, pero NO es dotación
         // del HDS, así que no cuenta en el avance (igual que los becados).
@@ -17539,10 +17743,55 @@ async function runSelfTest(){
       Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
     }
   });
+  T('🅿 Oficial (PAPS): pareo uno a uno N° ↔ plaza, escribe N° sólo si falta, zona siempre; faltantes punteados y clic los dibuja', ()=>{
+    const snap=JSON.stringify(structuresState), Dprev=window.ESTAC_OFICIAL, f0=S.floorId, l0=S.level, ed=S.editMode, eP=S.estac;
+    try{
+      _eoMemo={};
+      structuresState['P-2']=[{id:'o1',kind:'est',cat:'pub',x:1000,y:1000,w:150,h:290},{id:'o2',kind:'est',cat:'pub',x:1160,y:1000,w:150,h:290,etq:'99'},
+        {id:'o3',kind:'est',cat:'pub',x:3000,y:3000,w:150,h:290}];
+      structuresState['P-3']=[];
+      window.ESTAC_OFICIAL={generado:'t',oficial:{'P-2':{funcionarios:2,visitas:1},'P-3':{funcionarios_hds:0},total_concesionado:3,inger_sectores:{A:1}},
+        floors:{'P-2':[{n:2001,zona:'func',x:1000,y:1120,conf:'alta'},{n:2002,zona:'func',x:1160,y:990,conf:'alta'},{n:2003,zona:'visita',esp:'disc',x:1320,y:1000,conf:'alta'}],'P-3':[]}};
+      const r=importarNumeracionEstac(true), a=structsOf('P-2'), o1=a.find(x=>x.id==='o1'), o2=a.find(x=>x.id==='o2'), o3=a.find(x=>x.id==='o3');
+      const pareo=o1.etq==='2001' && o1.zona==='func' && o1.ofi===2001 && o2.etq==='99' && o2.ofi===2002 && !o3.ofi && r.escritos===1 && r.distintos===1 && r.sinPlaza===1 && r.sinNum===1;
+      S.floorId='P-2'; S.level=1; S.estac=true; S.editMode=false; renderSVG();
+      const falta=svg.querySelectorAll('.eo-falta').length===1 && /2003/.test(svg.querySelector('.eo-falta').textContent);
+      S.editMode=true; renderSVG(); svg.querySelector('.eo-falta').dispatchEvent(new MouseEvent('click',{bubbles:true}));
+      const n=structsOf('P-2').find(x=>x.ofi===2003), dibujada=!!n && n.cat==='disc' && n.zona==='visita' && n.etq==='2003' && !svg.querySelector('.eo-falta');
+      S.estZona=true; renderSVG(); const color=[...svg.querySelectorAll('.struct-est')].some(r=>r.getAttribute('fill')===EO_ZONA.visita[1]); S.estZona=false;
+      openEstacOficial(); const modal=/Oficial vs dibujado|oficial vs dibujado/i.test(document.getElementById('eoModal').innerText) && /INGER/.test(document.getElementById('eoBody').innerText); closeEstacOficial();
+      return pareo && falta && dibujada && color && modal;
+    } finally {
+      window.ESTAC_OFICIAL=Dprev; _eoMemo={}; S.floorId=f0; S.level=l0; S.editMode=ed; S.estac=eP; S.estZona=false;
+      Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
+    }
+  });
+  T('Tarjetas de nombre: fondo suave por rol (médico, enfermera, TENS rayos, TENS endoscopia, auxiliar); el resto en blanco', ()=>{
+    const prev=_estIdx; 
+    try{
+      _estIdx={}; const add=(n,o)=>{ _estIdx[norm(n)]={nombre:n,...o}; };
+      add('RF MEDICO',{estamento:'MEDICOS',cargo:'MEDICO CIRUJANO',unidad:'UNIDAD DE CUIDADOS EN PABELLON'});
+      add('RF ENFERMERA',{estamento:'PROFESIONALES',cargo:'ENFERMERA',unidad:'UNIDAD DE CUIDADOS EN PABELLON'});
+      add('RF TENS RX',{estamento:'TECNICOS',cargo:'TECNICO NIVEL SUPERIOR',unidad:'SERVICIO DE IMAGENOLOGIA'});
+      add('RF TENS ENDO',{estamento:'TECNICOS',cargo:'TECNICO PARAMEDICO',unidad:'UNIDAD DE ENDOSCOPIA DIGESTIVA'});
+      add('RF AUX',{estamento:'AUXILIARES',cargo:'AUXILIAR DE SERVICIO',unidad:'UNIDAD DE CUIDADOS EN PABELLON'});
+      add('RF TENS',{estamento:'TECNICOS',cargo:'TECNICO NIVEL SUPERIOR ENFERMERIA',unidad:'UNIDAD DE CUIDADOS EN PABELLON'});
+      add('RF TENS2',{estamento:'TECNICOS',cargo:'AUX. PARAMEDICO',unidad:'UNIDAD DE CUIDADOS EN PABELLON'});
+      const k=n=>_rolFondoClase(n);
+      const fuera=_rolFondoClase('RF NO ESTA',{cargo:'ENFERMERA',estamento:'PROFESIONALES'})==='enf';
+      const ok=fuera && k('RF MEDICO')==='med' && k('RF ENFERMERA')==='enf' && k('RF TENS RX')==='tens_rx' && k('RF TENS ENDO')==='tens_endo' && k('RF AUX')==='aux' && k('RF TENS')==='' && k('RF TENS2')==='' && k('NADIE')==='';
+      const din=_rolFondoDot({tipo:'dinamico',turnos:[{nombre:'RF MEDICO'},{nombre:'RF ENFERMERA'}]})==='' && _rolFondoDot({tipo:'dinamico',turnos:[{nombre:'RF AUX'}]})==='aux';
+      // dibujo: la tarjeta toma el color
+      const g0=svg.childNodes.length; _drawDotCard({dx:0,dy:0,col:'#10b981',lines:['👤 RF MEDICO'],rol:'med'},{rot:0,x0:10,cw:80,ch:14},{fs:7.5,lh:9.5,padX:5,padY:4});
+      const card=svg.lastChild, bg=card.querySelector('.ws-card-bg'), dib=bg.getAttribute('fill')===ROL_FONDO.med[1]; card.remove();
+      return ok && din && dib;
+    } finally { _estIdx=prev; }
+  });
   T('Capas: el nombre de la unidad queda encima de todo, después escaleras y ascensores, y abajo lo demás (plazas)', ()=>{
     const snap=JSON.stringify(structuresState), f0=S.floorId, l0=S.level, eP=S.estac, vP=S.verticales;
     try{
       S.floorId=fl.id; S.level=1; S.estac=true; S.verticales=true;
+      fl.areas.push({id:'cap_a', name:'CAPAS', rooms:[]}); boxState.areas['cap_a']=[{x:600,y:500,w:1200,h:900}]; nameState.areas['cap_a']='CAPAS';
       structuresState[fl.id]=[{id:'c1',kind:'stair',x:1000,y:800,w:200,h:300},{id:'c2',kind:'est',cat:'pub',x:1100,y:800,w:150,h:300},{id:'c3',kind:'asc-G',x:1300,y:800,w:150,h:180,etq:'Z1'}];
       renderSVG();
       const hijos=[...svg.children], idx=n=>hijos.indexOf(n);
@@ -17552,6 +17801,7 @@ async function runSelfTest(){
         && idx(lbl) > idx(top) && idx(top) > idx(base) && hijos.slice(idx(top)+1).every(n=>!n.classList || !n.classList.contains('structures-layer'));
     } finally {
       S.floorId=f0; S.level=l0; S.estac=eP; S.verticales=vP;
+      fl.areas=fl.areas.filter(a=>a.id!=='cap_a'); delete boxState.areas['cap_a']; delete nameState.areas['cap_a'];
       Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
     }
   });
