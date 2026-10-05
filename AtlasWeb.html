@@ -3950,7 +3950,8 @@ function _jardinesSync(){
     const b=document.getElementById('btnVert'); if(b) b.classList.toggle('active',S.verticales!==false); }
   if(S.relojes===undefined){ let v=null; try{ v=localStorage.getItem('cabida_relojes'); }catch(e){} S.relojes=(v!=='0');
     const b=document.getElementById('btnReloj'); if(b) b.classList.toggle('active',S.relojes!==false); }
-  if(S.estac===undefined){ let v=null; try{ v=localStorage.getItem('cabida_estac'); }catch(e){} S.estac=(v!=='0');
+  // estacionamientos APAGADOS por defecto (~1.460 plazas sobrecargan el plano): se encienden con 🅿 en la barra
+  if(S.estac===undefined){ let v=null; try{ v=localStorage.getItem('cabida_estac'); }catch(e){} S.estac=(v==='1');
     const b=document.getElementById('btnEstac'); if(b) b.classList.toggle('active',S.estac!==false); }
   if(S.correoN===undefined){ let v=null; try{ v=localStorage.getItem('cabida_correo_n'); }catch(e){} S.correoN=(v!=='0');
     const b=document.getElementById('btnCorreoN'); if(b) b.classList.toggle('active',S.correoN!==false); }
@@ -4621,9 +4622,21 @@ function renderSVG(){
   // Carros de paro: marcadores que laten en el recinto (todas las vistas)
   { const lg=document.getElementById('cpLegend');
     if(_cpOn){ try{ _cpLayer(); }catch(e){ console.warn('carros de paro',e); } } else if(lg) lg.style.display='none'; }
+  try{ _capasArriba(); }catch(e){ console.warn('orden de capas',e); }
   // Overlay de diagnóstico DXF (siempre encima de todo, no interactivo)
   if(_dxfOverlayOn && S.level<=2) paintDxfOverlay();
   try{ _dockSync(); }catch(e){}
+}
+// Orden de capas, de arriba hacia abajo (05-10-2026): 1) nombre de la unidad (siempre
+// visible), 2) escaleras y ascensores, 3) todo lo demás (plazas, relojes, correo, carros…).
+// Se MUEVEN los nodos al final del SVG (no se clonan): conservan sus eventos.
+function _capasArriba(){
+  const lay=svg.querySelector('.structures-layer');
+  if(lay){
+    const v=[...lay.children].filter(g=>g.classList.contains('struct-marker') && /^(asc-|stair$|escalator$)/.test(g.getAttribute('data-k')||''));
+    if(v.length){ const top=lay.cloneNode(false); top.setAttribute('class','structures-layer structures-top'); v.forEach(g=>top.appendChild(g)); svg.appendChild(top); if(!lay.children.length) lay.remove(); }
+  }
+  if(S.level===1) (_areaLabels||[]).forEach(a=>[a.lbl,a.sub,a.sub2].forEach(n=>{ if(n) svg.appendChild(n); }));
 }
 
 function renderL1(fl){
@@ -7488,6 +7501,93 @@ const CN_TIPO={paso:['P','Estación de paso'],final:['F','Estación final'],masi
 const EST_CAT={pub:{n:'Público general',col:'#38bdf8',ic:'🅿',w:2.5,h:5.0},disc:{n:'Discapacitados',col:'#2563eb',ic:'♿',w:3.6,h:5.0},
   amb:{n:'Ambulancias',col:'#ef4444',ic:'🚑',w:3.5,h:7.0},dir:{n:'Directivos',col:'#f59e0b',ic:'★',w:2.5,h:5.0},func:{n:'Funcionarios',col:'#14b8a6',ic:'👥',w:2.5,h:5.0}};
 function _estCat(it){ return EST_CAT[it.cat]||EST_CAT.pub; }
+// ── Plaza TIPO por categoría (05-10-2026): una plaza marcada estTipo, de otro color, fija
+// el tamaño de todas las de su categoría en todos los pisos (en metros: cada plano tiene su
+// escala). Se respeta la orientación de cada plaza (batería ↔ cordón) y se escala desde su
+// centro, así las que comparten pasillo de transferencia se superponen igual en todas.
+const EST_TIPO_COL={disc:'#c026d3',amb:'#f97316',pub:'#0d9488',dir:'#7c3aed',func:'#be123c'};
+// metros por px para plazas: la calibración de planos (la misma de Navegación) manda;
+// _mPx cae a 0,0161 en los subterráneos (sin DXF) y daría plazas de 1,9 m en P-3
+function _mPxEst(fid){ const m=(typeof _calibM==='function')?_calibM(fid||S.floorId):null; return m?1/Math.hypot(m[0],m[1]):_mPx(fid); }
+function _estCatId(x){ return EST_CAT[x.cat]?x.cat:'pub'; }
+function _estTipoDe(cat){
+  for(const [p,arr] of Object.entries(structuresState)){ const t=(arr||[]).find(x=>x.kind==='est'&&x.estTipo&&_estCatId(x)===cat); if(t) return {it:t, fid:p}; }
+  return null;
+}
+// medida de la tipo en px del piso fid: {largo, corto}
+function _estTipoMedida(cat, fid){
+  const T=_estTipoDe(cat); if(!T||!T.it.w||!T.it.h) return null;
+  const k0=_mPxEst(T.fid), k=_mPxEst(fid||S.floorId), a=T.it.w*k0, b=T.it.h*k0;
+  return {largo:Math.max(a,b)/k, corto:Math.min(a,b)/k, m:[Math.min(a,b), Math.max(a,b)]};
+}
+function _estAjustaATipo(x, med){ const vert=(x.h||0)>=(x.w||0); x.w=Math.round(vert?med.corto:med.largo); x.h=Math.round(vert?med.largo:med.corto); }
+function _estDeCat(cat){ return Object.entries(structuresState).flatMap(([p,arr])=>(arr||[]).filter(x=>x.kind==='est'&&_estCatId(x)===cat).map(x=>({x,p}))); }
+// Filas de plazas PARALELAS de una categoría en un piso: misma orientación, lado a lado
+// (hasta 1,2 m de pasillo entre ellas) y casi a la misma altura (≤ 35 % del largo).
+function _estFilas(arr, cat, fid){
+  const k=_mPxEst(fid), L=(arr||[]).filter(x=>x.kind==='est'&&_estCatId(x)===cat&&x.w&&x.h), par=L.map((_,i)=>i);
+  const raiz=i=>{ while(par[i]!==i){ par[i]=par[par[i]]; i=par[i]; } return i; };
+  for(let i=0;i<L.length;i++) for(let j=i+1;j<L.length;j++){
+    const a=L[i], b=L[j], va=a.h>=a.w; if(va!==(b.h>=b.w)) continue;
+    const lat=va?Math.abs(a.x-b.x):Math.abs(a.y-b.y), lon=va?Math.abs(a.y-b.y):Math.abs(a.x-b.x);
+    const corto=(Math.min(a.w,a.h)+Math.min(b.w,b.h))/2, largo=(Math.max(a.w,a.h)+Math.max(b.w,b.h))/2;
+    if(lat<=corto+1.2/k && lon<=largo*0.35) par[raiz(i)]=raiz(j);
+  }
+  const G={}; L.forEach((x,i)=>{ (G[raiz(i)]=G[raiz(i)]||[]).push(x); });
+  return Object.values(G).filter(g=>g.length>1);
+}
+// Alinea cada fila de plazas paralelas: mismos bordes delantero y trasero. Manda la tipo si
+// está en la fila (al arrastrar un tirador se corre su centro); si no, la mediana de la fila.
+function _estAlineaFilas(cat){
+  const T=_estTipoDe(cat), ti=T&&T.it; let n=0;
+  Object.entries(structuresState).forEach(([p,arr])=>_estFilas(arr,cat,p).forEach(g=>{
+    const ax=g[0].h>=g[0].w?'y':'x', v=g.map(x=>x[ax]).sort((a,b)=>a-b);
+    const ref=g.includes(ti)?ti[ax]:v[Math.floor(v.length/2)];
+    g.forEach(x=>{ if(x!==ti && Math.abs(x[ax]-ref)>0.5){ x[ax]=ref; n++; } });
+  }));
+  return n;
+}
+// lleva todas las plazas de la categoría al tamaño de la tipo y alinea las paralelas;
+// devuelve cuántas cambiaron
+function estReplicarTipo(cat, silencio){
+  const T=_estTipoDe(cat); if(!T) return 0; let n=0; const pisos=new Set();
+  _estDeCat(cat).forEach(({x,p})=>{ if(x===T.it) return; const med=_estTipoMedida(cat,p); if(!med) return;
+    const w0=x.w, h0=x.h; _estAjustaATipo(x, med); if(x.w!==w0||x.h!==h0){ n++; pisos.add(p); } });
+  const al=_estAlineaFilas(cat);
+  if(!silencio && typeof tbInfo!=='undefined'&&tbInfo){ const c=EST_CAT[cat], m=_estTipoMedida(cat,T.fid).m;
+    tbInfo.textContent=c.ic+' Tamaño tipo '+m[0].toFixed(2)+' × '+m[1].toFixed(2)+' m aplicado a '+n+' plaza(s) de '+c.n+(pisos.size?(' ('+[...pisos].join(', ')+')'):'')+(al?(' · '+al+' alineada(s) con su fila'):'');
+    setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },9000); }
+  return n+al;
+}
+// Al abrir: si alguna plaza de una categoría con tipo no tiene su medida (o su fila está
+// desalineada), se sincroniza. Así la réplica no depende de que se dispare el arrastre.
+function _estSincronizaTipos(){
+  let n=0;
+  Object.keys(EST_CAT).forEach(cat=>{ const T=_estTipoDe(cat); if(!T) return;
+    const dif=_estDeCat(cat).some(({x,p})=>{ if(x===T.it) return false; const med=_estTipoMedida(cat,p); if(!med) return false;
+      const vert=(x.h||0)>=(x.w||0); return Math.abs(x.w-Math.round(vert?med.corto:med.largo))>0.5 || Math.abs(x.h-Math.round(vert?med.largo:med.corto))>0.5; });
+    if(dif) n+=estReplicarTipo(cat, true); else n+=_estAlineaFilas(cat);
+  });
+  return n;
+}
+function _estHacerTipo(it){
+  const cat=_estCatId(it); _estDeCat(cat).forEach(({x})=>{ delete x.estTipo; }); it.estTipo=true;
+  if(!it.w||!it.h){ const c=_estCat(it), k=_mPxEst(); it.w=Math.round(c.w/k); it.h=Math.round(c.h/k); }
+}
+// Primera vez: marca como tipo, en P-2, la plaza ♿ y la 🚑 de tamaño más representativo
+// (la más cercana a la mediana de su categoría). Sólo si la categoría aún no tiene tipo.
+function _estTipoAuto(fid){
+  fid=fid||'P-2'; let n=0;
+  ['disc','amb'].forEach(cat=>{
+    if(_estTipoDe(cat)) return;
+    const L=(structuresState[fid]||[]).filter(x=>x.kind==='est'&&_estCatId(x)===cat&&x.w&&x.h); if(!L.length) return;
+    const med=a=>{ const v=a.slice().sort((p,q)=>p-q); return v[Math.floor(v.length/2)]; };
+    const lg=med(L.map(x=>Math.max(x.w,x.h))), co=med(L.map(x=>Math.min(x.w,x.h)));
+    const best=L.slice().sort((p,q)=>(Math.abs(Math.max(p.w,p.h)-lg)+Math.abs(Math.min(p.w,p.h)-co))-(Math.abs(Math.max(q.w,q.h)-lg)+Math.abs(Math.min(q.w,q.h)-co)))[0];
+    best.estTipo=true; n++;
+  });
+  return n;
+}
 function _cnCol(it){ return (CN_SIS[it.sis]||{}).col || STRUCT_TYPES.cn.col; }
 let structuresState = {};
 try { structuresState = JSON.parse(localStorage.getItem('cabida_cad_structures') || '{}'); } catch {}
@@ -7562,7 +7662,7 @@ function _structClickHandler(e){
   if(tdef.kind === 'point'){
     const nuevo={ id: S.floorId+'-st-'+Date.now(), kind: _structKind, x: p.x, y: p.y };
     if(_structKind==='cn'){ nuevo.sis=S.cnSisDef||'T2'; nuevo.tipo='paso'; if(S.correoN===false) toggleCorreoN(); }
-    if(_structKind==='est'){ const c=EST_CAT[S.estCatDef]||EST_CAT.pub, k=_mPx(); nuevo.cat=S.estCatDef||'pub'; nuevo.w=Math.round(c.w/k); nuevo.h=Math.round(c.h/k); if(S.estac===false) toggleEstac(); }
+    if(_structKind==='est'){ const c=EST_CAT[S.estCatDef]||EST_CAT.pub, k=_mPxEst(); nuevo.cat=S.estCatDef||'pub'; nuevo.w=Math.round(c.w/k); nuevo.h=Math.round(c.h/k); const mt=_estTipoMedida(nuevo.cat); if(mt) _estAjustaATipo(nuevo, mt); if(S.estac===false) toggleEstac(); }
     addStruct(nuevo);
     // Mantener modo activo para colocar varios; pulsar Esc para salir
   } else if(tdef.kind === 'line'){
@@ -7628,8 +7728,10 @@ function paintStructures(){
   const relojEditable = S.editMode && items.some(it=>_esMarca(it.kind));
   const g = el('g', {class:'structures-layer',
     ...(S.level>1 && !relojEditable ?{'pointer-events':'none'}:{})});
-  // Renderizar todos los elementos persistidos
-  items.forEach(it => {
+  // Renderizar todos los elementos persistidos. Orden de dibujo: plazas abajo (la TIPO
+  // encima de las que se le superponen), después lo demás y el seleccionado arriba de todo.
+  const _rk = it => it.id===S.structSel ? 3 : (it.kind==='est' ? (it.estTipo ? 1 : 0) : 2);
+  items.map((it,i)=>[it,i]).sort((p,q)=>(_rk(p[0])-_rk(q[0]))||(p[1]-q[1])).map(p=>p[0]).forEach(it => {
     const tdef = STRUCT_TYPES[it.kind]; if(!tdef) return;
     if(tdef.kind === 'point'){
       g.appendChild(renderStructMarker(it, tdef));
@@ -7665,7 +7767,7 @@ function renderStructMarker(it, tdef){
   const base = tdef.grupo==='reloj' ? 190 : (tdef.grupo==='cn' ? 180 : 95);
   const bw = sized ? Math.max(30, it.w) : base, bh = sized ? Math.max(30, it.h) : base;
   const R = sized ? Math.min(bw, bh) / 1.7 : base*56/95;
-  const g = el('g', {class:'struct-marker', transform:`translate(${it.x},${it.y})`});
+  const g = el('g', {class:'struct-marker', 'data-k':it.kind, transform:`translate(${it.x},${it.y})`});
   const baseStrokeW = Math.max(2, Math.min(5, R / 11));
   if(tdef.grupo==='reloj'){
     g.appendChild(el('circle',{class:'struct-reloj',cx:0,cy:0,r:Math.min(bw,bh)/2,fill:tdef.col,stroke:'#fff','stroke-width':baseStrokeW,opacity:0.95}));
@@ -7673,9 +7775,10 @@ function renderStructMarker(it, tdef){
     t.textContent = it.etq || tdef.short; g.appendChild(t);
   } else if(tdef.grupo==='est'){
     // plaza a tamaño real: caja translúcida del color de la categoría con su icono
-    const c=_estCat(it);
-    g.appendChild(el('rect',{class:'struct-est',x:-bw/2,y:-bh/2,width:bw,height:bh,rx:Math.min(10,Math.min(bw,bh)*0.08),fill:c.col,'fill-opacity':0.42,stroke:c.col,'stroke-width':Math.max(2,baseStrokeW*0.8)}));
-    const t=el('text',{x:0,y:0,'text-anchor':'middle','dominant-baseline':'central','font-size':Math.min(bw,bh)*0.55,'font-weight':900,fill:'#fff',stroke:c.col,'stroke-width':Math.max(1.5,Math.min(bw,bh)*0.03),'paint-order':'stroke fill','pointer-events':'none','font-family':'system-ui,-apple-system,sans-serif'});
+    const c=_estCat(it), tc=it.estTipo?(EST_TIPO_COL[_estCatId(it)]||'#c026d3'):c.col;
+    g.appendChild(el('rect',{class:'struct-est'+(it.estTipo?' struct-est-tipo':''),x:-bw/2,y:-bh/2,width:bw,height:bh,rx:Math.min(10,Math.min(bw,bh)*0.08),fill:tc,'fill-opacity':it.estTipo?0.6:0.42,stroke:tc,'stroke-width':Math.max(2,baseStrokeW*(it.estTipo?1.6:0.8))}));
+    if(it.estTipo){ const tt=el('text',{x:0,y:-bh/2+Math.min(bw,bh)*0.2,'text-anchor':'middle','dominant-baseline':'central','font-size':Math.min(bw,bh)*0.2,'font-weight':900,fill:'#fff','pointer-events':'none','font-family':'system-ui,-apple-system,sans-serif'}); tt.textContent='TIPO'; g.appendChild(tt); }
+    const t=el('text',{x:0,y:0,'text-anchor':'middle','dominant-baseline':'central','font-size':Math.min(bw,bh)*0.55,'font-weight':900,fill:'#fff',stroke:tc,'stroke-width':Math.max(1.5,Math.min(bw,bh)*0.03),'paint-order':'stroke fill','pointer-events':'none','font-family':'system-ui,-apple-system,sans-serif'});
     t.textContent=c.ic; g.appendChild(t);
     if(it.etq){ const te=el('text',{x:0,y:bh/2-Math.min(bw,bh)*0.16,'text-anchor':'middle','font-size':Math.min(bw,bh)*0.22,'font-weight':800,fill:'#0f172a','pointer-events':'none'}); te.textContent=it.etq; g.appendChild(te); }
   } else if(tdef.grupo==='cn'){
@@ -7727,7 +7830,7 @@ function renderStructMarker(it, tdef){
   const ext = DXF_EXT[S.floorId], dim = FLOOR_DIMS[S.floorId];
   const mx = (ext&&dim) ? ((ext.xmax-ext.xmin)/dim.w) : 0, my = (ext&&dim) ? ((ext.ymax-ext.ymin)/dim.h) : 0;
   const PUERTA={};
-  ttl.textContent = tdef.grupo==='est' ? ('🅿 Estacionamiento · '+_estCat(it).n+(it.etq?(' · '+it.etq):'')+(sized&&mx?` · ${(bw*mx).toFixed(1)} × ${(bh*my).toFixed(1)} m`:'')+(it.origen==='navegacion'?' · de Navegación':(it.origen==='replica'?' · replicada de '+(it.de||'otro piso'):''))
+  ttl.textContent = tdef.grupo==='est' ? ('🅿 Estacionamiento · '+_estCat(it).n+(it.estTipo?' · ⭐ PLAZA TIPO (su tamaño se replica a toda la categoría)':'')+(it.etq?(' · '+it.etq):'')+(sized?` · ${(Math.min(bw,bh)*_mPxEst()).toFixed(2)} × ${(Math.max(bw,bh)*_mPxEst()).toFixed(2)} m`:'')+(it.origen==='navegacion'?' · de Navegación':(it.origen==='replica'?' · replicada de '+(it.de||'otro piso'):''))
       + (S.editMode ? ' · clic: panel (categoría · girar · tamaño) · arrastrar mueve · × borra' : ''))
     : tdef.grupo==='cn' ? (_cnTitulo(it) + (S.editMode ? ' · clic: panel (sistema · tipo · estación del directorio) · arrastrar mueve · × borra (en cualquier vista)' : ''))
     : tdef.grupo==='reloj'
@@ -7750,8 +7853,19 @@ function renderStructMarker(it, tdef){
     // tiradores en los 4 VÉRTICES: arrastrar uno escala con el vértice opuesto fijo
     // (⇧ mantiene la proporción). Tamaño casi constante en pantalla.
     const hs = Math.max(8, Math.min(Math.min(bw,bh)*0.3, 11/Math.max(S.zoom,0.02)));
-    [[-1,-1,'nwse-resize'],[1,-1,'nesw-resize'],[1,1,'nwse-resize'],[-1,1,'nesw-resize']].forEach(([cx,cy,cur])=>{
+    // plazas: son cientos y se superponen → tiradores sólo en la seleccionada
+    const tiradores = tdef.grupo!=='est' || S.structSel===it.id;
+    if(tiradores) [[-1,-1,'nwse-resize'],[1,-1,'nesw-resize'],[1,1,'nwse-resize'],[-1,1,'nesw-resize']].forEach(([cx,cy,cur])=>{
       const hz = el('rect',{x:cx*bw/2-hs/2,y:cy*bh/2-hs/2,width:hs,height:hs,rx:hs*0.18,fill:'#fff',stroke:tdef.col,'stroke-width':Math.max(1.5,hs*0.16),class:'struct-resize','data-v':(cy<0?'n':'s')+(cx<0?'w':'e')});
+      hz.style.cursor = cur;
+      hz.addEventListener('mousedown', e => _startStructDrag(e, it, 'size', {sx:cx, sy:cy}));
+      g.appendChild(hz);
+    });
+    // tiradores en los 4 LADOS: cambian sólo el ancho o sólo el largo (lado opuesto fijo)
+    const hl = hs*1.9, ha = hs*0.62;
+    if(tiradores) [[0,-1,'ns-resize'],[1,0,'ew-resize'],[0,1,'ns-resize'],[-1,0,'ew-resize']].forEach(([cx,cy,cur])=>{
+      const w0=cx?ha:hl, h0=cx?hl:ha;
+      const hz = el('rect',{x:cx*bw/2-w0/2,y:cy*bh/2-h0/2,width:w0,height:h0,rx:Math.min(w0,h0)*0.45,fill:'#fff',stroke:tdef.col,'stroke-width':Math.max(1.5,hs*0.16),class:'struct-resize-lado','data-v':cy?(cy<0?'n':'s'):(cx<0?'w':'e')});
       hz.style.cursor = cur;
       hz.addEventListener('mousedown', e => _startStructDrag(e, it, 'size', {sx:cx, sy:cy}));
       g.appendChild(hz);
@@ -7824,6 +7938,7 @@ function _structDragUp(){
   if(_stDrag && _stDrag.moved){
     _stJustDragged=true; setTimeout(()=>{ _stJustDragged=false; }, 0);
     // gemelas (A1/A2): al escalar o mover una, la otra queda en espejo (salvo ⌥ o espejo apagado)
+    if(_stDrag.mode==='size' && _stDrag.it.kind==='est' && _stDrag.it.estTipo){ estReplicarTipo(_estCatId(_stDrag.it)); if(S.structSel===_stDrag.it.id) structEditRender(); }
     if(_stDrag.mode!=='all' && !_stDrag.noMirror && S.structMirror!==false) _espejaGemela(_stDrag.it);
     else { const a0=_stDrag.all[0]; if(a0) _vertAjusteRegistra(S.floorId, a0.x.x-a0.ox, a0.x.y-a0.oy); }
     sStruct(); renderSVG();
@@ -7890,7 +8005,7 @@ function structEditRender(){
 }
 function structEditApply(campo, val){
   const it=_structSelIt(); if(!it) return;
-  const mpx=_mPx(), mirror=S.structMirror!==false;
+  const mpx=it.kind==='est'?_mPxEst():_mPx(), mirror=S.structMirror!==false;
   if(campo==='etq'){ it.etq=String(val||'').trim(); if(!it.etq) delete it.etq; }
   else if(campo==='kind'){ if(STRUCT_TYPES[val]) it.kind=val; }
   else if(campo==='salida'){ if(val) it.salida=val; else delete it.salida; delete it.salida_fuente; }
@@ -7898,8 +8013,12 @@ function structEditApply(campo, val){
     const v='nesw'.split('').filter(l=>set.has(l)).join(''); if(v) it.salida=v; else delete it.salida; delete it.salida_fuente; }
   else if(campo==='w'||campo==='h'){ const px=Math.max(19, Math.round(parseFloat(val)/mpx)); if(isFinite(px)) it[campo]=px; const b0=it.kind==='cn'?180:(it.kind==='reloj'?190:95); if(!it.w) it.w=b0; if(!it.h) it.h=b0; }
   else if(campo==='mirror'){ S.structMirror=!!val; _lsPref('cabida_struct_mirror', val?'1':'0'); }
-  else if(campo==='estCat'){ if(EST_CAT[val]){ it.cat=val; S.estCatDef=val; } }
-  else if(campo==='estStd'){ const c=_estCat(it), k=_mPx(), vert=(it.h||0)>=(it.w||0); it.w=Math.round((vert?c.w:c.h)/k); it.h=Math.round((vert?c.h:c.w)/k); }
+  else if(campo==='estCat'){ if(EST_CAT[val]){ it.cat=val; S.estCatDef=val; delete it.estTipo; } }
+  else if(campo==='estStd'){ const c=_estCat(it), k=_mPxEst(), vert=(it.h||0)>=(it.w||0); it.w=Math.round((vert?c.w:c.h)/k); it.h=Math.round((vert?c.h:c.w)/k); }
+  else if(campo==='estAjTipo'){ const med=_estTipoMedida(_estCatId(it)); if(med) _estAjustaATipo(it, med); }
+  else if(campo==='estHacerTipo'){ _estHacerTipo(it); }
+  else if(campo==='estReplicar'){ if(it.estTipo && !confirm('¿Llevar TODAS las plazas de '+_estCat(it).n+' (todos los pisos) al tamaño de esta plaza tipo?')) return; }
+  if(it.kind==='est' && it.estTipo && ['w','h','estStd','estReplicar'].includes(campo)) estReplicarTipo(_estCatId(it));
   else if(campo==='estGira'){ const w=it.w; it.w=it.h; it.h=w; }
   else if(campo==='cnSis'){ if(CN_SIS[val]){ it.sis=val; S.cnSisDef=val; } }
   else if(campo==='cnTipo'){ if(CN_TIPO[val]) it.tipo=val; }
@@ -7990,16 +8109,29 @@ function _cnAutoImport(){
   return n;
 }
 window.addEventListener('load',()=>setTimeout(()=>{ if(typeof _SELFTEST!=='undefined'&&_SELFTEST) return; try{ _cnAutoImport(); }catch(e){ console.warn('correo neumático: importación automática',e); } }, 1400));
+window.addEventListener('load',()=>setTimeout(()=>{ if((typeof _SELFTEST!=='undefined'&&_SELFTEST) || S.viewOnly) return; try{ const a=_estTipoAuto('P-2'), b=_estSincronizaTipos(); if(a||b){ sStruct(); renderSVG(); } }catch(e){ console.warn('plaza tipo',e); } }, 1600));
 function _estEditRender(m, it){
-  const mpx=_mPx(), c=_estCat(it), w=it.w||Math.round(c.w/mpx), h=it.h||Math.round(c.h/mpx);
+  const mpx=_mPxEst(), c=_estCat(it), w=it.w||Math.round(c.w/mpx), h=it.h||Math.round(c.h/mpx);
   m.innerHTML=`<div class="se-t"><span style="display:inline-block;width:14px;height:14px;border-radius:3px;background:${c.col}"></span> Estacionamiento · ${esc(c.n)}<span class="x" onclick="structEditClose()">✕</span></div>
     <div class="se-row"><label>Categoría</label><select onchange="structEditApply('estCat',this.value)">${Object.entries(EST_CAT).map(([k,v])=>`<option value="${k}"${k===(it.cat||'pub')?' selected':''}>${v.ic} ${esc(v.n)}</option>`).join('')}</select></div>
     <div class="se-row"><label>Etiqueta</label><input value="${esc(it.etq||'')}" placeholder="N° de plaza" onchange="structEditApply('etq',this.value)" style="width:90px"></div>
     <div class="se-row"><label>Tamaño (m)</label><input type="number" step="0.1" min="0.5" value="${(w*mpx).toFixed(2)}" onchange="structEditApply('w',this.value)"> × <input type="number" step="0.1" min="0.5" value="${(h*mpx).toFixed(2)}" onchange="structEditApply('h',this.value)"></div>
     <div class="se-row"><label></label><button onclick="structEditApply('estGira')" title="Plaza en batería ↔ en cordón">⟲ Girar 90°</button><button onclick="structEditApply('estStd')" title="Medida estándar de la categoría (${c.w} × ${c.h} m)">Medida estándar</button></div>
-    <div class="se-note">Arrastrar o flechas mueven la plaza (⌘ 5 px · ⇧ 20 px). Los vértices cambian el tamaño.</div>
+    ${_estTipoPanel(it)}
+    <div class="se-note">Arrastrar o flechas mueven la plaza (⌘ 5 px · ⇧ 20 px). Los vértices cambian el tamaño; los tiradores de los lados, sólo el ancho o sólo el largo.</div>
     <div class="se-btns"><button class="danger" onclick="const id=S.structSel; structEditClose(); deleteStruct(id);">⌫ Borrar</button><button onclick="structEditClose()">Cerrar</button></div>`;
   m.style.display='block'; m.style.right='16px'; m.style.top='14px'; m.style.left='auto';
+}
+function _estTipoPanel(it){
+  const cat=_estCatId(it), c=EST_CAT[cat], T=_estTipoDe(cat), tc=EST_TIPO_COL[cat]||'#c026d3', N=_estDeCat(cat).length;
+  const caja=`<span style="display:inline-block;width:11px;height:11px;border-radius:2px;background:${tc};vertical-align:-1px"></span>`;
+  if(it.estTipo){ const m=_estTipoMedida(cat).m;
+    return `<div class="se-note" style="border-left:3px solid ${tc};padding-left:6px">${caja} <b>Plaza tipo de ${esc(c.n)}</b> (${m[0].toFixed(2)} × ${m[1].toFixed(2)} m): al cambiar su tamaño se replica a las ${N-1} plaza(s) de la categoría en todos los pisos, cada una con su orientación y desde su centro.</div>
+      <div class="se-row"><label></label><button onclick="structEditApply('estReplicar')">⎘ Replicar ahora a las ${N-1}</button></div>`; }
+  if(T){ const m=_estTipoMedida(cat).m;
+    return `<div class="se-row"><label>Tipo ${caja}</label><span style="color:var(--text-2)">${m[0].toFixed(2)} × ${m[1].toFixed(2)} m (${esc(T.fid)})</span></div>
+      <div class="se-row"><label></label><button onclick="structEditApply('estAjTipo')">Ajustar a la tipo</button><button onclick="structEditApply('estHacerTipo')" title="Esta plaza pasa a ser la tipo de ${esc(c.n)}">⭐ Hacer tipo</button></div>`; }
+  return `<div class="se-row"><label></label><button onclick="structEditApply('estHacerTipo')" title="Su tamaño pasará a mandar sobre todas las plazas de ${esc(c.n)}">⭐ Hacer plaza tipo</button></div>`;
 }
 function toggleEstac(){
   S.estac=(S.estac===false);
@@ -8023,6 +8155,7 @@ function importarEstacionamientosNav(sinConfirmar){
     if(!structuresState[p].length) delete structuresState[p];
   });
   if(S.estac===false) toggleEstac();
+  if(!sinConfirmar) _estTipoAuto('P-2');
   sStruct(); renderSVG();
   if(typeof closeStructMenu==='function') try{ closeStructMenu(); }catch(e){}
   if(!sinConfirmar && typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🅿 '+total+' estacionamientos importados de Navegación ('+pisos.join(', ')+')'; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},8000); }
@@ -17403,6 +17536,64 @@ async function runSelfTest(){
       return imp && sigue && mismo && otraVez && abajo && dib && oculta && !_vertPuntos('P-2').some(x=>x.kind==='est');
     } finally {
       window.NAV_VERTICALES=NVprev; S.estac=eP; S.floorId=f0; S.level=l0; _VA=VAprev;
+      Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
+    }
+  });
+  T('Capas: el nombre de la unidad queda encima de todo, después escaleras y ascensores, y abajo lo demás (plazas)', ()=>{
+    const snap=JSON.stringify(structuresState), f0=S.floorId, l0=S.level, eP=S.estac, vP=S.verticales;
+    try{
+      S.floorId=fl.id; S.level=1; S.estac=true; S.verticales=true;
+      structuresState[fl.id]=[{id:'c1',kind:'stair',x:1000,y:800,w:200,h:300},{id:'c2',kind:'est',cat:'pub',x:1100,y:800,w:150,h:300},{id:'c3',kind:'asc-G',x:1300,y:800,w:150,h:180,etq:'Z1'}];
+      renderSVG();
+      const hijos=[...svg.children], idx=n=>hijos.indexOf(n);
+      const lbl=svg.querySelector('.area-label'), esc=svg.querySelector('.struct-marker[data-k="stair"]'), asc=svg.querySelector('.struct-marker[data-k="asc-G"]'), est=svg.querySelector('.struct-marker[data-k="est"]');
+      const top=esc.parentNode, base=est.parentNode;
+      return !!lbl && top.classList.contains('structures-top') && asc.parentNode===top && base!==top
+        && idx(lbl) > idx(top) && idx(top) > idx(base) && hijos.slice(idx(top)+1).every(n=>!n.classList || !n.classList.contains('structures-layer'));
+    } finally {
+      S.floorId=f0; S.level=l0; S.estac=eP; S.verticales=vP;
+      Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
+    }
+  });
+  T('🅿 Plaza tipo: ♿/🚑 se marcan solas en P-2, otro color, su tamaño se replica en metros a toda la categoría (cada una con su orientación y centro) y los tiradores de los lados cambian un solo eje', ()=>{
+    const snap=JSON.stringify(structuresState), f0=S.floorId, l0=S.level, ed=S.editMode, eP=S.estac, z0=S.zoom;
+    try{
+      S.estac=true;
+      structuresState['P-2']=[{id:'d1',kind:'est',cat:'disc',x:6000,y:4000,w:224,h:310},{id:'d2',kind:'est',cat:'disc',x:7000,y:4000,w:320,h:230},
+        {id:'d3',kind:'est',cat:'disc',x:8000,y:4000,w:226,h:312},{id:'a1',kind:'est',cat:'amb',x:9000,y:4000,w:217,h:435},{id:'p1',kind:'est',cat:'pub',x:9500,y:4000,w:155,h:310}];
+      structuresState['P-3']=[{id:'d4',kind:'est',cat:'disc',x:6000,y:4000,w:100,h:140}];
+      const auto=_estTipoAuto('P-2')===2 && _estTipoDe('disc').it.id==='d3' && _estTipoDe('amb').it.id==='a1' && !_estTipoDe('pub') && _estTipoAuto('P-2')===0;
+      const d1=structsOf('P-2').find(x=>x.id==='d1'); _estHacerTipo(d1);
+      const unico=_estDeCat('disc').filter(o=>o.x.estTipo).length===1 && d1.estTipo;
+      d1.w=240; d1.h=330; const n=estReplicarTipo('disc');
+      const d2=structsOf('P-2').find(x=>x.id==='d2'), d3=structsOf('P-2').find(x=>x.id==='d3'), d4=structsOf('P-3')[0], k=_mPxEst('P-2')/_mPxEst('P-3');
+      const rep=n===3 && d3.w===240 && d3.h===330 && d2.w===330 && d2.h===240 && d2.x===7000 && d2.y===4000
+        && Math.abs(d4.w-240*k)<=1 && Math.abs(d4.h-330*k)<=1 && structsOf('P-2').find(x=>x.id==='p1').w===155;
+      // dibujo: la tipo con otro color + rótulo TIPO; en edición, 4 vértices + 4 lados
+      S.floorId='P-2'; S.level=1; S.editMode=true; S.structSel=null; renderSVG();
+      const sinSel=![...svg.querySelectorAll('.struct-marker')].some(g=>g.querySelector('.struct-resize,.struct-resize-lado'));
+      S.structSel='d1'; renderSVG();
+      const tipos=[...svg.querySelectorAll('.struct-est-tipo')], m1=tipos.length===2 && tipos.some(r=>r.getAttribute('fill')===EST_TIPO_COL.disc) && /TIPO/.test(svg.textContent);
+      const mk=[...svg.querySelectorAll('.struct-marker')].find(g=>g.querySelector('.struct-est-tipo[fill="'+EST_TIPO_COL.disc+'"]'));
+      const lados=!!mk && mk.querySelectorAll('.struct-resize-lado').length===4 && mk.querySelectorAll('.struct-resize').length===4;
+      // tirador del lado ESTE de la tipo: sólo crece el ancho, el lado oeste queda fijo, y se replica
+      S.zoom=1; const ev=(x,y)=>({clientX:x,clientY:y,button:0,shiftKey:false,altKey:false,preventDefault(){},stopPropagation(){}});
+      const oeste=d1.x-d1.w/2;
+      _startStructDrag(ev(100,100), d1, 'size', {sx:1, sy:0}); _structDragMove(ev(130,140)); _structDragUp();
+      const eje=d1.w===270 && d1.h===330 && Math.abs((d1.x-d1.w/2)-oeste)<=1 && d3.w===270 && d2.h===270;
+      // fila paralela: d5 al lado de la tipo; al estirar el borde SUR de la tipo su centro baja
+      // y d5 queda con los mismos bordes (alineada), no centrada en su posición anterior
+      structuresState['P-2'].push({id:'d5',kind:'est',cat:'disc',x:d1.x+260,y:4003,w:270,h:330});
+      const norte=d1.y-d1.h/2;
+      _startStructDrag(ev(100,100), d1, 'size', {sx:0, sy:1}); _structDragMove(ev(100,140)); _structDragUp();
+      const d5=structsOf('P-2').find(x=>x.id==='d5');
+      const fila=d1.h===370 && Math.abs((d1.y-d1.h/2)-norte)<=1 && d5.h===370 && d5.y===d1.y && d5.x===d1.x+260;
+      // al abrir: sincroniza lo que quedó distinto (p. ej. si la réplica no se disparó)
+      d5.w=200; d5.y=4100; const sync=_estSincronizaTipos()>0 && d5.w===270 && d5.y===d1.y && _estSincronizaTipos()===0;
+      S.structSel=null;
+      return auto && unico && rep && m1 && lados && eje && sinSel && fila && sync;
+    } finally {
+      S.floorId=f0; S.level=l0; S.editMode=ed; S.estac=eP; S.zoom=z0; S.structSel=null;
       Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
     }
   });

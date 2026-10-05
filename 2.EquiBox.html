@@ -2146,7 +2146,7 @@ function openModal(id){
     window._eettRenderVariant[b.code] = renderVariant;
   }
 
-    const _pinsItems = pinsForEquipo(b.name);
+    const _pinsItems = pinsForEquipo(b);
     const pinsTabLabel = _pinsItems.length ? `📦 PINS (${_pinsItems.length})` : '📦 PINS';
     // ORD SSMO 5040029-154: si el equipo está en la lista de necesidades no
     // consideradas, se avisa en su propia ficha (no solo en la pestaña).
@@ -2193,21 +2193,21 @@ function openModal(id){
 }
 // ══════════════════════════════════════════════════════════════════
 // CONECTOR PINS-EMMC
-// Cruza cada equipo (b.name) con SHARED_PINS_EMMC.items_principal
+// Cruza cada equipo con PINS_EMMC.items_principal por código de tipo (b.code = tipo_equipo);
+// si el código no aparece, por nombre. Dato: SHARED_DATA/pins_emmc.js (_DEV/pins/build_pins_emmc.py)
 // ══════════════════════════════════════════════════════════════════
-const PINS_ALL = (window.SHARED_PINS_EMMC && window.SHARED_PINS_EMMC.items_principal) || [];
+const _PINS_D = window.PINS_EMMC || window.SHARED_PINS_EMMC || {};
+const PINS_ALL = _PINS_D.items_principal || [];
+const PINS_CORTE = (function(){ const m=String(_PINS_D.corte||'').match(/(\d{4})-(\d{2})-(\d{2})/); return m ? m[3]+'-'+m[2]+'-'+m[1] : 'última versión'; })();
 function _normName(s){ return (s||'').toString().trim().toLowerCase().replace(/\s+/g,' '); }
-const _PINS_INDEX = (function(){
-  const idx = {};
-  for (const p of PINS_ALL){
-    const k = _normName(p.nombre);
-    if (!idx[k]) idx[k] = [];
-    idx[k].push(p);
-  }
-  return idx;
-})();
-function pinsForEquipo(name){
-  return _PINS_INDEX[_normName(name)] || [];
+const _PINS_INDEX = {}, _PINS_BYCODE = {};
+for (const p of PINS_ALL){
+  (_PINS_INDEX[_normName(p.nombre)] = _PINS_INDEX[_normName(p.nombre)] || []).push(p);
+  (_PINS_BYCODE[String(p.tipo_equipo)] = _PINS_BYCODE[String(p.tipo_equipo)] || []).push(p);
+}
+function pinsForEquipo(b){
+  if (typeof b === 'string') return _PINS_INDEX[_normName(b)] || [];
+  return (b && _PINS_BYCODE[String(b.code)]) || _PINS_INDEX[_normName(b && b.name)] || [];
 }
 function pinsSummary(items){
   const t = items.length;
@@ -2238,11 +2238,11 @@ function _bar(label, n, total, color){
   </div>`;
 }
 function renderPinsTab(b){
-  const items = pinsForEquipo(b.name);
+  const items = pinsForEquipo(b);
   if (!items.length){
     return `<div style="padding:30px;text-align:center;color:#94a3b8;font-size:13px">
       <div style="font-size:36px;margin-bottom:8px">📭</div>
-      <div><b style="color:#475569">"${b.name}"</b> no aparece en el despliegue PINS-EMMC actualizado al 22-may-2026.</div>
+      <div><b style="color:#475569">"${b.name}"</b> (código ${b.code}) no aparece en el despliegue PINS-EMMC al ${PINS_CORTE}.</div>
       <div style="font-size:11px;margin-top:6px">Si el nombre fue cambiado en la matriz, búscalo manualmente.</div>
     </div>`;
   }
@@ -2261,7 +2261,7 @@ function renderPinsTab(b){
   </tr>`).join('');
   const moreRow = items.length > 200 ? `<tr><td colspan="6" style="text-align:center;padding:8px;color:#94a3b8;font-style:italic">Mostrando 200 de ${items.length} unidades</td></tr>` : '';
   return `
-    <div class="section-title">Resumen despliegue PINS-EMMC · ${items.length} unidades en matriz</div>
+    <div class="section-title">Resumen despliegue PINS-EMMC · ${items.length} unidades en matriz · corte ${PINS_CORTE}</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:16px">
       <div style="background:#f8fafc;border-radius:8px;padding:10px 12px;border-left:4px solid #3b82f6">
         <div style="font-size:10px;color:#64748b;text-transform:uppercase;font-weight:700">Total unidades</div>
