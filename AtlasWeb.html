@@ -642,7 +642,41 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 
 /* ── Modales: un solo estilo (encabezado blanco, sin degradado) ──────────── */
 #fichaModal,#estadoModal,#equipModal{position:fixed;inset:0;background:rgba(15,22,34,.5);display:none;align-items:center;justify-content:center;z-index:120;padding:20px}
-#fichaModal.show,#estadoModal.show,#equipModal.show{display:flex}
+#fichaModal.show,#estadoModal.show,#equipModal.show,#dgModal.show{display:flex}
+#dgModal{position:fixed;inset:0;background:rgba(15,30,52,.55);display:none;align-items:center;justify-content:center;z-index:150;padding:16px}
+.ficha-box.dg-box{width:1000px}
+.srv-dg{display:block;width:100%;margin:6px 0 10px;padding:8px 10px;border:1px solid var(--accent-300);border-radius:var(--r-md);background:var(--accent-50);color:var(--accent-700);font:inherit;font-size:12px;font-weight:var(--fw-medium);cursor:pointer;text-align:left}
+.srv-dg:hover{background:var(--accent-100)}
+.dg-cupos{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.dg-cupo{display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--text-2)}
+.dg-cupo span{font-weight:var(--fw-medium);color:var(--text)}
+.dg-cupo input,.dg-cupo select{font:inherit;font-size:14px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text)}
+.dg-cupo small{font-size:10px;color:var(--text-3);line-height:1.3}
+.dg-zonas{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
+.dg-z{border:1px solid var(--border);border-radius:var(--r-md);padding:7px 9px;font-size:11px;display:flex;flex-direction:column;gap:2px}
+.dg-z b{font-size:12px;color:var(--text)}
+.dg-z.ok{background:#ecfdf5;border-color:#86efac;color:#166534}
+.dg-z.no{background:#fef2f2;border-color:#fca5a5;color:#991b1b}
+.dg-t{width:100%;border-collapse:collapse;font-size:12px}
+.dg-t th{font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--text-3);text-align:left;padding:5px 6px;border-bottom:1px solid var(--border)}
+.dg-t td{padding:6px;border-bottom:1px solid var(--n-100);vertical-align:top}
+.dg-t .n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.dg-t td small{display:block;font-size:10px;color:var(--text-3);font-weight:400}
+.dg-zh td{background:var(--surface-sunken);font-weight:var(--fw-medium);color:var(--text);font-size:12px}
+.dg-zh small{display:inline;font-weight:400}
+.dg-f{cursor:pointer}
+.dg-f:hover{background:var(--surface-sunken)}
+.dg-f.no td:nth-child(6){color:#b91c1c;font-weight:var(--fw-medium)}
+.dg-f .ar{font-size:9px;color:var(--text-3)}
+.dg-ps td{font-size:11px;color:var(--text);background:#fafafa;line-height:1.55}
+.dg-ps span{color:var(--text-3)}
+.dg-salas{margin-top:12px;font-size:12px}
+.dg-salas summary{cursor:pointer;color:var(--text-2)}
+.dg-salas-l{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;margin-top:8px}
+.dg-salas-l label{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:11px}
+.dg-salas-l select{font:inherit;font-size:11px;padding:2px 4px;border:1px solid var(--border);border-radius:5px;max-width:170px}
+.dg-nota{font-size:10.5px;color:var(--text-3);margin-top:10px;line-height:1.45}
+@media (max-width:840px){.dg-cupos{grid-template-columns:1fr 1fr}.dg-zonas{grid-template-columns:1fr 1fr}.dg-salas-l{grid-template-columns:1fr}}
 #fkPrintStamp{display:none}
 @media print{
   body.print-ficha>*{display:none !important}
@@ -1168,6 +1202,16 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="ficha-x" onclick="closeEstado()" title="Cerrar">×</button>
     </div>
     <div class="ficha-body" id="estadoBody"></div>
+  </div>
+</div>
+<div id="dgModal" onclick="if(event.target===this)closeDigedep()">
+  <div class="ficha-box dg-box">
+    <div class="ficha-head">
+      <div><div class="ficha-title">📐 Estándar basal de dotación · DIGEDEP</div>
+      <div class="ficha-sub" id="dgSub"></div></div>
+      <div style="display:flex;gap:6px;align-items:center"><button class="tb-btn" onclick="exportDigedep()" title="Descargar la comparación en Excel">⬇ Excel</button><button class="ficha-x" onclick="closeDigedep()" title="Cerrar">×</button></div>
+    </div>
+    <div class="ficha-body" id="dgBody"></div>
   </div>
 </div>
 <!-- Ficha de Recinto (equipamiento + mobiliario + pauta AS) -->
@@ -12384,6 +12428,202 @@ function sbShowTab(tab){
   if(tab==='tipos') renderTypeFilter();
   if(tab==='serv') renderSrvPanel();
 }
+// ══ ESTÁNDAR BASAL DE DOTACIÓN · DIGEDEP, Tabla 7 (Pabellón) ═══════════════════
+// Orientaciones técnicas DIGEDEP, 10.1 Tabla 7 «Resumen Estándar basal de dotación de
+// recursos humanos». Se mide el servicio abierto en vista 2:
+//  · CUPOS (base del estándar), automáticos desde el Atlas y editables:
+//      quirófanos = recintos tipo Pabellón · cupos de preanestesia = camillas en recintos
+//      de Preanestesia · unidades de recuperación = camillas en recintos de Recuperación.
+//  · PERSONAL: quien está asignado a un puesto del servicio, en la ZONA del recinto
+//      donde está (quirófanos, preanestesia, recuperación, gestión, áreas de apoyo; la
+//      zona se deduce del tipo y nombre del recinto y se puede corregir recinto a recinto).
+//      Unidad Prequirúrgica: la dotación de UNIDAD DEL PACIENTE PREQUIRURGICO (no tiene
+//      recintos en el pabellón). Turno, ley y horas salen de la matriz de dotación.
+//  · El estándar es BASAL (jornada diurna): el 4.º turno se muestra aparte y, si se
+//      elige, suma ¼ de puesto por persona. Becados no cuentan.
+// Los TENS de quirófano (arsenalera, pabellonera, anestesia) se comparan juntos, porque
+// la matriz aún no dice qué función cumple cada uno (rol_operativo sin completar).
+const DG_ZONAS={prequir:'Unidad Prequirúrgica',gestion:'Gestión',preanest:'Preanestesia',quir:'Quirófanos',recup:'Recuperación'};
+const DG_T7=[
+ {z:'prequir',ley:'18834',est:'Profesionales',cargo:'Enfermera(o)/matrona',k:'enf',r:{b:'quir',cada:3}},
+ {z:'prequir',ley:'18834',est:'Técnicos',cargo:'Técnico en Enfermería',k:'tens',r:{b:'quir',cada:3}},
+ {z:'prequir',ley:'18834',est:'Administrativos',cargo:'Administrativos',k:'adm',r:{b:'quir',cada:6}},
+ {z:'prequir',ley:'19664',est:'Médicos',cargo:'Anestesióloga(o)',k:'anest',r:{h:22}},
+ {z:'gestion',ley:'19664',est:'Médicos',cargo:'Jefatura',k:'jefe',r:{h:22}},
+ {z:'gestion',ley:'18834',est:'Profesionales',cargo:'Supervisora(or) · Coordinadora(or) Continuidad de la atención, IAAS y Calidad',k:'enf',r:{h:88,n:2},nota:'2 cargos de 44 h: supervisora + coordinadora'},
+ {z:'gestion',ley:'18834',est:'Administrativos',cargo:'Secretaria(o)',k:'adm',r:{h:44,n:1}},
+ {z:'preanest',ley:'18834',est:'Profesionales',cargo:'Enfermera(o) · Matrón(a)',k:'enf',r:{b:'pre',cada:6}},
+ {z:'preanest',ley:'18834',est:'Técnicos',cargo:'Técnico en Enfermería',k:'tens',r:{b:'pre',cada:6}},
+ {z:'preanest',ley:'18834',est:'Auxiliares',cargo:'Auxiliar de Servicios',k:'aux',r:{b:'pre',cada:6}},
+ {z:'quir',ley:'19664',est:'Médicos',cargo:'Anestesióloga(o)',k:'anest',r:{b:'quir',cada:1},jornadas:true},
+ {z:'quir',ley:'19664',est:'Médicos',cargo:'Cirujana(o)',k:'ciru',r:{b:'quir',cada:1,por:2},jornadas:true,nota:'los cirujanos los aportan los servicios quirúrgicos: acá sólo cuentan los asignados a un puesto del pabellón'},
+ {z:'quir',ley:'18834',est:'Profesionales',cargo:'Enfermera(o) · Matrón(a)',k:'enf',r:{b:'quir',cada:2}},
+ {z:'quir',ley:'18834',est:'Técnicos',cargo:'TENS Arsenalera(o) + Pabellonera(o) + Anestesia',k:'tens',r:{b:'quir',cada:1,por:3},nota:'3 filas de la Tabla 7 (1 de cada una por quirófano) comparadas juntas: la matriz aún no dice qué función cumple cada TENS'},
+ {z:'quir',ley:'18834',est:'Técnicos',cargo:'TENS áreas de apoyo (Farmacia · Insumos · Esterilización · Biopsias · Ropería)',k:'tens_apoyo',r:{n:3}},
+ {z:'quir',ley:'18834',est:'Auxiliares',cargo:'Auxiliar de Servicios',k:'aux',r:{b:'quir',cada:2}},
+ {z:'quir',ley:'18834',est:'Administrativos',cargo:'Administrativos',k:'adm',r:{b:'quir',cada:6}},
+ {z:'recup',ley:'18834',est:'Profesionales',cargo:'Enfermera(o) · Matrón(a)',k:'enf',r:{b:'recup',cada:6}},
+ {z:'recup',ley:'18834',est:'Técnicos',cargo:'Técnico en Enfermería',k:'tens',r:{b:'recup',cada:4}},
+ {z:'recup',ley:'18834',est:'Auxiliares',cargo:'Auxiliar de Servicios',k:'aux',r:{b:'recup',cada:12}}
+];
+function _dgRegla(r){ if(r.h!==undefined && r.b===undefined) return r.n?(r.n+' × 44 h semanales'):(r.h+' h semanales'); if(r.n!==undefined && r.b===undefined) return r.n+' para la unidad';
+  const base={quir:'quirófano',pre:'cupo de preanestesia',recup:'unidad de recuperación'}[r.b]; return (r.por||1)+' cada '+r.cada+' '+base+(r.cada>1?'s':''); }
+function _dgRequerido(r,c){ if(r.b) return Math.ceil(((c[r.b]||0)*(r.por||1))/r.cada); if(r.n!==undefined) return r.n; return null; }
+// Zona de un recinto del pabellón (corrección manual en nameState.digedepZona)
+function _dgZonaAuto(rid){
+  const t=rType(rid), n=(rName(rid)||'')+' '+(rCode(rid)||'');
+  if(t==='pabellon') return 'quir';
+  if(t==='preanest'||/pre.?anest|pre-?a\b/i.test(n)) return 'preanest';
+  if(t==='recup'||/\brecu/i.test(n)) return 'recup';
+  if(/jefe|jefatura|supervis|secretar|coordinac|calidad|iaas|direcci/i.test(n)) return 'gestion';
+  if(t==='bodega'||/botiqu|farmac|equipo|insumo|esteril|biops|roper|arsenal/i.test(n)) return 'apoyo';
+  if(/protocol|anestes|comando|recepci|pab\b|quir/i.test(n)) return 'quir';
+  return '';
+}
+function _dgZona(rid){ const m=(nameState.digedepZona||{})[rid]; return m!==undefined?m:_dgZonaAuto(rid); }
+function _dgCupos(area){
+  const c={quir:0,pre:0,recup:0}, f={quir:[],pre:[],recup:[]};
+  (area.rooms||[]).forEach(r=>{ if(!rShapes(r).length) return; const t=rType(r.id), z=_dgZona(r.id), bd=((wsState.beds||{})[r.id]||[]).length;
+    if(t==='pabellon'){ c.quir++; f.quir.push(rName(r.id)); }
+    if(z==='preanest' && bd){ c.pre+=bd; f.pre.push(rName(r.id)+' '+bd); }
+    if(z==='recup' && bd){ c.recup+=bd; f.recup.push(rName(r.id)+' '+bd); } });
+  return {c,f};
+}
+function _dgHoras(nombre){            // horas semanales de la persona (suma de sus cargos de la matriz)
+  const k=norm(nombre||''); let h=0, ley='', turno='', beca=false, unidad='';
+  ((dotDB&&dotDB.staff)||[]).forEach(s=>{ if(norm(s.nombre||'')!==k) return;
+    if(s.beca || /BECAD/i.test(s.ley||'')) beca=true;
+    const hh=String(s.horas||'').split('/').reduce((a,x)=>a+(parseFloat(x)||0),0); h+=hh;
+    ley=ley||s.ley||''; turno=turno||s.turno||''; unidad=unidad||s.unidad||''; });
+  return {h,ley,turno,beca,unidad};
+}
+function _dgClase(p, zona){
+  const e=String(p.estamento||'').toUpperCase(), c=String(p.cargo||'').toUpperCase(), u=String(p.unidad||'').toUpperCase();
+  const med=/MEDIC|ANESTES|CIRUJAN/.test(e+' '+c) && !/TECNIC/.test(c);
+  if(med) return zona==='gestion'?'jefe':((/ANESTES/.test(c)||/ANESTES/.test(u))?'anest':'ciru');
+  if(/ENFERMER|MATRON/.test(c) && !/TECNIC/.test(c)) return 'enf';
+  if(/TECNIC|TENS|PARAMEDIC/.test(e+' '+c)) return zona==='apoyo'?'tens_apoyo':'tens';
+  if(/AUXILIAR/.test(e+' '+c)) return 'aux';
+  if(/ADMINISTRAT|SECRETAR/.test(e+' '+c)) return 'adm';
+  return 'otro';
+}
+// Personas del servicio: {nombre, estamento, cargo, zona, clase, turno, horas, rid}
+function _dgPersonas(area){
+  const out=[], visto=new Set();
+  (area.rooms||[]).forEach(r=>{
+    const z=_dgZona(r.id);
+    ((wsState.dots||{})[r.id]||[]).forEach(d=>{
+      const per=d.tipo==='dinamico'?(d.turnos||[]).map(x=>({...x,_din:1})):[d];
+      per.forEach(p=>{ const nom=(p.nombre||'').trim(); if(!nom) return; const k=norm(nom); if(visto.has(k)) return; visto.add(k);
+        const st=_staffDe(nom)||{}, H=_dgHoras(nom);
+        const q={nombre:nom, estamento:p.estamento||st.estamento||'', cargo:p.cargo||st.cargo||'', unidad:H.unidad||st.unidad||'', rid:r.id, zona:z==='apoyo'?'quir':z, apoyo:z==='apoyo', turno:H.turno, horas:H.h, beca:H.beca, fuente:'Atlas'};
+        q.clase=_dgClase(q, z); out.push(q); });
+    });
+  });
+  // Unidad Prequirúrgica: no tiene recintos en el pabellón → desde la matriz de dotación
+  ((dotDB&&dotDB.staff)||[]).forEach(s=>{
+    if(!/PREQUIRURG/i.test(s.unidad||'')) return; const k=norm(s.nombre||''); if(visto.has(k)) return; visto.add(k);
+    const H=_dgHoras(s.nombre);
+    const q={nombre:s.nombre, estamento:s.estamento||'', cargo:s.cargo||'', unidad:s.unidad||'', rid:null, zona:'prequir', apoyo:false, turno:H.turno, horas:H.h, beca:H.beca, fuente:'Dotación'};
+    q.clase=_dgClase(q,'prequir'); out.push(q);
+  });
+  return out;
+}
+function _dgPeso(p, modo){ if(/4/.test(String(p.turno||''))) return modo==='cuarto'?0.25:(modo==='completo'?1:0); return 1; }
+// Evaluación completa: filas de la Tabla 7 con requerido, disponible y si cumple
+function dgEvaluar(area, cfg){
+  cfg=cfg||{}; const auto=_dgCupos(area), c={...auto.c, ...(cfg.cupos||{})}, modo=cfg.turno||'aparte';
+  const P=_dgPersonas(area).filter(p=>!p.beca);
+  const filas=DG_T7.map(f=>{
+    const ps=P.filter(p=>p.zona===f.z && p.clase===f.k);
+    const req=_dgRequerido(f.r,c);
+    let tiene, req2=req, unidad='personas';
+    if(f.r.h!==undefined && f.r.b===undefined){                       // estándar en horas semanales
+      unidad='horas'; req2=f.r.h; tiene=ps.reduce((a,p)=>a+(_dgPeso(p,modo)*(p.horas|| (f.k==='jefe'||f.k==='anest'?0:44))),0);
+    } else if(f.jornadas){                                              // médicos: jornadas de 44 h
+      unidad='jornadas de 44 h'; tiene=ps.reduce((a,p)=>a+_dgPeso(p,modo)*((p.horas||44)/44),0);
+    } else tiene=ps.reduce((a,p)=>a+_dgPeso(p,modo),0);
+    tiene=Math.round(tiene*100)/100;
+    const cuarto=ps.filter(p=>/4/.test(String(p.turno||''))).length;
+    return {...f, req:req2, tiene, unidad, dif:Math.round((tiene-req2)*100)/100, ok:tiene>=req2-1e-9, personas:ps, cuarto};
+  });
+  const sinZona=P.filter(p=>!p.zona), otros=P.filter(p=>p.zona&&p.clase==='otro');
+  const salasSin=[...new Set(sinZona.map(p=>p.rid))];
+  return {cupos:c, auto, filas, sinZona, otros, salasSin, personas:P, modo};
+}
+function _dgCfg(area){ const o=((nameState.digedep||{})[area.id])||{}; let t='aparte'; try{ t=localStorage.getItem('cabida_dg_turno')||'aparte'; }catch(e){} return {cupos:o.cupos||{}, turno:t}; }
+function dgSetCupo(k,v){
+  const a=curArea(); if(!a) return; nameState.digedep=nameState.digedep||{}; const o=nameState.digedep[a.id]=nameState.digedep[a.id]||{}; o.cupos=o.cupos||{};
+  if(v===''||v===null) delete o.cupos[k]; else { const n=Math.max(0,parseInt(v,10)||0); o.cupos[k]=n; }
+  sNames(); renderDigedep();
+}
+function dgSetTurno(v){ _lsPref('cabida_dg_turno',v); renderDigedep(); }
+function dgSetZona(rid,v){ nameState.digedepZona=nameState.digedepZona||{}; if(v==='auto') delete nameState.digedepZona[rid]; else nameState.digedepZona[rid]=v; sNames(); renderDigedep(); }
+let _dgAbiertas=new Set();
+function dgToggle(i){ if(_dgAbiertas.has(i)) _dgAbiertas.delete(i); else _dgAbiertas.add(i); renderDigedep(); }
+function openDigedep(){
+  let a=(S.level>=2&&S.areaId)?curArea():null;
+  if(!a||!(a.rooms||[]).some(r=>rType(r.id)==='pabellon')){
+    // sin servicio con quirófanos abierto: el que tenga más quirófanos
+    let best=null,bn=0; FLOORS.forEach(f=>f.areas.forEach(x=>{ const n=(x.rooms||[]).filter(r=>rType(r.id)==='pabellon'&&rShapes(r).length).length; if(n>bn){ bn=n; best={f,x}; } }));
+    if(!best){ alert('No hay servicios con quirófanos dibujados.'); return; }
+    if(S.floorId!==best.f.id) goFloor(best.f.id); didPan=false; goArea(best.x.id);
+  }
+  document.getElementById('dgModal').classList.add('show'); renderDigedep();
+}
+function closeDigedep(){ document.getElementById('dgModal').classList.remove('show'); }
+function renderDigedep(){
+  const body=document.getElementById('dgBody'), a=curArea(); if(!body||!a) return;
+  const esc0=x=>String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+  const cfg=_dgCfg(a), R=dgEvaluar(a,cfg), fmt=v=>Number.isInteger(v)?String(v):String(v).replace('.',',');
+  document.getElementById('dgSub').textContent=aName(a.id)+' · '+(curFloor()?curFloor().label:'')+' · DIGEDEP, Orientaciones técnicas, 10.1 Tabla 7';
+  const inp=(k,lbl,auto,fuente)=>{ const man=(cfg.cupos||{})[k]!==undefined;
+    return '<label class="dg-cupo"><span>'+lbl+'</span><input type="number" min="0" value="'+R.cupos[k]+'" onchange="dgSetCupo(\''+k+'\',this.value)"'+(S.viewOnly?' title="En la versión de consulta el cambio no se guarda"':'')+'>'
+      +'<small>'+(man?('a mano · automático: '+auto+' <a href="#" onclick="dgSetCupo(\''+k+'\',\'\');return false">↺</a>'):('automático · '+esc0(fuente||'—')))+'</small></label>'; };
+  let h='<div class="dg-cupos">'
+    +inp('quir','Quirófanos',R.auto.c.quir,R.auto.c.quir+' recintos tipo Pabellón')
+    +inp('pre','Cupos de preanestesia',R.auto.c.pre,R.auto.f.pre.join(' + ')||'sin camillas en Preanestesia')
+    +inp('recup','Unidades de recuperación',R.auto.c.recup,R.auto.f.recup.join(' + ')||'sin camillas en Recuperación')
+    +'<label class="dg-cupo"><span>4.º turno</span><select onchange="dgSetTurno(this.value)">'
+    +[['aparte','aparte (estándar diurno)'],['cuarto','suma ¼ de puesto'],['completo','suma la persona completa']].map(([v,l])=>'<option value="'+v+'"'+(R.modo===v?' selected':'')+'>'+l+'</option>').join('')
+    +'</select><small>el estándar es basal, de jornada diurna</small></label></div>';
+  // resumen por zona
+  h+='<div class="dg-zonas">'+Object.entries(DG_ZONAS).map(([z,n])=>{ const fs=R.filas.filter(f=>f.z===z), ok=fs.filter(f=>f.ok).length;
+    return '<div class="dg-z '+(ok===fs.length?'ok':'no')+'"><b>'+n+'</b><span>'+(ok===fs.length?'✅ cumple':('❌ '+(fs.length-ok)+' de '+fs.length+' bajo el estándar'))+'</span></div>'; }).join('')+'</div>';
+  // tabla
+  h+='<table class="dg-t"><thead><tr><th>Cargo</th><th>Estándar</th><th class="n">Requerido</th><th class="n">Tenemos</th><th class="n">4.º turno</th><th class="n">Diferencia</th><th></th></tr></thead><tbody>';
+  let zAnt='';
+  R.filas.forEach((f,i)=>{
+    if(f.z!==zAnt){ zAnt=f.z; h+='<tr class="dg-zh"><td colspan="7">'+DG_ZONAS[f.z]+(f.z==='prequir'?' <small>(personal de la unidad en la matriz de dotación)</small>':'')+'</td></tr>'; }
+    const ab=_dgAbiertas.has(i);
+    h+='<tr class="dg-f '+(f.ok?'ok':'no')+'" onclick="dgToggle('+i+')" title="Ver las personas que cuentan">'
+      +'<td><span class="ar">'+(ab?'▾':'▸')+'</span> '+esc0(f.cargo)+'<small>'+esc0(f.est)+' · Ley '+f.ley+(f.nota?(' · '+esc0(f.nota)):'')+'</small></td>'
+      +'<td>'+esc0(_dgRegla(f.r))+'</td><td class="n">'+fmt(f.req)+(f.unidad!=='personas'?('<small>'+f.unidad+'</small>'):'')+'</td>'
+      +'<td class="n"><b>'+fmt(f.tiene)+'</b><small>'+f.personas.length+' pers.</small></td><td class="n">'+(f.cuarto||'')+'</td>'
+      +'<td class="n">'+(f.dif>0?'+':'')+fmt(f.dif)+'</td><td>'+(f.ok?'✅':'❌')+'</td></tr>';
+    if(ab) h+='<tr class="dg-ps"><td colspan="7">'+(f.personas.length?f.personas.map(p=>esc0(p.nombre)+' <span>'+esc0([p.cargo,p.turno,p.horas?(p.horas+' h'):'' ,p.rid?rName(p.rid):p.fuente].filter(Boolean).join(' · '))+'</span>').join('<br>'):'Nadie asignado en esta zona con este cargo.')+'</td></tr>';
+  });
+  h+='</tbody></table>';
+  // recintos con personal sin zona + zonas de los recintos (corregibles)
+  const salas=(a.rooms||[]).filter(r=>((wsState.dots||{})[r.id]||[]).some(d=>(d.nombre||'').trim()||(d.turnos||[]).some(x=>x.nombre)));
+  h+='<details class="dg-salas"'+(R.salasSin.length?' open':'')+'><summary>Zona de cada recinto con personal ('+salas.length+')'+(R.salasSin.length?(' · <b>'+R.salasSin.length+' sin zona</b>: su personal no cuenta'):'')+'</summary>'
+    +'<div class="dg-salas-l">'+salas.map(r=>{ const z=_dgZona(r.id), man=(nameState.digedepZona||{})[r.id]!==undefined;
+      return '<label><span>'+esc0(rName(r.id))+' <small>'+esc0(rCode(r.id))+'</small></span><select onchange="dgSetZona(\''+r.id+'\',this.value)">'
+        +'<option value="auto">automático ('+esc0(_dgZonaAuto(r.id)?(_dgZonaAuto(r.id)==='apoyo'?'Quirófanos · apoyo':DG_ZONAS[_dgZonaAuto(r.id)]):'sin zona')+')</option>'
+        +[['quir','Quirófanos'],['apoyo','Quirófanos · áreas de apoyo'],['preanest','Preanestesia'],['recup','Recuperación'],['gestion','Gestión'],['','No cuenta']].map(([v,l])=>'<option value="'+v+'"'+(man&&z===v?' selected':'')+'>'+l+'</option>').join('')
+        +'</select></label>'; }).join('')+'</div></details>';
+  if(R.otros.length) h+='<div class="dg-nota">No cuentan para el estándar ('+R.otros.length+'): '+esc0(R.otros.map(p=>p.cargo||p.estamento).filter((v,i,x)=>x.indexOf(v)===i).join(', '))+'.</div>';
+  h+='<div class="dg-nota">Fuente: DIGEDEP, Orientaciones técnicas, 10.1 Tabla 7 «Resumen Estándar basal de dotación de recursos humanos». Personal: puestos asignados del servicio en el Atlas (zona según el recinto) y, para la Unidad Prequirúrgica, la matriz de dotación. Médicos en jornadas de 44 h y horas de la matriz. Becados no cuentan.</div>';
+  body.innerHTML=h;
+}
+function exportDigedep(){
+  const a=curArea(); if(!a) return; const R=dgEvaluar(a,_dgCfg(a));
+  const rows=[['Zona','Ley','Estamento','Cargo','Estándar','Requerido','Unidad','Tenemos','4.º turno (personas)','Diferencia','Cumple','Personas']];
+  R.filas.forEach(f=>rows.push([DG_ZONAS[f.z],f.ley,f.est,f.cargo,_dgRegla(f.r),f.req,f.unidad,f.tiene,f.cuarto,f.dif,f.ok?'SÍ':'NO',f.personas.map(p=>p.nombre).join('; ')]));
+  rows.push([]); rows.push(['Cupos usados','Quirófanos',R.cupos.quir,'Preanestesia',R.cupos.pre,'Recuperación',R.cupos.recup,'4.º turno',R.modo]);
+  xlsxDownload(rows,'Estándar DIGEDEP','Estandar_DIGEDEP_'+aName(a.id).replace(/[^A-Za-z0-9]+/g,'_')+'_'+new Date().toISOString().slice(0,10)+'.xlsx',
+    [{wch:20},{wch:7},{wch:15},{wch:46},{wch:30},{wch:10},{wch:15},{wch:9},{wch:10},{wch:10},{wch:7},{wch:80}]);
+}
 // ── Pestaña «Servicio» (barra izquierda, 28-09-2026) ─────────────────────────
 // El servicio que se está mirando: total de recintos, cuántos hay de cada tipo
 // (consultas, box, administrativos…) y, al desplegar un tipo, cuáles son. Es la
@@ -12416,6 +12656,7 @@ function renderSrvPanel(){
     +'<div class="tot"><b>'+tot+'</b><span>recintos'+(dib<tot?(' · '+(tot-dib)+' sin dibujar'):'')+'</span></div>'
     +(ws.total?('<div class="pst"><span class="taw-asig">'+ws.asig+' asignados</span> · <span class="'+(ws.disp>0?'taw-disp':'taw-zero')+'">'+ws.disp+' disponibles</span> <span class="taw-tot">/ '+ws.total+' puestos</span></div>'):'')
     +'</div>';
+  if((cnt.pabellon||{}).d) h+='<button class="srv-dg" onclick="openDigedep()" title="Compara el personal del servicio con el estándar basal de dotación DIGEDEP (Tabla 7): Unidad Prequirúrgica, Gestión, Preanestesia, Quirófanos y Recuperación">📐 Estándar de dotación (DIGEDEP)</button>';
   if(!filas.length) h+='<div class="srv-vacio">Este servicio aún no tiene recintos.</div>';
   filas.forEach(([t,v])=>{
     const m=ROOM_TYPES[t]||ROOM_TYPES[''], abierto=_srvAbiertos.has(t), pend=v.n-v.d;
@@ -15373,7 +15614,7 @@ async function runSelfTest(){
   // Testigo: al terminar, NINGUNA preferencia del usuario puede haber cambiado.
   const _PREFS=['cabida_room_labels','cabida_show_dotnames','cabida_box_vis','cabida_plan_kind',
                 'cabida_show_asign','cabida_show_sen','cabida_scenario','cabida_rp_collapsed',
-                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures','cabida_ubic','cabida_jardines','cabida_verticales','cabida_relojes','cabida_correo_n','cabida_cn_siembra','cabida_show_tomas','cabida_show_gases','cabida_show_puertas','cabida_fk_cerradas','cabida_estac','cabida_senalnum_siembra','cabida_show_ccdd','cabida_solo_reemp','cabida_show_pc'];
+                'cabida_dock_open','cabida_dotname_side','cabida_bed_alt_view','cabida_cad_structures','cabida_ubic','cabida_jardines','cabida_verticales','cabida_relojes','cabida_correo_n','cabida_cn_siembra','cabida_show_tomas','cabida_show_gases','cabida_show_puertas','cabida_fk_cerradas','cabida_estac','cabida_senalnum_siembra','cabida_dg_turno','cabida_show_ccdd','cabida_solo_reemp','cabida_show_pc'];
   const _PREV={}; _PREFS.forEach(k=>{ try{ _PREV[k]=localStorage.getItem(k); }catch(e){ _PREV[k]=null; } });
   // r==='omitir' ⇒ la prueba necesita recintos dibujados y este navegador no tiene ninguno (p. ej. un preview con
   // almacenamiento vacío): se informa como ⚪ omitida, ni verde ni roja. Con dibujo, la prueba corre completa.
@@ -16849,6 +17090,27 @@ async function runSelfTest(){
       return v1 && v2;
     } finally { S.level=nivel; S.editMode=ed; S.areaId=a0; _stDrag=null; window.removeEventListener('mousemove', _structDragMove); window.removeEventListener('mouseup', _structDragUp);
       _rpFix(false); Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG(); }
+  });
+  T('📐 Estándar DIGEDEP: cupos desde el Atlas, requerido por la Tabla 7, personal por zona del recinto y cumplimiento', ()=>{
+    const snap=JSON.stringify({d:wsState.dots,b:wsState.beds,t:nameState.types,n:nameState.rooms,z:nameState.digedepZona}); _rpFix(true);
+    try{
+      // st_r1 = quirófano · st_r2 = recuperación con 12 camillas
+      boxState.rooms['st_r2']=[{x:2100,y:900,w:900,h:900}];
+      nameState.types['st_r1']='pabellon'; nameState.types['st_r2']='recup';
+      wsState.beds=wsState.beds||{}; wsState.beds['st_r2']=Array.from({length:12},(_,i)=>({id:'b'+i,x:2200,y:1000,num:String(i+1),kind:'cupo'}));
+      wsState.dots['st_r1']=[{id:'d1',x:1000,y:1000,tipo:'fijo',nombre:'ZZ ENF UNO',cargo:'ENFERMERA',estamento:'PROFESIONALES'},
+        {id:'d2',x:1100,y:1000,tipo:'fijo',nombre:'ZZ TENS UNO',cargo:'TECNICO NIVEL SUPERIOR ENFERMERIA',estamento:'TECNICOS'},
+        {id:'d3',x:1200,y:1000,tipo:'fijo',nombre:'ZZ TENS DOS',cargo:'TECNICO PARAMEDICO',estamento:'TECNICOS'}];
+      wsState.dots['st_r2']=[{id:'d4',x:2300,y:1000,tipo:'fijo',nombre:'ZZ ENF DOS',cargo:'ENFERMERA',estamento:'PROFESIONALES'}];
+      const area=fl.areas.find(a=>a.id==='st_a'); const R=dgEvaluar(area,{turno:'aparte'});
+      const q=R.filas.find(f=>f.z==='quir'&&f.k==='tens'), e=R.filas.find(f=>f.z==='quir'&&f.k==='enf'), re=R.filas.find(f=>f.z==='recup'&&f.k==='enf'), rt=R.filas.find(f=>f.z==='recup'&&f.k==='tens');
+      const cupos=R.cupos.quir===1 && R.cupos.recup===12;
+      const req=q.req===3 && e.req===1 && re.req===2 && rt.req===3;              // 3 TENS por quirófano · 1 enf cada 2 · 12/6 · 12/4
+      const tiene=q.tiene===2 && !q.ok && e.tiene===1 && e.ok && re.tiene===1 && !re.ok;
+      const R2=dgEvaluar(area,{cupos:{quir:4}}); const manual=R2.filas.find(f=>f.z==='quir'&&f.k==='enf').req===2;
+      const zona=_dgZonaAuto('st_r1')==='quir' && _dgZonaAuto('st_r2')==='recup';
+      return cupos && req && tiene && manual && zona && DG_T7.length===20;
+    } finally { const o=JSON.parse(snap); wsState.dots=o.d; wsState.beds=o.b; nameState.types=o.t; nameState.rooms=o.n; if(o.z===undefined) delete nameState.digedepZona; else nameState.digedepZona=o.z; delete boxState.rooms['st_r2']; _rpFix(false); }
   });
   T('Numeración REV 5: importar escribe sólo donde senalNum está vacío, deja intacto lo distinto (queda en Revisión) y no repite', ()=>{
     const Np=window.NUMERACION_RECINTOS, snap=JSON.stringify({b:nameState.bim,n:nameState.senalNum,rv:nameState.recintosRev}); _rpFix(true);
