@@ -252,6 +252,11 @@ code,.mono{font-family:var(--font-mono)}
 #capasBar .cp-fin .tb-btn{border-radius:var(--r-md);color:var(--text)}
 #capasBar #btnEdit.active{background:var(--accent-600);border-color:var(--accent-600);color:#fff}
 @media (max-width:840px){#capasBar{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch}#capasBar .cp-fin{margin-left:0}}
+/* Teléfono: la cabecera no puede ser más ancha que la pantalla (si no, el navegador achica toda
+   la página, el panel no se reconoce como «teléfono» y la barra del editor del 🟡 queda fuera) */
+@media (max-width:760px){#hdr{overflow:hidden}#hdr #gSearch{flex:1 1 auto;min-width:0}
+  body.view-only #saveBadge,body.view-only #backupBadge,#consultaChip{display:none!important}
+  #pmBar{flex-wrap:wrap;gap:6px!important;padding:6px 10px!important}#pmBar>span:nth-child(2){display:none}#pmBar #pmCnt{margin-left:0!important;font-size:11px}#pmBar #pmSend{margin-left:auto}}
 #navBar .tb-btn.dis{opacity:.45}
 #navBar .tb-btn{height:26px;padding:0 8px;font-size:var(--fs-xs);gap:5px}
 #navBar .tog::after{width:22px;height:13px;margin-left:6px;background:radial-gradient(circle at 6.5px 50%,#fff 4px,transparent 4.6px) var(--n-200)}
@@ -5760,9 +5765,13 @@ function _propHintTxt(k){
       +C.auto+' automáticas + '+C.manual+' a mano de '+C.total+(C.faltan?(' · quedan '+C.faltan):(C.sobre?(' ⚠ '+C.sobre+' sobre el total'):' · completo'));
   }
   const D=PROP_DEF[k], c=_propCupo(k), n=_propTotal(k);
+  if(_esTelefono()) return D.ico+' '+D.corto+' — toca el plano para colocar · toca uno para eliminarlo · un dedo mueve el plano, dos hacen zoom'
+    +(c?(' · '+n+' de '+c):'');
   return D.ico+' '+D.lbl+' — clic en el plano coloca uno'+(D.rota?' · clic derecho rota 90°':'')+' · arrastrar mueve · doble clic elimina · Esc sale'
     +(c?(' · '+n+' de '+c+(n>=c?(n>c?(' ⚠ '+(n-c)+' sobre el cupo'):' · cupo completo'):(' · quedan '+(c-n)))):'');
 }
+// pantalla física de teléfono (innerWidth no sirve si la página desborda)
+function _esTelefono(){ return Math.min(window.innerWidth, (window.screen&&screen.width)||9999)<=600 && (('ontouchstart' in window) || (navigator.maxTouchPoints||0)>0); }
 function setPropMode(k){
   if(S.viewOnly && !S.editPM) return;
   if(k && !PROP_DEF[k]) k=null;
@@ -5772,6 +5781,8 @@ function setPropMode(k){
   }
   S.propMode=(S.propMode===k)?null:k;
   if(S.propMode){ if(S.puertaMode) togglePuertaMode(); if(S.stampMode) toggleStampMode(); }
+  // teléfono: el panel tapa el plano → se cierra al elegir qué colocar (se reabre desde el riel)
+  if(S.propMode && Math.min(window.innerWidth, (window.screen&&screen.width)||9999)<=600) try{ toggleRightPanel(true); }catch(e){}
   const h=document.getElementById('propHint');
   if(h){
     if(S.propMode){ h.textContent=_propHintTxt(S.propMode); h.classList.add('show'); }
@@ -5852,7 +5863,11 @@ function _propLayer(){
     if(!S.viewOnly||S.editPM){
       pg.addEventListener('mousedown',e=>_startPropDrag(e,it.id));
       pg.addEventListener('contextmenu',e=>{ e.preventDefault(); e.stopPropagation(); propRotar(it.id); });
-      pg.addEventListener('click',e=>{ e.stopPropagation(); });
+      // teléfono: no hay arrastre (un dedo mueve el plano) ni doble clic fiable → un toque
+      // sobre el elemento ofrece eliminarlo; para moverlo, se elimina y se vuelve a tocar donde va
+      pg.addEventListener('click',e=>{ e.stopPropagation();
+        if(_esTelefono() && confirm('¿Eliminar este '+D.corto+(it.rid?(' de '+(rName(it.rid)||'')):'')+'?\n\nPara moverlo: elimínalo y vuelve a tocar el plano donde corresponde.')){
+          propBorrar(it.id); if(typeof tbInfo!=='undefined'&&tbInfo){tbInfo.textContent='🗑 '+D.corto+' eliminado';setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},2500);} } });
       pg.addEventListener('dblclick',e=>{ e.stopPropagation(); propBorrar(it.id); if(typeof tbInfo!=='undefined'&&tbInfo){tbInfo.textContent='🗑 '+D.corto+' eliminado';setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},2500);} });
     }
     g.appendChild(pg);
@@ -10405,7 +10420,9 @@ function _pmUsuario(){
 // Arma el delta comparando contra la base: nombres distintos y recintos cuya
 // asignación de personas cambió. Nada más viaja.
 function pmDelta(){
-  const base=_pmTomarBase(), J=x=>JSON.stringify(x);
+  // el historial y el motivo de los reemplazos no viajan en la foto publicada (dato de salud):
+  // no cuentan como cambio
+  const base=_pmTomarBase(), J=x=>JSON.stringify(x, (k,v)=>(k==='reemplazoHist'||k==='motivo')?undefined:v);
   const nombres={};
   const ids=new Set([...Object.keys(base.nombres), ...Object.keys(nameState.rooms||{})]);
   ids.forEach(k=>{ const a=base.nombres[k], b=(nameState.rooms||{})[k];
@@ -10458,15 +10475,26 @@ function pmImportarDeltaArchivo(){
 async function pmEnviarCambios(){
   if(!S.editPM) return;
   const d=pmDelta(), res=pmResumenDelta(d);
-  if(!Object.keys(d.nombres).length && !Object.keys(d.dots).length){
+  // también cuentan los propuestos (DEA desde el celular): antes, un envío sólo con DEA
+  // decía «no hay cambios» y no generaba el archivo
+  if(!Object.keys(d.nombres).length && !Object.keys(d.dots).length && !Object.keys(d.props||{}).length){
     alert('Todavía no hay cambios que enviar.'); return;
   }
   const txt=JSON.stringify(d,null,2);
+  const fn='Atlas_cambios_'+_pmUsuario()+'_'+new Date().toISOString().replace(/[:.]/g,'-').slice(0,19)+'.json';
+  let compartido=false;
+  // celular: hoja de compartir del sistema (AirDrop, correo, WhatsApp…) si el navegador la ofrece
   try{
+    const f=new File([txt], fn, {type:'application/json'});
+    if(navigator.canShare && navigator.share && navigator.canShare({files:[f]}) && Math.min(window.innerWidth,(window.screen&&screen.width)||9999)<=900){
+      await navigator.share({files:[f], title:'Cambios del Atlas · '+_pmUsuario(), text:res}); compartido=true;
+    }
+  }catch(e){ if(e && e.name==='AbortError') compartido=false; }
+  if(!compartido) try{
     const b=new Blob([txt],{type:'application/json'}), a=document.createElement('a');
-    a.href=URL.createObjectURL(b);
-    a.download='Atlas_cambios_'+_pmUsuario()+'_'+new Date().toISOString().replace(/[:.]/g,'-').slice(0,19)+'.json';
-    a.click(); URL.revokeObjectURL(a.href);
+    a.href=URL.createObjectURL(b); a.download=fn; a.rel='noopener';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 10000);   // iOS: revocar al tiro cancela la descarga
   }catch(e){}
   let central='';
   const url=(window.PM_CONFIG&&window.PM_CONFIG.ATLAS_URL)||'';
@@ -10479,7 +10507,7 @@ async function pmEnviarCambios(){
     }catch(e){ central='\n\n(No se pudo enviar al servidor; el archivo igual se descargó.)'; }
   }
   alert('✓ Cambios exportados:\n'+res+central+
-        '\n\nEnvíale el archivo a Matías para incorporarlo al Atlas maestro.');
+        (compartido?'\n\nCompartido desde el celular: llega a Matías para incorporarlo al Atlas maestro.':'\n\nEnvíale el archivo «'+fn+'» (queda en Descargas) a Matías para incorporarlo al Atlas maestro.'));
 }
 /* Renombrar un recinto con el rol acotado del 🟡. No usa editBoxName(), que
    exige S.editMode y arrastra dibujar/mover/borrar: acá solo se cambia el
@@ -10765,7 +10793,11 @@ function toggleRightPanel(force){
 }
 (function initRightPanelState(){
   // en pantallas angostas (teléfono) el panel tapa el plano: parte cerrado salvo que ya se haya elegido
-  try{ const v=localStorage.getItem('cabida_rp_collapsed'); if(v==='1' || (v===null && window.innerWidth<=840)) toggleRightPanel(true); }catch{}
+  // En un TELÉFONO (pantalla física ≤ 600 px) parte siempre cerrado, aunque se haya abierto antes:
+  // innerWidth no sirve si algo desborda (el navegador achica la página y lo reporta más ancho).
+  try{ const v=localStorage.getItem('cabida_rp_collapsed');
+    const tel=Math.min(window.innerWidth, (window.screen&&screen.width)||9999, document.documentElement.clientWidth||9999)<=600;
+    if(v==='1' || tel || (v===null && window.innerWidth<=840)) toggleRightPanel(true); }catch{}
 })();
 // ── Contadores del panel derecho (proyecto + desglose por piso) ─────────────
 let _otrosOpen=false;
@@ -16115,8 +16147,11 @@ function init(){
   { const b=document.getElementById('btnPlanKind'); if(b){ const c=S.planKind==='color'; b.textContent=c?'🗺 Ver mobiliario':'🖌 Ver color'; b.classList.toggle('active',c); } }
   applyBoxVis();
   loadDotDB(); // async pero NO awaiteamos: el plano puede cargar en paralelo. Búsqueda queda lista cuando termine fetch.
-  try{ setTimeout(()=>{ try{ if(dotDB&&dotDB.staff){ _sincronizaReemplazos(); renderSVG(); try{ renderBimPending(); }catch(e){} } }catch(e){} }, 2500); }catch(e){}
-  try{ const nl=_normalizaMarcasDotacion();
+  // En la versión de consulta (AtlasWeb / 🟡) NO se tocan las asignaciones al cargar: la foto
+  // publicada ya viene sincronizada desde el maestro y, si se mutara aquí, el delta del editor
+  // del 🟡 cargaría recintos que nadie tocó (y al importarlo podría pisar el maestro).
+  try{ setTimeout(()=>{ try{ if(dotDB&&dotDB.staff&&!S.viewOnly){ _sincronizaReemplazos(); renderSVG(); try{ renderBimPending(); }catch(e){} } }catch(e){} }, 2500); }catch(e){}
+  if(!S.viewOnly) try{ const nl=_normalizaMarcasDotacion();
     if(nl) setTimeout(()=>{ if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🧹 '+nl+' asignaciones marcadas fuera de matriz ya estaban en la matriz: se quitó la marca'; setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },7000); } },1500);
   }catch(e){ console.warn('normalización de marcas de dotación',e); }
   setFloorPlan(S.floorId);
@@ -16126,7 +16161,7 @@ function init(){
   if(S.viewOnly){
     document.body.classList.add('view-only');
     const chip=document.createElement('span');
-    chip.textContent='👁 MODO CONSULTA · solo lectura';
+    chip.id='consultaChip'; chip.textContent=S.editPM?'✏ EDICIÓN ACOTADA':'👁 MODO CONSULTA · solo lectura';
     chip.style.cssText='background:#fef3c7;border:1px solid #f59e0b;color:#78350f;font-size:10px;font-weight:800;border-radius:8px;padding:4px 10px;margin-left:8px;white-space:nowrap';
     document.getElementById('hdr')?.appendChild(chip);
   }
@@ -18308,7 +18343,8 @@ document.addEventListener('keydown',e=>{
       ['btnScen','btnMoves','btnEquip'].forEach(id=>{ const b=document.getElementById(id); if(b&&id!=='btnEquip') b.style.display='none'; });
       // panel derecho colapsado por defecto en pantallas medianas/chicas
       if(window.innerWidth<1150){
-        try{ if(typeof toggleRightPanel==='function' && !document.body.classList.contains('rp-collapsed')) toggleRightPanel(); }catch(e){}
+        // (true = cerrar; sin argumento ALTERNABA y reabría el que el Atlas ya había cerrado en teléfono)
+        try{ if(typeof toggleRightPanel==='function') toggleRightPanel(true); }catch(e){}
       }
       // fecha del snapshot en la leyenda
       const md=(window.ATLAS_WEB_DATA&&ATLAS_WEB_DATA._meta&&ATLAS_WEB_DATA._meta.exportedAt)||'';
