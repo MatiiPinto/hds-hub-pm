@@ -1,7 +1,7 @@
 // SHARED_DATA/bitacora_pendientes.js — versión publicada en el HUB-PM (saneada por deploy_web_pm.py)
 window.BITACORA = {
  "version": "2026-10-05 · Bitácora y huddle de Puesta en Marcha",
- "generado": "2026-10-05",
+ "generado": "2026-10-06",
  "proposito": "Reunir en un solo lugar los pendientes que hoy viven dispersos en correos, ORD, cartas CS-IF, actas de mesas de trabajo y sesiones de trabajo.",
  "ambitos": [
   "Comunicaciones",
@@ -2912,6 +2912,31 @@ window.BITACORA = {
     {
      "fecha": "2026-10-05",
      "texto": "Levantado de la reunión del equipo PM del 05-10 [1·02:27–02:58]. Ver minuta en Minutas/minutas/2026-10-05_puesta-en-marcha-equipo-comunicaciones-discurso.md."
+    }
+   ]
+  },
+  {
+   "id": "P126",
+   "titulo": "Integración RIS-PACS ↔ TrakCare: casos de uso sin cerrar frenan el desarrollo",
+   "detalle": "InterSystems envió los 15 casos de uso de la integración RIS-PACS del HSG revisados en reunión y advierte que, mientras no estén cerrados y validados por todas las partes, no se puede avanzar con el desarrollo; pide las definiciones pendientes para la próxima sesión. Resultado de la revisión: CU1, CU2 y CU3 (creación de paciente ambulatorio y de urgencia/hospitalizado, actualización de datos demográficos) se eliminan como flujos independientes y se agrupan en el evento «Llegó»; CU4 y CU5 (fusión y desfusión de registro) se mantienen; CU6 (solicitud por indicaciones) se mantiene, pero podría cambiar según la nueva definición; CU11 (suspensión desde RIS) se elimina; CU10: el cambio de «Llegó» a «Agendado» cancela en el RIS y genera un ID nuevo. Sin comentarios: CU7, CU9, CU12, CU14 y CU15. DEFINICIONES PENDIENTES: CU8 (pacientes externos: incorporar el diagnóstico externo o usar la lista de espera creada administrativamente) y CU13 (si se requiere el envío de alta o egreso, dado el comportamiento de alta administrativa y alta clínica).",
+   "ambito": "TI",
+   "origen_tipo": "Correo",
+   "origen_ref": "Revisión casos de uso - RIS PAC - HSG (Julia Ordenes, InterSystems, 06-10-2026)",
+   "origen_fecha": "2026-10-06",
+   "contraparte": "InterSystems (Julia Ordenes, PM) · SSMO (Betzabeth Urrutia) · HDS (C. Cornejo) · CSSO · AIF",
+   "servicio": "IMAGENOLOGIA",
+   "prioridad": "Alta",
+   "estado": "Esperando terceros",
+   "compromiso": "Entregar las definiciones de CU8 y CU13 y validar el set de casos de uso antes de la próxima sesión (fecha no consta en el correo).",
+   "plazo": "",
+   "responsable": "SSMO / HDS (C. Cornejo) · seguimiento Matías Pinto",
+   "creado": "2026-10-06",
+   "actualizado": "2026-10-06",
+   "frente": "Puesta en Marcha",
+   "notas": [
+    {
+     "fecha": "2026-10-06",
+     "texto": "Correo de InterSystems a SSMO y HDS con copia al equipo PM, Informática, CSSO, AIF e INGER. Matías va en copia; la respuesta la deben dar quienes definen el flujo clínico-administrativo de Imagenología."
     }
    ]
   }
