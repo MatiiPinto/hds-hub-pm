@@ -647,6 +647,7 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 
 /* ── Modales: un solo estilo (encabezado blanco, sin degradado) ──────────── */
 #fichaModal,#estadoModal,#equipModal{position:fixed;inset:0;background:rgba(15,22,34,.5);display:none;align-items:center;justify-content:center;z-index:120;padding:20px}
+body.view-only #dkPmCentral,body.view-only #dkPmDelta{display:none!important}
 #fichaModal.show,#estadoModal.show,#equipModal.show,#dgModal.show,#dsModal.show,#eoModal.show{display:flex}
 #dsModal,#eoModal{position:fixed;inset:0;background:rgba(15,30,52,.55);display:none;align-items:center;justify-content:center;z-index:150;padding:16px}
 .eo-tab{width:100%;border-collapse:collapse;font-size:12.5px;margin:4px 0 12px;font-variant-numeric:tabular-nums}
@@ -1179,6 +1180,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
         <div class="dk-sep"></div><div class="dk-h">Exportar</div><div id="dkExp"></div>
         <button class="dk-btn" id="dkCarrosXls" onclick="exportCarrosParo()" title="Excel de carros de paro: recinto por recinto (completo / desfibrilador sin carro / carro sin desfibrilador), resumen por piso y lo que el EMMC trae sin caja en el plano"><span class="ic">⬇</span><span class="lb">Exportar carros de paro</span></button>
         <button class="dk-btn" id="dkPmDelta" onclick="pmImportarDeltaArchivo()" title="Incorporar al Atlas maestro un archivo Atlas_cambios_<usuario>_<fecha>.json exportado desde el 🟡 HUB-PM (por ejemplo, los DEA colocados desde el iPad): nombres y dotación se aplican, los propuestos se suman o actualizan por id"><span class="ic">⬇</span><span class="lb">Importar cambios del 🟡</span></button>
+        <button class="dk-btn" id="dkPmCentral" onclick="pmTraerCentral()" title="Trae del receptor central los cambios enviados desde el 🟡 HUB-PM (DEA colocados desde el celular, personas, nombres) y los incorpora al Atlas maestro. La primera vez pide la URL /exec y el TOKEN del Apps Script."><span class="ic">☁</span><span class="lb">Traer del 🟡 (central)</span><span class="n" id="dkPmCentralN"></span></button>
         <button class="dk-btn" id="dkReport" onclick="openPropReport()" title="Resumen de todo lo propuesto (puestos, tótems, DEA) por piso, área y recinto, con exportación a Excel y a Clave Azul"><span class="ic">📊</span><span class="lb">Reporte de propuestos</span><span class="n" id="dkReportN"></span></button>
       </div>
       <div class="rp-card" id="rpEditCard" style="display:none">
@@ -10429,7 +10431,8 @@ function pmDelta(){
     if(a!==b) nombres[k]={antes:a===undefined?null:a, ahora:b===undefined?null:b}; });
   const dots={};
   const rids=new Set([...Object.keys(base.dots), ...Object.keys(wsState.dots||{})]);
-  rids.forEach(k=>{ if(J(base.dots[k])!==J((wsState.dots||{})[k])) dots[k]=(wsState.dots||{})[k]||[]; });
+  const dotsAntes={};
+  rids.forEach(k=>{ if(J(base.dots[k])!==J((wsState.dots||{})[k])){ dots[k]=(wsState.dots||{})[k]||[]; dotsAntes[k]=base.dots[k]||[]; } });
   // propuestos colocados desde el 🟡 (DEA · tótems · impresoras… desde el iPad): los que no están en la base o cambiaron
   const props={};
   Object.keys(propState||{}).forEach(fid=>{ const bp=(base.props||{})[fid]||[];
@@ -10437,7 +10440,7 @@ function pmDelta(){
   return { _formato:'atlas-delta-pm', _version:2, por:_pmUsuario(),
            generadoEn:new Date().toISOString(),
            snapshot:(window.ATLAS_WEB_DATA&&ATLAS_WEB_DATA._meta&&ATLAS_WEB_DATA._meta.exportedAt)||null,
-           nombres, dots, props, bitacora:_pmCambios };
+           nombres, dots, dotsAntes, props, bitacora:_pmCambios };
 }
 function pmResumenDelta(d){
   const nN=Object.keys(d.nombres||{}).length, nR=Object.keys(d.dots||{}).length;
@@ -10455,13 +10458,20 @@ function pmImportarDelta(d, sinConfirmar){
   if(!sinConfirmar && !confirm('Incorporar los cambios del HUB-PM al Atlas maestro?'+enTexto+'\n\nNombres y dotación se aplican; los propuestos (DEA…) se suman o actualizan por id.')) return null;
   const r={nombres:0,dots:0,props:0,nuevos:0};
   Object.entries(d.nombres||{}).forEach(([k,v])=>{ const ahora=v&&typeof v==='object'?v.ahora:v; if(ahora==null||ahora===''){ delete (nameState.rooms||{})[k]; } else { (nameState.rooms=nameState.rooms||{})[k]=ahora; } r.nombres++; });
-  Object.entries(d.dots||{}).forEach(([k,arr])=>{ (wsState.dots=wsState.dots||{})[k]=JSON.parse(JSON.stringify(arr||[])); r.dots++; });
+  // dotsAntes (delta v2+): cómo estaba el recinto en la foto del 🟡. Si el maestro ya no está
+  // así, alguien lo cambió después → CONFLICTO: no se pisa, queda listado para revisar a mano.
+  const Jn=x=>JSON.stringify(x||[], (kk,v)=>(kk==='reemplazoHist'||kk==='motivo')?undefined:v);
+  r.conflictos=[];
+  Object.entries(d.dots||{}).forEach(([k,arr])=>{
+    if(d.dotsAntes && (k in d.dotsAntes) && Jn((wsState.dots||{})[k])!==Jn(d.dotsAntes[k]) && Jn((wsState.dots||{})[k])!==Jn(arr)){ r.conflictos.push(k); return; }
+    (wsState.dots=wsState.dots||{})[k]=JSON.parse(JSON.stringify(arr||[])); r.dots++; });
   Object.entries(d.props||{}).forEach(([fid,arr])=>{ const cur=(propState[fid]=propState[fid]||[]);
     (arr||[]).forEach(it=>{ const i=cur.findIndex(x=>x.id===it.id); const c={...it}; delete c.por; c.origen='hub-pm:'+(it.por||d.por||'?');
       if(i>=0) cur[i]={...cur[i],...c}; else { cur.push(c); r.nuevos++; } r.props++; }); });
   if(r.nombres) sNames(); if(r.dots) sWs(); if(r.props) sProp();
   renderSVG(); try{ renderSidebar(); }catch(e){} try{ _dockSync(); }catch(e){}
-  if(!sinConfirmar) alert('✓ Incorporado: '+r.nombres+' nombre(s), '+r.dots+' recinto(s) con dotación, '+r.props+' propuesto(s) ('+r.nuevos+' nuevos).');
+  if(!sinConfirmar) alert('✓ Incorporado: '+r.nombres+' nombre(s), '+r.dots+' recinto(s) con dotación, '+r.props+' propuesto(s) ('+r.nuevos+' nuevos).'
+    +(r.conflictos.length?('\n\n⚠ '+r.conflictos.length+' recinto(s) NO se aplicaron porque cambiaron en el maestro después de la foto del 🟡: '+r.conflictos.map(k=>rName(k)||k).join(', ')):''));
   return r;
 }
 function pmImportarDeltaArchivo(){
@@ -10471,6 +10481,50 @@ function pmImportarDeltaArchivo(){
     rd.onload=()=>{ try{ pmImportarDelta(JSON.parse(String(rd.result))); }catch(e){ alert('No se pudo leer el archivo: '+e.message); } }; rd.readAsText(f); };
   inp.click();
 }
+// ── Receptor central (_setup/Code_atlas.gs del 🟡) visto desde el Atlas MAESTRO ──────────
+// URL /exec + TOKEN de lectura guardados SÓLO en este navegador (el token no se publica).
+const ATLAS_CENTRAL_URL='';   // URL /exec del receptor (la misma de PM_CONFIG.ATLAS_URL); si queda vacía se pide
+function _pmCentralCfg(pedir){
+  let c={}; try{ c=JSON.parse(localStorage.getItem('cabida_atlas_central')||'{}')||{}; }catch(e){}
+  if(!c.url && ATLAS_CENTRAL_URL) c.url=ATLAS_CENTRAL_URL;
+  if(pedir && (!c.url || !c.t)){
+    const u=prompt('URL del receptor central del 🟡 (termina en /exec):', c.url||''); if(!u) return null;
+    const t=prompt('TOKEN de lectura (aparece al ejecutar «configurar» en el Apps Script):', c.t||''); if(!t) return null;
+    c={url:u.trim(), t:t.trim()}; _lsPref('cabida_atlas_central', JSON.stringify(c));
+  }
+  return (c.url&&c.t)?c:null;
+}
+// cuántos envíos esperan (insignia del botón); silencioso si no hay configuración o red
+async function pmCentralCuenta(){
+  const c=_pmCentralCfg(false), b=document.getElementById('dkPmCentralN'); if(!c||!b) return null;
+  try{ const j=await (await fetch(c.url+'?cuenta=1&t='+encodeURIComponent(c.t))).json();
+    if(j&&j.ok){ b.textContent=j.pendientes?String(j.pendientes):''; return j.pendientes; } }catch(e){}
+  return null;
+}
+// Trae los envíos pendientes, los incorpora en orden de llegada y los marca como importados
+async function pmTraerCentral(){
+  if(S.viewOnly) return null;
+  const c=_pmCentralCfg(true); if(!c) return null;
+  let j; try{ j=await (await fetch(c.url+'?pend=1&t='+encodeURIComponent(c.t))).json(); }
+  catch(e){ alert('No se pudo conectar con el receptor central: '+e.message); return null; }
+  if(!j||!j.ok){ if(j&&/token/i.test(j.error||'')){ _lsPref('cabida_atlas_central', JSON.stringify({url:c.url})); } alert('El receptor respondió: '+((j&&j.error)||'sin respuesta')); return null; }
+  const env=(j.envios||[]).filter(x=>x.delta);
+  if(!env.length){ alert('☁ No hay envíos pendientes del 🟡.'); pmCentralCuenta(); return {envios:0}; }
+  const lineas=env.map(x=>'· '+(x.delta.por||'?')+' · '+String(x.fecha||'').slice(0,16).replace('T',' ')+' · '+pmResumenDelta(x.delta));
+  if(!confirm('Incorporar '+env.length+' envío(s) del 🟡 al Atlas maestro?\n\n'+lineas.join('\n')+'\n\nLos DEA y propuestos se suman por id; un recinto que cambió aquí después de la foto del 🟡 no se pisa (queda en conflicto).')) return null;
+  const tot={envios:0,props:0,nuevos:0,dots:0,nombres:0,conflictos:[]};
+  for(const x of env){
+    const r=pmImportarDelta(x.delta, true); if(!r) continue;
+    tot.envios++; tot.props+=r.props; tot.nuevos+=r.nuevos; tot.dots+=r.dots; tot.nombres+=r.nombres; tot.conflictos.push(...(r.conflictos||[]));
+    try{ await fetch(c.url+'?marcar='+encodeURIComponent(x.id)+'&t='+encodeURIComponent(c.t)); }catch(e){}
+  }
+  pmCentralCuenta();
+  alert('✓ '+tot.envios+' envío(s) incorporado(s): '+tot.props+' propuesto(s) ('+tot.nuevos+' nuevos), '+tot.dots+' recinto(s) con dotación, '+tot.nombres+' nombre(s).'
+    +(tot.conflictos.length?('\n\n⚠ No se aplicaron (cambiaron en el maestro después de la foto): '+[...new Set(tot.conflictos)].map(k=>rName(k)||k).join(', ')):''));
+  return tot;
+}
+window.addEventListener('load',()=>setTimeout(()=>{ if(S.viewOnly||(typeof _SELFTEST!=='undefined'&&_SELFTEST)) return; pmCentralCuenta(); }, 3000));
+function _pmEnviado(d){ try{ sessionStorage.setItem('pm_ultimo_envio', new Date().toISOString()); }catch(e){} }
 // Descarga el delta y, si hay backend configurado, lo deja también en Drive.
 async function pmEnviarCambios(){
   if(!S.editPM) return;
@@ -10482,6 +10536,22 @@ async function pmEnviarCambios(){
   }
   const txt=JSON.stringify(d,null,2);
   const fn='Atlas_cambios_'+_pmUsuario()+'_'+new Date().toISOString().replace(/[:.]/g,'-').slice(0,19)+'.json';
+  // receptor central (PM_CONFIG.ATLAS_URL, _setup/Code_atlas.gs): POST «simple» con CORS para
+  // LEER la respuesta y confirmar que llegó; sólo si falla se ofrece el archivo
+  const url=(window.PM_CONFIG&&window.PM_CONFIG.ATLAS_URL)||'';
+  if(url){
+    try{
+      const rr=await fetch(url,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:new URLSearchParams({u:_pmUsuario(), delta:txt}).toString()});
+      const j=await rr.json();
+      if(j && j.ok){
+        try{ _pmEnviado(d); }catch(e){}
+        alert('✓ Cambios enviados al Atlas central:\n'+res+'\n\nMatías los incorpora al Atlas maestro desde ☁ Traer del 🟡. No hace falta mandar ningún archivo.');
+        return;
+      }
+      alert('El receptor central no aceptó el envío ('+((j&&j.error)||'sin respuesta')+'). Se genera el archivo para mandarlo a mano.');
+    }catch(e){ alert('No se pudo llegar al receptor central (¿sin conexión?). Se genera el archivo para mandarlo a mano.'); }
+  }
   let compartido=false;
   // celular: hoja de compartir del sistema (AirDrop, correo, WhatsApp…) si el navegador la ofrece
   try{
@@ -10496,16 +10566,7 @@ async function pmEnviarCambios(){
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(()=>URL.revokeObjectURL(a.href), 10000);   // iOS: revocar al tiro cancela la descarga
   }catch(e){}
-  let central='';
-  const url=(window.PM_CONFIG&&window.PM_CONFIG.ATLAS_URL)||'';
-  if(url){
-    try{
-      await fetch(url,{method:'POST',mode:'no-cors',keepalive:true,
-        headers:{'Content-Type':'application/x-www-form-urlencoded'},
-        body:new URLSearchParams({u:_pmUsuario(), delta:txt}).toString()});
-      central='\n\nTambién se envió a la carpeta central.';
-    }catch(e){ central='\n\n(No se pudo enviar al servidor; el archivo igual se descargó.)'; }
-  }
+  const central='';
   alert('✓ Cambios exportados:\n'+res+central+
         (compartido?'\n\nCompartido desde el celular: llega a Matías para incorporarlo al Atlas maestro.':'\n\nEnvíale el archivo «'+fn+'» (queda en Descargas) a Matías para incorporarlo al Atlas maestro.'));
 }
@@ -18077,6 +18138,33 @@ async function runSelfTest(){
       return dim===tot-1 && tot>=2 && badge && limpio;
     } finally { S.soloReemp=prev; S.level=nivel; S.areaId=a0; S.roomId=r0; S.floorId=f0; _rpFix(false); renderSVG(); }
   });
+  { // receptor central (Code_atlas.gs): el maestro trae los envíos pendientes con fetch simulado
+    const dPrev=JSON.stringify(wsState.dots), pPrev=JSON.stringify(propState), cfgPrev=_pmCentralCfg, fPrev=window.fetch, cPrev=window.confirm, aPrev=window.alert;
+    let res=null, marcados=[], err=null, chk=null;
+    try{
+      const P=(id,n)=>[{id,x:1,y:1,tipo:'fijo',nombre:n}];
+      wsState.dots['st_r1']=P('c1','ZZ ANTES'); wsState.dots['st_r2']=P('c2','ZZ MAESTRO NUEVO');
+      const d1={_formato:'atlas-delta-pm',_version:2,por:'tester',generadoEn:'2026-10-06T10:00:00Z',nombres:{},dots:{st_r1:P('c1','ZZ DESPUES')},dotsAntes:{st_r1:P('c1','ZZ ANTES')},props:{}};
+      const d2={_formato:'atlas-delta-pm',_version:2,por:'tester',generadoEn:'2026-10-06T10:05:00Z',nombres:{},dots:{st_r2:P('c2','ZZ DEL HUB')},dotsAntes:{st_r2:P('c2','ZZ FOTO VIEJA')},
+        props:{[fl.id]:[{id:'deaC1',k:'dea',x:1500,y:1000,rot:0,rid:'st_r1',por:'tester'}]}};
+      _pmCentralCfg=()=>({url:'https://x/exec',t:'tok'});
+      window.fetch=async u=>{ const q=String(u);
+        if(/pend=1/.test(q)) return {json:async()=>({ok:true,envios:[{id:'f1',fecha:'2026-10-06T10:00:00Z',delta:d1},{id:'f2',fecha:'2026-10-06T10:05:00Z',delta:d2}]})};
+        if(/marcar=/.test(q)){ marcados.push(q.match(/marcar=([^&]+)/)[1]); return {json:async()=>({ok:true})}; }
+        return {json:async()=>({ok:true,pendientes:0})}; };
+      window.confirm=()=>true; window.alert=()=>{};
+      res=await pmTraerCentral();
+      const dea=(propState[fl.id]||[]).find(x=>x.id==='deaC1');
+      chk={r1:wsState.dots['st_r1'][0].nombre, r2:wsState.dots['st_r2'][0].nombre, dea:dea&&dea.origen};
+    }catch(e){ err=e.message; }
+    finally{ _pmCentralCfg=cfgPrev; window.fetch=fPrev; window.confirm=cPrev; window.alert=aPrev;
+      wsState.dots=JSON.parse(dPrev); Object.keys(propState).forEach(k=>delete propState[k]); Object.assign(propState, JSON.parse(pPrev)); }
+    T('☁ Receptor central: trae los envíos en orden, aplica lo que no cambió en el maestro, deja en conflicto lo que sí, suma el DEA y los marca importados', ()=>{
+      if(err) throw new Error(err);
+      return !!res && res.envios===2 && chk.r1==='ZZ DESPUES' && chk.r2==='ZZ MAESTRO NUEVO' && res.conflictos.includes('st_r2')
+        && chk.dea==='hub-pm:tester' && marcados.join(',')==='f1,f2';
+    });
+  }
   T('Delta del 🟡: lleva los DEA propuestos y el maestro los incorpora por id (sin duplicar)', ()=>{
     const snapP=JSON.stringify(propState), baseP=_pmBase; const fid=fl.id;
     try{
@@ -18324,7 +18412,8 @@ document.addEventListener('keydown',e=>{
       +'padding:5px 14px;font-weight:800;cursor:pointer">📤 Enviar mis cambios</button>';
     document.body.appendChild(b);
     document.getElementById('pmSend').onclick=pmEnviarCambios;
-    const refrescar=()=>{ try{ document.getElementById('pmCnt').textContent=pmResumenDelta(pmDelta()); }catch(e){} };
+    const refrescar=()=>{ try{ let ue=null; try{ ue=sessionStorage.getItem('pm_ultimo_envio'); }catch(e){}
+      document.getElementById('pmCnt').textContent=pmResumenDelta(pmDelta())+(ue?(' · último envío '+new Date(ue).toLocaleString('es-CL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})):''); }catch(e){} };
     refrescar(); setInterval(refrescar, 4000);
     // que la barra no tape el plano
     document.body.style.paddingBottom='38px';
