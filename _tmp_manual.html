@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<script src="pm_config.js"></script>
+<script>localStorage.setItem("pm_session",JSON.stringify({u:"crivera",exp:Date.now()+3600e3}));</script><script src="pm_config.js"></script><script>window.PM_CONFIG.LOG_URL="";</script>
 <script src="pm_gate.js"></script>
 <style>/*HUB-PM*/ body:not(.pm-export) #expDD, body:not(.pm-editor) #wsModal, body:not(.pm-export-dot) #expDD [onclick^="exportPuestosTrabajo"], body:not(.pm-export-dot) #expDD [onclick^="exportAsignaciones"], body:not(.pm-export-dot) #btnDotServ, #expDD [onclick^="exportBackup"], #expDD [onclick^="exportWebData"], #expDD [onclick^="publicarAtlasPM"], #expDD [onclick^="fbakAhora"], #expDD [onclick^="fbakRestaurar"], #expDD [onclick^="diagGuardado"], #expDD [onclick^="copyConsultaLink"], #expDD [onclick^="exportForWeb"], #expDD [onclick*="_abHandle"] { display:none !important; }</style>
 <meta charset="UTF-8">
@@ -956,7 +956,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button onclick="exportSenaletica();closeExpMenu()">🏷 Señalética por recinto</button>
       <div class="exp-menu-lbl">Personas y puestos</div>
       <button onclick="exportPuestosTrabajo();closeExpMenu()" title="¿Calzan las personas asignadas con los puestos de trabajo? Puestos del plano (escritorio + computador) + escritorios nuevos fucsia vs. personas, contando el 4º turno como un solo puesto. Por servicio y por recinto">💼 Puestos de trabajo vs personas</button>
-      <button onclick="exportAsignacionesDialogo();closeExpMenu()" title="Dotación completa o filtrada por subdirección, servicio o ambos">👥 Dotación en recinto · completa o filtrada</button>
+      <button onclick="exportAsignaciones();closeExpMenu()">👥 Dotación en recinto</button>
       <button onclick="exportCamas();closeExpMenu()">🛏 Camas, sillones y cupos numerados</button>
       <div class="exp-menu-lbl">Equipamiento</div>
       <button onclick="exportEquipamiento();closeExpMenu()">🔧 Equipamiento en recinto (EquiBox)</button>
@@ -1433,20 +1433,6 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="btn-save" onclick="guardarBaja()">Guardar</button>
       <button class="btn-del" id="bajaQuitar" onclick="restaurarBaja(_bajaCtx&&_bajaCtx.nombre);closeBaja()">↩ Restaurar</button>
       <button class="btn-cancel" onclick="closeBaja()">Cancelar</button>
-    </div>
-  </div>
-</div>
-<div id="edfModal" class="modal-fondo" onclick="if(event.target===this)closeExportDot()">
-  <div class="modal-box" style="width:460px">
-    <h3>👥 Exportar dotación en recinto</h3>
-    <div class="form-row"><label>Subdirección</label>
-      <select id="edfSd" onchange="_edfServicios()" style="width:100%;height:30px;border:1px solid var(--border);border-radius:8px;padding:0 8px;font-size:13px"></select></div>
-    <div class="form-row"><label>Servicio</label>
-      <select id="edfSv" onchange="_edfCuenta()" style="width:100%;height:30px;border:1px solid var(--border);border-radius:8px;padding:0 8px;font-size:13px"></select></div>
-    <div class="rp-hint" id="edfCuenta"></div>
-    <div class="modal-actions">
-      <button class="btn-save" onclick="_edfExportar()">⬇ Exportar XLSX</button>
-      <button class="btn-cancel" onclick="closeExportDot()">Cancelar</button>
     </div>
   </div>
 </div>
@@ -15961,50 +15947,7 @@ function toggleExpMenu(e){ if(e)e.stopPropagation(); try{expDestLabel();}catch(e
 function closeExpMenu(){ const m=document.getElementById('expMenu'); if(m) m.classList.remove('show'); }
 document.addEventListener('click',function(e){ const dd=document.getElementById('expDD'); if(dd && !dd.contains(e.target)) closeExpMenu(); });
 
-// Diálogo: dotación completa o filtrada por subdirección, servicio o ambos
-const _edfVal = v => String(v||'').trim();
-function _edfStaff(sd, sv){
-  return dotDB.staff.filter(s => (!sd || _edfVal(s.subdireccion)===sd) && (!sv || _edfVal(s.servicio)===sv));
-}
-function exportAsignacionesDialogo(){
-  if(!dotDB || !dotDB.staff || !dotDB.staff.length){
-    alert('La base de dotación no está cargada. No se puede exportar.');
-    return;
-  }
-  const sds = [...new Set(dotDB.staff.map(s=>_edfVal(s.subdireccion)).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
-  document.getElementById('edfSd').innerHTML = '<option value="">Todas las subdirecciones</option>'
-    + sds.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join('');
-  _edfServicios();
-  document.getElementById('edfModal').classList.add('show');
-}
-function _edfServicios(){
-  const sd = document.getElementById('edfSd').value;
-  const sel = document.getElementById('edfSv'), prev = sel.value;
-  const cnt = {};
-  _edfStaff(sd, '').forEach(s=>{ const k=_edfVal(s.servicio); if(k) cnt[k]=(cnt[k]||0)+1; });
-  const svs = Object.keys(cnt).sort((a,b)=>a.localeCompare(b,'es'));
-  sel.innerHTML = '<option value="">Todos los servicios</option>'
-    + svs.map(x=>`<option value="${esc(x)}">${esc(x)} (${cnt[x]})</option>`).join('');
-  sel.value = svs.includes(prev) ? prev : '';
-  _edfCuenta();
-}
-function _edfCuenta(){
-  const sd = document.getElementById('edfSd').value, sv = document.getElementById('edfSv').value;
-  const n = _edfStaff(sd, sv).length;
-  document.getElementById('edfCuenta').textContent = (sd||sv)
-    ? n.toLocaleString('es-CL')+' funcionarios con este filtro. El archivo trae sus asignaciones, los sin asignar y el resumen.'
-    : 'Dotación completa: '+n.toLocaleString('es-CL')+' funcionarios (incluye fuera de matriz, compras de servicio y aforo de recintos).';
-}
-function closeExportDot(){ document.getElementById('edfModal').classList.remove('show'); }
-function _edfExportar(){
-  const sd = document.getElementById('edfSd').value, sv = document.getElementById('edfSv').value;
-  if((sd||sv) && !_edfStaff(sd, sv).length){ alert('No hay funcionarios con ese filtro.'); return; }
-  closeExportDot();
-  exportAsignaciones({sd, sv});
-}
-
-// filtro opcional {sd, sv}: subdirección y/o servicio (sin filtro = dotación completa)
-function exportAsignaciones(filtro){
+function exportAsignaciones(){
   if(typeof XLSX==='undefined'){
     alert('La librería XLSX no se cargó. Verifica tu conexión a internet (se descarga de CDN al abrir la plataforma).');
     return;
@@ -16013,11 +15956,6 @@ function exportAsignaciones(filtro){
     alert('La base de dotación no está cargada. No se puede exportar.');
     return;
   }
-  const F = {sd: _edfVal(filtro&&filtro.sd), sv: _edfVal(filtro&&filtro.sv)};
-  const filtrado = !!(F.sd || F.sv);
-  const STAFF = filtrado ? _edfStaff(F.sd, F.sv) : dotDB.staff;
-  const filtroLbl = [F.sd, F.sv].filter(Boolean).join(' · ');
-  if(!STAFF.length){ alert('No hay funcionarios con ese filtro.'); return; }
 
   // 1) Indexar asignaciones por nombre normalizado
   const asigMap = new Map();
@@ -16072,9 +16010,9 @@ function exportAsignaciones(filtro){
   // 2 violetas (Compra de Servicio) · 3 rojos (sin asignar). Alfabético en cada grupo.
   const _esCdsStaff = s => /COMPRA/i.test(String(s.calidad||''))||/COMPRA/i.test(String(s.ley||''));
   const dataRows = [], noAsigRows = [];
-  let verdes = 0, rojosN = 0, cdsMatrix = 0, bajasN = 0;
+  let verdes = 0, rojosN = 0, cdsMatrix = 0;
 
-  STAFF.forEach(s => {
+  dotDB.staff.forEach(s => {
     const key = norm(s.nombre);
     const asigs = asigMap.get(key) || [];
     const isAsig = asigs.length > 0;
@@ -16086,7 +16024,6 @@ function exportAsignaciones(filtro){
     const e = s.estamento || 'Sin estamento';
     const sd = s.subdireccion || 'Sin subdirección';
     if(baja){
-      bajasN++;
       const flagB='⊘ FUERA DE LA MATRIZ · '+_bajaLbl(baja).toUpperCase();
       const personB=[s.subdireccion||'', s.unidad||'', flagB, s.rut||s.id||'', s.nombre||'', s.estamento||'', s.calidad||'',
                      s.turno||'', s.cargo||'', s.ley||'', s.horas||'', s.servicio||''];
@@ -16116,10 +16053,9 @@ function exportAsignaciones(filtro){
 
   // 2b) Personas asignadas que NO están en la matriz: fuera de matriz (naranjo,
   // como el dot) o Compra de Servicio (violeta). Una fila por asignación.
-  // Con filtro no se puede saber a qué subdirección/servicio pertenecen: se omiten.
   let totalExt = 0, totalCds = 0;
   asigMap.forEach((asigs, key) => {
-    if(filtrado || _matched.has(key)) return;
+    if(_matched.has(key)) return;
     const a0 = asigs[0] || {};
     const esCds = asigs.some(x => x.cds);
     if(esCds) totalCds++; else totalExt++;
@@ -16136,15 +16072,15 @@ function exportAsignaciones(filtro){
   const _nk = n => { n=String(n||'').trim(); return n||'\uffff'; };
   dataRows.sort((a,b)=>a.rank-b.rank||_nk(a.nombre).localeCompare(_nk(b.nombre),'es'));
   noAsigRows.sort((a,b)=>_nk(a.nombre).localeCompare(_nk(b.nombre),'es'));
-  const baseN = STAFF.length - cdsMatrix - (filtrado ? bajasN : Object.keys(nameState.bajas||{}).length);
+  const baseN = dotDB.staff.length - cdsMatrix - Object.keys(nameState.bajas||{}).length;
   const _pf = n => baseN ? (n*100/baseN).toFixed(1).replace('.',',') : '0';
   const sumRow = new Array(headers.length).fill('');
   sumRow[0]='✔ Asignados: '+verdes+' ('+_pf(verdes)+'%)';
   sumRow[4]='🛒 Compras de Servicio: '+(cdsMatrix+totalCds)
-    +(dotDB.genericos && !filtrado ? ' · fuera de selección (sin nombre): '+dotDB.genericos.compras
+    +(dotDB.genericos ? ' · fuera de selección (sin nombre): '+dotDB.genericos.compras
       +' compras y '+dotDB.genericos.becados+' becados' : '');
   sumRow[8]='✘ No asignados: '+rojosN+' ('+_pf(rojosN)+'%)';
-  { const nB=filtrado ? bajasN : Object.keys(nameState.bajas||{}).length; if(nB) sumRow[11]='⊘ Fuera de la matriz (jubilación/renuncia…): '+nB; }
+  { const nB=Object.keys(nameState.bajas||{}).length; if(nB) sumRow[11]='⊘ Fuera de la matriz (jubilación/renuncia…): '+nB; }
   const rows = [sumRow, headers, ...dataRows.map(d=>d.row)];
   const unassignedRows = [sumRow.slice(0,12), headers.slice(0,12), ...noAsigRows.map(d=>d.row)];
 
@@ -16232,10 +16168,10 @@ function exportAsignaciones(filtro){
   applyStyles(wsNoa);
 
   // 4) Hoja de resumen
-  const totalDot = STAFF.length;
+  const totalDot = dotDB.staff.length;
   const totalNoAsig = totalDot - totalAsig;
   const sumRows = [
-    ['Resumen Dotación HDS' + (filtrado ? ' · ' + filtroLbl : '')],
+    ['Resumen Dotación HDS'],
     [`Generado: ${new Date().toLocaleString('es-CL')}`],
     [`Base dotación: ${dotDB.version} (${dotDB.total} funcionarios)`],
     [],
@@ -16243,8 +16179,8 @@ function exportAsignaciones(filtro){
     ['Total funcionarios', totalDot, '100,0%'],
     ['Asignados a puesto', totalAsig, (totalAsig*100/totalDot).toFixed(1).replace('.',',')+'%'],
     ['Sin asignar', totalNoAsig, (totalNoAsig*100/totalDot).toFixed(1).replace('.',',')+'%'],
-    ['Fuera de matriz (asignados, no en base)', filtrado ? 'solo en la exportación completa' : totalExt, ''],
-    ['Compra de Servicio (asignados, no en base)', filtrado ? 'solo en la exportación completa' : totalCds, ''],
+    ['Fuera de matriz (asignados, no en base)', totalExt, ''],
+    ['Compra de Servicio (asignados)', totalCds, ''],
     [],
     ['Estamento','Total','Asignados','Sin asignar','% Asignado']
   ];
@@ -16342,14 +16278,12 @@ function exportAsignaciones(filtro){
 
   // 6) Ensamblar libro y descargar
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, wsAll, filtrado ? 'Dotación filtrada' : 'Dotación Completa');
+  XLSX.utils.book_append_sheet(wb, wsAll, 'Dotación Completa');
   XLSX.utils.book_append_sheet(wb, wsNoa, 'Sin Asignar');
-  if(aforoData.length && !filtrado) XLSX.utils.book_append_sheet(wb, wsAforo, 'Aforo Recintos');
+  if(aforoData.length) XLSX.utils.book_append_sheet(wb, wsAforo, 'Aforo Recintos');
   XLSX.utils.book_append_sheet(wb, wsSum, 'Resumen');
 
-  const _slug = x => x.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,40);
-  const sufijo = filtrado ? [F.sd, F.sv].filter(Boolean).map(_slug).join('_') + '_' : '';
-  const filename = `Cubicacion_Dotacion_HDS_${sufijo}${new Date().toISOString().slice(0,10)}.xlsx`;
+  const filename = `Cubicacion_Dotacion_HDS_${new Date().toISOString().slice(0,10)}.xlsx`;
   XLSX.writeFile(wb, filename);
 }
 
@@ -18712,5 +18646,33 @@ document.addEventListener('keydown',e=>{
 </script>
 <script src="hub-home.js">
 </script>
-</body>
+<script>
+window.addEventListener('load',()=>setTimeout(async()=>{
+  const paso=new URLSearchParams(location.search).get('paso')||'1', W=ms=>new Promise(r=>setTimeout(r,ms));
+  const fin=()=>{ if(S.rafId){cancelAnimationFrame(S.rafId);S.rafId=null;} };
+  const area=n=>FLOORS.flatMap(f=>f.areas.map(a=>({f:f.id,a}))).find(o=>new RegExp(n,'i').test(aName(o.a.id)));
+  const centra=(bb,z)=>{ fin(); const r=viewer.getBoundingClientRect(); S.zoom=z; S.ox=r.width/2-(bb.x+bb.w/2)*z; S.oy=r.height/2-(bb.y+bb.h/2)*z; applyT(); renderSVG(); try{updateAreaLabelSizes();}catch(e){} };
+  if(S.correoN!==false) toggleCorreoN();
+  const E=area('^EMERGENCIA$');
+  const herr=()=>{ toggleRightPanel(false); if(_rpTab!=='herr') rpShowTab('herr'); };
+  if(paso==='1'){ goFloor('P1'); await W(2500); fin(); herr(); }
+  if(['2','6','7','9'].includes(paso)){ goFloor(E.f); await W(1500); goArea(E.a.id); await W(2500); fin();
+     const rr=E.a.rooms.filter(r=>rShapes(r).length); const bb=rr.map(r=>bounds(rShapes(r))).reduce((a,b)=>({x:Math.min(a.x,b.x),y:Math.min(a.y,b.y),X:Math.max(a.X,b.x+b.w),Y:Math.max(a.Y,b.y+b.h)}),{x:1e9,y:1e9,X:-1e9,Y:-1e9});
+     const r=viewer.getBoundingClientRect(); const z=Math.min(r.width/(bb.X-bb.x),r.height/(bb.Y-bb.y))*0.95; centra({x:bb.x,y:bb.y,w:bb.X-bb.x,h:bb.Y-bb.y},z);
+     if(paso==='2') herr();
+     const b8=E.a.rooms.find(r=>/BOX 8/i.test(rName(r.id))), b8b=bounds(rShapes(b8));
+     if(paso==='7'){ herr(); setPropMode('dea'); propState[E.f]=(propState[E.f]||[]).concat([{id:'demoDEA',k:'dea',x:b8b.x+b8b.w/2,y:b8b.y+b8b.h*0.25,rot:0,rid:b8.id}]); centra({x:b8b.x-300,y:b8b.y-150,w:b8b.w+600,h:b8b.h+300},0.55); }
+     if(paso==='6') openFichaRecinto(b8.id);
+  }
+  if(['3','4','5'].includes(paso)){ goFloor(E.f); await W(1200); goArea(E.a.id); await W(1500);
+     const rm=E.a.rooms.filter(r=>rShapes(r).length&&((wsState.dots||{})[r.id]||[]).length>=6).sort((a,b)=>((wsState.dots[b.id]||[]).length-(wsState.dots[a.id]||[]).length))[0];
+     goRoom(rm.id); await W(2500); fin(); const bb=bounds(rShapes(rm)), r=viewer.getBoundingClientRect(); centra(bb,Math.min(r.width/bb.w, r.height/bb.h)*0.8); herr();
+     if(paso==='4'){ if(!S.showDotNames) toggleDotNames(); renderSVG(); }
+     if(paso==='5'){ const L=(wsState.dots[rm.id]||[]); let i=L.findIndex(d=>!d.nombre&&d.tipo!=='dinamico'); if(i<0){ L.push({id:'demoWS',x:bb.x+bb.w/2,y:bb.y+bb.h/2,tipo:'fijo'}); i=L.length-1; renderSVG(); } openModal(rm.id,i); }
+  }
+  if(paso==='8'){ goFloor('P1'); await W(2000); fin(); toggleExpMenu(); }
+  await W(4000);
+  document.title='LISTO '+paso;
+}, 6000));
+</script></body>
 </html>
