@@ -1567,6 +1567,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 <script src="SHARED_DATA/ccdd_recinto.js"></script>
 <script src="SHARED_DATA/telefonia_ip.js"></script>
 <script src="SHARED_DATA/recintos_revisar.js"></script>
+<script src="SHARED_DATA/observaciones_unidades.js"></script>
 <script src="SHARED_DATA/consulta_subtipos.js"></script>
 <script src="SHARED_DATA/emmc_pendientes.js"></script>
 <script src="SHARED_DATA/nav_verticales.js"></script>
@@ -13584,6 +13585,40 @@ function _comisionPendientes(){
   });
   return out.sort((x,y)=>((y.asignado?1:0)-(x.asignado?1:0)) || x.nombre.localeCompare(y.nombre,'es'));
 }
+// ── Lo que pidió la unidad: dónde sentar a su gente pendiente ────────────────
+// Cuando se le manda a una unidad la lista de su personal sin puesto, vuelve con
+// instrucciones del tipo «sentar en bodega insumos 14.2.4». El código es PMA y
+// acá se busca el recinto que lo lleva, para poder ir y sentarla de una vez.
+if(!nameState.sentarRev) nameState.sentarRev={};
+function _obsUnidad(){ return ((window.OBSERVACIONES_UNIDADES||{}).observaciones)||[]; }
+function _recintoPorCodigo(cod){
+  if(!cod) return null;
+  for(const f of FLOORS) for(const a of f.areas) for(const r of a.rooms)
+    if(rCodeParts(r.id).indexOf(cod)>=0) return {f:f, a:a, r:r};
+  return null;
+}
+function _yaSentada(rid, nombre){
+  return (wsState.dots[rid]||[]).some(d=> norm(d.nombre||'')===norm(nombre)
+    || (d.turnos||[]).some(t=>norm(t.nombre||'')===norm(nombre)));
+}
+function _sentarTodas(){
+  return _obsUnidad().filter(o=>o.tipo==='sentar' && o.codigo_pma).map(o=>{
+    const loc=_recintoPorCodigo(o.codigo_pma);
+    return Object.assign({}, o, {_chk:'sentar', loc:loc,
+      code:norm(o.nombre)+'|'+o.codigo_pma,
+      ya: !!(loc && _yaSentada(loc.r.id, o.nombre))});
+  }).filter(x=>!x.ya && !nameState.sentarRev[norm(x.nombre)]);
+}
+// Sólo se listan las que tienen a dónde ir: una fila sin recinto dibujado no es
+// revisable (no hay destino). Las otras se cuentan y se avisan aparte.
+function _sentarPendientes(){ return _sentarTodas().filter(x=>x.loc); }
+function _sentarSinRecinto(){ return _sentarTodas().filter(x=>!x.loc); }
+function _goSentar(p){
+  if(!p.loc){ if(typeof tbInfo!=='undefined'&&tbInfo) tbInfo.textContent='El código '+p.codigo_pma+' no está dibujado en el Atlas'; return; }
+  if(S.floorId!==p.loc.f.id) goFloor(p.loc.f.id);
+  didPan=false; goArea(p.loc.a.id); didPan=false; goRoom(p.loc.r.id);
+}
+
 // ── Avisos del catastro de recintos (SHARED_DATA/recintos_revisar.js) ────────
 // Los calcula _DEV/build_recintos_pma.py desde el último respaldo del Atlas:
 // BIM completados por código, recintos sin BIM, código Atlas ≠ mapa PMA y
@@ -13946,6 +13981,19 @@ const REV_CHECKS={
     subText:p=>'🔁 marca de comisión en la matriz · '+[p.cargo,p.unidad,p.turno].filter(Boolean).join(' · ')
       +' · '+(p.asignado?('📍 '+(rName(p.r.id)||p.r.id)):'sin puesto en el Atlas')+' · ✓ revisada',
     done:'Todas las comisiones de servicio están revisadas.'},
+  dot_sentar:{label:'Personal: dónde pidió sentarlo la unidad',
+    find:_sentarPendientes, flat:true, approve:true,
+    okTitle:'Ya está sentada o se resolvió de otra forma',
+    allLabel:n=>'✓ Marcar las '+n+' como resueltas',
+    apply:p=>{ nameState.sentarRev[norm(p.nombre)]=1; },
+    go:p=>_goSentar(p), goDestino:p=>!!p.loc,
+    subText:p=>'📍 '+(p.loc?('va a «'+rName(p.loc.r.id)+'» · '+p.loc.f.id):'el código no está dibujado en el Atlas')
+      +' · código '+p.codigo_pma+(p.recinto?(' · '+p.recinto):'')+' · '+(p.unidad||'')
+      +' · dice la unidad: «'+String(p.observacion||'').slice(0,70)+'»',
+    done:(()=>{ const n=_sentarSinRecinto().length;
+      return 'No quedan asignaciones pedidas por las unidades con recinto dibujado.'
+        + (n ? ' Ojo: '+n+' traen un código que todavía no existe en el plano ('
+              + _sentarSinRecinto().map(x=>x.codigo_pma).join(', ')+').' : ''); })()},
   pma:{label:'BIM oficial (PMA)',
     find:_pmaPendientes, approve:true, noDialog:true,
     subText:p=>(p.current?('actual '+p.current):'sin BIM')+' → '+p.proposed,
@@ -16279,6 +16327,40 @@ async function runSelfTest(){
     const h2=_instalacionesHtmlCod('9.9.9.9',['9.9.9.9'],'AC');
     return /Grado médico/.test(h) && /Columnas quirúrgicas/.test(h) && /O₂ <b>3<\/b>/.test(h) && /ELE-AM-003/.test(h)
       && /no traen enchufes ni gases/.test(h2);
+  });
+
+  // Lo que pidió la unidad: el código PMA tiene que encontrar su recinto dibujado
+  T('Unidad: el código PMA encuentra el recinto y la ficha lo ofrece', ()=>{
+    const fl=FLOORS[0]; if(!fl||!fl.areas[0]||!fl.areas[0].rooms[0]) return true;   // sin plano, nada que probar
+    const r=fl.areas[0].rooms[0], codPrev=(nameState.codes||{})[r.id];
+    const obsPrev=window.OBSERVACIONES_UNIDADES;
+    try{
+      nameState.codes=nameState.codes||{}; nameState.codes[r.id]='99.9.9';
+      window.OBSERVACIONES_UNIDADES={observaciones:[{tipo:'sentar', nombre:'ZZQ PRUEBA SENTAR',
+        codigo_pma:'99.9.9', unidad:'UNIDAD DE PRUEBA', observacion:'sentar en 99.9.9'}]};
+      const loc=_recintoPorCodigo('99.9.9');
+      const pend=_sentarPendientes();
+      return !!loc && loc.r.id===r.id && pend.length===1 && pend[0].loc && pend[0].loc.r.id===r.id;
+    } finally {
+      if(codPrev===undefined) delete nameState.codes[r.id]; else nameState.codes[r.id]=codPrev;
+      window.OBSERVACIONES_UNIDADES=obsPrev;
+    }
+  });
+  T('Unidad: quien ya está sentada en su recinto sale de la lista', ()=>{
+    const fl=FLOORS[0]; if(!fl||!fl.areas[0]||!fl.areas[0].rooms[0]) return true;
+    const r=fl.areas[0].rooms[0], codPrev=(nameState.codes||{})[r.id];
+    const obsPrev=window.OBSERVACIONES_UNIDADES, dotsPrev=JSON.stringify(wsState.dots[r.id]||[]);
+    try{
+      nameState.codes=nameState.codes||{}; nameState.codes[r.id]='99.9.8';
+      window.OBSERVACIONES_UNIDADES={observaciones:[{tipo:'sentar', nombre:'ZZQ YA SENTADA',
+        codigo_pma:'99.9.8', unidad:'UNIDAD DE PRUEBA', observacion:'sentar en 99.9.8'}]};
+      wsState.dots[r.id]=(wsState.dots[r.id]||[]).concat([{id:'st_obs',x:1,y:1,tipo:'fijo',nombre:'ZZQ YA SENTADA'}]);
+      return _sentarPendientes().length===0;
+    } finally {
+      wsState.dots[r.id]=JSON.parse(dotsPrev);
+      if(codPrev===undefined) delete nameState.codes[r.id]; else nameState.codes[r.id]=codPrev;
+      window.OBSERVACIONES_UNIDADES=obsPrev;
+    }
   });
 
   // aislamiento: guardar en selftest NO toca localStorage

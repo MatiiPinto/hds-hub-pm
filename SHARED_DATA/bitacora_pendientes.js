@@ -1,7 +1,7 @@
 // SHARED_DATA/bitacora_pendientes.js — versión publicada en el HUB-PM (saneada por deploy_web_pm.py)
 window.BITACORA = {
  "version": "2026-10-05 · Bitácora y huddle de Puesta en Marcha",
- "generado": "2026-10-06",
+ "generado": "2026-10-07",
  "proposito": "Reunir en un solo lugar los pendientes que hoy viven dispersos en correos, ORD, cartas CS-IF, actas de mesas de trabajo y sesiones de trabajo.",
  "ambitos": [
   "Comunicaciones",
@@ -2618,7 +2618,7 @@ window.BITACORA = {
   {
    "id": "P114",
    "titulo": "Discurso común de Puesta en Marcha antes de comunicar nada más",
-   "detalle": "Decisión de la reunión: no se parte con nadie (equipos, gremios, clínicos) hasta tener un discurso único: nombre (somos Hospital del Salvador; no «complejo hospitalario», no «Salvador Geriátrico», no «proyecto INGER»; el INGER va por su carril), qué se puede decir oficialmente de la PSP, el traslado y los plazos, y respuestas a preguntas frecuentes (p. ej. fondos de puesta en marcha). Voceros: quien conduce y la Dra. «Viñardelli» [sic?].",
+   "detalle": "Decisión de la reunión: no se parte con nadie (equipos, gremios, clínicos) hasta tener un discurso único: nombre (somos Hospital del Salvador; no «complejo hospitalario», no «Salvador Geriátrico», no «proyecto INGER»; el INGER va por su carril), qué se puede decir oficialmente de la PSP, el traslado y los plazos, y respuestas a preguntas frecuentes (p. ej. fondos de puesta en marcha). Voceros: quien conduce y la Dra. Gabriela Brignardello.",
    "ambito": "Puesta en Marcha",
    "origen_tipo": "Reunión",
    "origen_ref": "Minuta 05-10-2026 · Equipo de Puesta en Marcha (audios «Avenida Salvador 364 6» y «Hospital del Salvador 2»)",
@@ -2637,6 +2637,10 @@ window.BITACORA = {
     {
      "fecha": "2026-10-05",
      "texto": "Levantado de la reunión del equipo PM del 05-10 [2·22:28–23:49]. Ver minuta en Minutas/minutas/2026-10-05_puesta-en-marcha-equipo-comunicaciones-discurso.md."
+    },
+    {
+     "fecha": "2026-10-06",
+     "texto": "Nombre corregido: la «Dra. Viñardelo/Viñardelli» del audio es la Dra. Gabriela Brignardello (pauta diaria PM y GDC del 06-10)."
     }
    ]
   },
@@ -2668,7 +2672,7 @@ window.BITACORA = {
   {
    "id": "P116",
    "titulo": "Coordinación PM: correos a la jefatura subrogante, con copia acotada, nunca masivos",
-   "detalle": "Hasta el 19-10 la jefatura (subrogante) de Puesta en Marcha es la Dra. «Viñardelo» [sic?]. Los correos de coordinación (p. ej. los de Francisca [sic?]) van a ella con copia a quien conduce y al Dr. Zajjur; no «para el mundo».",
+   "detalle": "Hasta el 19-10 la jefatura (subrogante) de Puesta en Marcha es la Dra. Gabriela Brignardello. Los correos de coordinación (p. ej. los de Francisca [sic?]) van a ella con copia a quien conduce y al Dr. Zajjur; no «para el mundo».",
    "ambito": "Puesta en Marcha",
    "origen_tipo": "Reunión",
    "origen_ref": "Minuta 05-10-2026 · Equipo de Puesta en Marcha (audios «Avenida Salvador 364 6» y «Hospital del Salvador 2»)",
@@ -2687,6 +2691,10 @@ window.BITACORA = {
     {
      "fecha": "2026-10-05",
      "texto": "Levantado de la reunión del equipo PM del 05-10 [1·00:00–00:37]. Ver minuta en Minutas/minutas/2026-10-05_puesta-en-marcha-equipo-comunicaciones-discurso.md."
+    },
+    {
+     "fecha": "2026-10-06",
+     "texto": "Nombre corregido: la «Dra. Viñardelo/Viñardelli» del audio es la Dra. Gabriela Brignardello (pauta diaria PM y GDC del 06-10)."
     }
    ]
   },
@@ -2939,6 +2947,206 @@ window.BITACORA = {
      "texto": "Correo de InterSystems a SSMO y HDS con copia al equipo PM, Informática, CSSO, AIF e INGER. Matías va en copia; la respuesta la deben dar quienes definen el flujo clínico-administrativo de Imagenología."
     }
    ]
+  },
+  {
+   "id": "P127",
+   "titulo": "Tiempos quirúrgicos en TrakCare registrados a posteriori y redondeados a 0/5: repetir la observación e informar",
+   "detalle": "Observación en terreno (Mónica [sic?]): la pabellonera anota los tiempos en papel y los cierra después en TrakCare, con horas terminadas en 0 o 5; a las 14:00 solo 4 cirugías tenían tiempos cerrados. Decisión: registrar en el momento y en el sistema. Se repite la observación otro día y se hace un informe para el martes 13-10. Es la línea base del proyecto de medición automática de pabellón y del paper de Renata Vargas (EMBC 2027).",
+   "ambito": "Puesta en Marcha",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Minuta 06-10-2026 · Reunión Proceso Pre-Quirúrgico (audio 62 min)",
+   "origen_fecha": "2026-10-06",
+   "contraparte": "",
+   "servicio": "PABELLON CENTRAL",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "compromiso": "Informe para el martes 13-10.",
+   "plazo": "2026-10-13",
+   "responsable": "Mónica [sic?] · Carlos [sic?] · Matías Pinto",
+   "creado": "2026-10-06",
+   "actualizado": "2026-10-06",
+   "frente": "Proceso Quirúrgico",
+   "notas": [
+    {
+     "fecha": "2026-10-06",
+     "texto": "Levantado de la reunión Proceso Pre-Quirúrgico del 06-10 [00:02:18–00:04:43, 01:01:36]. Minuta en Minutas/minutas/2026-10-06_proceso-pre-quirurgico.md · plataforma 47.ProcesoQuirurgico."
+    }
+   ]
+  },
+  {
+   "id": "P128",
+   "titulo": "Recambio y variabilidad de anestesia como focos de mejora: medirlos con los tiempos reales",
+   "detalle": "El tiempo quirúrgico es poco mejorable (mismos cirujanos); el recambio (34–36 min percibidos, 20 cuando se supervisa) y la variabilidad anestésica (15 min a 1 h) sí. «Un poquitito de cada tiempo». Requiere los 6 tiempos registrados en el momento (P127).",
+   "ambito": "Puesta en Marcha",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Minuta 06-10-2026 · Reunión Proceso Pre-Quirúrgico (audio 62 min)",
+   "origen_fecha": "2026-10-06",
+   "contraparte": "",
+   "servicio": "PABELLON CENTRAL",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "compromiso": "Sin plazo acordado.",
+   "plazo": "",
+   "responsable": "Jefatura de Pabellón y Anestesia",
+   "creado": "2026-10-06",
+   "actualizado": "2026-10-06",
+   "frente": "Proceso Quirúrgico",
+   "notas": [
+    {
+     "fecha": "2026-10-06",
+     "texto": "Levantado de la reunión Proceso Pre-Quirúrgico del 06-10 [00:05:37–00:07:41]. Minuta en Minutas/minutas/2026-10-06_proceso-pre-quirurgico.md · plataforma 47.ProcesoQuirurgico."
+    }
+   ]
+  },
+  {
+   "id": "P129",
+   "titulo": "Cambios de tabla (~50 %): separar inevitables de mejorables y exigir programación cierta por equipo",
+   "detalle": "La tabla presentada el viernes cambia cerca de la mitad. Separar los cambios inevitables (urgencias, hospitalizados que se complican) de los mejorables (equipos que presentan tabla sin estar seguros). Cada equipo responde por el orden y la programación de su tabla.",
+   "ambito": "Puesta en Marcha",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Minuta 06-10-2026 · Reunión Proceso Pre-Quirúrgico (audio 62 min)",
+   "origen_fecha": "2026-10-06",
+   "contraparte": "",
+   "servicio": "PABELLON CENTRAL",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "compromiso": "Sin plazo acordado.",
+   "plazo": "",
+   "responsable": "Unidad de Tabla · jefes de equipo quirúrgico",
+   "creado": "2026-10-06",
+   "actualizado": "2026-10-06",
+   "frente": "Proceso Quirúrgico",
+   "notas": [
+    {
+     "fecha": "2026-10-06",
+     "texto": "Levantado de la reunión Proceso Pre-Quirúrgico del 06-10 [00:18:10–00:20:14]. Minuta en Minutas/minutas/2026-10-06_proceso-pre-quirurgico.md · plataforma 47.ProcesoQuirurgico."
+    }
+   ]
+  },
+  {
+   "id": "P130",
+   "titulo": "Pabellones de urgencia y residencia fijos y usados para lo que son; revisar la tiroides electiva nocturna en residencia",
+   "detalle": "Los pabellones de urgencia y residencia cambian de número (1, 2, 3, 12) y el de residencia se usa para prolongar tablas electivas (tiroides electiva a las 20:00 que salió a las 00:30, sin que conste quién la autorizó); urgencias metidas en la tabla electiva. Deben ser fijos (para concluir y por el carro e insumos de urgencia). Antes de crear un pabellón nuevo, revisar para qué se usa el de residencia. Datos del 02/03-10: 9 cirugías en 24 h en dos pabellones.",
+   "ambito": "Puesta en Marcha",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Minuta 06-10-2026 · Reunión Proceso Pre-Quirúrgico (audio 62 min)",
+   "origen_fecha": "2026-10-06",
+   "contraparte": "",
+   "servicio": "PABELLON CENTRAL",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "compromiso": "Revisar con detención el martes 13-10.",
+   "plazo": "2026-10-13",
+   "responsable": "María Elena Sepúlveda · Paula [sic?]",
+   "creado": "2026-10-06",
+   "actualizado": "2026-10-06",
+   "frente": "Proceso Quirúrgico",
+   "notas": [
+    {
+     "fecha": "2026-10-06",
+     "texto": "Levantado de la reunión Proceso Pre-Quirúrgico del 06-10 [00:47:03–00:55:41]. Minuta en Minutas/minutas/2026-10-06_proceso-pre-quirurgico.md · plataforma 47.ProcesoQuirurgico."
+    }
+   ]
+  },
+  {
+   "id": "P131",
+   "titulo": "Jefatura única de pabellón que distribuya los quirófanos según demanda",
+   "detalle": "Propuesta de María Elena: una sola jefatura que integre a todos los que llegan a pabellón, ordene y distribuya los quirófanos de acuerdo a la demanda; cada equipo manda persona y horario a pabellón (no a policlínico). Hoy cada especialidad tiene quirófanos que no ocupa completos.",
+   "ambito": "Puesta en Marcha",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Minuta 06-10-2026 · Reunión Proceso Pre-Quirúrgico (audio 62 min)",
+   "origen_fecha": "2026-10-06",
+   "contraparte": "",
+   "servicio": "PABELLON CENTRAL",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "compromiso": "Sin plazo acordado.",
+   "plazo": "",
+   "responsable": "María Elena Sepúlveda (propuesta a Dirección)",
+   "creado": "2026-10-06",
+   "actualizado": "2026-10-06",
+   "frente": "Proceso Quirúrgico",
+   "notas": [
+    {
+     "fecha": "2026-10-06",
+     "texto": "Levantado de la reunión Proceso Pre-Quirúrgico del 06-10 [00:22:57–00:23:08, 00:33:40–00:34:04]. Minuta en Minutas/minutas/2026-10-06_proceso-pre-quirurgico.md · plataforma 47.ProcesoQuirurgico."
+    }
+   ]
+  },
+  {
+   "id": "P132",
+   "titulo": "Lockers y casilleros para médicos en las estaciones de trabajo del 4.º piso",
+   "detalle": "Las estaciones de trabajo por equipo médico ya están asignadas (levantamiento de Horacio Díaz con N. Calleja y P. Cruzat [sic?]). Faltan lockers seguros (laptops) y definir quién accede y cómo se administran las llaves; los casilleros de abajo estaban considerados para los médicos. María Elena se compromete a los casilleros.",
+   "ambito": "MNC",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Minuta 06-10-2026 · Reunión Proceso Pre-Quirúrgico (audio 62 min)",
+   "origen_fecha": "2026-10-06",
+   "contraparte": "",
+   "servicio": "PABELLON CENTRAL",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "compromiso": "Sin plazo acordado.",
+   "plazo": "",
+   "responsable": "Matías Pinto · María Elena Sepúlveda",
+   "creado": "2026-10-06",
+   "actualizado": "2026-10-06",
+   "frente": "Proceso Quirúrgico",
+   "notas": [
+    {
+     "fecha": "2026-10-06",
+     "texto": "Levantado de la reunión Proceso Pre-Quirúrgico del 06-10 [00:26:26–00:29:32, 00:57:34]. Minuta en Minutas/minutas/2026-10-06_proceso-pre-quirurgico.md · plataforma 47.ProcesoQuirurgico."
+    }
+   ]
+  },
+  {
+   "id": "P133",
+   "titulo": "Oficina prequirúrgica en tres funciones: orientación (1.º), gestión (4.º) y tabla / central de mando (2.º)",
+   "detalle": "La oficina quirúrgica actual (20 personas) no cabe en el espacio previsto; Autorización Sanitaria insiste en que esté en el 1.º piso atendiendo pacientes y el equipo no quiere atender. Propuesta: orientación prequirúrgica / front office en el 1.º piso (solo pacientes citados, con sticker), gestión prequirúrgica en el 4.º piso junto a los médicos, y tabla quirúrgica como central de mando en el 2.º piso (pabellón); dependen del Depto. de Cirugía. Dos tercios de las consultas deberían resolverse por teléfono, mail u online.",
+   "ambito": "Puesta en Marcha",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Minuta 06-10-2026 · Reunión Proceso Pre-Quirúrgico (audio 62 min)",
+   "origen_fecha": "2026-10-06",
+   "contraparte": "",
+   "servicio": "PABELLON CENTRAL",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "compromiso": "Validar en la propuesta del martes 13-10.",
+   "plazo": "2026-10-13",
+   "responsable": "Grupo chico (María Elena, jefes de servicio)",
+   "creado": "2026-10-06",
+   "actualizado": "2026-10-06",
+   "frente": "Proceso Quirúrgico",
+   "notas": [
+    {
+     "fecha": "2026-10-06",
+     "texto": "Levantado de la reunión Proceso Pre-Quirúrgico del 06-10 [00:39:37–00:46:05, 00:56:47–00:57:12]. Minuta en Minutas/minutas/2026-10-06_proceso-pre-quirurgico.md · plataforma 47.ProcesoQuirurgico."
+    }
+   ]
+  },
+  {
+   "id": "P134",
+   "titulo": "Residencia quirúrgica en el NHDS: definir con la universidad",
+   "detalle": "«Temazo pendiente»: cómo será la residencia quirúrgica en el nuevo hospital (cirujanos que entran a residencia, interconsultor que visa el paciente quirúrgico) y avisar a la universidad.",
+   "ambito": "Puesta en Marcha",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Minuta 06-10-2026 · Reunión Proceso Pre-Quirúrgico (audio 62 min)",
+   "origen_fecha": "2026-10-06",
+   "contraparte": "",
+   "servicio": "PABELLON CENTRAL",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "compromiso": "Sin plazo acordado.",
+   "plazo": "",
+   "responsable": "No consta",
+   "creado": "2026-10-06",
+   "actualizado": "2026-10-06",
+   "frente": "Proceso Quirúrgico",
+   "notas": [
+    {
+     "fecha": "2026-10-06",
+     "texto": "Levantado de la reunión Proceso Pre-Quirúrgico del 06-10 [00:48:03–00:48:12]. Minuta en Minutas/minutas/2026-10-06_proceso-pre-quirurgico.md · plataforma 47.ProcesoQuirurgico."
+    }
+   ]
   }
  ],
  "criticos": [
@@ -2956,7 +3164,9 @@ window.BITACORA = {
   "P111",
   "P114",
   "P115",
-  "P121"
+  "P121",
+  "P127",
+  "P130"
  ],
  "frentes": {
   "pabellon": [
@@ -2968,6 +3178,21 @@ window.BITACORA = {
    "P107",
    "P108",
    "P109"
+  ],
+  "proceso_quirurgico": [
+   "P102",
+   "P103",
+   "P104",
+   "P107",
+   "P108",
+   "P127",
+   "P128",
+   "P129",
+   "P130",
+   "P131",
+   "P132",
+   "P133",
+   "P134"
   ]
  },
  "equipo": [

@@ -141,6 +141,7 @@ footer{background:var(--panel2);border-top:1px solid var(--bd);color:var(--tx2);
   <section class="pane" id="p-dosim"></section>
   <section class="pane" id="p-lev"></section>
   <section class="pane" id="p-form"></section>
+  <section class="pane" id="p-copr"></section>
   <section class="pane" id="p-eqaut"></section>
   <section class="pane" id="p-opr"></section>
   <section class="pane" id="p-cumpl"></section>
@@ -228,6 +229,7 @@ function estadoDosis(mSv){
 /* ── Navegación ───────────────────────────────────────────────────────────── */
 const PANES=[
   {id:'panel', ic:'📊', t:'Panel'},
+  {id:'copr',  ic:'✅', t:'Cotejo OPR'},
   {id:'poe',   ic:'👷', t:'Personal expuesto'},
   {id:'dosi',  ic:'🎫', t:'Dosimetría'},
   {id:'hist',  ic:'📈', t:'Historial CCHEN'},
@@ -258,6 +260,7 @@ function pintaTabs(){
     if(p.id==='dosim'&&AG&&AG.resumen.dosimetros_no_devueltos) b='⚠ '+AG.resumen.dosimetros_no_devueltos;
     if(p.id==='lev'&&AG&&AG.resumen.levantamiento_sin_responder) b=String(AG.resumen.levantamiento_sin_responder);
     if(p.id==='form'&&window.PR_FORM) b=String(window.PR_FORM.resumen.personas);
+    if(p.id==='copr'&&AG&&AG.cotejo_opr) b=String(AG.cotejo_opr.total.personas);
     if(p.id==='eqaut'&&window.PR_EQ_AUT&&window.PR_EQ_AUT.resumen.vencidas) b='⛔ '+window.PR_EQ_AUT.resumen.vencidas;
     if(p.id==='opr'&&window.PR_OPR) b=String(window.PR_OPR.pendientes.length);
     if(p.id==='req'&&PR)   b=String(PR.requisitos_rrhh.filter(r=>r.estado==='falta').length);
@@ -268,7 +271,7 @@ function pintaTabs(){
 function irA(id){
   PANES.forEach(p=>{ document.getElementById('p-'+p.id).classList.toggle('on',p.id===id);
     const t=document.getElementById('tb-'+p.id); if(t) t.classList.toggle('on',p.id===id); });
-  ({panel:vPanel,poe:vPoe,dosi:vDosi,inst:vInst,epp:vEpp,doc:vDoc,cargo:vCargo,cumpl:vCumpl,req:vReq,guia:vGuia,hist:vHist,cot:vCot,dosim:vDosim,lev:vLev,form:vForm,eqaut:vEqAut,opr:vOpr})[id]();
+  ({panel:vPanel,poe:vPoe,dosi:vDosi,inst:vInst,epp:vEpp,doc:vDoc,cargo:vCargo,cumpl:vCumpl,req:vReq,guia:vGuia,hist:vHist,cot:vCot,dosim:vDosim,lev:vLev,form:vForm,eqaut:vEqAut,opr:vOpr,copr:vCopr})[id]();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -1110,6 +1113,76 @@ function formExcel(){
     x.curso?'SI':'NO',x.evidencia.some(e=>e.tipo==='curso')?'SI':'',x.licencia?'SI':'NO',x.evidencia.some(e=>e.tipo==='licencia')?'SI':'',
     x.vigente||'',(x.aporta||[]).join(' / '),(x.alertas||[]).join('; ')].map(cu).join(';')).join('\n');
   bajar('formulario_PR_'+F.resumen.corte+'.csv','﻿'+cab+cuerpo,'text/csv;charset=utf-8');
+}
+
+/* ══ ✅ COTEJO OPR · gran cotejo de la Oficial de Protección Radiológica ═══════
+   La OPR define QUIÉN se expone. Las cifras agregadas viajan en pr_resumen (🟡);
+   el detalle por persona y los aportes salen de pr_personal (solo 🔴 local). */
+const COPR_TIPO={curso_respaldo:'Curso «sí, sin documento»: la plataforma tiene el respaldo',
+  curso_no_registrado:'Figura «sin curso», pero tiene curso registrado',
+  autorizacion_vigente:'Figura sin autorización, pero hay resolución vigente',
+  dosimetro_cchen:'Figura «sin dosímetro», pero tiene lectura CCHEN reciente',
+  curso:'Certificado de curso que la plataforma no tenía', autorizacion:'Resolución de desempeño que la plataforma no tenía',
+  persona_nueva:'Persona expuesta que no estaba en la plataforma'};
+function vCopr(){
+  const box=document.getElementById('p-copr'), C=AG&&AG.cotejo_opr;
+  if(!C){ box.innerHTML='<div class="aviso a-warn">Falta el cotejo de la OPR (se genera con <code>python3 _DEV/build_pr_cotejo_opr.py</code> y luego <code>build_pr_personal.py</code>).</div>'; return; }
+  const T=C.total, pct=(v,t)=>t?Math.round(v*100/t)+'%':'—';
+  const fila=(x,k)=>'<tr><td><b>'+esc(x[k])+'</b></td><td>'+x.personas+'</td><td>'+x.encuesta+' <small>('+pct(x.encuesta,x.personas)+')</small></td>'
+    +'<td>'+x.curso_si+'</td><td>'+x.curso_sin_doc+'</td><td>'+(x.sin_curso?'<span class="pill p-warn">'+x.sin_curso+'</span>':'0')+'</td>'
+    +'<td>'+x.dosimetro+'</td><td>'+(x.sin_dosimetro?'<span class="pill p-warn">'+x.sin_dosimetro+'</span>':'0')+'</td>'
+    +'<td>'+x.autorizacion+(x.vencida?' <small>+'+x.vencida+' venc.</small>':'')+(x.en_firma?' <small>+'+x.en_firma+' en firma</small>':'')+'</td>'
+    +'<td>'+(x.sin_autorizacion?'<span class="pill p-bad">'+x.sin_autorizacion+'</span>':'0')+'</td><td><b>'+x.al_dia+'</b></td></tr>';
+  const cab='<thead><tr><th></th><th>Expuestos</th><th>Encuesta</th><th>Curso con doc.</th><th>Curso sin doc.</th><th>Sin curso</th><th>Dosímetro</th><th>Sin dosímetro</th><th>Autorización</th><th>Sin autorización</th><th>Al día</th></tr></thead>';
+  let h='<div class="aviso a-info"><b>Gran cotejo de la OPR al '+esc(C.corte)+'.</b> Ally cruzó la planilla de cada servicio (depurada a expuestos), '
+    +'la encuesta individual, la nómina CChEN y los certificados y autorizaciones que ordenó por servicio. Es la <b>nómina oficial de personal expuesto</b> (solo staff, sin becados). '
+    +'La plataforma la toma como base y le suma lo que tiene por su cuenta: SIRH, diplomas 2017-2026, resoluciones SEREMI e informes CCHEN.'
+    +'</div>'
+    +kpis([['Personas expuestas',T.personas,'var(--tx)'],['Al día en los 3 requisitos',T.al_dia,'var(--ok)'],
+           ['Sin autorización de desempeño',T.sin_autorizacion,'var(--bad)'],['Sin curso de PR',T.sin_curso,'var(--warn)'],
+           ['Sin dosímetro',T.sin_dosimetro,'var(--vio)'],['Respondieron la encuesta',T.encuesta+' ('+pct(T.encuesta,T.personas)+')','var(--info)']])
+    +'<div class="card" style="margin-top:12px"><h2>🏥 Por servicio</h2><div class="tw"><table>'+cab+'<tbody>'
+    +C.por_servicio.map(x=>fila(x,'servicio')).join('')+fila({...T,servicio:'TOTAL'},'servicio')+'</tbody></table></div></div>'
+    +'<div class="card"><h2>👥 Por estamento</h2><div class="tw"><table>'+cab+'<tbody>'+C.por_estamento.map(x=>fila(x,'estamento')).join('')+'</tbody></table></div></div>';
+  const AP=C.aportes_plataforma||{}, AO=C.aportes_opr||{}, Dc=C.documentos||{};
+  h+='<div class="grid g2"><div class="card"><h2>🤝 Lo que la plataforma aporta a la OPR</h2><div class="tw"><table><tbody>'
+    +Object.entries(AP).sort((a,b)=>b[1]-a[1]).map(([k,v])=>'<tr><td>'+esc(COPR_TIPO[k]||k)+'</td><td style="text-align:right"><b>'+v+'</b></td></tr>').join('')
+    +'</tbody></table></div>'+(PR?'<div style="margin-top:8px"><button class="btn xs" onclick="coprCSV()">⬇ Aportes por persona para la OPR (CSV)</button></div>':'')+'</div>'
+    +'<div class="card"><h2>📥 Lo que la OPR suma a la plataforma</h2><div class="tw"><table><tbody>'
+    +Object.entries(AO).sort((a,b)=>b[1]-a[1]).map(([k,v])=>'<tr><td>'+esc(COPR_TIPO[k]||k)+'</td><td style="text-align:right"><b>'+v+'</b></td></tr>').join('')
+    +'<tr><td>Documentos leídos de sus carpetas (texto u OCR)</td><td style="text-align:right"><b>'+Dc.leidos+'</b></td></tr>'
+    +'</tbody></table></div><div class="d" style="margin-top:6px">'+Dc.sin_rut+' documento(s) sin RUT legible · '+Dc.mal_archivados+' en una carpeta que no corresponde · '
+    +Dc.personas_fuera_del_cotejo+' persona(s) con documento en las carpetas que no figuran en el gran cotejo.</div></div></div>';
+  if(PR){
+    const P=PR.personas, porKey={}; P.forEach(p=>porKey[p.key]=p);
+    const conAp=P.filter(p=>p.opr&&p.opr.en_indicadores&&p.opr.aportes_plataforma&&p.opr.aportes_plataforma.length);
+    const nom=s=>String(s||'').normalize('NFD').replace(/[^A-Za-z ]/g,' ').toUpperCase().split(/\s+/).filter(Boolean).sort().join(' ');
+    const rev=(PR.cotejo_opr_revisar||[]).map(r=>{
+      const q=P.find(p=>p.opr&&nom(p.nombre)===nom(r.sujeto))||P.find(p=>nom(p.nombre)===nom(r.sujeto)); let nota='';
+      const doc=(PR.cotejo_opr_docs||[]).find(d=>d.archivo.indexOf(String(r.sujeto||'').replace(/\.pdf$/i,''))>=0&&d.ruts&&d.ruts.length);
+      if(doc){ const o=porKey[doc.ruts[0]]; nota=(doc.mal_archivado?'Es una resolución SEREMI de desempeño':'Documento')+(o?' de <b>'+esc(o.nombre)+'</b>':'')+(doc.resolucion?' (Res. '+esc(doc.resolucion)+', vence '+esc(doc.vence)+')':'')+(doc.mal_archivado?': moverla a su carpeta de autorizaciones.':'.'); }
+      else if(q){ nota='Curso: '+(q.curso?esc((q.curso.situacion||'')+(q.curso.termino?' · '+q.curso.termino:'')):'sin registro')
+        +' · Autorización: '+(q.desempeno&&q.desempeno.vence?'vence '+esc(q.desempeno.vence):'sin resolución')+(q.opr_docs?' · '+q.opr_docs.length+' documento(s) en sus carpetas':''); }
+      return '<tr><td>'+esc(r.servicio)+'</td><td><b>'+esc(r.sujeto)+'</b><br><small>'+esc(r.que)+'</small></td><td><small>'+(nota||'—')+'</small></td></tr>'; });
+    h+='<div class="card"><h2>🔎 «Por revisar» de la OPR · lo que encuentra la plataforma</h2><div class="tw"><table><thead><tr><th>Servicio</th><th>Caso</th><th>Lo que dicen los documentos</th></tr></thead><tbody>'+rev.join('')+'</tbody></table></div></div>';
+    const fuera=P.filter(p=>p.opr_docs&&!p.opr);
+    if(fuera.length) h+='<div class="card"><h2>📂 Con documento en las carpetas de la OPR, pero fuera del gran cotejo</h2><div class="d">Confirmar con la OPR si se exponen (en general radiólogos de Imágenes).</div><div class="tw" style="margin-top:8px"><table><tbody>'
+      +fuera.map(p=>'<tr><td><b>'+esc(p.nombre)+'</b></td><td><small>'+p.opr_docs.map(esc).join('<br>')+'</small></td><td>'+(p.desempeno&&p.desempeno.vence?'autorización vence '+esc(p.desempeno.vence):'')+'</td></tr>').join('')+'</tbody></table></div></div>';
+    h+='<div class="card"><h2>🧾 Aportes por persona ('+conAp.length+')</h2><div class="d">Nominado: solo en el 🔴 HUB local.</div><div class="tw" style="margin-top:8px"><table><thead><tr><th>Servicio</th><th>Persona</th><th>Según la OPR</th><th>Lo que tiene la plataforma</th></tr></thead><tbody>'
+      +conAp.map(p=>'<tr><td>'+esc(p.opr.servicio)+'</td><td><b>'+esc(p.nombre)+'</b><br><small style="color:var(--tx2)">'+esc(p.run||'')+'</small></td>'
+        +'<td><small>Curso: '+esc(p.opr.curso)+' · Dosímetro: '+esc(p.opr.dosimetro)+' · Autorización: '+esc(p.opr.autorizacion)+'</small></td>'
+        +'<td><small>'+p.opr.aportes_plataforma.map(a=>'<b>'+esc(COPR_TIPO[a.tipo]||a.tipo)+'</b>: '+esc(a.detalle||'')+(a.respaldo?' <span style="color:var(--tx2)">('+esc(String(a.respaldo).split('/').pop())+')</span>':'')).join('<br>')+'</small></td></tr>').join('')
+      +'</tbody></table></div></div>';
+  }
+  box.innerHTML=h;
+}
+function coprCSV(){
+  if(!PR) return;
+  const cu=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const filas=[];
+  PR.personas.filter(p=>p.opr&&p.opr.en_indicadores).forEach(p=>(p.opr.aportes_plataforma||[]).forEach(a=>filas.push(
+    [p.opr.servicio,p.nombre,p.run,p.opr.estamento,p.opr.curso,p.opr.dosimetro,p.opr.autorizacion,COPR_TIPO[a.tipo]||a.tipo,a.detalle,a.respaldo].map(cu).join(';'))));
+  bajar('aportes_plataforma_OPR_'+PR.cotejo_opr.corte+'.csv','﻿'+['Servicio','Nombre','RUT','Estamento','Curso (OPR)','Dosímetro (OPR)','Autorización (OPR)','Aporte','Detalle','Respaldo'].join(';')+'\n'+filas.join('\n'),'text/csv;charset=utf-8');
 }
 
 /* ══ 📜 AUTORIZACIÓN DE EQUIPOS EMISORES (HDS actual) ════════════════════════ */
