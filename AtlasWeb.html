@@ -647,7 +647,7 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 
 /* ── Modales: un solo estilo (encabezado blanco, sin degradado) ──────────── */
 #fichaModal,#estadoModal,#equipModal{position:fixed;inset:0;background:rgba(15,22,34,.5);display:none;align-items:center;justify-content:center;z-index:120;padding:20px}
-body.view-only #dkPmCentral,body.view-only #dkPmDelta{display:none!important}
+body.view-only #dkPmCentral,body.view-only #dkPmDelta,body.view-only #backupBadge{display:none!important}
 #fichaModal.show,#estadoModal.show,#equipModal.show,#dgModal.show,#dsModal.show,#eoModal.show{display:flex}
 #dsModal,#eoModal{position:fixed;inset:0;background:rgba(15,30,52,.55);display:none;align-items:center;justify-content:center;z-index:150;padding:16px}
 .eo-tab{width:100%;border-collapse:collapse;font-size:12.5px;margin:4px 0 12px;font-variant-numeric:tabular-nums}
@@ -6824,7 +6824,9 @@ function _firmaPlano(PP){
   return (PP.generado||'')+'·'+(PP.total||0)+'·'+(h>>>0).toString(36);
 }
 function _autoImportarPlano(){
-  if(_SELFTEST || (S.viewOnly && !S.editPM)) return 0;
+  // la versión de consulta (también el editor del 🟡) NO siembra: la foto publicada ya trae lo del
+  // plano y, si se sembrara aquí, 64 escritorios entraban al delta y podían pisar el maestro
+  if(_SELFTEST || S.viewOnly) return 0;
   const PP=window.PROPUESTOS_PLANO; if(!PP||!PP.floors) return 0;
   const firma=_firmaPlano(PP);
   let hecho=null; try{ hecho=localStorage.getItem('cabida_prop_plano_firma'); }catch(e){}
@@ -10499,7 +10501,9 @@ function pmDelta(){
   // propuestos colocados desde el 🟡 (DEA · tótems · impresoras… desde el iPad): los que no están en la base o cambiaron
   const props={};
   Object.keys(propState||{}).forEach(fid=>{ const bp=(base.props||{})[fid]||[];
-    (propState[fid]||[]).forEach(it=>{ const b=bp.find(x=>x.id===it.id); if(!b || J(b)!==J(it)) (props[fid]=props[fid]||[]).push({...it, por:_pmUsuario()}); }); });
+    // lo sembrado desde el plano (src:'plano') nunca lo coloca un editor: no viaja (navegadores que
+    // alcanzaron a sembrarlo con una versión anterior lo tienen en su capa local)
+    (propState[fid]||[]).forEach(it=>{ if(it.src==='plano') return; const b=bp.find(x=>x.id===it.id); if(!b || J(b)!==J(it)) (props[fid]=props[fid]||[]).push({...it, por:_pmUsuario()}); }); });
   return { _formato:'atlas-delta-pm', _version:2, por:_pmUsuario(),
            generadoEn:new Date().toISOString(),
            snapshot:(window.ATLAS_WEB_DATA&&ATLAS_WEB_DATA._meta&&ATLAS_WEB_DATA._meta.exportedAt)||null,
