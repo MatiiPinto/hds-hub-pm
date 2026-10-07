@@ -2124,14 +2124,75 @@ function _lsPref(k,v){ if(_SELFTEST) return false; try{ _lsSet(k,v); return true
 // su navegador con prefijo pm_. El snapshot queda intacto: su capa se lee
 // encima, y lo que cambió viaja como delta (📤 Enviar mis cambios).
 const _WD=window.ATLAS_WEB_DATA||{};
-function lg(k,d){
-  if(_esEditorAtlas()){
-    try{ let s=localStorage.getItem('pm_'+k);
-      if(s!=null){ if(s.slice(0,2)===LZ_MARCA) s=LZ.desempacar(s.slice(2)); return JSON.parse(s)||d; }
-    }catch(e){}
+// ── CAPA DEL EDITOR = SÓLO SUS CAMBIOS, aplicados ENCIMA del snapshot ──────
+// Antes la capa guardaba el ESTADO COMPLETO y lo usaba en reemplazo del
+// snapshot: al primer cambio quedaba congelada en esa foto y los snapshots
+// nuevos ya no le llegaban (oct-2026: Carolina veía en 0 recintos que Matías
+// ya había asignado), y su 📤 delta salía inflado con el trabajo de Matías al
+// revés. Ahora se guarda sólo el delta (pm_delta) con la marca del snapshot
+// sobre el que se tomó; si se publica uno nuevo, se rebasa recinto a recinto.
+const _PM_LEGADO=['cabida_cad_boxes','cabida_cad_delta','cabida_cad_dxf_calib','cabida_cad_muebles',
+  'cabida_cad_names','cabida_cad_propuestos','cabida_cad_puertas','cabida_cad_structures','cabida_cad_ws'];
+function _pmJ(x){ return JSON.stringify(x===undefined?null:x,(k,v)=>(k==='reemplazoHist'||k==='motivo')?undefined:v); }
+function _pmSello(){ return ((_WD._meta||{}).exportedAt)||''; }
+function _pmLeerRaw(key){ try{ let s=localStorage.getItem(key); if(s==null) return null;
+  if(s.slice(0,2)===LZ_MARCA) s=LZ.desempacar(s.slice(2)); return JSON.parse(s); }catch(e){ return null; } }
+function _pmEscribirRaw(key,obj){ let s=JSON.stringify(obj); if(LZ_OK) s=LZ_MARCA+LZ.empacar(s);
+  _lsSet(key,s); if(localStorage.getItem(key)!==s) throw new Error('no se pudo guardar en este navegador'); }
+function _pmMigrarLegado(){
+  // capa antigua (estado completo): se APARTA sin aplicarla. No se puede saber qué
+  // parte es de la editora y qué parte es una foto vieja del trabajo de Matías.
+  let n=0;
+  _PM_LEGADO.forEach(k=>{ try{ const v=localStorage.getItem('pm_'+k); if(v!=null){
+    _lsSet('pm_legado_'+k,v); if(localStorage.getItem('pm_legado_'+k)===v){ localStorage.removeItem('pm_'+k); n++; } } }catch(e){} });
+  if(n) _lsSet('pm_legado_desde', new Date().toISOString());
+}
+let _pmDV, _pmConflictos=[];
+function _pmDeltaVigente(){
+  if(_pmDV!==undefined) return _pmDV;
+  _pmMigrarLegado();
+  const D=_pmLeerRaw('pm_delta');
+  if(!D){ _pmDV=null; return null; }
+  const sello=_pmSello();
+  if(D.snapshot!==sello){
+    // rebase a 3 bandas: ya incorporado → se descarta · Matías no lo tocó → se
+    // mantiene · Matías lo cambió después → manda la versión oficial (conflicto)
+    const dots0=((_WD.cabida_cad_ws||{}).dots)||{}, nom0=((_WD.cabida_cad_names||{}).rooms)||{}, pro0=_WD.cabida_cad_propuestos||{};
+    const dots={}, dotsAntes={}, nombres={}, props={};
+    Object.keys(D.dots||{}).forEach(r=>{
+      const cur=_pmJ(dots0[r]||[]), mio=_pmJ(D.dots[r]||[]), ant=_pmJ((D.dotsAntes||{})[r]||[]);
+      if(cur===mio) return;
+      if(cur===ant){ dots[r]=D.dots[r]; dotsAntes[r]=(D.dotsAntes||{})[r]||[]; return; }
+      _pmConflictos.push(r);
+    });
+    Object.keys(D.nombres||{}).forEach(r=>{ const x=D.nombres[r]||{}, cur=_pmJ(nom0[r]);
+      if(cur===_pmJ(x.ahora)) return; if(cur===_pmJ(x.antes)){ nombres[r]=x; return; } _pmConflictos.push(r); });
+    Object.keys(D.props||{}).forEach(f=>{ (D.props[f]||[]).forEach(it=>{
+      const b=(pro0[f]||[]).find(y=>y.id===it.id); if(b && _pmJ(b)===_pmJ(it)) return;
+      (props[f]=props[f]||[]).push(it); }); });
+    Object.assign(D,{snapshot:sello, dots, dotsAntes, nombres, props});
+    try{ _pmEscribirRaw('pm_delta',D); }catch(e){}
   }
-  if(_WD[k]!==undefined && _WD[k]!==null) return _WD[k];
-  return d;
+  _pmDV=D; return D;
+}
+function _pmAplicar(k,v,D){
+  if(k==='cabida_cad_ws'){ v=v||{dots:{}}; v.dots=v.dots||{};
+    Object.keys(D.dots||{}).forEach(r=>{ v.dots[r]=JSON.parse(JSON.stringify(D.dots[r]||[])); }); }
+  else if(k==='cabida_cad_names'){ v=v||{rooms:{}}; v.rooms=v.rooms||{};
+    Object.keys(D.nombres||{}).forEach(r=>{ const a=(D.nombres[r]||{}).ahora; if(a===null||a===undefined) delete v.rooms[r]; else v.rooms[r]=a; }); }
+  else if(k==='cabida_cad_propuestos'){ v=v||{};
+    Object.keys(D.props||{}).forEach(f=>{ const arr=v[f]=v[f]||[]; (D.props[f]||[]).forEach(it=>{
+      const i=arr.findIndex(y=>y.id===it.id), c=JSON.parse(JSON.stringify(it)); if(i>=0) arr[i]=c; else arr.push(c); }); }); }
+  return v;
+}
+function lg(k,d){
+  let v=(_WD[k]!==undefined && _WD[k]!==null) ? _WD[k] : d;
+  if(_esEditorAtlas() && (k==='cabida_cad_ws'||k==='cabida_cad_names'||k==='cabida_cad_propuestos')){
+    const D=_pmDeltaVigente();
+    // copia: el snapshot crudo sigue intacto como línea base de pmDelta()
+    if(D) v=_pmAplicar(k, JSON.parse(JSON.stringify(v===undefined?null:v)), D);
+  }
+  return v;
 }
 const _SELFTEST=/[?&]selftest/.test(location.search);
 function _lsSet(k,v){ if(!/^cabida_cad/.test(k)) try{localStorage.setItem(k,v);}catch(e){} }
@@ -2180,10 +2241,11 @@ function _lsBanner(msg, ok){
 function ls(k,v){
   if(!S.editPM) return true;
   try{
-    let s=JSON.stringify(v);
-    if(LZ_OK) s=LZ_MARCA+LZ.empacar(s);
-    _lsSet('pm_'+k,s);          // el escritor sancionado: 'pm_…' no es 'cabida_cad…',
-                                // así que pasa el bloqueo del estado principal
+    // se guarda SÓLO lo que la editora cambió contra el snapshot vigente
+    const d=pmDelta();
+    const D={snapshot:_pmSello(), nombres:d.nombres, dots:d.dots, dotsAntes:d.dotsAntes,
+             props:d.props, bitacora:d.bitacora};
+    _pmEscribirRaw('pm_delta',D); _pmDV=D;
     return true;
   }catch(e){
     alert('⚠ No se pudo guardar en este navegador: '+(e&&e.name||e)+
@@ -18494,6 +18556,23 @@ document.addEventListener('keydown',e=>{
       +'padding:5px 14px;font-weight:800;cursor:pointer">📤 Enviar mis cambios</button>';
     document.body.appendChild(b);
     document.getElementById('pmSend').onclick=pmEnviarCambios;
+    try{ const D=_pmDeltaVigente(); if(D && D.bitacora && !_pmCambios.length) _pmCambios.push(...D.bitacora); }catch(e){}
+    if(_pmConflictos.length){
+      const c=document.createElement('span'); c.style.cssText='font-weight:500;background:#fef3c7;color:#92400e;border-radius:6px;padding:2px 8px';
+      c.textContent='⚠ '+_pmConflictos.length+' cambio(s) tuyo(s) fueron actualizados después por Matías: se muestra la versión oficial';
+      b.insertBefore(c, document.getElementById('pmCnt'));
+    }
+    let leg=null; try{ leg=localStorage.getItem('pm_legado_desde'); }catch(e){}
+    if(leg){
+      const l=document.createElement('button');
+      l.textContent='⬇ Respaldo de tu capa anterior'; l.title='Tu trabajo guardado antes de la actualización del 07-10-2026. Ya no se aplica sobre el plano; descárgalo y envíaselo a Matías si tenía cambios sin enviar.';
+      l.style.cssText='background:transparent;color:#fff;border:1px solid rgba(255,255,255,.6);border-radius:7px;padding:4px 10px;font-weight:600;cursor:pointer';
+      l.onclick=()=>{ const o={_formato:'atlas-capa-legado-pm', por:_pmUsuario(), apartadaEl:leg};
+        _PM_LEGADO.forEach(k=>{ const v=_pmLeerRaw('pm_legado_'+k); if(v!=null) o[k]=v; });
+        const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([JSON.stringify(o)],{type:'application/json'}));
+        a.download='Atlas_capa_anterior_'+_pmUsuario()+'.json'; a.click(); };
+      b.insertBefore(l, document.getElementById('pmSend'));
+    }
     const refrescar=()=>{ try{ let ue=null; try{ ue=sessionStorage.getItem('pm_ultimo_envio'); }catch(e){}
       document.getElementById('pmCnt').textContent=pmResumenDelta(pmDelta())+(ue?(' · último envío '+new Date(ue).toLocaleString('es-CL',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})):''); }catch(e){} };
     refrescar(); setInterval(refrescar, 4000);
