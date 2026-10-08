@@ -1127,6 +1127,10 @@ const COPR_TIPO={curso_respaldo:'Curso «sí, sin documento»: la plataforma tie
   curso_no_registrado:'Figura «sin curso», pero tiene curso registrado',
   autorizacion_vigente:'Figura sin autorización, pero hay resolución vigente',
   dosimetro_cchen:'Figura «sin dosímetro», pero tiene lectura CCHEN reciente',
+  dosimetro_activo:'Figura «sin dosímetro», pero está en la hoja de control CChEN vigente',
+  dosimetro_no_en_hoja:'Figura con dosímetro, pero no está en la hoja de control CChEN vigente',
+  servicio_cambiado:'Su dosímetro está (o estuvo) en el contrato de otro servicio',
+  contrato_cruzado:'⛔ Contrato cruzado: dosímetro del contrato de otro servicio',
   curso:'Certificado de curso que la plataforma no tenía', autorizacion:'Resolución de desempeño que la plataforma no tenía',
   persona_nueva:'Persona expuesta que no estaba en la plataforma'};
 function vCopr(){
@@ -1158,6 +1162,51 @@ function vCopr(){
     +'<tr><td>Documentos leídos de sus carpetas (texto u OCR)</td><td style="text-align:right"><b>'+Dc.leidos+'</b></td></tr>'
     +'</tbody></table></div><div class="d" style="margin-top:6px">'+Dc.sin_rut+' documento(s) sin RUT legible · '+Dc.mal_archivados+' en una carpeta que no corresponde · '
     +Dc.personas_fuera_del_cotejo+' persona(s) con documento en las carpetas que no figuran en el gran cotejo.</div></div></div>';
+  const H=C.cchen;
+  if(H){
+    h+='<div class="card"><h2>🎟 Dosímetros activos según la CChEN · hojas de control '+esc((H.periodo||[]).join(' → '))+'</h2>'
+      +'<div class="d">Lo que la CChEN tiene asignado hoy, contrato por contrato, cruzado con el gran cotejo y con las respuestas de la CChEN a las consultas de la OPR. '
+      +'Cirugía y Urología no tienen contrato propio: sus expuestos no tienen dosímetro a su nombre.</div>'
+      +kpis([['Dosímetros activos',H.activos,'var(--tx)'],['Expuestos con dosímetro a su nombre',H.expuestos_con_activo,'var(--ok)'],
+             ['Expuestos sin dosímetro a su nombre',H.expuestos_sin_activo,'var(--warn)'],['Activos de personas fuera del cotejo',H.activos_fuera_del_cotejo,'var(--vio)'],
+             ['⛔ Contrato cruzado (activos)',H.contrato_cruzado_activo||0,(H.contrato_cruzado_activo?'var(--bad)':'var(--ok)')]])
+      +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>Contrato</th><th style="text-align:right">Activos</th></tr></thead><tbody>'
+      +Object.entries(H.por_contrato).map(([k,v])=>'<tr><td>'+esc(k)+'</td><td style="text-align:right">'+v+'</td></tr>').join('')
+      +'</tbody></table></div><div class="d" style="margin-top:6px">Expuestos sin dosímetro a su nombre, por servicio: '
+      +Object.entries(H.sin_activo_por_servicio).filter(e=>e[1]).map(([k,v])=>esc(k)+' <b>'+v+'</b>').join(' · ')+'.</div>';
+    if(PR){
+      const P=PR.personas, ofic=p=>p.opr&&p.opr.en_indicadores;
+      const fuera=P.filter(p=>p.cchen_activo&&!ofic(p));
+      const sinHoja=P.filter(p=>ofic(p)&&(p.opr.aportes_plataforma||[]).some(a=>a.tipo==='dosimetro_no_en_hoja'));
+      const camb=P.filter(p=>p.contrato_cruzado&&p.contrato_cruzado.length);
+      const resp=p=>(p.cchen_respuestas||[]).map(x=>esc(x.respuesta)).join('; ');
+      const sug=p=>{ const r=(p.cchen_respuestas||[]).map(x=>x.respuesta||'').join(' ');
+        if(p.contrato_cruzado&&p.contrato_cruzado.some(c=>c.tipo==='activo')) return '<span class="pill p-bad">⛔ contrato cruzado</span>';
+        if(/dio de baja|NO ACTIVO/i.test(r)) return '<span class="pill p-info">ya dado de baja: sacarlo de la hoja</span>';
+        if(/reasign/i.test(r)) return '<span class="pill p-ok">CChEN autoriza: baja y reasignar</span>';
+        if(p.opr_decision&&p.opr_decision.decision==='no_expuesto') return '<span class="pill p-warn">no se expone: baja y reasignar</span>';
+        if(p.opr_decision&&p.opr_decision.decision==='pendiente') return '<span class="pill">OPR consultando</span>';
+        if(p.opr&&!p.opr.en_indicadores) return '<span class="pill">en el cotejo, fuera de indicadores</span>';
+        return '<span class="pill p-warn">confirmar uso; si se libera, solo a personal del mismo servicio</span>'; };
+      h+='<h3 style="margin-top:14px">Dosímetros a nombre de personas que no están en el cotejo ('+fuera.length+')</h3>'
+        +'<div class="d">Cupos que se pueden recuperar. La CChEN permite dar de baja y reasignar «bajo el mismo contrato al nuevo TOE», pero <b>solo a personal del mismo servicio del contrato</b>: usar el cupo de un servicio para alguien de otro es justo lo que hay que evitar (contrato cruzado).</div>'
+        +'<div class="tw" style="margin-top:6px"><table><thead><tr><th>Contrato</th><th>Titular en la hoja</th><th>Unidad en la dotación</th><th>Respuesta CChEN</th><th>Sugerencia</th></tr></thead><tbody>'
+        +fuera.map(p=>'<tr><td>'+p.cchen_activo.map(a=>esc(a.contrato+' '+a.servicio)+'<br><small>'+esc(a.dosimetro)+'</small>').join('')+'</td><td><b>'+esc(p.nombre)+'</b>'
+          +(p.opr_decision?'<br><small>'+esc(p.opr_decision.motivo)+'</small>':'')+'</td><td><small>'+esc((p.dotacion&&p.dotacion.unidad)||'no está en la dotación')+'</small></td>'
+          +'<td><small>'+(resp(p)||'—')+'</small></td><td>'+sug(p)+'</td></tr>').join('')+'</tbody></table></div>'
+        +'<h3 style="margin-top:14px">Expuestos que la OPR da «con dosímetro» y no están en ninguna hoja vigente ('+sinHoja.length+')</h3>'
+        +'<div class="d">Si lo usan, es un dosímetro a nombre de otra persona: su dosis queda registrada en otro historial. Regularizar con los cupos de la tabla anterior.</div>'
+        +'<div class="tw" style="margin-top:6px"><table><thead><tr><th>Servicio</th><th>Persona</th><th>Estamento</th><th>Respuesta CChEN</th></tr></thead><tbody>'
+        +sinHoja.map(p=>'<tr><td>'+esc(p.opr.servicio)+'</td><td><b>'+esc(p.nombre)+'</b></td><td><small>'+esc(p.opr.estamento||'')+'</small></td><td><small>'+(resp(p)||'—')+'</small></td></tr>').join('')+'</tbody></table></div>'
+        +'<h3 style="margin-top:14px">⛔ Contrato cruzado: dosímetro del contrato de otro servicio ('+camb.length+')</h3>'
+        +'<div class="aviso a-bad" style="margin-top:6px"><b>Regla:</b> un dosímetro de un contrato CChEN se asigna solo a personal de ese servicio. No se da de baja el de una persona para pasárselo a alguien de otro servicio (por ejemplo, un cupo de Vascular a un TM de Imágenes): esa persona va al contrato de su propio servicio, con una solicitud nueva si hace falta.</div>'
+        +'<div class="tw" style="margin-top:6px"><table><thead><tr><th>Persona</th><th>Su servicio</th><th>Contrato del dosímetro</th><th>Respuesta CChEN</th></tr></thead><tbody>'
+        +camb.map(p=>p.contrato_cruzado.map(c=>'<tr><td><b>'+esc(p.nombre)+'</b></td><td>'+esc(c.servicio_persona)+' <small style="color:var(--tx2)">('+esc(c.fuente_servicio)+')</small></td>'
+          +'<td>'+esc(c.contrato+' '+c.servicio_contrato)+'<br><small>'+(c.tipo==='activo'?'activo '+esc(c.dosimetro):'última lectura '+esc(c.desde)+' · hoy sin dosímetro')+'</small></td><td><small>'+(resp(p)||'—')+'</small></td></tr>').join('')).join('')
+        +'</tbody></table></div>';
+    }
+    h+='</div>';
+  }
   if(PR){
     const P=PR.personas, porKey={}; P.forEach(p=>porKey[p.key]=p);
     const conAp=P.filter(p=>p.opr&&p.opr.en_indicadores&&p.opr.aportes_plataforma&&p.opr.aportes_plataforma.length);
@@ -1171,8 +1220,8 @@ function vCopr(){
       return '<tr><td>'+esc(r.servicio)+'</td><td><b>'+esc(r.sujeto)+'</b><br><small>'+esc(r.que)+'</small></td><td><small>'+(nota||'—')+'</small></td></tr>'; });
     h+='<div class="card"><h2>🔎 «Por revisar» de la OPR · lo que encuentra la plataforma</h2><div class="tw"><table><thead><tr><th>Servicio</th><th>Caso</th><th>Lo que dicen los documentos</th></tr></thead><tbody>'+rev.join('')+'</tbody></table></div></div>';
     const fuera=P.filter(p=>p.opr_docs&&!p.opr);
-    if(fuera.length) h+='<div class="card"><h2>📂 Con documento en las carpetas de la OPR, pero fuera del gran cotejo</h2><div class="d">Confirmar con la OPR si se exponen (en general radiólogos de Imágenes).</div><div class="tw" style="margin-top:8px"><table><tbody>'
-      +fuera.map(p=>'<tr><td><b>'+esc(p.nombre)+'</b></td><td><small>'+p.opr_docs.map(esc).join('<br>')+'</small></td><td>'+(p.desempeno&&p.desempeno.vence?'autorización vence '+esc(p.desempeno.vence):'')+'</td></tr>').join('')+'</tbody></table></div></div>';
+    if(fuera.length) h+='<div class="card"><h2>📂 Con documento en las carpetas de la OPR, pero fuera del gran cotejo</h2><div class="d">Lo que la OPR respondió el 07-10 va bajo cada nombre.</div><div class="tw" style="margin-top:8px"><table><tbody>'
+      +fuera.map(p=>'<tr><td><b>'+esc(p.nombre)+'</b>'+(p.opr_decision?'<br><span class="pill '+(p.opr_decision.decision==='pendiente'?'p-warn':'p-info')+'">'+esc(p.opr_decision.motivo)+'</span>':'')+'</td><td><small>'+p.opr_docs.map(esc).join('<br>')+'</small></td><td>'+(p.desempeno&&p.desempeno.vence?'autorización vence '+esc(p.desempeno.vence):'')+'</td></tr>').join('')+'</tbody></table></div></div>';
     h+='<div class="card"><h2>🧾 Aportes por persona ('+conAp.length+')</h2><div class="d">Nominado: solo en el 🔴 HUB local.</div><div class="tw" style="margin-top:8px"><table><thead><tr><th>Servicio</th><th>Persona</th><th>Según la OPR</th><th>Lo que tiene la plataforma</th></tr></thead><tbody>'
       +conAp.map(p=>'<tr><td>'+esc(p.opr.servicio)+'</td><td><b>'+esc(p.nombre)+'</b><br><small style="color:var(--tx2)">'+esc(p.run||'')+'</small></td>'
         +'<td><small>Curso: '+esc(p.opr.curso)+' · Dosímetro: '+esc(p.opr.dosimetro)+' · Autorización: '+esc(p.opr.autorizacion)+'</small></td>'

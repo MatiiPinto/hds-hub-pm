@@ -5600,10 +5600,12 @@ function _placeDotCards(){
 // enfermería azul marino · tecnólogos médicos burdeo · nutrición morado · medicina física y
 // rehabilitación negro · TENS celeste · auxiliares gris grafito. El resto, gris claro.
 // [etiqueta, fondo, texto]
-const ROL_FONDO={med:['Médico(a) Ley 19.664','#ffffff','#0f3557'],med15:['Médico(a) Ley 15.076','#0e5e60','#ffffff'],
-  enf:['Enfermería','#1f3a68','#ffffff'],tm:['Tecnólogo(a) médico','#7b1e3a','#ffffff'],nutri:['Nutrición','#6d28d9','#ffffff'],
-  rehab:['Medicina Física y Rehabilitación','#111827','#ffffff'],tens:['TENS','#8fd0f2','#0f3557'],aux:['Auxiliar','#4b5563','#ffffff'],
-  otro:['Otro estamento','#eef2f6','#0f3557']};
+// tono SUAVE del color del uniforme, letra negra y BORDE con el color fuerte del uniforme
+// [etiqueta, fondo, texto, borde]
+const ROL_FONDO={med:['Médico(a) Ley 19.664','#ffffff','#111827','#64748b'],med15:['Médico(a) Ley 15.076','#cfe8e6','#111827','#0e5e60'],
+  enf:['Enfermería','#d5e0f2','#111827','#1f3a68'],tm:['Tecnólogo(a) médico','#f3d6de','#111827','#7b1e3a'],nutri:['Nutrición','#e7ddfb','#111827','#6d28d9'],
+  rehab:['Medicina Física y Rehabilitación','#c9cdd4','#111827','#111827'],tens:['TENS','#dcf1fc','#111827','#38a3d6'],aux:['Auxiliar','#e3e6ea','#111827','#4b5563'],
+  otro:['Otro estamento','#f7f8fa','#111827','#94a3b8']};
 // distintivo de los TENS por área (rol operativo o unidad): banda de color a la izquierda + sigla
 const TENS_AREA=[[/IMAGEN|RADIOL|RAYOS/,'RX','Rayos','#f59e0b'],[/ENDOSC/,'ENDO','Endoscopía','#7c3aed'],[/ESTERILIZ/,'ESTER','Esterilización','#0891b2'],
   [/FARMACIA/,'FARM','Farmacia de pabellón','#16a34a'],[/CIRUGIA MAYOR AMBULATORIA|\bCMA\b/,'CMA','Cirugía mayor ambulatoria','#db2777'],
@@ -5656,7 +5658,7 @@ function _drawDotCard(e,r,C){
   }
   const RF=ROL_FONDO[e.rol];
   const bg=el('rect',{x:r.x0,y:-r.ch/2,width:r.cw,height:r.ch,rx:4,fill:RF?RF[1]:'#ffffff','fill-opacity':0.97,
-    stroke:(e.rol==='med'?'#64748b':e.col),'stroke-width':(e.rol==='med'?1.4:1),style:'cursor:pointer',class:'ws-card-bg'+(RF?' rol-'+e.rol:'')});
+    stroke:(RF?RF[3]:e.col),'stroke-width':(RF?1.4:1),style:'cursor:pointer',class:'ws-card-bg'+(RF?' rol-'+e.rol:'')});
   const bt=el('title'); bt.textContent=(RF?(RF[0]+(e.area?(' · '+e.area.lbl):'')+' · '):'')+'Clic: pasa la tarjeta al otro lado del puesto (derecha ↔ izquierda)'; bg.appendChild(bt);
   bg.addEventListener('mousedown',ev=>ev.stopPropagation());
   bg.addEventListener('click',ev=>{ ev.stopPropagation(); flipDotName(e.nk,e.defR,ev.shiftKey); });
@@ -18425,7 +18427,7 @@ async function runSelfTest(){
       const lin=_rolLineas({tipo:'fijo',nombre:'RF TENS RX'})[0].startsWith('[RX] ');
       const din=_rolFondoDot({tipo:'dinamico',turnos:[{nombre:'RF MED19'},{nombre:'RF ENF'}]})==='' && _rolFondoDot({tipo:'dinamico',turnos:[{nombre:'RF AUX'}]})==='aux';
       _drawDotCard({dx:0,dy:0,col:'#10b981',lines:['👤 RF ENF'],rol:'enf'},{rot:0,x0:10,cw:80,ch:14},{fs:7.5,lh:9.5,padX:5,padY:4});
-      let card=svg.lastChild; const dib=card.querySelector('.ws-card-bg').getAttribute('fill')===ROL_FONDO.enf[1] && card.querySelector('text').getAttribute('fill')==='#ffffff'; card.remove();
+      let card=svg.lastChild; const dib=card.querySelector('.ws-card-bg').getAttribute('fill')===ROL_FONDO.enf[1] && card.querySelector('text').getAttribute('fill')==='#111827'; card.remove();
       _drawDotCard({dx:0,dy:0,col:'#10b981',lines:['[RX] 👤 RF TENS RX'],rol:'tens',area:_tensArea('RF TENS RX')},{rot:0,x0:10,cw:90,ch:14},{fs:7.5,lh:9.5,padX:5,padY:4});
       card=svg.lastChild; const banda=!!card.querySelector('.ws-card-area') && card.querySelector('.ws-card-bg').getAttribute('fill')===ROL_FONDO.tens[1]; card.remove();
       return ok && area && lin && din && dib && banda;
