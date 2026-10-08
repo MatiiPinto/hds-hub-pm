@@ -650,6 +650,19 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 body.view-only #dkPmCentral,body.view-only #dkPmDelta,body.view-only #backupBadge{display:none!important}
 #fichaModal.show,#estadoModal.show,#equipModal.show,#dgModal.show,#dsModal.show,#eoModal.show{display:flex}
 #dsModal,#eoModal{position:fixed;inset:0;background:rgba(15,30,52,.55);display:none;align-items:center;justify-content:center;z-index:150;padding:16px}
+.esc-sel{margin-left:auto;display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.esc-sel .esc-t{font-size:11px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.04em;margin-right:2px}
+.esc-b{border:1px solid #cbd5e1;background:#fff;color:#334155;border-radius:7px;padding:3px 9px;font-size:12px;font-weight:600;cursor:pointer}
+.esc-b.on{background:#a16207;border-color:#a16207;color:#fff}
+.esc-b.chk.on{background:#fef3c7;border-color:#f59e0b;color:#92400e}
+.area-fantasma{fill:rgba(148,163,184,.08);stroke:#94a3b8;stroke-width:4;stroke-dasharray:18 12}
+.area-fantasma-lbl{fill:#94a3b8;font-weight:700;font-family:system-ui,-apple-system,sans-serif;opacity:.85}
+.inst-bloque{stroke-width:14;stroke-dasharray:60 18;stroke-linejoin:round}
+.inst-lbl{font-weight:900;font-family:system-ui,-apple-system,sans-serif;opacity:.75;paint-order:stroke fill;stroke:#fff;stroke-width:10px}
+.edif-tag{display:inline-block;font-size:9.5px;font-weight:800;border-radius:6px;padding:1px 6px;margin-left:5px;vertical-align:middle;white-space:nowrap;border:1px solid}
+.edif-tag.nhds{background:#e0f2fe;color:#075985;border-color:#7dd3fc}
+.edif-tag.hds{background:#fef3c7;color:#92400e;border-color:#fcd34d}
+.edif-tag.ambos{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
 .eo-tab{width:100%;border-collapse:collapse;font-size:12.5px;margin:4px 0 12px;font-variant-numeric:tabular-nums}
 .eo-tab th,.eo-tab td{padding:4px 6px;border-bottom:1px solid var(--border,#e2e8f0);text-align:right}
 .eo-tab th:first-child,.eo-tab td:first-child{text-align:left}
@@ -1012,6 +1025,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <span class="nav-sep" id="sep2" style="display:none"> › </span>
       <span class="nav-crumb" id="crumb2" style="display:none"></span>
       <span class="level-badge" id="lvlBadge">Vista General</span>
+      <div id="escSel" class="esc-sel" style="display:none"></div>
     </div>
     <div id="editBar">
       <button class="tb-btn" id="btnBuscaRec" onclick="openRoomSearch()" title="Buscar recinto por nombre, código, BIM o señalética y saltar a él (Ctrl+K)">🔎 Recinto</button>
@@ -1582,6 +1596,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 <script src="SHARED_DATA/telefonia_ip.js"></script>
 <script src="SHARED_DATA/recintos_revisar.js"></script>
 <script src="SHARED_DATA/observaciones_unidades.js"></script>
+<script src="SHARED_DATA/dotacion_bajas.js"></script>
 <script src="SHARED_DATA/consulta_subtipos.js"></script>
 <script src="SHARED_DATA/emmc_pendientes.js"></script>
 <script src="SHARED_DATA/nav_verticales.js"></script>
@@ -4296,6 +4311,100 @@ const AREA_TONE_CONC = {fill:'rgba(217,119,6,.20)', stroke:'#b45309', dash:'30 1
 // el segundo tono cálido reservado de la paleta, distinguible de un vistazo
 // tanto de los servicios clínicos (fríos) como del ámbar concesionado.
 const AREA_TONE_LOCAL = {fill:'rgba(219,39,119,.18)', stroke:'#be185d', dash:'16 10'};
+// DESTINO del espacio (Continuidad Operativa · edificio actual del HDS, plataforma 48): qué pasa
+// con cada servicio al trasladarse al NHDS. Si un área tiene destino, manda sobre los demás tonos.
+const DESTINOS = {
+  continuidad:      {lbl:'Se mantiene (hospitalización · bodega temporal)', ic:'🟨', fill:'rgba(202,138,4,.22)',  stroke:'#a16207'},
+  pabellon_central: {lbl:'Pabellón Central (se mantiene)',                 ic:'🟩', fill:'rgba(22,163,74,.22)',  stroke:'#15803d'},
+  apoyos:           {lbl:'Apoyos del Pabellón (se mantienen)',             ic:'🟦', fill:'rgba(8,145,178,.20)',  stroke:'#0e7490'},
+  retiro:           {lbl:'Retiro',                                         ic:'🟪', fill:'rgba(192,38,211,.17)', stroke:'#a21caf', dash:'22 10'},
+  demolicion:       {lbl:'Demolición',                                     ic:'🟥', fill:'rgba(220,38,38,.15)',  stroke:'#b91c1c', dash:'10 8'},
+  sin_definir:      {lbl:'Sin definir',                                    ic:'⬜', fill:'rgba(100,116,139,.14)', stroke:'#64748b'},
+  otra_institucion: {lbl:'Otra institución',                               ic:'⬛', fill:'rgba(51,65,85,.10)',   stroke:'#475569', dash:'6 6'},
+};
+function areaDestino(areaId){ const d=(nameState.destino||{})[areaId]; return DESTINOS[d]?d:''; }
+// ── ESCENARIOS EN EL TIEMPO (Atlas HDS Actual · Continuidad Operativa) ───────────────────
+// Cada servicio tiene SITUACIÓN (permanente · modular/contenedor · se demuele · obra nueva) e
+// INSTITUCIÓN. El selector de escenario muestra el recinto Hoy, Sin modulares (se retira el
+// Hospital Modular) o Con nueva construcción (además sale lo demolido y entra el nuevo INN).
+// Nada se borra: lo que sale queda como contorno gris punteado. Sólo se activa en un Atlas que
+// usa destinos/situaciones (plataforma 48); en el Atlas del NHDS no aparece.
+const SITUACIONES={permanente:{lbl:'Permanente',ic:'🏛'}, modular:{lbl:'Modular (contenedor) · se retira',ic:'📦'},
+  demolicion:{lbl:'Se demuele',ic:'🧱'}, nueva:{lbl:'Obra nueva',ic:'🏗'}};
+const ESCENARIOS=[{k:'hoy',lbl:'Hoy',tip:'Las instalaciones como están hoy'},
+  {k:'sin_modulares',lbl:'Sin modulares',tip:'Se retira el Hospital Modular (contenedores): esos servicios quedan sin lugar'},
+  {k:'nueva',lbl:'Con nueva construcción',tip:'Sin modulares, sin lo que se demuele (Área concesión) y con el nuevo INN (obras 2030)'}];
+const INSTITUCIONES={hds:{lbl:'Hospital Del Salvador (actual)',col:'#a16207'}, inca:{lbl:'INCA · Instituto de Neurocirugía Dr. Asenjo',col:'#7c3aed'},
+  inn:{lbl:'Nuevo INN · Instituto Nacional de Neurocirugía (obras 2030)',col:'#c026d3'}, torax:{lbl:'Instituto Nacional del Tórax',col:'#0369a1'},
+  uchile:{lbl:'Universidad de Chile',col:'#1d4ed8'}, falp:{lbl:'FALP · Fundación Arturo López Pérez',col:'#be123c'},
+  centro_infantil:{lbl:'Centro Infantil SSMO',col:'#0f766e'}, samu:{lbl:'SAMU',col:'#b45309'}, otra:{lbl:'Otra institución',col:'#475569'}};
+function _escInit(){
+  if(S.escenario!==undefined) return;
+  let v=null; try{ v=localStorage.getItem('cabida_escenario_hds'); }catch(e){} S.escenario=ESCENARIOS.some(x=>x.k===v)?v:'hoy';
+  try{ S.escFantasma=localStorage.getItem('cabida_esc_fantasma')!=='0'; S.instCapa=localStorage.getItem('cabida_inst_capa')==='1'; }catch(e){}
+}
+function hayEscenarios(){ return Object.keys(nameState.destino||{}).length>0 || Object.keys(nameState.situ||{}).length>0; }
+function areaSituacion(id){ const s=(nameState.situ||{})[id]; if(SITUACIONES[s]) return s; const d=areaDestino(id);
+  if(d==='retiro' || /CONTAINER|MODULAR/i.test(aName(id)||'')) return 'modular'; return d==='demolicion'?'demolicion':'permanente'; }
+function areaInst(id){ const v=(nameState.inst||{})[id]; if(INSTITUCIONES[v]) return v; const n=aName(id)||'';
+  if(/NUEVO INN/i.test(n)) return 'inn'; if(/NEUROCIRUG/i.test(n)) return 'inca'; if(/T[OÓ]RAX/i.test(n)) return 'torax';
+  if(/UNIVERSIDAD|UCHILE|LIMCHILE/i.test(n)) return 'uchile'; if(/FALP|ARTURO L[OÓ]PEZ/i.test(n)) return 'falp';
+  if(/CENTRO ESCOLAR|JARD[IÍ]N INFANTIL|SALA CUNA|CENTRO INFANTIL/i.test(n)) return 'centro_infantil'; if(/\bSAMU\b/i.test(n)) return 'samu'; return 'hds'; }
+// 'si' (se ve) · 'fantasma' (sale en este escenario) · 'oculta' (todavía no existe)
+function escVisible(id){
+  if(!hayEscenarios()) return 'si';
+  _escInit();
+  const e=S.escenario||'hoy', s=areaSituacion(id);
+  if(s==='nueva') return e==='nueva'?'si':'oculta';
+  if(s==='modular' && e!=='hoy') return 'fantasma';
+  if(s==='demolicion' && e==='nueva') return 'fantasma';
+  return 'si';
+}
+function setEscenario(k){ S.escenario=k; _lsPref('cabida_escenario_hds', k); renderSVG(); try{ renderSidebar(); }catch(e){} }
+function toggleEscFantasma(){ S.escFantasma=(S.escFantasma===false); _lsPref('cabida_esc_fantasma', S.escFantasma?'1':'0'); renderSVG(); }
+function toggleInstCapa(){ S.instCapa=!S.instCapa; _lsPref('cabida_inst_capa', S.instCapa?'1':'0'); renderSVG(); }
+function renderEscSel(){
+  const b=document.getElementById('escSel'); if(!b) return;
+  if(!hayEscenarios()){ b.style.display='none'; return; }
+  _escInit();
+  b.style.display='flex';
+  b.innerHTML='<span class="esc-t">Escenario</span>'+ESCENARIOS.map(x=>'<button class="esc-b'+(S.escenario===x.k?' on':'')+'" title="'+esc(x.tip)+'" onclick="setEscenario(\''+x.k+'\')">'+esc(x.lbl)+'</button>').join('')
+    +'<button class="esc-b chk'+(S.escFantasma!==false?' on':'')+'" title="Mostrar en gris punteado lo que sale en este escenario" onclick="toggleEscFantasma()">👻</button>'
+    +'<button class="esc-b chk'+(S.instCapa?' on':'')+'" title="Bloques por institución (vista 1)" onclick="toggleInstCapa()">🏢 Instituciones</button>'
+    +'<button class="esc-b" title="Qué sale en cada escenario: servicios, m² y personas sin lugar" onclick="openEscImpacto()">📊 Impacto</button>';
+}
+function _areaPersonas(area){ const s=new Set(); (area.rooms||[]).forEach(r=>((wsState.dots||{})[r.id]||[]).forEach(d=>{ (d.tipo==='dinamico'?(d.turnos||[]).map(x=>x.nombre):[d.nombre]).filter(Boolean).forEach(n=>s.add(norm(n))); })); return s.size; }
+function _areaM2(fid, area){ const k=_mPx(fid); return Math.round(aShapes(area).reduce((a,r)=>a+r.w*r.h,0)*k*k); }
+// Bloques institucionales (vista 1): contorno de la unión de los servicios de cada institución
+function _instLayer(fl){
+  if(!hayEscenarios() || !S.instCapa) return;
+  const por={}; fl.areas.forEach(a=>{ if(escVisible(a.id)==='oculta') return; const sh=aShapes(a); if(!sh.length) return; (por[areaInst(a.id)]=por[areaInst(a.id)]||[]).push(...sh); });
+  Object.entries(por).forEach(([k,rs])=>{ const I=INSTITUCIONES[k]||INSTITUCIONES.otra;
+    svg.appendChild(el('path',{d:unionPath(rs),'fill-rule':'evenodd',class:'inst-bloque',style:'stroke:'+I.col+';fill:'+I.col+'14','pointer-events':'none'}));
+    let A=0,X=0,Y=0; rs.forEach(r=>{ const a=r.w*r.h; A+=a; X+=(r.x+r.w/2)*a; Y+=(r.y+r.h/2)*a; });
+    const b=bounds(rs), fs=Math.max(60,Math.min(220,Math.sqrt(A)/9));
+    svg.appendChild(txt(X/A, Y/A, (k==='hds'?'HDS ACTUAL':I.lbl.split(' · ')[0]).toUpperCase(), {class:'inst-lbl','font-size':fs,fill:I.col,'pointer-events':'none'}));
+  });
+}
+function openEscImpacto(){
+  const m=document.getElementById('eoModal'); if(!m) return;
+  const filas={}; ESCENARIOS.forEach(e=>{ filas[e.k]={sale:[],entra:[]}; });
+  const prev=S.escenario;
+  ESCENARIOS.forEach(e=>{ S.escenario=e.k; FLOORS.forEach(fl=>fl.areas.forEach(a=>{ const v=escVisible(a.id);
+    const it={fl:fl.label, n:aName(a.id), s:areaSituacion(a.id), m2:_areaM2(fl.id,a), p:_areaPersonas(a), inst:areaInst(a.id)};
+    if(v==='fantasma') filas[e.k].sale.push(it); if(v==='si' && it.s==='nueva') filas[e.k].entra.push(it); })); });
+  S.escenario=prev;
+  const sec=e=>{ const F=filas[e.k], tot=(L,k)=>L.reduce((a,x)=>a+x[k],0);
+    return '<div class="ds-t">'+esc(e.lbl)+'</div>'+(F.sale.length?('<div class="eo-nota"><b>Salen '+F.sale.length+' servicios</b> · ≈ '+tot(F.sale,'m2').toLocaleString('es-CL')+' m² · <b style="color:#b91c1c">'+tot(F.sale,'p')+' personas sin lugar</b></div>'
+      +'<table class="eo-tab"><tr><th>Servicio</th><th>Nivel</th><th>Situación</th><th>m²</th><th>Personas</th></tr>'+F.sale.sort((a,b)=>b.p-a.p||b.m2-a.m2).map(x=>'<tr><td>'+esc(x.n)+'</td><td>'+esc(x.fl)+'</td><td>'+SITUACIONES[x.s].ic+' '+esc(SITUACIONES[x.s].lbl)+'</td><td>'+x.m2.toLocaleString('es-CL')+'</td><td>'+(x.p||'')+'</td></tr>').join('')+'</table>')
+      :'<div class="eo-nota">No sale ningún servicio.</div>')
+      +(F.entra.length?('<div class="eo-nota">Entra: '+F.entra.map(x=>'🏗 '+esc(x.n)+' ('+esc(x.fl)+', ≈ '+x.m2.toLocaleString('es-CL')+' m²)').join(' · ')+'</div>'):''); };
+  document.querySelector('#eoModal .ficha-title').textContent='📊 Escenarios · qué sale y quién queda sin lugar';
+  document.getElementById('eoSub').textContent='Situación de cada servicio (modular · se demuele · obra nueva) · m² aproximados (escala estimada) · personas = asignadas en sus puestos';
+  document.getElementById('eoBody').innerHTML=ESCENARIOS.filter(e=>e.k!=='hoy').map(sec).join('');
+  m.classList.add('show');
+}
+
 const LOCAL_PAT=/local(es)?\s*comercial|kiosco|quiosco|cajero|banco|peluquer|barber|tienda|minimarket|m[aá]quinas?\s*(expendedora|de\s*caf[eé])|fotocopiado|cafeter[ií]a\s*comercial/i;
 const CONC_PAT=/\(\s*sc\s*\)|casino|alimentac|aseo\b|lavander|roper[ií]a|seguridad|vigilanc|estacionam|residuo|\breas\b|cafeter|jard[ií]n infantil|sala cuna|mantenci[oó]n|mantenimiento/i;
 // Marca de concesionado: override explícito del usuario > heurística por nombre.
@@ -4728,6 +4837,8 @@ function renderSVG(){
   // Carros de paro: marcadores que laten en el recinto (todas las vistas)
   { const lg=document.getElementById('cpLegend');
     if(_cpOn){ try{ _cpLayer(); }catch(e){ console.warn('carros de paro',e); } } else if(lg) lg.style.display='none'; }
+  if(S.level===1) try{ _instLayer(fl); }catch(e){ console.warn('instituciones',e); }
+  try{ renderEscSel(); }catch(e){}
   try{ _capasArriba(); }catch(e){ console.warn('orden de capas',e); }
   // Overlay de diagnóstico DXF (siempre encima de todo, no interactivo)
   if(_dxfOverlayOn && S.level<=2) paintDxfOverlay();
@@ -4758,7 +4869,8 @@ function renderL1(fl){
     const cls='area-box'+(sel?' sel':'');
     const conc=esConcesionado(area.id);
     const loc=esLocalComercial(area.id);
-    const t=loc?AREA_TONE_LOCAL:(conc?AREA_TONE_CONC:AREA_TONES[(CM[area.id]!==undefined?CM[area.id]:aIdx)%AREA_TONES.length]);
+    const dst=areaDestino(area.id);
+    const t=(areaSituacion(area.id)==='nueva'&&hayEscenarios())?{fill:'rgba(192,38,211,.22)',stroke:'#a21caf',dash:'40 14'}:dst?DESTINOS[dst]:(loc?AREA_TONE_LOCAL:(conc?AREA_TONE_CONC:AREA_TONES[(CM[area.id]!==undefined?CM[area.id]:aIdx)%AREA_TONES.length]));
     const stl=`fill:${t.fill};stroke:${t.stroke};stroke-width:4`+(t.dash?`;stroke-dasharray:${t.dash}`:'');
     // 2026-05-21 · Comportamiento clic en modo edición:
     //   • Clic simple → abre directamente el modal de info del área
@@ -4779,6 +4891,16 @@ function renderL1(fl){
     };
     if(!sh.length){ return; } // no box yet — user will draw it
     const b=bounds(sh);
+    // escenario (Atlas HDS Actual): lo que aún no existe no se dibuja; lo que sale, en gris punteado
+    const vis=escVisible(area.id);
+    if(vis==='oculta') return;
+    if(vis==='fantasma'){
+      if(S.escFantasma!==false){
+        svg.appendChild(el('path',{d:unionPath(sh),'fill-rule':'evenodd',class:'area-fantasma','pointer-events':'none'}));
+        svg.appendChild(txt(b.x+b.w/2,b.y+b.h/2,'✕ '+aName(area.id),{class:'area-fantasma-lbl','font-size':Math.max(16,Math.min(48,b.w/16,b.h/7)),'pointer-events':'none'}));
+      }
+      return;
+    }
 
     if(sh.length>1 && !S.editMode){
       // Merged multi-shape: single clean union polygon (no interior lines)
@@ -5239,7 +5361,7 @@ function renderL3(){
       if(_dotConReemplazo(dot)) g.appendChild(el('circle',{r:DOT_R+3.5,class:'reemp-ring','pointer-events':'none'}));
       if(S.showDotNames && asig){
         // La tarjeta se coloca en una pasada global anti-solape (_placeDotCards).
-        _dotCardQueue.push({dx:dot.x, dy:dot.y, lines:dotTitle(dot).split('\n'), col, nk:(dot.id||(room.id+':'+i)), defR:(i%2===0), rol:_rolFondoDot(dot)});
+        _dotCardQueue.push({dx:dot.x, dy:dot.y, lines:_rolLineas(dot), col, nk:(dot.id||(room.id+':'+i)), defR:(i%2===0), rol:_rolFondoDot(dot), area:(_rolFondoDot(dot)==='tens'?_tensAreaDot(dot):null)});
       }
       g.addEventListener('mousedown',e=>startDotDrag(e,room.id,i));
     g.addEventListener('contextmenu',e=>{ e.preventDefault(); e.stopPropagation(); dotClicDerecho(room.id,i); });
@@ -5286,7 +5408,7 @@ function renderL3(){
     if(_dotConReemplazo(dot)) g.appendChild(el('circle',{r:DOT_R+3.5,class:'reemp-ring','pointer-events':'none'}));
     if(S.showDotNames && asig){
       // La tarjeta se coloca en una pasada global anti-solape (_placeDotCards).
-      _dotCardQueue.push({dx:dot.x, dy:dot.y, lines:dotTitle(dot).split('\n'), col, nk:(dot.id||(room.id+':'+i)), defR:(i%2===0), rol:_rolFondoDot(dot)});
+      _dotCardQueue.push({dx:dot.x, dy:dot.y, lines:_rolLineas(dot), col, nk:(dot.id||(room.id+':'+i)), defR:(i%2===0), rol:_rolFondoDot(dot), area:(_rolFondoDot(dot)==='tens'?_tensAreaDot(dot):null)});
     }
     g.addEventListener('mousedown',e=>startDotDrag(e,room.id,i));
     g.addEventListener('contextmenu',e=>{ e.preventDefault(); e.stopPropagation(); dotClicDerecho(room.id,i); });
@@ -5434,29 +5556,56 @@ function _placeDotCards(){
     _drawDotCard(e,rect,{fs,lh,padX,padY});
   });
 }
-// Fondo suave de la tarjeta del nombre según el rol de la persona (05-10-2026, pedido para
-// el personal de Pabellón): médicos, enfermeras, TENS de rayos, TENS de endoscopia,
-// auxiliares y tecnólogos médicos (burdeo, como en la 37). El resto queda en blanco.
-// Rayos/endoscopia = TENS de Imagenología / Endoscopia (por unidad o rol operativo).
-const ROL_FONDO={med:['Médico(a)','#dbeafe'],enf:['Enfermera(o) / matrona','#dcfce7'],tens_rx:['TENS de rayos (Imagenología)','#fef3c7'],
-  tens_endo:['TENS de endoscopia','#ede9fe'],aux:['Auxiliar','#ffe4e6'],tm:['Tecnólogo(a) médico','#f3d6dc']};
+// Color de la tarjeta del nombre = UNIFORME INSTITUCIONAL del estamento (PPT Puesta en Marcha v16,
+// láminas 35-41, 08-10-2026): médicos 19.664 delantal blanco · médicos 15.076 verde petróleo ·
+// enfermería azul marino · tecnólogos médicos burdeo · nutrición morado · medicina física y
+// rehabilitación negro · TENS celeste · auxiliares gris grafito. El resto, gris claro.
+// [etiqueta, fondo, texto]
+const ROL_FONDO={med:['Médico(a) Ley 19.664','#ffffff','#0f3557'],med15:['Médico(a) Ley 15.076','#0e5e60','#ffffff'],
+  enf:['Enfermería','#1f3a68','#ffffff'],tm:['Tecnólogo(a) médico','#7b1e3a','#ffffff'],nutri:['Nutrición','#6d28d9','#ffffff'],
+  rehab:['Medicina Física y Rehabilitación','#111827','#ffffff'],tens:['TENS','#8fd0f2','#0f3557'],aux:['Auxiliar','#4b5563','#ffffff'],
+  otro:['Otro estamento','#eef2f6','#0f3557']};
+// distintivo de los TENS por área (rol operativo o unidad): banda de color a la izquierda + sigla
+const TENS_AREA=[[/IMAGEN|RADIOL|RAYOS/,'RX','Rayos','#f59e0b'],[/ENDOSC/,'ENDO','Endoscopía','#7c3aed'],[/ESTERILIZ/,'ESTER','Esterilización','#0891b2'],
+  [/FARMACIA/,'FARM','Farmacia de pabellón','#16a34a'],[/CIRUGIA MAYOR AMBULATORIA|\bCMA\b/,'CMA','Cirugía mayor ambulatoria','#db2777'],
+  [/PREQUIRURG/,'PREQX','Prequirúrgico','#ea580c'],[/DIALISIS/,'DIÁL','Diálisis','#2563eb']];
+function _rolStaff(nombre, p){
+  return _staffDe(nombre) || (p&&(p.cargo||p.estamento) ? {estamento:p.estamento, cargo:p.cargo, unidad:p.unidad||'', rol:''} : null);
+}
 function _rolFondoClase(nombre, p){
   // la matriz manda; si la persona no está, se usa el cargo/estamento guardado en el puesto
-  const s=_staffDe(nombre) || (p&&(p.cargo||p.estamento) ? {estamento:p.estamento, cargo:p.cargo, unidad:p.unidad||'', rol:''} : null); if(!s) return '';
-  const e=String(s.estamento||'').toUpperCase(), c=String(s.cargo||'').toUpperCase(), u=String(s.unidad||'').toUpperCase(), r=String(s.rol||'').toUpperCase();
-  const tens=/TECNIC|TENS|PARAMEDIC/.test(e+' '+c+' '+r);
-  if(/MEDIC/.test(e) || (/^MEDIC|ANESTESI|CIRUJAN/.test(c) && !tens)) return 'med';
+  const s=_rolStaff(nombre, p); if(!s) return '';
+  const e=String(s.estamento||'').toUpperCase(), c=String(s.cargo||'').toUpperCase(), u=String(s.unidad||'').toUpperCase(), r=String(s.rol||'').toUpperCase(), ley=String(s.ley||'').toUpperCase();
+  const tens=/TECNIC|TENS|PARAMEDIC/.test(e+' '+c+' '+r) && !/TECNOLOG/.test(c+' '+r);
+  if(/MEDIC/.test(e) || (/^MEDIC|ANESTESI|CIRUJAN/.test(c) && !tens)) return /15[.]?076/.test(ley)?'med15':'med';
   if(/TECNOLOG/.test(c+' '+r)) return 'tm';
-  if(tens && /IMAGEN|RADIOL|RAYOS/.test(u+' '+r)) return 'tens_rx';
-  if(tens && /ENDOSC/.test(u+' '+r)) return 'tens_endo';
-  if(!tens && /ENFERMER|MATRON/.test(c)) return 'enf';
-  if(!tens && (/AUXILIAR/.test(e) || /^AUX/.test(c) || /AUXILIAR/.test(r))) return 'aux';
-  return '';
+  if(tens) return 'tens';
+  if(/NUTRICION/.test(c)) return 'nutri';
+  if(/KINESIO|TERAPEUTA OCUP|FONOAUDI/.test(c) || (/PROFESIONAL/.test(e) && /MEDICINA FISICA|REHABILIT/.test(u))) return 'rehab';
+  if(/ENFERMER|MATRON/.test(c)) return 'enf';
+  if(/AUXILIAR/.test(e) || /^AUX/.test(c) || /AUXILIAR/.test(r)) return 'aux';
+  return 'otro';
 }
-// puesto con varias personas (dinámico): color sólo si todas tienen el mismo rol
+// área del TENS (o null): por rol operativo y, si no, por unidad
+function _tensArea(nombre, p){
+  const s=_rolStaff(nombre, p); if(!s) return null;
+  const txt=(String(s.rol||'')+' '+String(s.unidad||'')).toUpperCase();
+  const a=TENS_AREA.find(t=>t[0].test(txt)); return a?{sigla:a[1], lbl:a[2], col:a[3]}:null;
+}
+// puesto con varias personas (dinámico): color sólo si todas tienen el mismo estamento
 function _rolFondoDot(dot){
   const ps=(dot.tipo==='dinamico' ? (dot.turnos||[]) : [dot]).filter(p=>p&&p.nombre);
   const cl=new Set(ps.map(p=>_rolFondoClase(p.nombre, p))); return cl.size===1 ? [...cl][0] : '';
+}
+function _tensAreaDot(dot){
+  const ps=(dot.tipo==='dinamico' ? (dot.turnos||[]) : [dot]).filter(p=>p&&p.nombre);
+  const as=ps.map(p=>_tensArea(p.nombre,p)).filter(Boolean); const u=new Set(as.map(a=>a.sigla));
+  return u.size===1 ? as[0] : null;
+}
+function _rolLineas(dot){
+  const L=dotTitle(dot).split('\n');
+  if(_rolFondoDot(dot)==='tens'){ const a=_tensAreaDot(dot); if(a) L[0]='['+a.sigla+'] '+L[0]; }
+  return L;
 }
 function _drawDotCard(e,r,C){
   const g2=el('g',{class:'ws-card',transform:`translate(${e.dx},${e.dy}) rotate(${r.rot})`});
@@ -5467,14 +5616,15 @@ function _drawDotCard(e,r,C){
       stroke:e.col,'stroke-width':1.2,opacity:.9,'pointer-events':'none'}));
   }
   const RF=ROL_FONDO[e.rol];
-  const bg=el('rect',{x:r.x0,y:-r.ch/2,width:r.cw,height:r.ch,rx:4,fill:RF?RF[1]:'#ffffff','fill-opacity':RF?0.97:0.93,
-    stroke:e.col,'stroke-width':1,style:'cursor:pointer',class:'ws-card-bg'+(RF?' rol-'+e.rol:'')});
-  const bt=el('title'); bt.textContent=(RF?(RF[0]+' · '):'')+'Clic: pasa la tarjeta al otro lado del puesto (derecha ↔ izquierda)'; bg.appendChild(bt);
+  const bg=el('rect',{x:r.x0,y:-r.ch/2,width:r.cw,height:r.ch,rx:4,fill:RF?RF[1]:'#ffffff','fill-opacity':0.97,
+    stroke:(e.rol==='med'?'#64748b':e.col),'stroke-width':(e.rol==='med'?1.4:1),style:'cursor:pointer',class:'ws-card-bg'+(RF?' rol-'+e.rol:'')});
+  const bt=el('title'); bt.textContent=(RF?(RF[0]+(e.area?(' · '+e.area.lbl):'')+' · '):'')+'Clic: pasa la tarjeta al otro lado del puesto (derecha ↔ izquierda)'; bg.appendChild(bt);
   bg.addEventListener('mousedown',ev=>ev.stopPropagation());
   bg.addEventListener('click',ev=>{ ev.stopPropagation(); flipDotName(e.nk,e.defR,ev.shiftKey); });
   g2.appendChild(bg);
+  if(e.area) g2.appendChild(el('rect',{x:r.x0,y:-r.ch/2,width:3.2,height:r.ch,rx:1.2,fill:e.area.col,'pointer-events':'none',class:'ws-card-area'}));
   e.lines.forEach((ln,k)=>{
-    const t2=el('text',{x:r.x0+C.padX,y:-r.ch/2+C.padY+C.lh*(k+0.72),'font-size':C.fs,fill:'#0f3557',
+    const t2=el('text',{x:r.x0+C.padX,y:-r.ch/2+C.padY+C.lh*(k+0.72),'font-size':C.fs,fill:(RF?RF[2]:'#0f3557'),
       'pointer-events':'none','font-family':'Segoe UI,sans-serif','font-weight':k===0?700:400});
     t2.textContent=ln; g2.appendChild(t2);
   });
@@ -5486,8 +5636,15 @@ function _dotConReemplazo(dot){
   if(dot.tipo==='dinamico') return (dot.turnos||[]).some(t=>t.reemplazo&&_reempVigente(t.reemplazo));
   return !!(dot.reemplazo&&_reempVigente(dot.reemplazo));
 }
-// Tooltip del puesto: persona asignada (o turnos) al dejar el mouse encima.
+// Tooltip del puesto + aviso si la(s) persona(s) también tienen puesto en el otro edificio
 function dotTitle(dot){
+  const t=_dotTitleBase(dot);
+  try{ const nn=dot.tipo==='dinamico'?(dot.turnos||[]).map(x=>x.nombre):[dot.nombre];
+    const o=nn.filter(Boolean).map(n=>{ const l=_edifOtroIdx().get(norm(n)); return l?('📍 '+n+' también en '+ATLAS_EDIFICIO.otro.corto+': '+l.join(' | ')):''; }).filter(Boolean);
+    return o.length?(t+'\n'+o.join('\n')):t; }catch(e){ return t; }
+}
+// Tooltip del puesto: persona asignada (o turnos) al dejar el mouse encima.
+function _dotTitleBase(dot){
   const _tag=x=>[(x.cds?'🛒 CdS':''),(x.externa&&!x.cds?'⚠ fuera de matriz':''),(x.dinClin?'🔄 din. clínico':''),((x.reemplazo&&_reempVigente(x.reemplazo))?('🔁 ⇄ '+x.reemplazo.reemplazante):'')].filter(Boolean).join(' · ');
   if(dot.tipo==='dinamico'){
     const ts=(dot.turnos||[]);
@@ -8997,7 +9154,7 @@ function editBoxName(){
 
   // Marca de SERVICIO CONCESIONADO (solo áreas): la vista general los pinta
   // en el tono cálido para diferenciarlos de los servicios del hospital.
-  let concChk=null, locChk=null;
+  let concChk=null, locChk=null, dstSel=null, sitSel=null, instSel=null;
   if(isArea){
     const cw=document.createElement('label');
     cw.style.cssText='display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#92400e;cursor:pointer;';
@@ -9015,6 +9172,20 @@ function editBoxName(){
     box.append(lw);
     // marcar local comercial implica concesionado
     locChk.addEventListener('change',()=>{ if(locChk.checked) concChk.checked=true; });
+    // destino del espacio (sólo se ofrece si el Atlas ya usa destinos: plataforma 48)
+    if(Object.keys(nameState.destino||{}).length){
+      const dw=document.createElement('label');
+      dw.style.cssText='display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#334155;';
+      dstSel=document.createElement('select'); dstSel.style.cssText='flex:1;font-size:12px';
+      dstSel.innerHTML='<option value="">— sin destino —</option>'+Object.entries(DESTINOS).map(([k,v])=>'<option value="'+k+'"'+(areaDestino(id)===k?' selected':'')+'>'+v.ic+' '+v.lbl+'</option>').join('');
+      dw.append(document.createTextNode('Destino'), dstSel); box.append(dw);
+      const mk=(lbl,dic,val)=>{ const w=document.createElement('label'); w.style.cssText='display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;color:#334155;';
+        const sl=document.createElement('select'); sl.style.cssText='flex:1;font-size:12px';
+        sl.innerHTML=Object.entries(dic).map(([k,v])=>'<option value="'+k+'"'+(val===k?' selected':'')+'>'+(v.ic?v.ic+' ':'')+v.lbl+'</option>').join('');
+        w.append(document.createTextNode(lbl), sl); box.append(w); return sl; };
+      sitSel=mk('Situación', SITUACIONES, areaSituacion(id));
+      instSel=mk('Institución', INSTITUCIONES, areaInst(id));
+    }
   }
 
   // ── Barra superior para tomar y desplazar el cuadro ────────────────────────
@@ -9337,6 +9508,9 @@ function editBoxName(){
     const v=inp.value.trim();
     const codVal=codeInp?codeInp.value.trim():'';
     if(isArea && concChk) setConcesionado(id, concChk.checked, v);
+    if(isArea && dstSel){ if(!nameState.destino) nameState.destino={}; if(dstSel.value) nameState.destino[id]=dstSel.value; else delete nameState.destino[id]; }
+    if(isArea && sitSel){ if(!nameState.situ) nameState.situ={}; nameState.situ[id]=sitSel.value; }
+    if(isArea && instSel){ if(!nameState.inst) nameState.inst={}; nameState.inst[id]=instSel.value; }
     if(isArea && locChk)  setLocalComercial(id, locChk.checked, v);
     // FIX: antes TODO el guardado colgaba de `if(v)`, así que en un recinto
     // SIN NOMBRE no se guardaba nada —ni tipo, ni código, ni BIM, ni
@@ -13699,6 +13873,50 @@ function _goSentar(p){
   didPan=false; goArea(p.loc.a.id); didPan=false; goRoom(p.loc.r.id);
 }
 
+// ── Salidas de la matriz de dotación (SHARED_DATA/dotacion_bajas.js) ─────────
+// Las detecta _DEV/detectar_bajas_dotacion.py comparando el corte vigente de
+// Rodrigo con el roster histórico de la matriz: personas que algún corte trajo
+// y el corte nuevo ya no. NO son bajas confirmadas (la matriz no tiene columna
+// de egreso): el ✓ confirma la salida y la pasa a «fuera de la matriz» con su
+// motivo; el 🚫 dice «sigue trabajando acá» y queda como aviso para RR.HH.
+// Se identifican por NOMBRE normalizado: el dataset no lleva RUT (igual que
+// nameState.bajas, para que el snapshot web lo acepte).
+if(!nameState.salidaRev) nameState.salidaRev={};
+function _salidaTodas(){
+  const B=(window.DOT_BAJAS&&DOT_BAJAS.bajas)||[];
+  const asg=_dpAsignados();
+  return B.map(b=>{
+    const k=norm(b.nombre||''), rid=asg[k]||null, fr=rid?_findRoom(rid):null;
+    return Object.assign({},b,{_chk:'salida', code:'salida|'+k,
+      cargo:[b.cargo,b.estamento].filter(Boolean).join(' · '),
+      rid:rid, r:fr?fr.room:null, area:fr?fr.area:null, fl:fr?fr.floor:null});
+  });
+}
+function _salidaPendientes(){
+  return _salidaTodas().filter(x=>x.nombre && !nameState.salidaRev[norm(x.nombre)] && !_esBaja(x.nombre));
+}
+function _salidaConPuesto(){ return _salidaTodas().filter(x=>x.rid); }
+const SALIDA_GRUPO={salida_sin_respaldo:'posible renuncia o desvinculación',
+  alejamiento_registrado:'alejamiento ya registrado en la matriz', fin_de_reemplazo:'fin de reemplazo',
+  becado_fuera_del_listado:'becado que el corte ya no lista', vinculo_no_dotacion:'vínculo que no es dotación',
+  sin_unidad_conocida:'la matriz nunca dijo su unidad', ficha_incompleta:'ficha sin cargo ni unidad'};
+function _salidaLbl(p){ return SALIDA_GRUPO[p.grupo]||p.grupo||'salió de la matriz'; }
+// El clic lleva al puesto (si todavía lo tiene) y abre el diálogo de baja, que
+// es donde se escribe el motivo y, si corresponde, se libera el puesto.
+function _goSalida(p){
+  if(p.r && p.fl && p.area){ if(S.floorId!==p.fl.id) goFloor(p.fl.id); didPan=false; goArea(p.area.id); didPan=false; goRoom(p.r.id); }
+  openBaja(p.nombre);
+}
+function _salidaConfirmar(p){
+  const k=norm(p.nombre);
+  nameState.bajas=nameState.bajas||{};
+  nameState.bajas[k]={n:p.nombre, m:p.motivo_sugerido||'otro',
+    nota:'salió del corte '+(((window.DOT_BAJAS||{}).corte_vigente)||'')+' · confirmado con '+(p.a_quien_preguntar||'la jefatura'),
+    ts:Date.now()};
+  nameState.salidaRev[k]=1;
+  _mtxSrc=null; try{ _parecCache.clear(); _inMatrixCache.clear(); }catch(e){}
+}
+
 // ── Avisos del catastro de recintos (SHARED_DATA/recintos_revisar.js) ────────
 // Los calcula _DEV/build_recintos_pma.py desde el último respaldo del Atlas:
 // BIM completados por código, recintos sin BIM, código Atlas ≠ mapa PMA y
@@ -14074,6 +14292,19 @@ const REV_CHECKS={
       return 'No quedan asignaciones pedidas por las unidades con recinto dibujado.'
         + (n ? ' Ojo: '+n+' traen un código que todavía no existe en el plano ('
               + _sentarSinRecinto().map(x=>x.codigo_pma).join(', ')+').' : ''); })()},
+  dot_salida:{label:'Personal: salió de la matriz (confirmar con la jefatura)',
+    find:_salidaPendientes, flat:true, approve:true,
+    okTitle:'Confirmar la salida: queda marcada fuera de la matriz con su motivo (si sigue con puesto, se libera en «fuera de la matriz con puesto»)',
+    allLabel:n=>'✓ Confirmar las '+n+' salidas',
+    allMsg:n=>'¿Confirmar las '+n+' salidas visibles?\n\nSon personas que la matriz traía y el corte nuevo de Rodrigo ya no: quedan marcadas fuera de la matriz con el motivo propuesto, y las que todavía tengan puesto en el plano pasan a «fuera de la matriz con puesto» para liberarlo.\n\nSi alguna SIGUE trabajando, usá 🚫 en su fila: queda como aviso de que a la matriz le falta.',
+    apply:p=>_salidaConfirmar(p), go:p=>_goSalida(p), goDestino:()=>true,
+    subText:p=>'🚪 '+_salidaLbl(p)+' · estaba hasta el corte '+(p.ultimo_corte||'?')+' · '
+      +[p.cargo,p.u,p.sd].filter(Boolean).join(' · ')
+      +(p.fecha_alejamiento?(' · alejamiento '+p.fecha_alejamiento):'')
+      +(p.acceso_por_revocar?' · ⚠ mantiene acceso o huella activa':'')
+      +(p.rid?(' · 📍 sigue con puesto en «'+(rName(p.rid)||p.rid)+'»'):' · sin puesto en el Atlas')
+      +' · preguntar a '+(p.a_quien_preguntar||'RR.HH.')+' · ✓ confirma la salida · 🚫 sigue trabajando',
+    done:'Cada persona que el corte nuevo dejó fuera está confirmada o descartada.'},
   pma:{label:'BIM oficial (PMA)',
     find:_pmaPendientes, approve:true, noDialog:true,
     subText:p=>(p.current?('actual '+p.current):'sin BIM')+' → '+p.proposed,
@@ -14799,8 +15030,38 @@ function reempTag(s){
   });
   return h;
 }
+// ── Edificio: Nuevo HDS (este Atlas) ↔ HDS actual (48.AtlasHDSActual, clon generado) ──────
+// Cada Atlas guarda sus asignaciones en su almacenamiento; ambos se sirven desde el mismo
+// origen (localhost:8790), así que cada uno LEE las del otro y muestra dónde queda cada
+// persona: en el NHDS, en el HDS actual (edificio antiguo) o en ambos.
+const ATLAS_EDIFICIO={id:'NHDS', corto:'NHDS', lbl:'Nuevo HDS', otro:{ws:'hdsact_cad_ws', names:'hdsact_cad_names', corto:'HDS actual', lbl:'HDS actual (edificio antiguo)'}};
+let _edifMemo=null;
+function _edifOtroIdx(){
+  if(_edifMemo && Date.now()-_edifMemo.t<8000) return _edifMemo.m;
+  const m=new Map(); let w=null, n=null;
+  try{ w=lg(ATLAS_EDIFICIO.otro.ws, null); n=lg(ATLAS_EDIFICIO.otro.names, null); }catch(e){}
+  const rn=(n&&n.rooms)||{}, an=(n&&n.areas)||{};
+  const lugar=rid=>{ const a=Object.keys(an).filter(k=>rid.indexOf(k)===0).sort((p,q)=>q.length-p.length)[0]; return [...new Set([a?an[a]:'', rn[rid]||''].filter(Boolean))].join(' · ')||rid; };
+  Object.entries((w&&w.dots)||{}).forEach(([rid,arr])=>(arr||[]).forEach(d=>{
+    const nn=d.tipo==='dinamico'?(d.turnos||[]).map(x=>x.nombre):[d.nombre];
+    nn.filter(x=>x&&String(x).trim()).forEach(x=>{ const k=norm(x); if(!m.has(k)) m.set(k,[]); m.get(k).push(lugar(rid)); });
+  }));
+  _edifMemo={t:Date.now(), m}; return m;
+}
+window.addEventListener('storage',e=>{ if(e.key===ATLAS_EDIFICIO.otro.ws||e.key===ATLAS_EDIFICIO.otro.names) _edifMemo=null; });
+// Chip de edificio: dónde está asignada la persona. El color es del EDIFICIO (igual en los dos
+// Atlas): 🏥 NHDS azul · 🏛 HDS actual ámbar · rojo si tiene puesto en ambos (revisar).
+function edificioTag(nombre){
+  if(!nombre) return '';
+  const E=ATLAS_EDIFICIO, k=norm(nombre), aqui=!!(_dpAsignados()||{})[k], otro=_edifOtroIdx().get(k);
+  if(!aqui && !otro) return '';
+  const enN=E.id==='NHDS'?aqui:!!otro, enH=E.id==='NHDS'?!!otro:aqui;
+  const tip=(otro?(E.otro.lbl+': '+otro.join(' | ')):'')+(aqui?((otro?' · ':'')+'asignada en '+E.lbl):'');
+  if(enN&&enH) return '<span class="edif-tag ambos" title="'+esc(tip+' · revisar: tiene puesto en los dos edificios')+'">🏥 NHDS + 🏛 HDS actual</span>';
+  return enN ? '<span class="edif-tag nhds" title="'+esc(tip)+'">🏥 NHDS</span>' : '<span class="edif-tag hds" title="'+esc(tip)+'">🏛 HDS actual</span>';
+}
 function becaTag(s){
-  if(!s || !s.beca) return (typeof grupoTag==='function' ? grupoTag(s) : '') + reempTag(s);
+  if(!s || !s.beca) return edificioTag(s&&s.nombre) + (typeof grupoTag==='function' ? grupoTag(s) : '') + reempTag(s);
   const b = s.beca;
   const lbl = /SUB/.test(b.tipo) ? 'Becado subespecialidad'
             : /ESPEC/.test(b.tipo) ? 'Becado especialidad'
@@ -14809,7 +15070,7 @@ function becaTag(s){
   const vencido = /^\d{4}-\d{2}-\d{2}$/.test(fin) && fin < new Date().toISOString().slice(0,10);
   const tip = [b.programa, (b.inicio||fin) ? ('formación '+(b.inicio||'?')+' → '+(fin||'?')) : 'sin período informado']
     .filter(Boolean).join(' · ') + (vencido ? ' · PERÍODO VENCIDO: revisar si sigue en el hospital' : '');
-  return '<span class="beca-tag'+(vencido?' vencido':'')+'" title="'+tip.replace(/"/g,'&quot;')+'">'
+  return edificioTag(s.nombre) + '<span class="beca-tag'+(vencido?' vencido':'')+'" title="'+tip.replace(/"/g,'&quot;')+'">'
     + '🎓 '+lbl+(vencido?' · vencido':'')+'</span>' + grupoTag(s) + reempTag(s);
 }
 
@@ -14952,7 +15213,7 @@ function initGlobalSearch(){
       drop.appendChild(h);
       assigned.slice(0,5).forEach(d=>{
         const it=document.createElement('div'); it.className='ac-item';
-        it.innerHTML=`<strong>📍 ${d.nombre}</strong><span>${d.floorLabel} › ${d.areaLabel} › ${d.roomLabel}</span>`;
+        it.innerHTML=`<strong>📍 ${d.nombre}</strong>${edificioTag(d.nombre)}<span>${d.floorLabel} › ${d.areaLabel} › ${d.roomLabel}</span>`;
         it.onclick=()=>{ drop.style.display='none'; inp.value='';
           sidebarGoRoom(d.floorId,d.areaId,d.roomId); };
         drop.appendChild(it);
@@ -14967,11 +15228,11 @@ function initGlobalSearch(){
         const loc=findDotLocation(s.nombre);
         const it=document.createElement('div'); it.className='ac-item';
         if(loc){
-          it.innerHTML=`<strong>✓ ${s.nombre}${s.comision?' <span style="background:#fef3c7;color:#92400e;border-radius:6px;padding:0 5px;font-size:9px;font-weight:700">🧳 COMISIÓN</span>':''}</strong><span>${s.cargo||s.funcion||''} · Asignado</span>`;
+          it.innerHTML=`<strong>✓ ${s.nombre}${s.comision?' <span style="background:#fef3c7;color:#92400e;border-radius:6px;padding:0 5px;font-size:9px;font-weight:700">🧳 COMISIÓN</span>':''}</strong>${edificioTag(s.nombre)}<span>${s.cargo||s.funcion||''} · Asignado</span>`;
           it.onclick=()=>{ drop.style.display='none'; inp.value='';
             sidebarGoRoom(loc.floorId,loc.areaId,loc.roomId); };
         }else{
-          it.innerHTML=`<strong>${s.nombre}${s.comision?' <span style="background:#fef3c7;color:#92400e;border-radius:6px;padding:0 5px;font-size:9px;font-weight:700">🧳 COMISIÓN</span>':''}</strong><span>${[s.cargo||s.funcion,s.estamento,s.servicio].filter(Boolean).join(' · ')}</span>`;
+          it.innerHTML=`<strong>${s.nombre}${s.comision?' <span style="background:#fef3c7;color:#92400e;border-radius:6px;padding:0 5px;font-size:9px;font-weight:700">🧳 COMISIÓN</span>':''}</strong>${edificioTag(s.nombre)}<span>${[s.cargo||s.funcion,s.estamento,s.servicio].filter(Boolean).join(' · ')}</span>`;
           it.style.opacity='.65';
           it.onclick=()=>{ drop.style.display='none'; };
         }
@@ -16492,6 +16753,25 @@ async function runSelfTest(){
       wsState.dots[r.id]=JSON.parse(dotsPrev);
       if(codPrev===undefined) delete nameState.codes[r.id]; else nameState.codes[r.id]=codPrev;
       window.OBSERVACIONES_UNIDADES=obsPrev;
+    }
+  });
+
+  // Salidas de la matriz (dotacion_bajas.js): el dataset llega y el ✓ confirma
+  T('Salidas de la matriz: dataset cargado', ()=>!!(window.DOT_BAJAS && Array.isArray(DOT_BAJAS.bajas)));
+  T('Salidas de la matriz: el ✓ confirma la baja y saca la fila', ()=>{
+    const prev=window.DOT_BAJAS, bPrev=JSON.stringify(nameState.bajas||{}), sPrev=JSON.stringify(nameState.salidaRev||{});
+    try{
+      window.DOT_BAJAS={corte_vigente:'9999-99-99', bajas:[{nombre:'ZZQ PRUEBA SALIDA', cargo:'AUXILIAR',
+        estamento:'AUXILIARES', u:'UNIDAD DE PRUEBA', sd:'SUBDIRECCION DE PRUEBA', grupo:'salida_sin_respaldo',
+        motivo_sugerido:'otro', prioridad:'alta', ultimo_corte:'2026-09-24', a_quien_preguntar:'UNIDAD DE PRUEBA'}]};
+      const pend=_salidaPendientes(); if(pend.length!==1) return false;
+      const txt=REV_CHECKS.dot_salida.subText(pend[0]);
+      REV_CHECKS.dot_salida.apply(pend[0]);
+      return /posible renuncia/.test(txt) && /UNIDAD DE PRUEBA/.test(txt)
+        && _salidaPendientes().length===0 && _esBaja('ZZQ PRUEBA SALIDA');
+    } finally {
+      window.DOT_BAJAS=prev;
+      nameState.bajas=JSON.parse(bPrev); nameState.salidaRev=JSON.parse(sPrev);
     }
   });
 
@@ -18076,25 +18356,33 @@ async function runSelfTest(){
       Object.keys(structuresState).forEach(k=>delete structuresState[k]); Object.assign(structuresState, JSON.parse(snap)); renderSVG();
     }
   });
-  T('Tarjetas de nombre: fondo suave por rol (médico, enfermera, TENS rayos, TENS endoscopia, auxiliar); el resto en blanco', ()=>{
-    const prev=_estIdx; 
+  T('Tarjetas de nombre: color institucional del estamento (uniforme) y distintivo de área en los TENS', ()=>{
+    const prev=_estIdx;
     try{
       _estIdx={}; const add=(n,o)=>{ _estIdx[norm(n)]={nombre:n,...o}; };
-      add('RF MEDICO',{estamento:'MEDICOS',cargo:'MEDICO CIRUJANO',unidad:'UNIDAD DE CUIDADOS EN PABELLON'});
-      add('RF ENFERMERA',{estamento:'PROFESIONALES',cargo:'ENFERMERA',unidad:'UNIDAD DE CUIDADOS EN PABELLON'});
+      add('RF MED19',{estamento:'MEDICOS',cargo:'MEDICO CIRUJANO',ley:'LEY 19.664',unidad:'UNIDAD DE CUIDADOS EN PABELLON'});
+      add('RF MED15',{estamento:'MEDICOS',cargo:'MEDICO CIRUJANO',ley:'LEY 15.076',unidad:'UNIDAD DE CUIDADOS EN PABELLON'});
+      add('RF ENF',{estamento:'PROFESIONALES',cargo:'ENFERMERA',unidad:'UNIDAD DE CUIDADOS EN PABELLON'});
+      add('RF TM',{estamento:'PROFESIONALES',cargo:'TECNOLOGO MEDICO',unidad:'SERVICIO DE IMAGENOLOGIA'});
+      add('RF NUT',{estamento:'PROFESIONALES',cargo:'NUTRICIONISTA',unidad:'UNIDAD DE ALIMENTACION'});
+      add('RF KINE',{estamento:'PROFESIONALES',cargo:'KINESIOLOGO',unidad:'MEDICINA FISICA Y REHABILITACION'});
       add('RF TENS RX',{estamento:'TECNICOS',cargo:'TECNICO NIVEL SUPERIOR',unidad:'SERVICIO DE IMAGENOLOGIA'});
       add('RF TENS ENDO',{estamento:'TECNICOS',cargo:'TECNICO PARAMEDICO',unidad:'UNIDAD DE ENDOSCOPIA DIGESTIVA'});
-      add('RF AUX',{estamento:'AUXILIARES',cargo:'AUXILIAR DE SERVICIO',unidad:'UNIDAD DE CUIDADOS EN PABELLON'});
       add('RF TENS',{estamento:'TECNICOS',cargo:'TECNICO NIVEL SUPERIOR ENFERMERIA',unidad:'UNIDAD DE CUIDADOS EN PABELLON'});
-      add('RF TENS2',{estamento:'TECNICOS',cargo:'AUX. PARAMEDICO',unidad:'UNIDAD DE CUIDADOS EN PABELLON'});
+      add('RF AUX',{estamento:'AUXILIARES',cargo:'AUXILIAR DE SERVICIO',unidad:'UNIDAD DE CUIDADOS EN PABELLON'});
+      add('RF ADM',{estamento:'ADMINISTRATIVOS',cargo:'ADMINISTRATIVO',unidad:'UNIDAD DE CUIDADOS EN PABELLON'});
       const k=n=>_rolFondoClase(n);
-      const fuera=_rolFondoClase('RF NO ESTA',{cargo:'ENFERMERA',estamento:'PROFESIONALES'})==='enf';
-      const ok=fuera && k('RF MEDICO')==='med' && k('RF ENFERMERA')==='enf' && k('RF TENS RX')==='tens_rx' && k('RF TENS ENDO')==='tens_endo' && k('RF AUX')==='aux' && k('RF TENS')==='' && k('RF TENS2')==='' && k('NADIE')==='';
-      const din=_rolFondoDot({tipo:'dinamico',turnos:[{nombre:'RF MEDICO'},{nombre:'RF ENFERMERA'}]})==='' && _rolFondoDot({tipo:'dinamico',turnos:[{nombre:'RF AUX'}]})==='aux';
-      // dibujo: la tarjeta toma el color
-      const g0=svg.childNodes.length; _drawDotCard({dx:0,dy:0,col:'#10b981',lines:['👤 RF MEDICO'],rol:'med'},{rot:0,x0:10,cw:80,ch:14},{fs:7.5,lh:9.5,padX:5,padY:4});
-      const card=svg.lastChild, bg=card.querySelector('.ws-card-bg'), dib=bg.getAttribute('fill')===ROL_FONDO.med[1]; card.remove();
-      return ok && din && dib;
+      const ok=k('RF MED19')==='med' && k('RF MED15')==='med15' && k('RF ENF')==='enf' && k('RF TM')==='tm' && k('RF NUT')==='nutri' && k('RF KINE')==='rehab'
+        && k('RF TENS RX')==='tens' && k('RF TENS ENDO')==='tens' && k('RF TENS')==='tens' && k('RF AUX')==='aux' && k('RF ADM')==='otro' && k('NADIE')===''
+        && _rolFondoClase('RF NO ESTA',{cargo:'ENFERMERA',estamento:'PROFESIONALES'})==='enf';
+      const area=(_tensArea('RF TENS RX')||{}).sigla==='RX' && (_tensArea('RF TENS ENDO')||{}).sigla==='ENDO' && _tensArea('RF TENS')===null;
+      const lin=_rolLineas({tipo:'fijo',nombre:'RF TENS RX'})[0].startsWith('[RX] ');
+      const din=_rolFondoDot({tipo:'dinamico',turnos:[{nombre:'RF MED19'},{nombre:'RF ENF'}]})==='' && _rolFondoDot({tipo:'dinamico',turnos:[{nombre:'RF AUX'}]})==='aux';
+      _drawDotCard({dx:0,dy:0,col:'#10b981',lines:['👤 RF ENF'],rol:'enf'},{rot:0,x0:10,cw:80,ch:14},{fs:7.5,lh:9.5,padX:5,padY:4});
+      let card=svg.lastChild; const dib=card.querySelector('.ws-card-bg').getAttribute('fill')===ROL_FONDO.enf[1] && card.querySelector('text').getAttribute('fill')==='#ffffff'; card.remove();
+      _drawDotCard({dx:0,dy:0,col:'#10b981',lines:['[RX] 👤 RF TENS RX'],rol:'tens',area:_tensArea('RF TENS RX')},{rot:0,x0:10,cw:90,ch:14},{fs:7.5,lh:9.5,padX:5,padY:4});
+      card=svg.lastChild; const banda=!!card.querySelector('.ws-card-area') && card.querySelector('.ws-card-bg').getAttribute('fill')===ROL_FONDO.tens[1]; card.remove();
+      return ok && area && lin && din && dib && banda;
     } finally { _estIdx=prev; }
   });
   T('Capas: el nombre de la unidad queda encima de todo, después escaleras y ascensores, y abajo lo demás (plazas)', ()=>{

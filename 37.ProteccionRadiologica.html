@@ -143,6 +143,7 @@ footer{background:var(--panel2);border-top:1px solid var(--bd);color:var(--tx2);
   <section class="pane" id="p-form"></section>
   <section class="pane" id="p-copr"></section>
   <section class="pane" id="p-eqaut"></section>
+  <section class="pane" id="p-eqnhds"></section>
   <section class="pane" id="p-opr"></section>
   <section class="pane" id="p-cumpl"></section>
   <section class="pane" id="p-cot"></section>
@@ -173,6 +174,8 @@ footer{background:var(--panel2);border-top:1px solid var(--bd);color:var(--tx2);
 <script src="SHARED_DATA/pr_formulario.js"></script>
 <!-- autorizaciones de funcionamiento de los equipos emisores del HDS actual (sin datos personales) -->
 <script src="SHARED_DATA/pr_equipos_autorizacion.js"></script>
+<!-- Equipos emisores del NUEVO HDS categorizados según el D.S. 133/84 (PINS + CS-IF-9184): sin datos personales. -->
+<script src="SHARED_DATA/pr_equipos_nhds.js"></script>
 <script>
 /* ════════════════════════════════════════════════════════════════════════════
    Estructura según lo que las BASES DEL CARGO encomiendan al OPR:
@@ -237,6 +240,7 @@ const PANES=[
   {id:'lev',   ic:'📋', t:'Levantamiento AS'},
   {id:'form',  ic:'🗳', t:'Formulario'},
   {id:'eqaut', ic:'📜', t:'Autorización de equipos'},
+  {id:'eqnhds',ic:'🏗', t:'NHDS · categorías DS 133'},
   {id:'inst',  ic:'🏥', t:'Instalaciones y equipos'},
   {id:'epp',   ic:'🦺', t:'Elementos de protección'},
   {id:'guia',  ic:'🎬', t:'Guía rápida'},
@@ -262,6 +266,7 @@ function pintaTabs(){
     if(p.id==='form'&&window.PR_FORM) b=String(window.PR_FORM.resumen.personas);
     if(p.id==='copr'&&AG&&AG.cotejo_opr) b=String(AG.cotejo_opr.total.personas);
     if(p.id==='eqaut'&&window.PR_EQ_AUT&&window.PR_EQ_AUT.resumen.vencidas) b='⛔ '+window.PR_EQ_AUT.resumen.vencidas;
+    if(p.id==='eqnhds'&&window.PR_EQ_NHDS) b=String(window.PR_EQ_NHDS.resumen.emisores);
     if(p.id==='opr'&&window.PR_OPR) b=String(window.PR_OPR.pendientes.length);
     if(p.id==='req'&&PR)   b=String(PR.requisitos_rrhh.filter(r=>r.estado==='falta').length);
     return '<button class="tab" id="tb-'+p.id+'" onclick="irA(\''+p.id+'\')">'+p.ic+' '+p.t
@@ -271,7 +276,7 @@ function pintaTabs(){
 function irA(id){
   PANES.forEach(p=>{ document.getElementById('p-'+p.id).classList.toggle('on',p.id===id);
     const t=document.getElementById('tb-'+p.id); if(t) t.classList.toggle('on',p.id===id); });
-  ({panel:vPanel,poe:vPoe,dosi:vDosi,inst:vInst,epp:vEpp,doc:vDoc,cargo:vCargo,cumpl:vCumpl,req:vReq,guia:vGuia,hist:vHist,cot:vCot,dosim:vDosim,lev:vLev,form:vForm,eqaut:vEqAut,opr:vOpr,copr:vCopr})[id]();
+  ({panel:vPanel,poe:vPoe,dosi:vDosi,inst:vInst,epp:vEpp,doc:vDoc,cargo:vCargo,cumpl:vCumpl,req:vReq,guia:vGuia,hist:vHist,cot:vCot,dosim:vDosim,lev:vLev,form:vForm,eqaut:vEqAut,eqnhds:vEqNhds,opr:vOpr,copr:vCopr})[id]();
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -1207,6 +1212,69 @@ function vEqAut(){
       +'<td>'+esc(e.vence||'—')+'</td><td>'+est(e)+'</td></tr>').join('')
     +'</tbody></table></div>'
     +'<div class="d" style="margin-top:8px">Fuente: '+esc(Q.fuente)+'. Los PDF están en el Drive de la OPR, en «00 EQUIPOS EMISORES · autorización de funcionamiento» y en la carpeta de resoluciones de cada servicio.</div></div>';
+}
+
+/* ══ 🏗 NHDS · EQUIPOS EMISORES CATEGORIZADOS (D.S. 133/84) ═════════════════ */
+const NHDS_CAT_COL={'1ª':'var(--bad)','2ª':'var(--ok)','2ª · móviles':'var(--warn)','3ª':'var(--tx2)'};
+function vEqNhds(){
+  const box=document.getElementById('p-eqnhds');
+  const N=window.PR_EQ_NHDS||null;
+  if(!N){ box.innerHTML='<div class="aviso a-warn">Falta <b>SHARED_DATA/pr_equipos_nhds.js</b> (se genera con <code>python3 _DEV/pr_nhds/build_pr_equipos_nhds.py</code>).</div>'; return; }
+  const R=N.resumen, em=N.equipos.filter(e=>e.emisor), ins=N.equipos.filter(e=>!e.emisor);
+  const pc=e=>'<span class="pill" style="background:'+(NHDS_CAT_COL[e]||'var(--tx2)')+';color:#fff">'+esc(e)+'</span>';
+  const GN={}; N.grupos.forEach(g=>GN[g.id]=g);
+  box.innerHTML=
+    '<div class="aviso a-info"><b>Nuevo HDS · '+R.emisores+' equipos generadores de radiaciones ionizantes</b> en '+R.salas_fijas
+    +' salas fijas + '+R.moviles+' móviles, más Medicina Nuclear como instalación de 1ª categoría y sus fuentes selladas. '
+    +esc(N.nota)+' <small>Fuente: '+esc(N.fuente)+' · generado '+esc(N.generado)+'</small></div>'
+    +kpis([['Emisores',R.emisores,'var(--tx)'],['1ª categoría (CCHEN)',R.por_categoria['1ª']||0,'var(--bad)'],
+           ['2ª categoría (SEREMI)',R.por_categoria['2ª']||0,'var(--ok)'],['Serie leída en acta de recepción',(R.con_serie_acta||0)+' / '+R.emisores,'var(--ok)'],
+           ['Sin N° de serie',R.sin_serie,R.sin_serie?'var(--warn)':'var(--ok)'],['Sin acta de recepción',R.sin_acta,R.sin_acta?'var(--warn)':'var(--ok)']])
+    /* marco */
+    +'<div class="card" style="margin-top:12px"><h2>⚖️ Las tres categorías del D.S. 133/84 (art. 7)</h2><div class="d">'+esc(N.marco.norma)+'</div>'
+    +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>Categoría</th><th>Autoridad</th><th>Qué comprende</th><th>Trámite y antecedentes</th><th>En el NHDS</th></tr></thead><tbody>'
+    +N.marco.categorias.map(c=>'<tr><td>'+pc(c.cat)+'<br><small>'+esc(c.vigencia)+'</small></td><td>'+esc(c.autoridad)+'</td><td><small>'+esc(c.define)+'</small></td><td><small>'+esc(c.tramites)+'</small></td><td><small>'+esc(c.nhds)+'</small></td></tr>').join('')
+    +'</tbody></table></div>'
+    +'<div class="grid g4" style="margin-top:10px">'+Object.entries(R.solicitudes_estimadas).map(([k,v])=>'<div class="kpi"><div class="n">'+v+'</div><div class="l">'+esc(k)+'</div></div>').join('')+'</div></div>'
+    /* grupos */
+    +N.grupos.map(g=>'<div class="card" style="margin-top:12px"><h2>'+pc(g.cat)+' '+esc(g.nombre)+' <span class="pill p-mute">'+esc(g.autoridad)+'</span>'
+      +(g.n_equipos?' <span class="pill p-ok">'+g.n_equipos+' equipos</span>':'')+(g.n_instrumentos?' <span class="pill p-mute">'+g.n_instrumentos+' instrumentos</span>':'')+'</h2>'
+      +'<div class="d"><b>'+esc(g.edif)+' · '+esc(g.piso)+'</b> · '+esc(g.tramite)+(g.recintos?'<br>Recintos: '+esc(g.recintos.join(' · ')):'')+'</div>'
+      +'<div class="grid g2" style="margin-top:8px"><div><label>✅ Recibido</label><ul style="margin:4px 0 0 18px">'+g.recibido.map(x=>'<li><small>'+esc(x)+'</small></li>').join('')+'</ul></div>'
+      +'<div><label>⚠ Falta</label><ul style="margin:4px 0 0 18px">'+g.falta.map(x=>'<li><small>'+esc(x)+'</small></li>').join('')+'</ul></div></div>'
+      +(g.nota?'<div class="aviso a-warn" style="margin:10px 0 0"><small>'+esc(g.nota)+'</small></div>':'')+'</div>').join('')
+    /* tabla de equipos */
+    +'<div class="card" style="margin-top:12px"><h2>📋 Equipos emisores · uno por BIM <button class="btn" onclick="nhdsCSV()" style="float:right">⬇ CSV</button></h2>'
+    +'<div class="d">El N° de serie sale de las <b>actas de recepción RC-IB</b> (Existencias 23-09-26, OCR LecturaActasEQM, verificadas a ojo'+(R.actas_fuente?'':'')+'); lo que falta (tubo, kV/mA, año, planos, memoria, levantamiento, aceptación) se pide a la Concesionaria en la planilla «Levantamiento Equipos Emisores NHDS» (17.Autorización Sanitaria / Radiaciones Ionizantes NHDS).</div>'
+    +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>N°</th><th>Cat.</th><th>Grupo</th><th>Código</th><th>Equipo</th><th>Marca · modelo (PINS)</th><th>Ubicación</th><th>Estado PINS</th><th>Acta · N° de serie</th><th>Recibido (CS-IF-9184)</th><th>Alerta</th></tr></thead><tbody>'
+    +em.map(e=>'<tr><td>'+e.n+'</td><td>'+pc(e.cat)+'</td><td><small>'+esc((GN[e.grupo]||{}).nombre||e.grupo)+'</small></td><td class="mono">'+esc(e.code)+'</td>'
+      +'<td>'+esc(e.nombre)+'<br><small style="color:var(--tx2)">'+esc(e.clasif)+'</small></td><td>'+esc(e.marca||'—')+'<br><small>'+esc(e.modelo||'')+'</small></td>'
+      +'<td><small>'+esc(e.edif)+' '+esc(e.piso)+' · <b>'+esc(e.pma)+'</b> · '+esc(e.bim)+'<br>'+esc(e.recinto)+'</small></td>'
+      +'<td><small>'+esc(e.estado_pins||'')+(e.lugar_pins?' · '+esc(e.lugar_pins):'')+'</small></td>'
+      +'<td>'+(e.acta?'<small>'+esc(e.acta)+(e.acta_fecha?' · '+esc(e.acta_fecha):'')+'</small><br>':'<span class="pill p-warn">sin acta</span><br>')
+        +(e.serie_acta?'<b class="mono">'+esc(e.serie_acta)+'</b>':'<span class="pill p-mute">sin serie</span>')+(e.serie_2_manuscrita?'<br><small class="mono">'+esc(e.serie_2_manuscrita)+'</small>':'')
+        +(e.acta&&e.existe!==undefined?'<br><small>existe '+esc(e.existe||'—')+' · enciende '+esc(e.enciende||'—')+' · partes '+esc(e.partes||'—')+'</small>':'')
+        +(e.obs_acta?'<br><small style="color:var(--tx2)">'+esc(e.obs_acta)+'</small>':'')+'</td>'
+      +'<td><small>'+(e.garantia_recibida?'Garantía: '+esc(e.garantia_recibida)+'<br>Manual: '+esc(e.manual_recibido):'—')+'</small></td>'
+      +'<td>'+(e.alerta?'<span class="pill p-warn">⚠</span> <small>'+esc(e.alerta)+'</small>':'')+'</td></tr>').join('')
+    +'</tbody></table></div></div>'
+    /* instrumentos MN */
+    +'<div class="card" style="margin-top:12px"><h2>🧪 Instrumentación de Medicina Nuclear (no emisora, va en la descripción de la instalación)</h2>'
+    +'<div class="tw" style="margin-top:8px"><table><thead><tr><th>Código</th><th>Equipo</th><th>Marca · modelo</th><th>Ubicación</th><th>N° ítem</th></tr></thead><tbody>'
+    +ins.map(e=>'<tr><td class="mono">'+esc(e.code)+'</td><td>'+esc(e.nombre)+'</td><td>'+esc(e.marca)+' · '+esc(e.modelo)+'</td><td><small>'+esc(e.pma)+' · '+esc(e.bim)+'</small></td><td>'+esc(e.n_item)+'</td></tr>').join('')
+    +'</tbody></table></div></div>'
+    /* formulario */
+    +'<div class="card" style="margin-top:12px"><h2>📄 Formulario SEREMI «Solicitud de autorización de funcionamiento · 2ª y 3ª categoría»: quién aporta cada antecedente</h2>'
+    +'<div class="tw" style="margin-top:8px"><table><thead><tr><th>Punto</th><th>Antecedente</th><th>Quién lo aporta</th></tr></thead><tbody>'
+    +N.marco.formulario_seremi.map(([a,b,c])=>'<tr><td class="mono">'+esc(a)+'</td><td>'+esc(b)+'</td><td>'+(/SC/.test(c)?'<span class="pill p-warn">'+esc(c)+'</span>':'<span class="pill p-ok">'+esc(c)+'</span>')+'</td></tr>').join('')
+    +'</tbody></table></div><div class="d" style="margin-top:8px">Lo que aporta el HDS (titular) lo coordina la OPR con Autorización Sanitaria: representante legal, encargado de seguridad radiológica, desempeño y dosimetría del personal (pestañas 🎯 Cumplimiento AS y 🗂 Expediente OPR), procedimientos y plan de emergencia.</div></div>';
+}
+function nhdsCSV(){
+  const N=window.PR_EQ_NHDS; if(!N) return;
+  const cu=s=>'"'+String(s==null?'':s).replace(/"/g,'""')+'"';
+  const cab=['N°','Categoría','Autoridad','Grupo','Código','Equipo','Clasificación','Marca','Modelo','Proveedor','Edificio','Piso','PMA','BIM','Recinto','Servicio','N° ítem','Estado PINS','Acta','Fecha acta','N° de serie (acta)','2º N° manuscrito','Existe','Enciende','Partes','Obs. acta','Garantía recibida','Manual recibido','Alerta'].concat(N.campos_solicitados.map(c=>c[1]));
+  const filas=N.equipos.filter(e=>e.emisor).map(e=>[e.n,e.cat,e.autoridad,e.grupo,e.code,e.nombre,e.clasif,e.marca,e.modelo,e.proveedor,e.edif,e.piso,e.pma,e.bim,e.recinto,e.servicio,e.n_item,e.estado_pins,e.acta,e.acta_fecha,e.serie_acta,e.serie_2_manuscrita,e.existe,e.enciende,e.partes,e.obs_acta,e.garantia_recibida,e.manual_recibido,e.alerta].concat(N.campos_solicitados.map(()=>'' )).map(cu).join(';'));
+  bajar('equipos_emisores_NHDS_'+N.generado+'.csv','﻿'+cab.join(';')+'\n'+filas.join('\n'),'text/csv;charset=utf-8');
 }
 
 /* ══ 🗂 EXPEDIENTE OPR · documentos y Drive ══════════════════════════════════ */

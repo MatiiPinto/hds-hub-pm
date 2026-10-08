@@ -3147,6 +3147,31 @@ window.BITACORA = {
      "texto": "Levantado de la reunión Proceso Pre-Quirúrgico del 06-10 [00:48:03–00:48:12]. Minuta en Minutas/minutas/2026-10-06_proceso-pre-quirurgico.md · plataforma 47.ProcesoQuirurgico."
     }
    ]
+  },
+  {
+   "id": "P135",
+   "titulo": "Responder ORD SSMO N°1837: clasificación D.S. 133 de las instalaciones radiactivas del NHDS",
+   "detalle": "El Director del SSMO (ORD 1837, 07-10-2026, folio 5040029-183; ant. ORD IF-HSG 1106 del 24-09) pide al HDS entregar «a la brevedad» la caracterización y clasificación por categorías (1, 2 o 3, Título III D.S. 133/84) de cada instalación y/o equipo generador de radiaciones ionizantes. Clasificación propuesta (08-10): Medicina Nuclear 1ª categoría (CCHEN), 14 salas de rayos X 2ª (SEREMI RM), 13 equipos móviles art. 15, fuentes selladas de calibración 3ª / almacenamiento transitorio. Falta que Dirección emita el ORD de respuesta con el anexo de 29 equipos (borrador listo) y que la SC entregue series, tubos, kV/mA, planos y memorias por sala.",
+   "ambito": "Aut. Sanitaria",
+   "origen_tipo": "Oficio",
+   "origen_ref": "ORD SSMO N°1837 (2026-10-07) · ORD IF-HSG N°1106 (2026-09-24) · correo C. Sepúlveda 08-10 (hilo 1a11b543dcb26473)",
+   "origen_fecha": "2026-10-07",
+   "contraparte": "SSMO · Inspección Fiscal",
+   "servicio": "IMAGENOLOGIA · MEDICINA NUCLEAR · PABELLON CENTRAL · ODONTOLOGIA",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "compromiso": "«A la brevedad posible» (ORD 1837). Propuesto: ORD de respuesta firmado antes del 14-10-2026.",
+   "plazo": "2026-10-14",
+   "responsable": "Matías Pinto · Catherine Sepúlveda",
+   "creado": "2026-10-08",
+   "actualizado": "2026-10-08",
+   "frente": "Autorización Sanitaria",
+   "notas": [
+    {
+     "fecha": "2026-10-08",
+     "texto": "Borrador de ORD + anexo (29 equipos) y planilla de levantamiento en 17.Autorización Sanitaria/Radiaciones Ionizantes NHDS. Dato pr_equipos_nhds, pestaña 🏗 de la 37. Catherine preguntó a F. Cid por qué se le pide al HDS: la categoría la declara el titular (hospital) y define la autoridad (CCHEN vs SEREMI); los datos de equipo los tiene la SC."
+    }
+   ]
   }
  ],
  "criticos": [
@@ -3166,7 +3191,8 @@ window.BITACORA = {
   "P115",
   "P121",
   "P127",
-  "P130"
+  "P130",
+  "P135"
  ],
  "frentes": {
   "pabellon": [
@@ -3193,6 +3219,9 @@ window.BITACORA = {
    "P132",
    "P133",
    "P134"
+  ],
+  "autorizacion_sanitaria": [
+   "P135"
   ]
  },
  "equipo": [
