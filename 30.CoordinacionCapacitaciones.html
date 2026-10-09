@@ -203,6 +203,7 @@ th.sortable{cursor:pointer;user-select:none}th.sortable:hover{background:#0a558f
 .grep-cod{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:var(--tx2)}
 .grep-eq li b{margin-left:6px;font-size:11px;letter-spacing:.03em}
 .grep-obs{display:block;margin-left:0;color:var(--tx2);font-size:11px;font-style:italic}
+.slot-m{display:inline-block;font-size:10.5px;background:#e0f2f1;color:#0E7C66;border:1px solid #9fd8cf;border-radius:10px;padding:1px 7px;margin:0 4px;white-space:nowrap;vertical-align:middle}
 </style>
 </head>
 <body>
@@ -348,13 +349,14 @@ function estadoOf(area,row){
 }
 function valOf(row,key){ if(key==="_slots") return slotsText(row); var o=overrides[row.id]; if(o&&o.fields&&o.fields[key]!=null) return o.fields[key]; return row[key]!=null?row[key]:""; }
 function slotsOf(r){ var o=overrides[r.id]; if(o&&o.slots) return o.slots; return r._slots||[]; }
-function ensureSlots(id){ var o=ov(id); if(!o.slots){ o.slots=((IDX[id]&&IDX[id]._slots)||[]).map(function(s){return {f:s.f,h:s.h};}); } return o.slots; }
-function slotsText(r){ return slotsOf(r).map(function(s){return (s.f||"")+" "+(s.h||"");}).join(" | "); }
+function ensureSlots(id){ var o=ov(id); if(!o.slots){ o.slots=((IDX[id]&&IDX[id]._slots)||[]).map(function(s){return {f:s.f,h:s.h,m:s.m};}); } return o.slots; }
+function slotsText(r){ return slotsOf(r).map(function(s){return (s.f||"")+" "+(s.h||"")+(s.m?" ("+s.m+")":"");}).join(" | "); }
 function slotsCell(r){
   var slots=slotsOf(r), h='<td class="slotcell"><div class="slots">';
   slots.forEach(function(s,i){
     h+='<div class="slot"><input type="date" value="'+esc(s.f||"")+'" onchange="setSlot(\''+r.id+'\','+i+',\'f\',this.value)">'+
        '<input type="text" class="slot-h" placeholder="hora" value="'+esc(s.h||"")+'" onchange="setSlot(\''+r.id+'\','+i+',\'h\',this.value)">'+
+       (s.m?'<span class="slot-m" title="Marca capacitada en esta sesión">'+esc(s.m)+'</span>':'')+
        '<button class="slot-x" onclick="delSlot(\''+r.id+'\','+i+')" title="Quitar fecha">\u00d7</button></div>';
   });
   h+='<button class="slot-add" onclick="addSlot(\''+r.id+'\')">+ fecha</button></div></td>';
@@ -777,7 +779,7 @@ function slotsDe(js){ var v={}, o=[]; js.forEach(function(j){ var k=j.fecha+" "+
   D.capacitaciones.forEach(function(r){
     if(JXROW[r.id]) return;
     var o=overrides[r.id];
-    if(o && o.slots){ o.slots = (r._slots||[]).map(function(s0){return {f:s0.f,h:s0.h};});
+    if(o && o.slots){ o.slots = (r._slots||[]).map(function(s0){return {f:s0.f,h:s0.h,m:s0.m};});
       if(o.estado==="pendiente") delete o.estado; }
   });
   S.seed = SEG.version; ssave(); save();
