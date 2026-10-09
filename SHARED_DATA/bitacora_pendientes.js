@@ -1740,7 +1740,7 @@ window.BITACORA = {
    "estado": "Esperando terceros",
    "compromiso": "CSSO (Gabriela Romo) envía una planilla por especialidad con las fechas aproximadas, para programar al personal de Esterilización y Pabellón. Sin plazo. Queda pendiente formalizar por SSMO.",
    "creado": "2026-09-18",
-   "actualizado": "2026-09-28",
+   "actualizado": "2026-10-09",
    "notas": [
     {
      "fecha": "2026-09-18",
@@ -1749,6 +1749,10 @@ window.BITACORA = {
     {
      "fecha": "2026-09-28",
      "texto": "28-09: sin respuesta de la CSSO desde el 14-09. Borrador para visto bueno a Felipe Rojas (SSMO) pidiendo formalizar vía Inspección Fiscal los 6 datos con fecha de corte, respuesta antes del 02-10."
+    },
+    {
+     "fecha": "2026-10-09",
+     "texto": "Corte de llegada de la CSSO del 09-10-2026 (Estado de Instrumental 09.10.26): 1.288 de 1.507 cajas recibidas (85,5 %; 65,9 % de las piezas). Desde la programación del 17-09 no ha llegado ninguna de las 219 cajas pendientes: las 84 cajas de 21 tipologías comprometidas para el 01-10 están vencidas y la planilla mantiene esa fecha. Falta que informe nueva fecha y el avance de revisión (último corte 28-08). Dato llegada_instrumental + pestaña Instrumental del 23."
     }
    ],
    "responsable": "Matías Pinto"
@@ -2506,7 +2510,7 @@ window.BITACORA = {
    "estado": "Esperando terceros",
    "compromiso": "2026-11-01",
    "creado": "2026-10-01",
-   "actualizado": "2026-10-02",
+   "actualizado": "2026-10-09",
    "notas": [
     {
      "fecha": "2026-10-01",
@@ -2515,6 +2519,10 @@ window.BITACORA = {
     {
      "fecha": "2026-10-02",
      "texto": "Programación cargada en Informes › Instrumental y cruzada con la recepción del 28-08: las 219 cajas programadas calzan una a una con cajas sin revisar; quedan 71 cajas de 25 tipologías sin revisar que no aparecen en la programación (entre ellas Caja Hombro 6, Cirugía Bariátrica Laparoscópica 6, Cirugía Menor Tradicional 5, Tendones Nervios y Manos 5). Pedir a la Concesionaria que aclare si ya llegaron o si faltan en el programa."
+    },
+    {
+     "fecha": "2026-10-09",
+     "texto": "Corte 09-10-2026: siguen 135 cajas de 38 tipologías con llegada el 01-11 (después del traslado) y se suman 84 cajas del 01-10 vencidas sin entregar."
     }
    ],
    "responsable": "Matías Pinto"

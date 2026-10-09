@@ -136,6 +136,15 @@
 .rec-det{margin:0 0 12px}
 .rec-det>summary{cursor:pointer;font-size:12px;color:#8fc4ff;padding:4px 0}
 .rec-tab td.izq{text-align:left;font-weight:400}
+
+.rec-lleg{margin:0 0 20px}
+.rec-seg.lle{background:#0E7C66}.rec-seg.ven{background:#9B1C1C}.rec-seg.fut{background:#2E5A9E}
+.rec-leg i.lle{background:#0E7C66}.rec-leg i.ven{background:#9B1C1C}.rec-leg i.fut{background:#2E5A9E}
+.rec-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:0 0 10px}
+.rec-kpi{background:rgba(255,255,255,.05);border:1px solid rgba(127,127,127,.25);border-radius:9px;padding:8px 10px}
+.rec-kpi b{display:block;font-size:20px;color:var(--ink,#e8f1fb)}.rec-kpi span{font-size:11px;color:var(--mut,#9fb4cf)}
+.rec-kpi.mal b{color:#ff9a9a}.rec-kpi.ok b{color:#4fd1a5}
+.rec-alerta{background:rgba(155,28,28,.16);border:1px solid rgba(255,120,120,.45);border-radius:8px;padding:9px 12px;font-size:11.5px;color:#ffd0d0;margin-bottom:12px;line-height:1.55}
 </style>
 </head>
 <body>
@@ -166,7 +175,120 @@
   <div class="panel" id="p-ins"><div class="ins-kpis"><div class="ik"><div class="v">197</div><div class="l">tipologías de caja</div></div><div class="ik"><div class="v">1.517</div><div class="l">cajas físicas</div></div><div class="ik"><div class="v">52.6%</div><div class="l">recepción conforme</div></div><div class="ik"><div class="v">60.072</div><div class="l">piezas de instrumental</div></div><div class="ik"><div class="v">7</div><div class="l">especialidades</div></div></div>
   <!-- RECEPCION:INICIO — generado por _DEV/build_panel_recepcion.py, no editar a mano -->
 <div class="rec-blk">
-<div class="rec-h">Recepción y revisión de las cajas</div>
+<div class="rec-lleg">
+<div class="rec-h">Llegada del instrumental · corte 09-10-2026</div>
+<div class="rec-s">Planilla de la Sociedad Concesionaria «Estado de Instrumental 09.10.26.xlsx». «Recibida» = la caja llegó al hospital; no quiere decir que esté revisada ni aceptada (eso es el bloque siguiente). El traslado parte el 15-10-2026.</div>
+<div class="rec-kpis">
+<div class="rec-kpi ok"><b>1.288 / 1.507</b><span>cajas recibidas (85.5 %)</span></div>
+<div class="rec-kpi"><b>39.461 / 59.875</b><span>piezas recibidas (65.9 %)</span></div>
+<div class="rec-kpi mal"><b>84</b><span>cajas con fecha vencida (21 tipologías)</span></div>
+<div class="rec-kpi mal"><b>135</b><span>cajas que llegan después del traslado</span></div>
+<div class="rec-kpi"><b>70</b><span>cajas recibidas aún sin revisión (corte de revisión 28-08-2026)</span></div>
+</div><div class="rec-barra">
+<div class="rec-seg lle" style="width:85.47%">1.288</div>
+<div class="rec-seg ven" style="width:5.57%">84</div>
+<div class="rec-seg fut" style="width:8.96%">135</div>
+</div><div class="rec-leg"><span><i class="lle"></i> 1.288 recibidas</span><span><i class="ven"></i> 84 pendientes con fecha vencida</span><span><i class="fut"></i> 135 pendientes por llegar</span></div>
+<div class="rec-alerta">⚠ Desde la programación del 17-09-2026 (carta CS-IF-9744) <b>no ha llegado ninguna de las 219 cajas comprometidas</b>. Las <b>84 cajas de 21 tipologías</b> prometidas para el 01-10 siguen pendientes y la planilla mantiene esa fecha, ya pasada. Otras 135 cajas (14.911 piezas) llegan después del traslado. Corresponde pedir a la Concesionaria, vía Inspección Fiscal, la nueva fecha comprometida.</div>
+<table class="rec-tab"><thead><tr><th>ESPECIALIDAD</th><th>TIPOLOGÍAS</th><th>CAJAS</th><th>RECIBIDAS</th><th>PENDIENTES</th><th>VENCIDAS</th><th>TRAS TRASLADO</th><th>PIEZAS PEND.</th><th>LLEGADA</th></tr></thead><tbody>
+<tr><td>Cirugía general</td><td>83</td><td>1046</td><td class="ok">1038</td><td>8</td><td class="tarde">5</td><td class="tarde">3</td><td>1.126</td><td><span class="rec-mini"><i class="ok" style="width:99%"></i></span><b>99 %</b></td></tr>
+<tr><td>Traumatología</td><td>36</td><td>152</td><td class="ok">53</td><td>99</td><td class="tarde">23</td><td class="tarde">76</td><td>6.956</td><td><span class="rec-mini"><i class="pen" style="width:35%"></i></span><b>35 %</b></td></tr>
+<tr><td>Laparoscopía</td><td>7</td><td>76</td><td class="ok">41</td><td>35</td><td class="tarde">34</td><td class="tarde">1</td><td>1.508</td><td><span class="rec-mini"><i class="pen" style="width:54%"></i></span><b>54 %</b></td></tr>
+<tr><td>Dental</td><td>13</td><td>69</td><td class="ok">62</td><td>7</td><td class="">·</td><td class="tarde">7</td><td>2.035</td><td><span class="rec-mini"><i class="obs" style="width:90%"></i></span><b>90 %</b></td></tr>
+<tr><td>Otorrinolaringología</td><td>25</td><td>64</td><td class="ok">17</td><td>47</td><td class="tarde">17</td><td class="tarde">30</td><td>7.097</td><td><span class="rec-mini"><i class="pen" style="width:27%"></i></span><b>27 %</b></td></tr>
+<tr><td>Oftalmología</td><td>18</td><td>55</td><td class="ok">45</td><td>10</td><td class="tarde">2</td><td class="tarde">8</td><td>160</td><td><span class="rec-mini"><i class="obs" style="width:82%"></i></span><b>82 %</b></td></tr>
+<tr><td>Urología</td><td>15</td><td>45</td><td class="ok">32</td><td>13</td><td class="tarde">3</td><td class="tarde">10</td><td>1.532</td><td><span class="rec-mini"><i class="obs" style="width:71%"></i></span><b>71 %</b></td></tr>
+<tr class="tot"><td>TOTAL</td><td>197</td><td>1.507</td><td>1.288</td><td>219</td><td>84</td><td>135</td><td>20.414</td><td>85.5 %</td></tr></tbody></table>
+<details class="rec-det"><summary>Ver las 59 tipologías pendientes de llegada, con fecha y proveedor</summary><table class="rec-tab"><thead><tr><th>CAJA</th><th>ESPECIALIDAD</th><th>FECHA ESTIMADA</th><th>ATRASO</th><th>CAJAS</th><th>PIEZAS</th><th>OC</th><th>PROVEEDOR</th></tr></thead><tbody>
+<tr><td>Caja Anexa Hueso Cabeza y Cuello</td><td class="izq">Cirugía general</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>2</td><td>82</td><td>338</td><td class="izq">B Braun Medical SPA</td></tr>
+<tr><td>Microcirugia</td><td class="izq">Cirugía general</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>2</td><td>124</td><td>277</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Set Instrumental Salas Hospitalizacion</td><td class="izq">Cirugía general</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>1</td><td>512</td><td>289</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Bandeja Laparoscopica</td><td class="izq">Laparoscopía</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>34</td><td>1.258</td><td>326</td><td class="izq">TECNIGEN S.A.</td></tr>
+<tr><td>Caja Cirugia Trauma Ocular</td><td class="izq">Oftalmología</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>2</td><td>46</td><td>289</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Fonocirugia</td><td class="izq">Otorrinolaringología</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>2</td><td>122</td><td>289</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Fractura Nasal</td><td class="izq">Otorrinolaringología</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>2</td><td>114</td><td>277</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Meatotomia CEF</td><td class="izq">Otorrinolaringología</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>2</td><td>308</td><td>277</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Septoplastia</td><td class="izq">Otorrinolaringología</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>3</td><td>216</td><td>289</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Timpanocentesis</td><td class="izq">Otorrinolaringología</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>2</td><td>32</td><td>289</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Timpanoplastia Fina</td><td class="izq">Otorrinolaringología</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>2</td><td>114</td><td>277</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Timpanoplastia y Estapedectomia</td><td class="izq">Otorrinolaringología</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>2</td><td>418</td><td>289</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Traqueotomia</td><td class="izq">Otorrinolaringología</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>2</td><td>140</td><td>289</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Artroscopia Hombro</td><td class="izq">Traumatología</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>4</td><td>204</td><td>277</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Caderas</td><td class="izq">Traumatología</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>6</td><td>822</td><td>339</td><td class="izq">Hospital Studio</td></tr>
+<tr><td>Caja Cirugia Menisco</td><td class="izq">Traumatología</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>4</td><td>188</td><td>277</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja extracción tornillo difícil para tornillos de 1.0 a 3.0 mm</td><td class="izq">Traumatología</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>2</td><td>92</td><td>310</td><td class="izq">Tecnomedical S.A.</td></tr>
+<tr><td>Caja extracción tornillo difícil para tornillos de 3.5 a 4.5 mm</td><td class="izq">Traumatología</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>2</td><td>88</td><td>310</td><td class="izq">Tecnomedical S.A.</td></tr>
+<tr><td>Caja extracción tornillo difícil para tornillos de 5.0 a 7.3 mm</td><td class="izq">Traumatología</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>2</td><td>80</td><td>310</td><td class="izq">Tecnomedical S.A.</td></tr>
+<tr><td>Set Instrumental Box Yeso</td><td class="izq">Traumatología</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>3</td><td>171</td><td>289</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Trasplante Renal</td><td class="izq">Urología</td><td class="tarde">01-10-2026</td><td class="tarde">8 días</td><td>3</td><td>372</td><td>289</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Cirugia Endoscopica Cavidades Perinasales</td><td class="izq">Cirugía general</td><td class="tarde">01-11-2026</td><td class="">·</td><td>2</td><td>246</td><td>250</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Set Instrumental Especifico Anatomia Patologica</td><td class="izq">Cirugía general</td><td class="tarde">01-11-2026</td><td class="">·</td><td>1</td><td>162</td><td>271</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja de Cirugia Plastica Periodontal II</td><td class="izq">Dental</td><td class="tarde">01-11-2026</td><td class="">·</td><td>2</td><td>12</td><td>294</td><td class="izq">CC Dental Chile SPA</td></tr>
+<tr><td>Set Instrumental Endodoncia I</td><td class="izq">Dental</td><td class="tarde">01-11-2026</td><td class="">·</td><td>2</td><td>872</td><td>294</td><td class="izq">CC Dental Chile SPA</td></tr>
+<tr><td>Set Instrumental Operatoria</td><td class="izq">Dental</td><td class="tarde">01-11-2026</td><td class="">·</td><td>1</td><td>431</td><td>294</td><td class="izq">CC Dental Chile SPA</td></tr>
+<tr><td>Set Instrumental Protesis II</td><td class="izq">Dental</td><td class="tarde">01-11-2026</td><td class="">·</td><td>2</td><td>720</td><td>294</td><td class="izq">CC Dental Chile SPA</td></tr>
+<tr><td>Set de opticas laparoscopicas</td><td class="izq">Laparoscopía</td><td class="tarde">01-11-2026</td><td class="">·</td><td>1</td><td>250</td><td>330</td><td class="izq">Karl Storz Endoscopy Chile SPA</td></tr>
+<tr><td>Caja Cirugia Estrabismo</td><td class="izq">Oftalmología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>3</td><td>69</td><td>347</td><td class="izq">Comercial Salamanca y Compañia Ltda</td></tr>
+<tr><td>Caja Cirugia Intravitrea</td><td class="izq">Oftalmología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>3</td><td>9</td><td>264</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Cirugia Pterigion</td><td class="izq">Oftalmología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>2</td><td>36</td><td>340</td><td class="izq">Oller &amp; Cía. Ltda.</td></tr>
+<tr><td>Bandeja Lavado de Oidos</td><td class="izq">Otorrinolaringología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>8</td><td>2.104</td><td>348</td><td class="izq">CENTRO TECHSALUD LTDA.</td></tr>
+<tr><td>Caja Amigdalectomia y Adenoidectomia</td><td class="izq">Otorrinolaringología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>4</td><td>176</td><td>308</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Cirugia Endoscopica Cavidades Perinasales</td><td class="izq">Otorrinolaringología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>3</td><td>369</td><td>250</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Cirugia Laringoscopica Laringea</td><td class="izq">Otorrinolaringología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>2</td><td>364</td><td>296</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Cirugia Radical de Oido</td><td class="izq">Otorrinolaringología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>4</td><td>340</td><td>336</td><td class="izq">Comercial Salamanca y Compañia Ltda</td></tr>
+<tr><td>Caja Cuello</td><td class="izq">Otorrinolaringología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>2</td><td>444</td><td>336</td><td class="izq">Comercial Salamanca y Compañia Ltda</td></tr>
+<tr><td>Caja Tabique</td><td class="izq">Otorrinolaringología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>3</td><td>216</td><td>331</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Set Endoscopios Rigidos para ORL</td><td class="izq">Otorrinolaringología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>1</td><td>30</td><td>236</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Set Especulos Oticos</td><td class="izq">Otorrinolaringología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>2</td><td>1.138</td><td>260</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Set Instrumental Consultas ORL</td><td class="izq">Otorrinolaringología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>1</td><td>452</td><td>260</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Artroscopia Instrumental</td><td class="izq">Traumatología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>5</td><td>240</td><td>236</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Auxiliar de Cadera</td><td class="izq">Traumatología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>8</td><td>1.040</td><td>260</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Cinceles (osteotomos) Traumatologia</td><td class="izq">Traumatología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>4</td><td>16</td><td>264</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Cirugia Mano</td><td class="izq">Traumatología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>10</td><td>390</td><td>264</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Cirugia Microfractura (Rodilla)</td><td class="izq">Traumatología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>2</td><td>8</td><td>236</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Columna</td><td class="izq">Traumatología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>2</td><td>138</td><td>296</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Comun Traumatologia</td><td class="izq">Traumatología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>6</td><td>126</td><td>260</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Corriente</td><td class="izq">Traumatología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>2</td><td>76</td><td>341</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Grandes Fragmentos</td><td class="izq">Traumatología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>5</td><td>595</td><td>260</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Ligamento Cruzado</td><td class="izq">Traumatología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>3</td><td>174</td><td>264</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Pie</td><td class="izq">Traumatología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>5</td><td>420</td><td>260</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Pinzas Gubias</td><td class="izq">Traumatología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>1</td><td>1</td><td>343</td><td class="izq">Johnson &amp; Johnson</td></tr>
+<tr><td>Caja Revision</td><td class="izq">Traumatología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>2</td><td>76</td><td>341</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Separador Charnley</td><td class="izq">Traumatología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>4</td><td>48</td><td>337</td><td class="izq">Pimet S.A.</td></tr>
+<tr><td>Caja Separadores Hombro</td><td class="izq">Traumatología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>5</td><td>145</td><td>341</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Tobillo</td><td class="izq">Traumatología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>10</td><td>1.760</td><td>342</td><td class="izq">Comercial Salamanca y Compañia Ltda</td></tr>
+<tr><td>Set Instrum. Vario para Sala de Proc. Y Policlinico de Traumatologia</td><td class="izq">Traumatología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>2</td><td>58</td><td>260</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+<tr><td>Caja Prostatectomia</td><td class="izq">Urología</td><td class="tarde">01-11-2026</td><td class="">·</td><td>10</td><td>1.160</td><td>276</td><td class="izq">MDA- Importaciones Médico Técnicas SpA</td></tr>
+</tbody></table></details>
+<details class="rec-det"><summary>Ver las 25 tipologías recibidas con cajas aún sin revisión (70 cajas)</summary><table class="rec-tab"><thead><tr><th>CAJA</th><th>ESPECIALIDAD</th><th>RECIBIDAS</th><th>CONFORMES</th><th>OBSERVADAS</th><th>SIN REVISAR</th></tr></thead><tbody>
+<tr><td>Bandeja Traqueostomia</td><td class="izq">Cirugía general</td><td>3</td><td class="ok">0</td><td class="obs">0</td><td>3</td></tr>
+<tr><td>Caja Gastrectomia</td><td class="izq">Cirugía general</td><td>12</td><td class="ok">0</td><td class="obs">11</td><td>1</td></tr>
+<tr><td>Caja de Cirugia Menor Tradicional</td><td class="izq">Cirugía general</td><td>6</td><td class="ok">0</td><td class="obs">1</td><td>5</td></tr>
+<tr><td>Caja Cirugia Periodoncia</td><td class="izq">Dental</td><td>1</td><td class="ok">0</td><td class="obs">0</td><td>1</td></tr>
+<tr><td>Set Instrumental Cirugia Maxilo Facial (Instrumental Policlinico)</td><td class="izq">Dental</td><td>1</td><td class="ok">0</td><td class="obs">0</td><td>1</td></tr>
+<tr><td>Set Instrumental Endodoncia II</td><td class="izq">Dental</td><td>2</td><td class="ok">0</td><td class="obs">0</td><td>2</td></tr>
+<tr><td>Set Instrumental Periodoncia</td><td class="izq">Dental</td><td>4</td><td class="ok">0</td><td class="obs">0</td><td>4</td></tr>
+<tr><td>Caja Cirugia Bariatrica Laparoscopica</td><td class="izq">Laparoscopía</td><td>6</td><td class="ok">0</td><td class="obs">0</td><td>6</td></tr>
+<tr><td>Coledoscofibroscopio</td><td class="izq">Laparoscopía</td><td>2</td><td class="ok">0</td><td class="obs">0</td><td>2</td></tr>
+<tr><td>Caja Chalazion</td><td class="izq">Oftalmología</td><td>3</td><td class="ok">0</td><td class="obs">0</td><td>3</td></tr>
+<tr><td>Caja Extraccion Corneal</td><td class="izq">Oftalmología</td><td>2</td><td class="ok">0</td><td class="obs">0</td><td>2</td></tr>
+<tr><td>Caja Plastia</td><td class="izq">Oftalmología</td><td>2</td><td class="ok">0</td><td class="obs">0</td><td>2</td></tr>
+<tr><td>Caja Cirugia Endoscopica de Oido</td><td class="izq">Otorrinolaringología</td><td>4</td><td class="ok">0</td><td class="obs">0</td><td>4</td></tr>
+<tr><td>Caja Cirugia Menor ORL</td><td class="izq">Otorrinolaringología</td><td>3</td><td class="ok">0</td><td class="obs">1</td><td>2</td></tr>
+<tr><td>Caja Esofagoscopia y Extraccion Cuerpos Extraños</td><td class="izq">Otorrinolaringología</td><td>2</td><td class="ok">0</td><td class="obs">0</td><td>2</td></tr>
+<tr><td>Caja Laringoscopia Laser</td><td class="izq">Otorrinolaringología</td><td>2</td><td class="ok">0</td><td class="obs">0</td><td>2</td></tr>
+<tr><td>Caja Amputacion</td><td class="izq">Traumatología</td><td>2</td><td class="ok">0</td><td class="obs">0</td><td>2</td></tr>
+<tr><td>Caja Artrodesis</td><td class="izq">Traumatología</td><td>3</td><td class="ok">0</td><td class="obs">2</td><td>1</td></tr>
+<tr><td>Caja Hombro</td><td class="izq">Traumatología</td><td>6</td><td class="ok">0</td><td class="obs">0</td><td>6</td></tr>
+<tr><td>Caja Napoleon</td><td class="izq">Traumatología</td><td>3</td><td class="ok">0</td><td class="obs">0</td><td>3</td></tr>
+<tr><td>Caja Tendones Nervios y Manos</td><td class="izq">Traumatología</td><td>5</td><td class="ok">0</td><td class="obs">0</td><td>5</td></tr>
+<tr><td>Microcirugia SHINOVA</td><td class="izq">Traumatología</td><td>4</td><td class="ok">0</td><td class="obs">0</td><td>4</td></tr>
+<tr><td>Caja Cirugia Laparoscopica Urologica</td><td class="izq">Urología</td><td>4</td><td class="ok">0</td><td class="obs">0</td><td>4</td></tr>
+<tr><td>Caja Separadores para Trasplante Renal</td><td class="izq">Urología</td><td>2</td><td class="ok">0</td><td class="obs">0</td><td>2</td></tr>
+<tr><td>Ureterorenoscopio</td><td class="izq">Urología</td><td>1</td><td class="ok">0</td><td class="obs">0</td><td>1</td></tr>
+</tbody></table></details>
+</div>
+<div class="rec-h">Revisión de las cajas · corte 28-08-2026</div>
 <div class="rec-s">Estado de las 1.507 cajas físicas. Una caja <b>conforme</b> tiene su acta de revisión cerrada; una <b>observada</b> fue revisada pero mantiene observaciones abiertas, o sea está recibida pero no aceptada. Fuente: Resumen por especialidad-Cajas de Instrumental.xlsx · Sociedad Concesionaria, por especialidad.</div>
 <div class="rec-barra">
 <div class="rec-seg ok" style="width:52.55%">792</div>
