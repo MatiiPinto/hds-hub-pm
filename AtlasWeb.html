@@ -647,6 +647,8 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 
 /* ── Modales: un solo estilo (encabezado blanco, sin degradado) ──────────── */
 #fichaModal,#estadoModal,#equipModal{position:fixed;inset:0;background:rgba(15,22,34,.5);display:none;align-items:center;justify-content:center;z-index:120;padding:20px}
+g.ws-dot.roster-hl circle{stroke-width:5!important;filter:drop-shadow(0 0 4px #f59e0b)}
+.roster-fila:hover rect{filter:brightness(.95)}
 body.view-only #dkPmCentral,body.view-only #dkPmDelta,body.view-only #backupBadge{display:none!important}
 #fichaModal.show,#estadoModal.show,#equipModal.show,#dgModal.show,#dsModal.show,#eoModal.show{display:flex}
 #dsModal,#eoModal{position:fixed;inset:0;background:rgba(15,30,52,.55);display:none;align-items:center;justify-content:center;z-index:150;padding:16px}
@@ -1063,6 +1065,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="tb-btn tog" id="btnVert" onclick="toggleVerticales()" title="Mostrar u ocultar los ascensores, escaleras y escaleras mecánicas (se ven en todas las vistas). Las líneas de circulación no se tocan.">🛗 Ascensores</button>
       <button class="tb-btn tog" id="btnReloj" onclick="toggleRelojes()" title="Mostrar u ocultar los relojes control (lectores biométricos del control horario, ORD SSMO 5040029-145). Se ven en todas las vistas.">⏱ Relojes</button>
       <button class="tb-btn tog" id="btnCorreoN" onclick="toggleCorreoN()" title="Mostrar u ocultar las estaciones de correo neumático (planos de tuberías CNE-PL-GEN, PE 17). Cápsula del color del sistema: azul T1 Atención Abierta · magenta T2 Hospital 1 · ámbar T3 Hospital 2 · verde línea del Laboratorio. Letra = tipo: P paso · F final · M masivo · R recepción masiva · C central. Se ven en todas las vistas.">📮 Correo N.</button>
+      <button class="tb-btn tog" id="btnDotLista" onclick="toggleDotLista()" title="En recintos con 8 o más personas, los nombres van en un listado ordenado junto al recinto (por turno y estamento) y cada puesto lleva su número, en vez de tarjetas sobre el plano">≡ En lista</button>
       <button class="tb-btn tog" id="btnDotNames" onclick="toggleDotNames()" title="Mostrar u ocultar el nombre de las personas asignadas a los puestos en vista 3 (útil en recintos con muchos funcionarios)">👤 Nombres</button>
       <button class="tb-btn" id="btnPlanKind" onclick="togglePlanKind()" title="Alternar entre el plano de mobiliario y el plano a color (los recintos calzan en ambos)">🖌 Ver color</button>
       <button class="tb-btn" id="btnSen" onclick="toggleSenaletica()" title="Mostrar el nombre y N° de señalética de cada recinto bajo el código">🪧 Señalética</button>
@@ -1950,6 +1953,11 @@ function _cardRectFor(pos,dx,dy,cw,ch,gap){
   const x=Math.min(...xs), y=Math.min(...ys);
   return {pos:(pos in CARD_ANG)?pos:'E', rot, x0, cw, ch, gap, x, y, w:Math.max(...xs)-x, h:Math.max(...ys)-y};
 }
+function toggleDotLista(){
+  S.dotLista=!S.dotLista; _lsPref('cabida_dot_lista', S.dotLista?'1':'0');
+  const b=document.getElementById('btnDotLista'); if(b) b.classList.toggle('active',S.dotLista);
+  if(S.dotLista && !S.showDotNames) toggleDotNames(); else renderSVG();
+}
 function toggleDotNames(){
   S.showDotNames=!S.showDotNames;
   _lsPref('cabida_show_dotnames',S.showDotNames?'1':'0');
@@ -2018,6 +2026,8 @@ let S = {
   planKind: (function(){try{return localStorage.getItem('cabida_plan_kind')||'mobiliario';}catch(e){return 'mobiliario';}})(),
   boxVis: (function(){try{return localStorage.getItem('cabida_box_vis')||'on';}catch(e){return 'on';}})(),
   showDotNames: (function(){try{return localStorage.getItem('cabida_show_dotnames')==='1';}catch(e){return false;}})(),
+  // recintos con muchos funcionarios: nombres en un LISTADO ordenado junto al recinto (puestos numerados)
+  dotLista: (function(){try{return localStorage.getItem('cabida_dot_lista')!=='0';}catch(e){return true;}})(),
   bedAltView: (function(){try{return localStorage.getItem('cabida_bed_alt_view')==='1';}catch(e){return false;}})(),
   // Escenario de equipamiento: 'base' = Despliegue 0 (catálogo oficial intacto),
   // 'prop' = Propuesta de reubicación (aplica los traslados de wsState.equipMoves).
@@ -4273,8 +4283,15 @@ function goArea(id){
 function goRoom(id){
   if(didPan)return;
   pushH(); S.roomId=id; S.level=3; S.selIds.clear(); S.delDotMode=false;
-  const _rsSh=rShapes(curArea().rooms.find(r=>r.id===id)); if(_rsSh.length){zoomTo(bounds(_rsSh),50);}else{const{zoom,ox,oy}=fitView();animTo(zoom,ox,oy,700);}
+  const _rsSh=rShapes(curArea().rooms.find(r=>r.id===id));
   renderSVG(); updateUI();
+  if(_rsSh.length){
+    // con el listado ordenado, el encuadre incluye el recinto y su listado
+    let bb=bounds(_rsSh); const rp=svg.querySelector('.roster-panel');
+    if(rp){ try{ const pb=rp.getBBox(); const x=Math.min(bb.x,pb.x), y=Math.min(bb.y,pb.y);
+      bb={x, y, w:Math.max(bb.x+bb.w,pb.x+pb.width)-x, h:Math.max(bb.y+bb.h,pb.y+pb.height)-y}; }catch(e){} }
+    zoomTo(bb,50);
+  } else { const{zoom,ox,oy}=fitView(); animTo(zoom,ox,oy,700); }
 }
 function goFloor(id){
   // Si el prefijo de camas seguía el piso anterior (auto), actualizarlo al nuevo piso.
@@ -5429,6 +5446,9 @@ function renderL3(){
   const dd=dots(room.id);
   if(dd.length===0&&room.workstation_count>0) genDots(room);
   // Render dots
+  const _nAsig=dots(room.id).filter(d=>d.tipo==='dinamico'?(d.turnos||[]).length:(d.nombre||'').trim()).length;
+  const _enLista=S.showDotNames && S.dotLista && _nAsig>=ROSTER_MIN;
+  const _rosterE=[];
   dots(room.id).forEach((dot,i)=>{
     const din=dot.tipo==='dinamico';
     const turnos=din?(dot.turnos||[]):null;
@@ -5445,7 +5465,8 @@ function renderL3(){
     const ttl=el('title'); ttl.textContent=dotTitle(dot); g.appendChild(ttl);
     g.appendChild(c); g.appendChild(ic); if(dot.id)_renderedDotKeys.add(room.id+'§'+dot.id); _scheduleDotOverlays();
     if(_dotConReemplazo(dot)) g.appendChild(el('circle',{r:DOT_R+3.5,class:'reemp-ring','pointer-events':'none'}));
-    if(S.showDotNames && asig){
+    if(_enLista && asig){ _rosterE.push({i, dot, col, g}); ic.textContent=''; }
+    else if(S.showDotNames && asig){
       // La tarjeta se coloca en una pasada global anti-solape (_placeDotCards).
       _dotCardQueue.push({dx:dot.x, dy:dot.y, lines:_rolLineas(dot), col, nk:(dot.id||(room.id+':'+i)), defR:(i%2===0), rol:_rolFondoDot(dot), area:(_rolFondoDot(dot)==='tens'?_tensAreaDot(dot):null)});
     }
@@ -5459,6 +5480,7 @@ function renderL3(){
     });
     svg.appendChild(g);
   });
+  if(_enLista) try{ _rosterRecinto(room, b, _rosterE); }catch(e){ console.warn('listado del recinto',e); }
 }
 
 // ── Render de camas (dots cuadrados) de un contenedor ───────────────────────
@@ -5645,9 +5667,85 @@ function _tensAreaDot(dot){
 }
 function _rolLineas(dot){
   const L=dotTitle(dot).split('\n');
+  // turno de cada persona (matriz de Rodrigo): ☀ diurno · 🌙 4° turno · ◐ 3er turno
+  const ps=(dot.tipo==='dinamico'?(dot.turnos||[]):[dot]).filter(p=>p&&p.nombre);
+  ps.forEach(p=>{ const t=_turnoDe(p.nombre,p); if(!t.ic) return;
+    const k=L.findIndex(l=>l.startsWith('👤 '+p.nombre)); if(k>=0) L[k]='👤 '+t.ic+' '+L[k].slice(2).trimStart(); });
   if(_rolFondoDot(dot)==='tens'){ const a=_tensAreaDot(dot); if(a) L[0]='['+a.sigla+'] '+L[0]; }
   return L;
 }
+// Turno según la matriz (campo turno de la dotación de Rodrigo Quijada)
+const TURNO_G=[{k:'D',lbl:'Diurno',ic:'☀'},{k:'4T',lbl:'4° turno',ic:'🌙'},{k:'3T',lbl:'3er turno',ic:'◐'},{k:'OT',lbl:'Otros turnos',ic:'⏱'},{k:'SD',lbl:'Sin dato de turno',ic:''}];
+function _turnoDe(nombre, p){
+  const s=_rolStaff(nombre, p), t=String((s&&s.turno)||'').toUpperCase().trim();
+  const g=k=>({...TURNO_G.find(x=>x.k===k), raw:t});
+  if(!t) return g('SD');
+  if(/DIURN/.test(t)) return g('D');
+  if(/\b4/.test(t)) return g('4T');
+  if(/\b3/.test(t)) return g('3T');
+  return g('OT');
+}
+// ── LISTADO ORDENADO del recinto (vista 3, muchos funcionarios) ──────────────────────
+// Los puestos llevan un número y los nombres van en columnas junto al recinto: agrupados por
+// turno y, dentro, por estamento (color del uniforme) y nombre. Clic en una fila = su puesto.
+const ROSTER_MIN=8;
+const _ROL_ORDEN=['med','med15','enf','tm','nutri','rehab','tens','aux','otro',''];
+function _rosterRecinto(room, b, E){
+  const filas=[];
+  E.forEach(e=>{ const ps=(e.dot.tipo==='dinamico'?(e.dot.turnos||[]):[e.dot]).filter(p=>p&&p.nombre);
+    ps.forEach(p=>{ const st=_rolStaff(p.nombre,p)||{};
+      filas.push({e, p, nombre:p.nombre, cargo:(st.cargo||p.cargo||st.estamento||p.estamento||''), rol:_rolFondoClase(p.nombre,p),
+        area:(_rolFondoClase(p.nombre,p)==='tens'?_tensArea(p.nombre,p):null), t:_turnoDe(p.nombre,p),
+        reemp:!!(p.reemplazo&&_reempVigente(p.reemplazo))}); }); });
+  const gi=k=>TURNO_G.findIndex(x=>x.k===k);
+  filas.sort((a,c)=>gi(a.t.k)-gi(c.t.k) || _ROL_ORDEN.indexOf(a.rol)-_ROL_ORDEN.indexOf(c.rol) || a.nombre.localeCompare(c.nombre,'es'));
+  // número de cada puesto = orden de su primera aparición en el listado
+  const num=new Map(); filas.forEach(f=>{ if(!num.has(f.e.i)) num.set(f.e.i, num.size+1); });
+  // número sobre cada puesto
+  E.forEach(e=>{ const n=num.get(e.i); if(!n) return;
+    e.g.appendChild(el('text',{x:0,y:0.5,'text-anchor':'middle','dominant-baseline':'central','font-size':n>99?7.5:9,'font-weight':800,fill:'#0f172a','pointer-events':'none',class:'roster-num'},String(n))); });
+  // geometría (unidades del plano, como las tarjetas): filas de 11, columnas de 210
+  const fs=7.4, rh=11.5, cw=212, gh=13, pad=6;
+  const items=[]; let gPrev=null;
+  filas.forEach(f=>{ if(f.t.k!==gPrev){ items.push({hdr:f.t, n:filas.filter(x=>x.t.k===f.t.k).length}); gPrev=f.t.k; } items.push(f); });
+  const maxH=Math.max(b.h*1.25, 260), porCol=Math.max(10, Math.floor((maxH-22)/rh));
+  const cols=[]; let cur=[], h=0;
+  items.forEach(it=>{ const hh=it.hdr?gh:rh; if(cur.length && h+hh>porCol*rh){ cols.push(cur); cur=[]; h=0; } cur.push(it); h+=hh; });
+  if(cur.length) cols.push(cur);
+  const W=cols.length*cw+pad*2, H=22+Math.max(...cols.map(c=>c.reduce((a,it)=>a+(it.hdr?gh:rh),0)))+pad;
+  const x0=b.x+b.w+18, y0=b.y;
+  const g=el('g',{class:'roster-panel'});
+  g.appendChild(el('rect',{x:x0,y:y0,width:W,height:H,rx:6,fill:'#ffffff','fill-opacity':0.97,stroke:'#94a3b8','stroke-width':1}));
+  const tit=el('text',{x:x0+pad,y:y0+13,'font-size':fs+1.2,'font-weight':800,fill:'#0f172a','font-family':'Segoe UI,sans-serif'});
+  tit.textContent='👥 '+rName(room.id)+' · '+filas.length+' persona'+(filas.length===1?'':'s')+' · '+num.size+' puestos';
+  g.appendChild(tit);
+  cols.forEach((c,ci)=>{ let y=y0+22; const x=x0+pad+ci*cw;
+    c.forEach(it=>{
+      if(it.hdr){ const t=el('text',{x, y:y+9,'font-size':fs,'font-weight':800,fill:'#334155','font-family':'Segoe UI,sans-serif',class:'roster-grupo'});
+        t.textContent=(it.hdr.ic?it.hdr.ic+' ':'')+it.hdr.lbl+' · '+it.n; g.appendChild(t); y+=gh; return; }
+      const RF=ROL_FONDO[it.rol], n=num.get(it.e.i);
+      const row=el('g',{class:'roster-fila',style:'cursor:pointer'});
+      row.appendChild(el('circle',{cx:x+5.5,cy:y+rh/2-0.5,r:5.2,fill:it.e.col+'33',stroke:it.e.col,'stroke-width':1.2}));
+      const tn=el('text',{x:x+5.5,y:y+rh/2,'text-anchor':'middle','dominant-baseline':'central','font-size':n>99?5.4:6.4,'font-weight':800,fill:'#0f172a','pointer-events':'none'}); tn.textContent=n; row.appendChild(tn);
+      row.appendChild(el('rect',{x:x+13,y:y+0.6,width:cw-19,height:rh-1.6,rx:2.5,fill:RF?RF[1]:'#ffffff',stroke:RF?RF[3]:'#cbd5e1','stroke-width':0.9}));
+      if(it.area) row.appendChild(el('rect',{x:x+13,y:y+0.6,width:2.6,height:rh-1.6,rx:1,fill:it.area.col,'pointer-events':'none'}));
+      const tx=el('text',{x:x+17.5,y:y+rh/2,'dominant-baseline':'central','font-size':fs,fill:'#111827','font-family':'Segoe UI,sans-serif','pointer-events':'none'});
+      const sig=it.area?('['+it.area.sigla+'] '):'';
+      const nom=el('tspan',{'font-weight':700}); nom.textContent=sig+(it.reemp?'⇄ ':'')+_cortaTxt(it.nombre, 30);
+      const car=el('tspan',{fill:'#475569'}); car.textContent='  '+_cortaTxt(_cargoCorto(it.cargo), 18);
+      tx.appendChild(nom); tx.appendChild(car); row.appendChild(tx);
+      const tt=el('title'); tt.textContent='Puesto '+n+' · '+it.nombre+' · '+(it.cargo||'')+(RF?(' · '+RF[0]):'')+(it.area?(' · '+it.area.lbl):'')+' · '+(it.t.raw||'sin dato de turno')+' · clic: abrir el puesto'; row.appendChild(tt);
+      row.addEventListener('mouseenter',()=>it.e.g.classList.add('roster-hl')); row.addEventListener('mouseleave',()=>it.e.g.classList.remove('roster-hl'));
+      row.addEventListener('mousedown',ev=>ev.stopPropagation());
+      row.addEventListener('click',ev=>{ ev.stopPropagation(); if(didPan) return; openModal(room.id, it.e.i); });
+      g.appendChild(row); y+=rh;
+    });
+  });
+  svg.appendChild(g);
+  return {filas, num, cols:cols.length};
+}
+function _cortaTxt(t,n){ t=String(t||''); return t.length>n?t.slice(0,n-1)+'…':t; }
+function _cargoCorto(c){ return String(c||'').replace(/TECNICO NIVEL SUPERIOR( EN)? ENFERMERIA/i,'TENS').replace(/TECNICO PARAMEDICO/i,'TENS paramédico').replace(/TECNICO DE NIVEL SUPERIOR/i,'TNS').replace(/ENFERMERA \(O\)|ENFERMERA\/O|ENFERMERO/i,'ENFERMERA').toLowerCase().replace(/^./,m=>m.toUpperCase()); }
 function _drawDotCard(e,r,C){
   const g2=el('g',{class:'ws-card',transform:`translate(${e.dx},${e.dy}) rotate(${r.rot})`});
   // línea continua a lo largo del rayo si la tarjeta quedó lejos del puesto
@@ -7163,7 +7261,7 @@ function exportDEA(){
 // (plano · personas · planta · equipos · instalaciones · revisión).
 const CAPAS_BARRA=[
   ['btnBoxVis','Cajas'],['dkLabels','Etiquetas'],['btnSen','Señalética'],['btnPlanKind','Color'],'|',
-  ['btnDotNames','Nombres'],['btnAsigN','N° asignados'],['btnSoloReemp','Reemplazos'],'|',
+  ['btnDotNames','Nombres'],['btnDotLista','En lista'],['btnAsigN','N° asignados'],['btnSoloReemp','Reemplazos'],'|',
   ['btnVert','Ascensores'],['btnReloj','Relojes'],['btnCorreoN','Correo N.'],['btnEstac','Estacionam.'],['btnPuertasVis','Puertas'],['btnJardines','Jardines'],'|',
   ['dkUbicCarro','Carros de paro'],['dkUbicDea','DEA'],['dkUbicTotem','Tótems'],['btnImpresoras','Impresoras'],['btnShowPC','PC'],'|',
   ['btnShowTomas','Tomas'],['btnShowGases','Gases'],['btnCcdd','C. débiles']
@@ -18433,6 +18531,35 @@ async function runSelfTest(){
       return ok && area && lin && din && dib && banda;
     } finally { _estIdx=prev; }
   });
+  T('≡ Listado ordenado: recinto con ≥8 personas → puestos numerados y nombres por turno (diurno antes que 4° turno) y estamento; turno también en las tarjetas', ()=>{
+    const prev=_estIdx, dPrev=JSON.stringify(wsState.dots), sn=S.showDotNames, dl=S.dotLista, lv=S.level, rid0=S.roomId, a0=S.areaId, f0=S.floorId;
+    try{
+      _estIdx={}; const add=(n,o)=>{ _estIdx[norm(n)]={nombre:n,...o}; };
+      const P=[];
+      for(let i=0;i<9;i++){ const n='RL PERSONA '+String.fromCharCode(65+i); P.push(n);
+        add(n,{estamento:i%3===0?'PROFESIONALES':'TECNICOS',cargo:i%3===0?'ENFERMERA':'TECNICO NIVEL SUPERIOR ENFERMERIA',turno:i<3?'DIURNO':'4TO TURNO',unidad:i===8?'SERVICIO DE IMAGENOLOGIA':'UNIDAD DE CUIDADOS MEDICOS'}); }
+      const F0=FLOORS[0];
+      F0.areas.push({id:'rl_a', name:'RL', rooms:[{id:'rl_r'}]}); boxState.areas['rl_a']=[{x:800,y:800,w:1400,h:900}];
+      boxState.rooms['rl_r']=[{x:900,y:900,w:1100,h:600}]; nameState.areas['rl_a']='RL'; nameState.rooms['rl_r']='Estación RL'; _codeBoxIndex=null;
+      wsState.dots['rl_r']=P.map((n,i)=>({id:'rl'+i,x:950+i*100,y:1000+(i%3)*150,tipo:'fijo',nombre:n}));
+      S.showDotNames=true; S.dotLista=true; didPan=false; goFloor(F0.id); didPan=false; goArea('rl_a'); didPan=false; goRoom('rl_r'); renderSVG();
+      const filas=[...svg.querySelectorAll('.roster-fila')], grupos=[...svg.querySelectorAll('.roster-grupo')].map(t=>t.textContent);
+      const panel=filas.length===9 && grupos.length===2 && /Diurno · 3/.test(grupos[0]) && /4° turno · 6/.test(grupos[1])
+        && svg.querySelectorAll('.roster-num').length===9 && !svg.querySelector('.ws-card');
+      // dentro del turno: enfermería antes que TENS; el TENS de imagenología lleva [RX]
+      const txt=filas.map(f=>f.querySelector('text:last-of-type').textContent);
+      const orden=/RL PERSONA A/.test(txt[0]) && txt.some(t=>/\[RX\] RL PERSONA I/.test(t));
+      const t1=_turnoDe('RL PERSONA A').k==='D' && _turnoDe('RL PERSONA E').k==='4T' && _turnoDe('NADIE').k==='SD';
+      const lin=_rolLineas({tipo:'fijo',nombre:'RL PERSONA E'})[0].startsWith('👤 🌙 RL PERSONA E');
+      // apagado → vuelven las tarjetas
+      S.dotLista=false; renderSVG(); const tarjetas=!svg.querySelector('.roster-panel');
+      return panel && orden && t1 && lin && tarjetas;
+    } finally {
+      _estIdx=prev; wsState.dots=JSON.parse(dPrev); S.showDotNames=sn; S.dotLista=dl;
+      const F0=FLOORS[0]; F0.areas=F0.areas.filter(a=>a.id!=='rl_a'); delete boxState.areas['rl_a']; delete boxState.rooms['rl_r']; delete nameState.areas['rl_a']; delete nameState.rooms['rl_r']; _codeBoxIndex=null;
+      S.level=lv; S.roomId=rid0; S.areaId=a0; S.floorId=f0; renderSVG();
+    }
+  });
   T('Capas: el nombre de la unidad queda encima de todo, después escaleras y ascensores, y abajo lo demás (plazas)', ()=>{
     const snap=JSON.stringify(structuresState), f0=S.floorId, l0=S.level, eP=S.estac, vP=S.verticales;
     try{
@@ -18843,7 +18970,7 @@ if(_SELFTEST) window.addEventListener('load',()=>{
   });
   try{_lsSet('cabida_tab_ping',MY+'|'+Date.now());}catch(e){}
 })();
-(function(){ const f=()=>{ const b=document.getElementById('btnDotNames'); if(b)b.classList.toggle('active',!!S.showDotNames); };
+(function(){ const f=()=>{ const b=document.getElementById('btnDotNames'); if(b)b.classList.toggle('active',!!S.showDotNames); const bl=document.getElementById('btnDotLista'); if(bl)bl.classList.toggle('active',!!S.dotLista); };
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',f); else f(); })();
 
 /* ══ Mobiliario de estares, residencias y salas de reuniones ═══════════════
