@@ -11986,11 +11986,11 @@ function _servPuestosData(){
     const gente=[];
     dd.forEach(d=>{
       if(d.tipo==='dinamico'){
-        (d.turnos||[]).forEach(x=>{ if(x.nombre){ const rv=x.reemplazo&&_reempVigente(x.reemplazo); gente.push({n:x.nombre, c:[x.cargo,x.estamento].filter(Boolean).join(' · '), din:true, cds:!!x.cds, ext:!!x.externa, dc:!!x.dinClin, aus:!!rv});
+        (d.turnos||[]).forEach(x=>{ if(x.nombre){ const rv=x.reemplazo&&_reempVigente(x.reemplazo); gente.push({o:x, n:x.nombre, c:[x.cargo,x.estamento].filter(Boolean).join(' · '), din:true, cds:!!x.cds, ext:!!x.externa, dc:!!x.dinClin, aus:!!rv});
           if(rv) gente.push({n:x.reemplazo.reemplazante, c:'reemplaza a '+x.nombre+(x.reemplazo.hasta?(' · hasta '+_reempFechaLbl(x.reemplazo.hasta)):''), din:true, rmp:true}); } });
       } else if(d.nombre && d.nombre.trim()){
         const rv=d.reemplazo&&_reempVigente(d.reemplazo);
-        gente.push({n:d.nombre, c:[d.cargo,d.estamento].filter(Boolean).join(' · '), din:false, cds:!!d.cds, ext:!!d.externa, dc:!!d.dinClin, aus:!!rv});
+        gente.push({o:d, n:d.nombre, c:[d.cargo,d.estamento].filter(Boolean).join(' · '), din:false, cds:!!d.cds, ext:!!d.externa, dc:!!d.dinClin, aus:!!rv});
         if(rv) gente.push({n:d.reemplazo.reemplazante, c:'reemplaza a '+d.nombre+(d.reemplazo.hasta?(' · hasta '+_reempFechaLbl(d.reemplazo.hasta)):''), din:false, rmp:true});
       }
     });
@@ -12045,23 +12045,43 @@ function renderServPuestos(){
       +'<td style="padding:8px 9px;text-align:right;color:#15803d">'+D.asig+'</td>'
       +'<td style="padding:8px 9px;text-align:right;color:#b45309">'+D.disp+'</td></tr></tfoot></table>';
   } else {
+    // como el listado de la vista 3: por turno (matriz de Rodrigo) y, dentro, por estamento (color del
+    // uniforme) y nombre; arriba, el resumen del servicio por turno y por estamento
+    const gi=k=>TURNO_G.findIndex(x=>x.k===k);
+    D.rooms.forEach(r=>r.gente.forEach(g=>{ const o=g.o||{}; g.rol=_rolFondoClase(g.n,o)||'otro'; g.t=_turnoDe(g.n,o);
+      g.area=g.rol==='tens'?_tensArea(g.n,o):null; }));
+    const todos=D.rooms.flatMap(r=>r.gente);
+    const cuenta=(arr,f)=>arr.reduce((m,x)=>(m[f(x)]=(m[f(x)]||0)+1,m),{});
+    const ct=cuenta(todos,g=>g.t.k), ce=cuenta(todos,g=>g.rol);
+    const pill=(t,bg,bo)=>'<span style="display:inline-block;margin:2px 4px 2px 0;font-size:10.5px;font-weight:700;color:#111827;background:'+bg+';border:1.5px solid '+bo+';border-radius:6px;padding:1px 7px">'+t+'</span>';
+    html+='<div style="margin:0 0 10px;padding:8px 10px;border:1px solid #e2e8f0;border-radius:9px;background:#f8fafc">'
+      +'<div style="font-size:10px;font-weight:800;color:#64748b;letter-spacing:.04em;text-transform:uppercase;margin-bottom:3px">Por turno</div>'
+      +TURNO_G.filter(t=>ct[t.k]).map(t=>pill((t.ic?t.ic+' ':'')+t.lbl+' · '+ct[t.k],'#ffffff','#cbd5e1')).join('')
+      +'<div style="font-size:10px;font-weight:800;color:#64748b;letter-spacing:.04em;text-transform:uppercase;margin:6px 0 3px">Por estamento</div>'
+      +_ROL_ORDEN.filter(k=>k&&ce[k]).map(k=>pill(ROL_FONDO[k][0]+' · '+ce[k],ROL_FONDO[k][1],ROL_FONDO[k][3])).join('')
+      +'</div>';
     D.rooms.forEach(r=>{
+      r.gente.sort((a,c)=>gi(a.t.k)-gi(c.t.k) || _ROL_ORDEN.indexOf(a.rol)-_ROL_ORDEN.indexOf(c.rol) || String(a.n).localeCompare(String(c.n),'es'));
       const act=r.id===S.roomId;
       html+='<div style="margin-bottom:10px;border:1px solid '+(act?'#93c5fd':'#e8eef5')+';border-radius:9px;overflow:hidden">'
         +'<div onclick="servGoRoom(\''+r.id+'\')" style="cursor:pointer;background:'+(act?'#eff6ff':'#f8fafc')+';padding:7px 11px;display:flex;align-items:center;gap:8px">'
         +'<b style="flex:1;color:#0f172a;font-size:12.5px">'+(act?'▸ ':'')+esc(r.nombre)+(r.code?' <span style="font-weight:400;color:#64748b">· '+esc(r.code)+'</span>':'')+'</b>'
         +'<span style="font-size:11px;color:#15803d;font-weight:700">'+r.gente.length+(r.gente.length===1?' persona':' personas')+'</span>'
         +'<span style="font-size:11px;color:#94a3b8">de '+r.total+'</span></div>';
+      const fila=g=>{ const RF=ROL_FONDO[g.rol]||ROL_FONDO.otro;
+        return '<div style="padding:3px 7px;border-radius:5px;background:'+RF[1]+';border:1px solid '+RF[3]+';border-left:'+(g.area?('5px solid '+g.area.col):('3px solid '+RF[3]))+';font-size:11.5px;color:#111827;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+esc(g.n+' · '+(g.c||'')+' · '+RF[0]+(g.area?(' · '+g.area.lbl):'')+' · '+(g.t.raw||'sin dato de turno'))+'">'
+          +(g.area?'<b>['+esc(g.area.sigla)+']</b> ':'')+'<b>'+esc(g.n)+'</b>'
+          +(g.din?chip('turno','#dbeafe','#1e40af','#93c5fd'):'')
+          +(g.dc?chip('din. clínico','#e0f2fe','#0369a1','#7dd3fc'):'')
+          +(g.cds?chip('CdS','#f3e8ff','#5b21b6','#d8b4fe'):'')
+          +(g.ext&&!g.cds?chip('fuera de matriz','#fef3c7','#92400e','#fcd34d'):'')
+          +(g.aus?chip('🔁 ausente','#fef3c7','#92400e','#fcd34d'):'')
+          +(g.rmp?chip('🔁 reemplazo','#dcfce7','#166534','#86efac'):'')
+          +(g.c?'<span style="color:#475569"> · '+esc(_cargoCorto(g.c.split(' · ')[0]))+'</span>':'')+'</div>'; };
       html+= r.gente.length
-        ? '<div style="padding:4px 11px 8px">'+r.gente.map(g=>
-            '<div style="padding:4px 0;border-bottom:1px solid #f1f5f9;font-size:12.5px;color:#0f172a">👤 '+esc(g.n)
-            +(g.din?chip('turno','#dbeafe','#1e40af','#93c5fd'):'')
-            +(g.dc?chip('din. clínico','#e0f2fe','#0369a1','#7dd3fc'):'')
-            +(g.cds?chip('CdS','#f3e8ff','#5b21b6','#d8b4fe'):'')
-            +(g.ext&&!g.cds?chip('fuera de matriz','#fef3c7','#92400e','#fcd34d'):'')
-            +(g.aus?chip('🔁 ausente','#fef3c7','#92400e','#fcd34d'):'')
-            +(g.rmp?chip('🔁 reemplazo','#dcfce7','#166534','#86efac'):'')
-            +(g.c?'<div style="font-size:10.5px;color:#64748b">'+esc(g.c)+'</div>':'')+'</div>').join('')
+        ? '<div style="padding:4px 11px 8px">'+TURNO_G.filter(t=>r.gente.some(g=>g.t.k===t.k)).map(t=>{ const gs=r.gente.filter(g=>g.t.k===t.k);
+            return '<div style="font-size:10.5px;font-weight:800;color:#334155;margin:6px 0 3px">'+(t.ic?t.ic+' ':'')+t.lbl+' · '+gs.length+'</div>'
+              +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:3px 6px">'+gs.map(fila).join('')+'</div>'; }).join('')
           +'</div>'
         : '<div style="padding:8px 11px;font-size:11.5px;color:#94a3b8">Sin personal asignado ('+r.total+' disponibles).</div>';
       html+='</div>';
@@ -18558,6 +18578,27 @@ async function runSelfTest(){
       _estIdx=prev; wsState.dots=JSON.parse(dPrev); S.showDotNames=sn; S.dotLista=dl;
       const F0=FLOORS[0]; F0.areas=F0.areas.filter(a=>a.id!=='rl_a'); delete boxState.areas['rl_a']; delete boxState.rooms['rl_r']; delete nameState.areas['rl_a']; delete nameState.rooms['rl_r']; _codeBoxIndex=null;
       S.level=lv; S.roomId=rid0; S.areaId=a0; S.floorId=f0; renderSVG();
+    }
+  });
+  T('👥 Puestos del servicio (con nombres): resumen por turno y estamento; en cada recinto, por turno y estamento con color del uniforme', ()=>{
+    const prev=_estIdx, dPrev=JSON.stringify(wsState.dots), a0=S.areaId, f0=S.floorId, m0=_servMode;
+    const F0=FLOORS[0];
+    try{
+      _estIdx={}; const add=(n,o)=>{ _estIdx[norm(n)]={nombre:n,...o}; };
+      add('SV TENS DIA',{estamento:'TECNICOS',cargo:'TECNICO NIVEL SUPERIOR ENFERMERIA',turno:'DIURNO'});
+      add('SV ENF DIA',{estamento:'PROFESIONALES',cargo:'ENFERMERA',turno:'DIURNO'});
+      add('SV ENF 4T',{estamento:'PROFESIONALES',cargo:'ENFERMERA',turno:'4TO TURNO'});
+      F0.areas.push({id:'sv_a', name:'SV', rooms:[{id:'sv_r'}]}); boxState.areas['sv_a']=[{x:800,y:800,w:1400,h:900}];
+      boxState.rooms['sv_r']=[{x:900,y:900,w:1100,h:600}]; nameState.areas['sv_a']='SV'; nameState.rooms['sv_r']='Estación SV'; _codeBoxIndex=null;
+      wsState.dots['sv_r']=['SV ENF 4T','SV TENS DIA','SV ENF DIA'].map((n,i)=>({id:'sv'+i,x:950+i*100,y:1000,tipo:'fijo',nombre:n}));
+      S.floorId=F0.id; S.areaId='sv_a'; _servMode='nom'; renderServPuestos();
+      const all=document.getElementById('spBody').textContent, k=all.indexOf('Estación SV'), tx=all.slice(k);
+      const iD=tx.indexOf('Diurno · 2'), i4=tx.indexOf('4° turno · 1'), iE=tx.indexOf('SV ENF DIA'), iT=tx.indexOf('SV TENS DIA');
+      const resumen=k>0 && /Enfermería · 2/.test(all.slice(0,k)) && /TENS · 1/.test(all.slice(0,k));
+      return iD>=0 && i4>iD && iE>iD && iT>iE && iE<i4 && tx.indexOf('SV ENF 4T')>i4 && resumen;
+    } finally {
+      _estIdx=prev; wsState.dots=JSON.parse(dPrev); S.areaId=a0; S.floorId=f0; _servMode=m0;
+      F0.areas=F0.areas.filter(a=>a.id!=='sv_a'); delete boxState.areas['sv_a']; delete boxState.rooms['sv_r']; delete nameState.areas['sv_a']; delete nameState.rooms['sv_r']; _codeBoxIndex=null;
     }
   });
   T('Capas: el nombre de la unidad queda encima de todo, después escaleras y ascensores, y abajo lo demás (plazas)', ()=>{
