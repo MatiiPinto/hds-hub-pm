@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<script src="pm_config.js"></script>
+<script src="pm_gate.js"></script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Protección Radiológica · Oficial de PR · HDS</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23B36679'/><circle cx='50' cy='50' r='9' fill='%23FACC15'/><g fill='%23FACC15'><path d='M50 12a38 38 0 0 1 33 19l-16 9A19 19 0 0 0 50 31z'/><path d='M83 69a38 38 0 0 1-33 19V69a19 19 0 0 0 17-9z'/><path d='M17 69a38 38 0 0 1 0-38l16 9a19 19 0 0 0 0 20z'/></g></svg>">
+<style>
+/* ══ Protección Radiológica · HDS ═══════════════════════════════════════════
+   Herramienta de trabajo del Oficial de Protección Radiológica (TM). Cubre las
+   funciones que las bases del cargo le encomiendan: dosimetría trimestral,
+   elementos de protección, vigilancia de instalaciones y personal expuesto.
+   ⚠ USO INTERNO: la nómina de POE y las lecturas viven SOLO en este navegador
+   (localStorage) y se respaldan a archivo. No se publican en ningún HUB.      */
+/* Paleta base BURDEO: color del estamento de Tecnólogos Médicos (el OPR es TM) · amarillo = trébol de radiación.
+   Fondo = burdeo #800020 aclarado un 40 % (#B36679). Las tarjetas van en burdeo oscuro para que el texto
+   claro mantenga contraste AA (≥ 4,5:1) sobre ellas. */
+:root{
+  --bg:#B36679; --panel:#5A1428; --panel2:#4C1022; --bd:#8E4A60;
+  --tx:#F6EAEE; --tx2:#EBC7D3; --burdeo:#800020; --burdeo40:#B36679; --am:#FACC15; --am2:#B45309;
+  --ok:#22C55E; --warn:#F59E0B; --bad:#F87171; --info:#38BDF8; --vio:#A78BFA;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg);color:var(--tx);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+
+header{background:linear-gradient(120deg,#6B0F2A,#800020 55%,#93304B);padding:13px 22px;
+  position:sticky;top:0;z-index:40;border-bottom:1px solid var(--bd)}
+.hrow{display:flex;align-items:center;gap:14px;max-width:1240px;margin:0 auto;flex-wrap:wrap}
+.logo{width:44px;height:44px;border-radius:12px;background:rgba(250,204,21,.14);border:1px solid rgba(250,204,21,.4);
+  display:grid;place-items:center;font-size:23px;flex:none}
+h1{font-size:17.5px;font-weight:800;letter-spacing:-.2px}
+.sub{font-size:11.5px;color:var(--tx2);margin-top:1px}
+.hstats{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.hstat{background:rgba(255,255,255,.05);border:1px solid var(--bd);border-radius:10px;padding:6px 12px;text-align:center;min-width:70px}
+.hstat b{display:block;font-size:17px;font-weight:800;line-height:1.15}
+.hstat span{font-size:9.5px;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px}
+
+nav{background:var(--panel2);border-bottom:1px solid var(--bd);position:sticky;top:71px;z-index:35}
+.navin{max-width:1240px;margin:0 auto;display:flex;gap:2px;padding:0 14px;overflow-x:auto;scrollbar-width:none}
+.navin::-webkit-scrollbar{display:none}
+.tab{border:0;background:none;padding:12px 15px;font-size:13px;font-weight:700;color:var(--tx2);
+  cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;font-family:inherit;display:flex;gap:7px;align-items:center}
+.tab:hover{color:var(--tx)}
+.tab.on{color:var(--am);border-bottom-color:var(--am)}
+.tab .bdg{background:var(--bd);color:var(--tx2);font-size:10px;font-weight:800;border-radius:20px;padding:1px 7px}
+.tab.on .bdg{background:var(--am);color:#111}
+
+main{max-width:1240px;margin:0 auto;padding:18px 22px 60px}
+.pane{display:none}.pane.on{display:block}
+
+.card{background:var(--panel);border:1px solid var(--bd);border-radius:14px;padding:16px 18px;margin-bottom:12px}
+.card h2{font-size:14.5px;font-weight:800;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.card .d{font-size:12.5px;color:var(--tx2);line-height:1.5}
+.grid{display:grid;gap:11px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.g4{grid-template-columns:repeat(auto-fit,minmax(158px,1fr))}
+
+.kpi{background:var(--panel);border:1px solid var(--bd);border-radius:13px;padding:14px 16px}
+.kpi .n{font-size:26px;font-weight:800;letter-spacing:-.6px;line-height:1}
+.kpi .l{font-size:11.5px;color:var(--tx2);margin-top:4px;line-height:1.35}
+
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--tx2);
+  font-weight:800;padding:8px 10px;border-bottom:1px solid var(--bd);white-space:nowrap}
+td{padding:9px 10px;border-bottom:1px solid rgba(77,34,51,.5);vertical-align:top}
+tr:hover td{background:rgba(255,255,255,.02)}
+.tw{overflow-x:auto;border:1px solid var(--bd);border-radius:12px;background:var(--panel)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+
+.pill{display:inline-block;font-size:10.5px;font-weight:800;padding:2px 9px;border-radius:20px;white-space:nowrap}
+.p-ok{background:rgba(34,197,94,.15);color:#4ADE80;border:1px solid rgba(34,197,94,.4)}
+.p-warn{background:rgba(245,158,11,.15);color:#FBBF24;border:1px solid rgba(245,158,11,.4)}
+.p-bad{background:rgba(239,68,68,.15);color:#F87171;border:1px solid rgba(239,68,68,.4)}
+.p-info{background:rgba(56,189,248,.14);color:#7DD3FC;border:1px solid rgba(56,189,248,.35)}
+.p-mute{background:rgba(201,162,177,.12);color:var(--tx2);border:1px solid var(--bd)}
+.p-vio{background:rgba(167,139,250,.16);color:#C4B5FD;border:1px solid rgba(167,139,250,.4)}
+/* ── Cumplimiento AS · matriz nominada ── */
+.inline{display:flex;align-items:center;gap:10px}
+.btn.xs{padding:3px 9px;font-size:11px;border-radius:7px}
+/* ── Guía rápida en video ── */
+.guia{display:grid;grid-template-columns:330px 1fr;gap:20px;align-items:start}
+@media(max-width:820px){.guia{grid-template-columns:1fr}}
+.guia video{width:100%;border-radius:14px;border:1px solid var(--bd);background:#000;display:block}
+.pasos{counter-reset:paso;display:grid;gap:9px}
+.paso{display:flex;gap:11px;align-items:flex-start}
+.paso .np{flex:0 0 26px;height:26px;border-radius:50%;background:var(--am);color:#1A1205;
+  display:grid;place-items:center;font-weight:800;font-size:12.5px}
+.paso b{display:block;font-size:13px}
+.paso span{font-size:12.5px;color:var(--tx2);line-height:1.5}
+#p-cumpl table td{vertical-align:top}
+#p-cumpl input[type=text],#p-cumpl input:not([type]),#p-cumpl select{max-width:280px}
+
+.btn{border:1px solid var(--bd);background:var(--panel2);color:var(--tx);border-radius:9px;
+  padding:8px 14px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
+.btn:hover{border-color:var(--am);color:var(--am)}
+.btn.pri{background:var(--am);color:#1A1205;border-color:var(--am)}
+.btn.pri:hover{filter:brightness(1.08);color:#1A1205}
+.btn.danger:hover{border-color:var(--bad);color:var(--bad)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input,select,textarea{background:var(--panel2);border:1px solid var(--bd);color:var(--tx);
+  border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit;width:100%}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--am)}
+label{display:block;font-size:11px;color:var(--tx2);font-weight:700;margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px}
+.field{margin-bottom:9px}
+
+.aviso{border-radius:11px;padding:11px 14px;font-size:12.5px;line-height:1.5;margin-bottom:12px}
+.a-warn{background:linear-gradient(rgba(245,158,11,.10),rgba(245,158,11,.10)),var(--panel2);border:1px solid rgba(245,158,11,.35);color:#FCD34D}
+.a-info{background:linear-gradient(rgba(56,189,248,.09),rgba(56,189,248,.09)),var(--panel2);border:1px solid rgba(56,189,248,.3);color:#7DD3FC}
+.a-bad{background:linear-gradient(rgba(239,68,68,.12),rgba(239,68,68,.12)),var(--panel2);border:1px solid rgba(239,68,68,.35);color:#FCA5A5}
+
+.bar{height:8px;background:var(--bd);border-radius:20px;overflow:hidden;display:flex}
+.bar i{display:block;height:100%}
+.empty{text-align:center;color:var(--tx2);padding:26px;font-size:13px}
+footer{background:var(--panel2);border-top:1px solid var(--bd);color:var(--tx2);font-size:11.5px;padding:16px 22px;text-align:center;line-height:1.6}
+@media(max-width:640px){nav{top:76px}main{padding:14px 13px 40px}.hstats{width:100%;margin-left:0}}
+</style>
+</head><body>
+
+<header><div class="hrow">
+  <div class="logo">☢️</div>
+  <div>
+    <h1>Protección Radiológica</h1>
+    <div class="sub">Oficial de Protección Radiológica · Hospital del Salvador</div>
+  </div>
+  <div class="hstats" id="hstats"></div>
+</div></header>
+
+<nav><div class="navin" id="tabs"></div></nav>
+
+<main>
+  <section class="pane on" id="p-panel"></section>
+  <section class="pane" id="p-poe"></section>
+  <section class="pane" id="p-dosi"></section>
+  <section class="pane" id="p-inst"></section>
+  <section class="pane" id="p-epp"></section>
+  <section class="pane" id="p-doc"></section>
+  <section class="pane" id="p-guia"></section>
+  <section class="pane" id="p-hist"></section>
+  <section class="pane" id="p-dosim"></section>
+  <section class="pane" id="p-lev"></section>
+  <section class="pane" id="p-form"></section>
+  <section class="pane" id="p-copr"></section>
+  <section class="pane" id="p-eqaut"></section>
+  <section class="pane" id="p-eqnhds"></section>
+  <section class="pane" id="p-opr"></section>
+  <section class="pane" id="p-cumpl"></section>
+  <section class="pane" id="p-cot"></section>
+  <section class="pane" id="p-req"></section>
+  <section class="pane" id="p-cargo"></section>
+</main>
+
+<footer>
+  <b>Uso interno.</b> La nómina de personal expuesto y las lecturas dosimétricas se guardan solo en este
+  navegador. Respaldá con <b>💾 Exportar</b> — no se publican en ningún HUB.<br>
+  Equipos emisores y elementos de protección: catastro EMMC (EquiBox). Funciones del cargo: bases del
+  concurso interno TM Oficial de Protección Radiológica, SSMO · HDS.
+</footer>
+
+<script src="SHARED_DATA/proteccion_radiologica.js"></script>
+<!-- Resumen AGREGADO (sin nombres ni RUT): historial CCHEN por unidad y cotejo con las nóminas.
+     Es lo único de la base de personal que se publica en el 🟡 HUB-PM. -->
+<script src="SHARED_DATA/pr_resumen.js"></script>
+<!-- índice del expediente del OPR (documentos y carpetas de Drive), sin datos personales -->
+<script src="SHARED_DATA/pr_opr.js"></script>
+<!-- Matriz nominada del personal expuesto (RUT y nombres). Solo 🔴 HUB local:
+     NO se agrega a la lista `data` de la 37 en _DEV/deploy_web_pm.py. -->
+<script src="SHARED_DATA/pr_personal.js"></script>
+<!-- control de dosímetros y levantamiento por servicio: también nominados, solo 🔴 HUB local -->
+<script src="SHARED_DATA/pr_dosimetros.js"></script>
+<script src="SHARED_DATA/pr_levantamiento.js"></script>
+<!-- respuestas del formulario de autodeclaración (nominado, solo 🔴 HUB local) -->
+<script src="SHARED_DATA/pr_formulario.js"></script>
+<!-- autorizaciones de funcionamiento de los equipos emisores del HDS actual (sin datos personales) -->
+<script src="SHARED_DATA/pr_equipos_autorizacion.js"></script>
+<!-- Equipos emisores del NUEVO HDS categorizados según el D.S. 133/84 (PINS + CS-IF-9184): sin datos personales. -->
+<script src="SHARED_DATA/pr_equipos_nhds.js"></script>
+<script>
+/* ════════════════════════════════════════════════════════════════════════════
+   Estructura según lo que las BASES DEL CARGO encomiendan al OPR:
+     · distribuir dosímetros y remitirlos cada 3 meses al servicio de dosimetría
+     · definir y solicitar los elementos de seguridad del personal expuesto
+     · mantener el sistema de vigilancia radiológica de todo el hospital
+     · cumplir las normas de PR en salas con fuentes emisoras
+     · coordinar con Prevención de Riesgos las resoluciones sanitarias vigentes
+     · informar cambios en instalaciones y la nómina anual de expuestos
+   ════════════════════════════════════════════════════════════════════════════ */
+const D = window.PROTECCION_RADIOLOGICA || {};
+const PR = window.PR_PERSONAL || null;   // matriz nominada (opcional)
+const PRP = PR ? PR.personas : [];
+const AG = PR || window.PR_RESUMEN || null;   // agregados: la base nominada los trae; en el HUB-PM llega solo el resumen
+const EXPU = PRP.filter(p=>p.estado.dosimetria==='ok');   // con dosímetro al día (el historial trae también ex funcionarios)
+const LS = 'hds_opr_v1';
+let E = { poe:[], lecturas:[], epp:[], inst:{}, docs:[], cfg:{limite_anual:50, limite_prom:20, limite_5a:100, limite_inv:6} };
+/* Límites del D.S. 3/85: 50 mSv en un año, 100 mSv en 5 años (promedio 20 mSv/año),
+   6 mSv para quien no es POE. Los informes de la CCHEN los declaran en cada informe. */
+try{ const g=JSON.parse(localStorage.getItem(LS)||'null'); if(g) E=Object.assign(E,g); }catch(e){}
+function save(){ try{ localStorage.setItem(LS,JSON.stringify(E)); }catch(e){} }
+const esc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const hoy = () => new Date().toISOString().slice(0,10);
+/* Date.now() se repite si se agregan varios registros dentro del mismo milisegundo
+   (carga masiva): las lecturas quedarían colgando del id equivocado. */
+function nuevoId(){
+  const usados = E.poe.map(p=>p.id).concat(E.docs.map(d=>d.id));
+  let id = Date.now(); while(usados.includes(id)) id++;
+  return id;
+}
+const nfmt = n => (Math.round(n*100)/100).toLocaleString('es-CL');
+
+/* ── Trimestres: el ciclo que fija el cargo (remitir cada 3 meses) ─────────── */
+function trimestreDe(f){ const d=new Date(f+'T00:00:00'); return d.getFullYear()+'-T'+(Math.floor(d.getMonth()/3)+1); }
+function trimestreActual(){ return trimestreDe(hoy()); }
+function trimestresRecientes(n){
+  const out=[]; let d=new Date();
+  for(let i=0;i<n;i++){ out.push(d.getFullYear()+'-T'+(Math.floor(d.getMonth()/3)+1)); d.setMonth(d.getMonth()-3); }
+  return out;
+}
+/* Dosis acumulada de los últimos 4 trimestres = dosis anual del POE */
+function dosisAnual(poeId){
+  const t=new Set(trimestresRecientes(4));
+  return E.lecturas.filter(l=>l.poe===poeId && t.has(l.trim)).reduce((a,l)=>a+(+l.hp10||0),0);
+}
+function estadoDosis(mSv){
+  const L=E.cfg.limite_anual||20;
+  if(mSv>=L)      return {p:'p-bad',  t:'Supera límite anual'};
+  if(mSv>=L*0.75) return {p:'p-warn', t:'Sobre 75% del límite'};
+  if(mSv>=L*0.30) return {p:'p-info', t:'En seguimiento'};
+  return {p:'p-ok', t:'Dentro de rango'};
+}
+
+/* ── Navegación ───────────────────────────────────────────────────────────── */
+const PANES=[
+  {id:'panel', ic:'📊', t:'Panel'},
+  {id:'copr',  ic:'✅', t:'Cotejo OPR'},
+  {id:'poe',   ic:'👷', t:'Personal expuesto'},
+  {id:'dosi',  ic:'🎫', t:'Dosimetría'},
+  {id:'hist',  ic:'📈', t:'Historial CCHEN'},
+  {id:'dosim', ic:'🎟', t:'Dosímetros'},
+  {id:'lev',   ic:'📋', t:'Levantamiento AS'},
+  {id:'form',  ic:'🗳', t:'Formulario'},
+  {id:'eqaut', ic:'📜', t:'Autorización de equipos'},
+  {id:'eqnhds',ic:'🏗', t:'NHDS · categorías DS 133'},
+  {id:'inst',  ic:'🏥', t:'Instalaciones y equipos'},
+  {id:'epp',   ic:'🦺', t:'Elementos de protección'},
+  {id:'guia',  ic:'🎬', t:'Guía rápida'},
+  {id:'cumpl', ic:'🎯', t:'Cumplimiento AS'},
+  {id:'cot',   ic:'🧮', t:'Cotejo nóminas'},
+  {id:'opr',   ic:'🗂', t:'Expediente OPR'},
+  {id:'req',   ic:'📑', t:'Requerimiento AS'},
+  {id:'doc',   ic:'📁', t:'Documentación'},
+  {id:'cargo', ic:'📋', t:'Funciones del cargo'},
+];
+function pintaTabs(){
+  document.getElementById('tabs').innerHTML=PANES.map(p=>{
+    let b='';
+    if(p.id==='poe')  b=String(E.poe.length);
+    if(p.id==='dosi') b=String(pendientesTrim().length);
+    if(p.id==='inst') b=String((D.instalaciones||[]).length);
+    if(p.id==='epp')  b=String((D.epp||[]).reduce((a,x)=>a+x.cant,0));
+    if(p.id==='cumpl'&&AG) b=String(AG.resumen.dosimetria_al_dia||AG.resumen.expuestos_con_dosimetria);
+    if(p.id==='hist'&&AG&&AG.resumen.sobre_limite_anual) b='⛔ '+AG.resumen.sobre_limite_anual;
+    if(p.id==='cot'&&AG&&AG.cotejo_acciones) b=String(AG.resumen.con_nomina_servicio||'');
+    if(p.id==='dosim'&&AG&&AG.resumen.dosimetros_no_devueltos) b='⚠ '+AG.resumen.dosimetros_no_devueltos;
+    if(p.id==='lev'&&AG&&AG.resumen.levantamiento_sin_responder) b=String(AG.resumen.levantamiento_sin_responder);
+    if(p.id==='form'&&window.PR_FORM) b=String(window.PR_FORM.resumen.personas);
+    if(p.id==='copr'&&AG&&AG.cotejo_opr) b=String(AG.cotejo_opr.total.personas);
+    if(p.id==='eqaut'&&window.PR_EQ_AUT&&window.PR_EQ_AUT.resumen.vencidas) b='⛔ '+window.PR_EQ_AUT.resumen.vencidas;
+    if(p.id==='eqnhds'&&window.PR_EQ_NHDS) b=String(window.PR_EQ_NHDS.resumen.emisores);
+    if(p.id==='opr'&&window.PR_OPR) b=String(window.PR_OPR.pendientes.length);
+    if(p.id==='req'&&PR)   b=String(PR.requisitos_rrhh.filter(r=>r.estado==='falta').length);
+    return '<button class="tab" id="tb-'+p.id+'" onclick="irA(\''+p.id+'\')">'+p.ic+' '+p.t
+      +(b&&b!=='0'?' <span class="bdg">'+b+'</span>':'')+'</button>';
+  }).join('');
+}
+function irA(id){
+  PANES.forEach(p=>{ document.getElementById('p-'+p.id).classList.toggle('on',p.id===id);
+    const t=document.getElementById('tb-'+p.id); if(t) t.classList.toggle('on',p.id===id); });
+  ({panel:vPanel,poe:vPoe,dosi:vDosi,inst:vInst,epp:vEpp,doc:vDoc,cargo:vCargo,cumpl:vCumpl,req:vReq,guia:vGuia,hist:vHist,cot:vCot,dosim:vDosim,lev:vLev,form:vForm,eqaut:vEqAut,eqnhds:vEqNhds,opr:vOpr,copr:vCopr})[id]();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ── PANEL ────────────────────────────────────────────────────────────────── */
+function pendientesTrim(){
+  const t=trimestreActual();
+  return E.poe.filter(p=>p.activo!==false && !E.lecturas.some(l=>l.poe===p.id && l.trim===t));
+}
+function vPanel(){
+  const T=D.totales||{}, t=trimestreActual();
+  const pend=pendientesTrim(), sobre=E.poe.filter(p=>dosisAnual(p.id)>=(E.cfg.limite_anual||20)*0.75);
+  const vencidas=(D.instalaciones||[]).filter(i=>{
+    const x=E.inst[i.id]||{}; return x.res_vence && x.res_vence < hoy(); });
+  const porVencer=(D.instalaciones||[]).filter(i=>{
+    const x=E.inst[i.id]||{}; if(!x.res_vence||x.res_vence<hoy()) return false;
+    return (new Date(x.res_vence)-new Date())/86400000 <= 90; });
+  document.getElementById('p-panel').innerHTML=
+    avisoLimite()+avisoDosim()+avisoLevantamiento()
+    +(E.poe.length===0 ? '<div class="aviso a-info"><b>Primer uso.</b> Cargá la nómina de personal '
+      +'ocupacionalmente expuesto en <b>👷 Personal expuesto</b>. Con eso la plataforma empieza a '
+      +'controlar el ciclo trimestral de dosimetría que exigen las bases del cargo.</div>' : '')
+    +(vencidas.length ? '<div class="aviso a-bad"><b>⚠ '+vencidas.length+' instalación(es) con autorización '
+      +'sanitaria vencida:</b> '+vencidas.map(i=>esc(i.nombre)).join(' · ')+'. Coordinar con Prevención de Riesgos.</div>':'')
+    +(porVencer.length ? '<div class="aviso a-warn"><b>'+porVencer.length+' autorización(es) vencen dentro de 90 días:</b> '
+      +porVencer.map(i=>esc(i.nombre)+' ('+(E.inst[i.id].res_vence)+')').join(' · ')+'</div>':'')
+    +'<div class="grid g4" style="margin-bottom:12px">'
+    +[['POE vigentes',E.poe.filter(p=>p.activo!==false).length,'var(--info)'],
+      ['Dosímetros pendientes '+t,pend.length,pend.length?'var(--warn)':'var(--ok)'],
+      ['POE sobre 75% del límite',sobre.length,sobre.length?'var(--bad)':'var(--ok)'],
+      ['Equipos emisores',T.equipos_emisores||0,'var(--vio)'],
+      ['Instalaciones',T.instalaciones||0,'var(--tx)'],
+      ['Elementos de protección',T.elementos_proteccion||0,'var(--tx)'],
+      ['Lecturas registradas',E.lecturas.length,'var(--tx)'],
+      ['Documentos',E.docs.length,'var(--tx)']]
+      .map(([l,v,c])=>'<div class="kpi"><div class="n" style="color:'+c+'">'+v+'</div><div class="l">'+l+'</div></div>').join('')
+    +'</div>'
+    +'<div class="card"><h2>🎫 Ciclo trimestral de dosimetría</h2>'
+    +'<div class="d">Las bases del cargo fijan el ciclo: los dosímetros personales se distribuyen a todo '
+    +'funcionario expuesto y <b>cada tres meses</b> se remiten al Servicio de Dosimetría contratado. '
+    +'Este es el estado del trimestre en curso ('+t+').</div>'
+    +(E.poe.length ? (function(){
+        const act=E.poe.filter(p=>p.activo!==false).length, con=act-pend.length;
+        const pc=act?Math.round(con*100/act):0;
+        return '<div style="margin-top:12px"><div class="bar"><i style="width:'+pc+'%;background:var(--ok)"></i>'
+          +'<i style="width:'+(100-pc)+'%;background:var(--warn)"></i></div>'
+          +'<div style="margin-top:6px;font-size:12.5px;color:var(--tx2)">'+con+' de '+act
+          +' con lectura registrada ('+pc+'%)'+(pend.length?' · faltan '+pend.length:' · trimestre completo')+'</div></div>'
+          +(pend.length?'<div style="margin-top:10px;font-size:12.5px">Pendientes: '
+            +pend.slice(0,14).map(p=>'<span class="pill p-warn" style="margin:2px">'+esc(p.nombre)+'</span>').join('')
+            +(pend.length>14?' <span class="pill p-mute">+'+(pend.length-14)+'</span>':'')+'</div>':'');
+      })() : '<div class="empty">Sin personal cargado todavía.</div>')
+    +'</div>'
+    +(PR ? (function(){const R=PR.resumen, cri=PRP.filter(p=>p.estado.desempeno==='vencido');
+        return '<div class="card"><h2>🎯 Cumplimiento de Autorización Sanitaria · personal expuesto</h2>'
+        +'<div class="d">Lo que exige el punto 16 del requerimiento de RRHH para AS: curso de Protección '
+        +'Radiológica, autorización de desempeño vigente (3 años) e historial dosimétrico. Base cargada el '
+        +esc(PR.version)+' desde los informes de la CCHEN, las resoluciones de la SEREMI y el reporte de cursos del SIRH.</div>'
+        +'<div class="grid g4" style="margin-top:12px">'
+        +[['Con dosímetro al día',R.dosimetria_al_dia!=null?R.dosimetria_al_dia:R.expuestos_con_dosimetria,'var(--info)'],
+          ['Cumplen los 3 requisitos',R.completos,R.completos?'var(--ok)':'var(--bad)'],
+          ['Expuestos sin curso de PR',R.expuestos_sin_curso,R.expuestos_sin_curso?'var(--bad)':'var(--ok)'],
+          ['Expuestos sin autorización',R.expuestos_sin_desempeno,R.expuestos_sin_desempeno?'var(--bad)':'var(--ok)'],
+          ['Autorizaciones vigentes',R.con_desempeno_vigente,'var(--ok)'],
+          ['Vencen dentro de 180 días',R.desempeno_por_vencer,R.desempeno_por_vencer?'var(--warn)':'var(--ok)'],
+          ['Autorizaciones vencidas',R.desempeno_vencido,R.desempeno_vencido?'var(--bad)':'var(--ok)'],
+          ['Con dosímetro y sin contrato',R.sin_dotacion,R.sin_dotacion?'var(--warn)':'var(--ok)']]
+          .map(([l,v,c])=>'<div class="kpi"><div class="n" style="color:'+c+'">'+v+'</div><div class="l">'+l+'</div></div>').join('')
+        +'</div>'
+        +(cri.length?'<div class="aviso a-bad" style="margin-top:12px"><b>⚠ '+cri.length+' persona(s) con la autorización de desempeño vencida:</b> '
+          +cri.slice(0,8).map(p=>esc(p.nombre)+' ('+p.vence_desempeno+')').join(' · ')+'</div>':'')
+        +'<div style="margin-top:10px"><button class="btn pri" onclick="irA(\'cumpl\')">Ver la matriz completa →</button> '
+        +'<button class="btn" onclick="irA(\'hist\')">📈 Historial CCHEN</button> <button class="btn" onclick="irA(\'cot\')">🧮 Cotejo nóminas</button> '
+        +'<button class="btn" onclick="exportCapacitacion()">🎓 Nómina de capacitación (Excel)</button></div></div>';})() : cardAgregada())
+    +'<div class="card"><h2>📌 Qué controla esta plataforma</h2>'
+    +'<div class="d" style="margin-bottom:10px">¿Primera vez acá? La <b>🎬 Guía rápida</b> explica en un minuto '
+    +'cómo se usa, con los siete pasos del ciclo. '
+    +'<button class="btn xs" onclick="irA(\'guia\')" style="margin-left:6px">Ver la guía</button></div>'
+    +'<div class="d">Cada pestaña corresponde a una función que las bases encomiendan al Oficial de '
+    +'Protección Radiológica. La pestaña <b>📋 Funciones del cargo</b> tiene el detalle y el estado de cada una.</div></div>';
+}
+
+/* ── PERSONAL OCUPACIONALMENTE EXPUESTO ───────────────────────────────────── */
+function vPoe(){
+  const rows=E.poe.map(p=>{
+    const d=dosisAnual(p.id), st=estadoDosis(d);
+    return '<tr><td><b>'+esc(p.nombre)+'</b>'+(p.activo===false?' <span class="pill p-mute">inactivo</span>':'')+'</td>'
+      +'<td class="mono">'+esc(p.rut||'—')+'</td><td>'+esc(p.estamento||'—')+'</td>'
+      +'<td>'+esc(p.servicio||'—')+'</td><td class="mono">'+esc(p.dosimetro||'—')+'</td>'
+      +'<td style="text-align:right"><b>'+nfmt(d)+'</b> mSv</td>'
+      +'<td><span class="pill '+st.p+'">'+st.t+'</span></td>'
+      +'<td style="white-space:nowrap"><button class="btn" style="padding:4px 9px" onclick="poeToggle('+p.id+')">'
+      +(p.activo===false?'Reactivar':'Desactivar')+'</button> '
+      +'<button class="btn danger" style="padding:4px 9px" onclick="poeDel('+p.id+')">✕</button></td></tr>';
+  }).join('');
+  document.getElementById('p-poe').innerHTML=
+     '<div class="aviso a-warn"><b>Dato sensible.</b> Esta nómina incluye nombre y RUT: vive solo en este '
+    +'navegador y nunca se publica. Es la base de la <b>nómina anual de funcionarios expuestos</b> que el '
+    +'cargo debe enviar a Dirección, Calidad y Prevención de Riesgos.</div>'
+    +'<div class="card"><h2>➕ Agregar personal expuesto</h2>'
+    +'<div class="grid g3" style="margin-top:10px">'
+    +'<div class="field"><label>Nombre</label><input id="po-n" placeholder="Apellido Nombre"></div>'
+    +'<div class="field"><label>RUT</label><input id="po-r" placeholder="12.345.678-9"></div>'
+    +'<div class="field"><label>Estamento</label><input id="po-e" placeholder="Tecnólogo Médico"></div>'
+    +'<div class="field"><label>Servicio / unidad</label><input id="po-s" placeholder="Imagenología"></div>'
+    +'<div class="field"><label>N° dosímetro</label><input id="po-d" placeholder="DOS-001"></div>'
+    +'<div class="field"><label>&nbsp;</label><button class="btn pri" onclick="poeAdd()" style="width:100%">Agregar</button></div>'
+    +'</div></div>'
+    +'<div class="row" style="margin-bottom:10px"><button class="btn" onclick="expJSON()">💾 Exportar respaldo</button>'
+    +'<button class="btn" onclick="document.getElementById(\'impf\').click()">⬆ Restaurar</button>'
+    +'<input type="file" id="impf" accept=".json" style="display:none" onchange="impJSON(event)">'
+    +'<button class="btn" onclick="expNomina()">📄 Nómina anual (CSV)</button></div>'
+    +(E.poe.length
+      ? '<div class="tw"><table><thead><tr><th>Nombre</th><th>RUT</th><th>Estamento</th><th>Servicio</th>'
+        +'<th>Dosímetro</th><th style="text-align:right">Dosis 12 meses</th><th>Estado</th><th></th></tr></thead>'
+        +'<tbody>'+rows+'</tbody></table></div>'
+      : '<div class="card"><div class="empty">Todavía no hay personal cargado.</div></div>');
+}
+function poeAdd(){
+  const n=document.getElementById('po-n').value.trim();
+  if(!n){ alert('El nombre es obligatorio.'); return; }
+  E.poe.push({id:nuevoId(), nombre:n, rut:document.getElementById('po-r').value.trim(),
+    estamento:document.getElementById('po-e').value.trim(), servicio:document.getElementById('po-s').value.trim(),
+    dosimetro:document.getElementById('po-d').value.trim(), activo:true, alta:hoy()});
+  save(); pintaTabs(); vPoe(); document.getElementById('tb-poe').classList.add('on');
+}
+function poeToggle(id){ const p=E.poe.find(x=>x.id===id); if(!p) return; p.activo=(p.activo===false); save(); vPoe(); }
+function poeDel(id){
+  const p=E.poe.find(x=>x.id===id); if(!p) return;
+  if(!confirm('Eliminar a '+p.nombre+' y sus lecturas dosimétricas?')) return;
+  E.poe=E.poe.filter(x=>x.id!==id); E.lecturas=E.lecturas.filter(l=>l.poe!==id);
+  save(); pintaTabs(); vPoe();
+}
+
+/* ── DOSIMETRÍA ───────────────────────────────────────────────────────────── */
+function vDosi(){
+  const trims=trimestresRecientes(6), t=trimestreActual();
+  const act=E.poe.filter(p=>p.activo!==false);
+  const filas=act.map(p=>{
+    const cel=trims.map(tr=>{
+      const l=E.lecturas.find(x=>x.poe===p.id && x.trim===tr);
+      return '<td style="text-align:center">'+(l
+        ? '<b>'+nfmt(l.hp10)+'</b>'
+        : (tr===t?'<span class="pill p-warn">pend.</span>':'<span style="color:var(--tx2)">—</span>'))+'</td>';
+    }).join('');
+    const d=dosisAnual(p.id), st=estadoDosis(d);
+    return '<tr><td><b>'+esc(p.nombre)+'</b><div style="font-size:11px;color:var(--tx2)">'+esc(p.servicio||'')+'</div></td>'
+      +cel+'<td style="text-align:right"><b>'+nfmt(d)+'</b></td><td><span class="pill '+st.p+'">'+st.t+'</span></td></tr>';
+  }).join('');
+  document.getElementById('p-dosi').innerHTML=
+     '<div class="aviso a-info"><b>Ciclo trimestral.</b> Se registra la dosis <b>Hp(10)</b> en mSv que informa '
+    +'el Servicio de Dosimetría al devolver los dosímetros. Límites del D.S. 3/85: <b>'+(E.cfg.limite_anual||50)
+    +' mSv</b> en un año y <b>'+(E.cfg.limite_5a||100)+' mSv</b> en cinco (promedio '+(E.cfg.limite_prom||20)
+    +' mSv/año); la columna final acumula los últimos cuatro trimestres.</div>'
+    +(PR ? (function(){
+       const ult=PR.periodo_vigente||[], top=EXPU.filter(p=>p.ultimo&&p.ultimo.ac12!=null)
+         .sort((a,b)=>b.ultimo.ac12-a.ultimo.ac12).slice(0,12);
+       return '<div class="card"><h2>📥 Historial de la CCHEN ya cargado</h2>'
+       +'<div class="d">'+EXPU.length+' personas con dosímetro en '+PR.informes.length+' informes trimestrales '
+       +'('+PR.periodos.map(p=>esc(p.desde)).join(' · ')+'). Esta tabla es el dato oficial del servicio de '
+       +'dosimetría; el registro de arriba es la bitácora propia del OPR.</div>'
+       +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>Funcionario</th><th>Unidad</th>'
+       +'<th style="text-align:right">Período</th><th style="text-align:right">12 meses</th>'
+       +'<th style="text-align:right">5 años</th><th>Estado</th></tr></thead><tbody>'
+       +top.map(p=>{const u=p.ultimo, a=u.ac12||0;
+          const st=a>=(E.cfg.limite_anual||50)?['p-bad','sobre el límite anual']
+            :a>=(E.cfg.limite_prom||20)?['p-warn','sobre el promedio anual']
+            :a>=(E.cfg.limite_prom||20)*0.5?['p-info','en seguimiento']:['p-ok','dentro de rango'];
+          return '<tr><td><b>'+esc(p.nombre)+'</b></td><td>'+esc(p.unidades_pr.join(' · '))+'</td>'
+          +'<td style="text-align:right">'+(u.periodo!=null?nfmt(u.periodo):'—')+'</td>'
+          +'<td style="text-align:right"><b>'+nfmt(a)+'</b></td>'
+          +'<td style="text-align:right">'+(u.ac5a!=null?nfmt(u.ac5a):'—')+'</td>'
+          +'<td><span class="pill '+st[0]+'">'+st[1]+'</span></td></tr>';}).join('')
+       +'</tbody></table></div>'
+       +'<div style="margin-top:8px"><button class="btn" onclick="irA(\'cumpl\')">Ver las '+EXPU.length
+       +' personas en 🎯 Cumplimiento AS →</button></div></div>';})() : '')
+    +'<div class="card"><h2>➕ Registrar lectura</h2>'
+    +'<div class="grid g4" style="margin-top:10px">'
+    +'<div class="field"><label>Funcionario</label><select id="ls-p">'
+      +act.map(p=>'<option value="'+p.id+'">'+esc(p.nombre)+'</option>').join('')+'</select></div>'
+    +'<div class="field"><label>Trimestre</label><select id="ls-t">'
+      +trims.map(x=>'<option'+(x===t?' selected':'')+'>'+x+'</option>').join('')+'</select></div>'
+    +'<div class="field"><label>Hp(10) mSv</label><input id="ls-d" type="number" step="0.01" min="0" placeholder="0,12"></div>'
+    +'<div class="field"><label>&nbsp;</label><button class="btn pri" onclick="lecAdd()" style="width:100%">Registrar</button></div>'
+    +'</div>'
+    +'<div style="font-size:11.5px;color:var(--tx2)">Registrar la lectura equivale a dejar constancia de que ese '
+    +'dosímetro volvió del servicio con su informe.</div></div>'
+    +(act.length
+      ? '<div class="tw"><table><thead><tr><th>Funcionario</th>'
+        +trims.map(x=>'<th style="text-align:center">'+x+'</th>').join('')
+        +'<th style="text-align:right">12 meses</th><th>Estado</th></tr></thead><tbody>'+filas+'</tbody></table></div>'
+      : '<div class="card"><div class="empty">Cargá primero el personal expuesto.</div></div>');
+}
+function lecAdd(){
+  const p=+document.getElementById('ls-p').value, tr=document.getElementById('ls-t').value;
+  const v=parseFloat(document.getElementById('ls-d').value);
+  if(!p || isNaN(v)){ alert('Elegí un funcionario e ingresá la dosis.'); return; }
+  const ex=E.lecturas.find(l=>l.poe===p && l.trim===tr);
+  if(ex){ if(!confirm('Ya hay una lectura de ese trimestre ('+ex.hp10+' mSv). ¿Reemplazarla?')) return;
+          ex.hp10=v; ex.fecha=hoy(); }
+  else E.lecturas.push({poe:p, trim:tr, hp10:v, fecha:hoy()});
+  save(); pintaTabs(); vDosi();
+}
+
+/* ── INSTALACIONES Y EQUIPOS ──────────────────────────────────────────────── */
+function vInst(){
+  const eq=D.equipos||[];
+  const cards=(D.instalaciones||[]).map(i=>{
+    const x=E.inst[i.id]||{};
+    const mios=eq.filter(e=>(e.inst||[]).includes(i.id));           // asignación explícita del JSON
+    const nEpp=(D.epp||[]).filter(y=>y.inst===i.id).reduce((a,y)=>a+y.cant,0);
+    let est='<span class="pill p-mute">sin registrar</span>';
+    if(x.res_vence){ est = x.res_vence<hoy() ? '<span class="pill p-bad">vencida</span>'
+      : ((new Date(x.res_vence)-new Date())/86400000<=90 ? '<span class="pill p-warn">por vencer</span>'
+      : '<span class="pill p-ok">vigente</span>'); }
+    return '<div class="card"><h2>'+esc(i.nombre)+' '+est+'</h2>'
+      +'<div class="d">'+esc(i.desc)+' · <b>'+i.piso+'</b> · edificio '+i.edificio
+      +' · <span class="pill p-mute">'+esc(i.categoria||'')+'</span></div>'
+      +(mios.length && !nEpp ? '<div class="aviso a-warn" style="margin:10px 0 0">⚠ '+mios.reduce((a,e)=>a+e.cant,0)
+        +' equipos emisores y <b>ningún elemento de protección registrado</b> en el catastro para esta '
+        +'instalación. Verificar y, si corresponde, solicitarlos.</div>' : '')
+      +'<div class="grid g3" style="margin-top:11px">'
+      +'<div class="field"><label>N° autorización sanitaria</label>'
+        +'<input value="'+esc(x.res_num||'')+'" onchange="instSet(\''+i.id+'\',\'res_num\',this.value)" placeholder="Res. Ex. N°…"></div>'
+      +'<div class="field"><label>Vence</label>'
+        +'<input type="date" value="'+esc(x.res_vence||'')+'" onchange="instSet(\''+i.id+'\',\'res_vence\',this.value)"></div>'
+      +'<div class="field"><label>Última verificación de blindaje</label>'
+        +'<input type="date" value="'+esc(x.blindaje||'')+'" onchange="instSet(\''+i.id+'\',\'blindaje\',this.value)"></div>'
+      +'</div>'
+      +'<div class="field"><label>Observaciones</label><textarea rows="2" onchange="instSet(\''+i.id+'\',\'obs\',this.value)" '
+      +'placeholder="Señalización, monitoreo de área, cambios informados a Dirección…">'+esc(x.obs||'')+'</textarea></div>'
+      +(mios.length?'<div style="margin-top:6px"><label>Equipos emisores ('+mios.length+' tipologías · '
+        +mios.reduce((a,e)=>a+e.cant,0)+' equipos)</label>'
+        +'<div class="tw" style="margin-top:5px"><table><thead><tr><th>Código</th><th>Equipo</th>'
+        +'<th style="text-align:center">Cant.</th><th>Marca</th></tr></thead><tbody>'
+        +mios.map(e=>'<tr><td class="mono">'+esc(e.code)+'</td><td>'+esc(e.nombre)+'</td>'
+          +'<td style="text-align:center"><b>'+e.cant+'</b></td><td>'+esc(e.marca||'—')+'</td></tr>').join('')
+        +'</tbody></table></div></div>':'')
+      +(function(){ const ins=(D.instrumentos||[]).filter(y=>y.inst===i.id); return ins.length?'<div style="margin-top:10px"><label>Instrumentación de protección radiológica ('
+        +ins.reduce((a,y)=>a+y.cant,0)+' equipos, no emisores)</label><div class="tw" style="margin-top:5px"><table><thead><tr><th>Código</th><th>Equipo</th>'
+        +'<th style="text-align:center">Cant.</th><th>Marca · modelo</th><th>Recinto</th></tr></thead><tbody>'
+        +ins.map(y=>'<tr><td class="mono">'+esc(y.code)+'</td><td>'+esc(y.nombre)+'</td><td style="text-align:center"><b>'+y.cant+'</b></td>'
+          +'<td>'+esc(y.marca)+' · '+esc(y.modelo)+'</td><td>'+esc(y.recinto)+'</td></tr>').join('')+'</tbody></table></div></div>':''; })()
+      +(function(){ const pe=(D.pendientes_catastro||[]).filter(y=>y.inst===i.id); return pe.length?'<div class="aviso a-warn" style="margin:10px 0 0"><b>Pendiente de verificar</b><ul style="margin:4px 0 0 18px">'
+        +pe.map(y=>'<li>'+esc(y.texto)+'</li>').join('')+'</ul></div>':''; })()
+      +'</div>';
+  }).join('');
+  document.getElementById('p-inst').innerHTML=
+     '<div class="aviso a-info"><b>Vigilancia radiológica.</b> Los equipos emisores salen del catastro EMMC '
+    +'(EquiBox). Las autorizaciones sanitarias y verificaciones de blindaje se registran acá: la plataforma '
+    +'avisa en el panel cuando una vence o está por vencer, que es lo que hay que coordinar con Prevención '
+    +'de Riesgos.</div>'+cards;
+}
+function instSet(id,k,v){ (E.inst[id]=E.inst[id]||{})[k]=v; save(); vInst(); vPanel(); }
+
+/* ── ELEMENTOS DE PROTECCIÓN ──────────────────────────────────────────────── */
+function vEpp(){
+  const base=D.epp||[];
+  const rows=base.map((x,i)=>{
+    const k=x.recinto+'|'+x.elemento, c=(E.epp.find(y=>y.k===k)||{});
+    const est=c.rev ? ((new Date()-new Date(c.rev))/86400000>365
+      ? '<span class="pill p-warn">revisión vencida</span>' : '<span class="pill p-ok">revisado</span>')
+      : '<span class="pill p-mute">sin revisar</span>';
+    return '<tr><td>'+esc(x.recinto)+'</td><td>'+esc(x.elemento)+'</td>'
+      +'<td style="text-align:center"><b>'+x.cant+'</b></td>'
+      +'<td><input type="date" value="'+esc(c.rev||'')+'" onchange="eppSet(\''+esc(k)+'\',\'rev\',this.value)" style="max-width:150px"></td>'
+      +'<td>'+est+'</td>'
+      +'<td><input value="'+esc(c.obs||'')+'" onchange="eppSet(\''+esc(k)+'\',\'obs\',this.value)" placeholder="grietas, plomo dañado…"></td></tr>';
+  }).join('');
+  /* cobertura por instalación: deja a la vista dónde hay emisores sin plomada registrada */
+  const cob=(D.instalaciones||[]).map(i=>{
+    const n=base.filter(y=>y.inst===i.id).reduce((a,y)=>a+y.cant,0);
+    const e=(D.equipos||[]).filter(q=>(q.inst||[]).includes(i.id)).reduce((a,q)=>a+q.cant,0);
+    return '<div class="kpi"><div class="n" style="color:'+(n?'var(--tx)':'var(--bad)')+'">'+n+'</div>'
+      +'<div class="l">'+esc(i.nombre)+'<br><span style="color:var(--tx2)">'+e+' equipos emisores</span></div></div>';
+  }).join('');
+  document.getElementById('p-epp').innerHTML=
+     '<div class="aviso a-info"><b>Elementos de seguridad del personal expuesto.</b> Definir y solicitarlos es '
+    +'función del cargo. El inventario viene del catastro EMMC; acá se registra la <b>revisión anual de '
+    +'integridad</b> del plomo (grietas, delaminación) que condiciona su uso.</div>'
+    +'<div class="grid g3" style="margin-bottom:12px">'+cob+'</div>'
+    +'<div class="tw"><table><thead><tr><th>Recinto</th><th>Elemento</th><th style="text-align:center">Cant.</th>'
+    +'<th>Última revisión</th><th>Estado</th><th>Observación</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+}
+function eppSet(k,campo,v){
+  let c=E.epp.find(y=>y.k===k); if(!c){ c={k}; E.epp.push(c); }
+  c[campo]=v; save(); vEpp();
+}
+
+/* ── DOCUMENTACIÓN ────────────────────────────────────────────────────────── */
+const DOC_TIPOS=['Autorización sanitaria','Informe dosimétrico','Nómina anual de expuestos',
+  'Verificación de blindaje','Capacitación','Procedimiento / norma','Informe a Dirección','Otro'];
+function vDoc(){
+  const rows=E.docs.map(d=>'<tr><td>'+esc(d.fecha)+'</td><td><span class="pill p-info">'+esc(d.tipo)+'</span></td>'
+    +'<td><b>'+esc(d.titulo)+'</b></td><td>'+esc(d.dest||'—')+'</td><td>'+esc(d.obs||'')+'</td>'
+    +'<td><button class="btn danger" style="padding:4px 9px" onclick="docDel('+d.id+')">✕</button></td></tr>').join('');
+  document.getElementById('p-doc').innerHTML=
+     '<div class="aviso a-info"><b>Registro documental.</b> Bitácora de lo que el cargo debe emitir y mantener: '
+    +'resoluciones, informes dosimétricos, la nómina anual y los avisos a Dirección, Unidad de Calidad y '
+    +'Prevención de Riesgos ante cualquier cambio en las instalaciones radiactivas.</div>'
+    +'<div class="card"><h2>➕ Registrar documento</h2><div class="grid g3" style="margin-top:10px">'
+    +'<div class="field"><label>Fecha</label><input type="date" id="dc-f" value="'+hoy()+'"></div>'
+    +'<div class="field"><label>Tipo</label><select id="dc-t">'+DOC_TIPOS.map(t=>'<option>'+t+'</option>').join('')+'</select></div>'
+    +'<div class="field"><label>Título / N°</label><input id="dc-n" placeholder="Res. Ex. N° 1234 / Informe 3T"></div>'
+    +'<div class="field"><label>Destinatario</label><input id="dc-d" placeholder="Dirección · Calidad · Prev. de Riesgos"></div>'
+    +'<div class="field"><label>Observación</label><input id="dc-o"></div>'
+    +'<div class="field"><label>&nbsp;</label><button class="btn pri" style="width:100%" onclick="docAdd()">Registrar</button></div>'
+    +'</div></div>'
+    +(E.docs.length?'<div class="tw"><table><thead><tr><th>Fecha</th><th>Tipo</th><th>Título</th>'
+      +'<th>Destinatario</th><th>Observación</th><th></th></tr></thead><tbody>'+rows+'</tbody></table></div>'
+      :'<div class="card"><div class="empty">Sin documentos registrados.</div></div>');
+}
+function docAdd(){
+  const t=document.getElementById('dc-n').value.trim();
+  if(!t){ alert('Poné al menos el título o número.'); return; }
+  E.docs.unshift({id:nuevoId(), fecha:document.getElementById('dc-f').value,
+    tipo:document.getElementById('dc-t').value, titulo:t,
+    dest:document.getElementById('dc-d').value.trim(), obs:document.getElementById('dc-o').value.trim()});
+  save(); pintaTabs(); vDoc();
+}
+function docDel(id){ E.docs=E.docs.filter(d=>d.id!==id); save(); pintaTabs(); vDoc(); }
+
+/* ── FUNCIONES DEL CARGO ──────────────────────────────────────────────────── */
+const FUNCIONES=[
+ {f:'Distribuir los dosímetros personales a todo funcionario expuesto y remitirlos cada tres meses al Servicio de Dosimetría contratado.',
+  d:'dosi', como:'Pestaña 🎫 Dosimetría: matriz por trimestre y aviso de pendientes en el panel.'},
+ {f:'Definir y solicitar los elementos de seguridad para el personal expuesto en el Hospital.',
+  d:'epp', como:'Pestaña 🦺 Elementos de protección: inventario del catastro EMMC y revisión anual de integridad.'},
+ {f:'Mantener un sistema de vigilancia radiológica en todo el Hospital.',
+  d:'inst', como:'Pestaña 🏥 Instalaciones y equipos: recintos, equipos emisores y verificaciones.'},
+ {f:'Mantener y cumplir las normas de Protección Radiológica para las salas con fuentes emisoras de radiación.',
+  d:'inst', como:'Autorizaciones sanitarias, blindajes y observaciones por instalación.'},
+ {f:'Trabajar en coordinación con Prevención de Riesgos para mantener las resoluciones sanitarias actualizadas.',
+  d:'inst', como:'Alertas automáticas de autorizaciones vencidas o por vencer (90 días).'},
+ {f:'Informar a la Dirección, Unidad de Calidad y Prevención de Riesgos cualquier cambio en las instalaciones radiactivas, y enviar la nómina anual de funcionarios expuestos.',
+  d:'doc', como:'Pestaña 📁 Documentación (bitácora de envíos) y exportación de la nómina anual en CSV.'},
+];
+function vCargo(){
+  document.getElementById('p-cargo').innerHTML=
+     '<div class="card"><h2>📋 Objetivo del cargo</h2>'
+    +'<div class="d">«Supervisar y mantener vigilancia radiológica en instalaciones radiactivas como también '
+    +'vigilancia ocupacional de los trabajadores expuestos a radiaciones ionizantes.»<br>'
+    +'<span style="color:var(--tx2)">Bases del concurso interno · Tecnólogo Médico Oficial de Protección '
+    +'Radiológica, grado 9° diurno · SSMO / Hospital del Salvador.</span></div></div>'
+    +'<div class="card"><h2>Funciones y dónde se gestionan</h2>'
+    +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>Función encomendada</th><th>En la plataforma</th><th></th></tr></thead><tbody>'
+    +FUNCIONES.map(x=>'<tr><td>'+esc(x.f)+'</td><td style="color:var(--tx2)">'+esc(x.como)+'</td>'
+      +'<td><button class="btn" style="padding:4px 10px" onclick="irA(\''+x.d+'\')">Ir →</button></td></tr>').join('')
+    +'</tbody></table></div></div>'
+    +'<div class="card"><h2>Perfil exigido</h2><div class="d">'
+    +'Título de Tecnólogo(a) Médico(a) con mención en radiología y Registro SIS · Diplomado en Protección '
+    +'Radiológica · desde 3 años de experiencia profesional en Protección Radiológica en Servicios de '
+    +'Imagenología.</div></div>'
+    +'<div class="card"><h2>⚙️ Configuración</h2>'
+    +'<div class="grid g3" style="margin-top:10px">'
+    +'<div class="field"><label>Límite de dosis anual (mSv)</label>'
+      +'<input type="number" step="1" min="1" value="'+(E.cfg.limite_anual||20)+'" onchange="cfgSet(\'limite_anual\',+this.value)"></div>'
+    +'<div class="field"><label>Servicio de dosimetría</label>'
+      +'<input value="'+esc(E.cfg.servicio_dosi||'')+'" onchange="cfgSet(\'servicio_dosi\',this.value)" placeholder="Nombre del servicio contratado"></div>'
+    +'<div class="field"><label>Oficial de PR</label>'
+      +'<input value="'+esc(E.cfg.opr||'')+'" onchange="cfgSet(\'opr\',this.value)" placeholder="Nombre del TM a cargo"></div>'
+    +'</div>'
+    +'<div style="font-size:11.5px;color:var(--tx2)">El límite por defecto (20 mSv/año) es el de dosis efectiva '
+    +'para trabajadores expuestos; ajustalo si la normativa aplicable a tu instalación define otro.</div></div>';
+}
+function cfgSet(k,v){ E.cfg[k]=v; save(); vPanel(); }
+
+/* ── Respaldo ─────────────────────────────────────────────────────────────── */
+function bajar(nombre,contenido,tipo){
+  const b=new Blob([contenido],{type:tipo}), a=document.createElement('a');
+  a.href=URL.createObjectURL(b); a.download=nombre; a.click(); URL.revokeObjectURL(a.href);
+}
+function expJSON(){ bajar('proteccion_radiologica_'+hoy()+'.json', JSON.stringify(E,null,1), 'application/json'); }
+function impJSON(ev){
+  const f=ev.target.files&&ev.target.files[0]; ev.target.value=''; if(!f) return;
+  if(!confirm('Restaurar el respaldo REEMPLAZA los datos actuales. ¿Continuar?')) return;
+  const r=new FileReader();
+  r.onload=e=>{ try{ const d=JSON.parse(e.target.result); E=Object.assign(E,d); save();
+      pintaTabs(); irA('panel'); alert('✓ Respaldo restaurado.'); }
+    catch(err){ alert('No se pudo leer: '+err.message); } };
+  r.readAsText(f);
+}
+function expNomina(){
+  const cab='Nombre;RUT;Estamento;Servicio;Dosimetro;Dosis 12 meses (mSv);Estado\n';
+  const cu=s=>'"'+String(s==null?'':s).replace(/"/g,'""')+'"';
+  const cuerpo=E.poe.filter(p=>p.activo!==false).map(p=>{
+    const d=dosisAnual(p.id);
+    return [p.nombre,p.rut,p.estamento,p.servicio,p.dosimetro,nfmt(d),estadoDosis(d).t].map(cu).join(';');
+  }).join('\n');
+  bajar('nomina_anual_expuestos_'+hoy()+'.csv','﻿'+cab+cuerpo,'text/csv;charset=utf-8');
+}
+
+/* ══ 🎬 GUÍA RÁPIDA · cápsula de un minuto + los siete pasos ═══════════════════
+   El video se generó en NotebookLM desde Capsula_Video_Proteccion_Radiologica.md.
+   Es material ilustrativo: no muestra la nómina ni ningún dato personal, por eso
+   sí puede publicarse junto a la plataforma.                                    */
+const PASOS=[
+ ['Abrí el Panel','Lo urgente primero: autorizaciones vencidas o por vencer, dosímetros pendientes del trimestre y el estado de cumplimiento del personal expuesto.'],
+ ['Revisá Cumplimiento AS','La matriz persona por persona con las tres exigencias de la Autorización Sanitaria. Filtrá por unidad o por «Con algo pendiente» y exportá el CSV para gestionar.'],
+ ['Cerrá el trimestre en Dosimetría','El historial de la CCHEN ya viene cargado. Registrá la lectura de cada dosímetro que vuelve del servicio: eso deja constancia del ciclo.'],
+ ['Controlá Instalaciones y equipos','Anotá el número y el vencimiento de la resolución sanitaria de cada instalación. La plataforma avisa 90 días antes.'],
+ ['Revisá los elementos de protección','El inventario viene del catastro EMMC. Registrá la revisión anual de integridad del plomo: grietas o delaminación condicionan el uso.'],
+ ['Mirá el Requerimiento AS','Los 21 puntos que pide Recursos Humanos, con lo que ya está respaldado y lo que falta conseguir.'],
+ ['Respaldá','La nómina y las lecturas viven solo en este navegador. Usá 💾 Exportar respaldo cada vez que cargues información nueva.'],
+];
+function vGuia(){
+  document.getElementById('p-guia').innerHTML=
+     '<div class="card"><h2>🎬 Cómo funciona la plataforma · un minuto</h2>'
+    +'<div class="d">Cápsula de uso rápido para el equipo. Abajo, el mismo recorrido en siete pasos.</div>'
+    +'<div class="guia" style="margin-top:14px">'
+    +'<div><video controls preload="metadata" playsinline '
+      +'poster="assets/pr/guia_proteccion_radiologica.jpg">'
+      +'<source src="assets/pr/guia_proteccion_radiologica.mp4" type="video/mp4">'
+      +'Tu navegador no puede reproducir el video. '
+      +'<a href="assets/pr/guia_proteccion_radiologica.mp4">Descargalo aquí</a>.</video>'
+      +'<div style="margin-top:8px;font-size:11.5px;color:var(--tx2)">1 min 24 s · sin datos personales · '
+      +'<a href="assets/pr/guia_proteccion_radiologica.mp4" download style="color:var(--am)">descargar</a></div></div>'
+    +'<div><div class="pasos">'
+    +PASOS.map((p,i)=>'<div class="paso"><div class="np">'+(i+1)+'</div><div><b>'+esc(p[0])+'</b>'
+      +'<span>'+esc(p[1])+'</span></div></div>').join('')
+    +'</div>'
+    +'<div class="aviso a-info" style="margin-top:14px"><b>Lo que exige la Autorización Sanitaria por persona '
+    +'expuesta:</b> curso de Protección Radiológica (una vez), autorización de desempeño de la SEREMI '
+    +'(vigencia 3 años) e historial dosimétrico de los últimos 3 años. Los tres se controlan en '
+    +'<b>🎯 Cumplimiento AS</b>.</div>'
+    +'<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">'
+    +'<button class="btn pri" onclick="irA(\'cumpl\')">Ir a Cumplimiento AS</button>'
+    +'<button class="btn" onclick="irA(\'dosi\')">Ir a Dosimetría</button>'
+    +'<button class="btn" onclick="irA(\'req\')">Ver el requerimiento</button></div>'
+    +'</div></div></div>'
+    +'<div class="card"><h2>📋 Normativa de referencia</h2>'
+    +'<div class="d"><b>D.S. 133/84</b> · autorizaciones de instalaciones radiactivas, de los equipos generadores '
+    +'y del personal que se desempeña en ellas. <b>D.S. 3/85</b> · protección radiológica de instalaciones '
+    +'radiactivas: límites de dosis de '+(E.cfg.limite_anual||50)+' mSv en un año y '+(E.cfg.limite_5a||100)
+    +' mSv en cinco (promedio '+(E.cfg.limite_prom||20)+' mSv al año). <b>D.S. 594/99</b> · condiciones '
+    +'sanitarias y ambientales básicas en el lugar de trabajo.</div></div>';
+}
+
+/* ══ 🎯 CUMPLIMIENTO AS · matriz nominada del personal expuesto ═══════════════
+   Tres exigencias del punto 16 del requerimiento de RRHH para AS (D.S. 133/84 y
+   D.S. 3/85): curso de Protección Radiológica, autorización de desempeño vigente
+   e historial dosimétrico. La base la arma _DEV/build_pr_personal.py cruzando los
+   informes de la CCHEN, las resoluciones de la SEREMI, el reporte de cursos del
+   SIRH y la dotación oficial. Es de SOLO LECTURA: la nómina editable del OPR
+   sigue siendo la pestaña 👷, y desde aquí se puede incorporar a una persona.  */
+let CF={q:'',uni:'',est:'',ord:'nombre'};
+const ES_LBL={ok:'al día',declarado:'declarado en la nómina',falta:'falta',
+  vigente:'vigente',por_vencer:'por vencer',vencido:'vencido',sin_fecha:'sin fecha',
+  declarado_sin_documento:'declarado, sin documento',desactualizada:'desactualizada',sin_control:'sin control'};
+const ES_CLS={ok:'p-ok',declarado:'p-info',vigente:'p-ok',por_vencer:'p-warn',vencido:'p-bad',
+  falta:'p-bad',sin_fecha:'p-warn',declarado_sin_documento:'p-warn',desactualizada:'p-warn',sin_control:'p-bad'};
+const pill=(k)=>'<span class="pill '+(ES_CLS[k]||'p-mute')+'">'+(ES_LBL[k]||k)+'</span>';
+function cfSet(k,v){ CF[k]=v; vCumpl(); }
+function cumplFiltradas(){
+  const q=CF.q.toLowerCase();
+  return PRP.filter(p=>{
+    if(CF.uni==='__sin') { if(p.unidades_pr.length) return false; }
+    else if(CF.uni && CF.uni.startsWith('N:')) { if(!p.cotejo || !p.cotejo.servicios.includes(CF.uni.slice(2))) return false; }
+    else if(CF.uni && !p.unidades_pr.includes(CF.uni)) return false;
+    if(CF.est==='limite' && !p.alertas.some(a=>a.startsWith('⛔')&&a.includes('mSv'))) return false;
+    if(CF.est==='brechas' && !(p.estado.dosimetria==='ok' && p.alertas.some(a=>a.includes('brechas')))) return false;
+    if(CF.est==='accion' && !(p.cotejo && p.cotejo.acciones.length)) return false;
+    if(CF.est==='aldia' && p.estado.dosimetria!=='ok') return false;
+    if(CF.est==='incompleto' && p.completo) return false;
+    if(CF.est==='completo' && !p.completo) return false;
+    if(CF.est==='vencido' && p.estado.desempeno!=='vencido') return false;
+    if(CF.est==='sincurso' && p.estado.curso!=='falta') return false;
+    if(CF.est==='sindot' && p.dotacion) return false;
+    if(q){ const t=(p.nombre+' '+(p.run||'')+' '+(p.dotacion?p.dotacion.unidad+' '+p.dotacion.funcion:'')+' '+p.unidades_pr.join(' ')).toLowerCase();
+      if(!t.includes(q)) return false; }
+    return true;
+  }).sort((a,b)=> CF.ord==='dosis' ? ((b.ultimo?b.ultimo.ac12||0:0)-(a.ultimo?a.ultimo.ac12||0:0))
+      : CF.ord==='vence' ? ((a.dias_vence==null?99999:a.dias_vence)-(b.dias_vence==null?99999:b.dias_vence))
+      : a.nombre.localeCompare(b.nombre));
+}
+function vCumpl(){
+  const box=document.getElementById('p-cumpl');
+  if(!PR){ box.innerHTML=(AG?'<div class="aviso a-info"><b>Vista agregada.</b> El detalle por persona (nombre y RUT) '
+    +'vive solo en el 🔴 HUB local del Oficial de PR; aquí se muestran los totales.</div>'+cardAgregada()+tablaServicios()
+    :'<div class="aviso a-warn"><b>Sin la base nominada.</b> Falta '
+    +'<b>SHARED_DATA/pr_personal.js</b>. Se genera con <code>python3 _DEV/build_pr_personal.py</code> '
+    +'a partir de <b>_FUENTES/PR_2026-09/</b>.</div>'); return; }
+  const L=cumplFiltradas(), R=PR.resumen;
+  const unis=[...new Set(PRP.flatMap(p=>p.unidades_pr))].sort();
+  const filas=L.slice(0,400).map(p=>{
+    const u=p.ultimo, d=p.dotacion;
+    const dosis=u? (u.periodo!=null?nfmt(u.periodo):'—')+' <small style="color:var(--tx2)">12m '+(u.ac12!=null?nfmt(u.ac12):'—')
+       +' · 5a '+(u.ac5a!=null?nfmt(u.ac5a):'—')+'</small>' : '<span style="color:var(--tx2)">—</span>';
+    const al=p.alertas.length?'<div style="font-size:11px;color:var(--bad);margin-top:3px">'+p.alertas.map(esc).join(' · ')+'</div>':'';
+    return '<tr><td><b>'+esc(p.nombre)+'</b>'+(p.run?' <small style="color:var(--tx2)">'+esc(p.run)+'</small>':'')
+      +(d?'<div style="font-size:11px;color:var(--tx2)">'+esc(d.planta||'')+' · '+esc(d.funcion||'')+' · '+esc(d.unidad||'')+'</div>'
+         :'<div style="font-size:11px;color:var(--warn)">no está en la dotación oficial</div>')
+      +(p.cotejo?'<div style="font-size:11px;margin-top:3px">'+p.cotejo.servicios.map(x=>'<span class="pill p-mute" style="margin:1px">nómina '+esc(x)+'</span>').join('')
+         +(p.cotejo.acciones.length?' <span style="color:var(--warn)">→ '+p.cotejo.acciones.map(esc).join(' · ')+'</span>':'')+'</div>':'')+al+'</td>'
+      +'<td>'+(p.unidades_pr.length?p.unidades_pr.map(x=>'<span class="pill p-info" style="margin:1px">'+esc(x)+'</span>').join(''):'<span style="color:var(--tx2)">—</span>')+'</td>'
+      +'<td>'+pill(p.estado.curso)+(p.curso?'<div style="font-size:11px;color:var(--tx2)">'+esc(p.curso.organismo||'')+' · '+esc(String(p.curso.termino||'').slice(0,10))+' · '+(p.curso.horas||'?')+' h</div>':'')+'</td>'
+      +'<td>'+pill(p.estado.desempeno)+(p.vence_desempeno?'<div style="font-size:11px;color:var(--tx2)">vence '+esc(p.vence_desempeno)
+         +(p.dias_vence!=null?' · '+(p.dias_vence<0?Math.abs(p.dias_vence)+' d vencida':p.dias_vence+' d'):'')+'</div>':'')
+      +(p.desempeno&&p.desempeno.resolucion?'<div style="font-size:11px;color:var(--tx2)">Res. '+esc(p.desempeno.resolucion)+'</div>':'')+'</td>'
+      +'<td>'+pill(p.estado.dosimetria)+(p.historial&&p.historial.primer_control?'<div style="font-size:11px;color:var(--tx2)">'
+         +p.historial.trimestres_3a+' de '+p.historial.esperados_3a+' trim. en 3 años · desde '+esc(p.historial.primer_control.slice(0,7))+'</div>':'')+'</td><td style="text-align:right">'+dosis+'</td>'
+      +'<td><button class="btn xs" onclick="cumplAdd(\''+esc(p.key)+'\')" title="Copiar esta persona a la nómina editable del OPR">＋ POE</button></td></tr>';
+  }).join('');
+  box.innerHTML=
+    '<div class="aviso a-info"><b>Dato sensible.</b> Esta matriz tiene nombre y RUT: vive en el HUB local '
+    +'y no se publica. Fuentes: informes dosimétricos de la CCHEN, resoluciones de autorización de desempeño '
+    +'de la SEREMI RM, reporte de cursos del SIRH y dotación oficial. Corte: <b>'+esc(PR.version)+'</b>.</div>'
+    +'<div class="grid g4" style="margin-bottom:12px">'
+    +[['Personas en la base',R.personas,'var(--tx)'],['Con dosímetro al día',R.dosimetria_al_dia,'var(--info)'],
+      ['Cumplen los 3 requisitos',R.completos,R.completos?'var(--ok)':'var(--bad)'],
+      ['Sin curso de PR',R.expuestos_sin_curso,R.expuestos_sin_curso?'var(--bad)':'var(--ok)']]
+      .map(([l,v,c])=>'<div class="kpi"><div class="n" style="color:'+c+'">'+v+'</div><div class="l">'+l+'</div></div>').join('')+'</div>'
+    +'<div class="card"><div class="inline" style="flex-wrap:wrap;gap:8px">'
+    +'<input id="cfq" placeholder="Buscar nombre, RUT, unidad…" value="'+esc(CF.q)+'" oninput="CF.q=this.value;vCumpl();document.getElementById(\'cfq\').focus()" style="min-width:240px">'
+    +'<select onchange="cfSet(\'uni\',this.value)"><option value="">Todas las unidades con dosimetría</option>'
+    +unis.map(u=>'<option'+(CF.uni===u?' selected':'')+'>'+esc(u)+'</option>').join('')
+    +'<option value="__sin"'+(CF.uni==='__sin'?' selected':'')+'>Sin dosimetría (solo curso o certificado)</option>'
+    +'<optgroup label="Nómina de servicio">'+(PR.cotejo_por_servicio||[]).map(x=>'<option value="N:'+esc(x.servicio)+'"'+(CF.uni==='N:'+x.servicio?' selected':'')+'>'+esc(x.servicio)+' ('+x.personas+')</option>').join('')+'</optgroup></select>'
+    +'<select onchange="cfSet(\'est\',this.value)">'
+    +[['','Todos los estados'],['aldia','Con dosímetro al día'],['incompleto','Con algo pendiente'],['completo','Cumplen los 3'],
+      ['limite','⛔ Sobre el límite anual de dosis'],['brechas','Historial dosimétrico con brechas'],['accion','Con acción pendiente del OPR (nóminas)'],
+      ['vencido','Autorización vencida'],['sincurso','Sin curso de PR'],['sindot','No están en la dotación']]
+      .map(([v,l])=>'<option value="'+v+'"'+(CF.est===v?' selected':'')+'>'+l+'</option>').join('')+'</select>'
+    +'<select onchange="cfSet(\'ord\',this.value)">'
+    +[['nombre','Orden alfabético'],['dosis','Mayor dosis 12 meses'],['vence','Vence antes']]
+      .map(([v,l])=>'<option value="'+v+'"'+(CF.ord===v?' selected':'')+'>'+l+'</option>').join('')+'</select>'
+    +'<button class="btn" onclick="cumplCSV()">📄 Exportar CSV</button>'
+    +'<button class="btn pri" onclick="exportCapacitacion()" title="Excel para la Unidad de Capacitación: quién tiene el curso de Protección Radiológica, quién lo declara sin respaldo y a quién inscribir">🎓 Nómina de capacitación (Excel)</button>'
+    +'<span style="margin-left:auto;font-size:12px;color:var(--tx2)">'+L.length+' persona(s)'+(L.length>400?' · se muestran 400':'')+'</span></div>'
+    +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>Persona</th><th>Unidad con dosimetría</th>'
+    +'<th>Curso PR</th><th>Autorización de desempeño</th><th>Dosimetría</th>'
+    +'<th style="text-align:right">Última dosis (mSv)</th><th></th></tr></thead><tbody>'
+    +(filas||'<tr><td colspan="7" style="padding:14px;color:var(--tx2)">Sin resultados con ese filtro.</td></tr>')
+    +'</tbody></table></div></div>'
+    +'<div class="card"><h2>🎫 Dosis por unidad · período '+esc((PR.periodo_vigente||[])[0]||'')+'</h2>'
+    +'<div class="d">Informes trimestrales de la CCHEN. El límite legal es '+(E.cfg.limite_anual||50)+' mSv en un año y '
+    +(E.cfg.limite_5a||100)+' mSv en cinco (promedio '+(E.cfg.limite_prom||20)+' mSv/año).</div>'
+    +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>Unidad (cliente CCHEN)</th><th>Usuarios</th>'
+    +'<th style="text-align:right">Dosis media</th><th style="text-align:right">Máxima del período</th>'
+    +'<th style="text-align:right">Máx. 12 meses</th><th style="text-align:right">Máx. 5 años</th></tr></thead><tbody>'
+    +PR.por_unidad_ultimo_periodo.map(u=>'<tr><td><b>'+esc(u.servicio)+'</b> <small style="color:var(--tx2)">N° '+esc(u.cliente)+'</small></td>'
+      +'<td>'+u.usuarios+'</td><td style="text-align:right">'+(u.dosis_media!=null?nfmt(u.dosis_media):'—')+'</td>'
+      +'<td style="text-align:right">'+(u.dosis_max!=null?nfmt(u.dosis_max):'—')+'</td>'
+      +'<td style="text-align:right">'+nfmt(u.ac12_max)+'</td><td style="text-align:right">'+nfmt(u.ac5a_max)+'</td></tr>').join('')
+    +'</tbody></table></div></div>'
+    +(PR.certificados_sin_texto.length?'<div class="card"><h2>📎 Certificados que no se pudieron leer</h2>'
+      +'<div class="d">Están escaneados como imagen: hay que digitar su vigencia a mano o pedirlos en PDF a la SEREMI.</div>'
+      +'<div style="margin-top:8px;font-size:12px">'+PR.certificados_sin_texto.map(c=>'<span class="pill p-warn" style="margin:2px">'+esc(c.archivo)+'</span>').join('')+'</div></div>':'');
+}
+function cumplAdd(key){
+  const p=PRP.find(x=>x.key===key); if(!p) return;
+  if(E.poe.some(x=>x.rut===p.run)){ alert('Esa persona ya está en la nómina del OPR.'); return; }
+  E.poe.push({id:nuevoId(), nombre:p.nombre, rut:p.run||'', estamento:(p.dotacion&&p.dotacion.planta)||'',
+    servicio:(p.dotacion&&p.dotacion.unidad)||p.unidades_pr[0]||'', dosimetro:(p.ultimo&&p.ultimo.dosimetro)||'',
+    activo:true, alta:hoy()});
+  save(); pintaTabs(); alert('Agregada a la nómina de personal expuesto (pestaña 👷).'); vCumpl();
+}
+function cumplCSV(){
+  const cab='Nombre;RUT;Planta;Función;Unidad contrato;Unidades con dosimetría;Curso PR;Organismo;Fecha curso;'
+    +'Autorización desempeño;Resolución;Vence;Días;Dosimetría;Trimestres 3 años;Esperados;Dosis período;Acum 12m;Acum 5a;Nómina de servicio;Acciones OPR;Discrepancias;Alertas\n';
+  const cu=s=>'"'+String(s==null?'':s).replace(/"/g,'""')+'"';
+  const cuerpo=cumplFiltradas().map(p=>{const d=p.dotacion||{},u=p.ultimo||{};
+    return [p.nombre,p.run,d.planta,d.funcion,d.unidad,p.unidades_pr.join(' | '),
+      ES_LBL[p.estado.curso],p.curso&&p.curso.organismo,p.curso&&String(p.curso.termino||'').slice(0,10),
+      ES_LBL[p.estado.desempeno],p.desempeno&&p.desempeno.resolucion,p.vence_desempeno,p.dias_vence,
+      ES_LBL[p.estado.dosimetria],p.historial&&p.historial.trimestres_3a,p.historial&&p.historial.esperados_3a,u.periodo,u.ac12,u.ac5a,
+      p.cotejo?p.cotejo.servicios.join(' | '):'',p.cotejo?p.cotejo.acciones.join(' | '):'',p.cotejo?p.cotejo.discrepancias.join(' | '):'',p.alertas.join(' · ')].map(cu).join(';');
+  }).join('\n');
+  bajar('cumplimiento_proteccion_radiologica_'+hoy()+'.csv','﻿'+cab+cuerpo,'text/csv;charset=utf-8');
+}
+
+/* ══ Agregados (funcionan con la base nominada o solo con pr_resumen.js) ═══════ */
+function avisoDosim(){
+  if(!AG||!AG.resumen.dosimetros_no_devueltos) return '';
+  const d=AG.dosimetros||{}, pab=((d.por_contrato||[]).find(c=>c.servicio==='Pabellón')||{}).pendientes;
+  return '<div class="aviso a-warn"><b>⚠ '+AG.resumen.dosimetros_no_devueltos+' dosímetros sin devolver a la CCHEN</b>'
+    +(pab?' ('+pab+' de Pabellón)':'')+' · '+AG.resumen.personas_con_dosimetro_no_devuelto+' persona(s) quedan con un período sin lectura. '
+    +'<button class="btn xs" onclick="irA(\'dosim\')">Ver el detalle →</button></div>';
+}
+function avisoLevantamiento(){
+  const L=window.PR_LEVANTAMIENTO||(AG&&AG.levantamiento); if(!L||!L.plazos||!L.plazos.maximo) return '';
+  const d=Math.round((new Date(L.plazos.maximo+'T00:00:00')-new Date(hoy()+'T00:00:00'))/86400000);
+  const sin=(AG&&AG.resumen.levantamiento_sin_responder)||0; if(!sin) return '';
+  return '<div class="aviso '+(d<=3?'a-bad':'a-info')+'"><b>Levantamiento para la Autorización Sanitaria:</b> '+sin+' persona(s) sin responder si se exponen. '
+    +'Plazo máximo '+esc(L.plazos.maximo)+(d>=0?' · quedan '+d+' día(s)':' · vencido hace '+(-d)+' día(s)')+'. '
+    +'<button class="btn xs" onclick="irA(\'lev\')">Ver por servicio →</button></div>';
+}
+function avisoLimite(){
+  if(!AG||!AG.resumen.sobre_limite_anual) return '';
+  const quien=PR?PRP.filter(p=>p.alertas.some(a=>a.startsWith('⛔')&&a.includes('mSv'))):[];
+  return '<div class="aviso a-bad"><b>⛔ '+AG.resumen.sobre_limite_anual+' persona(s) superan el límite anual de '
+    +(AG.limites_msv.anual_legal||50)+' mSv</b> en el acumulado de 12 meses del último informe CCHEN (D.S. 3/85). '
+    +'Corresponde investigar la exposición, confirmar con la CCHEN que la lectura no sea un dosímetro olvidado en la sala '
+    +'e informar según el procedimiento de la SEREMI.'
+    +(quien.length?'<div style="margin-top:6px">'+quien.map(p=>'<b>'+esc(p.nombre)+'</b> · '+esc(p.unidades_pr.join(' · '))+' · '
+      +esc(p.alertas.filter(a=>a.includes('mSv')).join(' · '))).join('<br>')+'</div>'
+      +'<button class="btn xs" style="margin-top:6px" onclick="CF.est=\'limite\';irA(\'cumpl\')">Ver en la matriz →</button>':'')+'</div>';
+}
+function kpis(arr){ return '<div class="grid g4" style="margin-top:12px">'+arr.map(([l,v,c])=>'<div class="kpi"><div class="n" style="color:'+c+'">'+v+'</div><div class="l">'+l+'</div></div>').join('')+'</div>'; }
+function cardAgregada(){
+  if(!AG) return ''; const R=AG.resumen;
+  return '<div class="card"><h2>🎯 Cumplimiento de Autorización Sanitaria · personal expuesto</h2>'
+    +'<div class="d">Punto 16 del requerimiento de RRHH para AS: curso de Protección Radiológica, autorización de desempeño '
+    +'vigente (3 años) e historial dosimétrico de 3 años. Corte '+esc(AG.version)+' · '+R.informes_cchen+' informes CCHEN.</div>'
+    +kpis([['Con dosímetro al día',R.dosimetria_al_dia,'var(--info)'],['Cumplen los 3 requisitos',R.completos,R.completos?'var(--ok)':'var(--bad)'],
+      ['Expuestos sin curso de PR',R.expuestos_sin_curso,'var(--bad)'],['Expuestos sin autorización',R.expuestos_sin_desempeno,'var(--bad)'],
+      ['Autorizaciones vigentes',R.con_desempeno_vigente,'var(--ok)'],['Vencen dentro de 180 días',R.desempeno_por_vencer,R.desempeno_por_vencer?'var(--warn)':'var(--ok)'],
+      ['Historial 3 años completo',R.historial_completo_12t,'var(--ok)'],['Historial con brechas',R.historial_con_brechas,R.historial_con_brechas?'var(--warn)':'var(--ok)']])
+    +'<div style="margin-top:10px"><button class="btn" onclick="irA(\'hist\')">📈 Historial CCHEN</button> <button class="btn" onclick="irA(\'cot\')">🧮 Cotejo nóminas</button></div></div>';
+}
+function tablaServicios(){
+  if(!AG||!AG.cotejo_por_servicio) return '';
+  const b=(v,t,c)=>{const pc=t?Math.round(v*100/t):0;return '<div style="display:flex;align-items:center;gap:6px"><div class="bar" style="width:70px"><i style="width:'+pc+'%;background:'+c+'"></i></div><small>'+v+'</small></div>';};
+  return '<div class="card"><h2>🏥 Estado por servicio (nóminas levantadas para AS)</h2>'
+    +'<div class="d">Personas únicas de las nóminas por servicio, cruzadas con los documentos de respaldo.</div>'
+    +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>Servicio</th><th>Personas</th><th>Curso PR</th><th>Autorización vigente</th>'
+    +'<th>Dosímetro al día</th><th>Historial 3 años</th><th>Cumplen los 3</th></tr></thead><tbody>'
+    +AG.cotejo_por_servicio.map(x=>'<tr><td><b>'+esc(x.servicio)+'</b></td><td>'+x.personas+'</td><td>'+b(x.curso,x.personas,'var(--info)')+'</td>'
+      +'<td>'+b(x.desempeno_vigente,x.personas,'var(--vio)')+'</td><td>'+b(x.dosimetria,x.personas,'var(--info)')+'</td>'
+      +'<td>'+b(x.historial_ok,x.personas,'var(--ok)')+'</td><td><b style="color:'+(x.completos?'var(--ok)':'var(--bad)')+'">'+x.completos+'</b></td></tr>').join('')
+    +'</tbody></table></div></div>';
+}
+
+/* ══ 📈 HISTORIAL CCHEN · series por unidad (sin nombres) ════════════════════ */
+let HU='';
+function vHist(){
+  const box=document.getElementById('p-hist');
+  if(!AG||!AG.serie_dosis){ box.innerHTML='<div class="aviso a-warn">Falta <b>SHARED_DATA/pr_resumen.js</b> (se genera con <code>python3 _DEV/build_pr_personal.py</code>).</div>'; return; }
+  const S=AG.serie_dosis, unis=[...new Set(S.map(x=>x.servicio))].sort(); if(!HU||!unis.includes(HU)) HU=unis[0];
+  const R=AG.resumen, L=AG.limites_msv||{};
+  const col={PABELLON:'#38BDF8',RAYOS:'#A78BFA',TRAUMATOLOGIA:'#F59E0B',DENTAL:'#22C55E','CIRUGIA VASCULAR':'#F472B6'}, cc=col[HU]||'#38BDF8';
+  const serie=S.filter(x=>x.servicio===HU), W=760,H=240,pl=44,pr=14,pt=14,pb=34;
+  const ymax=Math.max(1,...serie.map(x=>x.p95))*1.35, xs=i=>pl+(serie.length>1?i*(W-pl-pr)/(serie.length-1):0), ys=v=>pt+(H-pt-pb)*(1-Math.min(v,ymax)/ymax);
+  const path=k=>serie.map((x,i)=>(i?'L':'M')+xs(i).toFixed(1)+','+ys(x[k]).toFixed(1)).join('');
+  let svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:auto;display:block;margin-top:8px">';
+  for(let g=0;g<=4;g++){const v=ymax*g/4,y=ys(v);svg+='<line x1="'+pl+'" x2="'+(W-pr)+'" y1="'+y+'" y2="'+y+'" stroke="rgba(148,163,184,.18)"/><text x="'+(pl-6)+'" y="'+(y+3)+'" font-size="10" fill="#94A3B8" text-anchor="end">'+nfmt(v)+'</text>';}
+  const paso=Math.max(1,Math.ceil(serie.length/9));
+  serie.forEach((x,i)=>{ if(i%paso===0||i===serie.length-1) svg+='<text x="'+xs(i)+'" y="'+(H-12)+'" font-size="10" fill="#94A3B8" text-anchor="middle">'+x.desde.slice(0,7)+'</text>';
+    if(x.max>ymax) svg+='<circle cx="'+xs(i)+'" cy="'+(pt+4)+'" r="5" fill="#EF4444"><title>'+x.desde+' · máximo '+nfmt(x.max)+' mSv</title></circle><text x="'+Math.min(W-60,xs(i))+'" y="'+(pt+20)+'" font-size="10.5" font-weight="700" fill="#F87171" text-anchor="middle">máx '+nfmt(x.max)+' mSv</text>'; });
+  svg+='<path d="'+path('p95')+'" fill="none" stroke="'+cc+'" stroke-width="2.4"/><path d="'+path('media')+'" fill="none" stroke="'+cc+'" stroke-width="1.6" stroke-dasharray="5 4" opacity=".75"/>';
+  serie.forEach((x,i)=>{ svg+='<circle cx="'+xs(i)+'" cy="'+ys(x.p95)+'" r="3.2" fill="'+cc+'"><title>'+x.desde+' · '+x.usuarios+' usuarios · media '+nfmt(x.media)+' · p95 '+nfmt(x.p95)+' · máx '+nfmt(x.max)+' mSv</title></circle>'; });
+  svg+='</svg>';
+  const cob=AG.cobertura_historial||{}, cobMax=Math.max(1,...Object.values(cob));
+  box.innerHTML=avisoLimite()
+    +'<div class="aviso a-info"><b>Historial dosimétrico de 3 años.</b> El punto 16 del requerimiento de RRHH para la Autorización Sanitaria pide el historial '
+    +'de los últimos 3 años por persona expuesta. Hay <b>'+R.informes_cchen+' informes trimestrales de la CCHEN</b> cargados ('
+    +esc((AG.periodos[0]||{}).desde||'')+' a '+esc((AG.periodos[AG.periodos.length-1]||{}).hasta||'')+'); las devoluciones tardías de dosímetros se suman a su trimestre. '
+    +'Límites D.S. 3/85: '+(L.anual_legal||50)+' mSv en un año · '+(L.quinquenal||100)+' mSv en 5 años · nivel de investigación '+(L.investigacion||6)+' mSv en un período.</div>'
+    +kpis([['Con dosímetro al día',R.dosimetria_al_dia,'var(--info)'],['Historial completo (3 años o desde su ingreso)',R.historial_completo_12t,'var(--ok)'],
+      ['Con brechas en el historial',R.historial_con_brechas,R.historial_con_brechas?'var(--warn)':'var(--ok)'],['Sobre el límite anual',R.sobre_limite_anual,R.sobre_limite_anual?'var(--bad)':'var(--ok)']])
+    +'<div class="card" style="margin-top:12px"><h2>📈 Dosis trimestral por unidad (cliente CCHEN)</h2>'
+    +'<div class="inline" style="flex-wrap:wrap;gap:6px;margin:8px 0">'+unis.map(u=>'<button class="btn xs'+(u===HU?' pri':'')+'" onclick="HU=\''+esc(u)+'\';vHist()">'+esc(u)+'</button>').join('')+'</div>'
+    +'<div class="d">Línea continua: percentil 95 de las lecturas del trimestre · punteada: media · punto rojo: máximo fuera de escala. Pasa el cursor sobre un punto para ver el detalle.</div>'
+    +svg
+    +'<div class="tw" style="margin-top:10px;max-height:320px"><table><thead><tr><th>Trimestre desde</th><th>Usuarios</th><th style="text-align:right">Media (mSv)</th><th style="text-align:right">P95</th><th style="text-align:right">Máxima</th></tr></thead><tbody>'
+    +serie.slice().reverse().map(x=>'<tr><td>'+esc(x.desde)+'</td><td>'+x.usuarios+'</td><td style="text-align:right">'+nfmt(x.media)+'</td><td style="text-align:right">'+nfmt(x.p95)+'</td>'
+      +'<td style="text-align:right"><b style="color:'+(x.max>=(L.anual_legal||50)?'var(--bad)':x.max>=(L.investigacion||6)?'var(--warn)':'inherit')+'">'+nfmt(x.max)+'</b></td></tr>').join('')
+    +'</tbody></table></div></div>'
+    +'<div class="card"><h2>🧾 Cobertura del historial · personas con dosímetro al día</h2>'
+    +'<div class="d">Trimestres con lectura en los últimos 3 años. Quien ingresó después se compara con los trimestres controlados desde su primer dosímetro.</div>'
+    +'<div style="display:flex;align-items:flex-end;gap:6px;height:130px;margin-top:12px">'
+    +Array.from({length:12},(_,i)=>i+1).map(k=>{const v=cob[k]||0;return '<div style="flex:1;text-align:center;font-size:10.5px;color:var(--tx2)"><div style="font-weight:800;color:var(--tx)">'+(v||'')+'</div>'
+      +'<div style="height:'+Math.round(v*95/cobMax)+'px;background:'+(k>=10?'var(--ok)':k>=6?'var(--info)':'var(--warn)')+';border-radius:5px 5px 0 0"></div>'+k+'</div>';}).join('')
+    +'</div><div style="font-size:11px;color:var(--tx2);text-align:center;margin-top:2px">trimestres con lectura</div></div>';
+}
+
+/* ══ 🧮 COTEJO NÓMINAS · plataforma vs nóminas por servicio ═════════════════ */
+let CT={serv:'',acc:''};
+function vCot(){
+  const box=document.getElementById('p-cot');
+  if(!AG||!AG.cotejo_por_servicio){ box.innerHTML='<div class="aviso a-warn">Sin datos del cotejo.</div>'; return; }
+  const A=AG.cotejo_acciones||{}, Dd=AG.cotejo_discrepancias||{}, aMax=Math.max(1,...Object.values(A));
+  let det='';
+  if(PR){
+    const L=PRP.filter(p=>p.cotejo&&(!CT.serv||p.cotejo.servicios.includes(CT.serv))&&(!CT.acc||p.cotejo.acciones.some(a=>a.startsWith(CT.acc))));
+    det='<div class="card"><h2>👥 Detalle por persona <span class="pill p-bad">dato sensible · solo HUB local</span></h2>'
+      +'<div class="inline" style="flex-wrap:wrap;gap:8px;margin-top:8px"><select onchange="CT.serv=this.value;vCot()"><option value="">Todos los servicios</option>'
+      +AG.cotejo_por_servicio.map(x=>'<option'+(CT.serv===x.servicio?' selected':'')+'>'+esc(x.servicio)+'</option>').join('')+'</select>'
+      +'<select onchange="CT.acc=this.value;vCot()"><option value="">Todas las acciones</option>'+Object.keys(A).map(a=>'<option'+(CT.acc===a?' selected':'')+'>'+esc(a)+'</option>').join('')+'</select>'
+      +'<button class="btn" onclick="CF.uni=CT.serv?\'N:\'+CT.serv:\'\';CF.est=\'accion\';CF.q=\'\';cumplCSV()">📄 Exportar CSV</button>'
+      +'<span style="margin-left:auto;font-size:12px;color:var(--tx2)">'+L.length+' persona(s)</span></div>'
+      +'<div class="tw" style="margin-top:10px;max-height:60vh"><table><thead><tr><th>Persona</th><th>Servicio · estamento</th><th>Curso</th><th>Autorización</th><th>Dosímetro</th><th>Acción del OPR</th><th>Discrepancias entre fuentes</th></tr></thead><tbody>'
+      +L.slice(0,500).map(p=>'<tr><td><b>'+esc(p.nombre)+'</b>'+(p.run?' <small style="color:var(--tx2)">'+esc(p.run)+'</small>':'')+'</td>'
+        +'<td>'+esc(p.cotejo.servicios.join(' · '))+'<div style="font-size:11px;color:var(--tx2)">'+esc(p.cotejo.estamento||'')+'</div></td>'
+        +'<td>'+pill(p.estado.curso)+'</td><td>'+pill(p.estado.desempeno)+'</td><td>'+pill(p.estado.dosimetria)+'</td>'
+        +'<td style="font-size:11.5px">'+(p.cotejo.acciones.length?p.cotejo.acciones.map(a=>'• '+esc(a)).join('<br>'):'<span class="pill p-ok">sin acción</span>')+'</td>'
+        +'<td style="font-size:11px;color:var(--tx2)">'+p.cotejo.discrepancias.map(esc).join('<br>')+'</td></tr>').join('')
+      +'</tbody></table></div></div>';
+  }
+  box.innerHTML='<div class="aviso a-info"><b>Cotejo con las nóminas por servicio.</b> Las nóminas que levantaron los servicios para la Autorización Sanitaria '
+    +'se cruzaron por RUT con los documentos de la plataforma: resoluciones SEREMI en PDF, informes CCHEN, reporte SIRH de cursos y la nómina de cursos 2026. '
+    +'<b>Una nómina que declara «Sí» sin documento detrás cuenta como declarado, no como cumplido.</b></div>'
+    +tablaServicios()
+    +'<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px">'
+    +'<div class="card"><h2>🗂 Plan de trabajo del OPR</h2><div class="d">Personas de las nóminas de servicio por acción pendiente.</div>'
+    +Object.entries(A).map(([a,v])=>'<div style="margin-top:9px"><div style="display:flex;justify-content:space-between;font-size:12.5px"><span>'+esc(a)+'</span><b>'+v+'</b></div>'
+      +'<div class="bar" style="margin-top:3px"><i style="width:'+Math.round(v*100/aMax)+'%;background:var(--vio)"></i></div></div>').join('')
+    +'<div class="d" style="margin-top:10px">«Tramitar autorización de desempeño» sigue el punto 16 del requerimiento de RRHH. Conviene que el OPR confirme qué estamentos la requieren antes de iniciar los trámites.</div></div>'
+    +'<div class="card"><h2>🔍 Discrepancias entre fuentes</h2><div class="tw" style="margin-top:8px"><table><thead><tr><th>Tipo</th><th style="text-align:right">Casos</th></tr></thead><tbody>'
+    +Object.entries(Dd).map(([k,v])=>'<tr><td>'+esc(k)+'</td><td style="text-align:right"><b>'+v+'</b></td></tr>').join('')+'</tbody></table></div></div></div>'
+    +'<div class="card"><h2>📌 Hallazgos para corregir en las planillas de origen</h2><ul class="d" style="margin:8px 0 0 18px;line-height:1.7">'
+    +'<li>Una de las listas de RRHH de <b>Pabellón</b> tiene los RUT desfasados una fila (cada nombre con el RUT de la persona siguiente). Se reasignaron por nombre contra la dotación; hay que corregir la planilla antes de cualquier trámite.</li>'
+    +'<li>Hay RUT que pertenecen a otra persona según la dotación oficial: el detalle está en la hoja «Calidad RUT» del Excel del cotejo.</li>'
+    +'<li>Las nóminas de <b>Dental e Imagenología</b> no reflejan resoluciones SEREMI vigentes que sí están en PDF.</li>'
+    +'<li>Expuestos con dosímetro al día que no figuran en ninguna nómina de servicio: <b>'+(AG.resumen.al_dia_sin_nomina!=null?AG.resumen.al_dia_sin_nomina:'—')+'</b>. Las nóminas no cubren todo el personal controlado.</li>'
+    +'<li>Los cursos de PR realizados entre junio y agosto de 2026 ya se suman a la matriz desde la nómina de cursos realizados.</li></ul></div>'
+    +det;
+}
+
+/* ══ 🎟 DOSÍMETROS · asignación y devolución a la CCHEN ═══════════════════════
+   Un dosímetro que no vuelve al laboratorio es un trimestre sin lectura: la persona queda con
+   un vacío en el historial dosimétrico que exige la Autorización Sanitaria. */
+let DF = { q: '', serv: '' };
+function vDosim(){
+  const box = document.getElementById('p-dosim');
+  const D_ = window.PR_DOSIMETROS || null, agg = AG && AG.dosimetros;
+  if(!D_ && !agg){ box.innerHTML = '<div class="aviso a-warn">Falta <b>SHARED_DATA/pr_dosimetros.js</b> (se genera con <code>python3 _DEV/build_pr_dosimetros.py</code>).</div>'; return; }
+  const cont = (D_ ? D_.por_contrato : agg.por_contrato), total = D_ ? D_.total_pendientes : agg.total;
+  const corte = D_ ? D_.corte_cchen : agg.corte;
+  const barra = (v, max) => '<div class="bar" style="width:120px"><i style="width:' + Math.round(v * 100 / Math.max(1, max)) + '%;background:' + (v ? 'var(--bad)' : 'var(--ok)') + '"></i></div>';
+  const max = Math.max(...cont.map(c => c.pendientes), 1);
+  let det = '';
+  if(D_){
+    const L = D_.pendientes.filter(x => (!DF.serv || x.servicio === DF.serv) && (!DF.q || (x.usuario + ' ' + x.rut + ' ' + x.n_dosimetro).toLowerCase().includes(DF.q.toLowerCase())));
+    det = '<div class="card"><h2>👥 Detalle por dosímetro <span class="pill p-bad">dato sensible · solo HUB local</span></h2>'
+      + '<div class="inline" style="flex-wrap:wrap;gap:8px;margin-top:8px"><input placeholder="Buscar funcionario, RUT o N° de dosímetro…" value="' + esc(DF.q) + '" oninput="DF.q=this.value;vDosim();document.querySelector(\'#p-dosim input\').focus()" style="min-width:260px">'
+      + '<select onchange="DF.serv=this.value;vDosim()"><option value="">Todos los servicios</option>' + cont.filter(c => c.pendientes).map(c => '<option' + (DF.serv === c.servicio ? ' selected' : '') + '>' + esc(c.servicio) + '</option>').join('') + '</select>'
+      + '<button class="btn" onclick="dosimCSV()">📄 Exportar CSV</button><span style="margin-left:auto;font-size:12px;color:var(--tx2)">' + L.length + ' dosímetro(s)</span></div>'
+      + '<div class="tw" style="margin-top:10px;max-height:58vh"><table><thead><tr><th>Servicio</th><th>Funcionario</th><th>N° dosímetro</th><th>Asignado</th><th>Recambio</th><th>Fin de control</th></tr></thead><tbody>'
+      + L.slice(0, 400).map(x => '<tr><td>' + esc(x.servicio) + '</td><td><b>' + esc(x.usuario) + '</b></td><td class="mono">' + esc(x.n_dosimetro) + '</td>'
+        + '<td>' + esc(x.asignacion || '—') + '</td><td>' + esc(x.recambio || '—') + '</td><td>' + (x.fin_control ? esc(x.fin_control) : '<span class="pill p-bad">sin lectura</span>') + '</td></tr>').join('')
+      + '</tbody></table></div></div>';
+  }
+  const devs = (D_ && D_.devueltos_despues_del_corte) ? D_.devueltos_despues_del_corte.length : 0;
+  box.innerHTML = '<div class="aviso a-bad"><b>⚠ ' + total + ' dosímetros sin devolver a la CCHEN</b> al corte del ' + esc(corte)
+    + (devs ? ' (descontados ' + devs + ' que ya tienen lectura del mismo período en informes posteriores)' : '') + '. '
+    + 'Cada uno es un período sin lectura: esas personas quedan con un vacío en el historial dosimétrico que pide la Autorización Sanitaria. '
+    + 'La CCHEN comprometió una nueva revisión oficial de faltantes.</div>'
+    + kpis([['Sin devolver', total, 'var(--bad)'], ['Personas afectadas', (AG && AG.resumen.personas_con_dosimetro_no_devuelto) || '—', 'var(--warn)'],
+      ['De Pabellón', (cont.find(c => c.servicio === 'Pabellón') || {}).pendientes || 0, 'var(--bad)'], ['Contratos con la CCHEN', cont.length, 'var(--tx)']])
+    + '<div class="card" style="margin-top:12px"><h2>📄 Contratos de dosimetría</h2>'
+    + '<div class="d">El hospital mantiene cinco contratos con la CCHEN. El convenio está vigente hasta el <b>14-02-2027</b>.</div>'
+    + '<div class="tw" style="margin-top:10px"><table><thead><tr><th>Contrato</th><th>Servicio</th><th>Sin devolver</th><th></th></tr></thead><tbody>'
+    + cont.map(c => '<tr><td class="mono">' + esc(c.contrato || c.n) + '</td><td><b>' + esc(c.servicio) + '</b></td><td style="text-align:right"><b style="color:' + (c.pendientes ? 'var(--bad)' : 'var(--ok)') + '">' + c.pendientes + '</b></td><td>' + barra(c.pendientes, max) + '</td></tr>').join('')
+    + '</tbody></table></div>'
+    + '<div class="d" style="margin-top:8px"><b>Cómo se dan de alta:</b> reemplazo directo dentro de 15 días desde la baja, escribiendo a dosimetria@cchen.cl; pasado ese plazo, por el Portal de Negocios o el área Comercial. '
+    + 'Para un trabajador nuevo la CCHEN exige orden de compra antes de despachar. <b>Devolución:</b> Nueva Bilbao 12501, Las Condes, con la palabra DOSÍMETROS visible en el sobre.</div></div>'
+    + det;
+}
+function dosimCSV(){
+  const D_ = window.PR_DOSIMETROS; if(!D_) return;
+  const cu = s => '"' + String(s == null ? '' : s).replace(/"/g, '""') + '"';
+  const cab = 'Contrato;Servicio;Funcionario;RUT;N dosímetro;Código;Asignado;Recambio;Fin de control\n';
+  const cuerpo = D_.pendientes.map(x => [x.contrato, x.servicio, x.usuario, x.rut, x.n_dosimetro, x.cod_dosimetro, x.asignacion, x.recambio, x.fin_control].map(cu).join(';')).join('\n');
+  bajar('dosimetros_sin_devolver_' + hoy() + '.csv', '﻿' + cab + cuerpo, 'text/csv;charset=utf-8');
+}
+
+/* ══ 📋 LEVANTAMIENTO AS · planillas por servicio ════════════════════════════ */
+function vLev(){
+  const box = document.getElementById('p-lev');
+  const L = window.PR_LEVANTAMIENTO || (AG && AG.levantamiento) || null;
+  if(!L || !L.servicios){ box.innerHTML = '<div class="aviso a-warn">Falta <b>SHARED_DATA/pr_levantamiento.js</b> (se genera con <code>python3 _DEV/build_pr_levantamiento.py</code>).</div>'; return; }
+  const S = L.servicios, pl = L.plazos || {}, T = S.reduce((a, x) => ({ personas: a.personas + x.personas, sin: a.sin + x.sin_responder, expone: a.expone + x.expone_si }), { personas: 0, sin: 0, expone: 0 });
+  const dias = f => f ? Math.round((new Date(f + 'T00:00:00') - new Date(hoy() + 'T00:00:00')) / 86400000) : null;
+  const dTope = dias(pl.maximo), dAv = dias(pl.primer_avance);
+  const b = (v, t, c) => '<div style="display:flex;align-items:center;gap:6px"><div class="bar" style="width:90px"><i style="width:' + Math.round(v * 100 / Math.max(1, t)) + '%;background:' + c + '"></i></div><small>' + v + '</small></div>';
+  box.innerHTML = '<div class="aviso ' + (dTope != null && dTope <= 3 ? 'a-bad' : 'a-info') + '"><b>Levantamiento de personal expuesto para la Autorización Sanitaria.</b> '
+    + 'Cada servicio debe devolver su planilla diciendo quién se expone y quién tiene o requiere dosímetro, cada funcionario debe responder el formulario, '
+    + 'y hay que adjuntar los respaldos de curso y autorización de quienes estén expuestos.'
+    + (pl.maximo ? '<div style="margin-top:6px"><b>Primer avance:</b> ' + esc(pl.primer_avance) + (dAv != null ? ' (' + (dAv >= 0 ? 'en ' + dAv + ' día(s)' : 'hace ' + (-dAv) + ' día(s)') + ')' : '')
+      + ' · <b>Plazo máximo:</b> ' + esc(pl.maximo) + (dTope != null ? ' (' + (dTope >= 0 ? 'en ' + dTope + ' día(s)' : 'vencido hace ' + (-dTope) + ' día(s)') + ')' : '') + '</div>' : '')
+    + '<div style="margin-top:6px">' + (L.form ? '<a class="btn xs" href="' + esc(L.form) + '" target="_blank">📝 Abrir el formulario</a> ' : '')
+    + (PR ? '<button class="btn xs" onclick="exportCapacitacion()">🎓 Nómina de capacitación (Excel)</button>' : '') + '</div></div>'
+    + kpis([['Personas en las planillas', T.personas, 'var(--tx)'], ['Declaran exposición', T.expone, T.expone ? 'var(--info)' : 'var(--tx2)'],
+      ['Sin responder', T.sin, T.sin ? 'var(--warn)' : 'var(--ok)'], ['Servicios', S.length, 'var(--tx)']])
+    + '<div class="card" style="margin-top:12px"><h2>🏥 Avance por servicio</h2>'
+    + '<div class="d">La columna «se expone» la responde cada servicio; las demás vienen precargadas con lo que ya tiene la plataforma.</div>'
+    + '<div class="tw" style="margin-top:10px"><table><thead><tr><th>Servicio</th><th>Personas</th><th>Responde la exposición</th><th>Declaran exposición</th><th>Con curso precargado</th><th>Con dosímetro precargado</th></tr></thead><tbody>'
+    + S.map(x => '<tr><td><b>' + esc(x.servicio) + '</b></td><td>' + x.personas + '</td><td>' + b(x.personas - x.sin_responder, x.personas, 'var(--ok)') + '</td>'
+      + '<td>' + x.expone_si + '</td><td>' + b(x.curso, x.personas, 'var(--info)') + '</td><td>' + b(x.dosimetro, x.personas, 'var(--vio)') + '</td></tr>').join('')
+    + '</tbody></table></div>'
+    + '<div class="d" style="margin-top:8px">Criterio que fijó la OPR para los dosímetros: deben quedar en quien hoy está expuesto. En rotaciones fuera del hospital, comisión de servicio, permiso sin goce de sueldo, pre o postnatal, o funciones administrativas sin exposición, se evalúa dar de baja el dosímetro y reasignarlo.</div></div>';
+}
+
+/* ══ 🗳 FORMULARIO · autodeclaración del personal ════════════════════════════
+   Datos nominados: viven solo en el 🔴 HUB local (pr_formulario.js no se publica). */
+function vForm(){
+  const box=document.getElementById('p-form');
+  const F=window.PR_FORM||null;
+  if(!F){ box.innerHTML='<div class="aviso a-warn">Falta <b>SHARED_DATA/pr_formulario.js</b> (se genera con <code>python3 _DEV/build_pr_formulario.py</code>).</div>'; return; }
+  const R=F.resumen, P=F.personas;
+  const si=v=>v?'<span class="pill p-ok">sí</span>':'<span class="pill p-bad">no</span>';
+  const bar=(v,t,c)=>'<div style="display:flex;align-items:center;gap:6px"><div class="bar" style="width:90px"><i style="width:'+Math.round(v*100/Math.max(1,t))+'%;background:'+c+'"></i></div><small>'+v+' / '+t+'</small></div>';
+  const cob=F.cobertura.slice().sort((a,b)=>(a.pct||0)-(b.pct||0));
+  const brecha=[['Sin dosímetro',R.exp_sin_dosimetro,'var(--vio)'],['Sin curso',R.exp_sin_curso,'var(--warn)'],['Sin licencia de desempeño',R.exp_sin_licencia,'var(--bad)']];
+  const alertas={}; (F.inconsistencias||[]).forEach(i=>{alertas[i.alerta]=(alertas[i.alerta]||0)+1;});
+  box.innerHTML='<div class="aviso a-info"><b>Formulario de autodeclaración del personal.</b> '
+    +R.respuestas+' respuestas de <b>'+R.personas+' personas</b> al '+esc(R.corte)+' ('+R.reenvios+' reenvíos, se toma la última). '
+    +'Los certificados y licencias adjuntos quedaron archivados en el Drive de la OPR, ordenados por servicio.'
+    +'<div style="margin-top:6px"><a class="btn xs" href="'+esc(F.fuente.formulario)+'" target="_blank">📝 Formulario</a> '
+    +'<a class="btn xs" href="'+esc(F.fuente.planilla)+'" target="_blank">📊 Respuestas</a> '
+    +'<a class="btn xs" href="'+esc(F.fuente.carpeta)+'" target="_blank">📂 Carpeta en Drive</a> '
+    +'<button class="btn xs" onclick="formExcel()">⬇ Nómina del formulario (CSV)</button></div></div>'
+    +kpis([['Respondieron',R.personas,'var(--tx)'],['Declaran exposición',R.expuestos,'var(--info)'],
+           ['Cumplen los 3 requisitos',R.exp_completos,R.exp_completos?'var(--ok)':'var(--tx2)'],
+           ['Expuestos sin nada de respaldo',R.exp_sin_nada,R.exp_sin_nada?'var(--bad)':'var(--ok)']])
+    +'<div class="card" style="margin-top:12px"><h2>🏥 Cobertura por servicio</h2>'
+    +'<div class="d">Cuántos de la nómina del levantamiento ya contestaron. El orden parte por el servicio más atrasado.</div>'
+    +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>Servicio</th><th>Nómina</th><th>Respondieron</th><th>%</th></tr></thead><tbody>'
+    +cob.map(c=>'<tr><td><b>'+esc(c.servicio)+'</b></td><td>'+c.nomina+'</td><td>'+bar(c.respondieron,c.nomina,c.pct>=25?'var(--ok)':'var(--warn)')+'</td>'
+      +'<td>'+(c.pct!=null?'<span class="pill '+(c.pct>=25?'p-ok':c.pct>=10?'p-warn':'p-bad')+'">'+c.pct+'%</span>':'—')+'</td></tr>').join('')
+    +'</tbody></table></div></div>'
+    +'<div class="card"><h2>🚨 Brechas de los '+R.expuestos+' que declaran exposición</h2><div class="grid g3" style="margin-top:10px">'
+    +brecha.map(([l,v,c])=>'<div class="kpi"><div class="n" style="color:'+c+'">'+v+'</div><div class="l">'+l+'</div></div>').join('')+'</div>'
+    +'<div class="d" style="margin-top:10px">Evidencia recibida: <b>'+R.adjuntos_curso+'</b> certificados de curso y <b>'+R.adjuntos_licencia+'</b> licencias de desempeño. '
+    +'De eso, <b>'+R.aportan_curso+'</b> cursos y <b>'+R.aportan_licencia+'</b> licencias son información que la matriz no tenía.</div></div>'
+    +'<div class="card"><h2>⚠ Respuestas que hay que confirmar</h2>'
+    +'<div class="tw" style="margin-top:8px"><table><thead><tr><th>Qué pasa</th><th style="text-align:right">Casos</th></tr></thead><tbody>'
+    +Object.entries(alertas).sort((a,b)=>b[1]-a[1]).map(([k,v])=>'<tr><td>'+esc(k)+'</td><td style="text-align:right"><b>'+v+'</b></td></tr>').join('')
+    +'</tbody></table></div>'
+    +(F.sin_enviar&&F.sin_enviar.length?'<div class="aviso a-warn" style="margin-top:10px"><b>'+F.sin_enviar.length+' documento(s) subido(s) sin enviar el formulario.</b> '
+      +'Quedan en la carpeta de adjuntos pero sin respuesta asociada: '+F.sin_enviar.map(x=>esc(x.quien||x.archivo)).join(', ')+'.</div>':'')
+    +(R.fuera_de_nomina?'<div class="d" style="margin-top:8px">'+R.fuera_de_nomina+' persona(s) respondieron sin estar en ninguna nómina del levantamiento: hay que decidir si corresponde incorporarlas.</div>':'')
+    +'</div>'
+    +'<div class="card"><h2>👥 Detalle por persona</h2><div class="d">'+P.length+' personas. Nominado: esta tabla no sale del 🔴 HUB local.</div>'
+    +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>Servicio</th><th>Persona</th><th>Estamento</th><th>Se expone</th><th>Dosímetro</th><th>Curso</th><th>Licencia</th><th>Adjuntos</th><th>Observación</th></tr></thead><tbody>'
+    +P.map(x=>'<tr><td>'+esc(x.servicio||'—')+'</td><td><b>'+esc(x.nombre||'—')+'</b><br><small style="color:var(--tx2)">'+esc(x.rut)+'</small></td>'
+      +'<td><small>'+esc(x.estamento||'')+(x.especialidad&&x.especialidad!=='No aplica'?' · '+esc(x.especialidad):'')+'</small></td>'
+      +'<td>'+si(x.expone)+'</td><td>'+si(x.dosimetro)+'</td><td>'+si(x.curso)+'</td>'
+      +'<td>'+si(x.licencia)+(x.licencia&&x.vigente?' <small>'+esc(x.vigente.toLowerCase()==='si'?'vigente':'no vigente')+'</small>':'')+'</td>'
+      +'<td>'+(x.evidencia.length?x.evidencia.map(e=>'<span class="pill p-info">'+(e.tipo==='curso'?'certificado':'licencia')+'</span>').join(' '):'<small style="color:var(--tx2)">—</small>')+'</td>'
+      +'<td><small>'+(x.alertas.length?esc(x.alertas.join('; ')):'')+'</small></td></tr>').join('')
+    +'</tbody></table></div></div>';
+}
+function formExcel(){
+  const F=window.PR_FORM; if(!F) return;
+  const cu=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const cab=['Servicio','Nombre','RUT','Estamento','Especialidad','Se expone','Dosímetro','Curso','Certificado adjunto','Licencia','Licencia adjunta','Vigente','Aporta a la matriz','Observación'].join(';')+'\n';
+  const cuerpo=F.personas.map(x=>[x.servicio,x.nombre,x.rut,x.estamento,x.especialidad,x.expone?'SI':'NO',x.dosimetro?'SI':'NO',
+    x.curso?'SI':'NO',x.evidencia.some(e=>e.tipo==='curso')?'SI':'',x.licencia?'SI':'NO',x.evidencia.some(e=>e.tipo==='licencia')?'SI':'',
+    x.vigente||'',(x.aporta||[]).join(' / '),(x.alertas||[]).join('; ')].map(cu).join(';')).join('\n');
+  bajar('formulario_PR_'+F.resumen.corte+'.csv','﻿'+cab+cuerpo,'text/csv;charset=utf-8');
+}
+
+/* ══ ✅ COTEJO OPR · gran cotejo de la Oficial de Protección Radiológica ═══════
+   La OPR define QUIÉN se expone. Las cifras agregadas viajan en pr_resumen (🟡);
+   el detalle por persona y los aportes salen de pr_personal (solo 🔴 local). */
+const COPR_TIPO={curso_respaldo:'Curso «sí, sin documento»: la plataforma tiene el respaldo',
+  curso_no_registrado:'Figura «sin curso», pero tiene curso registrado',
+  autorizacion_vigente:'Figura sin autorización, pero hay resolución vigente',
+  dosimetro_cchen:'Figura «sin dosímetro», pero tiene lectura CCHEN reciente',
+  dosimetro_activo:'Figura «sin dosímetro», pero está en la hoja de control CChEN vigente',
+  dosimetro_no_en_hoja:'Figura con dosímetro, pero no está en la hoja de control CChEN vigente',
+  servicio_cambiado:'Su dosímetro está (o estuvo) en el contrato de otro servicio',
+  contrato_cruzado:'⛔ Contrato cruzado: dosímetro del contrato de otro servicio',
+  curso:'Certificado de curso que la plataforma no tenía', autorizacion:'Resolución de desempeño que la plataforma no tenía',
+  persona_nueva:'Persona expuesta que no estaba en la plataforma'};
+function vCopr(){
+  const box=document.getElementById('p-copr'), C=AG&&AG.cotejo_opr;
+  if(!C){ box.innerHTML='<div class="aviso a-warn">Falta el cotejo de la OPR (se genera con <code>python3 _DEV/build_pr_cotejo_opr.py</code> y luego <code>build_pr_personal.py</code>).</div>'; return; }
+  const T=C.total, pct=(v,t)=>t?Math.round(v*100/t)+'%':'—';
+  const fila=(x,k)=>'<tr><td><b>'+esc(x[k])+'</b></td><td>'+x.personas+'</td><td>'+x.encuesta+' <small>('+pct(x.encuesta,x.personas)+')</small></td>'
+    +'<td>'+x.curso_si+'</td><td>'+x.curso_sin_doc+'</td><td>'+(x.sin_curso?'<span class="pill p-warn">'+x.sin_curso+'</span>':'0')+'</td>'
+    +'<td>'+x.dosimetro+'</td><td>'+(x.sin_dosimetro?'<span class="pill p-warn">'+x.sin_dosimetro+'</span>':'0')+'</td>'
+    +'<td>'+x.autorizacion+(x.vencida?' <small>+'+x.vencida+' venc.</small>':'')+(x.en_firma?' <small>+'+x.en_firma+' en firma</small>':'')+'</td>'
+    +'<td>'+(x.sin_autorizacion?'<span class="pill p-bad">'+x.sin_autorizacion+'</span>':'0')+'</td><td><b>'+x.al_dia+'</b></td></tr>';
+  const cab='<thead><tr><th></th><th>Expuestos</th><th>Encuesta</th><th>Curso con doc.</th><th>Curso sin doc.</th><th>Sin curso</th><th>Dosímetro</th><th>Sin dosímetro</th><th>Autorización</th><th>Sin autorización</th><th>Al día</th></tr></thead>';
+  let h='<div class="aviso a-info"><b>Gran cotejo de la OPR al '+esc(C.corte)+'.</b> Ally cruzó la planilla de cada servicio (depurada a expuestos), '
+    +'la encuesta individual, la nómina CChEN y los certificados y autorizaciones que ordenó por servicio. Es la <b>nómina oficial de personal expuesto</b> (solo staff, sin becados). '
+    +'La plataforma la toma como base y le suma lo que tiene por su cuenta: SIRH, diplomas 2017-2026, resoluciones SEREMI e informes CCHEN.'
+    +'</div>'
+    +kpis([['Personas expuestas',T.personas,'var(--tx)'],['Al día en los 3 requisitos',T.al_dia,'var(--ok)'],
+           ['Sin autorización de desempeño',T.sin_autorizacion,'var(--bad)'],['Sin curso de PR',T.sin_curso,'var(--warn)'],
+           ['Sin dosímetro',T.sin_dosimetro,'var(--vio)'],['Respondieron la encuesta',T.encuesta+' ('+pct(T.encuesta,T.personas)+')','var(--info)']])
+    +'<div class="card" style="margin-top:12px"><h2>🏥 Por servicio</h2><div class="tw"><table>'+cab+'<tbody>'
+    +C.por_servicio.map(x=>fila(x,'servicio')).join('')+fila({...T,servicio:'TOTAL'},'servicio')+'</tbody></table></div></div>'
+    +'<div class="card"><h2>👥 Por estamento</h2><div class="tw"><table>'+cab+'<tbody>'+C.por_estamento.map(x=>fila(x,'estamento')).join('')+'</tbody></table></div></div>';
+  const AP=C.aportes_plataforma||{}, AO=C.aportes_opr||{}, Dc=C.documentos||{};
+  h+='<div class="grid g2"><div class="card"><h2>🤝 Lo que la plataforma aporta a la OPR</h2><div class="tw"><table><tbody>'
+    +Object.entries(AP).sort((a,b)=>b[1]-a[1]).map(([k,v])=>'<tr><td>'+esc(COPR_TIPO[k]||k)+'</td><td style="text-align:right"><b>'+v+'</b></td></tr>').join('')
+    +'</tbody></table></div>'+(PR?'<div style="margin-top:8px"><button class="btn xs" onclick="coprCSV()">⬇ Aportes por persona para la OPR (CSV)</button></div>':'')+'</div>'
+    +'<div class="card"><h2>📥 Lo que la OPR suma a la plataforma</h2><div class="tw"><table><tbody>'
+    +Object.entries(AO).sort((a,b)=>b[1]-a[1]).map(([k,v])=>'<tr><td>'+esc(COPR_TIPO[k]||k)+'</td><td style="text-align:right"><b>'+v+'</b></td></tr>').join('')
+    +'<tr><td>Documentos leídos de sus carpetas (texto u OCR)</td><td style="text-align:right"><b>'+Dc.leidos+'</b></td></tr>'
+    +'</tbody></table></div><div class="d" style="margin-top:6px">'+Dc.sin_rut+' documento(s) sin RUT legible · '+Dc.mal_archivados+' en una carpeta que no corresponde · '
+    +Dc.personas_fuera_del_cotejo+' persona(s) con documento en las carpetas que no figuran en el gran cotejo.</div></div></div>';
+  const H=C.cchen;
+  if(H){
+    h+='<div class="card"><h2>🎟 Dosímetros activos según la CChEN · hojas de control '+esc((H.periodo||[]).join(' → '))+'</h2>'
+      +'<div class="d">Lo que la CChEN tiene asignado hoy, contrato por contrato, cruzado con el gran cotejo y con las respuestas de la CChEN a las consultas de la OPR. '
+      +'Cirugía y Urología no tienen contrato propio: sus expuestos no tienen dosímetro a su nombre.</div>'
+      +kpis([['Dosímetros activos',H.activos,'var(--tx)'],['Expuestos con dosímetro a su nombre',H.expuestos_con_activo,'var(--ok)'],
+             ['Expuestos sin dosímetro a su nombre',H.expuestos_sin_activo,'var(--warn)'],['Activos de personas fuera del cotejo',H.activos_fuera_del_cotejo,'var(--vio)'],
+             ['⛔ Contrato cruzado (activos)',H.contrato_cruzado_activo||0,(H.contrato_cruzado_activo?'var(--bad)':'var(--ok)')]])
+      +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>Contrato</th><th style="text-align:right">Activos</th></tr></thead><tbody>'
+      +Object.entries(H.por_contrato).map(([k,v])=>'<tr><td>'+esc(k)+'</td><td style="text-align:right">'+v+'</td></tr>').join('')
+      +'</tbody></table></div><div class="d" style="margin-top:6px">Expuestos sin dosímetro a su nombre, por servicio: '
+      +Object.entries(H.sin_activo_por_servicio).filter(e=>e[1]).map(([k,v])=>esc(k)+' <b>'+v+'</b>').join(' · ')+'.</div>';
+    if(PR){
+      const P=PR.personas, ofic=p=>p.opr&&p.opr.en_indicadores;
+      const fuera=P.filter(p=>p.cchen_activo&&!ofic(p));
+      const sinHoja=P.filter(p=>ofic(p)&&(p.opr.aportes_plataforma||[]).some(a=>a.tipo==='dosimetro_no_en_hoja'));
+      const camb=P.filter(p=>p.contrato_cruzado&&p.contrato_cruzado.length);
+      const resp=p=>(p.cchen_respuestas||[]).map(x=>esc(x.respuesta)).join('; ');
+      const sug=p=>{ const r=(p.cchen_respuestas||[]).map(x=>x.respuesta||'').join(' ');
+        if(p.contrato_cruzado&&p.contrato_cruzado.some(c=>c.tipo==='activo')) return '<span class="pill p-bad">⛔ contrato cruzado</span>';
+        if(/dio de baja|NO ACTIVO/i.test(r)) return '<span class="pill p-info">ya dado de baja: sacarlo de la hoja</span>';
+        if(/reasign/i.test(r)) return '<span class="pill p-ok">CChEN autoriza: baja y reasignar</span>';
+        if(p.opr_decision&&p.opr_decision.decision==='no_expuesto') return '<span class="pill p-warn">no se expone: baja y reasignar</span>';
+        if(p.opr_decision&&p.opr_decision.decision==='pendiente') return '<span class="pill">OPR consultando</span>';
+        if(p.opr&&!p.opr.en_indicadores) return '<span class="pill">en el cotejo, fuera de indicadores</span>';
+        return '<span class="pill p-warn">confirmar uso; si se libera, solo a personal del mismo servicio</span>'; };
+      h+='<h3 style="margin-top:14px">Dosímetros a nombre de personas que no están en el cotejo ('+fuera.length+')</h3>'
+        +'<div class="d">Cupos que se pueden recuperar. La CChEN permite dar de baja y reasignar «bajo el mismo contrato al nuevo TOE», pero <b>solo a personal del mismo servicio del contrato</b>: usar el cupo de un servicio para alguien de otro es justo lo que hay que evitar (contrato cruzado).</div>'
+        +'<div class="tw" style="margin-top:6px"><table><thead><tr><th>Contrato</th><th>Titular en la hoja</th><th>Unidad en la dotación</th><th>Respuesta CChEN</th><th>Sugerencia</th></tr></thead><tbody>'
+        +fuera.map(p=>'<tr><td>'+p.cchen_activo.map(a=>esc(a.contrato+' '+a.servicio)+'<br><small>'+esc(a.dosimetro)+'</small>').join('')+'</td><td><b>'+esc(p.nombre)+'</b>'
+          +(p.opr_decision?'<br><small>'+esc(p.opr_decision.motivo)+'</small>':'')+'</td><td><small>'+esc((p.dotacion&&p.dotacion.unidad)||'no está en la dotación')+'</small></td>'
+          +'<td><small>'+(resp(p)||'—')+'</small></td><td>'+sug(p)+'</td></tr>').join('')+'</tbody></table></div>'
+        +'<h3 style="margin-top:14px">Expuestos que la OPR da «con dosímetro» y no están en ninguna hoja vigente ('+sinHoja.length+')</h3>'
+        +'<div class="d">Si lo usan, es un dosímetro a nombre de otra persona: su dosis queda registrada en otro historial. Regularizar con los cupos de la tabla anterior.</div>'
+        +'<div class="tw" style="margin-top:6px"><table><thead><tr><th>Servicio</th><th>Persona</th><th>Estamento</th><th>Respuesta CChEN</th></tr></thead><tbody>'
+        +sinHoja.map(p=>'<tr><td>'+esc(p.opr.servicio)+'</td><td><b>'+esc(p.nombre)+'</b></td><td><small>'+esc(p.opr.estamento||'')+'</small></td><td><small>'+(resp(p)||'—')+'</small></td></tr>').join('')+'</tbody></table></div>'
+        +'<h3 style="margin-top:14px">⛔ Contrato cruzado: dosímetro del contrato de otro servicio ('+camb.length+')</h3>'
+        +'<div class="aviso a-bad" style="margin-top:6px"><b>Regla:</b> un dosímetro de un contrato CChEN se asigna solo a personal de ese servicio. No se da de baja el de una persona para pasárselo a alguien de otro servicio (por ejemplo, un cupo de Vascular a un TM de Imágenes): esa persona va al contrato de su propio servicio, con una solicitud nueva si hace falta.</div>'
+        +'<div class="tw" style="margin-top:6px"><table><thead><tr><th>Persona</th><th>Su servicio</th><th>Contrato del dosímetro</th><th>Respuesta CChEN</th></tr></thead><tbody>'
+        +camb.map(p=>p.contrato_cruzado.map(c=>'<tr><td><b>'+esc(p.nombre)+'</b></td><td>'+esc(c.servicio_persona)+' <small style="color:var(--tx2)">('+esc(c.fuente_servicio)+')</small></td>'
+          +'<td>'+esc(c.contrato+' '+c.servicio_contrato)+'<br><small>'+(c.tipo==='activo'?'activo '+esc(c.dosimetro):'última lectura '+esc(c.desde)+' · hoy sin dosímetro')+'</small></td><td><small>'+(resp(p)||'—')+'</small></td></tr>').join('')).join('')
+        +'</tbody></table></div>';
+    }
+    h+='</div>';
+  }
+  if(PR){
+    const P=PR.personas, porKey={}; P.forEach(p=>porKey[p.key]=p);
+    const conAp=P.filter(p=>p.opr&&p.opr.en_indicadores&&p.opr.aportes_plataforma&&p.opr.aportes_plataforma.length);
+    const nom=s=>String(s||'').normalize('NFD').replace(/[^A-Za-z ]/g,' ').toUpperCase().split(/\s+/).filter(Boolean).sort().join(' ');
+    const rev=(PR.cotejo_opr_revisar||[]).map(r=>{
+      const q=P.find(p=>p.opr&&nom(p.nombre)===nom(r.sujeto))||P.find(p=>nom(p.nombre)===nom(r.sujeto)); let nota='';
+      const doc=(PR.cotejo_opr_docs||[]).find(d=>d.archivo.indexOf(String(r.sujeto||'').replace(/\.pdf$/i,''))>=0&&d.ruts&&d.ruts.length);
+      if(doc){ const o=porKey[doc.ruts[0]]; nota=(doc.mal_archivado?'Es una resolución SEREMI de desempeño':'Documento')+(o?' de <b>'+esc(o.nombre)+'</b>':'')+(doc.resolucion?' (Res. '+esc(doc.resolucion)+', vence '+esc(doc.vence)+')':'')+(doc.mal_archivado?': moverla a su carpeta de autorizaciones.':'.'); }
+      else if(q){ nota='Curso: '+(q.curso?esc((q.curso.situacion||'')+(q.curso.termino?' · '+q.curso.termino:'')):'sin registro')
+        +' · Autorización: '+(q.desempeno&&q.desempeno.vence?'vence '+esc(q.desempeno.vence):'sin resolución')+(q.opr_docs?' · '+q.opr_docs.length+' documento(s) en sus carpetas':''); }
+      return '<tr><td>'+esc(r.servicio)+'</td><td><b>'+esc(r.sujeto)+'</b><br><small>'+esc(r.que)+'</small></td><td><small>'+(nota||'—')+'</small></td></tr>'; });
+    h+='<div class="card"><h2>🔎 «Por revisar» de la OPR · lo que encuentra la plataforma</h2><div class="tw"><table><thead><tr><th>Servicio</th><th>Caso</th><th>Lo que dicen los documentos</th></tr></thead><tbody>'+rev.join('')+'</tbody></table></div></div>';
+    const fuera=P.filter(p=>p.opr_docs&&!p.opr);
+    if(fuera.length) h+='<div class="card"><h2>📂 Con documento en las carpetas de la OPR, pero fuera del gran cotejo</h2><div class="d">Lo que la OPR respondió el 07-10 va bajo cada nombre.</div><div class="tw" style="margin-top:8px"><table><tbody>'
+      +fuera.map(p=>'<tr><td><b>'+esc(p.nombre)+'</b>'+(p.opr_decision?'<br><span class="pill '+(p.opr_decision.decision==='pendiente'?'p-warn':'p-info')+'">'+esc(p.opr_decision.motivo)+'</span>':'')+'</td><td><small>'+p.opr_docs.map(esc).join('<br>')+'</small></td><td>'+(p.desempeno&&p.desempeno.vence?'autorización vence '+esc(p.desempeno.vence):'')+'</td></tr>').join('')+'</tbody></table></div></div>';
+    h+='<div class="card"><h2>🧾 Aportes por persona ('+conAp.length+')</h2><div class="d">Nominado: solo en el 🔴 HUB local.</div><div class="tw" style="margin-top:8px"><table><thead><tr><th>Servicio</th><th>Persona</th><th>Según la OPR</th><th>Lo que tiene la plataforma</th></tr></thead><tbody>'
+      +conAp.map(p=>'<tr><td>'+esc(p.opr.servicio)+'</td><td><b>'+esc(p.nombre)+'</b><br><small style="color:var(--tx2)">'+esc(p.run||'')+'</small></td>'
+        +'<td><small>Curso: '+esc(p.opr.curso)+' · Dosímetro: '+esc(p.opr.dosimetro)+' · Autorización: '+esc(p.opr.autorizacion)+'</small></td>'
+        +'<td><small>'+p.opr.aportes_plataforma.map(a=>'<b>'+esc(COPR_TIPO[a.tipo]||a.tipo)+'</b>: '+esc(a.detalle||'')+(a.respaldo?' <span style="color:var(--tx2)">('+esc(String(a.respaldo).split('/').pop())+')</span>':'')).join('<br>')+'</small></td></tr>').join('')
+      +'</tbody></table></div></div>';
+  }
+  box.innerHTML=h;
+}
+function coprCSV(){
+  if(!PR) return;
+  const cu=v=>'"'+String(v==null?'':v).replace(/"/g,'""')+'"';
+  const filas=[];
+  PR.personas.filter(p=>p.opr&&p.opr.en_indicadores).forEach(p=>(p.opr.aportes_plataforma||[]).forEach(a=>filas.push(
+    [p.opr.servicio,p.nombre,p.run,p.opr.estamento,p.opr.curso,p.opr.dosimetro,p.opr.autorizacion,COPR_TIPO[a.tipo]||a.tipo,a.detalle,a.respaldo].map(cu).join(';'))));
+  bajar('aportes_plataforma_OPR_'+PR.cotejo_opr.corte+'.csv','﻿'+['Servicio','Nombre','RUT','Estamento','Curso (OPR)','Dosímetro (OPR)','Autorización (OPR)','Aporte','Detalle','Respaldo'].join(';')+'\n'+filas.join('\n'),'text/csv;charset=utf-8');
+}
+
+/* ══ 📜 AUTORIZACIÓN DE EQUIPOS EMISORES (HDS actual) ════════════════════════ */
+function vEqAut(){
+  const box=document.getElementById('p-eqaut');
+  const Q=window.PR_EQ_AUT||null;
+  if(!Q){ box.innerHTML='<div class="aviso a-warn">Falta <b>SHARED_DATA/pr_equipos_autorizacion.js</b> (se genera con <code>python3 _DEV/build_pr_equipos_autorizacion.py</code>).</div>'; return; }
+  const R=Q.resumen;
+  const est=e=>e.estado==='vencida'?'<span class="pill p-bad">vencida</span>'
+    :e.estado==='vigente'?'<span class="pill p-ok">vigente</span>':'<span class="pill p-warn">sin fecha legible</span>';
+  box.innerHTML='<div class="aviso '+(R.vencidas?'a-bad':'a-info')+'"><b>Autorizaciones de funcionamiento de los equipos emisores · HDS actual.</b> '
+    +esc(Q.nota)+'</div>'
+    +kpis([['Equipos con resolución',R.equipos,'var(--tx)'],['Vencidas',R.vencidas,R.vencidas?'var(--bad)':'var(--ok)'],
+           ['Vigentes',R.vigentes,R.vigentes?'var(--ok)':'var(--tx2)'],['Sin fecha legible',R.sin_fecha,R.sin_fecha?'var(--warn)':'var(--ok)']])
+    +'<div class="card" style="margin-top:12px"><h2>📜 Resoluciones SEREMI</h2>'
+    +'<div class="d">Cada resolución autoriza un equipo en un recinto determinado. Al trasladarse al NHDS cambia el recinto, así que corresponde pedir autorización nueva.</div>'
+    +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>Servicio</th><th>Equipo</th><th>Marca y modelo</th><th>Año</th><th>Serie</th><th>Ubicación autorizada</th><th>Resolución</th><th>Vence</th><th>Estado</th></tr></thead><tbody>'
+    +Q.equipos.map(e=>'<tr><td><b>'+esc(e.servicio||'—')+'</b></td><td>'+esc(e.equipo)+(e.tipo?'<br><small style="color:var(--tx2)">'+esc(e.tipo)+'</small>':'')+'</td>'
+      +'<td>'+esc(e.marca||'—')+'<br><small>'+esc(e.modelo||'')+'</small></td><td>'+esc(e.anio||'—')+'</td>'
+      +'<td><small>'+esc(e.serie_equipo||'—')+'</small></td><td><small>'+esc(e.ubicacion||'—')+'</small></td>'
+      +'<td>'+(e.resolucion?'N° '+esc(e.resolucion)+'<br><small>'+esc(e.emision||'')+'</small>':'<small>—</small>')+'</td>'
+      +'<td>'+esc(e.vence||'—')+'</td><td>'+est(e)+'</td></tr>').join('')
+    +'</tbody></table></div>'
+    +'<div class="d" style="margin-top:8px">Fuente: '+esc(Q.fuente)+'. Los PDF están en el Drive de la OPR, en «00 EQUIPOS EMISORES · autorización de funcionamiento» y en la carpeta de resoluciones de cada servicio.</div></div>';
+}
+
+/* ══ 🏗 NHDS · EQUIPOS EMISORES CATEGORIZADOS (D.S. 133/84) ═════════════════ */
+const NHDS_CAT_COL={'1ª':'var(--bad)','2ª':'var(--ok)','2ª · móviles':'var(--warn)','3ª':'var(--tx2)'};
+function vEqNhds(){
+  const box=document.getElementById('p-eqnhds');
+  const N=window.PR_EQ_NHDS||null;
+  if(!N){ box.innerHTML='<div class="aviso a-warn">Falta <b>SHARED_DATA/pr_equipos_nhds.js</b> (se genera con <code>python3 _DEV/pr_nhds/build_pr_equipos_nhds.py</code>).</div>'; return; }
+  const R=N.resumen, em=N.equipos.filter(e=>e.emisor), ins=N.equipos.filter(e=>!e.emisor);
+  const pc=e=>'<span class="pill" style="background:'+(NHDS_CAT_COL[e]||'var(--tx2)')+';color:#fff">'+esc(e)+'</span>';
+  const GN={}; N.grupos.forEach(g=>GN[g.id]=g);
+  box.innerHTML=
+    '<div class="aviso a-info"><b>Nuevo HDS · '+R.emisores+' equipos generadores de radiaciones ionizantes</b> en '+R.salas_fijas
+    +' salas fijas + '+R.moviles+' móviles, más Medicina Nuclear como instalación de 1ª categoría y sus fuentes selladas. '
+    +esc(N.nota)+' <small>Fuente: '+esc(N.fuente)+' · generado '+esc(N.generado)+'</small></div>'
+    +kpis([['Emisores',R.emisores,'var(--tx)'],['1ª categoría (CCHEN)',R.por_categoria['1ª']||0,'var(--bad)'],
+           ['2ª categoría (SEREMI)',R.por_categoria['2ª']||0,'var(--ok)'],['Serie leída en acta de recepción',(R.con_serie_acta||0)+' / '+R.emisores,'var(--ok)'],
+           ['Sin N° de serie',R.sin_serie,R.sin_serie?'var(--warn)':'var(--ok)'],['Sin acta de recepción',R.sin_acta,R.sin_acta?'var(--warn)':'var(--ok)']])
+    /* marco */
+    +'<div class="card" style="margin-top:12px"><h2>⚖️ Las tres categorías del D.S. 133/84 (art. 7)</h2><div class="d">'+esc(N.marco.norma)+'</div>'
+    +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>Categoría</th><th>Autoridad</th><th>Qué comprende</th><th>Trámite y antecedentes</th><th>En el NHDS</th></tr></thead><tbody>'
+    +N.marco.categorias.map(c=>'<tr><td>'+pc(c.cat)+'<br><small>'+esc(c.vigencia)+'</small></td><td>'+esc(c.autoridad)+'</td><td><small>'+esc(c.define)+'</small></td><td><small>'+esc(c.tramites)+'</small></td><td><small>'+esc(c.nhds)+'</small></td></tr>').join('')
+    +'</tbody></table></div>'
+    +'<div class="grid g4" style="margin-top:10px">'+Object.entries(R.solicitudes_estimadas).map(([k,v])=>'<div class="kpi"><div class="n">'+v+'</div><div class="l">'+esc(k)+'</div></div>').join('')+'</div></div>'
+    /* grupos */
+    +N.grupos.map(g=>'<div class="card" style="margin-top:12px"><h2>'+pc(g.cat)+' '+esc(g.nombre)+' <span class="pill p-mute">'+esc(g.autoridad)+'</span>'
+      +(g.n_equipos?' <span class="pill p-ok">'+g.n_equipos+' equipos</span>':'')+(g.n_instrumentos?' <span class="pill p-mute">'+g.n_instrumentos+' instrumentos</span>':'')+'</h2>'
+      +'<div class="d"><b>'+esc(g.edif)+' · '+esc(g.piso)+'</b> · '+esc(g.tramite)+(g.recintos?'<br>Recintos: '+esc(g.recintos.join(' · ')):'')+'</div>'
+      +'<div class="grid g2" style="margin-top:8px"><div><label>✅ Recibido</label><ul style="margin:4px 0 0 18px">'+g.recibido.map(x=>'<li><small>'+esc(x)+'</small></li>').join('')+'</ul></div>'
+      +'<div><label>⚠ Falta</label><ul style="margin:4px 0 0 18px">'+g.falta.map(x=>'<li><small>'+esc(x)+'</small></li>').join('')+'</ul></div></div>'
+      +(g.nota?'<div class="aviso a-warn" style="margin:10px 0 0"><small>'+esc(g.nota)+'</small></div>':'')+'</div>').join('')
+    /* tabla de equipos */
+    +'<div class="card" style="margin-top:12px"><h2>📋 Equipos emisores · uno por BIM <button class="btn" onclick="nhdsCSV()" style="float:right">⬇ CSV</button></h2>'
+    +'<div class="d">El N° de serie sale de las <b>actas de recepción RC-IB</b> (Existencias 23-09-26, OCR LecturaActasEQM, verificadas a ojo'+(R.actas_fuente?'':'')+'); lo que falta (tubo, kV/mA, año, planos, memoria, levantamiento, aceptación) se pide a la Concesionaria en la planilla «Levantamiento Equipos Emisores NHDS» (17.Autorización Sanitaria / Radiaciones Ionizantes NHDS).</div>'
+    +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>N°</th><th>Cat.</th><th>Grupo</th><th>Código</th><th>Equipo</th><th>Marca · modelo (PINS)</th><th>Ubicación</th><th>Estado PINS</th><th>Acta · N° de serie</th><th>Recibido (CS-IF-9184)</th><th>Alerta</th></tr></thead><tbody>'
+    +em.map(e=>'<tr><td>'+e.n+'</td><td>'+pc(e.cat)+'</td><td><small>'+esc((GN[e.grupo]||{}).nombre||e.grupo)+'</small></td><td class="mono">'+esc(e.code)+'</td>'
+      +'<td>'+esc(e.nombre)+'<br><small style="color:var(--tx2)">'+esc(e.clasif)+'</small></td><td>'+esc(e.marca||'—')+'<br><small>'+esc(e.modelo||'')+'</small></td>'
+      +'<td><small>'+esc(e.edif)+' '+esc(e.piso)+' · <b>'+esc(e.pma)+'</b> · '+esc(e.bim)+'<br>'+esc(e.recinto)+'</small></td>'
+      +'<td><small>'+esc(e.estado_pins||'')+(e.lugar_pins?' · '+esc(e.lugar_pins):'')+'</small></td>'
+      +'<td>'+(e.acta?'<small>'+esc(e.acta)+(e.acta_fecha?' · '+esc(e.acta_fecha):'')+'</small><br>':'<span class="pill p-warn">sin acta</span><br>')
+        +(e.serie_acta?'<b class="mono">'+esc(e.serie_acta)+'</b>':'<span class="pill p-mute">sin serie</span>')+(e.serie_2_manuscrita?'<br><small class="mono">'+esc(e.serie_2_manuscrita)+'</small>':'')
+        +(e.acta&&e.existe!==undefined?'<br><small>existe '+esc(e.existe||'—')+' · enciende '+esc(e.enciende||'—')+' · partes '+esc(e.partes||'—')+'</small>':'')
+        +(e.obs_acta?'<br><small style="color:var(--tx2)">'+esc(e.obs_acta)+'</small>':'')+'</td>'
+      +'<td><small>'+(e.garantia_recibida?'Garantía: '+esc(e.garantia_recibida)+'<br>Manual: '+esc(e.manual_recibido):'—')+'</small></td>'
+      +'<td>'+(e.alerta?'<span class="pill p-warn">⚠</span> <small>'+esc(e.alerta)+'</small>':'')+'</td></tr>').join('')
+    +'</tbody></table></div></div>'
+    /* instrumentos MN */
+    +'<div class="card" style="margin-top:12px"><h2>🧪 Instrumentación de Medicina Nuclear (no emisora, va en la descripción de la instalación)</h2>'
+    +'<div class="tw" style="margin-top:8px"><table><thead><tr><th>Código</th><th>Equipo</th><th>Marca · modelo</th><th>Ubicación</th><th>N° ítem</th></tr></thead><tbody>'
+    +ins.map(e=>'<tr><td class="mono">'+esc(e.code)+'</td><td>'+esc(e.nombre)+'</td><td>'+esc(e.marca)+' · '+esc(e.modelo)+'</td><td><small>'+esc(e.pma)+' · '+esc(e.bim)+'</small></td><td>'+esc(e.n_item)+'</td></tr>').join('')
+    +'</tbody></table></div></div>'
+    /* formulario */
+    +'<div class="card" style="margin-top:12px"><h2>📄 Formulario SEREMI «Solicitud de autorización de funcionamiento · 2ª y 3ª categoría»: quién aporta cada antecedente</h2>'
+    +'<div class="tw" style="margin-top:8px"><table><thead><tr><th>Punto</th><th>Antecedente</th><th>Quién lo aporta</th></tr></thead><tbody>'
+    +N.marco.formulario_seremi.map(([a,b,c])=>'<tr><td class="mono">'+esc(a)+'</td><td>'+esc(b)+'</td><td>'+(/SC/.test(c)?'<span class="pill p-warn">'+esc(c)+'</span>':'<span class="pill p-ok">'+esc(c)+'</span>')+'</td></tr>').join('')
+    +'</tbody></table></div><div class="d" style="margin-top:8px">Lo que aporta el HDS (titular) lo coordina la OPR con Autorización Sanitaria: representante legal, encargado de seguridad radiológica, desempeño y dosimetría del personal (pestañas 🎯 Cumplimiento AS y 🗂 Expediente OPR), procedimientos y plan de emergencia.</div></div>';
+}
+function nhdsCSV(){
+  const N=window.PR_EQ_NHDS; if(!N) return;
+  const cu=s=>'"'+String(s==null?'':s).replace(/"/g,'""')+'"';
+  const cab=['N°','Categoría','Autoridad','Grupo','Código','Equipo','Clasificación','Marca','Modelo','Proveedor','Edificio','Piso','PMA','BIM','Recinto','Servicio','N° ítem','Estado PINS','Acta','Fecha acta','N° de serie (acta)','2º N° manuscrito','Existe','Enciende','Partes','Obs. acta','Garantía recibida','Manual recibido','Alerta'].concat(N.campos_solicitados.map(c=>c[1]));
+  const filas=N.equipos.filter(e=>e.emisor).map(e=>[e.n,e.cat,e.autoridad,e.grupo,e.code,e.nombre,e.clasif,e.marca,e.modelo,e.proveedor,e.edif,e.piso,e.pma,e.bim,e.recinto,e.servicio,e.n_item,e.estado_pins,e.acta,e.acta_fecha,e.serie_acta,e.serie_2_manuscrita,e.existe,e.enciende,e.partes,e.obs_acta,e.garantia_recibida,e.manual_recibido,e.alerta].concat(N.campos_solicitados.map(()=>'' )).map(cu).join(';'));
+  bajar('equipos_emisores_NHDS_'+N.generado+'.csv','﻿'+cab.join(';')+'\n'+filas.join('\n'),'text/csv;charset=utf-8');
+}
+
+/* ══ 🗂 EXPEDIENTE OPR · documentos y Drive ══════════════════════════════════ */
+function vOpr(){
+  const box = document.getElementById('p-opr');
+  const O = window.PR_OPR || null;
+  if(!O){ box.innerHTML = '<div class="aviso a-warn">Falta <b>SHARED_DATA/pr_opr.js</b> (se genera con <code>python3 _DEV/build_pr_opr.py</code>).</div>'; return; }
+  const pr = { alta: 'p-bad', media: 'p-warn', baja: 'p-mute' };
+  box.innerHTML = '<div class="aviso a-info"><b>Expediente del Oficial de Protección Radiológica.</b> ' + esc(O.origen) + '. '
+    + 'Los archivos están en el Drive del hospital, ordenados en ' + O.carpetas.length + ' carpetas; acá queda el índice de qué es cada documento.'
+    + '<div style="margin-top:6px"><a class="btn xs" href="' + esc(O.drive.raiz) + '" target="_blank">📂 Abrir la carpeta en Drive</a> '
+    + '<a class="btn xs" href="' + esc(O.drive.indice) + '" target="_blank">📄 Índice completo (LEEME)</a></div></div>'
+    + '<div class="card"><h2>🗂 Carpetas</h2><div class="grid g3" style="margin-top:10px">'
+    + O.carpetas.map(c => '<div class="kpi"><div class="n">' + c.archivos + '</div><div class="l"><a href="' + esc(c.url) + '" target="_blank">' + esc(c.titulo) + '</a></div></div>').join('')
+    + '</div>'
+    + O.carpetas.map(c => '<h3 style="margin-top:14px">' + esc(c.titulo) + '</h3><div class="tw"><table><thead><tr><th>Documento</th><th>Qué es</th><th style="text-align:right">KB</th></tr></thead><tbody>'
+      + c.detalle.slice(0, 60).map(a => '<tr><td>' + esc(a.archivo) + (a.sub ? ' <span class="pill p-mute">' + esc(a.sub) + '</span>' : '') + '</td>'
+        + '<td><small>' + esc(a.que_es || '—') + '</small></td><td style="text-align:right">' + a.kb + '</td></tr>').join('')
+      + (c.detalle.length > 60 ? '<tr><td colspan="3"><small style="color:var(--tx2)">… y ' + (c.detalle.length - 60) + ' archivo(s) más en la carpeta de Drive</small></td></tr>' : '')
+      + (c.no_listados ? '<tr><td colspan="3"><small style="color:var(--tx2)">' + c.no_listados + ' archivo(s) personales (licencias, diplomas, nóminas o informes): se ven en la <a href="' + esc(c.url) + '" target="_blank">carpeta de Drive</a>, no se listan aquí.</small></td></tr>' : '')
+      + '</tbody></table></div>').join('')
+    + '</div>'
+    + '<div class="card"><h2>📌 Pendientes del traspaso</h2><div class="tw" style="margin-top:8px"><table><thead><tr><th>#</th><th>Pendiente</th><th>Quién</th><th>Prioridad</th></tr></thead><tbody>'
+    + O.pendientes.map(p => '<tr><td>' + p.n + '</td><td>' + esc(p.que) + '</td><td><small>' + esc(p.quien) + '</small></td><td><span class="pill ' + (pr[p.prioridad] || 'p-mute') + '">' + esc(p.prioridad) + '</span></td></tr>').join('')
+    + '</tbody></table></div></div>'
+    + '<div class="card"><h2>📇 Contactos</h2><div class="tw" style="margin-top:8px"><table><thead><tr><th>Nombre</th><th>Rol</th><th>Correo</th></tr></thead><tbody>'
+    + O.contactos.map(c => '<tr><td><b>' + esc(c.nombre) + '</b></td><td><small>' + esc(c.rol) + '</small></td><td class="mono">' + esc(c.correo) + (c.anexo ? ' · anexo ' + esc(c.anexo) : '') + '</td></tr>').join('')
+    + '</tbody></table></div></div>';
+}
+
+/* ══ 🎓 EXPORT PARA CAPACITACIÓN · nómina con y sin curso de Protección Radiológica ══
+   Excel para la Unidad de Capacitación: quién tiene el curso (con su respaldo), quién lo declara
+   sin documento y a quién hay que inscribir. Usa la base nominada: solo existe en el 🔴 HUB local.
+   La librería (assets/vendor/xlsx-js-style) se carga recién al exportar. */
+function cargarXLSX(){
+  if(window.XLSX) return Promise.resolve(window.XLSX);
+  return new Promise((ok, ko) => { const s = document.createElement('script'); s.src = 'assets/vendor/xlsx-js-style-1.2.0.bundle.js';
+    s.onload = () => ok(window.XLSX); s.onerror = () => ko(new Error('No se pudo cargar la librería de Excel')); document.head.appendChild(s); });
+}
+function capServicio(p){
+  if(p.cotejo && p.cotejo.servicios.length) return p.cotejo.servicios.join(' · ');
+  if(p.levantamiento && p.levantamiento.servicio) return p.levantamiento.servicio;
+  if(p.unidades_pr.length) return p.unidades_pr.map(u => u.charAt(0) + u.slice(1).toLowerCase()).join(' · ');
+  return (p.dotacion && p.dotacion.unidad) || 'Sin servicio identificado';
+}
+function capFila(p){
+  const c = p.curso || {}, d = p.dotacion || {};
+  // la nómina del servicio declara el curso pero no hay registro en SIRH ni en la nómina de cursos 2026
+  const e = p.estado.curso === 'falta' && (p.cotejo && p.cotejo.declara && p.cotejo.declara.curso) ? 'declarado' : p.estado.curso;
+  const tiene = e === 'ok' ? 'Sí' : e === 'declarado' ? 'Declarado, sin respaldo' : 'No';
+  const fuente = !p.curso ? '' : /2026/.test(c.situacion || '') ? 'Nómina de cursos realizados 2026' : 'Reporte SIRH (ene-2015 a mar-2026)';
+  const expo = p.estado.dosimetria === 'ok' ? 'Sí · dosímetro al día'
+    : (p.levantamiento && p.levantamiento.expone === true) ? 'Sí · declarado por el servicio'
+    : p.unidades_pr.length ? 'Tuvo dosímetro (no vigente)' : (p.cotejo ? 'Por confirmar (nómina de servicio)' : 'Sin antecedente');
+  const accion = e === 'ok' ? 'Ninguna: curso respaldado'
+    : e === 'declarado' ? 'Pedir el certificado del curso' : (p.estado.dosimetria === 'ok' || p.cotejo ? 'Inscribir en curso de Protección Radiológica' : 'Evaluar si requiere el curso');
+  return {
+    'Nombre': p.nombre, 'RUT': p.run ? p.run.slice(0, -1) + '-' + p.run.slice(-1) : '',
+    'Servicio': capServicio(p), 'Estamento / planta': (p.cotejo && p.cotejo.estamento) || d.planta || '',
+    'Función': d.funcion || '', 'Unidad de contrato': d.unidad || '', 'Exposición a radiación': expo,
+    '¿Tiene curso de PR?': tiene, 'Curso': c.curso || '', 'Organismo': c.organismo || '',
+    'Horas': c.horas != null ? c.horas : '', 'Término': c.termino ? String(c.termino).slice(0, 10) : '',
+    'Nota': c.nota != null ? c.nota : '', 'Fuente del respaldo': fuente, 'Acción sugerida': accion
+  };
+}
+async function exportCapacitacion(){
+  if(!PR){ alert('La nómina con nombres está disponible solo en el HUB local.'); return; }
+  let X; try{ X = await cargarXLSX(); }catch(e){ alert(e.message); return; }
+  const universo = PRP.filter(p => p.estado.dosimetria === 'ok' || p.cotejo || p.levantamiento || p.curso || p.unidades_pr.length);
+  const filas = universo.map(capFila).sort((a, b) => a['Servicio'].localeCompare(b['Servicio']) || a['Nombre'].localeCompare(b['Nombre']));
+  const sin = filas.filter(f => f['¿Tiene curso de PR?'] === 'No'), decl = filas.filter(f => f['¿Tiene curso de PR?'].startsWith('Declarado')), con = filas.filter(f => f['¿Tiene curso de PR?'] === 'Sí');
+  const servs = [...new Set(filas.map(f => f['Servicio']))].sort();
+  const resumen = servs.map(s => { const L = filas.filter(f => f['Servicio'] === s);
+    const n = k => L.filter(f => f['¿Tiene curso de PR?'].startsWith(k)).length;
+    const exp = L.filter(f => f['Exposición a radiación'].startsWith('Sí'));
+    return { 'Servicio': s, 'Personas': L.length, 'Con curso': n('Sí'), 'Declarado sin respaldo': n('Declarado'), 'Sin curso': n('No'),
+      'Expuestos sin curso': exp.filter(f => f['¿Tiene curso de PR?'] === 'No').length,
+      '% con curso': L.length ? Math.round(n('Sí') * 100 / L.length) + '%' : '' }; })
+    .sort((a, b) => b['Expuestos sin curso'] - a['Expuestos sin curso'] || b['Sin curso'] - a['Sin curso']);
+  const tot = { 'Servicio': 'TOTAL', 'Personas': filas.length, 'Con curso': con.length, 'Declarado sin respaldo': decl.length, 'Sin curso': sin.length,
+    'Expuestos sin curso': sin.filter(f => f['Exposición a radiación'].startsWith('Sí')).length, '% con curso': Math.round(con.length * 100 / Math.max(1, filas.length)) + '%' };
+
+  const BURDEO = '800020', CLARO = 'F6E3E8';
+  const head = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: BURDEO } }, alignment: { vertical: 'center', wrapText: true } };
+  const hoja = (rows, anchos) => {
+    const ws = X.utils.json_to_sheet(rows);
+    const r = X.utils.decode_range(ws['!ref']);
+    for(let C = r.s.c; C <= r.e.c; C++){ const a = ws[X.utils.encode_cell({ r: 0, c: C })]; if(a) a.s = head; }
+    ws['!cols'] = anchos.map(w => ({ wch: w })); ws['!autofilter'] = { ref: ws['!ref'] }; ws['!freeze'] = { xSplit: 0, ySplit: 1 };
+    ws['!views'] = [{ state: 'frozen', ySplit: 1 }];
+    return ws;
+  };
+  const anchos = [34, 12, 22, 20, 22, 30, 28, 20, 34, 34, 7, 11, 6, 30, 36];
+  const wb = X.utils.book_new();
+  const wr = hoja(resumen.concat([tot]), [30, 10, 11, 20, 10, 18, 12]);
+  const ult = X.utils.decode_range(wr['!ref']).e.r;
+  for(let C = 0; C <= 6; C++){ const a = wr[X.utils.encode_cell({ r: ult, c: C })]; if(a) a.s = { font: { bold: true }, fill: { fgColor: { rgb: CLARO } } }; }
+  X.utils.book_append_sheet(wb, wr, 'Resumen por servicio');
+  X.utils.book_append_sheet(wb, hoja(sin, anchos), 'Sin curso (inscribir)');
+  X.utils.book_append_sheet(wb, hoja(decl, anchos), 'Declarado sin respaldo');
+  X.utils.book_append_sheet(wb, hoja(con, anchos), 'Con curso');
+  X.utils.book_append_sheet(wb, hoja(filas, anchos), 'Nómina completa');
+  const leeme = [
+    ['Nómina de capacitación · Curso de Protección Radiológica · Hospital Del Salvador'],
+    ['Generado el ' + hoy() + ' desde la plataforma del Oficial de Protección Radiológica (corte de datos ' + PR.version + ').'],
+    [''],
+    ['Para qué sirve', 'Saber a quién inscribir en el curso de Protección Radiológica, que la Autorización Sanitaria exige a todo el personal expuesto (punto 16 del requerimiento de RRHH).'],
+    ['Con curso', 'Aprobado según el reporte de cursos del SIRH (ene-2015 a mar-2026) o la nómina de cursos realizados 2026.'],
+    ['Declarado sin respaldo', 'La nómina del servicio dice que tiene el curso, pero no aparece en ninguna de las dos fuentes: hay que pedir el certificado.'],
+    ['Sin curso', 'No hay registro del curso. La columna «Acción sugerida» separa a quienes están expuestos (inscribir) de quienes hay que evaluar.'],
+    ['Exposición', '«Dosímetro al día» = tiene lectura en el último trimestre de la CCHEN. «Declarado por el servicio» = lo marcó su jefatura en el levantamiento de septiembre.'],
+    [''],
+    ['⚠ Dato sensible', 'Contiene nombres y RUT. Uso interno de Capacitación y del OPR; no reenviar fuera del hospital.'],
+    ['Contacto', 'Allyson Davis Zubiri · Oficial de Protección Radiológica · adavis@hsalvador.cl · anexo 286947'],
+  ];
+  const wl = X.utils.aoa_to_sheet(leeme); wl['!cols'] = [{ wch: 24 }, { wch: 110 }];
+  wl['A1'].s = { font: { bold: true, sz: 14, color: { rgb: BURDEO } } };
+  X.utils.book_append_sheet(wb, wl, 'Léeme');
+  X.writeFile(wb, 'Capacitacion_Proteccion_Radiologica_' + hoy() + '.xlsx');
+  toastPR('🎓 Nómina exportada: ' + con.length + ' con curso · ' + decl.length + ' declarado sin respaldo · ' + sin.length + ' sin curso');
+}
+function toastPR(t){
+  let el = document.getElementById('toastPR');
+  if(!el){ el = document.createElement('div'); el.id = 'toastPR';
+    el.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#2A0A14;color:#fff;border:1px solid #B36679;padding:10px 16px;border-radius:999px;font-size:12.5px;z-index:9999;box-shadow:0 8px 24px rgba(0,0,0,.35)';
+    document.body.appendChild(el); }
+  el.textContent = t; el.hidden = false; clearTimeout(el._t); el._t = setTimeout(() => { el.hidden = true; }, 4500);
+}
+
+/* ══ 📑 REQUERIMIENTO AS · los 21 puntos que pide RRHH ════════════════════════ */
+function vReq(){
+  const box=document.getElementById('p-req');
+  if(!PR){ box.innerHTML='<div class="aviso a-warn">Falta <b>SHARED_DATA/pr_personal.js</b>.</div>'; return; }
+  const EST={'procesado':['p-ok','procesado en esta plataforma'],'en la carpeta':['p-info','está en la carpeta de RRHH'],
+    'parcial':['p-warn','parcial'],'pendiente':['p-warn','pendiente'],'falta':['p-bad','falta']};
+  const grupos={};
+  PR.requisitos_rrhh.forEach(r=>{ (grupos[r.ambito]=grupos[r.ambito]||[]).push(r); });
+  const faltan=PR.requisitos_rrhh.filter(r=>r.estado==='falta');
+  box.innerHTML=
+    '<div class="aviso a-info"><b>Requerimiento de RRHH para Autorización Sanitaria y Acreditación.</b> '
+    +'Documento del Departamento de Gestión de la Demanda. La columna «estado» dice qué llegó en la carpeta '
+    +'de septiembre de 2026 y qué falta. Los tres puntos de protección radiológica ya están procesados en '
+    +'<b>🎯 Cumplimiento AS</b>.</div>'
+    +(faltan.length?'<div class="aviso a-bad"><b>⚠ '+faltan.length+' requisito(s) sin respaldo en la carpeta:</b> '
+      +faltan.map(r=>esc(r.ambito)+' — '+esc(r.que.slice(0,70))).join(' · ')+'</div>':'')
+    +Object.entries(grupos).map(([amb,rs])=>
+      '<div class="card"><h2>'+esc(amb)+'</h2><div class="tw"><table><thead><tr><th style="width:44px">N°</th>'
+      +'<th>Qué exige</th><th>Fuente</th><th style="width:150px">Estado</th></tr></thead><tbody>'
+      +rs.map(r=>{const e=EST[r.estado]||['p-mute',r.estado];
+        return '<tr><td>'+r.n+'</td><td>'+esc(r.que)+(r.pr?' <span class="pill p-vio">PR</span>':'')+'</td>'
+        +'<td style="font-size:12px;color:var(--tx2)">'+esc(r.fuente)+'</td>'
+        +'<td><span class="pill '+e[0]+'">'+esc(e[1])+'</span></td></tr>';}).join('')
+      +'</tbody></table></div></div>').join('')
+    +'<div class="card"><h2>📦 Expediente entregado por RRHH</h2>'
+    +'<div class="d">Inventario de la carpeta <b>AS-Acreditación</b> (septiembre 2026). Al repositorio se copió '
+    +'solo lo de protección radiológica (<b>_FUENTES/PR_2026-09/</b>); el resto queda en el Drive de RRHH por volumen '
+    +'y por tratarse de datos personales.</div>'
+    +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>Carpeta</th><th style="text-align:right">Archivos</th>'
+    +'<th style="text-align:right">MB</th><th>Tipos</th></tr></thead><tbody>'
+    +PR.expediente.slice(0,30).map(x=>'<tr><td style="font-size:12px">'+esc(x.carpeta)+'</td>'
+      +'<td style="text-align:right">'+x.archivos+'</td><td style="text-align:right">'+x.mb+'</td>'
+      +'<td style="font-size:11px;color:var(--tx2)">'+Object.entries(x.tipos).map(([k,v])=>v+' '+k).join(' · ')+'</td></tr>').join('')
+    +'</tbody></table></div></div>'
+    +'<div class="card"><h2>🎫 Informes dosimétricos cargados</h2>'
+    +'<div class="tw"><table><thead><tr><th>Unidad</th><th>Período</th><th>Informe CCHEN</th><th>Emitido</th>'
+    +'<th style="text-align:right">Usuarios</th></tr></thead><tbody>'
+    +PR.informes.map(i=>'<tr><td><b>'+esc(i.servicio||'')+'</b> <small style="color:var(--tx2)">N° '+esc(i.cliente||'')+'</small></td>'
+      +'<td>'+esc(i.desde||'')+' → '+esc(i.hasta||'')+'</td><td style="font-size:11px">'+esc(i.codigo||'')+'</td>'
+      +'<td>'+esc(i.fecha_informe||'')+'</td><td style="text-align:right">'+i.usuarios+'</td></tr>').join('')
+    +'</tbody></table></div>'
+    +(PR.informes_descartados.length?'<div class="d" style="margin-top:8px"><b>Informes reemplazados:</b> '
+      +PR.informes_descartados.map(x=>esc(x.archivo)).join(' · ')+' (mismo servicio y período, se conservó el más completo).</div>':'')
+    +'<div class="d" style="margin-top:8px">El requerimiento pide <b>historial de 3 años</b>: hay '
+    +PR.periodos.length+' período(s) cargado(s). Faltan los trimestres anteriores para completarlo.</div></div>';
+}
+
+/* ── Arranque ─────────────────────────────────────────────────────────────── */
+function pintaHstats(){
+  const T=D.totales||{};
+  document.getElementById('hstats').innerHTML=
+    [[T.equipos_emisores||0,'Emisores'],[T.instalaciones||0,'Instalac.'],
+     [E.poe.filter(p=>p.activo!==false).length,'POE'],[pendientesTrim().length,'Pend.']]
+    .map(([v,l])=>'<div class="hstat"><b>'+v+'</b><span>'+l+'</span></div>').join('');
+}
+pintaTabs(); pintaHstats(); vPanel();
+document.getElementById('tb-panel').classList.add('on');
+const _save=save; save=function(){ _save(); pintaHstats(); };
+</script>
+<script src="hub-home.js"></script>
+</body></html>

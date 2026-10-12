@@ -1,0 +1,790 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10268 7512" width="10268" height="7512">
+<rect width="10268" height="7512" fill="#f0f4f8"/>
+<line x1="-9" y1="0" x2="-9" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="390" y1="0" x2="390" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="790" y1="0" x2="790" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="1190" y1="0" x2="1190" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="1590" y1="0" x2="1590" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="1990" y1="0" x2="1990" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="2390" y1="0" x2="2390" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="2790" y1="0" x2="2790" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="3190" y1="0" x2="3190" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="3590" y1="0" x2="3590" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="3990" y1="0" x2="3990" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="4390" y1="0" x2="4390" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="4790" y1="0" x2="4790" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="5190" y1="0" x2="5190" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="5590" y1="0" x2="5590" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="5990" y1="0" x2="5990" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="6390" y1="0" x2="6390" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="6790" y1="0" x2="6790" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="7190" y1="0" x2="7190" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="7590" y1="0" x2="7590" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="7990" y1="0" x2="7990" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="8390" y1="0" x2="8390" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="8790" y1="0" x2="8790" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="9190" y1="0" x2="9190" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="9590" y1="0" x2="9590" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="9990" y1="0" x2="9990" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="10390" y1="0" x2="10390" y2="7512" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="0" y1="7489" x2="10268" y2="7489" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="0" y1="7089" x2="10268" y2="7089" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="0" y1="6689" x2="10268" y2="6689" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="0" y1="6289" x2="10268" y2="6289" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="0" y1="5889" x2="10268" y2="5889" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="0" y1="5489" x2="10268" y2="5489" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="0" y1="5089" x2="10268" y2="5089" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="0" y1="4689" x2="10268" y2="4689" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="0" y1="4289" x2="10268" y2="4289" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="0" y1="3889" x2="10268" y2="3889" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="0" y1="3489" x2="10268" y2="3489" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="0" y1="3089" x2="10268" y2="3089" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="0" y1="2689" x2="10268" y2="2689" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="0" y1="2289" x2="10268" y2="2289" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="0" y1="1889" x2="10268" y2="1889" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="0" y1="1489" x2="10268" y2="1489" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="0" y1="1089" x2="10268" y2="1089" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="0" y1="689" x2="10268" y2="689" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="0" y1="289" x2="10268" y2="289" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<line x1="0" y1="-110" x2="10268" y2="-110" stroke="#cbd5e1" stroke-width="0.5" opacity="0.5"/>
+<rect x="9260.6" y="6595.6" width="88.9" height="88.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="5.3.1" data-name="Estación Enfermería" data-area="6.8"/>
+<text x="9305.0" y="6640.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">5.3.1</text>
+<text x="9305.0" y="6651.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estación Enferm</text>
+<rect x="9251.5" y="6586.5" width="106.9" height="106.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="5.3.1" data-name="Estación Enfermería" data-area="9.9"/>
+<text x="9305.0" y="6640.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">5.3.1</text>
+<text x="9305.0" y="6651.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estación Enferm</text>
+<rect x="8415.2" y="6539.2" width="109.5" height="109.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="5.1.2" data-name="Recepción Orientació" data-area="10.4"/>
+<text x="8470.0" y="6594.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">5.1.2</text>
+<text x="8470.0" y="6605.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Recepción Orien</text>
+<rect x="7870.8" y="6567.8" width="132.3" height="132.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="5.4.2" data-name="Baño Público Masculi" data-area="15.2"/>
+<text x="7937.0" y="6634.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">5.4.2</text>
+<text x="7937.0" y="6645.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Baño Público Ma</text>
+<rect x="9083.7" y="6149.7" width="168.5" height="168.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="5.4.5" data-name="Habitacion Pensionad" data-area="24.6"/>
+<text x="9168.0" y="6234.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">5.4.5</text>
+<text x="9168.0" y="6245.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Habitacion Pens</text>
+<rect x="8645.2" y="6180.2" width="231.5" height="231.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="5.1.1" data-name="Sala Espera" data-area="46.4"/>
+<text x="8761.0" y="6296.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">5.1.1</text>
+<text x="8761.0" y="6307.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Sala Espera</text>
+<rect x="9842.3" y="6078.3" width="283.4" height="283.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="5.4.4" data-name="Comedor Pacientes" data-area="69.5"/>
+<text x="9984.0" y="6220.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">5.4.4</text>
+<text x="9984.0" y="6231.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Comedor Pacient</text>
+<rect x="8764.5" y="7060.5" width="65.0" height="65.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="5.3.12" data-name="Residuos Sólidos Bañ" data-area="3.7"/>
+<text x="8797.0" y="7093.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">5.3.12</text>
+<text x="8797.0" y="7103.8" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Residuos Sólido</text>
+<rect x="9495.0" y="6529.0" width="179.9" height="179.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="5.4.3" data-name="Estar" data-area="28.0"/>
+<text x="9585.0" y="6619.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">5.4.3</text>
+<text x="9585.0" y="6630.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estar</text>
+<rect x="9084.5" y="6716.5" width="95.0" height="95.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="5.3.8" data-name="Ropa limpia Limpio R" data-area="7.8"/>
+<text x="9132.0" y="6764.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">5.3.8</text>
+<text x="9132.0" y="6775.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Ropa limpia Lim</text>
+<rect x="9038.3" y="6570.3" width="83.5" height="83.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="5.3.13" data-name="Trabajo Repostero CU" data-area="6.0"/>
+<text x="9080.0" y="6612.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">5.3.13</text>
+<text x="9080.0" y="6623.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Trabajo Reposte</text>
+<rect x="9123.8" y="6875.8" width="92.5" height="92.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="5.3.9" data-name="C. Neumático" data-area="7.4"/>
+<text x="9170.0" y="6922.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">5.3.9</text>
+<text x="9170.0" y="6933.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">C. Neumático</text>
+<rect x="8845.5" y="6565.5" width="120.9" height="120.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="5.3.5" data-name="Bodega Equipos Aseo" data-area="12.7"/>
+<text x="8906.0" y="6626.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">5.3.5</text>
+<text x="8906.0" y="6637.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Bodega Equipos </text>
+<rect x="8893.5" y="6797.5" width="109.1" height="109.1" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="5.3.3" data-name="Trabajo Sucio Degrad" data-area="10.3"/>
+<text x="8948.0" y="6852.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">5.3.3</text>
+<text x="8948.0" y="6863.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Trabajo Sucio D</text>
+<rect x="9828.1" y="7250.1" width="123.7" height="123.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="5.2.5" data-name="Residencia Baño 5.4." data-area="13.2"/>
+<text x="9890.0" y="7312.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">5.2.5</text>
+<text x="9890.0" y="7323.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Residencia Baño</text>
+<rect x="9869.5" y="7085.5" width="69.1" height="69.1" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="5.2.6" data-name="Baños Personal" data-area="4.1"/>
+<text x="9904.0" y="7120.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">5.2.6</text>
+<text x="9904.0" y="7131.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Baños Personal</text>
+<rect x="10003.6" y="7096.6" width="126.7" height="126.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="5.2.4" data-name="Estar" data-area="13.9"/>
+<text x="10067.0" y="7160.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">5.2.4</text>
+<text x="10067.0" y="7171.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estar</text>
+<rect x="7781.8" y="6822.8" width="100.3" height="100.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="5.4.1" data-name="Hall Acceso ING.01.P" data-area="8.7"/>
+<text x="7832.0" y="6873.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">5.4.1</text>
+<text x="7832.0" y="6884.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Hall Acceso ING</text>
+<rect x="8330.5" y="7073.5" width="123.1" height="123.1" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.2.1" data-name="Oficina Enfermera Su" data-area="13.1"/>
+<text x="8392.0" y="7135.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.2.1</text>
+<text x="8392.0" y="7146.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Oficina Enferme</text>
+<rect x="8412.0" y="6767.0" width="123.9" height="123.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.1.2" data-name="Recepción Orientació" data-area="13.3"/>
+<text x="8474.0" y="6829.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.1.2</text>
+<text x="8474.0" y="6840.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Recepción Orien</text>
+<rect x="8150.1" y="7187.1" width="193.9" height="193.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.2.3" data-name="Sala Reuniones" data-area="32.5"/>
+<text x="8247.0" y="7284.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.2.3</text>
+<text x="8247.0" y="7295.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Sala Reuniones</text>
+<rect x="6909.9" y="6518.9" width="226.2" height="226.2" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.3.7" data-name="Estación Trabajo Méd" data-area="44.3"/>
+<text x="7023.0" y="6632.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.3.7</text>
+<text x="7023.0" y="6643.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estación Trabaj</text>
+<rect x="6415.0" y="6867.0" width="120.0" height="120.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.3.1" data-name="Estación Enfermería" data-area="12.4"/>
+<text x="6475.0" y="6927.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.3.1</text>
+<text x="6475.0" y="6938.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estación Enferm</text>
+<rect x="6414.7" y="6866.7" width="120.6" height="120.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.3.1" data-name="Estación Enfermería" data-area="12.6"/>
+<text x="6475.0" y="6927.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.3.1</text>
+<text x="6475.0" y="6938.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estación Enferm</text>
+<rect x="8319.0" y="6138.0" width="297.9" height="297.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.1.1" data-name="Sala Espera" data-area="76.8"/>
+<text x="8468.0" y="6287.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.1.1</text>
+<text x="8468.0" y="6298.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Sala Espera</text>
+<rect x="7901.7" y="6124.7" width="280.6" height="280.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.4.4" data-name="Comedor" data-area="68.1"/>
+<text x="8042.0" y="6265.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.4.4</text>
+<text x="8042.0" y="6276.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Comedor</text>
+<rect x="7165.7" y="6131.7" width="168.5" height="168.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.4.5" data-name="Habitación" data-area="24.6"/>
+<text x="7250.0" y="6216.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.4.5</text>
+<text x="7250.0" y="6227.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Habitación</text>
+<rect x="7763.8" y="6116.8" width="170.5" height="170.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.3.8" data-name="Procedimiento Enferm" data-area="25.1"/>
+<text x="7849.0" y="6202.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.3.8</text>
+<text x="7849.0" y="6213.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimiento E</text>
+<rect x="7572.7" y="7038.7" width="272.7" height="272.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.4.3" data-name="Estar" data-area="64.3"/>
+<text x="7709.0" y="7175.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.4.3</text>
+<text x="7709.0" y="7186.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estar</text>
+<rect x="8595.8" y="7249.8" width="122.3" height="122.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.2.5" data-name="Residencia Baño" data-area="12.9"/>
+<text x="8657.0" y="7311.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.2.5</text>
+<text x="8657.0" y="7322.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Residencia Baño</text>
+<rect x="8204.8" y="6154.8" width="84.4" height="84.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.1.3" data-name="Cafetería" data-area="6.2"/>
+<text x="8247.0" y="6197.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.1.3</text>
+<text x="8247.0" y="6208.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Cafetería</text>
+<rect x="5397.7" y="6554.7" width="142.6" height="142.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.2.4" data-name="Estar Reserva 4.4.x" data-area="17.6"/>
+<text x="5469.0" y="6626.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.2.4</text>
+<text x="5469.0" y="6637.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estar Reserva 4</text>
+<rect x="7183.5" y="6592.5" width="65.0" height="65.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.3.12" data-name="Aseo Estacionamiento" data-area="3.7"/>
+<text x="7216.0" y="6625.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.3.12</text>
+<text x="7216.0" y="6635.8" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Aseo Estacionam</text>
+<rect x="7407.9" y="6566.9" width="66.2" height="66.2" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.3.15" data-name="Residuos Transitorio" data-area="3.8"/>
+<text x="7441.0" y="6600.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.3.15</text>
+<text x="7441.0" y="6611.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Residuos Transi</text>
+<rect x="7740.9" y="6574.9" width="164.3" height="164.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.4.1" data-name="Hall acceso Estacion" data-area="23.3"/>
+<text x="7823.0" y="6657.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.4.1</text>
+<text x="7823.0" y="6668.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Hall acceso Est</text>
+<rect x="5952.6" y="6221.6" width="152.7" height="152.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.4.7" data-name="Habitación 4.4.7_E" data-area="20.2"/>
+<text x="6029.0" y="6298.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.4.7</text>
+<text x="6029.0" y="6309.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Habitación 4.4.</text>
+<rect x="8229.8" y="7073.8" width="122.5" height="122.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.2.2" data-name="Entrevista" data-area="13.0"/>
+<text x="8291.0" y="7135.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.2.2</text>
+<text x="8291.0" y="7146.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Entrevista</text>
+<rect x="5810.1" y="6610.1" width="81.7" height="81.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.3.14" data-name="RACKS P3.R01_ING CUA" data-area="5.8"/>
+<text x="5851.0" y="6651.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.3.14</text>
+<text x="5851.0" y="6662.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">RACKS P3.R01_IN</text>
+<rect x="7030.5" y="6753.5" width="123.0" height="123.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.4.9" data-name="Baño Ducha Silla Lav" data-area="13.1"/>
+<text x="7092.0" y="6815.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.4.9</text>
+<text x="7092.0" y="6826.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Baño Ducha Sill</text>
+<rect x="7404.1" y="6638.1" width="85.9" height="85.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.3.13" data-name="Recinto" data-area="6.4"/>
+<text x="7447.0" y="6681.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.3.13</text>
+<text x="7447.0" y="6692.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Recinto</text>
+<rect x="7494.3" y="6544.3" width="189.3" height="189.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.3.5" data-name="Bodega Equipos" data-area="31.0"/>
+<text x="7589.0" y="6639.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.3.5</text>
+<text x="7589.0" y="6650.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Bodega Equipos</text>
+<rect x="5546.3" y="6710.3" width="115.5" height="115.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.2.6" data-name="Escaleras -" data-area="11.5"/>
+<text x="5604.0" y="6768.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.2.6</text>
+<text x="5604.0" y="6779.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Escaleras -</text>
+<rect x="5972.3" y="6772.3" width="135.3" height="135.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.3.3" data-name="Trabajo Sucio" data-area="15.8"/>
+<text x="6040.0" y="6840.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.3.3</text>
+<text x="6040.0" y="6851.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Trabajo Sucio</text>
+<rect x="6443.6" y="6585.6" width="122.9" height="122.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.3.4" data-name="Bodega Insumos Bodeg" data-area="13.1"/>
+<text x="6505.0" y="6647.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.3.4</text>
+<text x="6505.0" y="6658.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Bodega Insumos </text>
+<rect x="6184.2" y="6778.2" width="133.5" height="133.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.3.2" data-name="Trabajo Limpio" data-area="15.4"/>
+<text x="6251.0" y="6845.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.3.2</text>
+<text x="6251.0" y="6856.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Trabajo Limpio</text>
+<rect x="5978.7" y="6589.7" width="98.5" height="98.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.3.10" data-name="Ropa sucia Degradado" data-area="8.4"/>
+<text x="6028.0" y="6639.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.3.10</text>
+<text x="6028.0" y="6650.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Ropa sucia Degr</text>
+<rect x="6169.0" y="6546.0" width="130.0" height="130.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.3.9" data-name="Ropa limpia" data-area="14.6"/>
+<text x="6234.0" y="6611.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.3.9</text>
+<text x="6234.0" y="6622.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Ropa limpia</text>
+<rect x="7159.3" y="6679.3" width="97.3" height="97.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="4.4.2" data-name="Sillas Ruedas" data-area="8.2"/>
+<text x="7208.0" y="6728.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">4.4.2</text>
+<text x="7208.0" y="6739.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Sillas Ruedas</text>
+<rect x="7442.5" y="4490.5" width="133.1" height="133.1" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.3.7" data-name="Trabajo Médico" data-area="15.3"/>
+<text x="7509.0" y="4557.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.3.7</text>
+<text x="7509.0" y="4568.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Trabajo Médico</text>
+<rect x="7212.0" y="4590.0" width="110.1" height="110.1" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.3.3" data-name="Suci o" data-area="10.5"/>
+<text x="7267.0" y="4645.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.3.3</text>
+<text x="7267.0" y="4656.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Suci o</text>
+<rect x="7076.6" y="4692.6" width="136.9" height="136.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.3.1" data-name="Estación Enfermería" data-area="16.2"/>
+<text x="7145.0" y="4761.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.3.1</text>
+<text x="7145.0" y="4772.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estación Enferm</text>
+<rect x="7076.6" y="4692.6" width="136.9" height="136.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.3.1" data-name="Estación Enfermería" data-area="16.2"/>
+<text x="7145.0" y="4761.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.3.1</text>
+<text x="7145.0" y="4772.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estación Enferm</text>
+<rect x="7494.8" y="4155.8" width="80.4" height="80.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.4.5" data-name="Baño 33.4.5_B Esclus" data-area="5.6"/>
+<text x="7535.0" y="4196.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.4.5</text>
+<text x="7535.0" y="4207.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Baño 33.4.5_B E</text>
+<rect x="7149.8" y="4188.8" width="78.5" height="78.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.4.4" data-name="paciente" data-area="5.3"/>
+<text x="7189.0" y="4228.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.4.4</text>
+<text x="7189.0" y="4239.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">paciente</text>
+<rect x="7961.0" y="4710.0" width="78.0" height="78.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.3.13" data-name="Residuos Sólidos" data-area="5.3"/>
+<text x="8000.0" y="4749.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.3.13</text>
+<text x="8000.0" y="4760.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Residuos Sólido</text>
+<rect x="8623.4" y="5071.4" width="157.2" height="157.2" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.2.5" data-name="Estar" data-area="21.4"/>
+<text x="8702.0" y="5150.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.2.5</text>
+<text x="8702.0" y="5161.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estar</text>
+<rect x="8124.0" y="4655.0" width="153.9" height="153.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.3.8" data-name="Procedimiento Enferm" data-area="20.5"/>
+<text x="8201.0" y="4732.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.3.8</text>
+<text x="8201.0" y="4743.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimiento E</text>
+<rect x="7918.0" y="4545.0" width="102.0" height="102.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.3.5" data-name="Bodega Equipos" data-area="9.0"/>
+<text x="7969.0" y="4596.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.3.5</text>
+<text x="7969.0" y="4607.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Bodega Equipos</text>
+<rect x="7575.5" y="4004.5" width="243.0" height="243.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.4.3" data-name="Habitación 4 Camas" data-area="51.1"/>
+<text x="7697.0" y="4126.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.4.3</text>
+<text x="7697.0" y="4137.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Habitación 4 Ca</text>
+<rect x="8536.3" y="4014.3" width="159.3" height="159.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.2.6" data-name="Residencia" data-area="22.0"/>
+<text x="8616.0" y="4094.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.2.6</text>
+<text x="8616.0" y="4105.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Residencia</text>
+<rect x="6938.0" y="4672.0" width="80.1" height="80.1" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.3.9" data-name="Ropa Limpia Insumos" data-area="5.5"/>
+<text x="6978.0" y="4712.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.3.9</text>
+<text x="6978.0" y="4723.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Ropa Limpia Ins</text>
+<rect x="7461.1" y="4724.1" width="69.8" height="69.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.3.11" data-name="Lavachatas Ropa Suci" data-area="4.2"/>
+<text x="7496.0" y="4759.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.3.11</text>
+<text x="7496.0" y="4770.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Lavachatas Ropa</text>
+<rect x="7089.7" y="4562.7" width="98.6" height="98.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.3.2" data-name="Trabajo Limpio Estac" data-area="8.4"/>
+<text x="7139.0" y="4612.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.3.2</text>
+<text x="7139.0" y="4623.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Trabajo Limpio </text>
+<rect x="8326.3" y="4664.3" width="169.5" height="169.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.4.2" data-name="Estacionamiento cami" data-area="24.8"/>
+<text x="8411.0" y="4749.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.4.2</text>
+<text x="8411.0" y="4760.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estacionamiento</text>
+<rect x="9020.3" y="4928.3" width="349.3" height="349.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.1.1" data-name="Sala Espera" data-area="105.5"/>
+<text x="9195.0" y="5103.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.1.1</text>
+<text x="9195.0" y="5114.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Sala Espera</text>
+<rect x="8851.3" y="5163.3" width="49.4" height="49.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.1.3" data-name="Cafetería" data-area="2.1"/>
+<text x="8876.0" y="5188.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="8" font-weight="bold" fill="#1e293b">33.1.3</text>
+<rect x="8894.8" y="4935.8" width="108.4" height="108.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.1.2" data-name="Recepción Orientació" data-area="10.2"/>
+<text x="8949.0" y="4990.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.1.2</text>
+<text x="8949.0" y="5001.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Recepción Orien</text>
+<rect x="9176.8" y="4635.8" width="124.4" height="124.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.1.4" data-name="Baño Público Femenin" data-area="13.4"/>
+<text x="9239.0" y="4698.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.1.4</text>
+<text x="9239.0" y="4709.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Baño Público Fe</text>
+<rect x="6939.5" y="4479.5" width="76.9" height="76.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.3.4" data-name="Insumos Ropa Limpia" data-area="5.1"/>
+<text x="6978.0" y="4518.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.3.4</text>
+<text x="6978.0" y="4529.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Insumos Ropa Li</text>
+<rect x="7377.0" y="4357.0" width="102.0" height="102.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.3.10" data-name="Ropa Sucia ?" data-area="9.0"/>
+<text x="7428.0" y="4408.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.3.10</text>
+<text x="7428.0" y="4419.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Ropa Sucia ?</text>
+<rect x="8730.0" y="4244.0" width="67.9" height="67.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.2.7" data-name="Personal -" data-area="4.0"/>
+<text x="8764.0" y="4278.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.2.7</text>
+<text x="8764.0" y="4289.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Personal -</text>
+<rect x="6032.2" y="4719.2" width="169.6" height="169.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.2.1" data-name="Circulación - Circul" data-area="24.9"/>
+<text x="6117.0" y="4804.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.2.1</text>
+<text x="6117.0" y="4815.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Circulación - C</text>
+<rect x="6180.7" y="4607.7" width="106.6" height="106.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.2.2" data-name="Enfermera Supervisor" data-area="9.8"/>
+<text x="6234.0" y="4661.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.2.2</text>
+<text x="6234.0" y="4672.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Enfermera Super</text>
+<rect x="6596.2" y="4436.2" width="105.6" height="105.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.3.12" data-name="Aseo" data-area="9.6"/>
+<text x="6649.0" y="4489.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.3.12</text>
+<text x="6649.0" y="4500.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Aseo</text>
+<rect x="6593.8" y="4636.8" width="162.4" height="162.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="33.2.4" data-name="Reuniones" data-area="22.8"/>
+<text x="6675.0" y="4718.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">33.2.4</text>
+<text x="6675.0" y="4729.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Reuniones</text>
+<rect x="9479.4" y="4084.4" width="163.2" height="163.2" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.3.1" data-name="Estación Enfermería" data-area="23.0"/>
+<text x="9561.0" y="4166.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.3.1</text>
+<text x="9561.0" y="4177.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estación Enferm</text>
+<rect x="8886.4" y="3955.4" width="135.2" height="135.2" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.2.2" data-name="Oficina Enfermera Su" data-area="15.8"/>
+<text x="8954.0" y="4023.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.2.2</text>
+<text x="8954.0" y="4034.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Oficina Enferme</text>
+<rect x="9368.6" y="4238.6" width="90.8" height="90.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.3.3" data-name="Suci o" data-area="7.1"/>
+<text x="9414.0" y="4284.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.3.3</text>
+<text x="9414.0" y="4295.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Suci o</text>
+<rect x="9180.4" y="3851.4" width="139.2" height="139.2" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.2.4" data-name="Estar" data-area="16.8"/>
+<text x="9250.0" y="3921.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.2.4</text>
+<text x="9250.0" y="3932.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estar</text>
+<rect x="9925.5" y="3251.5" width="169.0" height="169.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.4.3" data-name="Habitación Pensionad" data-area="24.7"/>
+<text x="10010.0" y="3336.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.4.3</text>
+<text x="10010.0" y="3347.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Habitación Pens</text>
+<rect x="9462.5" y="4433.5" width="149.0" height="149.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.4.1" data-name="Hall Acceso" data-area="19.2"/>
+<text x="9537.0" y="4508.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.4.1</text>
+<text x="9537.0" y="4519.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Hall Acceso</text>
+<rect x="10017.0" y="4451.0" width="102.0" height="102.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.3.5" data-name="Bodega Equipos" data-area="9.0"/>
+<text x="10068.0" y="4502.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.3.5</text>
+<text x="10068.0" y="4513.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Bodega Equipos</text>
+<rect x="9191.8" y="4209.8" width="100.3" height="100.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.3.10" data-name="Ropa Sucia" data-area="8.7"/>
+<text x="9242.0" y="4260.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.3.10</text>
+<text x="9242.0" y="4271.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Ropa Sucia</text>
+<rect x="9317.8" y="4044.8" width="142.4" height="142.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.3.2" data-name="Trabajo Limpio Insum" data-area="17.5"/>
+<text x="9389.0" y="4116.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.3.2</text>
+<text x="9389.0" y="4127.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Trabajo Limpio </text>
+<rect x="9381.6" y="3831.6" width="152.8" height="152.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.3.8" data-name="Enfermería" data-area="20.2"/>
+<text x="9458.0" y="3908.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.3.8</text>
+<text x="9458.0" y="3919.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Enfermería</text>
+<rect x="8896.2" y="4163.2" width="85.5" height="85.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.3.13" data-name="Residuos Sólidos Sec" data-area="6.3"/>
+<text x="8939.0" y="4206.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.3.13</text>
+<text x="8939.0" y="4217.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Residuos Sólido</text>
+<rect x="9210.4" y="4104.4" width="95.3" height="95.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.3.9" data-name="Recinto" data-area="7.8"/>
+<text x="9258.0" y="4152.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.3.9</text>
+<text x="9258.0" y="4163.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Recinto</text>
+<rect x="9612.6" y="3627.6" width="68.8" height="68.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.3.12" data-name="Aseo Estacionamiento" data-area="4.1"/>
+<text x="9647.0" y="3662.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.3.12</text>
+<text x="9647.0" y="3673.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Aseo Estacionam</text>
+<rect x="9593.1" y="3382.1" width="113.8" height="113.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.3.14" data-name="Repostero" data-area="11.2"/>
+<text x="9650.0" y="3439.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.3.14</text>
+<text x="9650.0" y="3450.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Repostero</text>
+<rect x="9042.7" y="4184.7" width="92.6" height="92.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.3.11" data-name="Lavachatas Personal" data-area="7.4"/>
+<text x="9089.0" y="4231.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.3.11</text>
+<text x="9089.0" y="4242.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Lavachatas Pers</text>
+<rect x="9088.6" y="4067.6" width="54.7" height="54.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.2.5" data-name="Ropa LImpia Baño" data-area="2.6"/>
+<text x="9116.0" y="4095.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" font-weight="bold" fill="#1e293b">42.2.5</text>
+<text x="9116.0" y="4104.1" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="7" fill="#334155">Ropa LImpia Bañ</text>
+<rect x="9419.0" y="5240.0" width="39.9" height="39.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.1.3" data-name="Cafetería" data-area="1.4"/>
+<text x="9439.0" y="5260.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="7" font-weight="bold" fill="#1e293b">42.1.3</text>
+<rect x="9441.7" y="5019.7" width="194.7" height="194.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.1.1" data-name="Sala Espera Entrevis" data-area="32.8"/>
+<text x="9539.0" y="5117.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.1.1</text>
+<text x="9539.0" y="5128.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Sala Espera Ent</text>
+<rect x="9572.2" y="4924.2" width="129.6" height="129.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.1.2" data-name="Recepción Orientació" data-area="14.5"/>
+<text x="9637.0" y="4989.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.1.2</text>
+<text x="9637.0" y="5000.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Recepción Orien</text>
+<rect x="9552.6" y="5127.6" width="116.8" height="116.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.2.3" data-name="Recinto" data-area="11.8"/>
+<text x="9611.0" y="5186.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.2.3</text>
+<text x="9611.0" y="5197.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Recinto</text>
+<rect x="9368.0" y="4679.0" width="108.1" height="108.1" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.1.4" data-name="Baño Público Femenin" data-area="10.1"/>
+<text x="9422.0" y="4733.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.1.4</text>
+<text x="9422.0" y="4744.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Baño Público Fe</text>
+<rect x="9540.6" y="4641.6" width="126.7" height="126.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.1.5" data-name="Baño Público Masculi" data-area="13.9"/>
+<text x="9604.0" y="4705.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.1.5</text>
+<text x="9604.0" y="4716.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Baño Público Ma</text>
+<rect x="9602.0" y="3732.0" width="112.0" height="112.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="42.4.2" data-name="camillas, sillas rue" data-area="10.8"/>
+<text x="9658.0" y="3788.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">42.4.2</text>
+<text x="9658.0" y="3799.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">camillas, silla</text>
+<rect x="2532.8" y="2463.8" width="154.4" height="154.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.3.1" data-name="Estación Enfermería" data-area="20.6"/>
+<text x="2610.0" y="2541.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.3.1</text>
+<text x="2610.0" y="2552.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estación Enferm</text>
+<rect x="2626.8" y="2823.8" width="140.4" height="140.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.3.7" data-name="Trabajo Médico" data-area="17.1"/>
+<text x="2697.0" y="2894.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.3.7</text>
+<text x="2697.0" y="2905.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Trabajo Médico</text>
+<rect x="2129.7" y="3948.7" width="148.6" height="148.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.2.1" data-name="Secretaría" data-area="19.1"/>
+<text x="2204.0" y="4023.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.2.1</text>
+<text x="2204.0" y="4034.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Secretaría</text>
+<rect x="2532.8" y="2463.8" width="154.4" height="154.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.3.1" data-name="Estación Enfermería" data-area="20.6"/>
+<text x="2610.0" y="2541.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.3.1</text>
+<text x="2610.0" y="2552.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estación Enferm</text>
+<rect x="1907.6" y="3958.6" width="196.7" height="196.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.2.4" data-name="Sala Reuniones" data-area="33.5"/>
+<text x="2006.0" y="4057.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.2.4</text>
+<text x="2006.0" y="4068.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Sala Reuniones</text>
+<rect x="3042.2" y="2013.2" width="79.6" height="79.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.4.4" data-name="Baño paciente" data-area="5.5"/>
+<text x="3082.0" y="2053.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.4.4</text>
+<text x="3082.0" y="2064.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Baño paciente</text>
+<rect x="3116.6" y="2085.6" width="242.8" height="242.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.4.3" data-name="Habitación 4 Camas" data-area="51.0"/>
+<text x="3238.0" y="2207.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.4.3</text>
+<text x="3238.0" y="2218.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Habitación 4 Ca</text>
+<rect x="3226.1" y="2402.1" width="147.9" height="147.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.4.5" data-name="Habitación Aislado" data-area="18.9"/>
+<text x="3300.0" y="2476.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.4.5</text>
+<text x="3300.0" y="2487.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Habitación Aisl</text>
+<rect x="2250.7" y="4133.7" width="116.6" height="116.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.2.3" data-name="S. Médico-Parientes " data-area="11.8"/>
+<text x="2309.0" y="4192.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.2.3</text>
+<text x="2309.0" y="4203.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">S. Médico-Parie</text>
+<rect x="2727.8" y="2509.8" width="108.4" height="108.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.3.2" data-name="Trabajo Limpio Estac" data-area="10.2"/>
+<text x="2782.0" y="2564.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.3.2</text>
+<text x="2782.0" y="2575.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Trabajo Limpio </text>
+<rect x="2771.3" y="2265.3" width="89.4" height="89.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.3.9" data-name="Ropa Limpia Insumos" data-area="6.9"/>
+<text x="2816.0" y="2310.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.3.9</text>
+<text x="2816.0" y="2321.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Ropa Limpia Ins</text>
+<rect x="2575.6" y="3358.6" width="152.8" height="152.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.3.5" data-name="Bodega Equipos ?" data-area="20.2"/>
+<text x="2652.0" y="3435.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.3.5</text>
+<text x="2652.0" y="3446.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Bodega Equipos </text>
+<rect x="2647.8" y="3612.8" width="88.5" height="88.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.2.7" data-name="Baño Personal Depósi" data-area="6.8"/>
+<text x="2692.0" y="3657.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.2.7</text>
+<text x="2692.0" y="3668.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Baño Personal D</text>
+<rect x="2803.8" y="3677.8" width="88.4" height="88.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.3.12" data-name="Recinto" data-area="6.8"/>
+<text x="2848.0" y="3722.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.3.12</text>
+<text x="2848.0" y="3733.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Recinto</text>
+<rect x="2565.2" y="1120.2" width="153.6" height="153.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.2.6" data-name="Estar Baño" data-area="20.4"/>
+<text x="2642.0" y="1197.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.2.6</text>
+<text x="2642.0" y="1208.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estar Baño</text>
+<rect x="2204.7" y="4401.7" width="116.7" height="116.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.1.2" data-name="Recepción Orientació" data-area="11.8"/>
+<text x="2263.0" y="4460.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.1.2</text>
+<text x="2263.0" y="4471.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Recepción Orien</text>
+<rect x="1843.0" y="4343.0" width="280.0" height="280.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.1.1" data-name="Sala Espera" data-area="67.8"/>
+<text x="1983.0" y="4483.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.1.1</text>
+<text x="1983.0" y="4494.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Sala Espera</text>
+<rect x="2546.9" y="2920.9" width="72.1" height="72.1" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.3.11" data-name="Lavachatas Ropa Suci" data-area="4.5"/>
+<text x="2583.0" y="2957.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.3.11</text>
+<text x="2583.0" y="2968.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Lavachatas Ropa</text>
+<rect x="2038.9" y="3758.9" width="178.1" height="178.1" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.4.6" data-name="Sala espera" data-area="27.4"/>
+<text x="2128.0" y="3848.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.4.6</text>
+<text x="2128.0" y="3859.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Sala espera</text>
+<rect x="2249.0" y="3639.0" width="176.1" height="176.1" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.4.2" data-name="camillas, sillas rue" data-area="26.8"/>
+<text x="2337.0" y="3727.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.4.2</text>
+<text x="2337.0" y="3738.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">camillas, silla</text>
+<rect x="2791.1" y="3358.1" width="147.9" height="147.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.3.8" data-name="Procedimiento Enferm" data-area="18.9"/>
+<text x="2865.0" y="3432.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.3.8</text>
+<text x="2865.0" y="3443.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimiento E</text>
+<rect x="2757.0" y="3800.0" width="159.9" height="159.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.2.5" data-name="Estar" data-area="22.1"/>
+<text x="2837.0" y="3880.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.2.5</text>
+<text x="2837.0" y="3891.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estar</text>
+<rect x="2643.5" y="2273.5" width="107.0" height="107.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.3.4" data-name="Recinto" data-area="9.9"/>
+<text x="2697.0" y="2327.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.3.4</text>
+<text x="2697.0" y="2338.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Recinto</text>
+<rect x="2847.2" y="2904.2" width="65.7" height="65.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="31.3.10" data-name="Ropa Sucia Lavachata" data-area="3.7"/>
+<text x="2880.0" y="2937.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">31.3.10</text>
+<text x="2880.0" y="2947.9" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Ropa Sucia Lava</text>
+<rect x="2835.6" y="5130.6" width="150.7" height="150.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.2.4" data-name="Sala Reuniones" data-area="19.6"/>
+<text x="2911.0" y="5206.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.2.4</text>
+<text x="2911.0" y="5217.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Sala Reuniones</text>
+<rect x="2748.3" y="5098.3" width="95.3" height="95.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.2.1" data-name="Secretaría" data-area="7.9"/>
+<text x="2796.0" y="5146.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.2.1</text>
+<text x="2796.0" y="5157.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Secretaría</text>
+<rect x="4542.3" y="4513.3" width="131.4" height="131.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.3.7" data-name="Trabajo Médico" data-area="14.9"/>
+<text x="4608.0" y="4579.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.3.7</text>
+<text x="4608.0" y="4590.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Trabajo Médico</text>
+<rect x="4266.5" y="4582.5" width="109.0" height="109.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.3.3" data-name="Suci o" data-area="10.3"/>
+<text x="4321.0" y="4637.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.3.3</text>
+<text x="4321.0" y="4648.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Suci o</text>
+<rect x="4177.1" y="4435.1" width="135.7" height="135.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.3.1" data-name="Estación Enfermería" data-area="15.9"/>
+<text x="4245.0" y="4503.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.3.1</text>
+<text x="4245.0" y="4514.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estación Enferm</text>
+<rect x="2894.0" y="4907.0" width="130.0" height="130.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.2.11" data-name="Sala Trabajo" data-area="14.6"/>
+<text x="2959.0" y="4972.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.2.11</text>
+<text x="2959.0" y="4983.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Sala Trabajo</text>
+<rect x="4177.1" y="4435.1" width="135.7" height="135.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.3.1" data-name="Estación Enfermería" data-area="15.9"/>
+<text x="4245.0" y="4503.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.3.1</text>
+<text x="4245.0" y="4514.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estación Enferm</text>
+<rect x="1778.2" y="4530.2" width="279.5" height="279.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.1.1" data-name="Sala Espera" data-area="67.6"/>
+<text x="1918.0" y="4670.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.1.1</text>
+<text x="1918.0" y="4681.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Sala Espera</text>
+<rect x="2193.2" y="4683.2" width="117.5" height="117.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.2.3" data-name="Entrevista Cafetería" data-area="11.9"/>
+<text x="2252.0" y="4742.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.2.3</text>
+<text x="2252.0" y="4753.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Entrevista Cafe</text>
+<rect x="4009.0" y="4673.0" width="76.0" height="76.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.3.4" data-name="Insumos Ropa LImpia" data-area="5.0"/>
+<text x="4047.0" y="4711.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.3.4</text>
+<text x="4047.0" y="4722.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Insumos Ropa LI</text>
+<rect x="5632.4" y="3958.4" width="139.2" height="139.2" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.2.5" data-name="Estar" data-area="16.8"/>
+<text x="5702.0" y="4028.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.2.5</text>
+<text x="5702.0" y="4039.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estar</text>
+<rect x="3243.3" y="4682.3" width="149.4" height="149.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.3.8" data-name="Procedimiento Enferm" data-area="19.3"/>
+<text x="3318.0" y="4757.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.3.8</text>
+<text x="3318.0" y="4768.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimiento E</text>
+<rect x="5623.6" y="4959.6" width="76.9" height="76.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.3.13" data-name="Residuos Sólidos Bañ" data-area="5.1"/>
+<text x="5662.0" y="4998.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.3.13</text>
+<text x="5662.0" y="5009.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Residuos Sólido</text>
+<rect x="3074.9" y="4641.9" width="122.2" height="122.2" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.3.14" data-name="Repostero CUADROS EL" data-area="12.9"/>
+<text x="3136.0" y="4703.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.3.14</text>
+<text x="3136.0" y="4714.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Repostero CUADR</text>
+<rect x="5818.9" y="4921.9" width="66.2" height="66.2" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.2.7" data-name="Baño Personal Baño" data-area="3.8"/>
+<text x="5852.0" y="4955.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.2.7</text>
+<text x="5852.0" y="4966.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Baño Personal B</text>
+<rect x="4097.7" y="4022.7" width="150.6" height="150.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.4.5" data-name="Habitación" data-area="19.6"/>
+<text x="4173.0" y="4098.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.4.5</text>
+<text x="4173.0" y="4109.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Habitación</text>
+<rect x="4245.6" y="4197.6" width="78.7" height="78.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.4.4" data-name="Baño 32.4.5_B Baño" data-area="5.4"/>
+<text x="4285.0" y="4237.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.4.4</text>
+<text x="4285.0" y="4248.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Baño 32.4.5_B B</text>
+<rect x="4337.3" y="4005.3" width="243.3" height="243.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.4.3" data-name="Habitación" data-area="51.2"/>
+<text x="4459.0" y="4127.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.4.3</text>
+<text x="4459.0" y="4138.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Habitación</text>
+<rect x="5537.4" y="4472.4" width="129.2" height="129.2" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.4.1" data-name="Hall Acceso HS.04.H." data-area="14.4"/>
+<text x="5602.0" y="4537.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.4.1</text>
+<text x="5602.0" y="4548.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Hall Acceso HS.</text>
+<rect x="2416.5" y="5109.5" width="129.1" height="129.1" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.2.8" data-name="Residencia Baño 32.2" data-area="14.4"/>
+<text x="2481.0" y="5174.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.2.8</text>
+<text x="2481.0" y="5185.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Residencia Baño</text>
+<rect x="2259.9" y="5141.9" width="138.3" height="138.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.2.9" data-name="Residencia" data-area="16.5"/>
+<text x="2329.0" y="5211.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.2.9</text>
+<text x="2329.0" y="5222.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Residencia</text>
+<rect x="2564.5" y="5107.5" width="119.1" height="119.1" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.2.10" data-name="Residencia Baño 32.2" data-area="12.3"/>
+<text x="2624.0" y="5167.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.2.10</text>
+<text x="2624.0" y="5178.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Residencia Baño</text>
+<rect x="5672.7" y="5106.7" width="140.5" height="140.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.2.6" data-name="Residencia Estar" data-area="17.1"/>
+<text x="5743.0" y="5177.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.2.6</text>
+<text x="5743.0" y="5188.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Residencia Esta</text>
+<rect x="4520.6" y="4705.6" width="82.9" height="82.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.3.11" data-name="Lavachatas Ropa Suci" data-area="5.9"/>
+<text x="4562.0" y="4747.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.3.11</text>
+<text x="4562.0" y="4758.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Lavachatas Ropa</text>
+<rect x="5646.4" y="4127.4" width="153.2" height="153.2" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.3.5" data-name="Bodega Equipos" data-area="20.3"/>
+<text x="5723.0" y="4204.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.3.5</text>
+<text x="5723.0" y="4215.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Bodega Equipos</text>
+<rect x="4025.9" y="4519.9" width="74.2" height="74.2" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.3.9" data-name="Ropa LImpia Insumos " data-area="4.8"/>
+<text x="4063.0" y="4557.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.3.9</text>
+<text x="4063.0" y="4568.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Ropa LImpia Ins</text>
+<rect x="4509.3" y="4430.3" width="67.4" height="67.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.3.10" data-name="Ropa Sucia Lavachata" data-area="3.9"/>
+<text x="4543.0" y="4464.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.3.10</text>
+<text x="4543.0" y="4475.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Ropa Sucia Lava</text>
+<rect x="2496.0" y="4870.0" width="166.1" height="166.1" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="32.4.2" data-name="Estacionamiento cami" data-area="23.9"/>
+<text x="2579.0" y="4953.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">32.4.2</text>
+<text x="2579.0" y="4964.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estacionamiento</text>
+<rect x="1015.1" y="496.1" width="113.8" height="113.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.2.2" data-name="Box Di sfuci ón" data-area="11.2"/>
+<text x="1072.0" y="553.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.2.2</text>
+<text x="1072.0" y="564.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Box Di sfuci ón</text>
+<rect x="151.7" y="129.7" width="140.6" height="140.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.1.5" data-name="Sala Reuniones" data-area="17.1"/>
+<text x="222.0" y="200.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.1.5</text>
+<text x="222.0" y="211.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Sala Reuniones</text>
+<rect x="172.8" y="1725.8" width="98.3" height="98.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.1.2" data-name="Secretaría/Admisi ón" data-area="8.4"/>
+<text x="222.0" y="1775.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.1.2</text>
+<text x="222.0" y="1786.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Secretaría/Admi</text>
+<rect x="1244.4" y="2448.4" width="127.2" height="127.2" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.2.2" data-name="Box Consulta Psi cól" data-area="14.0"/>
+<text x="1308.0" y="2512.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.2.2</text>
+<text x="1308.0" y="2523.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Box Consulta Ps</text>
+<rect x="460.3" y="2646.3" width="115.4" height="115.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.2.4" data-name="Box Enfermería" data-area="11.5"/>
+<text x="518.0" y="2704.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.2.4</text>
+<text x="518.0" y="2715.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Box Enfermería</text>
+<rect x="1244.8" y="2448.8" width="126.4" height="126.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.2.2" data-name="Box Consulta Psi cól" data-area="13.8"/>
+<text x="1308.0" y="2512.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.2.2</text>
+<text x="1308.0" y="2523.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Box Consulta Ps</text>
+<rect x="1029.3" y="1504.3" width="105.5" height="105.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.1.4" data-name="Oficina Jefe Neurol " data-area="9.6"/>
+<text x="1082.0" y="1557.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.1.4</text>
+<text x="1082.0" y="1568.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Oficina Jefe Ne</text>
+<rect x="727.7" y="1529.7" width="120.5" height="120.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.2.1" data-name="Box Consulta Médica" data-area="12.6"/>
+<text x="788.0" y="1590.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.2.1</text>
+<text x="788.0" y="1601.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Box Consulta Mé</text>
+<rect x="729.8" y="1531.8" width="116.5" height="116.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.2.1" data-name="Box Consulta Médica" data-area="11.7"/>
+<text x="788.0" y="1590.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.2.1</text>
+<text x="788.0" y="1601.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Box Consulta Mé</text>
+<rect x="728.5" y="1530.5" width="119.0" height="119.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.2.1" data-name="Box Consulta Médica" data-area="12.3"/>
+<text x="788.0" y="1590.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.2.1</text>
+<text x="788.0" y="1601.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Box Consulta Mé</text>
+<rect x="729.3" y="1531.3" width="117.5" height="117.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.2.1" data-name="Box Consulta Médica" data-area="11.9"/>
+<text x="788.0" y="1590.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.2.1</text>
+<text x="788.0" y="1601.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Box Consulta Mé</text>
+<rect x="727.7" y="1529.7" width="120.5" height="120.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.2.1" data-name="Box Consulta Médica" data-area="12.6"/>
+<text x="788.0" y="1590.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.2.1</text>
+<text x="788.0" y="1601.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Box Consulta Mé</text>
+<rect x="728.4" y="1530.4" width="119.2" height="119.2" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.2.1" data-name="Box Consulta Médica" data-area="12.3"/>
+<text x="788.0" y="1590.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.2.1</text>
+<text x="788.0" y="1601.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Box Consulta Mé</text>
+<rect x="728.4" y="1530.4" width="119.2" height="119.2" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.2.1" data-name="Box Consulta Médica" data-area="12.3"/>
+<text x="788.0" y="1590.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.2.1</text>
+<text x="788.0" y="1601.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Box Consulta Mé</text>
+<rect x="727.5" y="1529.5" width="120.9" height="120.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.2.1" data-name="Box Consulta Médica" data-area="12.7"/>
+<text x="788.0" y="1590.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.2.1</text>
+<text x="788.0" y="1601.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Box Consulta Mé</text>
+<rect x="459.4" y="2645.4" width="117.3" height="117.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.2.4" data-name="Box Enfermería" data-area="11.9"/>
+<text x="518.0" y="2704.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.2.4</text>
+<text x="518.0" y="2715.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Box Enfermería</text>
+<rect x="158.3" y="1711.3" width="127.5" height="127.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.1.2" data-name="Secretaría/Admisi ón" data-area="14.1"/>
+<text x="222.0" y="1775.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.1.2</text>
+<text x="222.0" y="1786.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Secretaría/Admi</text>
+<rect x="502.8" y="1130.8" width="132.4" height="132.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.2.3" data-name="Procedimientos odont" data-area="15.2"/>
+<text x="569.0" y="1197.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.2.3</text>
+<text x="569.0" y="1208.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimientos </text>
+<rect x="663.1" y="1159.1" width="125.8" height="125.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.2.5" data-name="Procedimientos odont" data-area="13.7"/>
+<text x="726.0" y="1222.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.2.5</text>
+<text x="726.0" y="1233.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimientos </text>
+<rect x="1210.1" y="830.1" width="127.7" height="127.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.2.1" data-name="Procedimientos odont" data-area="14.1"/>
+<text x="1274.0" y="894.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.2.1</text>
+<text x="1274.0" y="905.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimientos </text>
+<rect x="521.9" y="150.9" width="146.3" height="146.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.2.10" data-name="Rayos X Scanner Dent" data-area="18.5"/>
+<text x="595.0" y="224.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.2.10</text>
+<text x="595.0" y="235.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Rayos X Scanner</text>
+<rect x="991.4" y="724.4" width="89.1" height="89.1" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.3.3" data-name="Trabajo Limpio 12.2." data-area="6.9"/>
+<text x="1036.0" y="769.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.3.3</text>
+<text x="1036.0" y="780.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Trabajo Limpio </text>
+<rect x="1024.5" y="877.5" width="114.9" height="114.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.2.4" data-name="Procedimientos odont" data-area="11.4"/>
+<text x="1082.0" y="935.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.2.4</text>
+<text x="1082.0" y="946.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimientos </text>
+<rect x="1208.8" y="216.8" width="128.5" height="128.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.2.6" data-name="Procedimientos odont" data-area="14.3"/>
+<text x="1273.0" y="281.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.2.6</text>
+<text x="1273.0" y="292.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimientos </text>
+<rect x="283.6" y="437.6" width="64.8" height="64.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.3.2" data-name="Bodega Insumos Estar" data-area="3.6"/>
+<text x="316.0" y="470.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.3.2</text>
+<text x="316.0" y="480.8" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Bodega Insumos </text>
+<rect x="948.4" y="204.4" width="119.2" height="119.2" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.2.8" data-name="RACKS P3.R.01_CCEE" data-area="12.3"/>
+<text x="1008.0" y="264.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.2.8</text>
+<text x="1008.0" y="275.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">RACKS P3.R.01_C</text>
+<rect x="717.6" y="1411.6" width="94.8" height="94.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.3.11" data-name="CUADROS ELÉCTRICOS P" data-area="7.8"/>
+<text x="765.0" y="1459.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.3.11</text>
+<text x="765.0" y="1470.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">CUADROS ELÉCTRI</text>
+<rect x="733.4" y="550.4" width="137.1" height="137.1" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.13.12" data-name="Procedimiento Maxilo" data-area="16.3"/>
+<text x="802.0" y="619.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.13.12</text>
+<text x="802.0" y="630.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimiento M</text>
+<rect x="830.5" y="270.5" width="73.0" height="73.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.2.11" data-name="Revelado" data-area="4.6"/>
+<text x="867.0" y="307.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.2.11</text>
+<text x="867.0" y="318.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Revelado</text>
+<rect x="276.5" y="618.5" width="70.9" height="70.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.3.8" data-name="Personal Masculino B" data-area="4.3"/>
+<text x="312.0" y="654.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.3.8</text>
+<text x="312.0" y="665.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Personal Mascul</text>
+<rect x="265.6" y="723.6" width="78.8" height="78.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.3.7" data-name="Femenino" data-area="5.4"/>
+<text x="305.0" y="763.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.3.7</text>
+<text x="305.0" y="774.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Femenino</text>
+<rect x="1018.6" y="1426.6" width="74.9" height="74.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.3.10" data-name="Aseo Jefe Servicio" data-area="4.8"/>
+<text x="1056.0" y="1464.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.3.10</text>
+<text x="1056.0" y="1475.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Aseo Jefe Servi</text>
+<rect x="403.7" y="1551.7" width="78.6" height="78.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.1.1" data-name="Sala espera" data-area="5.3"/>
+<text x="443.0" y="1591.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.1.1</text>
+<text x="443.0" y="1602.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Sala espera</text>
+<rect x="144.5" y="1331.5" width="163.0" height="163.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.3.5" data-name="Baño Pacientes Femen" data-area="23.0"/>
+<text x="226.0" y="1413.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.3.5</text>
+<text x="226.0" y="1424.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Baño Pacientes </text>
+<rect x="159.0" y="1569.0" width="102.0" height="102.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="12.3.6" data-name="Baño Pacientes Mascu" data-area="9.0"/>
+<text x="210.0" y="1620.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">12.3.6</text>
+<text x="210.0" y="1631.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Baño Pacientes </text>
+<rect x="1228.2" y="1834.2" width="125.6" height="125.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.2.7" data-name="Procedimientos Elect" data-area="13.6"/>
+<text x="1291.0" y="1897.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.2.7</text>
+<text x="1291.0" y="1908.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimientos </text>
+<rect x="719.3" y="2412.3" width="121.4" height="121.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.2.3" data-name="Consulta" data-area="12.8"/>
+<text x="780.0" y="2473.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.2.3</text>
+<text x="780.0" y="2484.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Consulta</text>
+<rect x="995.7" y="1665.7" width="78.6" height="78.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.2.5" data-name="Almacenaje Insumos C" data-area="5.3"/>
+<text x="1035.0" y="1705.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.2.5</text>
+<text x="1035.0" y="1716.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Almacenaje Insu</text>
+<rect x="1008.2" y="1837.2" width="61.7" height="61.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.3.2" data-name="Personal Circulacion" data-area="3.3"/>
+<text x="1039.0" y="1868.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="10" font-weight="bold" fill="#1e293b">11.3.2</text>
+<text x="1039.0" y="1878.3" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="8" fill="#334155">Personal Circul</text>
+<rect x="952.5" y="1944.5" width="163.1" height="163.1" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.1.5" data-name="Estaciones Trabajo N" data-area="23.0"/>
+<text x="1034.0" y="2026.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.1.5</text>
+<text x="1034.0" y="2037.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estaciones Trab</text>
+<rect x="1183.6" y="2259.6" width="136.8" height="136.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.2.8" data-name="Procedimientos Video" data-area="16.2"/>
+<text x="1252.0" y="2328.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.2.8</text>
+<text x="1252.0" y="2339.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimientos </text>
+<rect x="1227.0" y="1703.0" width="113.9" height="113.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.2.6" data-name="Procedimiento - Lava" data-area="11.2"/>
+<text x="1284.0" y="1760.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.2.6</text>
+<text x="1284.0" y="1771.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimiento -</text>
+<rect x="956.6" y="2337.6" width="142.8" height="142.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.1.6" data-name="Sala Reunión (12p) R" data-area="17.6"/>
+<text x="1028.0" y="2409.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.1.6</text>
+<text x="1028.0" y="2420.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Sala Reunión (1</text>
+<rect x="158.1" y="2204.1" width="137.9" height="137.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="11.1.1" data-name="Sala Espera" data-area="16.4"/>
+<text x="227.0" y="2273.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">11.1.1</text>
+<text x="227.0" y="2284.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Sala Espera</text>
+<rect x="212.8" y="4710.8" width="126.3" height="126.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.2.5" data-name="Box Consulta Médica" data-area="13.8"/>
+<text x="276.0" y="4774.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.2.5</text>
+<text x="276.0" y="4785.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Box Consulta Mé</text>
+<rect x="212.3" y="4710.3" width="127.3" height="127.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.2.5" data-name="Box Consulta Médica" data-area="14.0"/>
+<text x="276.0" y="4774.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.2.5</text>
+<text x="276.0" y="4785.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Box Consulta Mé</text>
+<rect x="1161.0" y="5155.0" width="126.1" height="126.1" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.1.3" data-name="Secretaría" data-area="13.8"/>
+<text x="1224.0" y="5218.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.1.3</text>
+<text x="1224.0" y="5229.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Secretaría</text>
+<rect x="1233.3" y="4966.3" width="133.5" height="133.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.1.4" data-name="Oficina Jefe Otorri " data-area="15.4"/>
+<text x="1300.0" y="5033.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.1.4</text>
+<text x="1300.0" y="5044.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Oficina Jefe Ot</text>
+<rect x="213.0" y="4711.0" width="126.0" height="126.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.2.5" data-name="Box Consulta Médica" data-area="13.7"/>
+<text x="276.0" y="4774.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.2.5</text>
+<text x="276.0" y="4785.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Box Consulta Mé</text>
+<rect x="212.4" y="4710.4" width="127.3" height="127.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.2.5" data-name="Box Consulta Médica" data-area="14.0"/>
+<text x="276.0" y="4774.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.2.5</text>
+<text x="276.0" y="4785.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Box Consulta Mé</text>
+<rect x="213.1" y="4711.1" width="125.8" height="125.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.2.5" data-name="Box Consulta Médica" data-area="13.7"/>
+<text x="276.0" y="4774.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.2.5</text>
+<text x="276.0" y="4785.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Box Consulta Mé</text>
+<rect x="213.1" y="4711.1" width="125.8" height="125.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.2.5" data-name="Box Consulta Médica" data-area="13.7"/>
+<text x="276.0" y="4774.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.2.5</text>
+<text x="276.0" y="4785.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Box Consulta Mé</text>
+<rect x="678.5" y="4652.5" width="149.0" height="149.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.2.9" data-name="Procedimientos nasof" data-area="19.2"/>
+<text x="753.0" y="4727.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.2.9</text>
+<text x="753.0" y="4738.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimientos </text>
+<rect x="512.3" y="4614.3" width="89.3" height="89.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.2.2" data-name="Trabajo Limpio" data-area="6.9"/>
+<text x="557.0" y="4659.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.2.2</text>
+<text x="557.0" y="4670.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Trabajo Limpio</text>
+<rect x="667.5" y="4901.5" width="155.0" height="155.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.2.12" data-name="Procedimientos poten" data-area="20.8"/>
+<text x="745.0" y="4979.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.2.12</text>
+<text x="745.0" y="4990.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimientos </text>
+<rect x="678.1" y="4366.1" width="169.7" height="169.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.1.6" data-name="Estac. Trabajo Prof." data-area="24.9"/>
+<text x="763.0" y="4451.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.1.6</text>
+<text x="763.0" y="4462.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estac. Trabajo </text>
+<rect x="110.6" y="4390.6" width="222.8" height="222.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.1.1" data-name="Sala Espera" data-area="43.0"/>
+<text x="222.0" y="4502.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.1.1</text>
+<text x="222.0" y="4513.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Sala Espera</text>
+<rect x="969.3" y="5097.3" width="117.3" height="117.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.2.10" data-name="Procedimiento Estrob" data-area="11.9"/>
+<text x="1028.0" y="5156.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.2.10</text>
+<text x="1028.0" y="5167.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimiento E</text>
+<rect x="1007.3" y="4562.3" width="81.4" height="81.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.3.5" data-name="Aseo AA.05 SHAFT" data-area="5.7"/>
+<text x="1048.0" y="4603.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.3.5</text>
+<text x="1048.0" y="4614.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Aseo AA.05 SHAF</text>
+<rect x="1233.2" y="5331.2" width="187.6" height="187.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.2.13" data-name="Procedimientos rehab" data-area="30.5"/>
+<text x="1327.0" y="5425.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.2.13</text>
+<text x="1327.0" y="5436.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimientos </text>
+<rect x="526.2" y="5318.2" width="137.6" height="137.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.2.7" data-name="Cámara Audiometría e" data-area="16.4"/>
+<text x="595.0" y="5387.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.2.7</text>
+<text x="595.0" y="5398.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Cámara Audiomet</text>
+<rect x="1156.3" y="4659.3" width="177.3" height="177.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.1.7" data-name="Reuniones" data-area="27.2"/>
+<text x="1245.0" y="4748.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.1.7</text>
+<text x="1245.0" y="4759.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Reuniones</text>
+<rect x="844.4" y="5370.4" width="161.2" height="161.2" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.2.11" data-name="Procedimientos poten" data-area="22.5"/>
+<text x="925.0" y="5451.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.2.11</text>
+<text x="925.0" y="5462.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimientos </text>
+<rect x="986.7" y="5327.7" width="160.6" height="160.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.2.6" data-name="Procedimiento Octavo" data-area="22.3"/>
+<text x="1067.0" y="5408.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.2.6</text>
+<text x="1067.0" y="5419.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimiento O</text>
+<rect x="539.3" y="4756.3" width="125.3" height="125.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.2.1" data-name="Circulaciones Genera" data-area="13.6"/>
+<text x="602.0" y="4819.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.2.1</text>
+<text x="602.0" y="4830.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Circulaciones G</text>
+<rect x="984.2" y="4955.2" width="95.7" height="95.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.2.4" data-name="Residuos Sólidos Clí" data-area="7.9"/>
+<text x="1032.0" y="5003.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.2.4</text>
+<text x="1032.0" y="5014.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Residuos Sólido</text>
+<rect x="783.6" y="4759.6" width="78.7" height="78.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.3.2" data-name="Baño Personal" data-area="5.4"/>
+<text x="823.0" y="4799.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.3.2</text>
+<text x="823.0" y="4810.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Baño Personal</text>
+<rect x="9911.9" y="6594.9" width="124.1" height="124.1" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="14.2" data-name="Residencia Generales" data-area="13.3"/>
+<text x="9974.0" y="6657.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">14.2</text>
+<text x="9974.0" y="6668.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Residencia Gene</text>
+<rect x="724.2" y="3689.2" width="129.6" height="129.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.1.2" data-name="Secr.-Adm.-Rec." data-area="14.5"/>
+<text x="789.0" y="3754.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.1.2</text>
+<text x="789.0" y="3765.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Secr.-Adm.-Rec.</text>
+<rect x="1204.2" y="3940.2" width="133.6" height="133.6" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.1.7" data-name="Jefe Servici o" data-area="15.4"/>
+<text x="1271.0" y="4007.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.1.7</text>
+<text x="1271.0" y="4018.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Jefe Servici o</text>
+<rect x="1209.1" y="4121.1" width="127.7" height="127.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.1.5" data-name="Secretaría Servico" data-area="14.1"/>
+<text x="1273.0" y="4185.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.1.5</text>
+<text x="1273.0" y="4196.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Secretaría Serv</text>
+<rect x="706.3" y="3461.3" width="133.5" height="133.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.2.8" data-name="Box Enfermería" data-area="15.4"/>
+<text x="773.0" y="3528.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.2.8</text>
+<text x="773.0" y="3539.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Box Enfermería</text>
+<rect x="1010.3" y="2873.3" width="65.4" height="65.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.2.3" data-name="Trabajo Suci o" data-area="3.7"/>
+<text x="1043.0" y="2906.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.2.3</text>
+<text x="1043.0" y="2916.9" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Trabajo Suci o</text>
+<rect x="990.2" y="3015.2" width="77.7" height="77.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.2.4" data-name="Insumos Clínicos Ase" data-area="5.2"/>
+<text x="1029.0" y="3054.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.2.4</text>
+<text x="1029.0" y="3065.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Insumos Clínico</text>
+<rect x="44.8" y="3336.8" width="310.4" height="310.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.1.1" data-name="Sala Espera" data-area="83.3"/>
+<text x="200.0" y="3492.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.1.1</text>
+<text x="200.0" y="3503.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Sala Espera</text>
+<rect x="1243.1" y="3014.1" width="125.7" height="125.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.2.6" data-name="Consulta" data-area="13.7"/>
+<text x="1306.0" y="3077.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.2.6</text>
+<text x="1306.0" y="3088.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Consulta</text>
+<rect x="1170.1" y="3802.1" width="157.8" height="157.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.2.5" data-name="Baño Personal" data-area="21.5"/>
+<text x="1249.0" y="3881.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.2.5</text>
+<text x="1249.0" y="3892.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Baño Personal</text>
+<rect x="1186.8" y="4261.8" width="126.4" height="126.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.1.8" data-name="Reuniones -" data-area="13.8"/>
+<text x="1250.0" y="4325.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.1.8</text>
+<text x="1250.0" y="4336.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Reuniones -</text>
+<rect x="1214.8" y="2663.8" width="126.4" height="126.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.4.1" data-name="Estar" data-area="13.8"/>
+<text x="1278.0" y="2727.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.4.1</text>
+<text x="1278.0" y="2738.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estar</text>
+<rect x="1020.8" y="2727.8" width="84.4" height="84.4" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.4.3" data-name="Baño Personal Aseo" data-area="6.2"/>
+<text x="1063.0" y="2770.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.4.3</text>
+<text x="1063.0" y="2781.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Baño Personal A</text>
+<rect x="1286.0" y="2860.0" width="102.0" height="102.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.3.4" data-name="Fototerapia y PUVA" data-area="9.0"/>
+<text x="1337.0" y="2911.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.3.4</text>
+<text x="1337.0" y="2922.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Fototerapia y P</text>
+<rect x="667.6" y="2618.6" width="138.8" height="138.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.2.10" data-name="Pabellón de cirugía " data-area="16.7"/>
+<text x="737.0" y="2688.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.2.10</text>
+<text x="737.0" y="2699.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Pabellón de cir</text>
+<rect x="1166.6" y="4417.6" width="162.8" height="162.8" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.1.9" data-name="Estación Trabajo Pro" data-area="22.9"/>
+<text x="1248.0" y="4499.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.1.9</text>
+<text x="1248.0" y="4510.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estación Trabaj</text>
+<rect x="982.7" y="3716.7" width="104.5" height="104.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.1.3" data-name="Recepción Archivo" data-area="9.4"/>
+<text x="1035.0" y="3769.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.1.3</text>
+<text x="1035.0" y="3780.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Recepción Archi</text>
+<rect x="982.8" y="3137.8" width="102.3" height="102.3" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.2.1" data-name="Estación Enfermería" data-area="9.1"/>
+<text x="1034.0" y="3189.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.2.1</text>
+<text x="1034.0" y="3200.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Estación Enferm</text>
+<rect x="979.5" y="3356.5" width="103.0" height="103.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.3.2" data-name="Procedimiento Dermat" data-area="9.2"/>
+<text x="1031.0" y="3408.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.3.2</text>
+<text x="1031.0" y="3419.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimiento D</text>
+<rect x="656.8" y="3139.8" width="146.5" height="146.5" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.3.1" data-name="Procedimiento Laser" data-area="18.6"/>
+<text x="730.0" y="3213.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.3.1</text>
+<text x="730.0" y="3224.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimiento L</text>
+<rect x="728.0" y="3352.0" width="102.0" height="102.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.2.7" data-name="Procedimientos ETS" data-area="9.0"/>
+<text x="779.0" y="3403.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.2.7</text>
+<text x="779.0" y="3414.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Procedimientos </text>
+<rect x="748.6" y="3931.6" width="80.9" height="80.9" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.4.6" data-name="Residuos Sólidos Gen" data-area="5.7"/>
+<text x="789.0" y="3972.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.4.6</text>
+<text x="789.0" y="3983.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Residuos Sólido</text>
+<rect x="723.2" y="2888.2" width="69.7" height="69.7" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.4.9" data-name="Baño 17.3.3_B Vestua" data-area="4.2"/>
+<text x="758.0" y="2923.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.4.9</text>
+<text x="758.0" y="2934.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Baño 17.3.3_B V</text>
+<rect x="835.5" y="2704.5" width="65.0" height="65.0" rx="3" ry="3" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" data-code="17.4.8" data-name="Vestidor" data-area="3.6"/>
+<text x="868.0" y="2737.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">17.4.8</text>
+<text x="868.0" y="2747.8" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Vestidor</text>
+<rect x="2284.9" y="5015.9" width="52.1" height="52.1" rx="3" ry="3" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5" data-code="59.2" data-name="Casilleros Trabajo B" data-area="2.4"/>
+<text x="2311.0" y="5042.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" font-weight="bold" fill="#1e293b">59.2</text>
+<text x="2311.0" y="5050.7" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="7" fill="#334155">Casilleros Trab</text>
+<rect x="5488.6" y="1416.6" width="170.9" height="170.9" rx="3" ry="3" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1.5" data-code="77.5" data-name="Extracción Gases Ane" data-area="25.3"/>
+<text x="5574.0" y="1502.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="11" font-weight="bold" fill="#1e293b">77.5</text>
+<text x="5574.0" y="1513.0" text-anchor="middle" dominant-baseline="middle" font-family="Arial,sans-serif" font-size="9" fill="#334155">Extracción Gase</text>
+<rect x="10063" y="5" width="195" height="58" rx="4" fill="white" opacity="0.9"/>
+<rect x="10068" y="10" width="12" height="12" rx="2" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+<text x="10084" y="20" font-family="Arial,sans-serif" font-size="9" fill="#334155">59: Servicio 59</text>
+<rect x="10068" y="26" width="12" height="12" rx="2" fill="#e2e8f0" stroke="#94a3b8" stroke-width="1"/>
+<text x="10084" y="36" font-family="Arial,sans-serif" font-size="9" fill="#334155">77: Servicio 77</text>
+<rect x="10068" y="42" width="12" height="12" rx="2" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1"/>
+<text x="10084" y="52" font-family="Arial,sans-serif" font-size="9" fill="#334155">GEN: Banco de Sangre</text>
+<text x="10" y="20" font-family="Arial,sans-serif" font-size="14" font-weight="bold" fill="#1e293b">Piso 3</text>
+<text x="10" y="34" font-family="Arial,sans-serif" font-size="9" fill="#64748b">243 recintos · 257m × 188m</text>
+<line x1="10" y1="7497" x2="2010" y2="7497" stroke="#475569" stroke-width="3"/>
+<line x1="10" y1="7492" x2="10" y2="7502" stroke="#475569" stroke-width="2"/>
+<line x1="2010" y1="7492" x2="2010" y2="7502" stroke="#475569" stroke-width="2"/>
+<text x="1010.0" y="7490" text-anchor="middle" font-family="Arial,sans-serif" font-size="10" fill="#475569">50 m</text>
+</svg>

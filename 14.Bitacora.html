@@ -1,0 +1,1101 @@
+<!doctype html>
+<html lang="es">
+<head>
+<script src="pm_config.js"></script>
+<script src="pm_gate.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bitácora y Huddle · Puesta en Marcha NHDS</title>
+<style>
+:root{
+  --navy:#1F3B63; --blue:#2E5A9E; --teal:#0E7C66; --amber:#B45309; --red:#9B1C1C;
+  --bg:#0e1726; --bg2:#152238; --card:#1b2b45; --line:rgba(255,255,255,.10);
+  --txt:#e8eef7; --dim:#93a4bd; --chip:#22375a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);
+  font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+header{background:var(--navy);padding:14px 20px 0;border-bottom:3px solid var(--teal)}
+h1{margin:0;font-size:19px;letter-spacing:.2px}
+.sub{color:#b9c8de;font-size:12.5px;margin:3px 0 12px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tab{padding:8px 14px;border-radius:8px 8px 0 0;background:rgba(255,255,255,.06);
+  cursor:pointer;font-size:13px;user-select:none;white-space:nowrap}
+.tab.on{background:var(--bg2);font-weight:600}
+.tab .n{color:#8fa6c4;font-size:11px;margin-left:6px}
+main{padding:16px 20px 60px;background:var(--bg2);min-height:80vh}
+.panel{display:none}.panel.on{display:block}
+.kpis{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.k{background:var(--card);border:1px solid var(--line);border-radius:10px;
+  padding:10px 16px;min-width:110px}
+.k .v{font-size:22px;font-weight:700}
+.k .l{font-size:11px;color:var(--dim);text-transform:lowercase}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+input.q,select,input.f,textarea{background:#101c30;color:var(--txt);
+  border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:13px;font-family:inherit}
+input.q{flex:1;min-width:220px}
+button{background:var(--blue);color:#fff;border:0;border-radius:8px;padding:8px 14px;
+  font-size:13px;cursor:pointer;font-family:inherit}
+button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}
+button.danger{background:var(--red)}
+.it{background:var(--card);border:1px solid var(--line);border-radius:10px;
+  padding:12px 14px;margin-bottom:9px}
+.it h3{margin:0 0 4px;font-size:14.5px;font-weight:600;cursor:pointer}
+.it .det{color:#c6d4e8;font-size:12.8px;margin:4px 0 8px}
+.meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chip{background:var(--chip);border-radius:20px;padding:2px 10px;font-size:11px;color:#cfe0f5}
+.chip.est{font-weight:600}
+.est-Abierto{background:#3a2a12;color:#f0c07a}
+.est-En-curso{background:#12314f;color:#8fc4ff}
+.est-Esperando-terceros{background:#3d2140;color:#e0a8ea}
+.est-Cerrado{background:#12362c;color:#7fd8bb}
+.pri-Alta{background:#4a1a1a;color:#ff9a9a}
+.pri-Media{background:#3a3212;color:#e8d07a}
+.pri-Baja{background:#1e2c40;color:#a9bcd6}
+.acts{display:flex;gap:6px;margin-top:9px;flex-wrap:wrap}
+.acts button{padding:4px 10px;font-size:11.5px}
+.notas{margin-top:9px;border-top:1px solid var(--line);padding-top:8px;display:none}
+.notas.on{display:block}
+.nota{font-size:12.3px;color:#c6d4e8;margin-bottom:4px}
+.nota b{color:#8fa6c4;font-weight:600;margin-right:6px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.cr{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:10px;overflow:hidden}
+.cr>summary{padding:11px 14px;cursor:pointer;list-style:none;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.cr>summary::-webkit-details-marker{display:none}
+.cr>summary:hover{background:rgba(255,255,255,.03)}
+.cr .nom{font-weight:600;font-size:14px;flex:1;min-width:200px}
+.prog{width:110px;height:7px;background:#101c30;border-radius:6px;overflow:hidden;flex:none}
+.prog i{display:block;height:100%;background:var(--teal)}
+.prog.lo i{background:var(--red)}.prog.mid i{background:var(--amber)}
+.pc{font-size:12px;color:var(--dim);min-width:38px;text-align:right}
+.hit{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 14px 8px 26px;border-top:1px solid var(--line);font-size:12.8px}
+.hit .h{flex:1;min-width:190px}
+.hit .f{color:var(--dim);font-size:11.5px;white-space:nowrap}
+.hit.post{background:rgba(155,28,28,.13)}
+.hit.venc{background:rgba(180,83,9,.12)}
+.seg{cursor:pointer;user-select:none}
+.seg-Sin-revisar{background:#22375a;color:#9fb6d4}
+.seg-Al-dia{background:#12362c;color:#7fd8bb}
+.seg-En-riesgo{background:#3a3212;color:#e8d07a}
+.seg-Atrasado{background:#4a1a1a;color:#ff9a9a}
+.seg-Bloqueado{background:#3d2140;color:#e0a8ea}
+.seg-No-aplica{background:#1e2c40;color:#7f8ea3}
+.avi{border-radius:10px;padding:11px 14px;margin-bottom:12px;font-size:13px;line-height:1.55}
+.avi.rojo{background:rgba(155,28,28,.16);border:1px solid rgba(255,120,120,.3)}
+.avi b{color:#ffc9c9}
+.form{background:var(--card);border:1px solid var(--line);border-radius:10px;
+  padding:14px;margin-bottom:14px;display:none}
+.form.on{display:block}
+.form label{display:block;font-size:11px;color:var(--dim);margin:8px 0 3px}
+.form input,.form select,.form textarea{width:100%}
+table{width:100%;border-collapse:collapse;font-size:12.6px}
+th{background:var(--navy);text-align:left;padding:7px 9px;position:sticky;top:0}
+td{padding:6px 9px;border-bottom:1px solid var(--line)}
+tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+.vacio{color:var(--dim);padding:20px;text-align:center}
+.chip.crit{background:#7a1414;color:#ffd9d9;font-weight:700}
+.it.crit{border-left:4px solid #e05252}
+.sec{margin:20px 0 9px;font-size:14.5px;font-weight:700;letter-spacing:.2px}
+.sec small{color:var(--dim);font-weight:400;font-size:12px;margin-left:8px}
+.px td.c,.px th.c{text-align:center}
+.px td.bad{background:rgba(155,28,28,.30);color:#ffc9c9;font-weight:700}
+.px td.alt{background:rgba(180,83,9,.22);color:#f0c07a;font-weight:600}
+.px td.dim{color:var(--dim)}
+.px .nt{color:var(--dim);font-size:11.8px;margin-top:2px;line-height:1.4}
+.rq-Cumple,.rq-Cubierto{background:#12362c;color:#7fd8bb}
+.rq-Brecha{background:#4a1a1a;color:#ff9a9a}
+.rq-Redistribuir,.rq-Por-confirmar{background:#3a3212;color:#e8d07a}
+.rq-Insumo,.rq-Obra,.rq-Sin-cotejar{background:#1e2c40;color:#a9bcd6}
+details.mas{margin-top:6px}
+details.mas>summary{cursor:pointer;color:#8fc4ff;font-size:13px;padding:6px 0}
+footer{padding:14px 20px;color:var(--dim);font-size:11.5px;background:var(--bg)}
+a{color:#8fc4ff}
+/* ── Huddle ── */
+.hud-top{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:linear-gradient(90deg,#173257,#132a47);
+  border:1px solid var(--line);border-radius:12px;padding:12px 16px;margin-bottom:12px}
+.hud-top .tt{font-size:17px;font-weight:700;flex:1;min-width:240px}
+.hud-top .tt small{display:block;font-size:12px;color:var(--dim);font-weight:400;margin-top:2px}
+.hud-top .reloj{font-variant-numeric:tabular-nums;font-size:13px;color:#cfe0f5;background:#0f2038;border-radius:8px;padding:6px 10px}
+.sync{font-size:11.5px;border-radius:20px;padding:3px 10px;cursor:pointer}
+.sync.on{background:#12362c;color:#7fd8bb}.sync.off{background:#22375a;color:#9fb6d4}.sync.err{background:#4a1a1a;color:#ff9a9a}
+button.go{background:var(--teal)} button.warn{background:var(--amber)}
+.hud-add{padding:10px 12px}
+.hud-add .row{display:grid;grid-template-columns:2.4fr 1.2fr .9fr 1fr auto auto;gap:8px;align-items:center}
+.hud-add input,.hud-add select{width:100%}
+.hsec{margin:16px 0 8px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.hsec h2{margin:0;font-size:15px}
+.hsec .n{background:var(--chip);border-radius:20px;padding:1px 9px;font-size:11.5px;color:#cfe0f5}
+.hsec .ayuda{color:var(--dim);font-size:12px}
+.hr{display:grid;grid-template-columns:22px 70px 1fr auto;gap:10px;align-items:start;background:var(--card);
+  border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:6px}
+.hr.crit{border-left:4px solid #e05252}
+.hr.rev{background:#16304a;border-color:rgba(127,216,187,.35)}
+.hr.cer{opacity:.85;background:#132b25}
+.hr .ck{width:20px;height:20px;border-radius:6px;border:2px solid #4f6a8f;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;font-size:13px;margin-top:2px;user-select:none}
+.hr .ck.si{background:var(--teal);border-color:var(--teal);color:#fff}
+.hr .id{font-size:11.5px;color:var(--dim);margin-top:3px}
+.hr .tx b{font-size:14px;font-weight:600}
+.hr .tx .ult{color:#b7c7dd;font-size:12.3px;margin-top:3px}
+.hr .tx .ult i{color:var(--dim);font-style:normal;margin-right:5px}
+.hr .tx .meta{margin-top:5px}
+.hr .ha{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end;max-width:330px}
+.hr .ha button{padding:4px 9px;font-size:11.5px}
+.chip.resp{background:#1d3a35;color:#9fe3cc}.chip.resp.no{background:#4a1a1a;color:#ffb0b0}
+.chip.plz{background:#2a2f45;color:#cdd6f6}.chip.plz.venc{background:#7a1414;color:#ffd9d9;font-weight:700}
+.chip.plz.pronto{background:#5a4210;color:#ffe0a0}
+.chip.okh{background:#12362c;color:#7fd8bb}
+details.fr{background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
+details.fr>summary{padding:9px 12px;cursor:pointer;font-weight:600;list-style:none}
+details.fr>summary::-webkit-details-marker{display:none}
+details.fr>div{padding:0 10px 6px}
+.modal{position:fixed;inset:0;background:rgba(3,8,16,.7);display:none;align-items:flex-start;justify-content:center;z-index:50;overflow:auto;padding:40px 12px}
+.modal.on{display:flex}
+.mbox{background:var(--bg2);border:1px solid var(--line);border-radius:12px;max-width:820px;width:100%;padding:18px 20px}
+.mbox h3{margin:0 0 10px}
+.mbox textarea,.mbox input{width:100%}
+.mbox pre{white-space:pre-wrap;background:#0f1b2e;border-radius:8px;padding:12px;font-size:12.5px;max-height:60vh;overflow:auto}
+body.pub .solo-local{display:none!important}
+@media (max-width:760px){ .hr{grid-template-columns:22px 1fr} .hr .id{display:none} .hr .ha{grid-column:1/-1;justify-content:flex-start;max-width:none}
+  .hud-add .row{grid-template-columns:1fr 1fr} }
+@media print{ header .tabs,.hud-add,.hr .ha,.hr .ck,footer,.hud-top button,.sync{display:none!important}
+  body,main{background:#fff;color:#000} .hr,.k,.hud-top{background:#fff!important;border-color:#bbb;color:#000} .chip{border:1px solid #999;background:#fff!important;color:#000!important} }
+</style>
+</head>
+<body>
+<header>
+  <h1>🗂️ Bitácora de Pendientes · Huddle de Puesta en Marcha</h1>
+  <div class="sub">Nuevo Hospital Del Salvador — lo que quedó abierto en reuniones, correos, ORD, cartas y mesas de trabajo, quién lo lleva, cómo se resolvió</div>
+  <div class="tabs">
+    <div class="tab on" data-p="hud" onclick="tab(this)">🧭 Huddle <span class="n" id="n-h"></span></div>
+    <div class="tab" data-p="pend" onclick="tab(this)">📌 Pendientes <span class="n" id="n-p"></span></div>
+    <div class="tab" data-p="pab" onclick="tab(this)">🏥 Pabellón <span class="n" id="n-pb"></span></div>
+    <div class="tab" data-p="actas" onclick="tab(this)">📋 Actas de capacitación <span class="n" id="n-a"></span></div>
+    <div class="tab" data-p="cron" onclick="tab(this)">🗓️ Cronograma traslado · TI · TD · EMMC · Logística <span class="n" id="n-cr"></span></div>
+    <div class="tab" data-p="cerr" onclick="tab(this)">✅ Cerrados <span class="n" id="n-c"></span></div>
+  </div>
+</header>
+
+<main>
+  <!-- ══ HUDDLE ══ -->
+  <div class="panel on" id="p-hud">
+    <div class="hud-top" id="hud-top"></div>
+    <div class="kpis" id="kpis-h"></div>
+    <div class="form on hud-add" id="hud-add"></div>
+    <div id="hud-body"></div>
+  </div>
+
+  <!-- ══ PENDIENTES ══ -->
+  <div class="panel" id="p-pend">
+    <div class="kpis" id="kpis"></div>
+    <div class="bar">
+      <input class="q" id="q" placeholder="Buscar en título, detalle, origen, contraparte…" oninput="render()">
+      <select id="f-amb" onchange="render()"><option value="">Ámbito: todos</option></select>
+      <select id="f-est" onchange="render()"><option value="">Estado: abiertos</option></select>
+      <select id="f-pri" onchange="render()"><option value="">Prioridad: todas</option></select>
+      <select id="f-cri" onchange="render()"><option value="">Críticos: todos</option><option value="1">🚨 Solo críticos</option></select>
+      <button onclick="nuevo()">+ Nuevo pendiente</button>
+      <button class="ghost" onclick="exportar()">⤓ Exportar</button>
+      <button class="ghost solo-local" onclick="document.getElementById('imp').click()">⤒ Importar</button>
+      <input type="file" id="imp" accept="application/json" style="display:none" onchange="importar(this)">
+    </div>
+    <div class="form" id="form"></div>
+    <div id="lista"></div>
+  </div>
+
+  <!-- ══ PABELLÓN ══ -->
+  <div class="panel" id="p-pab">
+    <div id="alerta-pb"></div>
+    <div class="kpis" id="kpis-pb"></div>
+    <div class="sec">🚨 Pendientes críticos de Pabellón</div>
+    <div id="lista-pb-crit"></div>
+    <details class="mas"><summary id="sum-pb-otros"></summary><div id="lista-pb-otros"></div></details>
+    <div class="sec">📋 Pauta de autorización sanitaria · quirófano de cirugía mayor<small id="pb-fuente"></small></div>
+    <div id="pb-reqs"></div>
+    <div class="sec">🧮 Equipamiento propio por quirófano<small>unidades asignadas por código de recinto · en rojo, menos unidades que quirófanos</small></div>
+    <div id="pb-matriz"></div>
+  </div>
+
+  <!-- ══ ACTAS ══ -->
+  <div class="panel" id="p-actas">
+    <div class="kpis" id="kpis-a"></div>
+    <div class="bar">
+      <input class="q" id="qa" placeholder="Buscar acta, proveedor, equipo, marca o carta…" oninput="renderActas()">
+      <select id="fa-est" onchange="renderActas()"><option value="">Estado: todos</option></select>
+      <select id="fa-hos" onchange="renderActas()"><option value="">Hospital: ambos</option></select>
+      <button class="ghost" onclick="actaAPendiente()">Crear pendiente de lo filtrado</button>
+    </div>
+    <div id="lista-a"></div>
+  </div>
+
+  <!-- ══ CRONOGRAMA DE TRASLADO ══ -->
+  <div class="panel" id="p-cron">
+    <div class="kpis" id="kpis-cr"></div>
+    <div id="alerta-cr"></div>
+    <div class="bar">
+      <input class="q" id="qc" placeholder="Buscar subproyecto, hito, actividad o responsable…" oninput="renderCron()">
+      <select id="fc-area" onchange="renderCron()"><option value="">Área: todas</option></select>
+      <select id="fc-nivel" onchange="renderCron()">
+        <option value="act">Nivel: actividades</option>
+        <option value="hito">Nivel: solo hitos</option>
+      </select>
+      <select id="fc-vis" onchange="renderCron()">
+        <option value="">Ver: todo</option>
+        <option value="abierto">Solo lo no terminado</option>
+        <option value="alerta">Solo lo que cae después del traslado</option>
+        <option value="vencido">Solo con fecha vencida</option>
+        <option value="sinresp">Solo sin responsable</option>
+      </select>
+      <select id="fc-resp" onchange="renderCron()"><option value="">Responsable: todos</option></select>
+      <select id="fc-seg" onchange="renderCron()"><option value="">Seguimiento: todos</option></select>
+      <button class="ghost" onclick="exportarCron()">⤓ Exportar seguimiento</button>
+    </div>
+    <div id="lista-cr"></div>
+  </div>
+
+  <!-- ══ CERRADOS ══ -->
+  <div class="panel" id="p-cerr"><div id="lista-c"></div></div>
+</main>
+
+<footer id="pie"></footer>
+<div class="modal" id="modal" onclick="if(event.target===this)this.classList.remove('on')"><div class="mbox" id="mbox"></div></div>
+
+<script src="SHARED_DATA/bitacora_pendientes.js"></script>
+<script src="SHARED_DATA/pabellon_pauta.js"></script>
+<script src="SHARED_DATA/actas_capacitacion.js"></script>
+<script src="SHARED_DATA/cronograma_traslado.js"></script>
+<script src="hub-home.js"></script>
+<script>
+// ════════════════════════════════════════════════════════════════════════════
+// La semilla viene del JSON compartido; lo que se edita aquí vive en el
+// navegador. Nunca se pisa una edición local con la semilla: al cargar se
+// fusiona por id, y los pendientes nuevos del JSON se suman al final.
+// ════════════════════════════════════════════════════════════════════════════
+const PUBLIC_BUILD = true; /*__PUBLIC_FLAG__*/
+if(PUBLIC_BUILD) document.body.classList.add('pub');
+const KEY='hds_bitacora_v1';
+const SEMILLA=(window.BITACORA||{items:[]});
+const ACTAS=(window.ACTAS_CAP||{actas:[],totales:{}});
+const hoy=()=>new Date().toISOString().slice(0,10);
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const nrm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+
+function cargar(){
+  let local=[];
+  try{ local=JSON.parse(localStorage.getItem(KEY)||'[]'); }catch(e){ local=[]; }
+  const porId=new Map(local.map(x=>[x.id,x]));
+  // la semilla solo aporta lo que todavía no existe en el navegador
+  const choques=[]; let sumadas=0;
+  const NOTAS_SEMILLA_DESDE='2026-10-01';   // antes de esa fecha las notas de la semilla no se reinyectan
+  SEMILLA.items.forEach(s=>{
+    const l=porId.get(s.id);
+    if(!l){ porId.set(s.id, JSON.parse(JSON.stringify(s))); return; }
+    // Mismo número, otro pendiente: se creó en este navegador («+ Nuevo pendiente») antes de que
+    // la semilla usara ese id. Entra el de la semilla y el local se renumera al final: no se pierde.
+    if(l.creado&&s.creado&&l.creado!==s.creado&&l.titulo!==s.titulo){ choques.push(l); porId.set(s.id, JSON.parse(JSON.stringify(s))); return; }
+    // Mismo pendiente: el texto y el estado de este navegador mandan, pero las anotaciones nuevas de
+    // la semilla (novedades registradas después) se suman a su bitácora para que no se pierdan.
+    ['responsable','plazo','frente','privado','privado_motivo'].forEach(k=>{ if(l[k]===undefined&&s[k]!==undefined){ l[k]=s[k]; sumadas++; } });
+    const tiene=new Set((l.notas||[]).map(n=>n.fecha+'|'+n.texto));
+    const nuevas=(s.notas||[]).filter(n=>n.fecha>=NOTAS_SEMILLA_DESDE&&!tiene.has(n.fecha+'|'+n.texto));
+    if(nuevas.length){ l.notas=(l.notas||[]).concat(JSON.parse(JSON.stringify(nuevas))); sumadas++; }
+  });
+  let n=[...porId.keys()].reduce((m,id)=>Math.max(m,parseInt(String(id).slice(1))||0),0);
+  choques.forEach(l=>{ const antes=l.id; l.id='P'+String(++n).padStart(3,'0');
+    (l.notas=l.notas||[]).push({fecha:hoy(),texto:'Renumerado desde '+antes+': la semilla usó ese número para otro pendiente.'});
+    porId.set(l.id,l); });
+  const out=[...porId.values()];
+  if(choques.length||sumadas) localStorage.setItem(KEY,JSON.stringify(out));
+  return out;
+}
+let D=cargar();
+const guardar=()=>localStorage.setItem(KEY,JSON.stringify(D));
+
+// Crítico para la apertura del hospital: lo marca la semilla (lista «criticos») y se puede
+// cambiar aquí con el botón 🚨; lo que se decide en el navegador manda sobre la semilla.
+const CRIT_SEM=new Set(SEMILLA.criticos||[]);
+const esCritico=x=>x.critico===true||(x.critico===undefined&&CRIT_SEM.has(x.id));
+// Frente Pabellón: lo que la semilla lista en frentes.pabellon + lo que nombra pabellón o quirófano.
+const PAB_SEM=new Set(((SEMILLA.frentes||{}).pabellon)||[]);
+const esPabellon=x=>x.frente==='Pabellón'||PAB_SEM.has(x.id)||/pabell|quir[oó]fano/i.test((x.servicio||'')+' '+(x.titulo||''));
+function alternarCritico(id){
+  const x=D.find(y=>y.id===id); accion(id,'campo',{k:'critico',v:!esCritico(x)});
+}
+
+function opts(sel,vals,pref){
+  const e=document.getElementById(sel); const cur=e.value;
+  e.innerHTML='<option value="">'+pref+'</option>'+vals.map(v=>`<option>${esc(v)}</option>`).join('');
+  e.value=cur;
+}
+function initFiltros(){
+  opts('f-amb',[...new Set(D.map(x=>x.ambito).filter(Boolean))].sort(),'Ámbito: todos');
+  opts('f-est',SEMILLA.estados||[],'Estado: abiertos');
+  opts('f-pri',SEMILLA.prioridades||[],'Prioridad: todas');
+  opts('fa-est',Object.keys(ACTAS.totales.por_estado||{}),'Estado: todos');
+  opts('fa-hos',Object.keys(ACTAS.totales.por_hospital||{}),'Hospital: ambos');
+  opts('fc-seg',SEG,'Seguimiento: todos');
+  opts('fc-area',CRON.areas||[],'Área: todas');
+  opts('fc-resp',[...new Set((CRON.subproyectos||[]).flatMap(s=>s.hitos.flatMap(h=>h.actividades.map(a=>a.responsable))).filter(x=>x&&!/^sin asignar/i.test(x)))].sort(),'Responsable: todos');
+}
+
+function tab(el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');
+  const p=el.dataset.p;
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('on'));
+  document.getElementById('p-'+p).classList.add('on');
+  // el formulario de edición vive en la pestaña de pendientes
+  if(p!=='pend') document.getElementById('form').classList.remove('on');
+  if(p==='actas') renderActas(); else if(p==='cron') renderCron(); else render();
+  try{ localStorage.setItem('hds_bitacora_tab',p); }catch(e){}
+}
+
+// ── Pendientes ──────────────────────────────────────────────────────────────
+function filtra(){
+  const q=nrm(document.getElementById('q').value);
+  const a=document.getElementById('f-amb').value, e=document.getElementById('f-est').value,
+        p=document.getElementById('f-pri').value, c=document.getElementById('f-cri').value;
+  return D.filter(x=>{
+    if(c&&!esCritico(x)) return false;
+    if(e){ if(x.estado!==e) return false; } else if(x.estado==='Cerrado') return false;
+    if(a&&x.ambito!==a) return false;
+    if(p&&x.prioridad!==p) return false;
+    if(!q) return true;
+    return nrm([x.titulo,x.detalle,x.origen_tipo,x.origen_ref,x.contraparte,x.servicio,x.ambito,
+                (x.notas||[]).map(n=>n.texto).join(' ')].join(' ')).includes(q);
+  }).sort((a,b)=>esCritico(b)-esCritico(a));   // los críticos primero; el resto conserva su orden
+}
+function tarjeta(x,pre=''){
+  const cls=s=>String(s||'').replace(/\s+/g,'-'); const cri=esCritico(x);
+  const notas=(x.notas||[]).map(n=>`<div class="nota"><b>${esc(n.fecha)}</b>${esc(n.texto)}</div>`).join('')||'<div class="nota">Sin anotaciones.</div>';
+  const org=[x.origen_tipo,x.origen_ref,x.origen_fecha].filter(Boolean).join(' · ');
+  return `<div class="it${cri?' crit':''}" data-id="${x.id}">
+    <h3 onclick="verNotas('${pre}${x.id}')">${esc(x.titulo)}</h3>
+    <div class="det">${esc(x.detalle)}</div>
+    <div class="meta">
+      ${cri?'<span class="chip crit">🚨 Crítico</span>':''}
+      <span class="chip est est-${cls(x.estado)}">${esc(x.estado)}</span>
+      <span class="chip pri-${cls(x.prioridad)}">${esc(x.prioridad)}</span>
+      ${x.ambito?`<span class="chip">${esc(x.ambito)}</span>`:''}
+      ${org?`<span class="chip">${esc(org)}</span>`:''}
+      ${x.contraparte?`<span class="chip">👤 ${esc(x.contraparte)}</span>`:''}
+      ${x.servicio?`<span class="chip">🏥 ${esc(x.servicio)}</span>`:''}
+      <span class="chip resp${noResp(x)?' no':''}">🙋 ${esc(noResp(x)?'sin responsable':x.responsable)}</span>
+      ${plazoDe(x)?`<span class="chip plz">📅 ${fmt(plazoDe(x))}</span>`:''}
+      ${x.compromiso&&!/^20\d\d-\d\d-\d\d$/.test(x.compromiso)?`<span class="chip">🤝 ${esc(String(x.compromiso).slice(0,160))}</span>`:''}
+      <span class="chip">${esc(x.id)}</span>
+    </div>
+    <div class="acts">
+      <button class="ghost" onclick="anotar('${x.id}')">+ Anotación</button>
+      <button class="ghost" onclick="avanzar('${x.id}')">Cambiar estado</button>
+      <button class="ghost" onclick="editar('${x.id}')">Editar</button>
+      <button class="ghost" onclick="verNotas('${pre}${x.id}')">Bitácora (${(x.notas||[]).length})</button>
+      <button class="ghost" onclick="alternarCritico('${x.id}')">${cri?'Quitar crítico':'🚨 Marcar crítico'}</button>
+      <button class="danger solo-local" onclick="borrar('${x.id}')">Eliminar</button>
+    </div>
+    <div class="notas" id="n-${pre}${x.id}">${notas}</div>
+  </div>`;
+}
+function render(){
+  const f=filtra();
+  document.getElementById('lista').innerHTML=f.length?f.map(x=>tarjeta(x)).join(''):'<div class="vacio">Nada que mostrar con esos filtros.</div>';
+  const ab=D.filter(x=>x.estado!=='Cerrado');
+  const k=[['pendientes abiertos',ab.length],['🚨 críticos',ab.filter(esCritico).length],['prioridad alta',ab.filter(x=>x.prioridad==='Alta').length],
+           ['esperando terceros',ab.filter(x=>x.estado==='Esperando terceros').length],
+           ['en curso',ab.filter(x=>x.estado==='En curso').length],
+           ['cerrados',D.filter(x=>x.estado==='Cerrado').length],
+           ['ámbitos',new Set(ab.map(x=>x.ambito)).size]];
+  document.getElementById('kpis').innerHTML=k.map(([l,v])=>`<div class="k"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+  document.getElementById('n-p').textContent=ab.length;
+  document.getElementById('n-c').textContent=D.filter(x=>x.estado==='Cerrado').length;
+  document.getElementById('n-a').textContent=(ACTAS.actas||[]).length;
+  document.getElementById('lista-c').innerHTML=D.filter(x=>x.estado==='Cerrado').map(x=>tarjeta(x,'c-')).join('')||'<div class="vacio">Todavía no hay pendientes cerrados.</div>';
+  renderPab(); renderHuddle();
+  document.getElementById('pie').innerHTML=
+    'Semilla: '+esc(SEMILLA.version||'')+' · Actas: '+esc(ACTAS.version||'')+
+    ' — las ediciones se guardan en este navegador. Exportá el JSON para respaldar o compartir.';
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// Pabellón · pendientes del frente + cotejo contra la pauta de cirugía mayor
+//
+// La pauta y el cotejo vienen de SHARED_DATA/pabellon_pauta.js (lo genera
+// _DEV/build_pabellon_pauta.py desde la norma de Atención Cerrada, el Seguimiento
+// EMMC y el catastro). Aquí solo se muestra; los pendientes son los mismos de la
+// pestaña 📌, filtrados por el frente.
+// ════════════════════════════════════════════════════════════════════════════
+const PAUTA=(window.PABELLON_PAUTA||{grupos:[],requisitos:[],resumen:{},fuentes:{}});
+function renderPab(){
+  const ab=D.filter(x=>x.estado!=='Cerrado'&&esPabellon(x));
+  const cr=ab.filter(esCritico), ot=ab.filter(x=>!esCritico(x));
+  document.getElementById('n-pb').textContent=ab.length;
+  const tr=(window.CRONOGRAMA_TRASLADO&&(window.CRONOGRAMA_TRASLADO.hitos_contrato||[]).find(h=>/Traslado/i.test(h.hito)))||null;
+  const dias=tr?Math.round((new Date(tr.fecha)-new Date(hoy()))/864e5):null;
+  const R=PAUTA.requisitos||[], mesa=R.find(r=>r.n===206)||{};
+  const br=R.filter(r=>r.estado==='Brecha'), pc=R.filter(r=>r.estado==='Por confirmar'||r.estado==='Redistribuir');
+  document.getElementById('alerta-pb').innerHTML=`<div class="avi rojo">
+    <b>${cr.length} pendientes críticos abiertos en Pabellón</b>${tr?`, a <b>${dias>=0?dias+' días del traslado':(-dias)+' días después del traslado'}</b> (${tr.fecha.split('-').reverse().join('-')})`:''}.
+    ${mesa.total?`La pauta de cirugía mayor exige mesa quirúrgica propia en cada quirófano y el proyecto asigna <b>${mesa.asignados} mesas para ${mesa.total} quirófanos</b>: sin resolver eso, esos ${mesa.total-mesa.cubiertos} quirófanos no se autorizan.`:''}</div>`;
+  const k=[['quirófanos',PAUTA.total_quirofanos||0],['con mesa quirúrgica',mesa.total?mesa.cubiertos+' / '+mesa.total:'—'],
+           ['requisitos con brecha',br.length],['por confirmar',pc.length],
+           ['🚨 críticos',cr.length],['pendientes del frente',ab.length]];
+  document.getElementById('kpis-pb').innerHTML=k.map(([l,v])=>`<div class="k"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+  document.getElementById('lista-pb-crit').innerHTML=cr.map(x=>tarjeta(x,'pb-')).join('')||'<div class="vacio">Sin pendientes críticos abiertos.</div>';
+  document.getElementById('sum-pb-otros').textContent='Otros pendientes de Pabellón ('+ot.length+')';
+  document.getElementById('lista-pb-otros').innerHTML=ot.map(x=>tarjeta(x,'pb-')).join('')||'<div class="vacio">No hay otros pendientes.</div>';
+
+  // pauta: primero lo que no cumple, después lo que cumple; lo de obra y lo no cotejado, plegado
+  const F=PAUTA.fuentes||{};
+  document.getElementById('pb-fuente').textContent=(F.seguimiento?'Seguimiento '+F.seguimiento.split(' · ').pop():'')+(PAUTA.generado?' · cotejo del '+PAUTA.generado.split('-').reverse().join('-'):'');
+  const ORD={'Brecha':0,'Redistribuir':1,'Por confirmar':2,'Cumple':3,'Cubierto':3,'Insumo':4};
+  const cot=R.filter(r=>r.estado in ORD).sort((a,b)=>ORD[a.estado]-ORD[b.estado]||a.n-b.n);
+  const resto=R.filter(r=>!(r.estado in ORD));
+  const fila=r=>{
+    const cob=r.cotejo==='equipo'?`${r.cubiertos} / ${r.total}`:'—';
+    const fal=(r.faltantes||[]).map(f=>`${esc(f.nombre)} (${esc(f.cod)}): ${f.faltan} sin`).join(' · ');
+    return `<tr><td class="c dim">${r.n}</td><td>${esc(r.texto)}
+        ${r.nota?`<div class="nt">${esc(r.nota)}</div>`:''}${fal?`<div class="nt">Sin cubrir → ${fal}</div>`:''}</td>
+      <td class="c">${cob}</td><td class="c">${r.cotejo==='equipo'?r.asignados:'—'}</td>
+      <td><span class="chip rq-${clsx(r.estado)}">${esc(r.estado)}</span></td></tr>`;
+  };
+  const tabla=L=>`<table class="px"><thead><tr><th class="c">N°</th><th>Requisito de la pauta</th><th class="c">Quirófanos cubiertos</th><th class="c">Unidades</th><th>Estado</th></tr></thead><tbody>${L.map(fila).join('')}</tbody></table>`;
+  document.getElementById('pb-reqs').innerHTML=R.length?
+    tabla(cot)+`<details class="mas"><summary>Requisitos de obra e instalaciones y los no cotejados (${resto.length})</summary>${tabla(resto)}</details>`
+    :'<div class="vacio">No se cargó SHARED_DATA/pabellon_pauta.js. Generarlo con _DEV/build_pabellon_pauta.py</div>';
+
+  // matriz por código de quirófano
+  const COL=[['206','Mesa quirúrgica'],['camilla_oft','Camilla oftalmo.'],['207','Lámpara'],['208','Anestesia'],['217','Electrobisturí'],
+             ['218','Arsenalera'],['221','Mesa Mayo'],['220','Aspiración'],['216','Porta sueros'],['torre_lap','Torre laparosc.'],['arco_c','Arco C']];
+  const OPC=new Set(['camilla_oft','torre_lap','arco_c']);    // no los exige la pauta por quirófano
+  const G=PAUTA.grupos||[];
+  document.getElementById('pb-matriz').innerHTML=G.length?`<table class="px"><thead><tr><th>Quirófanos</th><th>BIM</th><th class="c">N°</th>${COL.map(c=>`<th class="c">${c[1]}</th>`).join('')}</tr></thead><tbody>`+
+    G.map(g=>`<tr><td>${esc(g.nombre)}<div class="nt">${esc(g.cod)}</div></td><td class="dim">${esc(g.bims.join(' · '))}</td><td class="c"><b>${g.quirofanos}</b></td>`+
+      COL.map(([c])=>{ const v=g.equipos[c]||0; const cl=OPC.has(c)?(v?'':'dim'):(v<g.quirofanos?(v?'alt':'bad'):'');
+        return `<td class="c ${cl}">${v}</td>`; }).join('')+'</tr>').join('')+
+    `<tr><td><b>TOTAL</b></td><td></td><td class="c"><b>${G.reduce((a,g)=>a+g.quirofanos,0)}</b></td>${COL.map(([c])=>`<td class="c"><b>${G.reduce((a,g)=>a+(g.equipos[c]||0),0)}</b></td>`).join('')}</tr></tbody></table>`:'';
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// Cronogramas TIC · seguimiento
+//
+// Los cronogramas son de Informática y de Transformación Digital: esta bitácora
+// los mira, no los ejecuta. Por eso el dato del avance viene de su archivo y no
+// se toca; lo único que se guarda aquí es NUESTRA lectura de cada hito —si está
+// al día, en riesgo o atrasado— y la nota de por qué. Vive en este navegador,
+// igual que los pendientes.
+//
+// Cuando una lectura deja de ser una observación y pasa a ser algo que hay que
+// exigir, el botón «→ Pendiente» la convierte en un P0NN de la pestaña de
+// pendientes, con el cronograma como origen.
+// ════════════════════════════════════════════════════════════════════════════
+const CRON=(window.CRONOGRAMA_TRASLADO||{subproyectos:[],integraciones:[],alertas:{},totales:{}});
+const KEY_CR='hds_cronogramas_v1';
+const SEG=['Sin revisar','Al día','En riesgo','Atrasado','Bloqueado','No aplica'];
+const TRASLADO=(CRON.hitos_contrato||[]).find(h=>/Traslado/i.test(h.hito));
+let SG={}; try{ SG=JSON.parse(localStorage.getItem(KEY_CR)||'{}'); }catch(e){ SG={}; }
+// el dataset anterior guardaba el seguimiento por índice (S3-2); ahora el id es
+// estable por nombre. Se migra una vez y no se pierde lo ya revisado.
+(function migrar(){
+  const M=CRON.migracion_ids||{}; let n=0;
+  Object.keys(SG).forEach(k=>{ if(M[k]&&!SG[M[k]]){ SG[M[k]]=SG[k]; delete SG[k]; n++; } });
+  if(n) localStorage.setItem(KEY_CR,JSON.stringify(SG));
+})();
+const guardarCr=()=>localStorage.setItem(KEY_CR,JSON.stringify(SG));
+const clsx=t=>String(t||'').replace(/\s+/g,'-').replace(/í/g,'i');
+const AREA_ICO={TI:'🖥️',TD:'🔌',EMMC:'🩺','Logística':'📦'};
+const AMBITO_DE={TI:'TI',TD:'TI',EMMC:'EMMC','Logística':'Otros'};
+const terminado=f=>f.tipo==='act'?(f.estado==='Completado'||f.estado==='Cancelado'):((f.avance||0)>=1);
+
+// una fila = un hito, una actividad o un paso de integración
+function filasCron(){
+  const out=[];
+  (CRON.subproyectos||[]).forEach(s=>s.hitos.forEach(h=>{
+    out.push({id:h.id, sub:s, grupo:s.n+'. '+s.nombre, area:s.area, tipo:'hito', nombre:h.hito,
+      fecha:h.termino, inicio:h.inicio, avance:h.avance, peso:h.peso, nact:h.actividades.length,
+      hechas:h.actividades.filter(a=>a.estado==='Completado').length});
+    h.actividades.forEach(a=>out.push({id:a.id, sub:s, grupo:s.n+'. '+s.nombre, area:s.area,
+      tipo:'act', hito:h.hito, hitoId:h.id, nombre:a.actividad, detalle:a.detalle, estado:a.estado,
+      quien:a.responsable, dep:a.area_resp, peso:a.peso, fecha:a.termino, inicio:a.inicio,
+      real:a.termino_real, avance:a.estado==='Completado'?1:0}));
+  }));
+  (CRON.integraciones||[]).forEach((t,i)=>t.pasos.forEach((p,j)=>out.push({
+    id:'I'+i+'-'+j, grupo:'Integraciones TrakCare · '+t.tema, area:'TD', tipo:'integ', nombre:p.paso,
+    fecha:p.fecha, quien:p.ejecuta, sigue:p.seguimiento, avance:t.avance, nota:t.nota})));
+  return out;
+}
+const post=f=>f.fecha&&TRASLADO&&f.fecha>TRASLADO.fecha&&!terminado(f);
+const venc=f=>f.fecha&&f.fecha<hoy()&&!terminado(f);
+const sinResp=f=>f.tipo==='act'&&/^sin asignar/i.test(f.quien||'')&&!terminado(f);
+
+function renderCron(){
+  const q=nrm(document.getElementById('qc').value);
+  const vis=document.getElementById('fc-vis').value;
+  const nivel=document.getElementById('fc-nivel').value;
+  const area=document.getElementById('fc-area').value;
+  const resp=document.getElementById('fc-resp').value;
+  const fs=document.getElementById('fc-seg').value;
+  const todas=filasCron();
+  const T=CRON.totales||{};
+  const acts=todas.filter(f=>f.tipo==='act');
+
+  const k=[['subproyectos',T.subproyectos||0],['hitos',T.hitos||0],
+           ['actividades',(T.actividades||0)],
+           ['completadas',acts.filter(a=>a.estado==='Completado').length],
+           ['en ejecución',acts.filter(a=>a.estado==='En ejecución').length],
+           ['terminan tras el traslado',acts.filter(post).length],
+           ['con fecha vencida',acts.filter(venc).length],
+           ['sin responsable',acts.filter(sinResp).length],
+           ['revisados',Object.keys(SG).filter(k=>SG[k]&&SG[k].estado&&SG[k].estado!=='Sin revisar').length]];
+  document.getElementById('kpis-cr').innerHTML=k.map(([l,v])=>
+    `<div class="k"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+  document.getElementById('n-cr').textContent=todas.filter(f=>f.tipo!=='hito').length;
+
+  const np=acts.filter(post).length, nv=acts.filter(venc).length, ns=acts.filter(sinResp).length;
+  const emmc=acts.filter(a=>a.area==='EMMC');
+  document.getElementById('alerta-cr').innerHTML = `<div class="avi rojo">
+    <b>${np} actividades terminan después del traslado</b> del
+    ${TRASLADO?TRASLADO.fecha.split('-').reverse().join('-'):''}, <b>${nv} tienen la fecha vencida</b>
+    y <b>${ns} no tienen responsable</b>. Los tres subproyectos de Equipamiento Médico
+    (traslado de EMMC, revisión del EMMC del NHDS e inventario) suman ${emmc.length} actividades:
+    ${emmc.filter(a=>a.estado==='Completado').length} completadas, ${emmc.filter(a=>a.estado==='En ejecución').length}
+    en ejecución y ${emmc.filter(sinResp).length} sin responsable asignado. Un equipo que llega al
+    recinto nuevo sin su red, su integración o su protocolo de traslado no está en servicio.</div>`;
+
+  const pasa=f=>{
+    if(nivel==='hito'&&f.tipo==='act') return false;
+    if(area&&f.area!==area) return false;
+    if(resp&&f.tipo==='act'&&!nrm(f.quien||'').includes(nrm(resp))) return false;
+    if(resp&&f.tipo!=='act') return false;
+    if(vis==='abierto'&&terminado(f)) return false;
+    if(vis==='alerta'&&!post(f)) return false;
+    if(vis==='vencido'&&!venc(f)) return false;
+    if(vis==='sinresp'&&!sinResp(f)) return false;
+    if(vis==='integ'&&f.tipo!=='integ') return false;
+    if(fs&&((SG[f.id]||{}).estado||'Sin revisar')!==fs) return false;
+    if(!q) return true;
+    return nrm([f.grupo,f.hito,f.nombre,f.quien,f.dep,f.detalle,f.sigue,(SG[f.id]||{}).nota].join(' ')).includes(q);
+  };
+  // si una actividad pasa el filtro, su hito se muestra como cabecera aunque no lo pase
+  const vivas=todas.filter(pasa);
+  const hitosVivos=new Set(vivas.filter(f=>f.tipo==='act').map(f=>f.hitoId));
+  const conCab=todas.filter(f=>vivas.includes(f)||(f.tipo==='hito'&&hitosVivos.has(f.id)));
+  const grupos=[...new Set(conCab.map(f=>f.grupo))];
+  document.getElementById('lista-cr').innerHTML = grupos.length ? grupos.map(g=>{
+    const fl=conCab.filter(f=>f.grupo===g), any=fl[0];
+    const av=any.tipo==='integ'?any.avance:(any.sub||{}).avance;
+    const pct=Math.round((av||0)*100);
+    const cl=pct<25?'lo':(pct<70?'mid':'');
+    const abierto=(vis||q||fs||resp||area)?' open':'';
+    const na=fl.filter(f=>f.tipo==='act').length;
+    return `<details class="cr"${abierto}><summary>
+      <span class="chip">${AREA_ICO[any.area]||''} ${esc(any.area||'')}</span>
+      <span class="nom">${esc(g)}${any.sub&&any.sub.flag?` <span class="chip pri-Alta">${esc(any.sub.flag)}</span>`:''}${any.sub&&any.sub.estado&&any.sub.estado!=='Activo'?` <span class="chip">${esc(any.sub.estado)}</span>`:''}</span>
+      ${fl.some(post)?'<span class="chip pri-Alta">tras el traslado</span>':''}
+      <span class="f">${fl.filter(f=>f.tipo==='hito').length} hitos${na?' · '+na+' act.':''}</span>
+      <span class="prog ${cl}"><i style="width:${pct}%"></i></span><span class="pc">${pct}%</span>
+    </summary>${fl.map(filaCron).join('')}</details>`;
+  }).join('') : '<div class="vacio">Nada que mostrar con esos filtros.</div>';
+
+  document.getElementById('pie').innerHTML=
+    'Cronograma: '+esc(CRON.fuente||'')+' — el avance lo informa quien ejecuta; '+
+    'el seguimiento se guarda en este navegador.';
+}
+
+const EST_COL={'Completado':'seg-Al-dia','En ejecución':'seg-En-riesgo','En revisión':'seg-En-riesgo',
+               'No iniciado':'seg-Sin-revisar','Bloqueado':'seg-Bloqueado','En riesgo':'seg-Atrasado','Cancelado':'seg-No-aplica'};
+function filaCron(f){
+  const g=SG[f.id]||{}; const est=g.estado||'Sin revisar';
+  const fch=f.fecha?f.fecha.split('-').reverse().join('-'):'sin fecha';
+  if(f.tipo==='hito'){
+    const pct=Math.round((f.avance||0)*100);
+    return `<div class="hit ${post(f)?'post':(venc(f)?'venc':'')}" style="background:rgba(255,255,255,.035)">
+      <span class="h"><b>▶ ${esc(f.nombre)}</b>${f.peso!=null?` <span class="f">· peso ${f.peso}%</span>`:''}
+        ${f.nact?` <span class="f">· ${f.hechas}/${f.nact} actividades</span>`:''}
+        ${g.nota?`<div class="f" style="margin-top:3px">📝 ${esc(g.nota)}</div>`:''}</span>
+      <span class="f">${fch}</span>
+      <span class="pc">${pct}%</span>
+      <span class="chip seg seg-${clsx(est)}" onclick="cicloSeg('${f.id}')">${esc(est)}</span>
+      <button class="ghost" style="padding:3px 9px;font-size:11px" onclick="notaCron('${f.id}')">nota</button>
+      <button class="ghost" style="padding:3px 9px;font-size:11px" onclick="cronAPendiente('${f.id}')">→ Pendiente</button>
+    </div>`;
+  }
+  const estAct=f.tipo==='act'?`<span class="chip ${EST_COL[f.estado]||''}" title="Estado que informa quien ejecuta">${esc(f.estado)}</span>`:'';
+  return `<div class="hit ${post(f)?'post':(venc(f)?'venc':'')}" style="padding-left:${f.tipo==='act'?'44px':'26px'}">
+    <span class="h">${esc(f.nombre)}${f.peso?` <span class="f">· ${f.peso}%</span>`:''}
+      ${f.detalle?`<div class="f" style="margin-top:2px;white-space:normal;line-height:1.4">${esc(f.detalle)}</div>`:''}
+      ${g.nota?`<div class="f" style="margin-top:3px">📝 ${esc(g.nota)}</div>`:''}</span>
+    ${estAct}
+    <span class="f" title="${f.inicio?'inicio '+f.inicio.split('-').reverse().join('-'):''}">${fch}${f.real?' ✔ '+f.real.split('-').reverse().join('-'):''}</span>
+    ${f.quien?`<span class="chip" title="${esc(f.dep||'')}">${esc(f.quien)}</span>`:''}
+    <span class="chip seg seg-${clsx(est)}" onclick="cicloSeg('${f.id}')">${esc(est)}</span>
+    <button class="ghost" style="padding:3px 9px;font-size:11px" onclick="notaCron('${f.id}')">nota</button>
+    <button class="ghost" style="padding:3px 9px;font-size:11px" onclick="cronAPendiente('${f.id}')">→ Pendiente</button>
+  </div>`;
+}
+
+function cicloSeg(id){
+  const g=SG[id]=SG[id]||{}; const i=SEG.indexOf(g.estado||'Sin revisar');
+  g.estado=SEG[(i+1)%SEG.length]; g.fecha=hoy(); guardarCr(); renderCron();
+}
+function notaCron(id){
+  const g=SG[id]=SG[id]||{}; const t=prompt('Nota de seguimiento:',g.nota||'');
+  if(t!==null){ g.nota=t.trim(); g.fecha=hoy(); guardarCr(); renderCron(); }
+}
+function cronAPendiente(id){
+  const f=filasCron().find(x=>x.id===id); if(!f) return;
+  const g=SG[id]||{};
+  const t=prompt('Título del pendiente:', f.grupo+' — '+(f.hito?f.hito+' · ':'')+f.nombre);
+  if(!t||!t.trim()) return;
+  const n=D.reduce((m,y)=>Math.max(m,parseInt((y.id||'P0').slice(1))||0),0)+1;
+  D.push({id:'P'+String(n).padStart(3,'0'), titulo:t.trim(),
+    detalle:(g.nota?g.nota+' — ':'')+'Del cronograma de traslado: '+f.grupo+(f.hito?' · '+f.hito:'')+' · '+f.nombre+
+      (f.estado?' (estado informado: '+f.estado+')':'')+
+      (f.fecha?'. Fecha comprometida '+f.fecha:'. Sin fecha comprometida.')+
+      (f.quien?' Ejecuta: '+f.quien+(f.dep?' ('+f.dep+')':'')+'.':''),
+    ambito:AMBITO_DE[f.area]||'Otros', estado:'Esperando terceros',
+    prioridad:(post(f)||venc(f)||sinResp(f))?'Alta':'Media',
+    origen_tipo:'Cronograma', origen_ref:f.tipo==='integ'?'Integraciones TrakCare 19-08-2026':'Cronograma detalle traslado TI·TD·EMMC·Logística 10-09-2026',
+    origen_fecha:hoy(), contraparte:f.quien||'', compromiso:f.fecha||'',
+    creado:hoy(), notas:[{fecha:hoy(),texto:'Creado desde la pestaña del cronograma de traslado.'}]});
+  guardar(); g.estado=g.estado||'En riesgo'; SG[id]=g; guardarCr();
+  alert('Creado '+D[D.length-1].id+' en Pendientes.'); renderCron();
+}
+function exportarCron(){
+  const filas=filasCron().map(f=>({id:f.id,tipo:f.tipo,area:f.area,subproyecto:f.grupo,hito:f.hito||f.nombre,
+    actividad:f.tipo==='act'?f.nombre:'',estado_informado:f.estado||'',responsable:f.quien||'',
+    fecha:f.fecha||'',seguimiento:(SG[f.id]||{}).estado||'Sin revisar',nota:(SG[f.id]||{}).nota||'',
+    fecha_seguimiento:(SG[f.id]||{}).fecha||''}));
+  const b=new Blob([JSON.stringify({generado:hoy(),fuente:CRON.fuente,filas},null,1)],
+                   {type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b);
+  a.download='seguimiento_cronograma_traslado_'+hoy()+'.json'; a.click();
+}
+
+function verNotas(id){ document.getElementById('n-'+id).classList.toggle('on'); }
+function toca(x){ x.actualizado=hoy(); guardar(); render(); }
+function anotar(id){
+  const x=D.find(y=>y.id===id); const t=prompt('Anotación para «'+x.titulo+'»:');
+  if(t&&t.trim()) accion(id,'nota',{texto:t.trim()});
+}
+function avanzar(id){
+  const x=D.find(y=>y.id===id); const E=SEMILLA.estados||['Abierto','Cerrado'];
+  const n=prompt('Estado ('+E.join(' / ')+'):',x.estado);
+  if(n&&E.includes(n)&&n!==x.estado) accion(id,'estado',{estado:n});
+}
+function borrar(id){
+  const x=D.find(y=>y.id===id);
+  if(confirm('¿Eliminar «'+x.titulo+'»? No se puede deshacer.')){ D=D.filter(y=>y.id!==id); guardar(); render(); }
+}
+function campo(l,n,v,tipo){
+  if(tipo==='ta') return `<label>${l}</label><textarea name="${n}" rows="3">${esc(v||'')}</textarea>`;
+  if(Array.isArray(tipo)) return `<label>${l}</label><select name="${n}">`+
+    ['',...tipo].map(o=>`<option ${o===v?'selected':''}>${esc(o)}</option>`).join('')+'</select>';
+  return `<label>${l}</label><input class="f" name="${n}" type="${tipo||'text'}" value="${esc(v||'')}">`;
+}
+function editar(id){
+  if(!document.getElementById('p-pend').classList.contains('on')) tab(document.querySelector('.tab[data-p="pend"]'));
+  const x=id?D.find(y=>y.id===id):{estado:'Abierto',prioridad:'Media',origen_fecha:hoy()};
+  const f=document.getElementById('form');
+  f.innerHTML=`<h3 style="margin:0 0 6px">${id?'Editar '+esc(id):'Nuevo pendiente'}</h3>
+    ${campo('Título','titulo',x.titulo)}
+    ${campo('Detalle','detalle',x.detalle,'ta')}
+    <div class="grid2">
+      ${campo('Ámbito','ambito',x.ambito,SEMILLA.ambitos)}
+      ${campo('Origen','origen_tipo',x.origen_tipo,SEMILLA.origenes)}
+      ${campo('Referencia del origen (folio, N° carta, asunto)','origen_ref',x.origen_ref)}
+      ${campo('Fecha del origen','origen_fecha',x.origen_fecha,'date')}
+      ${campo('Contraparte','contraparte',x.contraparte)}
+      ${campo('Servicio','servicio',x.servicio)}
+      ${campo('Estado','estado',x.estado,SEMILLA.estados)}
+      ${campo('Prioridad','prioridad',x.prioridad,SEMILLA.prioridades)}
+      ${campo('Responsable','responsable',x.responsable)}
+      ${campo('Plazo','plazo',plazoDe(x),'date')}
+      ${campo('Compromiso (qué se acordó)','compromiso',x.compromiso)}
+    </div>
+    <div class="acts"><button onclick="salvar('${id||''}')">Guardar</button>
+      <button class="ghost" onclick="document.getElementById('form').classList.remove('on')">Cancelar</button></div>`;
+  f.classList.add('on'); f.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function nuevo(){ editar(''); }
+function salvar(id){
+  const f=document.getElementById('form'); const g=n=>f.querySelector(`[name="${n}"]`).value.trim();
+  if(!g('titulo')){ alert('El título es obligatorio.'); return; }
+  const K=['titulo','detalle','ambito','origen_tipo','origen_ref','origen_fecha','contraparte',
+   'servicio','estado','prioridad','compromiso','responsable','plazo'];
+  const v={}; K.forEach(k=>v[k]=g(k));
+  f.classList.remove('on');
+  if(!id){ accion(nuevoId(),'nuevo',{item:Object.assign(v,{creado:hoy(),actualizado:hoy(),notas:[{fecha:hoy(),texto:'Pendiente creado.'}]})}); return; }
+  const x=D.find(y=>y.id===id), cambio={}; K.forEach(k=>{ if((x[k]||'')!==v[k]) cambio[k]=v[k]; });
+  if(Object.keys(cambio).length) accion(id,'campos',{v:cambio});
+}
+function exportar(){
+  const b=new Blob([JSON.stringify({version:'Bitácora HDS · export '+hoy(),items:D},null,1)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b);
+  a.download='bitacora_pendientes_'+hoy()+'.json'; a.click();
+}
+function importar(inp){
+  const fr=new FileReader();
+  fr.onload=()=>{ try{ const j=JSON.parse(fr.result); const its=Array.isArray(j)?j:(j.items||[]);
+    if(!its.length){ alert('El archivo no trae pendientes.'); return; }
+    const m=new Map(D.map(x=>[x.id,x])); its.forEach(x=>m.set(x.id,x));
+    D=[...m.values()]; guardar(); initFiltros(); render(); alert(its.length+' pendientes incorporados.');
+  }catch(e){ alert('No pude leer el JSON: '+e.message); } };
+  fr.readAsText(inp.files[0]); inp.value='';
+}
+
+// ── Actas de capacitación ───────────────────────────────────────────────────
+function filtraActas(){
+  const q=nrm(document.getElementById('qa').value);
+  const e=document.getElementById('fa-est').value, h=document.getElementById('fa-hos').value;
+  return (ACTAS.actas||[]).filter(a=>{
+    if(e&&a.estado!==e) return false;
+    if(h&&a.hospital!==h) return false;
+    if(!q) return true;
+    return nrm([a.acta,a.proveedor,a.equipo,a.marca,a.modelo,a.carta,a.tipo_equipo].join(' ')).includes(q);
+  });
+}
+function renderActas(){
+  const f=filtraActas(), T=ACTAS.totales||{};
+  const k=[['actas',(ACTAS.actas||[]).length],['ejecutadas',(T.por_estado||{}).Ejecutada||0],
+           ['canceladas',T.canceladas||0],['sin notificación',T.sin_notificacion||0],
+           ['proveedores',T.proveedores||0],['equipos',T.equipos||0]];
+  document.getElementById('kpis-a').innerHTML=k.map(([l,v])=>`<div class="k"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+  document.getElementById('lista-a').innerHTML=
+    `<div style="color:var(--dim);font-size:12px;margin-bottom:8px">${f.length} de ${(ACTAS.actas||[]).length} actas · ${esc((T.rango||['',''])[0])} a ${esc((T.rango||['',''])[1])}</div>
+     <table><thead><tr><th>Acta</th><th>Hosp.</th><th>Proveedor</th><th>Equipo</th><th>Marca / modelo</th>
+     <th>Programada</th><th>Ejecutada</th><th>Estado</th><th>Carta</th></tr></thead><tbody>`+
+    f.map(a=>`<tr><td>${esc(a.acta)}</td><td>${esc(a.hospital)}</td><td>${esc(a.proveedor)}</td>
+      <td>${esc(a.equipo)}<div style="color:var(--dim);font-size:11px">${esc(a.tipo_equipo)}</div></td>
+      <td>${esc(a.marca)}<div style="color:var(--dim);font-size:11px">${esc(a.modelo)}</div></td>
+      <td>${esc(a.fecha_programada)}</td><td>${esc(a.fecha_ejecutada)||'—'}</td>
+      <td><span class="chip est ${a.estado==='Cancelada'?'pri-Alta':'est-Cerrado'}">${esc(a.estado)}</span></td>
+      <td>${esc(a.carta)}</td></tr>`).join('')+'</tbody></table>';
+}
+function actaAPendiente(){
+  const f=filtraActas();
+  if(!f.length){ alert('No hay actas en el filtro actual.'); return; }
+  const t=prompt('Título del pendiente para las '+f.length+' actas filtradas:',
+                 'Seguimiento de '+f.length+' actas de capacitación');
+  if(!t) return;
+  const n=D.reduce((m,y)=>Math.max(m,parseInt((y.id||'P0').slice(1))||0),0)+1;
+  D.push({id:'P'+String(n).padStart(3,'0'),titulo:t.trim(),
+    detalle:'Actas: '+f.slice(0,25).map(a=>a.acta).join(', ')+(f.length>25?' y '+(f.length-25)+' más.':'.'),
+    ambito:'Capacitación',origen_tipo:'Acta de capacitación',
+    origen_ref:[...new Set(f.map(a=>a.carta).filter(Boolean))].slice(0,4).join(' · '),
+    origen_fecha:hoy(),contraparte:[...new Set(f.map(a=>a.proveedor).filter(Boolean))].slice(0,3).join(' · '),
+    servicio:'',estado:'Abierto',prioridad:'Media',compromiso:'',creado:hoy(),actualizado:hoy(),
+    notas:[{fecha:hoy(),texto:'Creado desde el listado de actas.'}]});
+  guardar(); initFiltros();
+  document.querySelector('.tab[data-p="pend"]').click();
+}
+
+// ════════════════════════════════════════════════════════════════════════════
+// 🧭 HUDDLE de Puesta en Marcha
+//
+// Reunión corta y diaria sobre los MISMOS pendientes de la bitácora, en orden de
+// agenda: lo resuelto desde el último huddle (se valida), lo nuevo (sale con
+// responsable y plazo), lo crítico, lo vencido o por vencer y, al final, el resto
+// por frente. Cada fila se marca «revisado» al tratarla; al cerrar el huddle se
+// genera el acta (.md) con lo resuelto, lo nuevo, los avances y los compromisos.
+//
+// Todo cambio se registra como EVENTO {k,ts,u,id,tipo,d}. Se aplica al tiro en
+// este navegador y, si hay URL de sincronización (PM_CONFIG.BITACORA_URL en el
+// 🟡, o la que se configure con «⚙ Sincronizar»), se envía al Apps Script del
+// HUB-PM (_setup/Code_bitacora.gs). Al abrir, se traen los eventos de los demás
+// y se aplican los que falten: así varias personas pueden sumar y marcar.
+// ════════════════════════════════════════════════════════════════════════════
+const KEY_H='hds_huddle_v1', KEY_EV='hds_bitacora_eventos_v1';
+let HS={sesiones:[],activo:null};
+try{ HS=Object.assign(HS,JSON.parse(localStorage.getItem(KEY_H)||'{}')); }catch(e){}
+const guardarH=()=>localStorage.setItem(KEY_H,JSON.stringify(HS));
+const ahoraHM=()=>new Date().toTimeString().slice(0,5);
+const fmt=f=>f?String(f).split('-').reverse().join('-'):'';
+const sumaDias=(f,n)=>{ const d=new Date(f+'T12:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); };
+const abierto=x=>x.estado!=='Cerrado';
+function plazoDe(x){
+  if(x.plazo) return x.plazo;
+  const s=String(x.compromiso||''); let m=s.match(/(20\d\d)-(\d\d)-(\d\d)/); if(m) return m[0];
+  m=s.match(/\b(\d\d)-(\d\d)-(20\d\d)\b/); return m?m[3]+'-'+m[2]+'-'+m[1]:'';
+}
+const noResp=x=>!x.responsable||/^no consta/i.test(x.responsable);
+function ultimoHuddle(){ const c=(HS.sesiones||[]).filter(s=>s.fin); return c.length?c[c.length-1].fecha:null; }
+const desde=()=>ultimoHuddle()||sumaDias(hoy(),-7);
+function fechaCierre(x){
+  if(x.cerrado) return x.cerrado;
+  const n=(x.notas||[]).filter(n=>/→ Cerrado|✅ Resuelto/.test(n.texto)).pop();
+  return n?n.fecha:(x.actualizado||'');
+}
+
+// ── sincronización ──────────────────────────────────────────────────────────
+const SYNC_URL=()=>((window.PM_CONFIG||{}).BITACORA_URL)||localStorage.getItem('bitacora_sync_url')||'';
+function usuario(){
+  try{ if(typeof pmSession==='function'){ const s=pmSession(); if(s&&s.u) return s.u; } }catch(e){}
+  return localStorage.getItem('bitacora_usuario')||(PUBLIC_BUILD?'anon':'mpinto');
+}
+let APL=new Set(); try{ APL=new Set(JSON.parse(localStorage.getItem(KEY_EV)||'[]')); }catch(e){}
+// eventos que ya vienen consolidados en la semilla (_DEV/build_bitacora_eventos.py): no se reaplican
+(SEMILLA.eventos_aplicados||[]).forEach(k=>APL.add(k));
+const guardarApl=()=>localStorage.setItem(KEY_EV,JSON.stringify([...APL].slice(-8000)));
+const SYNC={estado:'off',n:0,ultimo:'',err:''};
+function nuevoId(){ return 'H'+Date.now().toString(36).slice(-5).toUpperCase()+Math.random().toString(36).slice(2,4).toUpperCase(); }
+
+// aplica un evento al conjunto D; devuelve true si cambió algo
+function aplicar(ev){
+  const d=ev.d||{}, f=(ev.ts||'').slice(0,10)||hoy(), por=ev.u?' ('+ev.u+')':'';
+  if(ev.tipo==='nuevo'){
+    if(D.some(y=>y.id===ev.id)) return false;
+    D.push(Object.assign({notas:[]},d.item,{id:ev.id})); return true;
+  }
+  const x=D.find(y=>y.id===ev.id); if(!x) return false;
+  const nota=t=>(x.notas=x.notas||[]).push({fecha:f,texto:t+por});
+  switch(ev.tipo){
+    case 'nota': nota(d.texto); break;
+    case 'estado': nota('Estado: '+x.estado+' → '+d.estado); x.estado=d.estado; if(d.estado==='Cerrado') x.cerrado=f; else delete x.cerrado; break;
+    case 'resolver': x.estado='Cerrado'; x.cerrado=f; x.resolucion=d.texto||''; nota('✅ Resuelto'+(d.texto?': '+d.texto:'')); break;
+    case 'reabrir': nota('↩ Reabierto'+(d.texto?': '+d.texto:'')); x.estado=d.estado||'En curso'; delete x.cerrado; break;
+    case 'campo': { const ant=x[d.k]; x[d.k]=d.v; if(d.k!=='critico') nota((d.k==='responsable'?'Responsable':d.k==='plazo'?'Plazo':d.k)+': '+(ant||'—')+' → '+(d.v||'—'));
+                    else nota(d.v?'Marcado como crítico.':'Deja de ser crítico.'); break; }
+    case 'campos': Object.assign(x,d.v||{}); nota('Editado: '+Object.keys(d.v||{}).join(', ')); break;
+    case 'revisado': x.revisado=f; break;
+    default: return false;
+  }
+  x.actualizado=f; return true;
+}
+function enviar(ev){
+  const url=SYNC_URL(); if(!url) return;
+  const body=new URLSearchParams({k:ev.k,ts:ev.ts,u:ev.u,id:ev.id,tipo:ev.tipo,d:JSON.stringify(ev.d||{})});
+  try{ fetch(url,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'application/x-www-form-urlencoded'},body:body.toString()}); }catch(e){}
+}
+// toda acción del usuario pasa por aquí
+function accion(id,tipo,d){
+  const ev={k:Date.now().toString(36)+Math.random().toString(36).slice(2,7),ts:new Date().toISOString(),u:usuario(),id,tipo,d:d||{}};
+  aplicar(ev); APL.add(ev.k); guardarApl(); guardar();
+  if(HS.activo){ (HS.activo.log=HS.activo.log||[]).push({h:ahoraHM(),id,tipo,d:ev.d,u:ev.u}); guardarH(); }
+  enviar(ev); render();
+}
+async function traerEventos(){
+  const url=SYNC_URL(); if(!url){ SYNC.estado='off'; pintarSync(); return; }
+  try{
+    const r=await fetch(url+(url.includes('?')?'&':'?')+'list=1',{cache:'no-store'});
+    const L=await r.json(); let n=0;
+    (Array.isArray(L)?L:(L.eventos||[])).sort((a,b)=>String(a.ts).localeCompare(String(b.ts))).forEach(ev=>{
+      if(!ev||!ev.k||APL.has(ev.k)) return;
+      if(typeof ev.d==='string'){ try{ ev.d=JSON.parse(ev.d); }catch(e){ ev.d={}; } }
+      if(aplicar(ev)) n++; APL.add(ev.k);
+    });
+    guardarApl(); if(n){ guardar(); initFiltros(); render(); }
+    SYNC.estado='on'; SYNC.n=(Array.isArray(L)?L:(L.eventos||[])).length; SYNC.ultimo=ahoraHM(); SYNC.nuevos=n;
+  }catch(e){ SYNC.estado='err'; SYNC.err=String(e.message||e); }
+  pintarSync();
+}
+function pintarSync(){
+  const el=document.getElementById('sync'); if(!el) return;
+  const m={on:['on','🟢 Sincronizado · '+SYNC.n+' cambios del equipo · '+SYNC.ultimo],
+           off:['off','⚪ Solo este navegador'],err:['err','🔴 Sin conexión con la planilla del equipo']};
+  const [c,t]=m[SYNC.estado]||m.off; el.className='sync '+c; el.textContent=t;
+  el.title=SYNC.estado==='err'?SYNC.err:(SYNC.estado==='off'?'Lo que marques queda en este navegador. ⚙ para conectar la planilla compartida.':'Clic para traer los cambios del equipo ahora');
+}
+function configSync(){
+  if(SYNC_URL()&&(window.PM_CONFIG||{}).BITACORA_URL){ traerEventos(); return; }
+  const u=prompt('URL /exec del Apps Script de la bitácora (vacío = solo este navegador):',localStorage.getItem('bitacora_sync_url')||'');
+  if(u===null) return; localStorage.setItem('bitacora_sync_url',u.trim());
+  if(!PUBLIC_BUILD){ const q=prompt('¿Con qué usuario se firman tus cambios?',localStorage.getItem('bitacora_usuario')||'mpinto'); if(q) localStorage.setItem('bitacora_usuario',q.trim()); }
+  traerEventos();
+}
+
+// ── sesión de huddle ────────────────────────────────────────────────────────
+function iniciarHuddle(){
+  if(HS.activo) return;
+  HS.activo={fecha:hoy(),inicio:ahoraHM(),desde:desde(),revisados:{},log:[]}; guardarH(); render();
+}
+function marcarRevisado(id){
+  if(!HS.activo) iniciarHuddle();
+  const r=HS.activo.revisados; if(r[id]) delete r[id]; else { r[id]=ahoraHM(); accion(id,'revisado',{}); return; }
+  guardarH(); render();
+}
+function resolver(id){
+  const x=D.find(y=>y.id===id);
+  modal(`<h3>✅ Resolver ${esc(id)}</h3><div style="color:var(--dim);margin-bottom:8px">${esc(x.titulo)}</div>
+    <label style="font-size:12px;color:var(--dim)">¿Cómo se resolvió? (queda en la bitácora y en el acta)</label>
+    <textarea id="m-t" rows="3"></textarea>
+    <div class="acts"><button class="go" onclick="const t=document.getElementById('m-t').value.trim();cerrarModal();accion('${id}','resolver',{texto:t});if(HS.activo){HS.activo.revisados['${id}']=ahoraHM();guardarH();render();}">Marcar resuelto</button>
+    <button class="ghost" onclick="cerrarModal()">Cancelar</button></div>`,'m-t');
+}
+function reabrir(id){
+  const t=prompt('¿Por qué se reabre?'); if(t===null) return; accion(id,'reabrir',{texto:t.trim()});
+}
+function avance(id){
+  const x=D.find(y=>y.id===id);
+  modal(`<h3>✎ Avance · ${esc(id)}</h3><div style="color:var(--dim);margin-bottom:8px">${esc(x.titulo)}</div>
+    <textarea id="m-t" rows="3" placeholder="Qué pasó, qué falta, qué se acordó"></textarea>
+    <div class="grid2"><div><label style="font-size:12px;color:var(--dim)">Estado</label><select id="m-e">${(SEMILLA.estados||[]).map(e=>`<option ${e===x.estado?'selected':''}>${esc(e)}</option>`).join('')}</select></div>
+    <div><label style="font-size:12px;color:var(--dim)">Plazo</label><input class="f" id="m-p" type="date" value="${esc(plazoDe(x))}"></div></div>
+    <div class="acts"><button onclick="guardarAvance('${id}')">Guardar</button><button class="ghost" onclick="cerrarModal()">Cancelar</button></div>`,'m-t');
+}
+function guardarAvance(id){
+  const x=D.find(y=>y.id===id), t=document.getElementById('m-t').value.trim(),
+        e=document.getElementById('m-e').value, p=document.getElementById('m-p').value;
+  cerrarModal();
+  if(t) accion(id,'nota',{texto:t});
+  if(e&&e!==x.estado) accion(id,'estado',{estado:e});
+  if(p!==plazoDe(x)) accion(id,'campo',{k:'plazo',v:p});
+  if(HS.activo){ HS.activo.revisados[id]=ahoraHM(); guardarH(); render(); }
+}
+function cambiarResp(id){
+  const x=D.find(y=>y.id===id); const v=prompt('Responsable de «'+x.titulo+'»:',noResp(x)?'':x.responsable);
+  if(v!==null&&v.trim()!==x.responsable) accion(id,'campo',{k:'responsable',v:v.trim()});
+}
+function cambiarPlazo(id){
+  const x=D.find(y=>y.id===id); const v=prompt('Plazo (AAAA-MM-DD; vacío = sin plazo):',plazoDe(x));
+  if(v===null) return; const t=v.trim();
+  if(t&&!/^20\d\d-\d\d-\d\d$/.test(t)){ alert('Usá el formato AAAA-MM-DD.'); return; }
+  accion(id,'campo',{k:'plazo',v:t});
+}
+function sumarHuddle(){
+  const g=n=>document.getElementById(n), t=g('ha-t').value.trim();
+  if(!t){ g('ha-t').focus(); return; }
+  const item={titulo:t,detalle:'',ambito:g('ha-a').value||'Puesta en Marcha',responsable:g('ha-r').value.trim(),
+    plazo:g('ha-p').value,estado:'Abierto',prioridad:g('ha-c').checked?'Alta':'Media',critico:g('ha-c').checked||undefined,
+    origen_tipo:'Reunión',origen_ref:'Huddle '+fmt(hoy()),origen_fecha:hoy(),contraparte:'',servicio:'',compromiso:'',
+    frente:'Puesta en Marcha',creado:hoy(),actualizado:hoy(),notas:[{fecha:hoy(),texto:'Sumado en el huddle por '+usuario()+'.'}]};
+  accion(nuevoId(),'nuevo',{item});
+  ['ha-t','ha-r','ha-p'].forEach(n=>g(n).value=''); g('ha-c').checked=false; g('ha-t').focus();
+}
+function modal(html,foco){ document.getElementById('mbox').innerHTML=html; document.getElementById('modal').classList.add('on'); if(foco) setTimeout(()=>{const e=document.getElementById(foco); e&&e.focus();},30); }
+function cerrarModal(){ document.getElementById('modal').classList.remove('on'); }
+
+// ── acta ────────────────────────────────────────────────────────────────────
+function actaMd(S,asist){
+  const L=S.log||[], porId=id=>D.find(y=>y.id===id)||{id,titulo:'(eliminado)'};
+  const uniq=a=>[...new Set(a)];
+  const res=uniq(L.filter(e=>e.tipo==='resolver').map(e=>e.id)).map(porId);
+  const nue=uniq(L.filter(e=>e.tipo==='nuevo').map(e=>e.id)).map(porId);
+  const avz=L.filter(e=>['nota','estado','campo','reabrir'].includes(e.tipo));
+  const rev=Object.keys(S.revisados||{}).map(porId);
+  const linea=x=>`${x.id} · ${x.titulo} — resp.: ${x.responsable||'No consta'} · plazo: ${fmt(plazoDe(x))||'sin plazo'}`;
+  const desc=e=>e.tipo==='nota'?e.d.texto:e.tipo==='estado'?'estado → '+e.d.estado:e.tipo==='reabrir'?'reabierto'+(e.d.texto?': '+e.d.texto:''):(e.d.k==='critico'?(e.d.v?'marcado crítico':'deja de ser crítico'):e.d.k+' → '+(e.d.v||'—'));
+  const crit=D.filter(x=>abierto(x)&&esCritico(x));
+  return [`# Huddle de Puesta en Marcha · ${fmt(S.fecha)}`,'',
+   `Inicio ${S.inicio} · cierre ${S.fin||ahoraHM()} · asistentes: ${asist||'No consta'}`,
+   `Revisados en la reunión: ${rev.length} pendientes · desde el huddle anterior (${fmt(S.desde)}).`,'',
+   `## ✅ Resueltos (${res.length})`,...(res.length?res.map(x=>`- ${x.id} · ${x.titulo} — ${x.resolucion||'sin detalle'}`):['- Ninguno.']),'',
+   `## 🆕 Sumados (${nue.length})`,...(nue.length?nue.map(x=>'- '+linea(x)):['- Ninguno.']),'',
+   `## ✎ Avances y cambios (${avz.length})`,...(avz.length?avz.map(e=>`- ${e.id} · ${porId(e.id).titulo} — ${desc(e)}`):['- Ninguno.']),'',
+   `## 🚨 Críticos que siguen abiertos (${crit.length})`,...crit.map(x=>'- '+linea(x)),'',
+   `## 📋 Compromisos revisados`,'','| Id | Pendiente | Responsable | Plazo | Estado |','|---|---|---|---|---|',
+   ...rev.filter(abierto).map(x=>`| ${x.id} | ${String(x.titulo).replace(/\|/g,'/')} | ${x.responsable||'No consta'} | ${fmt(plazoDe(x))||'—'} | ${x.estado} |`),'',
+   '---','Generado desde 14.Bitacora · pestaña 🧭 Huddle.'].join('\n');
+}
+function cerrarHuddle(){
+  if(!HS.activo) return;
+  modal(`<h3>■ Cerrar el huddle del ${fmt(HS.activo.fecha)}</h3>
+    <label style="font-size:12px;color:var(--dim)">Asistentes</label><input class="f" id="m-a" placeholder="Nombres separados por coma">
+    <div class="acts"><button class="go" onclick="confirmarCierre()">Cerrar y generar acta</button><button class="ghost" onclick="cerrarModal()">Seguir en el huddle</button></div>`,'m-a');
+}
+function confirmarCierre(){
+  const S=HS.activo, asist=document.getElementById('m-a').value.trim();
+  S.fin=ahoraHM(); S.asistentes=asist; S.acta=actaMd(S,asist);
+  HS.sesiones.push(S); HS.activo=null; guardarH(); verActa(HS.sesiones.length-1); render();
+}
+function verActa(i){
+  const S=HS.sesiones[i]; if(!S) return;
+  modal(`<h3>Acta · huddle del ${fmt(S.fecha)}</h3><pre id="m-acta">${esc(S.acta)}</pre>
+    <div class="acts"><button onclick="bajarActa(${i})">⤓ Descargar .md</button>
+    <button class="ghost" onclick="navigator.clipboard.writeText(HS.sesiones[${i}].acta).then(()=>alert('Copiada'))">Copiar</button>
+    <button class="ghost" onclick="cerrarModal()">Cerrar</button></div>`);
+}
+function bajarActa(i){
+  const S=HS.sesiones[i], b=new Blob([S.acta],{type:'text/markdown'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='Huddle_PuestaEnMarcha_'+S.fecha+'.md'; a.click();
+}
+function vistaPrevia(){ if(HS.activo) modal(`<h3>Acta en curso (vista previa)</h3><pre>${esc(actaMd(HS.activo,''))}</pre><div class="acts"><button class="ghost" onclick="cerrarModal()">Cerrar</button></div>`); }
+
+// ── render ──────────────────────────────────────────────────────────────────
+function filaH(x){
+  const cri=esCritico(x), A=HS.activo, rv=A&&A.revisados[x.id], pl=plazoDe(x), h=hoy();
+  const plc=!pl?'':(abierto(x)&&pl<h?'venc':(abierto(x)&&pl<=sumaDias(h,3)?'pronto':''));
+  const ult=(x.notas||[]).slice(-1)[0];
+  const acc=abierto(x)
+    ?`<button class="go" onclick="resolver('${x.id}')">✓ Resuelto</button><button class="ghost" onclick="avance('${x.id}')">✎ Avance</button>
+      <button class="ghost" onclick="cambiarResp('${x.id}')">👤</button><button class="ghost" onclick="cambiarPlazo('${x.id}')">📅</button>
+      <button class="ghost" onclick="alternarCritico('${x.id}')" title="${cri?'Quitar crítico':'Marcar crítico'}">🚨</button>`
+    :`<button class="ghost" onclick="reabrir('${x.id}')">↩ Reabrir</button>`;
+  return `<div class="hr${cri&&abierto(x)?' crit':''}${rv?' rev':''}${abierto(x)?'':' cer'}">
+    <div class="ck${rv?' si':''}" title="${rv?'Revisado a las '+rv+' · clic para desmarcar':'Marcar como revisado en este huddle'}" onclick="marcarRevisado('${x.id}')">${rv?'✓':''}</div>
+    <div class="id">${esc(x.id)}</div>
+    <div class="tx"><b>${esc(x.titulo)}</b>
+      ${ult?`<div class="ult"><i>${fmt(ult.fecha)}</i>${esc(String(ult.texto).slice(0,240))}</div>`:''}
+      ${!abierto(x)&&x.resolucion?`<div class="ult"><i>resolución</i>${esc(x.resolucion)}</div>`:''}
+      <div class="meta">
+        <span class="chip resp${noResp(x)?' no':''}" onclick="cambiarResp('${x.id}')" style="cursor:pointer">🙋 ${esc(noResp(x)?'sin responsable':x.responsable)}</span>
+        <span class="chip plz ${plc}" onclick="cambiarPlazo('${x.id}')" style="cursor:pointer">📅 ${pl?fmt(pl):'sin plazo'}${plc==='venc'?' · vencido':''}</span>
+        <span class="chip est est-${String(x.estado||'').replace(/\s+/g,'-')}">${esc(x.estado)}</span>
+        ${x.ambito?`<span class="chip">${esc(x.ambito)}</span>`:''}
+        ${!abierto(x)?`<span class="chip okh">cerrado ${fmt(fechaCierre(x))}</span>`:''}
+      </div></div>
+    <div class="ha">${acc}</div></div>`;
+}
+function seccion(ico,tit,ayuda,L,abiertoDef=true){
+  return `<div class="hsec"><h2>${ico} ${tit}</h2><span class="n">${L.length}</span><span class="ayuda">${ayuda}</span></div>`+
+    (L.length?L.map(filaH).join(''):'<div class="vacio" style="padding:10px">Nada aquí.</div>');
+}
+function renderHuddle(){
+  const el=document.getElementById('hud-body'); if(!el) return;
+  const A=HS.activo, h=hoy(), dsd=A?A.desde:desde();
+  const ab=D.filter(abierto);
+  const res=D.filter(x=>!abierto(x)&&fechaCierre(x)>=dsd).sort((a,b)=>fechaCierre(b).localeCompare(fechaCierre(a)));
+  const nue=ab.filter(x=>(x.creado||'')>=dsd).sort((a,b)=>(b.creado||'').localeCompare(a.creado||''));
+  const usados=new Set(nue.map(x=>x.id));
+  const cri=ab.filter(x=>esCritico(x)&&!usados.has(x.id)); cri.forEach(x=>usados.add(x.id));
+  const ven=ab.filter(x=>!usados.has(x.id)&&plazoDe(x)&&plazoDe(x)<=sumaDias(h,7)).sort((a,b)=>plazoDe(a).localeCompare(plazoDe(b)));
+  ven.forEach(x=>usados.add(x.id));
+  const resto=ab.filter(x=>!usados.has(x.id));
+  const venc=ab.filter(x=>plazoDe(x)&&plazoDe(x)<h).length;
+  const tr=(window.CRONOGRAMA_TRASLADO&&(window.CRONOGRAMA_TRASLADO.hitos_contrato||[]).find(t=>/Traslado/i.test(t.hito)))||null;
+  const dias=tr?Math.round((new Date(tr.fecha+'T12:00:00')-new Date(h+'T12:00:00'))/864e5):null;
+  const nrev=A?Object.keys(A.revisados).length:0;
+  document.getElementById('hud-top').innerHTML=`
+    <div class="tt">🧭 Huddle de Puesta en Marcha · ${fmt(A?A.fecha:h)}
+      <small>${A?'En curso desde las '+A.inicio+' · '+nrev+' revisados':'Último huddle: '+(ultimoHuddle()?fmt(ultimoHuddle()):'todavía ninguno')+' · lo «nuevo» y lo «resuelto» se cuentan desde el '+fmt(dsd)}
+      ${tr?' · traslado '+fmt(tr.fecha)+(dias>=0?' (en '+dias+' días)':' ('+(-dias)+' días atrás)'):''}</small></div>
+    <span id="sync" class="sync off" onclick="configSync()"></span>
+    ${A?`<button class="ghost" onclick="vistaPrevia()">👁 Acta en curso</button><button class="warn" onclick="cerrarHuddle()">■ Cerrar huddle</button>`
+       :`<button class="go" onclick="iniciarHuddle()">▶ Iniciar huddle</button>`}
+    ${(HS.sesiones||[]).length?`<select onchange="if(this.value!=='')verActa(+this.value);this.value=''"><option value="">Actas anteriores…</option>${HS.sesiones.map((s,i)=>`<option value="${i}">${fmt(s.fecha)} · ${s.inicio}</option>`).reverse().join('')}</select>`:''}`;
+  pintarSync();
+  const k=[['abiertos',ab.length],['🚨 críticos',ab.filter(esCritico).length],['vencidos',venc],
+           ['nuevos desde '+fmt(dsd).slice(0,5),nue.length],['✅ resueltos desde '+fmt(dsd).slice(0,5),res.length],
+           ['sin responsable',ab.filter(noResp).length],['sin plazo',ab.filter(x=>!plazoDe(x)).length]];
+  document.getElementById('kpis-h').innerHTML=k.map(([l,v])=>`<div class="k"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+  document.getElementById('n-h').textContent=ab.filter(esCritico).length+' 🚨';
+  const amb=[...new Set([...(SEMILLA.ambitos||[]),...D.map(x=>x.ambito)].filter(Boolean))];
+  const resps=[...new Set([...(SEMILLA.equipo||[]),...D.map(x=>x.responsable)].filter(Boolean))].sort();
+  const add=document.getElementById('hud-add');
+  if(!add.dataset.ok){
+    add.innerHTML=`<div class="row">
+      <input class="f" id="ha-t" placeholder="+ Sumar pendiente (Enter para guardar)" onkeydown="if(event.key==='Enter')sumarHuddle()">
+      <input class="f" id="ha-r" placeholder="Responsable" list="dl-resp">
+      <input class="f" id="ha-p" type="date" title="Plazo">
+      <select id="ha-a">${amb.map(a=>`<option ${a==='Puesta en Marcha'?'selected':''}>${esc(a)}</option>`).join('')}</select>
+      <label style="font-size:12px;white-space:nowrap"><input type="checkbox" id="ha-c" style="width:auto"> 🚨</label>
+      <button onclick="sumarHuddle()">Sumar</button></div><datalist id="dl-resp"></datalist>`;
+    add.dataset.ok=1;
+  }
+  document.getElementById('dl-resp').innerHTML=resps.map(r=>`<option value="${esc(r)}">`).join('');
+  const frentes=[...new Set(resto.map(x=>x.ambito||'Otros'))].sort((a,b)=>resto.filter(x=>(x.ambito||'Otros')===b).length-resto.filter(x=>(x.ambito||'Otros')===a).length);
+  el.innerHTML=
+    seccion('✅','Resuelto desde el último huddle','validar y despedir',res)+
+    seccion('🆕','Nuevos','que salgan con responsable y plazo',nue)+
+    seccion('🚨','Críticos','lo que frena la apertura',cri)+
+    seccion('⏰','Vencidos y por vencer (7 días)','¿se cumple, se reprograma o se escala?',ven)+
+    `<div class="hsec"><h2>🗂️ Resto por frente</h2><span class="n">${resto.length}</span><span class="ayuda">se revisa si hay tiempo o si alguien trae novedad</span></div>`+
+    frentes.map(f=>{ const L=resto.filter(x=>(x.ambito||'Otros')===f);
+      return `<details class="fr"><summary>${esc(f)} · ${L.length}${L.some(noResp)?' · '+L.filter(noResp).length+' sin responsable':''}</summary><div>${L.map(filaH).join('')}</div></details>`; }).join('');
+}
+
+initFiltros(); render();
+(function(){ let p='hud'; try{ p=localStorage.getItem('hds_bitacora_tab')||'hud'; }catch(e){}
+  const t=document.querySelector('.tab[data-p="'+p+'"]'); if(t&&p!=='hud') tab(t); })();
+traerEventos(); setInterval(traerEventos,60000);
+</script>
+</body>
+</html>
