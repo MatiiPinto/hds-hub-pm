@@ -94,6 +94,24 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .loc-table tr:last-child td{border-bottom:none}
 .loc-qty{font-weight:700;color:var(--cyan2);text-align:center}
 .docs-list{display:flex;flex-direction:column;gap:6px}
+/* ── EquiBox v2 · ficha (documentación, compra, reposición) ── */
+.fx-sem{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.fx-card{background:#f8fafc;border-radius:8px;padding:10px 12px;border-left:4px solid #94a3b8}
+.fx-card .k{font-size:10px;color:#64748b;text-transform:uppercase;font-weight:700;letter-spacing:.3px}
+.fx-card .v{font-size:20px;font-weight:800;color:#0f172a}
+.fx-ok{border-left-color:#10b981}.fx-falta{border-left-color:#dc2626;background:#fef2f2}
+.fx-grupo{border:1px solid var(--border);border-radius:8px;margin-bottom:8px}
+.fx-grupo summary{cursor:pointer;padding:8px 12px;font-size:12px;font-weight:700;color:var(--text);display:flex;gap:8px;align-items:center}
+.fx-grupo summary .n{margin-left:auto;font-weight:600;color:var(--muted)}
+.fx-grupo ul{margin:0 12px 10px 28px;padding:0;font-size:11.5px;color:#334155;line-height:1.7}
+.fx-aviso{border-radius:10px;padding:11px 14px;margin-bottom:14px;font-size:13px;line-height:1.5}
+.fx-aviso.rojo{background:#fef2f2;border:1px solid #fecaca;border-left:4px solid #b91c1c;color:#7f1d1d}
+.fx-aviso.ambar{background:#fffbeb;border:1px solid #fde68a;border-left:4px solid #b45309;color:#78350f}
+.fx-aviso.azul{background:#eff6ff;border:1px solid #bfdbfe;border-left:4px solid #1d4ed8;color:#1e3a8a}
+.fx-tabla{width:100%;border-collapse:collapse;font-size:12px}
+.fx-tabla th{text-align:left;font-size:10px;text-transform:uppercase;color:#64748b;padding:6px 8px;border-bottom:1px solid var(--border)}
+.fx-tabla td{padding:6px 8px;border-bottom:1px solid #f1f5f9;vertical-align:top}
+.fx-btn{display:inline-block;padding:6px 12px;border-radius:7px;background:#1D2D5B;color:#fff;font-size:12px;font-weight:600;text-decoration:none}
 .doc-item{display:flex;align-items:center;gap:8px;padding:8px 10px;background:#f8fafc;border-radius:8px;font-size:12px;color:var(--text);text-decoration:none;transition:background .15s}
 .doc-item:hover{background:#e8f5fc;color:var(--cyan2)}
 .doc-icon{font-size:14px;flex-shrink:0}
@@ -384,6 +402,7 @@ table.excel-tbl tr:nth-child(even) td{background:#f8fafc}
   <button class="dim-btn dim-cian" data-dim="seguimiento" data-color="cian" onclick="setDim('seguimiento',this)" title="Hoja de ruta oficial del traslado de equipos médicos y casos de coordinación levantados del correo (visitas técnicas, factibilidades, requerimientos de instalación). Solo HUB local.">📬 Seguimiento <span id="segBadge" style="background:#0e7490;color:#fff;border-radius:9px;padding:0 6px;font-size:10px;font-weight:800"></span></button>
   <button class="dim-btn dim-ambar" data-dim="revision" data-color="ambar" onclick="setDim('revision',this)" title="Casos del cruce con el Excel de despliegue que requieren validación manual">⚠ Revisión <span id="revBadge" style="background:#d97706;color:#fff;border-radius:9px;padding:0 6px;font-size:10px;font-weight:800"></span></button>
   <button class="dim-btn dim-rojo" data-dim="necesidades" data-color="rojo" onclick="setDim('necesidades',this)" title="ORD. SSMO N° 5040029-154: equipos que no pueden operar por falta de accesorios y/o componentes no considerados en la adquisición">🧩 Necesidades no consideradas <span id="necBadge" style="background:#b91c1c;color:#fff;border-radius:9px;padding:0 6px;font-size:10px;font-weight:800"></span></button>
+  <button class="dim-btn dim-azul" data-dim="documentacion" data-color="azul" onclick="setDim('documentacion',this)" title="Ficha por tipología: manuales faltantes, lo pedido a la SC el 12-10, diferencias con la OC y año de reposición">📄 Documentación</button>
 </div>
 <div class="subtab-bar" id="subtabBar"></div>
 <div class="cross-bar" id="crossBar"></div>
@@ -418,6 +437,7 @@ table.excel-tbl tr:nth-child(even) td{background:#f8fafc}
 <script src="data/equibox_rx.js"></script>
 <script src="data/equibox_laparoscopia.js"></script>
 <script src="SHARED_DATA/pins_emmc.js"></script>
+<script src="SHARED_DATA/equibox_ficha.js"></script>
 <!-- traslados y comodatos EMMC en 4 estados, por subdirección (corte 16-09-2026 · libro consolidado) -->
 <script src="SHARED_DATA/traslados_comodatos_2026.js"></script>
 <!-- seguimiento de traslados: hoja de ruta + casos del correo (solo HUB local, no se publica) -->
@@ -752,7 +772,7 @@ const SUBTYPES = [
 let activeSubtype = null;
 const DIM_COLOR = {
   categoria:'verde', tecnologia:'verde', especialidad:'azul',
-  apoyo:'naranja', camas:'celeste', admin:'gris', traslados:'violeta', comodatos:'rosa', necesidades:'rojo', seguimiento:'cian',
+  apoyo:'naranja', camas:'celeste', admin:'gris', traslados:'violeta', comodatos:'rosa', necesidades:'rojo', seguimiento:'cian', documentacion:'azul',
 };
 const ASSIGNABLE_DIMS = ['especialidad','apoyo','camas','admin'];
 // Conjunto de servicios que constituyen la dimensión "Especialidad"
@@ -923,7 +943,7 @@ const CAMAS_LABELS = {
 // ── BUILD SUB-TABS ────────────────────────────────────────────
 function buildSubtabs() {
   // Tabs with no data yet — show empty bar
-  if (activeDim === 'traslados' || activeDim === 'comodatos' || activeDim === 'revision' || activeDim === 'necesidades' || activeDim === 'seguimiento') {
+  if (activeDim === 'traslados' || activeDim === 'comodatos' || activeDim === 'revision' || activeDim === 'necesidades' || activeDim === 'seguimiento' || activeDim === 'documentacion') {
     document.getElementById('subtabBar').innerHTML = '';
     return;
   }
@@ -1015,7 +1035,7 @@ function buildSubcatBar() {
   activeSvcFilter = null;
 
   // For categoria/tecnologia: hide the bar entirely
-  if (activeDim === 'categoria' || activeDim === 'tecnologia' || activeDim === 'traslados' || activeDim === 'comodatos' || activeDim === 'revision' || activeDim === 'necesidades' || activeDim === 'seguimiento') {
+  if (activeDim === 'categoria' || activeDim === 'tecnologia' || activeDim === 'traslados' || activeDim === 'comodatos' || activeDim === 'revision' || activeDim === 'necesidades' || activeDim === 'seguimiento' || activeDim === 'documentacion') {
     bar.style.display = 'none';
     bar.innerHTML = '';
     return;
@@ -1638,6 +1658,7 @@ function renderGrid(){
   // Pestaña de revisión manual del cruce con el despliegue
   if (activeDim === 'revision') { renderRevisionTab(); return; }
   if (activeDim === 'necesidades') { renderNecesidadesTab(); return; }
+  if (activeDim === 'documentacion') { renderDocGeneral(); return; }
   if (activeDim === 'seguimiento') { renderSeguimientoTab(); return; }
   // Tabs with no data yet — show placeholder, hide grid
   if (activeDim === 'traslados' || activeDim === 'comodatos') { renderTrasComTab(activeDim === 'traslados' ? 'traslado' : 'comodato'); return; }
@@ -1826,7 +1847,7 @@ function openModal(id){
           <div class="modal-field"><label>Unidades HDS</label><span>${b.qty}${(function(){const d=despCode(b.code);return d?` <small style="color:#15803d;font-weight:700">· ${d.total} distribuidas</small>`:' <small style="color:#b45309;font-weight:600">· sin despliegue</small>'})()}</span></div>
           <div class="modal-field"><label>Proveedor</label><span>${b.provider||'—'}</span></div>
           <div class="modal-field"><label>Marca</label><span>${b.brand||'—'}</span></div>
-          <div class="modal-field modal-field--full"><label>Modelo</label><span>${b.model||'—'}</span></div>
+          <div class="modal-field modal-field--full"><label>Modelo</label><span>${b.model||'—'}</span></div>${fxOcAviso(b)}
         </div>
         ${driveBtnHtml(b.code)}
       </div>
@@ -1847,7 +1868,7 @@ function openModal(id){
         <div class="modal-field"><label>Unidades HDS</label><span>${b.qty}${(function(){const d=despCode(b.code);return d?` <small style="color:#15803d;font-weight:700">· ${d.total} distribuidas</small>`:' <small style="color:#b45309;font-weight:600">· sin despliegue</small>'})()}</span></div>
         <div class="modal-field"><label>Proveedor</label><span>${b.provider||'—'}</span></div>
         <div class="modal-field"><label>Marca</label><span>${b.brand||'—'}</span></div>
-        <div class="modal-field modal-field--full"><label>Modelo</label><span>${b.model||'—'}</span></div>
+        <div class="modal-field modal-field--full"><label>Modelo</label><span>${b.model||'—'}</span></div>${fxOcAviso(b)}
       </div>
       ${driveBtnHtml(b.code)}
     </div>`;
@@ -2167,6 +2188,8 @@ function openModal(id){
       <button class="modal-tab-btn" onclick="switchModalTab(this,'tab-lic')">${licTabLabel}</button>
       <button class="modal-tab-btn" onclick="switchModalTab(this,'tab-eett')">EETT vs Adjudicado${eettTabSuffix}</button>
       <button class="modal-tab-btn" onclick="switchModalTab(this,'tab-pins')">${pinsTabLabel}</button>
+      <button class="modal-tab-btn" onclick="switchModalTab(this,'tab-doc')">${fxDocLabel(b)}</button>
+      <button class="modal-tab-btn" onclick="switchModalTab(this,'tab-compra')">🧾 Compra y reposición</button>
     </div>
     <div class="modal-tab-panel active" id="tab-equip">
       ${necAviso}
@@ -2187,6 +2210,12 @@ function openModal(id){
     </div>
     <div class="modal-tab-panel" id="tab-pins">
       ${renderPinsTab(b)}
+    </div>
+    <div class="modal-tab-panel" id="tab-doc">
+      ${renderDocTab(b)}
+    </div>
+    <div class="modal-tab-panel" id="tab-compra">
+      ${renderCompraTab(b)}
     </div>`;
   document.getElementById('modalOverlay').classList.add('open');
   modalOpen=id;
@@ -2258,8 +2287,9 @@ function renderPinsTab(b){
     <td><span style="display:inline-block;padding:1px 7px;border-radius:10px;font-size:9px;font-weight:700;color:#fff;background:${_PINS_COL[p.pins]||'#94a3b8'}">${p.pins||'—'}</span></td>
     <td><span style="display:inline-block;padding:1px 7px;border-radius:10px;font-size:9px;font-weight:700;color:#fff;background:${_ESTADO_COL[p.estado]||'#94a3b8'}">${p.estado||'—'}</span></td>
     <td style="font-size:11px;color:#64748b">${p.lugar||'—'}</td>
+    <td style="font-size:11px">${(()=>{const sv=((fxDe(b)||{}).series||{})[p.serie]; return sv ? fxEsc([sv.serie, sv.inv, sv.gar_fin?'garantía hasta '+sv.gar_fin:''].filter(Boolean).join(' · ')) : '<span style="color:#94a3b8">solicitado 12-10</span>';})()}</td>
   </tr>`).join('');
-  const moreRow = items.length > 200 ? `<tr><td colspan="6" style="text-align:center;padding:8px;color:#94a3b8;font-style:italic">Mostrando 200 de ${items.length} unidades</td></tr>` : '';
+  const moreRow = items.length > 200 ? `<tr><td colspan="7" style="text-align:center;padding:8px;color:#94a3b8;font-style:italic">Mostrando 200 de ${items.length} unidades</td></tr>` : '';
   return `
     <div class="section-title">Resumen despliegue PINS-EMMC · ${items.length} unidades en matriz · corte ${PINS_CORTE}</div>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:16px">
@@ -2302,11 +2332,12 @@ function renderPinsTab(b){
     <div style="max-height:380px;overflow:auto;border:1px solid #e2e8f0;border-radius:8px">
       <table class="acc-table" id="pins-table">
         <thead>
-          <tr><th>Serie / BIM</th><th>Ubicación</th><th>Recinto</th><th>PINS</th><th>Estado</th><th>Lugar</th></tr>
+          <tr><th>Código PINS</th><th>Ubicación</th><th>Recinto</th><th>PINS</th><th>Estado</th><th>Lugar</th><th>N° serie · inventario · garantía</th></tr>
         </thead>
         <tbody>${rows}${moreRow}</tbody>
       </table>
-    </div>`;
+    </div>
+    ${fxComponentesHtml(b)}`;
 }
 function _filterPinsRows(q){
   q = (q||'').toLowerCase().trim();
@@ -2315,6 +2346,117 @@ function _filterPinsRows(q){
   });
 }
 
+// ══════════════════════════════════════════════════════════════════
+// EquiBox v2 · ficha por tipología (SPEC-EquiBox-v2, 12-10-2026)
+// Dato: SHARED_DATA/equibox_ficha.js ← _DEV/equibox_v2/build_equibox_ficha.py
+// ══════════════════════════════════════════════════════════════════
+const FX = ((window.EQUIBOX_FICHA||{}).fichas)||{};
+const FX_SUB = [['1.1','Manual de usuario'],['1.2','Manual de servicio técnico'],['1.3','Protocolo de mantención preventiva'],
+  ['1.4','Fichas técnicas y brochures'],['1.5','Otros · por clasificar'],['2.1','EETT madre (licitación)'],
+  ['2.2','EETT trabajadas (CTAR · adjudicado)'],['3','PINS'],['4','Insumos'],['5','Oferta'],['6','Ubicación']];
+const fxEsc = s => String(s==null?'':s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function fxDe(b){ return FX[String(b.code)] || FX[String(b.code).split('.')[0]] || null; }
+function fxFaltan(f){ return !f||!f.sem ? [] : [['u','usuario'],['s','servicio'],['mp','protocolo MP']].filter(([k])=>!f.sem[k]).map(([,n])=>n); }
+function fxDocLabel(b){ const f=fxDe(b); if(!f||!f.sem) return '📄 Documentación'; const n=fxFaltan(f).length;
+  if(n) return `📄 Documentación <span style="color:#dc2626;font-weight:800">· ${n} falta${n>1?'n':''}</span>`;
+  return f.dif_oc ? '📄 Documentación <span style="color:#b45309;font-weight:800">⚠</span>' : '📄 Documentación ✓'; }
+
+// encabezado: si la marca de la ficha no está en la OC, se muestra lo comprado (caso Rx Portátil: GE en la ficha, Philips en la OC)
+function fxOcAviso(b){
+  const f=fxDe(b); if(!f||!(f.oc||[]).length) return '';
+  const norm=x=>String(x||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  const marcas=f.oc.map(o=>norm(o.m)).filter(Boolean), m=norm(b.brand);
+  if(!m || marcas.some(x=>x.includes(m)||m.includes(x))) return '';
+  const oc=[...new Set(f.oc.map(o=>[o.m,o.modelo].filter(Boolean).join(' / ')))].join(' · ');
+  return `<div class="modal-field modal-field--full" style="background:#fef2f2;border-radius:8px;padding:6px 8px"><label style="color:#b91c1c">Según orden de compra</label><span style="color:#7f1d1d;font-weight:700">${fxEsc(oc)}</span></div>`;
+}
+function renderDocTab(b){
+  const f = fxDe(b);
+  if(!f||!f.carpeta) return `<div class="fx-aviso ambar">Esta tipología (código ${fxEsc(b.code)}) no tiene carpeta en 1.EMMC.</div>`;
+  const card=(k,n,lbl)=>`<div class="fx-card ${n?'fx-ok':'fx-falta'}"><div class="k">${lbl}</div><div class="v">${n?n+' ✓':'falta'}</div></div>`;
+  const pedido = f.pedido ? `<div class="fx-aviso azul"><b>📨 Solicitado a la Sociedad Concesionaria el 12-10-2026</b> (vía SSMO, ORD a la IF): ${fxEsc(f.pedido)}.</div>` : '';
+  const dif = f.dif_oc ? `<div class="fx-aviso rojo"><b>⚠ Diferencia con la orden de compra:</b> ${fxEsc(f.dif_oc)}</div>` : '';
+  const grupos = FX_SUB.map(([k,lbl])=>{
+    const L=(f.docs||{})[k]||[];
+    return `<details class="fx-grupo"${L.length&&['1.1','1.2','1.3'].includes(k)?' open':''}><summary>${k} · ${lbl}<span class="n">${L.length||'—'}</span></summary>${
+      L.length?'<ul>'+L.map(n=>`<li>${fxEsc(n)}</li>`).join('')+'</ul>':''}</details>`;}).join('');
+  return `${dif}${pedido}
+    <div class="section-title" style="margin-top:0;border-top:0;padding-top:0">Manuales clave</div>
+    <div class="fx-sem">${card('u',f.sem.u,'Manual de usuario')}${card('s',f.sem.s,'Manual de servicio')}${card('mp',f.sem.mp,'Protocolo MP')}</div>
+    <div style="display:flex;align-items:center;gap:10px;margin:6px 0 12px">
+      ${f.drive?`<a class="fx-btn" href="${fxEsc(f.drive)}" target="_blank" rel="noopener">📂 Abrir carpeta en Drive</a>`:''}
+      <span style="font-size:11px;color:var(--muted)">1.EMMC / ${fxEsc(f.carpeta)} · árbol uniforme</span></div>
+    <div class="section-title">Contenido por subcarpeta</div>${grupos}`;
+}
+
+function renderCompraTab(b){
+  const f = fxDe(b);
+  if(!f) return `<div class="fx-aviso ambar">Sin datos de compra para el código ${fxEsc(b.code)}.</div>`;
+  const ocRows = (f.oc||[]).map(o=>`<tr><td><b>${fxEsc(o.m)}</b> / ${fxEsc(o.modelo)}</td><td>${fxEsc(o.p)}</td></tr>`).join('');
+  const est = f.estado_oc||'sin OC en la planilla';
+  const estCls = /distinto|difiere/i.test(est)?'rojo':(/coincide/i.test(est)?'azul':'ambar');
+  const r = f.repo||{};
+  const kv=(k,v)=>`<div class="fx-card"><div class="k">${k}</div><div class="v" style="font-size:16px">${v==null||v===''?'—':fxEsc(v)}</div></div>`;
+  return `
+    <div class="fx-aviso ${estCls}"><b>Lo comprado es la orden de compra.</b> Estado frente a PINS-EMMC: ${fxEsc(est)}.</div>
+    <div class="section-title" style="margin-top:0;border-top:0;padding-top:0">Marca y modelo con OC (${(f.oc||[]).length} línea${(f.oc||[]).length===1?'':'s'})</div>
+    ${ocRows?`<table class="fx-tabla"><thead><tr><th>Marca / modelo</th><th>Proveedor</th></tr></thead><tbody>${ocRows}</tbody></table>`
+            :'<div class="no-doc">Sin orden de compra registrada en la planilla de seguimiento.</div>'}
+    <div class="fx-sem" style="margin-top:12px">
+      ${kv('PINS-EMMC (registrado)', [f.pins&&f.pins.m, f.pins&&f.pins.modelo].filter(Boolean).join(' / '))}
+      ${kv('Evaluación CTAR (referencia)', [f.ctar&&f.ctar.m, f.ctar&&f.ctar.modelo].filter(Boolean).join(' / '))}
+    </div>
+    <div class="section-title">Ficha de reposición · 15 años de explotación</div>
+    <div class="fx-sem">
+      ${kv('Año estimado de reposición', r.anio)}${kv('Vida útil (años)', r.vu)}${kv('Unidades', f.unidades)}
+      ${kv('Clase de riesgo', r.clase)}${kv('Zonificación', r.zona)}${kv('Disponibilidad mínima', r.disp)}${kv('Tiempo máx. de parada', r.parada)}
+    </div>
+    <div style="font-size:11px;color:var(--muted)">Año estimado = puesta en marcha ${(window.EQUIBOX_FICHA||{}).pm||2026} + vida útil. Fuente de la OC: ${fxEsc((window.EQUIBOX_FICHA||{}).fuente_oc||'')}.</div>`;
+}
+
+function fxComponentesHtml(b){
+  const f = fxDe(b); const C = (f&&f.comp)||[];
+  if(!C.length) return '';
+  const ser = (f&&f.series)||{};
+  const rows = C.map(c=>{ const sv=ser['c:'+c.u+':'+c.n+':'+c.k]||{};
+    return `<tr><td style="font-family:monospace;font-size:11px">${fxEsc(c.u||'(torre o recinto por indicar)')}</td><td>${fxEsc(c.n)}<div style="font-size:10px;color:#64748b">${fxEsc(c.t)}</div></td>
+      <td>${fxEsc([c.m,c.modelo].filter(Boolean).join(' / '))||'—'}</td><td style="font-family:monospace;font-size:11px">${fxEsc(sv.serie||'—')}</td><td style="font-size:11px">${fxEsc(sv.inv||'—')}</td></tr>`;}).join('');
+  return `<div class="section-title">Componentes con serie propia (${C.length})</div>
+    <div style="max-height:300px;overflow:auto;border:1px solid #e2e8f0;border-radius:8px"><table class="fx-tabla">
+      <thead><tr><th>Equipo principal</th><th>Componente</th><th>Marca / modelo</th><th>N° serie</th><th>Inventario</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+
+let _fxSoloFaltan = true, _fxClase = '', _fxQ = '';
+function renderDocGeneral(){
+  const grid=document.getElementById('gridWrap'); document.getElementById('noResults').style.display='none';
+  const ord={'III':0,'IV':0,'II':1,'I':2};
+  let L = BOXES.map(b=>({b, f:fxDe(b)})).filter(x=>x.f&&x.f.sem);
+  const tot=L.length, conF=L.filter(x=>fxFaltan(x.f).length).length, ped=L.filter(x=>x.f.pedido).length, dif=L.filter(x=>x.f.dif_oc).length;
+  if(_fxSoloFaltan) L=L.filter(x=>fxFaltan(x.f).length||x.f.dif_oc);
+  if(_fxClase) L=L.filter(x=>(x.f.repo||{}).clase===_fxClase);
+  if(_fxQ) L=L.filter(x=>(x.b.name+' '+x.b.code).toLowerCase().includes(_fxQ));
+  L.sort((a,c)=>(ord[(a.f.repo||{}).clase]??3)-(ord[(c.f.repo||{}).clase]??3) || fxFaltan(c.f).length-fxFaltan(a.f).length || (c.f.unidades||0)-(a.f.unidades||0));
+  document.getElementById('resultsInfo').textContent = `${tot} tipologías · ${conF} con algún manual faltante · ${ped} pedidas a la SC el 12-10 · ${dif} con diferencia de OC`;
+  const ok=v=>v?`<span style="color:#16a34a;font-weight:700">${v}</span>`:'<span style="color:#dc2626;font-weight:800">falta</span>';
+  const rows=L.slice(0,400).map(({b,f})=>`<tr style="cursor:pointer" onclick="openModal('${b.id}');setTimeout(()=>{const t=document.querySelector('#modalBody [onclick*=tab-doc]'); if(t) switchModalTab(t,'tab-doc');},50)">
+      <td style="font-family:monospace">${fxEsc(b.code)}</td><td><b>${fxEsc(b.name)}</b>${f.dif_oc?' <span title="'+fxEsc(f.dif_oc)+'" style="color:#b45309">⚠ OC</span>':''}</td>
+      <td>${fxEsc((f.repo||{}).clase||'—')}</td><td>${fxEsc((f.repo||{}).zona||'—')}</td><td style="text-align:right">${f.unidades||0}</td>
+      <td>${ok(f.sem.u)}</td><td>${ok(f.sem.s)}</td><td>${ok(f.sem.mp)}</td>
+      <td style="font-size:11px">${f.pedido?'📨 12-10':''}</td><td>${fxEsc((f.repo||{}).anio||'—')}</td></tr>`).join('');
+  grid.innerHTML = `<div class="rev-sec" style="grid-column:1/-1">
+    <h3>📄 Documentación por tipología</h3>
+    <div class="rev-desc">Manuales de 1.EMMC (árbol uniforme), lo pedido a la Sociedad Concesionaria el 12-10-2026 y las diferencias con la orden de compra. Clic en una fila para abrir su ficha.</div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:10px 0">
+      <label style="font-size:12px"><input type="checkbox" ${_fxSoloFaltan?'checked':''} onchange="_fxSoloFaltan=this.checked;renderDocGeneral()"> Solo con faltantes o diferencia de OC</label>
+      <select onchange="_fxClase=this.value;renderDocGeneral()" style="font-size:12px;padding:3px 6px">
+        <option value="">Todas las clases</option>${['III','II','I'].map(c=>`<option ${_fxClase===c?'selected':''}>${c}</option>`).join('')}</select>
+      <input id="fxQ" placeholder="buscar tipología o código…" value="${fxEsc(_fxQ)}" oninput="_fxQ=this.value.toLowerCase();window._fxFocus=1;clearTimeout(window._fxT);window._fxT=setTimeout(renderDocGeneral,250)" style="font-size:12px;padding:4px 8px;border:1px solid #cbd5e1;border-radius:6px">
+      <span style="font-size:12px;color:var(--muted)">${L.length} en la lista</span></div>
+    <div style="overflow:auto;border:1px solid var(--border);border-radius:8px;background:#fff"><table class="fx-tabla">
+      <thead><tr><th>Código</th><th>Tipología</th><th>Clase</th><th>Zona</th><th>Unid.</th><th>Usuario</th><th>Servicio</th><th>MP</th><th>Pedido SC</th><th>Reposición</th></tr></thead>
+      <tbody>${rows||'<tr><td colspan="10" style="text-align:center;padding:14px;color:#94a3b8">Sin tipologías con este filtro</td></tr>'}</tbody></table></div></div>`;  if(window._fxFocus){ const i=document.getElementById('fxQ'); i.focus(); i.setSelectionRange(i.value.length,i.value.length); window._fxFocus=0; }
+}
 function switchModalTab(btn, panelId){
   document.querySelectorAll('.modal-tab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.modal-tab-panel').forEach(p=>p.classList.remove('active'));

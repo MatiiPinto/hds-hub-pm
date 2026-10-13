@@ -1,7 +1,7 @@
 // SHARED_DATA/bitacora_pendientes.js — versión publicada en el HUB-PM (saneada por deploy_web_pm.py)
 window.BITACORA = {
  "version": "2026-10-05 · Bitácora y huddle de Puesta en Marcha",
- "generado": "2026-10-07",
+ "generado": "2026-10-13",
  "proposito": "Reunir en un solo lugar los pendientes que hoy viven dispersos en correos, ORD, cartas CS-IF, actas de mesas de trabajo y sesiones de trabajo.",
  "ambitos": [
   "Comunicaciones",
@@ -2626,7 +2626,7 @@ window.BITACORA = {
   {
    "id": "P114",
    "titulo": "Discurso común de Puesta en Marcha antes de comunicar nada más",
-   "detalle": "Decisión de la reunión: no se parte con nadie (equipos, gremios, clínicos) hasta tener un discurso único: nombre (somos Hospital del Salvador; no «complejo hospitalario», no «Salvador Geriátrico», no «proyecto INGER»; el INGER va por su carril), qué se puede decir oficialmente de la PSP, el traslado y los plazos, y respuestas a preguntas frecuentes (p. ej. fondos de puesta en marcha). Voceros: quien conduce y la Dra. Gabriela Brignardello.",
+   "detalle": "Avance 13-10-2026 (reunión PM): se decidió que lo hecho se llama revisión de existencia (firma 1), no recepción, y que habrá una sola definición de «equipo», separada de partes, piezas y accesorios, igual para Cati, Fernando, Mey y Matías. Minuta: Minutas/minutas/2026-10-13_martes-13-10.md",
    "ambito": "Puesta en Marcha",
    "origen_tipo": "Reunión",
    "origen_ref": "Minuta 05-10-2026 · Equipo de Puesta en Marcha (audios «Avenida Salvador 364 6» y «Hospital del Salvador 2»)",
@@ -2634,7 +2634,7 @@ window.BITACORA = {
    "contraparte": "",
    "servicio": "",
    "prioridad": "Alta",
-   "estado": "Abierto",
+   "estado": "En curso",
    "compromiso": "Armarlo en la reunión del 06-10; todos aportan.",
    "plazo": "2026-10-06",
    "responsable": "Equipo PM (voceros)",
@@ -3180,6 +3180,52 @@ window.BITACORA = {
      "texto": "Borrador de ORD + anexo (29 equipos) y planilla de levantamiento en 17.Autorización Sanitaria/Radiaciones Ionizantes NHDS. Dato pr_equipos_nhds, pestaña 🏗 de la 37. Catherine preguntó a F. Cid por qué se le pide al HDS: la categoría la declara el titular (hospital) y define la autoridad (CCHEN vs SEREMI); los datos de equipo los tiene la SC."
     }
    ]
+  },
+  {
+   "id": "P136",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-10-13",
+   "titulo": "EMMC · corroborar cifras de existencia y resumen comprado vs constatado por edificio y recinto",
+   "detalle": "Reunión PM 13-10-2026 [00:06:07] y [00:28:45]: se pide a Matías corroborar el informe de avance al 08-10 (6.460 equipos, 6.299 revisados, 97,5 %, solo existencia/firma 1) y armar un resumen de lo comprado frente a lo constatado existente, por edificio y por recinto. Las cifras de recintos (1.025 BIM, 94,6 %) las corrobora Carolina Aravena [sic?]. Minuta: Minutas/minutas/2026-10-13_martes-13-10.md",
+   "responsable": "Matías Pinto",
+   "ambito": "EMMC"
+  },
+  {
+   "id": "P137",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-10-13",
+   "titulo": "EMMC · desglosar lo revisado en firma 1 (existencia) y firma 2",
+   "detalle": "Reunión PM 13-10-2026 [00:41:38]: se pidió saber qué porcentaje está en firma 1 y cuál en firma 2. Se calificó de complejo; se le consulta a «la Mei» [sic?] el 14-10 si es factible. Solo ella tiene acceso al Drive de la Concesionaria con las actas por BIM. Minuta: Minutas/minutas/2026-10-13_martes-13-10.md",
+   "plazo": "2026-10-14",
+   "responsable": "Matías Pinto",
+   "ambito": "EMMC"
+  },
+  {
+   "id": "P138",
+   "estado": "Esperando terceros",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-10-13",
+   "titulo": "Contrato · aclarar el Anexo I-D y hasta dónde llegan los servicios concesionados",
+   "detalle": "Reunión PM 13-10-2026 [00:04:23] y [00:25:30]: se pidió por escrito a Úrsula [sic?] aclarar los componentes del Anexo I-D [sic?] y qué hace la Concesionaria y qué hace el hospital en la planta de agua de diálisis (microbiología), el área preparada estéril de Farmacia (ISP) y la droguería que atiende al Geriátrico. Ninguno de estos alcances tiene respuesta hoy. Minuta: Minutas/minutas/2026-10-13_martes-13-10.md",
+   "responsable": "Matías Pinto",
+   "ambito": "Otros"
+  },
+  {
+   "id": "P139",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-10-13",
+   "titulo": "Plan piloto INGER · revisar qué servicios concesionados miden los casos de uso",
+   "detalle": "Reunión PM 13-10-2026 [00:22:53]–[00:24:20]: el plan piloto debía medir los 14 servicios concesionados, pero los casos de uso bajaron de ~1.200 a ~600 y apuntan sobre todo a aseo, alimentación y lectores. Cati, Fernando y Marisol van al INGER el 14-10 a las 11:00 a ver cómo lo hicieron. Minuta: Minutas/minutas/2026-10-13_martes-13-10.md",
+   "plazo": "2026-10-14",
+   "responsable": "Matías Pinto",
+   "ambito": "Otros"
   }
  ],
  "criticos": [

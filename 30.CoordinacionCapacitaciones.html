@@ -295,7 +295,7 @@ var COLS = {
     {key:"fecha_coord",label:"Fecha entrega",edit:1,type:"date"}
   ],
   instrumental:[
-    {key:"codigo",label:"Código"},{key:"especialidad",label:"Especialidad"},{key:"caja",label:"Caja"},
+    {key:"codigo",label:"Código"},{key:"especialidad",label:"Especialidad"},{key:"caja",label:"Caja"},{key:"tipo_cap",label:"Capacitación"},
     {key:"cant_cajas",label:"Cant. cajas"},{key:"piezas_caja",label:"Piezas/caja"},{key:"piezas_total",label:"Piezas tot."},
     {key:"proveedor",label:"Proveedor"},{key:"marca",label:"Marca"},
     {key:"_slots",label:"Fechas propuestas",slots:1}
@@ -306,7 +306,7 @@ var AREAS=[["capacitaciones","Programa de Capacitación"],["instructivos","Instr
 var FILTERFIELDS={
   capacitaciones:["establecimiento","proveedor","marca","detalle_servicios"],
   instructivos:["establecimiento","proveedor"],
-  instrumental:["especialidad","proveedor"]
+  instrumental:["tipo_cap","especialidad","proveedor"]
 };
 
 var overrides = load();
@@ -390,9 +390,10 @@ function barArea(area,c){
 }
 // Instrumental ponderado por CAJAS FÍSICAS: cada tipo pesa su cant_cajas,
 // así el % refleja las ~1.500+ cajas reales y no solo los ~196 tipos.
-function cajasCounts(){
+function cajasCounts(filtro){
   var c={total:0}; validKeys("instrumental").forEach(function(k){c[k]=0;});
   D.instrumental.forEach(function(r){
+    if(filtro&&!filtro(r)) return;
     var q=parseInt(String(valOf(r,"cant_cajas")).replace(/\D/g,""),10)||1;
     c[estadoOf("instrumental",r)]+=q; c.total+=q;
   });
@@ -422,10 +423,14 @@ function renderDash(){
   AREAS.forEach(function(a){
     var c=counts(a[0]);
     if(a[0]==="instrumental"){
-      // % por TIPOLOGÍAS de caja; las cajas físicas quedan como referencia
-      var cw=cajasCounts();
-      h+='<div class="kpi"><h3>'+a[1]+'</h3><div class="big">'+pctArea("instrumental",c)+'%</div>'+
-         '<div class="sub">'+(c[DONE.instrumental]||0)+' de '+c.total+' tipologías · '+(cw[DONE.instrumental]||0)+'/'+cw.total+' cajas</div>'+barArea("instrumental",c)+'</div>';
+      // la unidad de medida es la CAJA física (13-10-2026); los tipos quedan como referencia
+      var cw=cajasCounts(), ce=cajasCounts(function(r){return valOf(r,"tipo_cap")==="Especial";});
+      var pctC=cw.total>0?Math.round((cw[DONE.instrumental]||0)/cw.total*100):0;
+      h+='<div class="kpi"><h3>'+a[1]+' · por cajas</h3><div class="big">'+pctC+'%</div>'+
+         '<div class="sub">'+fmtN(cw[DONE.instrumental]||0)+' de '+fmtN(cw.total)+' cajas · '+(c[DONE.instrumental]||0)+' de '+c.total+' tipos'+
+         (cw.programado?' · '+cw.programado+' coordinadas':'')+'</div>'+barArea("instrumental",cw)+
+         (ce.total?'<div class="sub" style="margin-top:6px">★ Especiales: '+(ce[DONE.instrumental]||0)+' de '+ce.total+' cajas'+
+           (ce.programado?' · '+ce.programado+' coordinadas':'')+' · '+(ce.sin_info||0)+' pendientes</div>':'')+'</div>';
       return;
     }
     var subx=(c[DONE[a[0]]]||0)+' '+DONE_WORD[a[0]]+
