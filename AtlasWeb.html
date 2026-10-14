@@ -5729,36 +5729,38 @@ function _rosterRecinto(room, b, E){
   // número sobre cada puesto
   E.forEach(e=>{ const n=num.get(e.i); if(!n) return;
     e.g.appendChild(el('text',{x:0,y:0.5,'text-anchor':'middle','dominant-baseline':'central','font-size':n>99?7.5:9,'font-weight':800,fill:'#0f172a','pointer-events':'none',class:'roster-num'},String(n))); });
-  // geometría (unidades del plano, como las tarjetas): filas de 11, columnas de 210
-  const fs=7.4, rh=11.5, cw=212, gh=13, pad=6;
+  // geometría (unidades del plano, como las tarjetas): filas de 15 (caja 12 + aire), columnas de 252.
+  // La línea base va explícita (y + rh/2 + 0,36·fs): Safari no centra igual con dominant-baseline.
+  const fs=7.6, rh=15, cw=252, gh=17, pad=7, bh=12, base=y=>y+rh/2+fs*0.36;
   const items=[]; let gPrev=null;
   filas.forEach(f=>{ if(f.t.k!==gPrev){ items.push({hdr:f.t, n:filas.filter(x=>x.t.k===f.t.k).length}); gPrev=f.t.k; } items.push(f); });
   const maxH=Math.max(b.h*1.25, 260), porCol=Math.max(10, Math.floor((maxH-22)/rh));
   const cols=[]; let cur=[], h=0;
   items.forEach(it=>{ const hh=it.hdr?gh:rh; if(cur.length && h+hh>porCol*rh){ cols.push(cur); cur=[]; h=0; } cur.push(it); h+=hh; });
   if(cur.length) cols.push(cur);
-  const W=cols.length*cw+pad*2, H=22+Math.max(...cols.map(c=>c.reduce((a,it)=>a+(it.hdr?gh:rh),0)))+pad;
+  const W=cols.length*cw+pad*2, H=24+Math.max(...cols.map(c=>c.reduce((a,it)=>a+(it.hdr?gh:rh),0)))+pad;
   const x0=b.x+b.w+18, y0=b.y;
-  const g=el('g',{class:'roster-panel'});
+  const g=el('g',{class:'roster-panel'}), _ajustar=[];
   g.appendChild(el('rect',{x:x0,y:y0,width:W,height:H,rx:6,fill:'#ffffff','fill-opacity':0.97,stroke:'#94a3b8','stroke-width':1}));
-  const tit=el('text',{x:x0+pad,y:y0+13,'font-size':fs+1.2,'font-weight':800,fill:'#0f172a','font-family':'Segoe UI,sans-serif'});
+  const tit=el('text',{x:x0+pad,y:y0+15,'font-size':fs+1.6,'font-weight':800,fill:'#0f172a','font-family':'Segoe UI,sans-serif'});
   tit.textContent='👥 '+rName(room.id)+' · '+filas.length+' persona'+(filas.length===1?'':'s')+' · '+num.size+' puestos';
   g.appendChild(tit);
-  cols.forEach((c,ci)=>{ let y=y0+22; const x=x0+pad+ci*cw;
+  cols.forEach((c,ci)=>{ let y=y0+24; const x=x0+pad+ci*cw;
     c.forEach(it=>{
-      if(it.hdr){ const t=el('text',{x, y:y+9,'font-size':fs,'font-weight':800,fill:'#334155','font-family':'Segoe UI,sans-serif',class:'roster-grupo'});
+      if(it.hdr){ const t=el('text',{x, y:y+gh-5,'font-size':fs+0.4,'font-weight':800,fill:'#334155','font-family':'Segoe UI,sans-serif',class:'roster-grupo'});
         t.textContent=(it.hdr.ic?it.hdr.ic+' ':'')+it.hdr.lbl+' · '+it.n; g.appendChild(t); y+=gh; return; }
       const RF=ROL_FONDO[it.rol], n=num.get(it.e.i);
       const row=el('g',{class:'roster-fila',style:'cursor:pointer'});
-      row.appendChild(el('circle',{cx:x+5.5,cy:y+rh/2-0.5,r:5.2,fill:it.e.col+'33',stroke:it.e.col,'stroke-width':1.2}));
-      const tn=el('text',{x:x+5.5,y:y+rh/2,'text-anchor':'middle','dominant-baseline':'central','font-size':n>99?5.4:6.4,'font-weight':800,fill:'#0f172a','pointer-events':'none'}); tn.textContent=n; row.appendChild(tn);
-      row.appendChild(el('rect',{x:x+13,y:y+0.6,width:cw-19,height:rh-1.6,rx:2.5,fill:RF?RF[1]:'#ffffff',stroke:RF?RF[3]:'#cbd5e1','stroke-width':0.9}));
-      if(it.area) row.appendChild(el('rect',{x:x+13,y:y+0.6,width:2.6,height:rh-1.6,rx:1,fill:it.area.col,'pointer-events':'none'}));
-      const tx=el('text',{x:x+17.5,y:y+rh/2,'dominant-baseline':'central','font-size':fs,fill:'#111827','font-family':'Segoe UI,sans-serif','pointer-events':'none'});
+      const yc=y+rh/2;
+      row.appendChild(el('circle',{cx:x+6,cy:yc,r:5.6,fill:it.e.col+'33',stroke:it.e.col,'stroke-width':1.2}));
+      const tn=el('text',{x:x+6,y:yc+(n>99?5.4:6.4)*0.36,'text-anchor':'middle','font-size':n>99?5.4:6.4,'font-weight':800,fill:'#0f172a','pointer-events':'none'}); tn.textContent=n; row.appendChild(tn);
+      row.appendChild(el('rect',{x:x+14.5,y:yc-bh/2,width:cw-20,height:bh,rx:3,fill:RF?RF[1]:'#ffffff',stroke:RF?RF[3]:'#cbd5e1','stroke-width':0.9}));
+      if(it.area) row.appendChild(el('rect',{x:x+14.5,y:yc-bh/2,width:2.8,height:bh,rx:1,fill:it.area.col,'pointer-events':'none'}));
+      const tx=el('text',{x:x+19.5,y:base(y),'font-size':fs,fill:'#111827','font-family':'Segoe UI,sans-serif','pointer-events':'none'});
       const sig=it.area?('['+it.area.sigla+'] '):'';
-      const nom=el('tspan',{'font-weight':700}); nom.textContent=sig+(it.reemp?'⇄ ':'')+_cortaTxt(it.nombre, 30);
+      const nom=el('tspan',{'font-weight':700}); nom.textContent=sig+(it.reemp?'⇄ ':'')+_cortaTxt(it.nombre, 36);
       const car=el('tspan',{fill:'#475569'}); car.textContent='  '+_cortaTxt(_cargoCorto(it.cargo), 18);
-      tx.appendChild(nom); tx.appendChild(car); row.appendChild(tx);
+      tx.appendChild(nom); tx.appendChild(car); row.appendChild(tx); _ajustar.push([tx, cw-26]);
       const tt=el('title'); tt.textContent='Puesto '+n+' · '+it.nombre+' · '+(it.cargo||'')+(RF?(' · '+RF[0]):'')+(it.area?(' · '+it.area.lbl):'')+' · '+(it.t.raw||'sin dato de turno')+' · clic: abrir el puesto'; row.appendChild(tt);
       row.addEventListener('mouseenter',()=>it.e.g.classList.add('roster-hl')); row.addEventListener('mouseleave',()=>it.e.g.classList.remove('roster-hl'));
       row.addEventListener('mousedown',ev=>ev.stopPropagation());
@@ -5767,6 +5769,8 @@ function _rosterRecinto(room, b, E){
     });
   });
   svg.appendChild(g);
+  // si un nombre + cargo no cabe en su caja, se comprime en vez de salirse del borde
+  _ajustar.forEach(([t,w])=>{ try{ if(t.getComputedTextLength()>w){ t.setAttribute('textLength',w); t.setAttribute('lengthAdjust','spacingAndGlyphs'); } }catch(e){} });
   return {filas, num, cols:cols.length};
 }
 function _cortaTxt(t,n){ t=String(t||''); return t.length>n?t.slice(0,n-1)+'…':t; }
