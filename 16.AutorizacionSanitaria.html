@@ -5153,6 +5153,134 @@ if(location.hash==='#asignacion') setTimeout(asgAbrir,300);
 if(location.hash==='#informes') setTimeout(itAbrir,300);
 </script>
 
+<!-- ═══════════ AS-UNIFICADA:INICIO · barra única + 🏠 Inicio + 📱 Terreno + 🤖 Catymey embebidos (SPEC-AutorizacionSanitaria-unificada, 13-10-2026)
+     Bloque fuente: _DEV/as_unificada/bloque_unificada_16.html · se reinserta con _DEV/as_unificada/inserta_bloque_16.py (no editar dentro de la 16). -->
+<script>document.write('<scr'+'ipt src="SHARED_DATA/as_inicio.js?v='+Date.now()+'"></scr'+'ipt>');</script>
+<style>
+:root{--hdr-h:108px}
+/* el alto del encabezado lo mide el script (ResizeObserver) y lo publica en --hdr-h: stickies y vistas se acomodan solos */
+header{flex-wrap:wrap;align-content:center;row-gap:6px;height:auto!important;min-height:64px;padding-top:8px!important;padding-bottom:8px!important}
+/* la barra reemplaza a estos botones del encabezado */
+header .hd-actions .hd-btn[onclick="asgAbrir()"],header .hd-actions .hd-btn[onclick="expAbrir()"],header .hd-actions .hd-btn[onclick="guAbrir()"]{display:none}
+#asNav{flex:0 0 100%;display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+#asNav::-webkit-scrollbar{display:none}
+#asNav button{flex:0 0 auto;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.20);color:#e8f1fb;border-radius:999px;
+  padding:6px 13px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap}
+#asNav button:hover{background:rgba(255,255,255,.2)}
+#asNav button.on{background:#fff;color:#222944;border-color:#fff}
+.a16-ov{top:var(--hdr-h)}
+#itFab{display:none!important}
+.asi-body{flex:1;overflow:auto;padding:18px 22px;background:#f5f7fb}
+.asi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.asi-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px}
+.asi-card h3{margin:0 0 10px;font-size:13px;color:#222944;display:flex;align-items:center;gap:8px}
+.asi-card h3 button{margin-left:auto;font-size:11px;border:1px solid #cbd5e1;background:#fff;border-radius:7px;padding:3px 9px;cursor:pointer;color:#1e3a8a}
+.asi-kpis{display:flex;gap:16px;flex-wrap:wrap}
+.asi-k b{display:block;font-size:22px;color:#0f172a}
+.asi-k span{font-size:11px;color:#64748b}
+.asi-bar{display:flex;height:10px;border-radius:6px;overflow:hidden;background:#eef2f7;margin:10px 0 6px}
+.asi-bar i{display:block;height:100%}
+.asi-lg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:#475569}
+.asi-lg em{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+.asi-hito{display:flex;justify-content:space-between;font-size:12.5px;padding:5px 0;border-bottom:1px dashed #e2e8f0}
+.asi-hito b{color:#0f172a}
+.asi-nota{font-size:11px;color:#64748b;margin-top:8px}
+.asi-frame{flex:1;border:0;width:100%;background:#fff}
+</style>
+
+<div class="a16-ov" id="inOv"><div class="a16-panel">
+  <div class="a16-hd"><h2 style="margin:0;font-size:16px">🏠 Autorización Sanitaria NHDS · Inicio</h2>
+    <span class="sub" id="inSub" style="font-size:12px;opacity:.8"></span></div>
+  <div class="asi-body" id="inBody"></div>
+</div></div>
+<div class="a16-ov" id="terOv"><div class="a16-panel">
+  <div class="a16-hd"><h2 style="margin:0;font-size:16px">📱 Terreno</h2><span class="sub" style="font-size:12px;opacity:.8">la misma aplicación que usan los responsables (39 · generada desde el Atlas)</span>
+    <a href="39.ASTerreno.html" target="_blank" style="margin-left:auto;color:#fff;font-size:12px">abrir sola ↗</a></div>
+  <iframe class="asi-frame" id="terFr" title="Terreno"></iframe>
+</div></div>
+<div class="a16-ov" id="ctyOv"><div class="a16-panel">
+  <div class="a16-hd"><h2 style="margin:0;font-size:16px">🤖 Catymey</h2><span class="sub" style="font-size:12px;opacity:.8">asignación propuesta, reglas, precotejo y solicitud a la Concesionaria (41)</span>
+    <a href="41.Catymey.html" target="_blank" style="margin-left:auto;color:#fff;font-size:12px">abrir sola ↗</a></div>
+  <iframe class="asi-frame" id="ctyFr" title="Catymey"></iframe>
+</div></div>
+
+<script>
+(function(){
+const NAV=[['inicio','🏠 Inicio',()=>asiInicio()],['normas','📋 Normas y pautas',null],['terreno','📱 Terreno',()=>asiFrame('terOv','terFr','39.ASTerreno.html')],
+  ['asignacion','🧩 Asignación',()=>asgAbrir()],['expediente','📂 Expediente',()=>expAbrir()],['catymey','🤖 Catymey',()=>asiFrame('ctyOv','ctyFr','41.Catymey.html')],
+  ['informes','📑 Informes',()=>itAbrir()],['guia','📘 Guía',()=>guAbrir()]];
+const OVS=['inOv','terOv','ctyOv','asgOv','expOv','itOv','guOv'];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let actual='normas', navegando=false;
+function marcar(k){actual=k;document.querySelectorAll('#asNav button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));}
+window.asiIr=function(k){
+  navegando=true;
+  OVS.forEach(id=>{const e=document.getElementById(id);if(e)e.classList.remove('open');});
+  const it=NAV.find(n=>n[0]===k)||NAV[1];
+  if(it[2]) it[2]();
+  marcar(it[0]);
+  history.replaceState(null,'',it[0]==='normas'?location.pathname:'#'+it[0]);
+  navegando=false;
+};
+window.asiFrame=function(ov,fr,src){const f=document.getElementById(fr);if(!f.src)f.src=src;document.getElementById(ov).classList.add('open');};
+// si una vista se cierra con su propia ✕, la barra vuelve a «Normas y pautas»
+new MutationObserver(()=>{if(navegando)return;if(!OVS.some(id=>{const e=document.getElementById(id);return e&&e.classList.contains('open');}))marcar('normas');})
+  .observe(document.body,{attributes:true,subtree:true,attributeFilter:['class']});
+
+function cuenta(base,ovs){const c={};base.forEach(x=>{const e=((ovs||{})[x.id]||{}).estado||x.estado||'pendiente';c[e]=(c[e]||0)+1;});return c;}
+function barra(c,ords){const t=Object.values(c).reduce((a,b)=>a+b,0)||1;
+  return '<div class="asi-bar">'+ords.map(([k,col])=>c[k]?`<i style="width:${100*c[k]/t}%;background:${col}"></i>`:'').join('')+'</div>'
+   +'<div class="asi-lg">'+ords.filter(([k])=>c[k]).map(([k,col,l])=>`<span><em style="background:${col}"></em>${l} ${c[k]}</span>`).join('')+'</div>';}
+const fmt=d=>{if(!d)return '—';const x=new Date(d+'T12:00:00');return x.toLocaleDateString('es-CL',{day:'2-digit',month:'short'});};
+const dias=d=>Math.round((new Date(d+'T12:00:00')-new Date())/864e5);
+
+window.asiInicio=function(){
+  const I=window.AS_INICIO||{}, E=window.AS_EXPEDIENTE||{};
+  let S={};try{S=JSON.parse(localStorage.getItem('as16_expediente_v1')||'{}')}catch(e){}
+  const ST=[['listo','#10b981','Listo'],['en_curso','#3b82f6','En curso'],['por_verificar','#a855f7','Por verificar'],['observado','#f59e0b','Observado'],['pendiente','#cbd5e1','Pendiente'],['no_aplica','#94a3b8','No aplica']];
+  const ct=cuenta(E.tramites||[],S.tram), cd=cuenta(E.documentos||[],S.doc);
+  const h=I.hitos||{}, cy=(I.catymey||{}), ca=cy.asignacion||{}, cp=cy.precotejo||{}, pa=I.pautas||{};
+  // avance en terreno: sólo si ya hay sesión con el backend (🧩 Asignación)
+  let ter='<div class="asi-nota">Para ver el avance en vivo, entra con tu correo en 🧩 Asignación (mismo backend que terreno).</div>';
+  if(typeof A16!=="undefined"&&A16.ready){const ks=Object.keys(A16.est).filter(k=>/^(rec|svc)\|/.test(k)&&!(A16.est[k].datos||{})._borrada);
+    const con=ks.filter(k=>(A16.est[k]||{}).avance>0), fin=ks.filter(k=>(A16.est[k]||{}).avance>=100);
+    ter=`<div class="asi-kpis"><div class="asi-k"><b>${ks.length}</b><span>pautas asignadas</span></div><div class="asi-k"><b>${con.length}</b><span>con avance</span></div><div class="asi-k"><b>${fin.length}</b><span>terminadas</span></div></div>`
+       +barra({fin:fin.length,con:con.length-fin.length,sin:ks.length-con.length},[['fin','#10b981','Terminadas'],['con','#3b82f6','En curso'],['sin','#cbd5e1','Sin avance']]);}
+  const precot=[['documental_ok','#10b981','Documental OK'],['terreno','#3b82f6','Se verifica en terreno'],['concesionaria','#f59e0b','Concesionaria'],['gestion','#a855f7','Gestión'],['falta_en_despliegue','#ef4444','Falta en despliegue'],['condicional','#94a3b8','Condicional']];
+  document.getElementById('inSub').textContent='datos al '+fmt(I.generado)+' · el Expediente suma lo editado en este navegador';
+  document.getElementById('inBody').innerHTML=`<div class="asi-grid">
+   <div class="asi-card"><h3>📅 Fechas que mandan</h3>
+     ${[['Inicio del traslado',h.traslado_inicio],['Fin del traslado',h.traslado_fin],['Autorización de puesta en servicio (APS)',h.aps]].filter(x=>x[1]).map(([l,d])=>{const n=dias(d);return `<div class="asi-hito"><span>${l}</span><b>${fmt(d)}${n>=0?' · en '+n+' días':' · hace '+(-n)+' días'}</b></div>`}).join('')}</div>
+   <div class="asi-card"><h3>📂 Expediente de la solicitud<button onclick="asiIr('expediente')">abrir</button></h3>
+     <div class="asi-kpis"><div class="asi-k"><b>${(E.tramites||[]).length}</b><span>trámites</span></div><div class="asi-k"><b>${(E.documentos||[]).length}</b><span>documentos</span></div><div class="asi-k"><b>${(E.riesgos||[]).length}</b><span>riesgos</span></div></div>
+     <div style="font-size:11px;color:#475569;margin-top:8px">Trámites</div>${barra(ct,ST)}
+     <div style="font-size:11px;color:#475569;margin-top:8px">Documentos</div>${barra(cd,ST)}</div>
+   <div class="asi-card"><h3>📱 Avance en terreno<button onclick="asiIr('terreno')">abrir</button></h3>${ter}
+     <div class="asi-nota">${pa.recintos_con_pauta||0} recintos y ${pa.servicios_con_pauta||0} servicios con pauta asignada · ${pa.servicios_sin_responsable?'<b style="color:#b91c1c">'+pa.servicios_sin_responsable+' servicios sin responsable</b>':'todos los servicios con pauta tienen responsable'}.</div></div>
+   <div class="asi-card"><h3>🤖 Catymey · por decidir<button onclick="asiIr('catymey')">abrir</button></h3>
+     <div class="asi-kpis"><div class="asi-k"><b>${(ca.cambios||{}).distinta||0}</b><span>pautas distintas a la actual</span></div><div class="asi-k"><b>${(ca.cambios||{}).nueva||0}</b><span>recintos con pauta nueva</span></div><div class="asi-k"><b>${ca.pautas_unidad_nuevas||0}</b><span>pautas de unidad nuevas</span></div></div>
+     <div style="font-size:11px;color:#475569;margin-top:8px">Precotejo de ${(cp.requisitos_evaluados||0).toLocaleString('es-CL')} requisitos</div>${barra(cp,precot)}</div>
+  </div>`;
+  document.getElementById('inOv').classList.add('open');
+};
+
+// barra en el encabezado
+const nav=document.createElement('nav');nav.id='asNav';
+nav.innerHTML=NAV.map(([k,l])=>`<button data-k="${k}" onclick="asiIr('${k}')">${l}</button>`).join('');
+const hdr=document.querySelector('header');hdr.appendChild(nav);
+const medir=()=>document.documentElement.style.setProperty('--hdr-h',Math.ceil(hdr.getBoundingClientRect().height)+'px');
+new ResizeObserver(medir).observe(hdr);addEventListener('resize',medir);addEventListener('load',medir);medir();setTimeout(medir,800);
+marcar('normas');
+const h0=location.hash.slice(1);
+if(NAV.some(n=>n[0]===h0)) setTimeout(()=>asiIr(h0),400);
+addEventListener('hashchange',()=>{const k=location.hash.slice(1);if(NAV.some(n=>n[0]===k)&&k!==actual)asiIr(k);});
+
+// Catymey flotante en todas las pestañas (a la izquierda: a la derecha están los botones de la 16)
+window.CATYMEY_CONFIG=Object.assign({lado:'left'},window.CATYMEY_CONFIG||{});
+setTimeout(()=>['SHARED_DATA/catymey_kb.js','SHARED_DATA/catymey.js'].reduce((p,src)=>p.then(()=>new Promise(r=>{const s=document.createElement('script');s.src=src;s.onload=s.onerror=r;document.body.appendChild(s);})),Promise.resolve()),1200);
+})();
+</script>
+<!-- AS-UNIFICADA:FIN -->
 <!-- ═══════════ EXPEDIENTE DE AUTORIZACIÓN SANITARIA · BITÁCORA ═══════════
      Bloque añadido (no reemplaza nada). Datos: SHARED_DATA/as_expediente.js (window.AS_EXPEDIENTE, generado por
      _DEV/as_expediente/build_expediente.py) + SHARED_DATA/as_resumen_recintos.js (se carga al abrir Recintos).

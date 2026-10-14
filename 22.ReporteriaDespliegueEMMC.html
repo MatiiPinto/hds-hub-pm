@@ -39,6 +39,15 @@ body{font-family:Verdana,Geneva,sans-serif;background:var(--bg);color:var(--text
 .container{max-width:1280px;margin:0 auto;padding:20px 22px;}
 
 /* SECTION TITLE */
+.pl-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:18px}
+.pl-row td{vertical-align:top}
+.pl-n{font-weight:800;color:var(--inst);white-space:nowrap}
+.pl-bar{display:flex;align-items:center;gap:8px;min-width:150px}
+.pl-bar span{flex:1;height:8px;border-radius:5px;background:#e8edf5;overflow:hidden}.pl-bar span i{display:block;height:100%}
+.pl-bar b{font-size:.68rem;min-width:46px;text-align:right}
+.pl-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+.pl-lect{font-size:.6rem;color:var(--muted);margin-top:3px;line-height:1.4}
+.pl-bases{font-size:.62rem;color:var(--muted);line-height:1.5;margin-top:12px}
 .sec-title{font-size:.67rem;font-weight:700;color:var(--inst);text-transform:uppercase;letter-spacing:.08em;border-left:3px solid var(--accent);padding-left:10px;margin-bottom:14px;}
 
 /* KPI CARDS */
@@ -310,6 +319,7 @@ details.rp-det{margin:0 0 18px}details.rp-det>summary{cursor:pointer;font-size:.
   <div class="rp-tabs" id="rp-tabs">
     <button class="rp-tab on" data-p="pins" onclick="rpTab('pins')">📦 PINS · despliegue EMMC</button>
     <button class="rp-tab" data-p="inst" onclick="rpTab('inst')">🧰 Instrumental quirúrgico</button>
+    <button class="rp-tab" data-p="plan" onclick="rpTab('plan')">📜 Plan de Instalación · cumplimiento</button>
   </div>
 
   <!-- ═══ PESTAÑA PINS ═══ -->
@@ -552,6 +562,9 @@ details.rp-det{margin:0 0 18px}details.rp-det>summary{cursor:pointer;font-size:.
 
     </details>
   </div>
+
+  <!-- ═══ PESTAÑA PLAN DE INSTALACIÓN (bases, letra D, puntos i–x) ═══ -->
+  <div class="rp-pane" id="pane-plan"></div>
 
   <div class="footer" id="rp-footer"></div>
 </div>
@@ -806,8 +819,32 @@ function rInst(){
   {const hc=document.getElementById('hdr-corte'); if(hc) hc.textContent=`PINS ${fch(R.pins_corte)} · Instr. ${L?fch(L.corte):'—'}`;}
   document.getElementById('rp-footer').textContent=`Reportería PINS e Instrumental · PINS-EMMC corte ${fch(R.pins_corte)} (HDS + AA + ING) · instrumental: llegada ${L?fch(L.corte):'—'}, revisión ${V?fch(V.corte):'—'} · generado ${fch(R.generado)}`;
 }
+
+function rPlan(){
+  const D=R.plan_instalacion, el=document.getElementById('pane-plan');
+  if(!D){ el.innerHTML='<div class="rp-alerta">Falta la documentación PINS (pins_documentacion.json) para calcular el Plan de Instalación.</div>'; return; }
+  const COL={rojo:'#dc2626',ambar:'#f59e0b',verde:'#16a34a',gris:'#94a3b8'};
+  const pc=v=>v==null?'—':String(v).replace('.',',')+' %';
+  const bar=(v,c)=>v==null?'<span style="font-size:.62rem;color:var(--muted)">no medible</span>':`<div class="pl-bar"><span><i style="width:${v}%;background:${c}"></i></span><b>${pc(v)}</b></div>`;
+  el.innerHTML=`
+   <div class="sec-title">Plan de Instalación · bases de licitación, letra D (puntos i a x) <span class="rp-corte">${D.cortes}</span></div>
+   <div class="pl-kpis">
+     <div class="kpi-card"><div class="kpi-label">Presentado (documentos)</div><div class="kpi-val">${pc(D.promedio_presentado)}</div><div class="kpi-sub">promedio de los 10 puntos · lo que la SC subió al Drive «05. PINS»</div></div>
+     <div class="kpi-card accent"><div class="kpi-label">Cumplido en los hechos</div><div class="kpi-val" style="color:#dc2626">${pc(D.promedio_hechos)}</div><div class="kpi-sub">promedio de los ${D.n_medibles} puntos con datos de ejecución (i, iv, v, viii, x)</div></div>
+     <div class="kpi-card"><div class="kpi-label">Pruebas de aceptación</div><div class="kpi-val" style="color:#dc2626">${pc((D.puntos.find(x=>x.n==='iv')||{}).hechos)}</div><div class="kpi-sub">${(D.puntos.find(x=>x.n==='iv')||{}).det||''}</div></div>
+   </div>
+   <div class="card" style="overflow-x:auto"><table class="tbl">
+     <thead><tr><th></th><th>Punto exigido</th><th>Presentado</th><th>Cumplido en los hechos</th><th>Detalle</th></tr></thead>
+     <tbody>${D.puntos.map(x=>`<tr class="pl-row"><td class="pl-n"><span class="pl-dot" style="background:${COL[x.nivel]}"></span>${x.n})</td>
+       <td><b>${x.t}</b><div class="pl-lect">${x.lect}</div></td><td>${bar(x.presentado,'#94a3b8')}</td><td>${bar(x.hechos,COL[x.nivel])}</td>
+       <td style="font-size:.66rem">${x.det}</td></tr>`).join('')}</tbody></table>
+     <div class="pl-bases"><b>Qué exigen las bases:</b> la instalación del EMMC es de exclusivo cargo, costo y responsabilidad del Concesionario. ${D.plazo}
+       <br><b>Cómo leerlo:</b> «presentado» = % de tipologías con el documento en el Drive de la Concesionaria; «cumplido en los hechos» = lo que efectivamente ocurrió
+       (unidades instaladas, pruebas y actas, manuales completos, capacitación al personal). <span class="pl-dot" style="background:#dc2626"></span>crítico
+       <span class="pl-dot" style="background:#f59e0b"></span>parcial <span class="pl-dot" style="background:#94a3b8"></span>no medible con los datos actuales.</div></div>`;
+}
 if(!R){ document.getElementById('pane-pins').insertAdjacentHTML('afterbegin','<div class="rp-alerta">Falta SHARED_DATA/reporteria_pins_instrumental.js (python3 _DEV/build_reporteria_pins_instrumental.py).</div>'); }
-else { rPins(); rInst(); try{ const t=localStorage.getItem('rp22_tab'); if(t) rpTab(t); }catch(e){} }
+else { rPins(); rInst(); rPlan(); try{ const t=localStorage.getItem('rp22_tab'); if(t) rpTab(t); }catch(e){} }
 </script>
 <script src="hub-home.js"></script>
 </body>

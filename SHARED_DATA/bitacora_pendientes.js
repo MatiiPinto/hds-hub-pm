@@ -2626,7 +2626,7 @@ window.BITACORA = {
   {
    "id": "P114",
    "titulo": "Discurso común de Puesta en Marcha antes de comunicar nada más",
-   "detalle": "Avance 13-10-2026 (reunión PM): se decidió que lo hecho se llama revisión de existencia (firma 1), no recepción, y que habrá una sola definición de «equipo», separada de partes, piezas y accesorios, igual para Cati, Fernando, Mey y Matías. Minuta: Minutas/minutas/2026-10-13_martes-13-10.md",
+   "detalle": "Decisión de la reunión: no se parte con nadie (equipos, gremios, clínicos) hasta tener un discurso único: nombre (somos Hospital del Salvador; no «complejo hospitalario», no «Salvador Geriátrico», no «proyecto INGER»; el INGER va por su carril), qué se puede decir oficialmente de la PSP, el traslado y los plazos, y respuestas a preguntas frecuentes (p. ej. fondos de puesta en marcha). Voceros: quien conduce y la Dra. Gabriela Brignardello. · Avance 13-10-2026 (reunión PM): lo hecho se llama revisión de existencia (firma 1), no recepción, y habrá una sola definición de «equipo», separada de partes, piezas y accesorios, igual para Cati, Fernando, Mey y Matías. Minuta: Minutas/minutas/2026-10-13_martes-13-10.md",
    "ambito": "Puesta en Marcha",
    "origen_tipo": "Reunión",
    "origen_ref": "Minuta 05-10-2026 · Equipo de Puesta en Marcha (audios «Avenida Salvador 364 6» y «Hospital del Salvador 2»)",
