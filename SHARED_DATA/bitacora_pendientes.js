@@ -1,7 +1,7 @@
 // SHARED_DATA/bitacora_pendientes.js — versión publicada en el HUB-PM (saneada por deploy_web_pm.py)
 window.BITACORA = {
  "version": "2026-10-05 · Bitácora y huddle de Puesta en Marcha",
- "generado": "2026-10-13",
+ "generado": "2026-10-14",
  "proposito": "Reunir en un solo lugar los pendientes que hoy viven dispersos en correos, ORD, cartas CS-IF, actas de mesas de trabajo y sesiones de trabajo.",
  "ambitos": [
   "Comunicaciones",
@@ -3226,6 +3226,17 @@ window.BITACORA = {
    "plazo": "2026-10-14",
    "responsable": "Matías Pinto",
    "ambito": "Otros"
+  },
+  {
+   "id": "P140",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-10-14",
+   "titulo": "Hemodinamia · informe sobre el «equipo de radiofrecuencia»: se compró electroterapia, no ablación cardíaca",
+   "detalle": "Reunión de productividad 14-10-2026 [01:07:45]–[01:08:42]: en los pabellones de hemodinamia hay 2 equipos de electroterapia por radiofrecuencia (medicina física), no de ablación cardíaca. La ablación hepática y la de safena siguen en comodato y no se compraron; la única crioablación es la de oftalmología. Matías se comprometió a hacer un informe para el doctor [sic?]. Minuta: Minutas/minutas/2026-10-14_productividad.md",
+   "responsable": "Matías Pinto",
+   "ambito": "EMMC"
   }
  ],
  "criticos": [
