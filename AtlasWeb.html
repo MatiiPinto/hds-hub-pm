@@ -770,6 +770,13 @@ body.view-only #dkPmCentral,body.view-only #dkPmDelta,body.view-only #backupBadg
 .fk-pp-det summary{cursor:pointer;font-size:11.5px;color:var(--text-2);margin:2px 0}
 .fk-pp-lista{font-size:11px;color:var(--text-1);line-height:1.5;margin:2px 0 4px;word-break:break-word}
 .fk-pp-comp{font-weight:600}
+.av-cuantos{margin:2px 4px 8px;padding:8px 10px;border:1px solid #cbd5e1;border-radius:8px;background:#f8fafc;font-size:11px;color:#0f172a}
+.av-cq-t{font-weight:800;font-size:12px;display:flex;align-items:baseline;gap:6px}.av-cq-t span{font-weight:400;color:#64748b;font-size:10.5px;margin-left:auto}
+.av-cq-big{font-size:13px;margin:4px 0 2px}.av-cq-big b{font-size:16px}
+.av-cq-s{font-size:10.5px;color:#64748b;margin:3px 0}
+.av-cq-sub{font-weight:700;font-size:11px;margin:7px 0 2px}
+.av-cq-tab{width:100%;border-collapse:collapse;margin:3px 0}.av-cq-tab td,.av-cq-tab th{padding:2px 4px;border-bottom:1px solid #e2e8f0;text-align:left;font-size:11px}
+.av-cq-tab th{font-size:10px;color:#64748b;font-weight:600}.av-cq-tab .n{text-align:right;font-weight:700;white-space:nowrap}.av-cq-tab .t{text-align:right;color:#475569;white-space:nowrap}.av-cq-tab span{font-weight:400;color:#64748b}
 .pp-tab{width:100%;border-collapse:collapse;font-size:11.5px;font-variant-numeric:tabular-nums}
 .pp-tab th,.pp-tab td{padding:3px 5px;border-bottom:1px solid var(--border,#e2e8f0);text-align:left}
 .pp-tab th{font-size:10px;color:var(--text-2);text-transform:uppercase;letter-spacing:.04em;position:sticky;top:0;background:var(--surface,#fff)}
@@ -11927,6 +11934,59 @@ function _avArbol(){
   const tA=Object.values(arbol).reduce((x,v)=>x+v.a,0);
   return {asg,arbol,nBec,nExt,tN,tA};
 }
+// ── ¿Cuántos somos? ── cifras oficiales confirmadas con la sesión de Matriz Dotación (14-10-2026).
+// Se calculan en vivo sobre la matriz (window.SHARED_DOTACION), así cambian solas con cada corte.
+// Dotación oficial = cargos de las leyes 18.834 · 19.664 · 15.076 que cuentan (sin no_cuenta_cargo:
+// el reemplazante no suma, el cargo es del titular); personas = RUT distintos (un médico puede tener 2).
+// La comparación oficial contra la Ley de Presupuestos es del módulo ⚖️ de 11.Dotación: aquí sólo se cita el tope.
+const _AV_LEYES=['LEY 18.834','LEY 19.664','LEY 15.076'];
+function _avNum(n){ return Number(n||0).toLocaleString('es-CL'); }
+function _avHoras(p){ const v=parseFloat(String(p.horas_sum||p.horas_cto||0).replace(',','.')); return isFinite(v)?v:0; }
+function _avCuantos(){
+  const D=window.SHARED_DOTACION; if(!D||!D.staff) return null;
+  // versión web (dotacion_slim: sin RUT ni ley por persona): usa el agregado `cuantos` que trae el
+  // slim con las mismas definiciones; si no lo trae, el recuadro no se muestra (mejor nada que ceros)
+  if(!D.staff.some(p=>p.ley)) return D.cuantos ? Object.assign({version:D.cuantos.corte||String(D.version||'').split(' · ')[0]}, D.cuantos) : null;
+  const L=D.staff, GEN=/^\s*(BECAD|COMPRAS?\s+DE\s+SERVICIO)/i;
+  const cuenta=L.filter(p=>_AV_LEYES.includes(p.ley) && !p.no_cuenta_cargo);
+  const pers=a=>new Set(a.map(p=>p.i)).size;
+  const porLey=_AV_LEYES.map(l=>{ const x=cuenta.filter(p=>p.ley===l); return {ley:l, cargos:x.length, personas:pers(x), horas:x.reduce((a,p)=>a+_avHoras(p),0)}; });
+  const conNombre=L.filter(p=>!GEN.test(String(p.n||'')));
+  const compras=L.filter(p=>p.ley==='COMPRAS DE SERVICIO');
+  const bec=(dotDB&&dotDB.staff)?dotDB.staff.filter(s=>s.beca).length:0;
+  return { version:String(D.version||'').split(' · ')[0], cargos:cuenta.length, personas:pers(cuenta), porLey,
+    registros:L.length, conNombre:conNombre.length, personasMatriz:pers(L.filter(p=>p.i)),
+    compras:compras.length, comprasNombre:compras.filter(p=>!GEN.test(String(p.n||''))).length,
+    becados:bec, cuposBecas:L.filter(p=>p.ley==='BECADOS').length,
+    honorarios:L.filter(p=>p.ley==='HONORARIO').length, docentes:L.filter(p=>p.ley==='DOCENTE UCH').length,
+    externos:L.filter(p=>/^EXTERNO\s/i.test(String(p.tipo_vinculo||''))).length,
+    reemplazantes:L.filter(p=>p.reemplaza_a).length };
+}
+function _avCuantosHtml(){
+  const C=_avCuantos(); if(!C) return '';
+  const T={}; (((window.DOTACION_PRESUPUESTO||{}).topes)||[{ley:'LEY 18.834',unidad:'cargos',tope:2102},{ley:'LEY 19.664',unidad:'horas',tope:15268},{ley:'LEY 15.076',unidad:'cargos',tope:129}])
+    .forEach(t=>{ if(!t.solo_informativo && !T[t.ley]) T[t.ley]=t; });
+  const fila=(a,b,c)=>'<tr><td>'+a+'</td><td class="n">'+b+'</td><td class="t">'+c+'</td></tr>';
+  let h='<div class="av-cuantos"><div class="av-cq-t">¿Cuántos somos? <span>matriz al '+esc(C.version)+'</span></div>'
+    +'<div class="av-cq-big"><b>'+_avNum(C.personas)+'</b> personas · <b>'+_avNum(C.cargos)+'</b> cargos</div>'
+    +'<div class="av-cq-s">Dotación oficial = cargos de las leyes 18.834, 19.664 y 15.076. Son más cargos que personas porque '+_avNum(C.cargos-C.personas)+' son segundos cargos de la misma persona (p. ej. un médico 19.664 + 15.076). Los reemplazantes no suman: el cargo es del titular.</div>'
+    +'<table class="av-cq-tab"><thead><tr><th>Por ley</th><th class="n">Dotación</th><th class="t">Tope Ley de Presupuestos</th></tr></thead><tbody>'
+    +C.porLey.map(x=>{ const t=T[x.ley]||{}; const v=x.ley==='LEY 19.664'?(_avNum(Math.round(x.horas))+' h <span>('+_avNum(x.cargos)+' cargos)</span>'):(_avNum(x.cargos)+' cargos');
+        return fila(esc(x.ley.replace('LEY ','')), v, t.tope?(_avNum(t.tope)+' '+(t.unidad==='horas'?'h':'cargos')):'—'); }).join('')
+    +'</tbody></table>'
+    +'<div class="av-cq-s">La 19.664 se mide en horas médicas semanales, no en cargos. La comparación oficial contra el tope está en ⚖️ Ley de Presupuestos (11.Dotación).</div>'
+    +'<div class="av-cq-sub">No son dotación del HDS (están en la matriz para ubicarlos)</div>'
+    +'<table class="av-cq-tab"><tbody>'
+    +fila('🛒 Compra de servicio', _avNum(C.compras), _avNum(C.comprasNombre)+' con nombre')
+    +fila('🎓 Becados en formación', _avNum(C.becados), _avNum(C.cuposBecas)+' cupos por programa')
+    +(C.honorarios?fila('📝 Honorarios', _avNum(C.honorarios), ''):'')
+    +(C.docentes?fila('🏫 Docentes U. de Chile', _avNum(C.docentes), ''):'')
+    +(C.externos?fila('🏛 Otra institución o empresa', _avNum(C.externos), ''):'')
+    +'</tbody></table>'
+    +'<div class="av-cq-s">'+_avNum(C.reemplazantes)+' reemplazantes vigentes (no suman cargo). Base del % de recintos: registros con nombre sin becados ni externos.</div>'
+    +'</div>';
+  return h;
+}
 function renderAvance(){
   const cont=document.getElementById('avBody'); if(!cont) return;
   if(!dotDB||!dotDB.staff){ cont.innerHTML='<div style="padding:8px;color:#64748b">La matriz de dotación no está cargada.</div>'; return; }
@@ -11942,11 +12002,12 @@ function renderAvance(){
     +'<b style="font-size:12px">'+(_avFiltro?('🖋️ '+esc(_avGrupoNombre(_avFiltro))+' · asignadas a recinto'):'Dotación asignada a recinto')+'</b>'
     +'<b style="margin-left:auto;font-size:15px;color:'+_avColor(_avPct(tA,tN))+'">'+_avPct(tA,tN)+'%</b></div>'
     +'<div style="padding:0 4px 6px">'+_avBarra(tA,tN,8)
-    +'<div style="font-size:10.5px;color:#64748b;margin-top:3px">'+tA+' de '+tN+' personas · faltan '+(tN-tA)+'</div>'
+    +'<div style="font-size:10.5px;color:#64748b;margin-top:3px" title="Base del porcentaje: registros de la matriz con nombre, sin becados ni personal de otra institución. Un médico con dos cargos cuenta dos veces. No es «cuántos somos»: ver el recuadro de abajo.">'+_avNum(tA)+' de '+_avNum(tN)+' registros de la matriz · faltan '+_avNum(tN-tA)+'</div>'
     +((!_avFiltro&&nBec)?'<div style="font-size:10.5px;color:#94a3b8;margin-top:2px" title="Los becados en formación no pertenecen a una subdirección">🎓 '+nBec+' becados no considerados</div>':'')
     +((!_avFiltro&&nExt)?'<div style="font-size:10.5px;color:#94a3b8;margin-top:2px" title="Personal de otra institución (Universidad de Chile) que trabaja en el hospital: está en la matriz para ubicarlo, pero no es dotación del HDS">🏛 '+nExt+' de otra institución no considerados</div>':'')
     +(nPend?'<div style="font-size:10.5px;color:#b45309;margin-top:2px" title="Personal contratado que RRHH aún no clasifica por departamento ni subdirección. La categoría desaparece cuando llegue la clasificación.">📋 '+nPend+' sin clasificar por RRHH ('+(tN? (nPend*100/tN<1 ? (nPend*100/tN).toFixed(1) : _avPct(nPend,tN)) : 0)+'% de la dotación)</div>':'')
-    +(_avFiltro?'<div style="font-size:10.5px;color:#94a3b8;margin-top:2px">Grupo transversal · '+Object.keys(arbol).length+' subdirecciones</div>':'')+'</div>');
+    +(_avFiltro?'<div style="font-size:10.5px;color:#94a3b8;margin-top:2px">Grupo transversal · '+Object.keys(arbol).length+' subdirecciones</div>':'')+'</div>'
+    +(_avFiltro?'':_avCuantosHtml()));
   // cada subdirección se abre a sus servicios/departamentos y éstos a sus
   // unidades, con el mismo avance; todo el árbol se puede abrir de una vez o exportar
   H.push('<div class="av-tools">'
@@ -18780,6 +18841,13 @@ async function runSelfTest(){
       _estIdx=prev; wsState.dots=JSON.parse(dPrev); S.areaId=a0; S.floorId=f0; _servMode=m0;
       F0.areas=F0.areas.filter(a=>a.id!=='sv_a'); delete boxState.areas['sv_a']; delete boxState.rooms['sv_r']; delete nameState.areas['sv_a']; delete nameState.rooms['sv_r']; _codeBoxIndex=null;
     }
+  });
+  T('¿Cuántos somos?: dotación oficial = cargos de las 3 leyes que cuentan, personas por RUT distinto, y el recuadro aparece en el avance', ()=>{
+    const C=_avCuantos(); if(!C) return 'omitir';
+    const L=SHARED_DOTACION.staff, c=L.filter(p=>_AV_LEYES.includes(p.ley)&&!p.no_cuenta_cargo);
+    if(C.cargos!==c.length || C.personas!==new Set(c.map(p=>p.i)).size || C.personas>C.cargos) return false;
+    if(C.porLey.reduce((a,x)=>a+x.cargos,0)!==C.cargos) return false;
+    const h=_avCuantosHtml(); return /¿Cuántos somos\?/.test(h) && /Compra de servicio/.test(h) && /Becados en formación/.test(h) && /15\.268 h/.test(h);
   });
   T('📐 Puntos PINS: dato cargado (≥1.500 recintos que existen en el Atlas, capa P2 con 5 campos) y ficha de Recu 2 CMA con datos, enchufes y tableros', ()=>{
     const D=_ppD(); if(!D) return false;
