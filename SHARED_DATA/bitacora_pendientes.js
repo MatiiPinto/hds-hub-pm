@@ -1,7 +1,7 @@
 // SHARED_DATA/bitacora_pendientes.js — versión publicada en el HUB-PM (saneada por deploy_web_pm.py)
 window.BITACORA = {
  "version": "2026-10-05 · Bitácora y huddle de Puesta en Marcha",
- "generado": "2026-10-14",
+ "generado": "2026-10-15",
  "proposito": "Reunir en un solo lugar los pendientes que hoy viven dispersos en correos, ORD, cartas CS-IF, actas de mesas de trabajo y sesiones de trabajo.",
  "ambitos": [
   "Comunicaciones",
@@ -3211,18 +3211,18 @@ window.BITACORA = {
    "origen": "matii01",
    "creado": "2026-10-13",
    "titulo": "Contrato · aclarar el Anexo I-D y hasta dónde llegan los servicios concesionados",
-   "detalle": "Reunión PM 13-10-2026 [00:04:23] y [00:25:30]: se pidió por escrito a Úrsula [sic?] aclarar los componentes del Anexo I-D [sic?] y qué hace la Concesionaria y qué hace el hospital en la planta de agua de diálisis (microbiología), el área preparada estéril de Farmacia (ISP) y la droguería que atiende al Geriátrico. Ninguno de estos alcances tiene respuesta hoy. Minuta: Minutas/minutas/2026-10-13_martes-13-10.md",
+   "detalle": "Reunión PM 13-10-2026 [00:04:23] y [00:25:30]: se pidió por escrito a Úrsula [sic?] aclarar los componentes del Anexo I-D [sic?] y qué hace la Concesionaria y qué hace el hospital en la planta de agua de diálisis (microbiología), el área preparada estéril de Farmacia (ISP) y la droguería que atiende al Geriátrico. Ninguno de estos alcances tiene respuesta hoy. Minuta: Minutas/minutas/2026-10-13_martes-13-10.md · Avance 15-10-2026: hubo reunión con Úrsula el 14-10. Criterio: el hospital entra post-PSP [sic?]; lo previo es del MOP salvo lo que el contrato exija. Se pidió un informe ejecutivo sobre lo que dice el contrato del plan piloto y la marcha blanca. El alcance de la planta de agua de diálisis sigue sin aclarar. Minuta: Minutas/minutas/2026-10-15_puesta-en-marcha.md",
    "responsable": "Matías Pinto",
    "ambito": "Otros"
   },
   {
    "id": "P139",
-   "estado": "Abierto",
+   "estado": "En curso",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-13",
    "titulo": "Plan piloto INGER · revisar qué servicios concesionados miden los casos de uso",
-   "detalle": "Reunión PM 13-10-2026 [00:22:53]–[00:24:20]: el plan piloto debía medir los 14 servicios concesionados, pero los casos de uso bajaron de ~1.200 a ~600 y apuntan sobre todo a aseo, alimentación y lectores. Cati, Fernando y Marisol van al INGER el 14-10 a las 11:00 a ver cómo lo hicieron. Minuta: Minutas/minutas/2026-10-13_martes-13-10.md",
+   "detalle": "Reunión PM 13-10-2026 [00:22:53]–[00:24:20]: el plan piloto debía medir los 14 servicios concesionados, pero los casos de uso bajaron de ~1.200 a ~600 y apuntan sobre todo a aseo, alimentación y lectores. Cati, Fernando y Marisol van al INGER el 14-10 a las 11:00 a ver cómo lo hicieron. Minuta: Minutas/minutas/2026-10-13_martes-13-10.md · Avance 15-10-2026: en el INGER el piloto falló porque los BIM no estaban asociados en el SIC. La versión vigente (~300 casos de uso en 2 semanas, ajustada por la Mei [sic?] con Rayén [sic?] del SSMO) se filtró en reunión y cubre los 14 servicios concesionados. Objetivo único: probar los servicios concesionados; lo visa la IF (Paz Fuentes). Minuta: Minutas/minutas/2026-10-15_puesta-en-marcha.md",
    "plazo": "2026-10-14",
    "responsable": "Matías Pinto",
    "ambito": "Otros"
@@ -3236,7 +3236,89 @@ window.BITACORA = {
    "titulo": "Hemodinamia · informe sobre el «equipo de radiofrecuencia»: se compró electroterapia, no ablación cardíaca",
    "detalle": "Reunión de productividad 14-10-2026 [01:07:45]–[01:08:42]: en los pabellones de hemodinamia hay 2 equipos de electroterapia por radiofrecuencia (medicina física), no de ablación cardíaca. La ablación hepática y la de safena siguen en comodato y no se compraron; la única crioablación es la de oftalmología. Matías se comprometió a hacer un informe para el doctor [sic?]. Minuta: Minutas/minutas/2026-10-14_productividad.md",
    "responsable": "Matías Pinto",
+   "ambito": "EMMC",
+   "notas": [
+    {
+     "fecha": "2026-10-15",
+     "texto": "Informe técnico PDF (5 págs.) y borrador de ORD listos en 4.INFORMES Y FICHAS TECNICAS/ABLACION RF HEMODINAMIA; correo al Dr. Ramírez (SDM) en borrador."
+    }
+   ]
+  },
+  {
+   "id": "P141",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-10-15",
+   "responsable": "Matías Pinto",
+   "ambito": "Puesta en Marcha",
+   "origen_tipo": "Trabajo interno",
+   "origen_ref": "Plan_Piloto_HDS_Propuesta.xlsx",
+   "origen_fecha": "2026-10-15",
+   "titulo": "Plan piloto · corregir la propuesta antes de ejecutar (9 hallazgos) y hacer el seguimiento de los 300 casos",
+   "detalle": "Revisión del 15-10 (pestaña 🧪 Plan piloto): 6 casos con equipos que no son de la concesión (glucómetro, bombas de infusión, IH-500, analizador de microbiología, refrigerador de vacunas) medidos con AMEQM_6, cuando según el PAPS AMEQM ‹b152› su mantención es del hospital; falta el flujo de derivación a la Unidad de Equipos Médicos / proveedor del comodato. Además: equipamiento solo mide AMEQM_6 (falta Anexo H y AMEQM_4), 23 casos con servicio distinto del recinto, cronograma 826 vs registro 300, Logística y Traslado sin casos, hoja Validación con #REF!, hoja Estacionamientos con RUT (separar antes de compartir).",
+   "notas": [
+    {
+     "fecha": "2026-10-15",
+     "texto": "Revisión cargada en la pestaña 🧪 Plan piloto de la Bitácora (renombrada «Bitácora y Plan Piloto»)."
+    }
+   ]
+  },
+  {
+   "id": "P142",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-10-15",
+   "titulo": "Plan piloto · responder el correo de Francisca con los entregables",
+   "detalle": "Reunión PM 15-10-2026 [00:00:00]: hay que responder hoy el correo de Francisca con el cronograma actualizado, el listado de pacientes ficticios, el listado de funcionarios y patentes vehiculares y los recintos asignados (Francisca insistió en ellos; según dijo, llega hasta el MOP y no a la Concesionaria). Antes, revisar que los ~300 casos de uso cubren los 14 servicios concesionados. Minuta: Minutas/minutas/2026-10-15_puesta-en-marcha.md",
+   "plazo": "2026-10-15",
+   "responsable": "Matías Pinto",
+   "ambito": "Otros"
+  },
+  {
+   "id": "P143",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-10-15",
+   "titulo": "Comisionamiento · propuesta formal separada del plan piloto",
+   "detalle": "Reunión PM 15-10-2026 [00:14:41]: para no mezclar el plan piloto (14 servicios concesionados) con pruebas de infraestructura como la presión de agua o la climatización, se planteó que Fernando Lacalle y Marisol Salvatierra presenten una propuesta formal y protocolizada de comisionamiento hospitalario (por área, piso o edificio). Se eliminan del vocabulario «estrés» y «espejo». Matías ofreció enviar literatura sobre comisionamiento. Minuta: Minutas/minutas/2026-10-15_puesta-en-marcha.md",
+   "responsable": "Fernando Lacalle · Marisol Salvatierra",
+   "ambito": "Otros"
+  },
+  {
+   "id": "P144",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-10-15",
+   "titulo": "Láser de Dermatología: la batería explotó al encenderlo · capacitación suspendida",
+   "detalle": "Reunión PM 15-10-2026 [00:19:02]: Matías informó que hoy le suspendieron una capacitación porque al encender el láser de Dermatología [sic?, el audio dice «hermato»] la batería explotó y el equipo quedó inutilizado. Hay que identificar el equipo (código y serie), informar a la CSSO por el conducto formal y dejarlo registrado en la revisión de existencias y funcionamiento. Minuta: Minutas/minutas/2026-10-15_puesta-en-marcha.md",
+   "responsable": "Matías Pinto",
    "ambito": "EMMC"
+  },
+  {
+   "id": "P145",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-10-15",
+   "titulo": "Gremios · ubicación y dotación de los profesionales no enfermeros",
+   "detalle": "Reunión PM 15-10-2026 [00:24:37]: tras la carta de los gremios, quedó claro lo de enfermería y TENS, pero sigue pendiente responder sobre kinesiólogos, nutricionistas (incluida la compra de servicios), fonoaudiólogos, psicólogos y terapeutas. Discurso acordado: «los otros profesionales se están ubicando según sus unidades y funciones». Un solo vocero; a la reunión de hoy a las 9:00 se fue solo a escuchar. Minuta: Minutas/minutas/2026-10-15_puesta-en-marcha.md",
+   "responsable": "Equipo PM (voceros)",
+   "ambito": "Dotación"
+  },
+  {
+   "id": "P146",
+   "estado": "Esperando terceros",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-10-15",
+   "titulo": "Dotación · conciliar con RR.HH. 130 funcionarios y los reemplazos",
+   "detalle": "Reunión PM 15-10-2026 [00:29:30]: se envió a Rodrigo Quijada un correo con 130 funcionarios para aclararlos uno por uno; el corte de dotación ya está al 13-10. Se cuestionan 85 reemplazos [sic?] y siguen apareciendo funcionarios que renunciaron (p. ej., en marzo). Se pide que RR.HH. informe el motivo de cada baja. Minuta: Minutas/minutas/2026-10-15_puesta-en-marcha.md",
+   "responsable": "Loreto [sic?]",
+   "ambito": "Dotación"
   }
  ],
  "criticos": [

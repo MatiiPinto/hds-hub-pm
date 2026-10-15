@@ -5,7 +5,7 @@
 <script src="pm_gate.js"></script>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Bitácora y Huddle · Puesta en Marcha NHDS</title>
+<title>Bitácora y Plan Piloto · Puesta en Marcha NHDS</title>
 <style>
 :root{
   --navy:#1F3B63; --blue:#2E5A9E; --teal:#0E7C66; --amber:#B45309; --red:#9B1C1C;
@@ -164,7 +164,7 @@ body.pub .solo-local{display:none!important}
 </head>
 <body>
 <header>
-  <h1>🗂️ Bitácora de Pendientes · Huddle de Puesta en Marcha</h1>
+  <h1>🗂️ Bitácora y Plan Piloto · Huddle de Puesta en Marcha</h1>
   <div class="sub">Nuevo Hospital Del Salvador — lo que quedó abierto en reuniones, correos, ORD, cartas y mesas de trabajo, quién lo lleva, cómo se resolvió</div>
   <div class="tabs">
     <div class="tab on" data-p="hud" onclick="tab(this)">🧭 Huddle <span class="n" id="n-h"></span></div>
@@ -172,6 +172,7 @@ body.pub .solo-local{display:none!important}
     <div class="tab" data-p="pab" onclick="tab(this)">🏥 Pabellón <span class="n" id="n-pb"></span></div>
     <div class="tab" data-p="actas" onclick="tab(this)">📋 Actas de capacitación <span class="n" id="n-a"></span></div>
     <div class="tab" data-p="cron" onclick="tab(this)">🗓️ Cronograma traslado · TI · TD · EMMC · Logística <span class="n" id="n-cr"></span></div>
+    <div class="tab" data-p="piloto" onclick="tab(this)">🧪 Plan piloto <span class="n" id="n-pp"></span></div>
     <div class="tab" data-p="cerr" onclick="tab(this)">✅ Cerrados <span class="n" id="n-c"></span></div>
   </div>
 </header>
@@ -253,6 +254,28 @@ body.pub .solo-local{display:none!important}
     <div id="lista-cr"></div>
   </div>
 
+  <!-- ══ PLAN PILOTO ══ -->
+  <div class="panel" id="p-piloto">
+    <div class="kpis" id="kpis-pp"></div>
+    <div id="alerta-pp"></div>
+    <div class="sec">🔎 Hallazgos de la revisión<small id="pp-rev"></small></div>
+    <div id="pp-hall"></div>
+    <div class="sec">📊 Cobertura por servicio concesionado<small>casos registrados y seguimiento de ejecución</small></div>
+    <div id="pp-cob"></div>
+    <div class="sec">📋 Casos</div>
+    <div class="bar">
+      <input class="q" id="qpp" placeholder="Buscar caso, servicio o nivel de servicio…" oninput="renderPiloto()">
+      <select id="fpp-sem" onchange="renderPiloto()"><option value="">Semana: todas</option></select>
+      <select id="fpp-sc" onchange="renderPiloto()"><option value="">Servicio concesionado: todos</option></select>
+      <select id="fpp-srv" onchange="renderPiloto()"><option value="">Servicio participante: todos</option></select>
+      <select id="fpp-obs" onchange="renderPiloto()"><option value="">Observación: todas</option><option value="1">Solo con observación</option>
+        <option value="no_conc">No concesionados</option><option value="nivel">Nivel incompleto</option><option value="ubic">Servicio ≠ recinto</option></select>
+      <select id="fpp-seg" onchange="renderPiloto()"><option value="">Seguimiento: todos</option></select>
+      <button class="ghost" onclick="exportarPiloto()">⤓ Exportar seguimiento</button>
+    </div>
+    <div id="lista-pp"></div>
+  </div>
+
   <!-- ══ CERRADOS ══ -->
   <div class="panel" id="p-cerr"><div id="lista-c"></div></div>
 </main>
@@ -264,6 +287,7 @@ body.pub .solo-local{display:none!important}
 <script src="SHARED_DATA/pabellon_pauta.js"></script>
 <script src="SHARED_DATA/actas_capacitacion.js"></script>
 <script src="SHARED_DATA/cronograma_traslado.js"></script>
+<script src="SHARED_DATA/plan_piloto.js"></script>
 <script src="hub-home.js"></script>
 <script>
 // ════════════════════════════════════════════════════════════════════════════
@@ -345,7 +369,7 @@ function tab(el){
   document.getElementById('p-'+p).classList.add('on');
   // el formulario de edición vive en la pestaña de pendientes
   if(p!=='pend') document.getElementById('form').classList.remove('on');
-  if(p==='actas') renderActas(); else if(p==='cron') renderCron(); else render();
+  if(p==='actas') renderActas(); else if(p==='cron') renderCron(); else if(p==='piloto') renderPiloto(); else render();
   try{ localStorage.setItem('hds_bitacora_tab',p); }catch(e){}
 }
 
@@ -1090,6 +1114,84 @@ function renderHuddle(){
     `<div class="hsec"><h2>🗂️ Resto por frente</h2><span class="n">${resto.length}</span><span class="ayuda">se revisa si hay tiempo o si alguien trae novedad</span></div>`+
     frentes.map(f=>{ const L=resto.filter(x=>(x.ambito||'Otros')===f);
       return `<details class="fr"><summary>${esc(f)} · ${L.length}${L.some(noResp)?' · '+L.filter(noResp).length+' sin responsable':''}</summary><div>${L.map(filaH).join('')}</div></details>`; }).join('');
+}
+
+// ── Plan piloto (revisión + seguimiento de casos) ─────────────────────────────
+const PP = window.PLAN_PILOTO || {casos:[],hallazgos:[],cronograma:[],resumen:{},estados:[]};
+const KEY_PP='hds_piloto_v1';
+let SP={}; try{ SP=JSON.parse(localStorage.getItem(KEY_PP)||'{}'); }catch(e){ SP={}; }
+const ESTPP=['Sin registrar',...(PP.estados||[])];
+const PP_CL={'Sin registrar':'Sin-revisar','Programado':'Sin-revisar','Ejecutado · cumple':'Al-dia','Ejecutado · no cumple':'Atrasado',
+  'No ejecutado':'Bloqueado','Reprogramado':'En-riesgo','No aplica':'No-aplica'};
+function guardarPP(){ try{ localStorage.setItem(KEY_PP,JSON.stringify(SP)); }catch(e){} }
+function estPP(id){ return (SP[id]||{}).estado||'Sin registrar'; }
+(function(){ const set=(id,v,l)=>{ const el=document.getElementById(id); if(el) el.innerHTML='<option value="">'+l+'</option>'+v.map(x=>`<option>${esc(x)}</option>`).join(''); };
+  set('fpp-sem',[...new Set(PP.casos.map(c=>c.semana))].sort(),'Semana: todas');
+  set('fpp-sc',[...new Set(PP.casos.map(c=>c.concesionado))].sort(),'Servicio concesionado: todos');
+  set('fpp-srv',[...new Set(PP.casos.map(c=>c.servicio))].sort(),'Servicio participante: todos');
+  set('fpp-seg',ESTPP,'Seguimiento: todos');
+  const n=document.getElementById('n-pp'); if(n) n.textContent=PP.casos.length; })();
+function renderPiloto(){
+  const C=PP.casos, R=PP.resumen||{};
+  const ej=C.filter(c=>/^Ejecutado/.test(estPP(c.id))).length, ok=C.filter(c=>estPP(c.id)==='Ejecutado · cumple').length;
+  const k=[['casos registrados',C.length],['programados en cronograma',R.programados||0],['con observación',R.con_observacion||0],
+           ['hallazgos',PP.hallazgos.length],['ejecutados',ej],['cumplen',ok],['no cumplen',C.filter(c=>estPP(c.id)==='Ejecutado · no cumple').length]];
+  document.getElementById('kpis-pp').innerHTML=k.map(([l,v])=>`<div class="k"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+  document.getElementById('n-pp').textContent=C.length;
+  const nc=C.filter(c=>c.obs.some(o=>o.k==='no_conc'));
+  document.getElementById('alerta-pp').innerHTML=`<div class="avi rojo"><b>Antes de ejecutar:</b> ${PP.hallazgos.filter(h=>h.sev==='Alta').length} hallazgos de prioridad alta.
+    ${nc.length} casos usan equipos que <b>no son de la concesión</b> (${nc.map(c=>esc(c.caso.split('.')[0])).join(' · ')}):
+    la Concesionaria solo los registra en el SIC y su mantención es de cargo del hospital, así que el piloto debe probar también ese flujo.</div>`;
+  document.getElementById('pp-rev').textContent=' '+(PP.revision||'')+' · fuente '+(PP.fuente||'');
+  document.getElementById('pp-hall').innerHTML=PP.hallazgos.map(h=>`<div class="hit" style="padding-left:14px">
+    <span class="chip pri-${h.sev==='Alta'?'Alta':(h.sev==='Media'?'Media':'Baja')}">${esc(h.id)} · ${esc(h.sev)}</span>
+    <span class="h"><b>${esc(h.titulo)}</b><div class="f" style="margin-top:2px;white-space:normal;line-height:1.45">${esc(h.detalle)}</div>
+    ${h.filas.length?`<div class="f" style="margin-top:3px">Filas de la planilla: ${h.filas.join(', ')}</div>`:''}</span>
+    <button class="ghost" style="padding:3px 9px;font-size:11px" onclick="ppAPendiente('${h.id}')">→ Pendiente</button></div>`).join('');
+  const cob=Object.entries(R.por_servicio_concesionado||{});
+  document.getElementById('pp-cob').innerHTML=`<table class="tb" style="width:100%;border-collapse:collapse;font-size:12.5px">
+    <tr style="color:var(--dim);text-align:left"><th>Servicio concesionado</th><th>Casos</th><th>Sem. 1</th><th>Sem. 2</th><th>Ejecutados</th><th>Cumplen</th><th>No cumplen</th></tr>`+
+    cob.map(([s,v])=>{ const L=C.filter(c=>c.concesionado===s);
+      return `<tr style="border-top:1px solid var(--line)${v.casos?'':';color:#ff9a9a'}"><td>${esc(s)}</td><td>${v.casos}</td><td>${v['Semana 1']||0}</td><td>${v['Semana 2']||0}</td>
+      <td>${L.filter(c=>/^Ejecutado/.test(estPP(c.id))).length}</td><td>${L.filter(c=>estPP(c.id)==='Ejecutado · cumple').length}</td>
+      <td>${L.filter(c=>estPP(c.id)==='Ejecutado · no cumple').length}</td></tr>`; }).join('')+'</table>';
+  const q=nrm(document.getElementById('qpp').value), fs=document.getElementById('fpp-sem').value, fc=document.getElementById('fpp-sc').value,
+        fv=document.getElementById('fpp-srv').value, fo=document.getElementById('fpp-obs').value, fg=document.getElementById('fpp-seg').value;
+  const L=C.filter(c=>(!fs||c.semana===fs)&&(!fc||c.concesionado===fc)&&(!fv||c.servicio===fv)&&
+    (!fo||(fo==='1'?c.obs.length:c.obs.some(o=>o.k===fo)))&&(!fg||estPP(c.id)===fg)&&
+    (!q||nrm([c.caso,c.servicio,c.concesionado,c.nivel,(SP[c.id]||{}).nota].join(' ')).includes(q)));
+  document.getElementById('lista-pp').innerHTML=L.length?L.map(c=>{ const g=SP[c.id]||{}, e=estPP(c.id);
+    return `<div class="hit" style="padding-left:14px;align-items:flex-start">
+      <span class="chip">${esc(c.id)} · ${esc(c.semana)}</span>
+      <span class="h"><b>${esc(c.caso.split('. ')[0])}</b> <span class="f">· ${esc(c.servicio)}</span>
+        <div class="f" style="margin-top:2px;white-space:normal;line-height:1.4">${esc(c.caso)}</div>
+        <div class="f" style="margin-top:2px">🏷️ ${esc(c.concesionado)} · ⏱️ ${esc(c.nivel||'sin nivel')}</div>
+        ${c.obs.map(o=>`<div class="f" style="margin-top:3px;color:${o.k==='no_conc'?'#ff9a9a':'#e8d07a'}">⚠ <b>${esc(o.t)}.</b> ${esc(o.d)}</div>`).join('')}
+        ${g.nota?`<div class="f" style="margin-top:3px">📝 ${esc(g.nota)}${g.fecha?' · '+g.fecha.split('-').reverse().join('-'):''}</div>`:''}</span>
+      <span class="chip seg seg-${PP_CL[e]||'Sin-revisar'}" onclick="cicloPP('${c.id}')" title="Clic para cambiar el seguimiento">${esc(e)}</span>
+      <button class="ghost" style="padding:3px 9px;font-size:11px" onclick="notaPP('${c.id}')">nota</button></div>`; }).join('')
+    :'<div class="vacio">Nada que mostrar con esos filtros.</div>';
+  document.getElementById('pie').innerHTML='Plan piloto: '+esc(PP.fuente||'')+' — el seguimiento de cada caso se guarda en este navegador.';
+}
+function cicloPP(id){ const g=SP[id]=SP[id]||{}; const i=ESTPP.indexOf(g.estado||'Sin registrar');
+  g.estado=ESTPP[(i+1)%ESTPP.length]; g.fecha=hoy(); guardarPP(); renderPiloto(); }
+function notaPP(id){ const g=SP[id]=SP[id]||{}; const t=prompt('Nota de seguimiento (resultado, tiempos, evidencia):',g.nota||'');
+  if(t!==null){ g.nota=t.trim(); g.fecha=hoy(); guardarPP(); renderPiloto(); } }
+function ppAPendiente(hid){
+  const h=PP.hallazgos.find(x=>x.id===hid); if(!h) return;
+  const t=prompt('Título del pendiente:','Plan piloto · '+h.titulo); if(!t||!t.trim()) return;
+  const n=D.reduce((m,y)=>Math.max(m,parseInt((y.id||'P0').slice(1))||0),0)+1;
+  D.push({id:'P'+String(n).padStart(3,'0'),titulo:t.trim(),detalle:h.detalle+(h.filas.length?' Filas de la planilla: '+h.filas.join(', ')+'.':''),
+    ambito:'Puesta en Marcha',estado:'Abierto',prioridad:h.sev==='Alta'?'Alta':'Media',origen_tipo:'Trabajo interno',
+    origen_ref:'Revisión plan piloto ('+(PP.fuente||'')+')',origen_fecha:hoy(),creado:hoy(),
+    notas:[{fecha:hoy(),texto:'Creado desde la pestaña Plan piloto.'}]});
+  guardar(); alert('Creado '+D[D.length-1].id+' en Pendientes.'); renderPiloto();
+}
+function exportarPiloto(){
+  const filas=PP.casos.map(c=>({id:c.id,fila:c.fila,semana:c.semana,servicio:c.servicio,concesionado:c.concesionado,caso:c.caso,
+    nivel:c.nivel,observaciones:c.obs.map(o=>o.t).join(' | '),seguimiento:estPP(c.id),nota:(SP[c.id]||{}).nota||'',fecha:(SP[c.id]||{}).fecha||''}));
+  const b=new Blob([JSON.stringify({generado:hoy(),fuente:PP.fuente,filas},null,1)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='seguimiento_plan_piloto_'+hoy()+'.json'; a.click();
 }
 
 initFiltros(); render();

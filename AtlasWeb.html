@@ -960,8 +960,24 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 .pm-kpi div{flex:1;min-width:120px;background:var(--surface-sunken);border:1px solid var(--border);border-radius:var(--r-md);padding:8px 12px}
 .pm-kpi b{display:block;font-size:var(--fs-2xl);line-height:1.1;font-weight:var(--fw-bold)}.pm-kpi span{font-size:var(--fs-xs);color:var(--text-2)}
 </style>
+<script>
+// ── carga diferida en teléfono (AtlasWeb) ──
+window._ES_TEL=(function(){ try{ const q=new URLSearchParams(location.search).get('plano'); if(q==='full') return false; if(q==='lite') return true;
+  return /iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)||((navigator.deviceMemory||8)<=4); }catch(e){ return false; } })();
+window._LAZY_PEND={};
+function _lazyTag(src){ if(!window._ES_TEL) document.write('<script src="'+src+'"><\/script>'); else _LAZY_PEND[src]=null; }
+function _lazyFalta(L){ return L.some(s=>s in _LAZY_PEND && _LAZY_PEND[s]!=='ok'); }
+function _cargarJS(L){
+  return Promise.all(L.filter(s=>s in _LAZY_PEND).map(s=>{
+    if(_LAZY_PEND[s]==='ok') return null;
+    if(_LAZY_PEND[s]) return _LAZY_PEND[s];
+    return (_LAZY_PEND[s]=new Promise(ok=>{ const e=document.createElement('script'); e.src=s;
+      e.onload=()=>{ _LAZY_PEND[s]='ok'; ok(); }; e.onerror=()=>{ delete _LAZY_PEND[s]; ok(); }; document.head.appendChild(e); }));
+  }));
+}
+</script>
 <!-- xlsx-js-style: fork de SheetJS con soporte de estilos de celda (para colorear filas en el export de dotación) -->
-<script src="assets/vendor/xlsx-js-style-1.2.0.bundle.js"></script>
+<script>_lazyTag("assets/vendor/xlsx-js-style-1.2.0.bundle.js")</script>
 </head>
 <body>
 <div id="hdr">
@@ -1626,9 +1642,9 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 <script src="SHARED_DATA/recinto_bim_cajas.js"></script>
 <script src="SHARED_DATA/recinto_pma_bim.js"></script>
 <script src="SHARED_DATA/instalaciones_recinto.js"></script>
-<script src="SHARED_DATA/ccdd_recinto.js"></script>
-<script src="SHARED_DATA/puntos_pins_recinto.js"></script>
-<script src="SHARED_DATA/telefonia_ip.js"></script>
+<script>_lazyTag("SHARED_DATA/ccdd_recinto.js")</script>
+<script>_lazyTag("SHARED_DATA/puntos_pins_recinto.js")</script>
+<script>_lazyTag("SHARED_DATA/telefonia_ip.js")</script>
 <script src="SHARED_DATA/recintos_revisar.js"></script>
 <script src="SHARED_DATA/observaciones_unidades.js"></script>
 <script src="SHARED_DATA/dotacion_bajas.js"></script>
@@ -1642,7 +1658,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 <script src="SHARED_DATA/numeracion_recintos.js"></script>
 <script src="SHARED_DATA/estacionamientos_oficial.js"></script>
 <script src="SHARED_DATA/verticales_parches.js"></script>
-<script src="SHARED_DATA/circulacion_red.js"></script>
+<script>_lazyTag("SHARED_DATA/circulacion_red.js")</script>
 <script src="SHARED_DATA/propuestos_plano.js"></script>
 <script src="SHARED_DATA/paisajismo.js"></script>
 <script src="SHARED_DATA/impresoras_hds.js"></script>
@@ -4109,7 +4125,7 @@ function _escRescale(){
   });
 }
 function _jardinesSync(){
-  if(S.jardines===undefined){ let v=null; try{ v=localStorage.getItem('cabida_jardines'); }catch(e){} S.jardines=(v!=='0'); }
+  if(S.jardines===undefined){ let v=null; try{ v=localStorage.getItem('cabida_jardines'); }catch(e){} S.jardines=PLANO_LIVIANO?false:(v!=='0'); }   // iPhone: jardines siempre parten apagados (≈60 MB menos); se pueden prender
   if(S.verticales===undefined){ let v=null; try{ v=localStorage.getItem('cabida_verticales'); }catch(e){} S.verticales=(v!=='0');
     const b=document.getElementById('btnVert'); if(b) b.classList.toggle('active',S.verticales!==false); }
   if(S.relojes===undefined){ let v=null; try{ v=localStorage.getItem('cabida_relojes'); }catch(e){} S.relojes=(v!=='0');
@@ -17092,6 +17108,8 @@ function init(){
   const _refitIfBroken=()=>{ if(S.zoom<=0.011 && viewer.clientWidth>0){ const{zoom,ox,oy}=fitView(); S.zoom=zoom;S.ox=ox;S.oy=oy; applyT(); } };
   window.addEventListener('resize',_refitIfBroken);
   document.addEventListener('visibilitychange',_refitIfBroken);
+  // el panel derecho se cierra DESPUÉS del primer encuadre (teléfono): el viewer cambia de ancho sin evento resize
+  try{ new ResizeObserver(_refitIfBroken).observe(viewer); }catch(e){}
 }
 window.addEventListener('load',init);
 document.addEventListener('DOMContentLoaded',updateScenUI); if(document.readyState!=='loading') updateScenUI();
@@ -19385,13 +19403,22 @@ document.addEventListener('keydown',e=>{
     b.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:99998;background:#0f766e;color:#fff;'
       +'font-size:12px;font-weight:700;padding:7px 14px;display:flex;align-items:center;gap:12px;'
       +'box-shadow:0 -3px 14px rgba(0,0,0,.25)';
+    b.style.flexWrap='wrap'; b.style.rowGap='6px';
     b.innerHTML='<span>✏ Modo edición acotada — '+_pmUsuario()+'</span>'
-      +'<span style="font-weight:500;opacity:.9">Podés asignar funcionarios, corregir nombres y colocar DEA (Herramientas → 💚 DEA · Clave Azul, dentro de un servicio).</span>'
+      +'<span class="pm-ayuda" style="font-weight:500;opacity:.9">Asigna funcionarios, corrige nombres y coloca DEA: entra a un servicio y toca 💚 DEA.</span>'
+      +'<button id="pmDea" style="background:#16a34a;color:#fff;border:2px solid #fff;border-radius:7px;padding:5px 12px;font-weight:800;cursor:pointer">💚 DEA</button>'
       +'<span id="pmCnt" style="margin-left:auto;font-weight:500;opacity:.9"></span>'
       +'<button id="pmSend" style="background:#fff;color:#0f766e;border:none;border-radius:7px;'
       +'padding:5px 14px;font-weight:800;cursor:pointer">📤 Enviar mis cambios</button>';
     document.body.appendChild(b);
     document.getElementById('pmSend').onclick=pmEnviarCambios;
+    // 💚 DEA directo (el panel de Herramientas no existe en la web): en vista general avisa que hay que entrar a un servicio
+    const bd=document.getElementById('pmDea');
+    const marcar=()=>{ const on=S.propMode==='dea'; bd.style.background=on?'#fff':'#16a34a'; bd.style.color=on?'#16a34a':'#fff'; bd.textContent=on?'✓ Colocando DEA · toca aquí para terminar':'💚 DEA'; };
+    bd.onclick=()=>{ if(S.level<2 && S.propMode!=='dea'){ alert('Primero entra a un servicio (toca su nombre en el plano) y después toca 💚 DEA: cada toque en el plano coloca uno. Para quitar uno, tócalo de nuevo.'); return; }
+      setPropMode('dea'); marcar(); };
+    setInterval(marcar, 1500);
+    if(window.innerWidth<700){ const ay=b.querySelector('.pm-ayuda'); if(ay) ay.style.display='none'; }
     try{ const D=_pmDeltaVigente(); if(D && D.bitacora && !_pmCambios.length) _pmCambios.push(...D.bitacora); }catch(e){}
     if(_pmConflictos.length){
       const c=document.createElement('span'); c.style.cssText='font-weight:500;background:#fef3c7;color:#92400e;border-radius:6px;padding:2px 8px';
@@ -19417,6 +19444,22 @@ document.addEventListener('keydown',e=>{
   }
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>setTimeout(armar,300));
   else setTimeout(armar,300);
+})();
+
+// ── teléfono: lo diferido se carga la primera vez que se usa ──────────────
+(function(){
+  if(!window._ES_TEL) return;
+  const XL=['assets/vendor/xlsx-js-style-1.2.0.bundle.js'];
+  const FICHA=['SHARED_DATA/ccdd_recinto.js','SHARED_DATA/puntos_pins_recinto.js','SHARED_DATA/telefonia_ip.js'];
+  const envolver=(nombre, L, antes)=>{ const f=window[nombre]; if(typeof f!=='function') return;
+    window[nombre]=function(){ const a=arguments, self=this;
+      if(_lazyFalta(L)) return _cargarJS(L).then(()=>{ if(antes) antes(); return f.apply(self,a); });
+      return f.apply(self,a); }; };
+  envolver('openFichaRecinto', FICHA, ()=>{ try{ _TELIP_IDX=null; }catch(e){} });
+  envolver('togglePP', ['SHARED_DATA/puntos_pins_recinto.js']);
+  envolver('toggleCcdd', ['SHARED_DATA/ccdd_recinto.js']);
+  envolver('toggleNavPanel', ['SHARED_DATA/circulacion_red.js']);
+  ['toggleExpMenu','xlsxDownload','xlsxLibro','exportAsignaciones'].forEach(n=>envolver(n, XL));
 })();
 
 // ═══ BOOT VERSIÓN WEB ════════════════════════════════════════════════════════
