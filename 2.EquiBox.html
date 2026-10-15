@@ -148,6 +148,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .dim-btn.dim-rosa:hover:not(.active)    { background:#fdf2f8; color:#db2777; }
 .dim-btn.dim-cian.active { border-color:#0e7490; color:#0e7490; }
 .dim-btn.dim-cian:hover:not(.active) { background:#ecfeff; color:#0e7490; }
+.dim-btn.dim-cafe.active { border-color:#92400e; color:#92400e; }
+.dim-btn.dim-cafe:hover:not(.active) { background:#fdf8f3; color:#92400e; }
+/* 🪑 Mobiliario No Clínico · consulta rápida */
+.mnc-top{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px}
+.mnc-top input{flex:1 1 280px;font-size:14px;padding:9px 12px;border:1.5px solid #e7d7c4;border-radius:10px;outline:none}
+.mnc-top input:focus{border-color:#92400e}
+.mnc-chip{border:1.5px solid #e7d7c4;background:#fff;color:#7c4a1e;border-radius:16px;padding:4px 11px;font-size:11.5px;font-weight:700;cursor:pointer}
+.mnc-chip.on{background:#92400e;border-color:#92400e;color:#fff}
+.mnc-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;transition:box-shadow .15s,transform .15s}
+.mnc-card:hover{box-shadow:0 6px 18px rgba(15,23,42,.12);transform:translateY(-2px)}
+.mnc-ph{height:150px;background:#faf7f2;display:flex;align-items:center;justify-content:center;font-size:46px}
+.mnc-ph img{max-height:140px;max-width:92%;object-fit:contain}
+.mnc-b{padding:10px 12px;display:flex;flex-direction:column;gap:3px}
+.mnc-n{font-weight:800;font-size:13.5px;color:#0f172a}
+.mnc-s{font-size:11px;color:#64748b}
+.mnc-q{font-size:11.5px;color:#92400e;font-weight:700;margin-top:3px}
+.mnc-ov{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:9000;display:flex;align-items:flex-start;justify-content:center;padding:4vh 12px;overflow:auto}
+.mnc-pn{background:#fff;border-radius:14px;max-width:880px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,.3);overflow:hidden}
+.mnc-hd{display:flex;gap:16px;padding:18px;border-bottom:1px solid #f1e7dc;background:#fdf8f3}
+.mnc-hd .mnc-ph{width:210px;height:200px;flex:0 0 210px;border-radius:10px;background:#fff}
+.mnc-hd .mnc-ph img{max-height:190px}
+.mnc-sec{padding:12px 18px;border-bottom:1px solid #f1f5f9;font-size:12.5px;color:#334155}
+.mnc-sec h4{margin:0 0 6px;font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:#92400e}
+.mnc-tag{display:inline-block;background:#fdf2e3;color:#7c4a1e;border-radius:10px;padding:2px 9px;margin:2px 4px 2px 0;font-size:11.5px;font-weight:600}
+.mnc-desc{white-space:pre-wrap;line-height:1.5;color:#334155;font-size:12.5px}
+@media(max-width:640px){.mnc-hd{flex-direction:column}.mnc-hd .mnc-ph{width:100%;flex:0 0 auto}}
 .dim-btn.dim-ambar.active { border-color:#d97706; color:#b45309; }
 .dim-btn.dim-ambar:hover:not(.active) { background:#fffbeb; color:#b45309; }
 .dim-btn.dim-rojo.active { border-color:#b91c1c; color:#991b1b; }
@@ -400,6 +426,7 @@ table.excel-tbl tr:nth-child(even) td{background:#f8fafc}
   <button class="dim-btn dim-violeta" data-dim="traslados" data-color="violeta" onclick="setDim('traslados',this)" title="Equipos propios del hospital actual que se trasladan: 4 estados, por subdirección (corte 16-09-2026)">🚚 Traslados <span id="traBadge" style="background:#7c3aed;color:#fff;border-radius:9px;padding:0 6px;font-size:10px;font-weight:800"></span></button>
   <button class="dim-btn dim-rosa" data-dim="comodatos" data-color="rosa" onclick="setDim('comodatos',this)" title="Equipos de terceros en comodato: 4 estados, por subdirección (corte 16-09-2026)">🤝 Comodatos <span id="comBadge" style="background:#db2777;color:#fff;border-radius:9px;padding:0 6px;font-size:10px;font-weight:800"></span></button>
   <button class="dim-btn dim-cian" data-dim="seguimiento" data-color="cian" onclick="setDim('seguimiento',this)" title="Hoja de ruta oficial del traslado de equipos médicos y casos de coordinación levantados del correo (visitas técnicas, factibilidades, requerimientos de instalación). Solo HUB local.">📬 Seguimiento <span id="segBadge" style="background:#0e7490;color:#fff;border-radius:9px;padding:0 6px;font-size:10px;font-weight:800"></span></button>
+  <button class="dim-btn dim-cafe" data-dim="mobiliario" data-color="cafe" onclick="setDim('mobiliario',this)" title="Consulta rápida del Mobiliario No Clínico: cómo es cada mueble (foto, medidas, materiales, ficha técnica), cuántos hay y dónde. Ej.: sofá, sillón clínico, silla de escritorio.">🪑 Mobiliario <span id="mncBadge" style="background:#92400e;color:#fff;border-radius:9px;padding:0 6px;font-size:10px;font-weight:800"></span></button>
   <button class="dim-btn dim-ambar" data-dim="revision" data-color="ambar" onclick="setDim('revision',this)" title="Casos del cruce con el Excel de despliegue que requieren validación manual">⚠ Revisión <span id="revBadge" style="background:#d97706;color:#fff;border-radius:9px;padding:0 6px;font-size:10px;font-weight:800"></span></button>
   <button class="dim-btn dim-rojo" data-dim="necesidades" data-color="rojo" onclick="setDim('necesidades',this)" title="ORD. SSMO N° 5040029-154: equipos que no pueden operar por falta de accesorios y/o componentes no considerados en la adquisición">🧩 Necesidades no consideradas <span id="necBadge" style="background:#b91c1c;color:#fff;border-radius:9px;padding:0 6px;font-size:10px;font-weight:800"></span></button>
   <button class="dim-btn dim-azul" data-dim="documentacion" data-color="azul" onclick="setDim('documentacion',this)" title="Ficha por tipología: manuales faltantes, lo pedido a la SC el 12-10, diferencias con la OC y año de reposición">📄 Documentación</button>
@@ -438,6 +465,7 @@ table.excel-tbl tr:nth-child(even) td{background:#f8fafc}
 <script src="data/equibox_laparoscopia.js"></script>
 <script src="SHARED_DATA/pins_emmc.js"></script>
 <script src="SHARED_DATA/equibox_ficha.js"></script>
+<script src="SHARED_DATA/mnc_catalogo.js"></script>
 <!-- traslados y comodatos EMMC en 4 estados, por subdirección (corte 16-09-2026 · libro consolidado) -->
 <script src="SHARED_DATA/traslados_comodatos_2026.js"></script>
 <!-- seguimiento de traslados: hoja de ruta + casos del correo (solo HUB local, no se publica) -->
@@ -772,7 +800,7 @@ const SUBTYPES = [
 let activeSubtype = null;
 const DIM_COLOR = {
   categoria:'verde', tecnologia:'verde', especialidad:'azul',
-  apoyo:'naranja', camas:'celeste', admin:'gris', traslados:'violeta', comodatos:'rosa', necesidades:'rojo', seguimiento:'cian', documentacion:'azul',
+  apoyo:'naranja', camas:'celeste', admin:'gris', traslados:'violeta', comodatos:'rosa', necesidades:'rojo', seguimiento:'cian', documentacion:'azul', mobiliario:'cafe',
 };
 const ASSIGNABLE_DIMS = ['especialidad','apoyo','camas','admin'];
 // Conjunto de servicios que constituyen la dimensión "Especialidad"
@@ -943,7 +971,7 @@ const CAMAS_LABELS = {
 // ── BUILD SUB-TABS ────────────────────────────────────────────
 function buildSubtabs() {
   // Tabs with no data yet — show empty bar
-  if (activeDim === 'traslados' || activeDim === 'comodatos' || activeDim === 'revision' || activeDim === 'necesidades' || activeDim === 'seguimiento' || activeDim === 'documentacion') {
+  if (activeDim === 'traslados' || activeDim === 'comodatos' || activeDim === 'revision' || activeDim === 'necesidades' || activeDim === 'seguimiento' || activeDim === 'documentacion' || activeDim === 'mobiliario') {
     document.getElementById('subtabBar').innerHTML = '';
     return;
   }
@@ -1035,7 +1063,7 @@ function buildSubcatBar() {
   activeSvcFilter = null;
 
   // For categoria/tecnologia: hide the bar entirely
-  if (activeDim === 'categoria' || activeDim === 'tecnologia' || activeDim === 'traslados' || activeDim === 'comodatos' || activeDim === 'revision' || activeDim === 'necesidades' || activeDim === 'seguimiento' || activeDim === 'documentacion') {
+  if (activeDim === 'categoria' || activeDim === 'tecnologia' || activeDim === 'traslados' || activeDim === 'comodatos' || activeDim === 'revision' || activeDim === 'necesidades' || activeDim === 'seguimiento' || activeDim === 'documentacion' || activeDim === 'mobiliario') {
     bar.style.display = 'none';
     bar.innerHTML = '';
     return;
@@ -1654,11 +1682,84 @@ function renderNecesidadesTab(){
   grid.innerHTML=html;
 }
 
+// ══ 🪑 MOBILIARIO NO CLÍNICO · consulta rápida ══════════════════════════════
+// «¿Cómo es el sofá? ¿Y el sillón clínico?»: foto, descripción del fabricante (ficha
+// técnica), medidas, materiales, cuántos hay y dónde. Dato: SHARED_DATA/mnc_catalogo.js
+// (← _DEV/build_mnc_catalogo.py). Sin datos personales.
+var mncFam = null;
+function mncNorm(s){ return String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase(); }
+function mncEsc(s){ return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function mncEmoji(n){ n=mncNorm(n); return /sillon|butaca|sofa/.test(n)?'🛋':/silla|taburete/.test(n)?'🪑':/mesa|estacion|escritorio|meson/.test(n)?'🪵':/locker|casillero|estante|armario|mueble|velador/.test(n)?'🗄':/televisor|tv|proyector|telon|parlante/.test(n)?'📺':/frigobar|refriger|microondas|hervidor|kitchen/.test(n)?'🍽':/cama|camarote/.test(n)?'🛏':/pizarra/.test(n)?'📋':'📦'; }
+function mncFoto(r){ return r.foto ? '<img src="'+mncEsc(r.foto)+'" alt="" loading="lazy" onerror="this.parentNode.textContent=\''+mncEmoji(r.nombre)+'\'">' : mncEmoji(r.nombre); }
+function mncFiltrados(){
+  var C = window.MNC_CATALOGO, q = mncNorm(searchTerm).split(/\s+/).filter(Boolean);
+  return C.items.filter(function(r){
+    if (mncFam && r.familia !== mncFam) return false;
+    if (!q.length) return true;
+    var h = mncNorm([r.nombre, r.codigo, r.marca, r.modelo, r.proveedor, r.sinonimos, r.familia, (r.materiales||[]).join(' '), r.descripcion].join(' '));
+    return q.every(function(t){ return h.indexOf(t) >= 0; });
+  }).sort(function(a, b){   // primero lo que calza por nombre o sinónimo
+    var s = function(r){ var n = mncNorm(r.nombre + ' ' + r.sinonimos); return q.length && q.every(function(t){ return n.indexOf(t) >= 0; }) ? 0 : 1; };
+    return s(a) - s(b) || (b.cantidad||0) - (a.cantidad||0);
+  });
+}
+function renderMobiliarioTab(){
+  var grid = document.getElementById('gridWrap'), C = window.MNC_CATALOGO;
+  document.getElementById('noResults').style.display = 'none';
+  if (!C) { grid.innerHTML = '<div class="rev-sec"><h3>⚠ Sin datos</h3><div class="rev-desc">Falta SHARED_DATA/mnc_catalogo.js (se genera con _DEV/build_mnc_catalogo.py).</div></div>'; return; }
+  var fams = C.familias.map(function(f){ return '<button class="mnc-chip'+(mncFam===f?' on':'')+'" onclick="mncFam=(mncFam===\''+f+'\'?null:\''+f+'\');renderMobiliarioTab()">'+mncEsc(f.replace(/^\d+\.\s*/,''))+'</button>'; }).join('');
+  grid.innerHTML = '<div class="mnc-top"><input id="mncQ" type="search" placeholder="¿Qué mueble? Ej.: sofá, sillón clínico, silla de escritorio, locker, 150.078…" value="'+mncEsc(searchTerm)+'" oninput="searchTerm=this.value.toLowerCase().trim();document.getElementById(\'searchInput\').value=this.value;mncPintar()">'
+    + '<div style="display:flex;flex-wrap:wrap;gap:6px;width:100%">'+fams+'</div></div><div id="mncGrid" style="display:contents"></div>';
+  mncPintar();
+}
+function mncPintar(){
+  var L = mncFiltrados(), C = window.MNC_CATALOGO, g = document.getElementById('mncGrid'); if (!g) return;
+  document.getElementById('resultsInfo').textContent = L.length + ' de ' + C.items.length + ' tipologías de mobiliario no clínico · ' + C.totales.piezas.toLocaleString('es-CL') + ' piezas en la matriz · ficha técnica en ' + C.totales.con_ficha_pdf;
+  g.innerHTML = L.length ? L.map(function(r){
+    return '<div class="mnc-card" onclick="mncAbrir(\''+r.clave+'\')"><div class="mnc-ph">'+mncFoto(r)+'</div><div class="mnc-b">'
+      + '<div class="mnc-n">'+mncEsc(r.nombre)+'</div><div class="mnc-s">'+mncEsc(r.codigo)+(r.marca||r.modelo?' · '+mncEsc([r.marca,r.modelo].filter(Boolean).join(' ')):'')+'</div>'
+      + (r.sinonimos?'<div class="mnc-s" style="font-style:italic">'+mncEsc(r.sinonimos.split(',').slice(0,3).join(','))+'</div>':'')
+      + '<div class="mnc-q">'+(r.cantidad!=null?r.cantidad+' unid. · '+r.recintos+' recintos':'sin cantidad en la matriz')+(r.tiene_ficha||r.ficha_url?'':' · <span style="color:#b91c1c">sin ficha</span>')+'</div></div></div>';
+  }).join('') : '<div class="rev-sec"><h3>Sin resultados</h3><div class="rev-desc">Prueba con otra palabra (por ejemplo «sillón», «mesa», «locker») o quita el filtro de familia.</div></div>';
+}
+function mncAbrir(k){
+  var r = window.MNC_CATALOGO.items.find(function(x){ return x.clave === k; }); if (!r) return;
+  var tags = function(a){ return (a||[]).map(function(x){ return '<span class="mnc-tag">'+mncEsc(x)+'</span>'; }).join(''); };
+  var sec = function(t, h){ return h ? '<div class="mnc-sec"><h4>'+t+'</h4>'+h+'</div>' : ''; };
+  var ov = document.createElement('div'); ov.className = 'mnc-ov';
+  ov.onclick = function(e){ if (e.target === ov) ov.remove(); };
+  ov.innerHTML = '<div class="mnc-pn"><div class="mnc-hd"><div class="mnc-ph">'+mncFoto(r)+'</div><div style="flex:1;min-width:0">'
+    + '<div style="display:flex;justify-content:space-between;gap:8px"><div class="mnc-s">'+mncEsc(r.familia)+' · '+mncEsc(r.codigo)+'</div><button onclick="this.closest(\'.mnc-ov\').remove()" style="border:0;background:none;font-size:20px;cursor:pointer;color:#64748b">✕</button></div>'
+    + '<h2 style="margin:4px 0 6px;font-size:20px;color:#0f172a">'+mncEsc(r.nombre)+'</h2>'
+    + '<div style="font-size:13px;color:#334155;line-height:1.7">'
+    + (r.marca||r.modelo?'<b>Marca / modelo:</b> '+mncEsc([r.marca,r.modelo].filter(Boolean).join(' · '))+'<br>':'')
+    + (r.proveedor?'<b>Proveedor:</b> '+mncEsc(r.proveedor)+'<br>':'')
+    + (r.cantidad!=null?'<b>En el NHDS:</b> '+r.cantidad+' unidades en '+r.recintos+' recintos · '+r.n_servicios+' servicios'+(r.pisos&&r.pisos.length?' · pisos '+mncEsc(r.pisos.join(', ')):'')+'<br>':'')
+    + (r.via_adquisicion?'<b>Adquiere:</b> '+mncEsc(r.via_adquisicion)+(r.vida_util?' · vida útil '+mncEsc(r.vida_util)+' años':'')+'<br>':'')
+    + (r.garantia?'<b>Garantía:</b> '+mncEsc(r.garantia)+'<br>':'')
+    + (r.antecedente?'<b>Ficha remitida por:</b> '+mncEsc(r.antecedente)+'<br>':'')
+    + (r.sinonimos?'<span class="mnc-s"><i>También le dicen: '+mncEsc(r.sinonimos)+'</i></span>':'')
+    + '</div>'
+    + (r.ficha_url && (!PUBLIC || window.PM_CONFIG) ? '<a href="'+encodeURI(r.ficha_url)+'" target="_blank" style="display:inline-block;margin-top:10px;background:#92400e;color:#fff;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;text-decoration:none">📄 Ver ficha técnica (PDF)</a>' : '')
+    + (!r.ficha_url ? '<div style="margin-top:8px;font-size:12px;color:#b91c1c;font-weight:700">Sin ficha técnica recibida'+(r.pendiente?' (pendiente según la Inspección Fiscal)':'')+'</div>' : '')
+    + '</div></div>'
+    + sec('Medidas', (r.medidas&&r.medidas.length) ? '<ul style="margin:0;padding-left:18px">'+r.medidas.map(function(m){ return '<li>'+mncEsc(m)+'</li>'; }).join('')+'</ul>' : '')
+    + sec('Materiales', tags(r.materiales))
+    + sec('Colores', tags(r.colores))
+    + sec('Cómo lo describe el fabricante (ficha técnica)'+(r.ficha_compartida?' · ficha compartida con '+mncEsc(r.ficha_compartida.join(', ')):''), r.descripcion ? '<div class="mnc-desc">'+mncEsc(r.descripcion)+'</div>' : '')
+    + sec('Dónde está (servicios con más unidades)', (r.servicios||[]).map(function(s){ return '<span class="mnc-tag">'+mncEsc(s[0])+' · '+s[1]+'</span>'; }).join('') + (r.n_servicios>8?'<span class="mnc-s"> y '+(r.n_servicios-8)+' más</span>':''))
+    + '<div class="mnc-sec mnc-s">Fuente: '+mncEsc(window.MNC_CATALOGO.fuente)+'</div></div>';
+  document.body.appendChild(ov);
+  document.addEventListener('keydown', function esc(e){ if (e.key === 'Escape') { ov.remove(); document.removeEventListener('keydown', esc); } });
+}
+(function(){ var b = document.getElementById('mncBadge'); if (b && window.MNC_CATALOGO) b.textContent = window.MNC_CATALOGO.items.length; })();
+
 function renderGrid(){
   // Pestaña de revisión manual del cruce con el despliegue
   if (activeDim === 'revision') { renderRevisionTab(); return; }
   if (activeDim === 'necesidades') { renderNecesidadesTab(); return; }
   if (activeDim === 'documentacion') { renderDocGeneral(); return; }
+  if (activeDim === 'mobiliario') { renderMobiliarioTab(); return; }
   if (activeDim === 'seguimiento') { renderSeguimientoTab(); return; }
   // Tabs with no data yet — show placeholder, hide grid
   if (activeDim === 'traslados' || activeDim === 'comodatos') { renderTrasComTab(activeDim === 'traslados' ? 'traslado' : 'comodato'); return; }
