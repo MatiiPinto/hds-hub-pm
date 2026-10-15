@@ -115,7 +115,10 @@ window.PM_CONFIG = {
     'ebecerra':   '81c1cb19bc0b745f748185734aea04aa8df298b3754f1602fba580134e439e0e',
     // Dra. Gabriella Brignardello Garrido · médica de Medicina Familiar,
     // Unidad de Puesta en Marcha
-    'gbrignardello': '4d605ea08497f067cf03dac710513d59eb17cb14b56bb7317faf35d3222ad8d9'
+    'gbrignardello': '4d605ea08497f067cf03dac710513d59eb17cb14b56bb7317faf35d3222ad8d9',
+    // Dra. Mariluz Lozano González · odontóloga, Departamento de Atención
+    // Abierta (Subdirección Médica) — consulta
+    'mlozano':    '66b49203d548e902e2e72a945f7f141813d756d70d3930e955b86e361f6a9f5f'
   }
 };
 
