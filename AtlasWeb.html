@@ -380,6 +380,7 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 #stampHint::before{background:#0d9488}
 #puertaHint::before{background:#60a5fa}
 #propHint::before{background:var(--prop-desk)}
+.prop-sel>rect:first-of-type{stroke:#facc15!important;stroke-width:6px}
 #bedHint::before{background:#38bdf8}
 #lblHint{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:31;background:var(--n-900);color:#fff;border:0;border-radius:var(--r-pill);padding:6px 14px;font-size:var(--fs-sm);cursor:pointer;box-shadow:var(--shadow-2);white-space:nowrap}
 #lblHint b{font-weight:var(--fw-medium);text-decoration:underline;text-underline-offset:2px}
@@ -2254,8 +2255,13 @@ function _pmDeltaVigente(){
     });
     Object.keys(D.nombres||{}).forEach(r=>{ const x=D.nombres[r]||{}, cur=_pmJ(nom0[r]);
       if(cur===_pmJ(x.ahora)) return; if(cur===_pmJ(x.antes)){ nombres[r]=x; return; } _pmConflictos.push(r); });
+    // propuestos (DEA): si el Atlas maestro ya lo tiene (mismo id) manda su versión —puede haberlo
+    // ajustado—; si el maestro dejó uno del mismo tipo a menos de 1 m, era un toque repetido que
+    // se depuró al incorporar (15-10-2026) y no vuelve a aparecer
     Object.keys(D.props||{}).forEach(f=>{ (D.props[f]||[]).forEach(it=>{
-      const b=(pro0[f]||[]).find(y=>y.id===it.id); if(b && _pmJ(b)===_pmJ(it)) return;
+      const B=pro0[f]||[];
+      if(B.some(y=>y.id===it.id)) return;
+      if(B.some(y=>y.k===it.k && Math.hypot(y.x-it.x,y.y-it.y)*_cmPorPx(f)/100<1)) return;
       (props[f]=props[f]||[]).push(it); }); });
     Object.assign(D,{snapshot:sello, dots, dotsAntes, nombres, props});
     try{ _pmEscribirRaw('pm_delta',D); }catch(e){}
@@ -6207,6 +6213,7 @@ function setPropMode(k){
     return;
   }
   S.propMode=(S.propMode===k)?null:k;
+  if(!S.propMode) S.propMover=null;
   if(S.propMode){ if(S.puertaMode) togglePuertaMode(); if(S.stampMode) toggleStampMode(); }
   // teléfono: el panel tapa el plano → se cierra al elegir qué colocar (se reabre desde el riel)
   if(S.propMode && Math.min(window.innerWidth, (window.screen&&screen.width)||9999)<=600) try{ toggleRightPanel(true); }catch(e){}
@@ -6226,6 +6233,33 @@ function propAdd(k,x,y,rot){
   (propState[S.floorId]=propState[S.floorId]||[]).push(it);
   sProp(); return it;
 }
+function _propAviso(t){ const h=document.getElementById('propHint'); if(!h) return; h.textContent=t; h.classList.add('show');
+  clearTimeout(_propAviso._t); _propAviso._t=setTimeout(()=>{ if(S.propMode) h.textContent=_propHintTxt(S.propMode); else h.classList.remove('show'); },2600); }
+// teléfono: tocar un DEA/escritorio ya puesto → mover (el próximo toque en el plano es su nuevo lugar) o eliminar
+function _propAcciones(id){
+  const f=propFind(id); if(!f) return; const D=PROP_DEF[f.it.k];
+  let m=document.getElementById('propAcc'); if(m) m.remove();
+  m=document.createElement('div'); m.id='propAcc';
+  m.style.cssText='position:fixed;left:12px;right:12px;bottom:64px;z-index:100000;background:#fff;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.3);padding:12px;font:600 15px Segoe UI,system-ui,sans-serif;display:flex;flex-direction:column;gap:8px';
+  const B=(t,bg,fn)=>{ const b=document.createElement('button'); b.textContent=t; b.style.cssText='border:none;border-radius:10px;padding:12px;font:inherit;background:'+bg+';color:'+(bg==='#f1f5f9'?'#0f172a':'#fff'); b.onclick=()=>{ m.remove(); fn&&fn(); }; return b; };
+  const t=document.createElement('div'); t.textContent=D.ico+' '+D.corto+(f.it.rid?(' · '+(rName(f.it.rid)||'')):' · fuera de recinto'); t.style.cssText='text-align:center;color:#334155';
+  m.append(t,
+    B('↔ Mover: toca después el lugar exacto','#16a34a',()=>{ if(S.propMode!==f.it.k){ S.propMode=null; setPropMode(f.it.k); } S.propMover=id; _propAviso('↔ Toca en el plano el nuevo lugar del '+D.corto); }),
+    B('🗑 Eliminar','#dc2626',()=>{ propBorrar(id); _propAviso('🗑 '+D.corto+' eliminado'); }),
+    B('Cancelar','#f1f5f9',null));
+  document.body.appendChild(m);
+}
+// escritorio: ajuste fino con flechas del elemento seleccionado (clic sobre él)
+document.addEventListener('keydown',e=>{
+  if(!S.propSel || (S.viewOnly&&!S.editPM)) return;
+  if(/INPUT|TEXTAREA|SELECT/.test((e.target&&e.target.tagName)||'')) return;
+  const f=propFind(S.propSel); if(!f){ S.propSel=null; return; }
+  const k={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];
+  if(k){ e.preventDefault(); const paso=(e.shiftKey?50:10)/_cmPorPx(f.fid);   // 10 cm · Shift 50 cm
+    f.it.x=Math.round(f.it.x+k[0]*paso); f.it.y=Math.round(f.it.y+k[1]*paso); f.it.rid=_roomAtPoint(f.it.x,f.it.y)||null; sProp(); renderSVGThrottled(); return; }
+  if(e.key==='Delete'||e.key==='Backspace'){ e.preventDefault(); const id=S.propSel; S.propSel=null; propBorrar(id); return; }
+  if(e.key==='Escape'){ S.propSel=null; renderSVG(); }
+});
 function propFind(id){ for(const fid of Object.keys(propState)){ const i=(propState[fid]||[]).findIndex(x=>x.id===id); if(i>=0) return {fid,i,it:propState[fid][i]}; } return null; }
 function propRotar(id){ const f=propFind(id); if(!f) return; const D=PROP_DEF[f.it.k]; if(D&&!D.rota) return; f.it.rot=((f.it.rot||0)+90)%360; sProp(); renderSVG(); }
 function propBorrar(id){ const f=propFind(id); if(!f) return; propState[f.fid].splice(f.i,1); if(!propState[f.fid].length) delete propState[f.fid]; sProp(); renderSVG(); }
@@ -6242,8 +6276,8 @@ function propBorrarCtx(sinConfirmar){
 // Símbolos a escala (cm → px con el factor del piso). Marco local: centro (0,0),
 // el "frente" del elemento mira hacia +y (abajo) con rot=0.
 function _propSymbol(it){
-  const D=PROP_DEF[it.k]||PROP_DEF.desk, f=1/_cmPorPx(S.floorId);
-  const g=el('g',{class:'prop-g prop-'+it.k,transform:`translate(${it.x},${it.y}) rotate(${it.rot||0})`});
+  const D=PROP_DEF[it.k]||PROP_DEF.desk; let f=1/_cmPorPx(S.floorId);
+  const g=el('g',{class:'prop-g prop-'+it.k+(S.propSel===it.id?' prop-sel':''),transform:`translate(${it.x},${it.y}) rotate(${it.rot||0})`});
   const sw=Math.max(2,3*f*1.6);
   if(it.k==='desk'){
     const W=150*f, H=70*f;                  // cubierta 150 × 70 cm; silla 50 cm; total 160 cm
@@ -6268,6 +6302,8 @@ function _propSymbol(it){
     g.appendChild(el('rect',{x:-W/2+10*f,y:H/2-4*f,width:W-20*f,height:12*f,rx:2*f,fill:'#fff',stroke:D.col,'stroke-width':sw*.7}));   // bandeja con hoja
     g.appendChild(txt(0,2*f,'🖨',{'font-size':Math.max(12,22*f*1.6),'pointer-events':'none'}));
   } else {  // dea
+    // a tamaño real (60 cm) en un teléfono mide ~3 px y no se ve: se agranda hasta ~26 px en pantalla
+    f=f*Math.max(1, 26/(60*f*Math.max(S.zoom,0.001)));
     const W=60*f;
     g.appendChild(el('rect',{x:-W/2,y:-W/2,width:W,height:W,rx:10*f,fill:D.col,stroke:'#fff','stroke-width':sw}));
     g.appendChild(el('rect',{x:-W/2-3*f,y:-W/2-3*f,width:W+6*f,height:W+6*f,rx:12*f,fill:'none',stroke:D.col,'stroke-width':sw*.8,'stroke-dasharray':`${8*f} ${5*f}`}));
@@ -6293,8 +6329,8 @@ function _propLayer(){
       // teléfono: no hay arrastre (un dedo mueve el plano) ni doble clic fiable → un toque
       // sobre el elemento ofrece eliminarlo; para moverlo, se elimina y se vuelve a tocar donde va
       pg.addEventListener('click',e=>{ e.stopPropagation();
-        if(_esTelefono() && confirm('¿Eliminar este '+D.corto+(it.rid?(' de '+(rName(it.rid)||'')):'')+'?\n\nPara moverlo: elimínalo y vuelve a tocar el plano donde corresponde.')){
-          propBorrar(it.id); if(typeof tbInfo!=='undefined'&&tbInfo){tbInfo.textContent='🗑 '+D.corto+' eliminado';setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},2500);} } });
+        if(_esTelefono()) _propAcciones(it.id);
+        else { S.propSel=it.id; renderSVG(); _propAviso(D.ico+' '+D.corto+' seleccionado · flechas lo mueven (Shift = más) · Supr lo elimina · Esc suelta'); } });
       pg.addEventListener('dblclick',e=>{ e.stopPropagation(); propBorrar(it.id); if(typeof tbInfo!=='undefined'&&tbInfo){tbInfo.textContent='🗑 '+D.corto+' eliminado';setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},2500);} });
     }
     g.appendChild(pg);
@@ -6306,12 +6342,21 @@ function _propLayer(){
       if(e.button!==0) return;
       e.preventDefault(); e.stopPropagation();
       const p=s2i(e.clientX,e.clientY);
+      if(S.propMover){ const f=propFind(S.propMover); S.propMover=null;
+        if(f){ f.it.x=Math.round(p.x); f.it.y=Math.round(p.y); f.it.rid=_roomAtPoint(f.it.x,f.it.y)||null; f.it.ts=Date.now(); sProp(); renderSVG();
+          _propAviso('✓ '+PROP_DEF[f.it.k].corto+' movido'+(f.it.rid?(' a '+(rName(f.it.rid)||'')):' (fuera de recinto)')); }
+        return; }
+      if(_esTelefono()){   // toque repetido: otro del mismo tipo a menos de 1 m
+        const cerca=(propState[S.floorId]||[]).filter(x=>x.k===S.propMode).map(x=>Math.hypot(x.x-p.x,x.y-p.y)*_cmPorPx(S.floorId)/100).filter(d=>d<1).sort((a,b)=>a-b)[0];
+        if(cerca!=null && !confirm('Ya hay un '+PROP_DEF[S.propMode].corto+' a '+cerca.toFixed(1).replace('.',',')+' m de ese punto.\n\n¿Agregar otro igual?')) return;
+      }
       const cupo=_propCupo(S.propMode), n=_propTotal(S.propMode);
       if((cupo || (S.propMode==='printer' && cupo===0)) && n>=cupo){
         const D=PROP_DEF[S.propMode];
         if(!confirm('⚠ Ya se colocaron '+n+' '+D.lbl.toLowerCase()+'s y el cupo es '+cupo+'.\n\n¿Colocar igual y quedar '+(n+1-cupo)+' sobre el cupo?')) return;
       }
       const it=propAdd(S.propMode,p.x,p.y,0);
+      if(it) _propAviso('✓ '+PROP_DEF[it.k].corto+' colocado'+(it.rid?(' en '+(rName(it.rid)||'')):' (fuera de recinto)')+' · '+(propState[S.floorId]||[]).filter(x=>x.k===it.k).length+' en este piso');
       if(it && !it.rid && typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='⚠ Colocado fuera de un recinto dibujado: no saldrá asociado a ningún recinto en el reporte'; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},4000); }
       renderSVG();
     });
@@ -11077,6 +11122,20 @@ function pmImportarDelta(d, sinConfirmar){
     +(r.conflictos.length?('\n\n⚠ '+r.conflictos.length+' recinto(s) NO se aplicaron porque cambiaron en el maestro después de la foto del 🟡: '+r.conflictos.map(k=>rName(k)||k).join(', ')):''));
   return r;
 }
+// Atlas MAESTRO: incorpora solo los deltas del 🟡 dejados en SHARED_DATA/pm_deltas_pendientes.js
+// (una vez por _id; la fusión es por id, así que repetir no duplica)
+function _pmAutoImport(){
+  if(S.viewOnly) return;
+  const L=window.PM_DELTAS_PENDIENTES||[]; if(!L.length) return;
+  let hechos=[]; try{ hechos=JSON.parse(localStorage.getItem('cabida_pm_deltas_aplicados')||'[]'); }catch(e){}
+  const nuevos=L.filter(d=>d&&d._id&&!hechos.includes(d._id)); if(!nuevos.length) return;
+  let nP=0, nN=0;
+  nuevos.forEach(d=>{ const r=pmImportarDelta(d,true); if(r){ nP+=r.props; nN+=r.nuevos; hechos.push(d._id); } });
+  _lsPref('cabida_pm_deltas_aplicados', JSON.stringify(hechos));
+  renderSVG();
+  if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='📥 Incorporados desde el 🟡: '+nP+' propuesto(s) ('+nN+' nuevos) · revisa con 💚 DEA · Clave Azul'; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},9000); }
+}
+window.addEventListener('load',()=>setTimeout(()=>{ if(typeof _SELFTEST!=='undefined'&&_SELFTEST) return; try{ _pmAutoImport(); }catch(e){ console.warn('deltas del 🟡',e); } }, 2100));
 function pmImportarDeltaArchivo(){
   if(S.viewOnly) return;
   const inp=document.createElement('input'); inp.type='file'; inp.accept='.json,application/json';
