@@ -4004,6 +4004,33 @@ const curArea  = () => curFloor()?.areas.find(a=>a.id===S.areaId);
 const curRoom  = () => curArea()?.rooms.find(r=>r.id===S.roomId);
 
 function aShapes(area){ return boxState.areas[area.id]||[]; }
+// ── Logos de concesiones / comercios sobre su área (15-10-2026) ──────────────
+// Por piso + nombre del área (no por id: sobrevive a re-dibujar el área). La imagen va
+// en la parte baja de la caja del área, bajo el nombre, en vista de piso y de servicio.
+const AREA_LOGOS=[
+  // ancla = recinto Cafetería 68.2.13 · BIM H2516 del plano de mobiliario (aún sin caja propia en el Atlas):
+  // el logo va a su izquierda, en el Área Mesas, y un ☕ marca el recinto
+  {piso:'P1', area:'CASINO GENERAL', img:'CABIDA_DATA/logos/casa_y_cafe.png', ar:1400/707, ancla:{x:9190,y:5916}, ancho:1006,
+   nombre:'Casa y Café · «Sabores de siempre»', nota:'Cafetería del casino general · recinto 68.2.13 · BIM H2516 (letrero instalado, foto 15-10-2026)'},
+];
+function _logosLayer(){
+  if(S.level>2) return;
+  const fl=curFloor(); if(!fl) return;
+  const g=el('g',{class:'logos-layer','pointer-events':'none'});
+  AREA_LOGOS.filter(L=>L.piso===fl.id).forEach(L=>{
+    const a=fl.areas.find(x=>norm(aName(x.id)||x.name||'')===norm(L.area)); if(!a) return;
+    if(S.level===2 && S.areaId!==a.id) return;
+    const sh=aShapes(a); if(!sh.length) return; const b=bounds(sh);
+    let w=Math.min(b.w*0.55, b.h*0.42*L.ar), h=w/L.ar, x=b.x+(b.w-w)/2, y=b.y+b.h-h-b.h*0.07;
+    if(L.ancla){ w=L.ancho||w; h=w/L.ar; x=L.ancla.x-90-w-40; y=L.ancla.y-h/2;
+      const pin=txt(L.ancla.x, L.ancla.y+40, '☕', {'font-size':120,'text-anchor':'middle','pointer-events':'none'}); g.appendChild(pin); }
+    const im=el('image',{x, y, width:w, height:h, preserveAspectRatio:'xMidYMid meet', opacity:0.92});
+    im.setAttribute('href', L.img); im.setAttributeNS('http://www.w3.org/1999/xlink','href', L.img);
+    const t=el('title'); t.textContent=L.nombre+' — '+L.nota; im.appendChild(t);
+    g.appendChild(im);
+  });
+  if(g.childNodes.length) svg.appendChild(g);
+}
 function rShapes(room){ return boxState.rooms[room.id]||[]; }
 function dots(roomId){
   if(!wsState.dots[roomId]) wsState.dots[roomId]=[];
@@ -4945,6 +4972,7 @@ function renderSVG(){
     if(_cpOn){ try{ _cpLayer(); }catch(e){ console.warn('carros de paro',e); } } else if(lg) lg.style.display='none'; }
   if(S.level===1) try{ _instLayer(fl); }catch(e){ console.warn('instituciones',e); }
   try{ renderEscSel(); }catch(e){}
+  try{ _logosLayer(); }catch(e){ console.warn('logos de áreas',e); }
   try{ _capasArriba(); }catch(e){ console.warn('orden de capas',e); }
   // Overlay de diagnóstico DXF (siempre encima de todo, no interactivo)
   if(_dxfOverlayOn && S.level<=2) paintDxfOverlay();

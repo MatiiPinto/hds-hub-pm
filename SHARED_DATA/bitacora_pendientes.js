@@ -1625,11 +1625,15 @@ window.BITACORA = {
    "estado": "En curso",
    "compromiso": "Revisar la planilla e incorporar los monitores ECG de las camas MQ (Mariana Bravo con Juan Carvajal y Cristian Fernández) antes de la reunión de revisión final del 2026-09-23 a las 14:00.",
    "creado": "2026-09-18",
-   "actualizado": "2026-09-18",
+   "actualizado": "2026-10-15",
    "notas": [
     {
      "fecha": "2026-09-18",
      "texto": "Registrado en la bitácora desde la revisión del correo del 11 al 18-09-2026."
+    },
+    {
+     "fecha": "2026-10-15",
+     "texto": "Nuevo corte «Traslados y Comodatos EMMC HDS 15OCT26» (guardado en 3.REVISION_SUBDIRECCIONES/2026-10-15 y cargado en EquiBox): reemplaza al del 16-09. Los monitores para camas básicas y medias ya están: 60 Mindray uMEC12 + 6 VS-600, presentados al SSMO el 16-09. Comodatos: 223 → 237 (+18, −4): entra la línea de laboratorio Abbott Alinity/GLP (bioquímica, inmunología, serología, transporte de muestras, módulos), Snibe Maglumi X3, ELISA, planta de agua, vitrina y freezer, y Diabetología (Ley Ricarte Soto, Accu-Chek, HbA1c, plataforma de descarga de glucómetros); salen los Abbott Architect y Minividas. 43 comodatos pasan de «pendiente de presentación» a «presentados en 2026 a SSMO»."
     }
    ],
    "responsable": "Matías Pinto"
@@ -2561,14 +2565,18 @@ window.BITACORA = {
    "contraparte": "Mariana Bravo (Equipos Médicos) · Rodrigo Hermosilla · Francisca Cid (SSMO)",
    "servicio": "Subdirección Médica",
    "prioridad": "Alta",
-   "estado": "Abierto",
+   "estado": "Esperando terceros",
    "compromiso": "",
    "creado": "2026-10-01",
-   "actualizado": "2026-10-01",
+   "actualizado": "2026-10-15",
    "notas": [
     {
      "fecha": "2026-10-01",
      "texto": "Registrado como pendiente crítico para la apertura del nuevo hospital."
+    },
+    {
+     "fecha": "2026-10-15",
+     "texto": "Corte del 15-10: las líneas «por presentar» ya se presentaron al SSMO: 73 el 16-09 y 134 líneas (398 unidades) el 15-10, todas con factibilidad «Pendiente». Las del 15-10: Medicina Física 28, Urgencia 18, UPC 15, Dermatología 14, Hematología Intensiva 10, Oftalmología 9, Neurología 9. Observaciones de Equipos Médicos: 9 «por brecha», ~12 «no hay en el NHDS», varias «ya hay N en el NHDS, debe justificar», ventiladores descontinuados que no pueden trasladarse (Urgencia, UPC, UHI) y un servidor NAS de Cardiología que es propiedad de un médico (no es activo fijo). Ya están en EquiBox (estado «Presentados 2026 · sin respuesta SSMO», con fecha). Queda esperar la respuesta de factibilidad del SSMO."
     }
    ],
    "responsable": "Matías Pinto"
@@ -3261,8 +3269,13 @@ window.BITACORA = {
     {
      "fecha": "2026-10-15",
      "texto": "Revisión cargada en la pestaña 🧪 Plan piloto de la Bitácora (renombrada «Bitácora y Plan Piloto»)."
+    },
+    {
+     "fecha": "2026-10-15",
+     "texto": "El corte de comodatos del 15-10 confirma que los glucómetros de Diabetología van en comodato (plataforma de descarga de glucómetros i-SENS, analizador Accu-Chek): el caso del glucómetro del plan piloto no es equipo de la concesión."
     }
-   ]
+   ],
+   "actualizado": "2026-10-15"
   },
   {
    "id": "P142",
