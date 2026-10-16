@@ -635,6 +635,7 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 .av-tools a.av-falt.on{background:var(--danger);border-color:var(--danger);color:#fff}
 .av-fila.av-abre:hover{background:var(--surface-sunken)}
 .av-chev{color:var(--accent-600);width:9px;display:inline-block;font-size:10px}
+.av-g{position:absolute;border-left:1px solid #cbd5e1;pointer-events:none}.av-gh{border-left:none;border-top:1px solid #cbd5e1;height:0}
 .av-hijos{font-size:10px;font-weight:var(--fw-regular);color:var(--text-3);white-space:nowrap}
 .rev-tools{display:flex;justify-content:flex-end;margin:0 0 6px}
 .rev-exp{height:26px;padding:0 10px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--surface);color:var(--accent-600);font-size:var(--fs-xs);font-weight:var(--fw-medium);cursor:pointer}
@@ -1575,7 +1576,7 @@ function _cargarJS(L){
     <div class="form-row"><label></label><label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:#0369a1;cursor:pointer"><input type="checkbox" id="mDinClin" style="width:auto;margin:0"> 🔄 Personal dinámico clínico (rota entre servicios, ej. 4º turno)</label></div>
     <div class="form-row"><label></label><label style="display:flex;align-items:center;gap:7px;font-size:12px;font-weight:500;color:#166534;cursor:pointer"><input type="checkbox" id="mReemp" style="width:auto;margin:0" onchange="_mReempToggle()"> 🔁 Puesto con reemplazo (el titular está ausente; el reemplazante no abre puesto)</label></div>
     <div class="form-row" id="mReempRow" style="display:none"><label>Reemplazo</label><div style="flex:1;display:flex;flex-direction:column;gap:4px">
-      <input id="mReempQuien" placeholder="Quién lo cubre (reemplazante)" autocomplete="hds-reemp" spellcheck="false" oninput="_mReempManual()">
+      <div class="ac-wrap"><input id="mReempQuien" placeholder="Quién lo cubre: busca en la dotación" autocomplete="hds-reemp" spellcheck="false" oninput="_mReempManual()"><div id="mReempDrop" class="ac-drop"></div></div>
       <div style="display:flex;gap:6px"><input id="mReempMotivo" placeholder="Motivo (licencia, postnatal, comisión…)" style="flex:1" oninput="_mReempManual()"><input id="mReempHasta" type="date" title="Hasta (fin del reemplazo)" style="width:150px" oninput="_mReempManual()"></div>
       <div id="mReempInfo" style="font-size:11px;color:#475569"></div></div></div>
     <div class="form-row">
@@ -4008,11 +4009,12 @@ function aShapes(area){ return boxState.areas[area.id]||[]; }
 // Por piso + nombre del área (no por id: sobrevive a re-dibujar el área). La imagen va
 // en la parte baja de la caja del área, bajo el nombre, en vista de piso y de servicio.
 const AREA_LOGOS=[
-  // ancla = recinto Cafetería 68.2.13 · BIM H2516 del plano de mobiliario (aún sin caja propia en el Atlas):
-  // el logo va a su izquierda, en el Área Mesas, y un ☕ marca el recinto
-  {piso:'P1', area:'CASINO GENERAL', img:'CABIDA_DATA/logos/casa_y_cafe.png', ar:1400/707, ancla:{x:9190,y:5916}, ancho:1006,
+  // espacio concesionado: el logo REEMPLAZA al nombre del área y va en la parte baja del bloque dibujado
+  {piso:'P1', area:'CASINO GENERAL', img:'CABIDA_DATA/logos/casa_y_cafe.png', ar:1400/707,
    nombre:'Casa y Café · «Sabores de siempre»', nota:'Cafetería del casino general · recinto 68.2.13 · BIM H2516 (letrero instalado, foto 15-10-2026)'},
 ];
+function _areaLogo(area){ const f=(FLOORS.find(x=>x.areas.includes(area))||{}).id;
+  return AREA_LOGOS.find(L=>L.piso===f && norm(aName(area.id)||area.name||'')===norm(L.area))||null; }
 function _logosLayer(){
   if(S.level>2) return;
   const fl=curFloor(); if(!fl) return;
@@ -4021,9 +4023,7 @@ function _logosLayer(){
     const a=fl.areas.find(x=>norm(aName(x.id)||x.name||'')===norm(L.area)); if(!a) return;
     if(S.level===2 && S.areaId!==a.id) return;
     const sh=aShapes(a); if(!sh.length) return; const b=bounds(sh);
-    let w=Math.min(b.w*0.55, b.h*0.42*L.ar), h=w/L.ar, x=b.x+(b.w-w)/2, y=b.y+b.h-h-b.h*0.07;
-    if(L.ancla){ w=L.ancho||w; h=w/L.ar; x=L.ancla.x-90-w-40; y=L.ancla.y-h/2;
-      const pin=txt(L.ancla.x, L.ancla.y+40, '☕', {'font-size':120,'text-anchor':'middle','pointer-events':'none'}); g.appendChild(pin); }
+    const w=Math.min(b.w*0.42, b.h*0.30*L.ar), h=w/L.ar, x=b.x+(b.w-w)/2, y=b.y+b.h-h-Math.min(b.w,b.h)*0.04;
     const im=el('image',{x, y, width:w, height:h, preserveAspectRatio:'xMidYMid meet', opacity:0.92});
     im.setAttribute('href', L.img); im.setAttributeNS('http://www.w3.org/1999/xlink','href', L.img);
     const t=el('title'); t.textContent=L.nombre+' — '+L.nota; im.appendChild(t);
@@ -5068,6 +5068,8 @@ function renderL1(fl){
       g.addEventListener('click',e=>{e.stopPropagation();openPautaPanel(area.id,'s');});
       svg.appendChild(g);
     }
+    // espacio concesionado con logo (AREA_LOGOS): el logo es su rótulo, sin nombre ni conteo
+    if(_areaLogo(area)) return;
     // Label centred on bounding box: nombre · total de puestos · asignados/disponibles
     const fs=Math.max(20,Math.min(70,b.w/14,b.h/6));
     const ws=areaWsStats(area);
@@ -12121,14 +12123,26 @@ function renderAvance(){
     +'<a href="#" class="av-falt'+(_avSoloFaltan?' on':'')+'" onclick="avSoloFaltan();return false" title="Ver sólo dónde falta gente por cubicar y quiénes son (el % restante)">'
     +(_avSoloFaltan?'✕ Ver todo':'○ Sólo faltantes ('+(tN-tA)+')')+'</a>'
     +'<a href="#" onclick="exportFaltantes();return false" title="Excel con nombre, cargo, subdirección, servicio y unidad de cada persona que aún no tiene recinto">⬇ Exportar faltantes</a></div>');
-  const fila=(nivel,nombre,a,n,clave,hayHijos,nHijos)=>{
+  // Líneas guía del árbol (sutiles): cada fila hija se conecta con su padre (├ / └) y la línea del
+  // abuelo sigue mientras queden hermanos abajo. sigue[L] = la guía del nivel L continúa bajo esta fila.
+  const GX=[8.5,20.5];                       // centro del chevron de los niveles 0 y 1
+  const guias=(nivel,sigue,tick,y)=>{ let h='';
+    for(let L=0;L<nivel;L++){
+      const esPadre=(L===nivel-1)&&tick;
+      if(sigue[L]) h+='<span class="av-g" style="left:'+GX[L]+'px;top:0;bottom:0"></span>';
+      else if(esPadre) h+='<span class="av-g" style="left:'+GX[L]+'px;top:0;height:'+y+'px"></span>';
+      if(esPadre) h+='<span class="av-g av-gh" style="left:'+GX[L]+'px;top:'+y+'px;width:'+(GX[L+1]!==undefined?(GX[L+1]-GX[L]-4):9)+'px"></span>';
+    }
+    return h; };
+  const fila=(nivel,nombre,a,n,clave,hayHijos,nHijos,sigue)=>{
     const p=_avPct(a,n), ab=!!_avAbierto[clave];
     const pad=[0,12,24][nivel];
     const abre=hayHijos||nivel===2;          // la hoja despliega los NOMBRES
-    return '<div class="av-fila'+(abre?' av-abre':'')+(ab?' av-ab':'')+'" style="padding:5px 4px 5px '+(4+pad)+'px;border-top:1px solid #eef2f7;'
+    return '<div class="av-fila'+(abre?' av-abre':'')+(ab?' av-ab':'')+'" style="position:relative;padding:5px 4px 5px '+(4+pad)+'px;border-top:1px solid #eef2f7;'
       +(abre?'cursor:pointer':'')+'" '+(abre?'onclick="avToggle(\''+clave.replace(/'/g,"\\'")+'\')"':'')+'>'
       +'<div style="display:flex;align-items:flex-start;gap:6px;font-size:'+[11.5,11,10.5][nivel]+'px">'
       +(abre?'<span class="av-chev">'+(ab?'▾':'▸')+'</span>':'<span style="width:9px;display:inline-block"></span>')
+      +(nivel?guias(nivel,sigue||[],true,12):'')
       // El nombre envuelve en vez de recortarse: en un testigo, un nombre a
       // medias es peor que una fila un poco más alta.
       +'<span title="'+esc(nombre)+'" style="flex:1;min-width:0;overflow-wrap:anywhere;line-height:1.25;'
@@ -12147,14 +12161,15 @@ function renderAvance(){
     const kA='sd:'+sd, hijosA=Object.entries(A.hijos).filter(([,B])=>vivo(B));
     H.push(fila(0,sd,A.a,A.n,kA,hijosA.length>0,hijosA.length));
     if(!_avAbierto[kA]) return;
-    hijosA.sort(orden).forEach(([sv,B])=>{
+    hijosA.sort(orden).forEach(([sv,B],iB)=>{
       const kB=kA+'|sv:'+sv, hijosB=Object.entries(B.hijos).filter(([,C])=>vivo(C));
-      H.push(fila(1,sv,B.a,B.n,kB,hijosB.length>0,hijosB.length));
+      const masB=iB<hijosA.length-1;         // quedan servicios abajo: la guía del nivel 0 sigue
+      H.push(fila(1,sv,B.a,B.n,kB,hijosB.length>0,hijosB.length,[masB]));
       if(!_avAbierto[kB]) return;
-      hijosB.sort(orden).forEach(([u,C])=>{
-        const kC=kB+'|u:'+u;
-        H.push(fila(2,u,C.a,C.n,kC,false));
-        if(_avAbierto[kC]) H.push(_avPersonas(sd,sv,u,asg));
+      hijosB.sort(orden).forEach(([u,C],iC)=>{
+        const kC=kB+'|u:'+u, masC=iC<hijosB.length-1;
+        H.push(fila(2,u,C.a,C.n,kC,false,0,[masB,masC]));
+        if(_avAbierto[kC]) H.push('<div style="position:relative">'+guias(2,[masB,masC],false,0)+_avPersonas(sd,sv,u,asg)+'</div>');
       });
     });
   });
@@ -12501,13 +12516,24 @@ function _dpServiciosDelArea(areaId){
   return (rel.length?rel:[orden[0]]).map(([k,v])=>({srv:k,n:v}));
 }
 // Dónde está asignada cada persona (nombre normalizado → recinto)
+let _NOMIDX=null;
+function _nombreDotacion(n){
+  const k=norm(n||'').trim(); if(!k) return n;
+  if(!_NOMIDX || _NOMIDX.ref!==dotDB){ const by={}, L=[];
+    ((dotDB&&dotDB.staff)||[]).forEach(s=>{ if(!s||!s.nombre) return; const kk=norm(s.nombre); by[kk]=s.nombre; L.push([new Set(kk.split(/\s+/)), s.nombre]); });
+    _NOMIDX={ref:dotDB, by, L}; }
+  if(_NOMIDX.by[k]) return _NOMIDX.by[k];
+  const tk=k.split(/\s+/).filter(t=>t.length>=2); if(tk.length<2) return n;
+  const c=_NOMIDX.L.filter(([S2])=>tk.every(t=>S2.has(t)));
+  return c.length===1 ? c[0][1] : n;
+}
 function _dpAsignados(){
   const m={};
   for(const[rid,arr] of Object.entries(wsState.dots||{})) (arr||[]).forEach(d=>{
     const nn=[];
     if(d.tipo==='dinamico') (d.turnos||[]).forEach(x=>{ if(x.nombre) nn.push(x.nombre); if(x.reemplazo&&_reempVigente(x.reemplazo)) nn.push(x.reemplazo.reemplazante); });
     else if(d.nombre&&d.nombre.trim()){ nn.push(d.nombre); if(d.reemplazo&&_reempVigente(d.reemplazo)) nn.push(d.reemplazo.reemplazante); }
-    nn.forEach(n2=>{ if(!m[norm(n2)]) m[norm(n2)]=rid; });
+    nn.forEach(n2=>{ const k2=norm(_nombreDotacion(n2)); if(!m[k2]) m[k2]=rid; });
   });
   return m;
 }
@@ -13258,7 +13284,7 @@ function _mReempTitular(titular, reemplazante){
 // Lee el diálogo → objeto reemplazo (o null si la casilla está apagada / sin reemplazante)
 function _mReempLeer(titular, previo){
   const chk=document.getElementById('mReemp'); if(!chk||!chk.checked) return null;
-  const quien=(document.getElementById('mReempQuien').value||'').trim(); if(!quien) return null;
+  const quien=_nombreDotacion((document.getElementById('mReempQuien').value||'').trim()); if(!quien) return null;
   const motivo=(document.getElementById('mReempMotivo').value||'').trim(), hasta=(document.getElementById('mReempHasta').value||'').trim();
   const igual=previo && previo.reemplazante===quien && (previo.motivo||'')===motivo && (_fechaISO(previo.hasta)||'')===hasta;
   return {titular:titular, reemplazante:quien, motivo, hasta, fuente:(igual?previo.fuente:(_mReempOrigen==='matriz'?'matriz':'manual')), ts:(igual?previo.ts:Date.now())};
@@ -15686,6 +15712,19 @@ function initAutocomplete(){
     drop.style.display='block';
   });
   inp.addEventListener('blur',()=>setTimeout(()=>drop.style.display='none',120));
+  // reemplazante: el mismo buscador de la dotación (antes era texto libre y no contaba en el avance)
+  const rq=document.getElementById('mReempQuien'), rd=document.getElementById('mReempDrop');
+  if(rq && rd){
+    rq.addEventListener('input',()=>{ const q=rq.value.trim(); rd.innerHTML='';
+      if(q.length<2){ rd.style.display='none'; return; }
+      const res=searchDB(q,10); if(!res.length){ rd.style.display='none'; return; }
+      res.forEach(s=>{ const it=document.createElement('div'); it.className='ac-item';
+        it.innerHTML=`<strong>${s.nombre}</strong>${becaTag(s)}<span>${[s.cargo||s.funcion,s.estamento,s.servicio].filter(Boolean).join(' · ')}</span>`;
+        it.onmousedown=e=>{ e.preventDefault(); rq.value=s.nombre; rd.style.display='none'; _mReempManual(); };
+        rd.appendChild(it); });
+      rd.style.display='block'; });
+    rq.addEventListener('blur',()=>setTimeout(()=>rd.style.display='none',120));
+  }
 }
 
 // ─── Global search ───────────────────────────────────────────────────────────
