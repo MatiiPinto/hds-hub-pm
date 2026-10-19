@@ -14543,6 +14543,12 @@ function _salidaTodas(){
 function _salidaPendientes(){
   return _salidaTodas().filter(x=>x.nombre && !nameState.salidaRev[norm(x.nombre)] && !_esBaja(x.nombre));
 }
+// Desde el 19-10-2026 la planilla trae la hoja «Egresos»: las salidas que vienen
+// con causal ya NO hay que preguntarlas, sólo darlas de baja con ese motivo. Las
+// que no, siguen siendo consulta a la jefatura. Son dos trabajos distintos y por
+// eso son dos categorías distintas en la Revisión.
+function _salidaConMotivo(){ return _salidaPendientes().filter(x=>x.causal); }
+function _salidaSinMotivo(){ return _salidaPendientes().filter(x=>!x.causal); }
 function _salidaConPuesto(){ return _salidaTodas().filter(x=>x.rid); }
 const SALIDA_GRUPO={salida_sin_respaldo:'posible renuncia o desvinculación',
   alejamiento_registrado:'alejamiento ya registrado en la matriz', fin_de_reemplazo:'fin de reemplazo',
@@ -14559,7 +14565,8 @@ function _salidaConfirmar(p){
   const k=norm(p.nombre);
   nameState.bajas=nameState.bajas||{};
   nameState.bajas[k]={n:p.nombre, m:p.motivo_sugerido||'otro',
-    nota:'salió del corte '+(((window.DOT_BAJAS||{}).corte_vigente)||'')+' · confirmado con '+(p.a_quien_preguntar||'la jefatura'),
+    nota:(p.causal ? ('Unidad de Dotación: '+p.causal+(p.fecha_termino?(' · término '+p.fecha_termino):''))
+                   : ('salió del corte '+(((window.DOT_BAJAS||{}).corte_vigente)||'')+' · confirmado con '+(p.a_quien_preguntar||'la jefatura'))),
     ts:Date.now()};
   nameState.salidaRev[k]=1;
   _mtxSrc=null; try{ _parecCache.clear(); _inMatrixCache.clear(); }catch(e){}
@@ -14940,8 +14947,21 @@ const REV_CHECKS={
       return 'No quedan asignaciones pedidas por las unidades con recinto dibujado.'
         + (n ? ' Ojo: '+n+' traen un código que todavía no existe en el plano ('
               + _sentarSinRecinto().map(x=>x.codigo_pma).join(', ')+').' : ''); })()},
-  dot_salida:{label:'Personal: salió de la matriz (confirmar con la jefatura)',
-    find:_salidaPendientes, flat:true, approve:true,
+  dot_salida:{label:'Personal: egreso informado por Dotación (dar de baja con su motivo)',
+    find:_salidaConMotivo, flat:true, approve:true,
+    okTitle:'Dar de baja con el motivo que informó la Unidad de Dotación',
+    allLabel:n=>'✓ Dar de baja las '+n+' con motivo informado',
+    allMsg:n=>'¿Dar de baja a las '+n+' personas visibles?\n\nLa Unidad de Dotación ya informó la causal y la fecha de término de cada una en la hoja «Egresos» de la planilla: no hay que preguntarle a la jefatura. Quedan marcadas fuera de la matriz con ese motivo, y las que todavía tengan puesto en el plano pasan a «fuera de la matriz con puesto» para liberarlo.',
+    apply:p=>_salidaConfirmar(p), go:p=>_goSalida(p), goDestino:()=>true,
+    subText:p=>'🚪 '+(p.causal||'')+(p.fecha_termino?(' · término '+p.fecha_termino):'')
+      +(p.retirada_de_la_planilla?' · ya retirada de la planilla':'')+' · '
+      +[p.cargo,p.u,p.sd].filter(Boolean).join(' · ')
+      +(p.acceso_por_revocar?' · ⚠ mantiene acceso o huella activa':'')
+      +(p.rid?(' · 📍 sigue con puesto en «'+(rName(p.rid)||p.rid)+'»'):'')
+      +' · ✓ la da de baja',
+    done:'Todos los egresos informados por la Unidad de Dotación están dados de baja.'},
+  dot_salida_consulta:{label:'Personal: salió de la matriz sin motivo informado (consultar)',
+    find:_salidaSinMotivo, flat:true, approve:true,
     okTitle:'Confirmar la salida: queda marcada fuera de la matriz con su motivo (si sigue con puesto, se libera en «fuera de la matriz con puesto»)',
     allLabel:n=>'✓ Confirmar las '+n+' salidas',
     allMsg:n=>'¿Confirmar las '+n+' salidas visibles?\n\nSon personas que la matriz traía y el corte nuevo de Rodrigo ya no: quedan marcadas fuera de la matriz con el motivo propuesto, y las que todavía tengan puesto en el plano pasan a «fuera de la matriz con puesto» para liberarlo.\n\nSi alguna SIGUE trabajando, usá 🚫 en su fila: queda como aviso de que a la matriz le falta.',
@@ -14952,7 +14972,7 @@ const REV_CHECKS={
       +(p.acceso_por_revocar?' · ⚠ mantiene acceso o huella activa':'')
       +(p.rid?(' · 📍 sigue con puesto en «'+(rName(p.rid)||p.rid)+'»'):' · sin puesto en el Atlas')
       +' · preguntar a '+(p.a_quien_preguntar||'RR.HH.')+' · ✓ confirma la salida · 🚫 sigue trabajando',
-    done:'Cada persona que el corte nuevo dejó fuera está confirmada o descartada.'},
+    done:'Cada salida sin motivo informado está confirmada o descartada.'},
   pma:{label:'BIM oficial (PMA)',
     find:_pmaPendientes, approve:true, noDialog:true,
     subText:p=>(p.current?('actual '+p.current):'sin BIM')+' → '+p.proposed,
@@ -17421,17 +17441,37 @@ async function runSelfTest(){
 
   // Salidas de la matriz (dotacion_bajas.js): el dataset llega y el ✓ confirma
   T('Salidas de la matriz: dataset cargado', ()=>!!(window.DOT_BAJAS && Array.isArray(DOT_BAJAS.bajas)));
-  T('Salidas de la matriz: el ✓ confirma la baja y saca la fila', ()=>{
+  T('Salidas sin motivo: van a «consultar» y el ✓ confirma la baja', ()=>{
     const prev=window.DOT_BAJAS, bPrev=JSON.stringify(nameState.bajas||{}), sPrev=JSON.stringify(nameState.salidaRev||{});
     try{
       window.DOT_BAJAS={corte_vigente:'9999-99-99', bajas:[{nombre:'ZZQ PRUEBA SALIDA', cargo:'AUXILIAR',
         estamento:'AUXILIARES', u:'UNIDAD DE PRUEBA', sd:'SUBDIRECCION DE PRUEBA', grupo:'salida_sin_respaldo',
         motivo_sugerido:'otro', prioridad:'alta', ultimo_corte:'2026-09-24', a_quien_preguntar:'UNIDAD DE PRUEBA'}]};
-      const pend=_salidaPendientes(); if(pend.length!==1) return false;
-      const txt=REV_CHECKS.dot_salida.subText(pend[0]);
-      REV_CHECKS.dot_salida.apply(pend[0]);
+      if(_salidaConMotivo().length!==0) return false;          // sin causal no entra a «egresos»
+      const pend=_salidaSinMotivo(); if(pend.length!==1) return false;
+      const txt=REV_CHECKS.dot_salida_consulta.subText(pend[0]);
+      REV_CHECKS.dot_salida_consulta.apply(pend[0]);
       return /posible renuncia/.test(txt) && /UNIDAD DE PRUEBA/.test(txt)
         && _salidaPendientes().length===0 && _esBaja('ZZQ PRUEBA SALIDA');
+    } finally {
+      window.DOT_BAJAS=prev;
+      nameState.bajas=JSON.parse(bPrev); nameState.salidaRev=JSON.parse(sPrev);
+    }
+  });
+  T('Egresos informados: la causal manda el motivo de la baja', ()=>{
+    const prev=window.DOT_BAJAS, bPrev=JSON.stringify(nameState.bajas||{}), sPrev=JSON.stringify(nameState.salidaRev||{});
+    try{
+      window.DOT_BAJAS={corte_vigente:'9999-99-99', bajas:[{nombre:'ZZQ PRUEBA EGRESO', cargo:'ENFERMERA',
+        estamento:'PROFESIONALES', u:'UNIDAD DE PRUEBA', sd:'SUBDIRECCION DE PRUEBA', grupo:'egreso_confirmado',
+        motivo_sugerido:'renuncia', prioridad:'alta', ultimo_corte:'2026-10-13',
+        causal:'RENUNCIA VOLUNTARIA', fecha_termino:'2026-09-30', retirada_de_la_planilla:true}]};
+      if(_salidaSinMotivo().length!==0) return false;          // con causal no se pregunta
+      const pend=_salidaConMotivo(); if(pend.length!==1) return false;
+      const txt=REV_CHECKS.dot_salida.subText(pend[0]);
+      REV_CHECKS.dot_salida.apply(pend[0]);
+      const b=(nameState.bajas||{})[norm('ZZQ PRUEBA EGRESO')]||{};
+      return /RENUNCIA VOLUNTARIA/.test(txt) && /2026-09-30/.test(txt) && /ya retirada/.test(txt)
+        && b.m==='renuncia' && /Unidad de Dotación/.test(b.nota||'') && _salidaConMotivo().length===0;
     } finally {
       window.DOT_BAJAS=prev;
       nameState.bajas=JSON.parse(bPrev); nameState.salidaRev=JSON.parse(sPrev);
