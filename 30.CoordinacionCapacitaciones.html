@@ -54,6 +54,21 @@ main{max-width:1500px;margin:0 auto;padding:16px 22px 50px}
 .tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
 .tab{border:1px solid var(--bd);background:#fff;border-radius:9px;padding:9px 15px;font-size:13px;font-weight:600;cursor:pointer;color:var(--tx2)}
 .tab.on{background:var(--azul);color:#fff;border-color:var(--azul)}
+.subidx{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px 14px;margin-bottom:12px}
+.subidx h3{font-size:13px;margin-bottom:8px;color:var(--tx)}
+.subidx .sk{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.subidx .sk button{border:1px solid var(--bd);background:#fff;border-radius:9px;padding:7px 11px;font-size:12px;cursor:pointer;text-align:left}
+.subidx .sk button b{display:block;font-size:17px}
+.subidx .sk button.on{outline:2px solid var(--azul)}
+.subidx .grp{font-size:11px;font-weight:700;color:var(--tx2);margin:8px 0 4px;text-transform:uppercase;letter-spacing:.03em}
+.subidx .actas{display:flex;flex-wrap:wrap;gap:5px}
+.acta-chip{display:inline-flex;align-items:center;gap:4px;border-radius:12px;padding:2px 9px;font-size:11px;border:1px solid;cursor:pointer;white-space:nowrap;background:#fff}
+.acta-chip.f{background:var(--e-ejec-bg);color:#166534;border-color:#86efac}
+.acta-chip.p{background:var(--e-porc-bg);color:#92400e;border-color:#fcd34d}
+.acta-chip.on{outline:2px solid var(--azul)}
+.acta-chip a{color:inherit;text-decoration:none;font-weight:700}
+td.actas .acta-chip{margin:1px 2px}
+.subidx .x{font-size:11px;color:var(--tx2)}
 .tab .c{font-size:11px;opacity:.8;margin-left:5px}
 .filters{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:11px;align-items:center}
 .filters input,.filters select{border:1px solid var(--bd);border-radius:8px;padding:8px 11px;font-size:12.5px;background:#fff;color:var(--tx);max-width:230px}
@@ -227,6 +242,7 @@ th.sortable{cursor:pointer;user-select:none}th.sortable:hover{background:#0a558f
   <div class="dash" id="dash"></div>
   <div class="legend" id="legend"></div>
   <div class="tabs" id="tabs"></div>
+  <div class="subidx" id="subidx" style="display:none"></div>
   <div class="filters" id="filters"></div>
   <div class="bulkbar" id="bulkbar"></div>
   <div class="twrap"><table><thead id="thead"></thead><tbody id="tbody"></tbody></table></div>
@@ -246,6 +262,8 @@ th.sortable{cursor:pointer;user-select:none}th.sortable:hover{background:#0a558f
 <script>document.write('<scr'+'ipt src="SHARED_DATA/cap_seguimiento.js?v='+Date.now()+'"></scr'+'ipt>');</script>
 <!-- catálogo de estamentos por servicio (15-09-2026): quién puede participar; lo marcado por equipo va a la columna S -->
 <script>document.write('<scr'+'ipt src="SHARED_DATA/cap_estamentos.js?v='+Date.now()+'"></scr'+'ipt>');</script>
+<!-- sub-índice de recepción de Instructivos de Uso: actas HDS-IU firmadas y por firmar (19-10-2026) -->
+<script>document.write('<scr'+'ipt src="SHARED_DATA/iu_actas.js?v='+Date.now()+'"></scr'+'ipt>');</script>
 <script>
 "use strict";
 var D = window.CAP_DATA;
@@ -289,7 +307,7 @@ var COLS = {
     {key:"propuesta_adelantar",label:"Prop. adelantar",edit:1},{key:"detalle_servicios",label:"Servicio clínico",lista:1}
   ],
   instructivos:[
-    {key:"codigo",label:"Código"},{key:"equipo",label:"Equipo"},{key:"cant_equipos",label:"Cant. eq."},
+    {key:"codigo",label:"Código"},{key:"equipo",label:"Equipo"},{key:"_actas",label:"Acta de recepción",actas:1},{key:"cant_equipos",label:"Cant. eq."},
     {key:"establecimiento",label:"Estab."},{key:"proveedor",label:"Proveedor"},{key:"marca",label:"Marca"},
     {key:"modelo",label:"Modelo"},{key:"detalle_servicios",label:"Servicio clínico",lista:1},
     {key:"fecha_coord",label:"Fecha entrega",edit:1,type:"date"}
@@ -347,7 +365,7 @@ function estadoOf(area,row){
   if(validKeys(area).indexOf(v)<0) v=DEFAULT_EST[area];
   return v;
 }
-function valOf(row,key){ if(key==="_slots") return slotsText(row); var o=overrides[row.id]; if(o&&o.fields&&o.fields[key]!=null) return o.fields[key]; return row[key]!=null?row[key]:""; }
+function valOf(row,key){ if(key==="_slots") return slotsText(row); if(key==="_actas") return actasDe(row).join(" "); var o=overrides[row.id]; if(o&&o.fields&&o.fields[key]!=null) return o.fields[key]; return row[key]!=null?row[key]:""; }
 function slotsOf(r){ var o=overrides[r.id]; if(o&&o.slots) return o.slots; return r._slots||[]; }
 function ensureSlots(id){ var o=ov(id); if(!o.slots){ o.slots=((IDX[id]&&IDX[id]._slots)||[]).map(function(s){return {f:s.f,h:s.h,m:s.m};}); } return o.slots; }
 function slotsText(r){ return slotsOf(r).map(function(s){return (s.f||"")+" "+(s.h||"")+(s.m?" ("+s.m+")":"");}).join(" | "); }
@@ -486,7 +504,7 @@ function renderTabs(){
     return '<button class="tab'+(active===a[0]?' on':'')+'" onclick="setArea(\''+a[0]+'\')">'+a[1]+'<span class="c">'+D[a[0]].length+'</span></button>';
   }).join("");
 }
-function setArea(a){ active=a; filtro={q:"",estado:"",fields:{}}; selected={}; sortBy={key:null,dir:1}; renderTabs(); renderLegend(); renderFilters(); renderBulk(); renderTable(); }
+function setArea(a){ active=a; filtro={q:"",estado:"",fields:{}}; selected={}; sortBy={key:null,dir:1}; renderTabs(); renderSubIdx(); renderLegend(); renderFilters(); renderBulk(); renderTable(); }
 
 function uniq(area,key){var s={};D[area].forEach(function(r){var v=valOf(r,key);if(v)s[v]=1;});return Object.keys(s).sort();}
 function colByKey(k){return COLS[active].filter(function(c){return c.key===k;})[0]||{label:k};}
@@ -508,6 +526,8 @@ function filtered(){
   var q=filtro.q.toLowerCase();
   return D[active].filter(function(r){
     if(filtro.estado && estadoOf(active,r)!==filtro.estado) return false;
+    if(active==="instructivos" && filtro.acta && actasDe(r).indexOf(filtro.acta)<0) return false;
+    if(active==="instructivos" && filtro.recep && recepOf(r)!==filtro.recep) return false;
     for(var fk in filtro.fields){ if(valOf(r,fk)!==filtro.fields[fk]) return false; }
     if(q){ var hay=COLS[active].some(function(c){return (valOf(r,c.key)+"").toLowerCase().indexOf(q)>-1;}); if(!hay) return false; }
     return true;
@@ -544,6 +564,7 @@ function renderTable(){
     var tds=cols.map(function(c){
       if(c.slots) return slotsCell(r);
       if(c.estam) return estamCell(r);
+      if(c.actas) return actasCell(r);
       var v=valOf(r,c.key);
       if(c.lista) return '<td class="lista">'+String(v||"").split(/[\n;]+/).map(function(x){return x.trim();}).filter(Boolean).map(esc).join('<br>')+'</td>';
       if(c.edit) return '<td class="edit"><input type="'+(c.type||"text")+'" value="'+esc(v)+'" onchange="setField(\''+r.id+'\',\''+c.key+'\',this.value)"></td>';
@@ -555,6 +576,34 @@ function renderTable(){
   }).join("");
   document.getElementById("tbody").innerHTML=tb||'<tr><td colspan="24" style="padding:30px;text-align:center" class="muted">Sin resultados.</td></tr>';
   var fc=document.getElementById("fcount"); if(fc) fc.textContent=rows.length+" de "+D[active].length;
+}
+// ── Sub-índice de recepción de Instructivos de Uso (actas HDS-IU) ─────────────
+// recepcionado = la tipología figura en un acta FIRMADA; en_acta = solo en actas
+// por firmar (complementarias/nuevas); sin_acta = en ninguna.
+var IUA=window.IU_ACTAS||{actas:[],por_codigo:{},recepcionados:[]};
+var ACTA_BY={}; IUA.actas.forEach(function(a){ACTA_BY[a.folio]=a;});
+var RECEP={}; (IUA.recepcionados||[]).forEach(function(c){RECEP[c]=1;});
+function actasDe(r){ return (IUA.por_codigo[String(r.codigo)]||[]).slice().sort(); }
+function recepOf(r){ var c=String(r.codigo); return RECEP[c]?"recepcionado":((IUA.por_codigo[c]||[]).length?"en_acta":"sin_acta"); }
+function actaChip(f,small){ var a=ACTA_BY[f]; if(!a) return ""; var cls=a.estado==="firmada"?"f":"p";
+  var tit=a.servicio+(a.estado==="firmada"?" · firmada "+(a.fecha?a.fecha.split("-").reverse().join("-"):""):" · por firmar ("+(a.tipo||"")+")")+" · "+a.codigos.length+" instructivos";
+  return '<span class="acta-chip '+cls+(filtro.acta===f?' on':'')+'" title="'+esc(tit)+'" onclick="setActa(\''+f+'\')">'+f.replace("HDS-IU-","IU-")+
+    (small?'':' · '+esc(a.servicio))+' <a href="'+a.drive+'" target="_blank" onclick="event.stopPropagation()" title="Abrir en Drive">↗</a></span>'; }
+function actasCell(r){ var fs=actasDe(r); return '<td class="actas">'+(fs.length?fs.map(function(f){return actaChip(f,1);}).join(""):'<span class="muted">sin acta</span>')+'</td>'; }
+function setActa(f){ filtro.acta=(filtro.acta===f?"":f); renderSubIdx(); renderTable(); }
+function setRecep(k){ filtro.recep=(filtro.recep===k?"":k); renderSubIdx(); renderTable(); }
+function renderSubIdx(){
+  var el=document.getElementById("subidx"); if(!el) return;
+  if(active!=="instructivos"){ el.style.display="none"; return; } el.style.display="";
+  var n={recepcionado:0,en_acta:0,sin_acta:0}; D.instructivos.forEach(function(r){ n[recepOf(r)]++; });
+  var tot=D.instructivos.length, firm=IUA.actas.filter(function(a){return a.estado==="firmada";}), pf=IUA.actas.filter(function(a){return a.estado!=="firmada";});
+  function k(key,lbl,col){ return '<button class="'+(filtro.recep===key?'on':'')+'" onclick="setRecep(\''+key+'\')" style="border-left:4px solid '+col+'"><b>'+n[key]+'</b>'+lbl+' · '+Math.round(n[key]*100/tot)+'%</button>'; }
+  var h='<h3>Sub-índice de recepción · actas de entrega de Instructivos de Uso <span class="x">(actualizado '+esc(IUA.generado||"")+' · clic en un acta o indicador para filtrar la tabla)</span></h3>';
+  h+='<div class="sk">'+k("recepcionado","recepcionados en acta firmada","var(--e-ejec)")+k("en_acta","en acta por firmar","var(--e-porc)")+k("sin_acta","sin acta","var(--e-na)")+'</div>';
+  h+='<div class="grp">Actas firmadas ('+firm.length+')</div><div class="actas">'+firm.map(function(a){return actaChip(a.folio);}).join("")+'</div>';
+  h+='<div class="grp">Actas por firmar ('+pf.length+') · <a href="'+esc(IUA.carpeta_drive||"#")+'" target="_blank">carpeta Drive ↗</a></div><div class="actas">'+pf.map(function(a){return actaChip(a.folio);}).join("")+'</div>';
+  if(filtro.acta||filtro.recep) h+='<div style="margin-top:8px"><button class="btn" onclick="filtro.acta=\'\';filtro.recep=\'\';renderSubIdx();renderTable()">✕ Quitar filtro de actas</button></div>';
+  el.innerHTML=h;
 }
 function setEstado(id,v){ ov(id).estado=v; save(); renderDash(); renderTable(); }
 function setField(id,key,v){ var o=ov(id); (o.fields=o.fields||{})[key]=v; save(); }
@@ -646,7 +695,7 @@ function exportEstam(){
   alert("Estamentos exportados: "+st.def+" de "+st.pend+" tipologías pendientes con estamentos definidos.\nArchivo en Descargas (y copiado al portapapeles). Para llevarlo a la hoja 4:\n  python3 _DEV/ingesta_estamentos.py");
 }
 
-renderDash();renderTabs();renderLegend();renderFilters();renderBulk();renderTable();
+renderDash();renderTabs();renderSubIdx();renderLegend();renderFilters();renderBulk();renderTable();
 
 // ── ACTUALIZAR DESDE EXCEL (botón del header) ───────────────────────────────
 // Pide al servidor local (python3 _DEV/deploy_server.py, puerto 8799) que corra
