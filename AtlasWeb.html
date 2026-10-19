@@ -1230,6 +1230,7 @@ function _cargarJS(L){
         <button class="dk-btn prop" id="dkTotem" onclick="setPropMode('totem')" title="Tótem / gestor de fila (dispositivo TI para salas de espera). Clic coloca · clic derecho rota · arrastrar mueve · doble clic elimina"><span class="ic">🎫</span><span class="lb">Tótem / gestor de fila</span><span class="n" id="dkTotemN"></span></button>
         <button class="dk-btn prop" id="dkDea" onclick="setPropMode('dea')" title="DEA · desfibrilador externo automático (se exporta a Clave Azul). Clic coloca · arrastrar mueve · doble clic elimina"><span class="ic">💚</span><span class="lb">DEA · Clave Azul</span><span class="n" id="dkDeaN"></span></button>
         <button class="dk-btn prop" id="dkPrinter" onclick="setPropMode('printer')" title="Impresora (dispositivo TI). Clic coloca · clic derecho rota 90° · arrastrar mueve · doble clic elimina"><span class="ic">🖨</span><span class="lb">Impresora</span><span class="n" id="dkPrinterN"></span></button>
+        <button class="dk-btn" id="dkDeaRev" onclick="abrirRevisionDEA()" title="Revisión de DEA: cada equipo del Anexo Ib (42) con su posición en el plano. Confirmar = posición final; avisa repetidos, faltantes y sobrantes"><span class="ic">📋</span><span class="lb">Revisión DEA</span><span class="n" id="dkDeaRevN"></span></button>
         <button class="dk-btn" id="dkPropImp" onclick="importarPropuestosPlano()" title="Traer los puestos de trabajo que el proyectista marcó en MAGENTA en el plano de Coordinación Mobiliario. Reemplaza los que ya se importaron antes; lo que colocaste a mano no se toca."><span class="ic">⬇</span><span class="lb">Importar del plano</span><span class="n" id="dkPropImpN"></span></button>
         <button class="dk-btn" id="dkPropDel" onclick="propBorrarCtx()" title="Borrar TODO lo propuesto del contexto en que estás trabajando (el recinto en vista 3, el área en vista 2, el piso en vista 1)"><span class="ic">🗑</span><span class="lb">Borrar propuestos de aquí</span></button>
         </div>
@@ -1525,6 +1526,16 @@ function _cargarJS(L){
       <button class="ficha-x" onclick="closeReportePP()" title="Cerrar">×</button>
     </div>
     <div class="ficha-body" id="ppModalBody"></div>
+  </div>
+</div>
+<div id="deaModal" class="modal-fondo" onclick="if(event.target===this)cerrarRevisionDEA()">
+  <div class="ficha-box" style="width:980px">
+    <div class="ficha-head">
+      <div><div class="ficha-title">📋 Revisión de DEA · <span id="deaModalN"></span></div>
+      <div class="ficha-sub">Cada equipo del Anexo Ib ([130015] Desfibrilador tipo DEA) con su posición en el plano. ✓ Confirmar = posición final (queda fija); los repetidos y sobrantes se marcan para depurar.</div></div>
+      <button class="ficha-x" onclick="cerrarRevisionDEA()" title="Cerrar">×</button>
+    </div>
+    <div class="ficha-body" id="deaModalBody"></div>
   </div>
 </div>
 <div id="tiModal" class="modal-fondo" onclick="if(event.target===this)closeReporteTI()">
@@ -6268,6 +6279,7 @@ function _propAviso(t){ const h=document.getElementById('propHint'); if(!h) retu
 // teléfono: tocar un DEA/escritorio ya puesto → mover (el próximo toque en el plano es su nuevo lugar) o eliminar
 function _propAcciones(id){
   const f=propFind(id); if(!f) return; const D=PROP_DEF[f.it.k];
+  if(f.it.conf){ _propAviso('🔒 '+D.corto+' confirmado en su posición final (revisión en el Atlas principal)'); return; }
   let m=document.getElementById('propAcc'); if(m) m.remove();
   m=document.createElement('div'); m.id='propAcc';
   m.style.cssText='position:fixed;left:12px;right:12px;bottom:64px;z-index:100000;background:#fff;border-radius:14px;box-shadow:0 8px 30px rgba(0,0,0,.3);padding:12px;font:600 15px Segoe UI,system-ui,sans-serif;display:flex;flex-direction:column;gap:8px';
@@ -6284,6 +6296,7 @@ document.addEventListener('keydown',e=>{
   if(!S.propSel || (S.viewOnly&&!S.editPM)) return;
   if(/INPUT|TEXTAREA|SELECT/.test((e.target&&e.target.tagName)||'')) return;
   const f=propFind(S.propSel); if(!f){ S.propSel=null; return; }
+  if(f.it.conf && /^Arrow|Delete|Backspace/.test(e.key)){ e.preventDefault(); _propAviso('🔒 Confirmado: desconfírmalo en 📋 Revisión DEA para moverlo o eliminarlo'); return; }
   const k={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]}[e.key];
   if(k){ e.preventDefault(); const paso=(e.shiftKey?50:10)/_cmPorPx(f.fid);   // 10 cm · Shift 50 cm
     f.it.x=Math.round(f.it.x+k[0]*paso); f.it.y=Math.round(f.it.y+k[1]*paso); f.it.rid=_roomAtPoint(f.it.x,f.it.y)||null; sProp(); renderSVGThrottled(); return; }
@@ -6336,7 +6349,9 @@ function _propSymbol(it){
     f=f*Math.max(1, 26/(60*f*Math.max(S.zoom,0.001)));
     const W=60*f;
     g.appendChild(el('rect',{x:-W/2,y:-W/2,width:W,height:W,rx:10*f,fill:D.col,stroke:'#fff','stroke-width':sw}));
-    g.appendChild(el('rect',{x:-W/2-3*f,y:-W/2-3*f,width:W+6*f,height:W+6*f,rx:12*f,fill:'none',stroke:D.col,'stroke-width':sw*.8,'stroke-dasharray':`${8*f} ${5*f}`}));
+    if(!it.conf) g.appendChild(el('rect',{x:-W/2-3*f,y:-W/2-3*f,width:W+6*f,height:W+6*f,rx:12*f,fill:'none',stroke:D.col,'stroke-width':sw*.8,'stroke-dasharray':`${8*f} ${5*f}`}));
+    else { g.appendChild(el('circle',{cx:W/2,cy:-W/2,r:12*f,fill:'#fff',stroke:D.col,'stroke-width':sw*.8}));
+      g.appendChild(txt(W/2,-W/2+5*f,'✓',{fill:D.col,'font-size':Math.max(9,16*f),'font-weight':900,'text-anchor':'middle','pointer-events':'none'})); }
     g.appendChild(txt(0,2*f,'♥',{fill:'#fff','font-size':Math.max(14,44*f*1.6),'font-weight':900,'pointer-events':'none','font-family':'Segoe UI,sans-serif'}));
     g.appendChild(txt(0,4*f,'⚡',{fill:D.col,'font-size':Math.max(8,18*f*1.6),'pointer-events':'none'}));
     g.appendChild(txt(0,W/2+16*f,'DEA',{fill:D.col,'font-size':Math.max(11,14*f*1.6),'font-weight':900,'font-family':'Segoe UI,sans-serif','pointer-events':'none',stroke:'#fff','stroke-width':3,'paint-order':'stroke fill'}));
@@ -6399,6 +6414,7 @@ function _startPropDrag(e,id){
   if(e.button!==0) return;
   e.preventDefault(); e.stopPropagation();
   const f=propFind(id); if(!f) return;
+  if(f.it.conf){ _propAviso('🔒 '+PROP_DEF[f.it.k].corto+' confirmado en su posición final · para moverlo, desconfírmalo en 📋 Revisión DEA'); return; }
   _propDrag={id,sx:e.clientX,sy:e.clientY,ox:f.it.x,oy:f.it.y,moved:false};
   window.addEventListener('mousemove',_propDragMove);
   window.addEventListener('mouseup',_propDragUp);
@@ -6429,7 +6445,9 @@ function _propDragUp(){
 function _propCupo(k){
   // impresoras: el cupo ya no se fija a mano — es lo que falta para el total del archivo
   if(k==='printer' && _tiD().filas.length){ const c=_tiCuenta(); return Math.max(0,c.total-c.auto); }
-  const v=+((nameState.propCupos||{})[k]); return (Number.isFinite(v)&&v>0)?Math.floor(v):null; }
+  const v=+((nameState.propCupos||{})[k]); if(Number.isFinite(v)&&v>0) return Math.floor(v);
+  if(k==='dea' && window.DEA_CATALOGO && DEA_CATALOGO.total) return DEA_CATALOGO.total;   // equipos del Anexo Ib
+  return null; }
 function _propTotal(k){ let n=0; Object.values(propState).forEach(a=>(a||[]).forEach(x=>{ if(x&&x.k===k) n++; })); return n; }
 function _propCupoTxt(k){ const c=_propCupo(k), n=_propTotal(k); return c?(n+' / '+c):String(n); }
 function fijarCupo(k){
@@ -7500,6 +7518,100 @@ function openPropReport(){
   document.getElementById('propModal').classList.add('show');
 }
 function closePropReport(){ document.getElementById('propModal').classList.remove('show'); }
+// ═══ REVISIÓN DE DEA (19-10-2026) ════════════════════════════════════════════
+// Número finito de equipos: los DEA del Anexo Ib (SHARED_DATA/dea_catalogo.js, uno por línea).
+// Cada DEA colocado se asocia a UN equipo (it.cat) y se confirma en su posición final (it.conf);
+// confirmado = fijo (no se arrastra ni se mueve desde el celular). Lo colocado de más o
+// repetido (< 3 m de otro) queda a la vista para depurar.
+const _DEA_STOP=new Set(['de','del','la','las','el','los','y','e','en','al','unidad','servicio','area','modulo','camas','cama','sala','recinto','p1','p2','p3','p4','p5','inger','hds','atencion','programa']);
+function _deaTok(t){ return new Set(norm(t||'').replace(/[^a-z0-9ñ ]+/g,' ').split(/\s+/).filter(w=>w.length>=3 && !_DEA_STOP.has(w))); }
+function _deaLineas(){ return ((window.DEA_CATALOGO||{}).lineas)||[]; }
+function _deaItems(){ const o=[]; Object.keys(propState).forEach(fid=>(propState[fid]||[]).forEach(it=>{ if(it&&it.k==='dea') o.push({fid,it}); })); return o; }
+function _deaAreaDe(fid,it){
+  const ctx=it.rid?_findRoom(it.rid):null; if(ctx) return ctx.area;
+  const fl=gFloor(fid); if(!fl) return null;
+  for(const a of fl.areas) for(const b of (boxState.areas[a.id]||[])) if(it.x>=b.x&&it.x<=b.x+b.w&&it.y>=b.y&&it.y<=b.y+b.h) return a;
+  return null;
+}
+function _deaCerca(fid,it){ let m=null;
+  (propState[fid]||[]).forEach(o=>{ if(o===it||o.k!=='dea') return; const d=Math.hypot(o.x-it.x,o.y-it.y)*_cmPorPx(fid)/100; if(m===null||d<m) m=d; });
+  return m; }
+// sugerencia: el equipo libre cuyo servicio/área del Anexo Ib más se parece al servicio/recinto del Atlas
+function _deaSugerir(fid,it,tomadas){
+  const a=_deaAreaDe(fid,it); const T=_deaTok((a?aName(a.id):'')+' '+(it.rid?(rName(it.rid)||''):''));
+  let best=null, bs=0;
+  _deaLineas().forEach(L=>{ if(tomadas.has(L.id)) return; const U=_deaTok(L.servicio+' '+L.area);
+    let n=0; T.forEach(w=>{ if(U.has(w)) n++; }); const sc=n/Math.max(1,Math.min(T.size,U.size)); if(n && sc>bs){ bs=sc; best=L; } });
+  return best;
+}
+function abrirRevisionDEA(){ if(S.viewOnly) return; renderRevisionDEA(); document.getElementById('deaModal').classList.add('show'); }
+function cerrarRevisionDEA(){ document.getElementById('deaModal').classList.remove('show'); }
+function _deaMarca(){ const b=document.getElementById('dkDeaRevN'); if(!b) return; const I=_deaItems(), c=I.filter(x=>x.it.conf).length, N=_deaLineas().length; b.textContent=N?(c+'/'+N):''; }
+function renderRevisionDEA(){
+  const body=document.getElementById('deaModalBody'); if(!body) return;
+  const Ls=_deaLineas(), I=_deaItems(), porId={}; Ls.forEach(L=>porId[L.id]=L);
+  const asig={}; I.forEach(x=>{ if(x.it.cat && porId[x.it.cat]) (asig[x.it.cat]=asig[x.it.cat]||[]).push(x); });
+  const tomadas=new Set(Object.keys(asig));
+  const conf=I.filter(x=>x.it.conf).length, N=Ls.length;
+  const rep=I.filter(x=>{ const d=_deaCerca(x.fid,x.it); return d!==null && d<3; }).length;
+  const sinEq=I.filter(x=>!x.it.cat||!porId[x.it.cat]).length;
+  const dif=I.length-N;
+  document.getElementById('deaModalN').textContent=I.length+' colocados · '+conf+' confirmados de '+N+' equipos';
+  const kpi=(v,t,c)=>'<div><b style="color:'+c+'">'+v+'</b><span>'+t+'</span></div>';
+  let h='<div class="pm-kpi">'+kpi(N,'💚 Equipos DEA (Anexo Ib'+(window.DEA_CATALOGO?(' · '+esc((DEA_CATALOGO.lineas[0]||{}).marca||'')+' '+esc((DEA_CATALOGO.lineas[0]||{}).modelo||'')):'')+')','#16a34a')
+    +kpi(I.length,'📍 Colocados en el plano'+(dif>0?(' · '+dif+' de más'):dif<0?(' · faltan '+(-dif)):' · cuadra'),dif?'#b45309':'#16a34a')
+    +kpi(conf+' / '+N,'✓ Confirmados en su posición final',conf===N?'#16a34a':'#1d4ed8')
+    +kpi(rep,'⚠ A menos de 3 m de otro DEA (¿repetidos?)',rep?'#dc2626':'#94a3b8')+'</div>';
+  // ── DEA colocados ──
+  const fo=FLOORS.map(f=>f.id);
+  I.sort((a,b)=>fo.indexOf(a.fid)-fo.indexOf(b.fid) || String((_deaAreaDe(a.fid,a.it)||{}).id||'').localeCompare(String((_deaAreaDe(b.fid,b.it)||{}).id||'')));
+  h+='<div class="fk-sec-t" style="margin-top:10px">DEA en el plano · '+I.length+'</div>'
+    +'<div class="fk-inst-meta">Asocia cada DEA a su equipo y confírmalo cuando esté en su lugar definitivo. 🔍 lleva al punto (ahí se arrastra o se ajusta con flechas); confirmado queda fijo.</div>'
+    +'<table class="pp-tab"><thead><tr><th>Piso</th><th>Servicio (Atlas)</th><th>Recinto</th><th>Equipo del Anexo Ib</th><th>Estado</th><th></th></tr></thead><tbody>';
+  const usadas=new Set(tomadas);
+  I.forEach(({fid,it})=>{
+    const a=_deaAreaDe(fid,it), d=_deaCerca(fid,it), L=it.cat&&porId[it.cat];
+    const sug=L?null:_deaSugerir(fid,it,usadas); if(sug) usadas.add(sug.id);   // una sugerencia por equipo
+    const opc='<option value="">— sin equipo —</option>'+Ls.filter(x=>x.id===it.cat || !tomadas.has(x.id)).map(x=>'<option value="'+x.id+'"'+((L&&x.id===L.id)||(!L&&sug&&x.id===sug.id)?' selected':'')+'>'+esc(x.id+' · '+x.servicio+(x.area&&x.area!==x.servicio?(' · '+x.area):'')+' · '+x.codigo).slice(0,120)+'</option>').join('');
+    const est=it.conf?'<b style="color:#16a34a">✓ confirmado</b>':(L?'asignado':(sug?'<span style="color:#1d4ed8">sugerido</span>':'<span style="color:#b45309">sin equipo</span>'));
+    h+='<tr><td>'+esc(fid)+'</td><td>'+esc(a?aName(a.id):'—')+'</td><td>'+esc(it.rid?(rName(it.rid)||''):'(fuera de recinto)')+(d!==null&&d<3?' <b style="color:#dc2626" title="Otro DEA a '+d.toFixed(1)+' m">⚠ '+d.toFixed(1).replace('.',',')+' m</b>':'')+'</td>'
+      +'<td><select id="deaSel_'+it.id+'" '+(it.conf?'disabled':'')+' style="max-width:330px;font-size:11px">'+opc+'</select></td><td>'+est+'</td>'
+      +'<td style="white-space:nowrap"><button class="fk-open" onclick="deaVer(\''+fid+'\',\''+it.id+'\')" title="Ir al DEA en el plano">🔍</button> '
+      +(it.conf?'<button class="fk-open" onclick="deaConfirmar(\''+it.id+'\',false)" title="Volver a propuesto (permite moverlo)">↺</button>'
+               :'<button class="fk-open" style="background:#16a34a;color:#fff;border:none" onclick="deaConfirmar(\''+it.id+'\',true)" title="Posición final + equipo elegido">✓ Confirmar</button> <button class="fk-open" onclick="deaBorrar(\''+it.id+'\')" title="Eliminar (repetido o de más)">🗑</button>')
+      +'</td></tr>';
+  });
+  h+='</tbody></table>';
+  // ── equipos ──
+  const sinUb=Ls.filter(L=>!asig[L.id]);
+  h+='<div class="fk-sec-t" style="margin-top:12px">Equipos del Anexo Ib · '+N+' · '+(N-sinUb.length)+' con DEA en el plano'+(sinUb.length?(' · <span style="color:#b45309">'+sinUb.length+' sin ubicar</span>'):'')+'</div>'
+    +'<table class="pp-tab"><thead><tr><th>Equipo</th><th>Hospital</th><th>Servicio (Anexo Ib)</th><th>Código</th><th>DEA en el plano</th></tr></thead><tbody>'
+    +Ls.map(L=>{ const A=asig[L.id]||[];
+      const ub=A.map(x=>'<a href="#" onclick="deaVer(\''+x.fid+'\',\''+x.it.id+'\');return false">'+esc(x.fid)+' · '+esc(x.it.rid?(rName(x.it.rid)||''):'fuera de recinto')+'</a>'+(x.it.conf?' ✓':'')).join('<br>');
+      return '<tr'+(A.length?'':' style="color:#b45309"')+'><td>'+esc(L.id)+'</td><td>'+esc(L.hosp)+'</td><td>'+esc(L.servicio)+(L.area&&L.area!==L.servicio?('<br><span style="color:#64748b">'+esc(L.area)+'</span>'):'')+'</td><td>'+esc(L.codigo)+'</td><td>'+(ub||'sin ubicar')+'</td></tr>'; }).join('')
+    +'</tbody></table>'
+    +'<div class="fk-inst-fte">Fuente: '+esc((window.DEA_CATALOGO||{}).fuente||'—')+'. La sugerencia compara el nombre del servicio/recinto del Atlas con el del Anexo Ib: revísala antes de confirmar.'+(sinEq?(' · '+sinEq+' DEA aún sin equipo asociado.'):'')+'</div>';
+  body.innerHTML=h; _deaMarca();
+}
+function deaConfirmar(id,on){
+  const f=propFind(id); if(!f) return;
+  if(on){ const sel=document.getElementById('deaSel_'+id), cat=sel?sel.value:'';
+    if(!cat && !confirm('Este DEA no tiene equipo del Anexo Ib asociado.\n\n¿Confirmar igual su posición (quedará como «sin equipo»)?')) return;
+    if(cat) f.it.cat=cat; else delete f.it.cat;
+    f.it.conf={ts:Date.now(), por:'atlas'};
+  } else delete f.it.conf;
+  sProp(); renderSVG(); renderRevisionDEA();
+}
+function deaBorrar(id){ const f=propFind(id); if(!f||f.it.conf) return;
+  if(!confirm('¿Eliminar este DEA del plano?'+(f.it.rid?(' ('+(rName(f.it.rid)||'')+')'):''))) return;
+  propBorrar(id); renderRevisionDEA(); }
+function deaVer(fid,id){
+  const f=propFind(id); if(!f) return; cerrarRevisionDEA();
+  if(S.floorId!==fid) goFloor(fid);
+  const a=_deaAreaDe(fid,f.it);
+  setTimeout(()=>{ if(a){ didPan=false; goArea(a.id); }
+    setTimeout(()=>{ S.propSel=id; renderSVG(); _propAviso('💚 DEA '+(f.it.conf?'confirmado':'seleccionado · arrástralo o usa las flechas para el ajuste fino')); },650); },300);
+}
 function propIr(fid,aid,rid){
   closePropReport();
   if(S.floorId!==fid) goFloor(fid);
@@ -11165,7 +11277,7 @@ function _pmAutoImport(){
   renderSVG();
   if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='📥 Incorporados desde el 🟡: '+nP+' propuesto(s) ('+nN+' nuevos) · revisa con 💚 DEA · Clave Azul'; setTimeout(()=>{if(tbInfo)tbInfo.textContent='';},9000); }
 }
-window.addEventListener('load',()=>setTimeout(()=>{ if(typeof _SELFTEST!=='undefined'&&_SELFTEST) return; try{ _pmAutoImport(); }catch(e){ console.warn('deltas del 🟡',e); } }, 2100));
+window.addEventListener('load',()=>setTimeout(()=>{ if(typeof _SELFTEST!=='undefined'&&_SELFTEST) return; try{ _pmAutoImport(); }catch(e){ console.warn('deltas del 🟡',e); } try{ _deaMarca(); }catch(e){} }, 2100));
 function pmImportarDeltaArchivo(){
   if(S.viewOnly) return;
   const inp=document.createElement('input'); inp.type='file'; inp.accept='.json,application/json';
