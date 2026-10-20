@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="es">
+<head>
+<script src="pm_config.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#222944">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Pautas AS">
+<link rel="manifest" href="as_app.webmanifest">
+<link rel="icon" href="assets/as_app/icono.svg">
+<link rel="apple-touch-icon" href="assets/as_app/icono_180.png">
+<title>Autorización Sanitaria · NHDS</title>
+<!-- GENERADO por _DEV/as_app/build_as_app.py desde _DEV/as_app/app.html · no editar este archivo -->
+<style>
+:root{--ink:#222944;--acc:#00A1DF;--bg:#F4F6FA;--card:#fff;--line:#E2E7EF;--mute:#5B6B85;
+  --ok:#0E7C66;--ok-bg:#E6F4EF;--no:#B91C1C;--no-bg:#FDECEC;--na:#5B6B85;--na-bg:#EEF1F5;--warn:#B45309;--warn-bg:#FEF3C7;
+  --r:14px;--tap:48px;--safe-b:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+[hidden]{display:none!important}
+a{color:var(--acc)}
+/* encabezado */
+#top{position:sticky;top:0;z-index:20;background:var(--ink);color:#fff;display:flex;align-items:center;gap:6px;
+  padding:calc(env(safe-area-inset-top,0px) + 8px) 10px 8px;min-height:56px}
+#top h1{flex:1;margin:0;font-size:17px;font-weight:700;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#top h1 small{display:block;font-size:12px;font-weight:400;opacity:.75}
+.ib{width:44px;height:44px;border:0;border-radius:12px;background:rgba(255,255,255,.12);color:#fff;font-size:20px;display:grid;place-items:center;flex:none}
+.sync{width:10px;height:10px;border-radius:50%;background:#7bd389;flex:none;margin:0 4px}
+.sync.pend{background:#f5b84a}.sync.off{background:#9aa3b5}.sync.err{background:#ef6b6b}
+/* contenedor */
+#app{max-width:1280px;margin:0 auto;padding:12px 12px calc(96px + var(--safe-b))}
+.cols{display:block}
+@media(min-width:1024px){.cols{display:grid;grid-template-columns:380px 1fr;gap:16px;align-items:start}
+  .cols>.izq{position:sticky;top:70px;max-height:calc(100vh - 90px);overflow:auto;padding-right:4px}}
+.solo-ancho{display:none}@media(min-width:1024px){.solo-ancho{display:block}.solo-angosto{display:none}}
+h2{font-size:20px;margin:6px 2px 10px}
+h3{font-size:13px;letter-spacing:.4px;text-transform:uppercase;color:var(--mute);margin:18px 4px 8px}
+.sub{color:var(--mute);font-size:14px}
+/* tarjetas y listas */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.item{display:flex;align-items:center;gap:12px;width:100%;min-height:64px;text-align:left;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--r);padding:12px 14px;margin-bottom:8px}
+.item:active{transform:scale(.99)}.item.sel{border-color:var(--acc);box-shadow:0 0 0 2px rgba(0,161,223,.2)}
+.item .tx{flex:1;min-width:0}.item b{display:block;font-size:16px;line-height:1.25}
+.item .sub{display:block;font-size:13px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ring{--p:0;width:44px;height:44px;border-radius:50%;flex:none;display:grid;place-items:center;font-size:12px;font-weight:700;
+  background:conic-gradient(var(--ok) calc(var(--p)*1%),#E2E7EF 0)}
+.ring span{width:34px;height:34px;border-radius:50%;background:#fff;display:grid;place-items:center}
+.ring.cero{background:#E2E7EF}.ring.full span{background:var(--ok-bg);color:var(--ok)}
+.buscar{width:100%;height:var(--tap);border:1px solid var(--line);border-radius:12px;padding:0 14px;background:#fff;margin-bottom:12px;font-size:16px}
+.vacio{text-align:center;color:var(--mute);padding:28px 12px}
+.pill{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px;background:var(--na-bg);color:var(--na)}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}.pill.no{background:var(--no-bg);color:var(--no)}.pill.warn{background:var(--warn-bg);color:var(--warn)}
+details.pl{background:var(--card);border:1px solid var(--line);border-radius:var(--r);margin-bottom:10px}
+details.pl>summary{min-height:var(--tap);display:flex;align-items:center;padding:0 14px;font-weight:600;cursor:pointer;list-style:none}
+details.pl>summary::after{content:'▾';margin-left:auto;color:var(--mute)}details.pl[open]>summary::after{content:'▴'}
+details.pl>div{padding:0 14px 14px}
+/* botones */
+.btn{min-height:var(--tap);border:0;border-radius:12px;padding:0 18px;font-weight:700;background:var(--ink);color:#fff;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.btn.acc{background:var(--acc)}.btn.sec{background:#fff;color:var(--ink);border:1px solid var(--line)}.btn.ok{background:var(--ok)}
+.btn.full{width:100%}.btn:disabled{opacity:.45}
+.fijo{position:fixed;left:0;right:0;bottom:0;z-index:15;padding:10px 12px calc(10px + var(--safe-b));background:linear-gradient(transparent,var(--bg) 30%)}
+.fijo .btn{width:100%;max-width:560px;margin:0 auto;display:flex}
+/* barra inferior (referentes) */
+#nav{position:fixed;left:0;right:0;bottom:0;z-index:16;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:var(--safe-b)}
+#nav button{flex:1;min-height:58px;border:0;background:none;font-size:12px;color:var(--mute);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+#nav button i{font-style:normal;font-size:20px}#nav button.on{color:var(--ink);font-weight:700}
+body.con-nav .fijo{bottom:calc(58px + var(--safe-b))}
+body.con-nav #app{padding-bottom:calc(150px + var(--safe-b))}
+/* pauta */
+#prog{position:sticky;top:56px;z-index:12;background:var(--bg);padding:8px 2px 10px}
+.barra{height:8px;border-radius:99px;background:#E2E7EF;overflow:hidden}.barra i{display:block;height:100%;background:var(--ok);transition:width .3s}
+.filtros{display:flex;gap:6px;margin-top:8px;overflow-x:auto}
+.filtros button{min-height:36px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:0 12px;font-size:13px;white-space:nowrap}
+.filtros button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.grupo{font-size:13px;font-weight:700;color:var(--mute);margin:16px 4px 8px;line-height:1.3}
+.req{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:var(--r);padding:12px 12px 12px 14px;margin-bottom:10px}
+.req.C{border-left-color:var(--ok)}.req.NC{border-left-color:var(--no)}.req.NA{border-left-color:var(--na)}
+.req.drag{outline:3px dashed var(--acc)}
+.req .t{font-size:16px;line-height:1.4;margin-bottom:10px}.req .n{color:var(--mute);font-weight:700;margin-right:4px}
+.est{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.est button{min-height:var(--tap);border:2px solid var(--line);background:#fff;border-radius:12px;font-weight:800;font-size:14px}
+.est button.C.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.est button.NC.on{background:var(--no);border-color:var(--no);color:#fff}
+.est button.NA.on{background:var(--na);border-color:var(--na);color:#fff}
+.obs{width:100%;min-height:72px;margin-top:8px;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:16px;resize:vertical}
+.obs.falta{border-color:var(--no);background:var(--no-bg)}
+.adj{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;align-items:center}
+.adj .mini{min-height:40px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:0 12px;font-size:14px}
+.chip{display:inline-flex;align-items:center;gap:6px;max-width:100%;min-height:36px;border:1px solid #cfe3f2;background:#EEF7FC;color:var(--ink);border-radius:10px;padding:0 10px;font-size:13px}
+.chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:200px}
+.chip.pend{border-style:dashed;opacity:.8}
+.soltar{border:2px dashed #b9cde0;border-radius:var(--r);padding:16px;text-align:center;color:var(--mute);background:#fff}
+.soltar.drag{border-color:var(--acc);background:#EEF7FC}
+/* plano */
+.plano{position:relative;overflow:hidden;height:230px;border-radius:12px;background:#eef1f5;border:1px solid var(--line);touch-action:pan-y}
+.plano img{position:absolute;left:0;top:0;max-width:none;transform-origin:0 0}
+.plano .box{position:absolute;border:3px solid #E11D48;background:rgba(225,29,72,.18);border-radius:4px;box-shadow:0 0 0 999px rgba(34,41,68,.12)}
+/* hojas y avisos */
+#hoja{position:fixed;inset:0;z-index:40;background:rgba(15,20,40,.45);display:flex;align-items:flex-end;justify-content:center}
+#hoja>div{background:#fff;width:100%;max-width:640px;max-height:88vh;overflow:auto;border-radius:18px 18px 0 0;padding:16px 14px calc(16px + var(--safe-b))}
+@media(min-width:760px){#hoja{align-items:center}#hoja>div{border-radius:18px}}
+#hoja h2{margin-top:0}
+#toast{position:fixed;left:50%;bottom:calc(84px + var(--safe-b));transform:translateX(-50%);z-index:50;background:var(--ink);color:#fff;
+  padding:12px 18px;border-radius:14px;font-size:14px;max-width:92vw;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.esq{background:linear-gradient(90deg,#e9edf3,#f6f8fb,#e9edf3);background-size:200% 100%;animation:esq 1.2s infinite;border-radius:var(--r);height:64px;margin-bottom:8px}
+@keyframes esq{to{background-position:-200% 0}}
+/* login */
+.login{max-width:420px;margin:8vh auto 0;text-align:center}
+.login .logo{width:72px;height:72px;margin:0 auto 12px}
+.login input{width:100%;height:56px;border:1px solid var(--line);border-radius:14px;padding:0 16px;font-size:18px;margin:10px 0;background:#fff;text-align:center}
+.login input.cod{letter-spacing:10px;font-size:26px;font-weight:700}
+.msg{min-height:22px;color:var(--no);font-size:14px}
+/* asignar */
+.seg{display:flex;background:#e7ebf2;border-radius:12px;padding:3px;margin-bottom:12px;overflow-x:auto}
+.seg button{flex:1;min-height:40px;border:0;background:none;border-radius:10px;font-size:14px;font-weight:600;white-space:nowrap;padding:0 10px}
+.seg button.on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.asg{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:10px 12px;margin-bottom:8px}
+.asg .cab{display:flex;gap:8px;align-items:center}.asg .cab b{flex:1}
+.pa{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.tg{display:inline-flex;align-items:center;gap:6px;text-align:left;min-height:34px;border-radius:10px;padding:0 10px;font-size:13px;border:1px solid var(--line);background:var(--na-bg)}
+.tg.vig{background:#EEF7FC;border-color:#cfe3f2}.tg.sug{background:#fff;border:1.5px dashed var(--acc)}.tg.sug.on{background:#E6F4EF;border:1.5px solid var(--ok)}
+.tg button{border:0;background:none;padding:0 2px;font-size:15px;color:var(--no);min-width:28px;min-height:28px}
+.ck{width:24px;height:24px;flex:none;accent-color:var(--ok)}
+.lista-pick label{display:flex;gap:10px;align-items:flex-start;padding:10px 4px;border-bottom:1px solid var(--line)}
+.lista-pick small{color:var(--mute);display:block}
+@media print{#top,#nav,.fijo,.filtros,.adj,.est{display:none!important}}
+</style>
+</head>
+<body>
+<header id="top">
+  <button class="ib" id="bAtras" onclick="history.back()" aria-label="Atrás" hidden>‹</button>
+  <h1 id="tit">Autorización Sanitaria<small>Nuevo Hospital del Salvador</small></h1>
+  <span class="sync" id="sync" title="Sincronización"></span>
+  <button class="ib" onclick="ayuda()" aria-label="Ayuda Catymey" title="Dudas · Catymey">?</button>
+  <button class="ib" onclick="menu()" aria-label="Menú" id="bMenu" hidden>⋯</button>
+</header>
+<main id="app"><div class="esq"></div><div class="esq"></div><div class="esq"></div></main>
+<nav id="nav" hidden></nav>
+<div id="toast" hidden></div>
+<input type="file" id="fFoto" accept="image/*" capture="environment" hidden>
+<input type="file" id="fDoc" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.webp,image/*,application/pdf" hidden>
+<script src="data/as_app/datos.b02b926f.js"></script>
+<script>
+'use strict';
+/* ═══ Autorización Sanitaria NHDS · app única (SPEC-AS-unaApp.md) ═══════════════════════════════════════════════
+   Datos: window.ASD (paquete liviano) · window.ASR (propuesta Catymey, solo referentes, se carga al abrir Asignar).
+   Backend: Apps Script v4 (token por código al correo). Mismas claves que la 39: rec|recinto|ámbito · svc|servicio|ámbito.
+   Modo demostración: ?demo=1 (backend simulado en este navegador; código 123456). */
+const URLC='https://script.google.com/macros/s/AKfycbzOkdj1TkaZG7BS6NdVDx8hUKLShOqxZTI37YpCPeGRRZPGLqlqECwnhf8MhYeLNxWW-w/exec', REF_SRC='data/as_app/ref.38613aa0.js', VER='b170b164';
+const DEMO=/[?&]demo=1/.test(location.search);
+const D=window.ASD, Q=new URLSearchParams(location.search);
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nrm=s=>String(s||'').toUpperCase().normalize('NFD').replace(/[̀-ͯ]/g,'').trim();
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){toast('⚠ Sin espacio en este navegador');return false}}};
+const P=DEMO?'asdemo_':'asapp_';
+
+/* ── índices ──────────────────────────────────────────────────────────── */
+const AMB=D.amb, SVC={}, REC={}, RECS={}, PTO={};
+D.servicios.forEach(s=>SVC[s.n]=s);
+D.recintos.forEach(r=>{REC[r[0]]=r;(RECS[r[3]]=RECS[r[3]]||[]).push(r[0]);});
+D.puntos.forEach(p=>PTO[p.id]=p);
+const NORMA_CORTA={atencion_cerrada:'Atención cerrada',cirugia_menor:'Cirugía menor',dialisis:'Diálisis',laboratorio:'Laboratorio',
+  imagenologia:'Radiaciones',medicina_nuclear:'Medicina nuclear',quimioterapia:'Quimioterapia',farmacia:'Farmacia',
+  hospitalizacion_psiquiatrica:'Hosp. psiquiátrica',al:'Alimentación',re:'REAS',cp:'Calderas y autoclaves',dr:'Droguería',cz:'Central de mezclas'};
+const NIVELES={HOSPITAL:'Hospital (todo el establecimiento)','EDIFICIO AA':'Edificio de Atención Abierta'};
+function svcCanon(n){
+  const k=nrm(n), a=(D.alias||{})[String(n||'').toUpperCase()]||(D.alias||{})[k];
+  if(a&&SVC[a])return a;
+  const ex=D.servicios.find(x=>nrm(x.n)===k); return ex?ex.n:String(n||'');
+}
+const nomAmb=id=>(AMB[id]||[id])[0];
+const normaAmb=id=>NORMA_CORTA[(AMB[id]||[])[1]]||(AMB[id]||[])[1]||'';
+const reqsAmb=id=>(AMB[id]||[])[4]||[];
+const nomRec=rid=>PTO[rid]?PTO[rid].n:(REC[rid]?REC[rid][2]+(REC[rid][6]?' · '+REC[rid][6]:''):rid);
+const svcDeRec=rid=>PTO[rid]?PTO[rid].svc:(REC[rid]?REC[rid][3]:'');
+
+/* ── sesión ───────────────────────────────────────────────────────────── */
+let SES=LS.get(P+'ses',null);
+if(SES&&SES.expira&&new Date(SES.expira)<new Date())SES=null;
+const esRef=()=>SES&&SES.nivel==='total';
+function puedo(svc){
+  if(!SES)return false; if(esRef())return true;
+  const a=nrm(svc); if(!a)return false;
+  return (SES.servicios||[]).some(m=>{const b=nrm(m);return a===b||a.includes(b)||b.includes(a);});
+}
+const misServicios=()=>D.servicios.filter(s=>puedo(s.n)).map(s=>s.n);
+
+/* ── estados (local + backend) ───────────────────────────────────────── */
+let EST=LS.get(P+'est',{}), COLA=LS.get(P+'cola',[]);
+const guardaLocal=()=>{LS.set(P+'est',EST);LS.set(P+'cola',COLA);};
+function borrada(k){const e=EST[k];if(e&&e.datos&&e.datos._borrada)return true;const v=EST['val|'+k];return !!(v&&v.datos&&v.datos.v==='no');}
+function pautasRec(rid){
+  const s=new Set((D.asign[rid]||[]).filter(a=>!borrada('rec|'+rid+'|'+a)));
+  Object.keys(EST).forEach(k=>{if(k.startsWith('rec|'+rid+'|')&&!borrada(k))s.add(k.split('|')[2]);});
+  return [...s].filter(a=>AMB[a]);
+}
+function pautasSvc(svc){
+  const s=new Set(((D.asign_svc||{})[svc]||[]).filter(a=>!borrada('svc|'+svc+'|'+a)));
+  Object.keys(EST).forEach(k=>{if(k.startsWith('svc|'+svc+'|')&&!borrada(k))s.add(k.split('|')[2]);});
+  return [...s].filter(a=>AMB[a]);
+}
+const respondidos=d=>Object.keys(d||{}).filter(k=>/^r\d+$/.test(k)&&d[k]).length;
+function avanceDe(clave){const e=EST[clave];return e&&e.avance?Number(e.avance):0;}
+function avanceSvc(svc){
+  const ks=pautasSvc(svc).map(a=>'svc|'+svc+'|'+a);
+  (RECS[svc]||[]).forEach(rid=>pautasRec(rid).forEach(a=>ks.push('rec|'+rid+'|'+a)));
+  if(!ks.length)return {n:0,p:0,listas:0};
+  const sum=ks.reduce((t,k)=>t+avanceDe(k),0);
+  return {n:ks.length,p:Math.round(sum/ks.length),listas:ks.filter(k=>avanceDe(k)>=100).length};
+}
+function avanceRec(rid){const ps=pautasRec(rid);if(!ps.length)return null;return Math.round(ps.reduce((t,a)=>t+avanceDe('rec|'+rid+'|'+a),0)/ps.length);}
+
+/* ── backend ─────────────────────────────────────────────────────────── */
+async function api(cuerpo){
+  if(DEMO)return demo.post(cuerpo);
+  const r=await fetch(URLC,{method:'POST',headers:{'Content-Type':'text/plain'},body:JSON.stringify(cuerpo)});
+  return r.json();
+}
+async function apiGet(params){
+  if(DEMO)return demo.get(params);
+  const r=await fetch(URLC+'?'+new URLSearchParams(params));
+  return r.json();
+}
+function setSync(c){$('sync').className='sync '+(c||'');}
+function sesionVencida(){toast('Tu sesión venció: vuelve a entrar. Lo marcado queda guardado.');SES=null;LS.set(P+'ses',null);setTimeout(()=>ir('#/'),1200);}
+async function bajarEstados(){
+  if(!SES)return;
+  try{
+    const r=await apiGet({token:SES.token});
+    if(r.ok===false){if(r.error==='sesion')sesionVencida();setSync('err');return;}
+    Object.entries(r.estados||{}).forEach(([k,v])=>{
+      if(k.startsWith('__'))return;
+      if(k.startsWith('svc|')){const p=k.split('|'),c=svcCanon(p[1]);if(c&&c!==p[1]){k='svc|'+c+'|'+p.slice(2).join('|');v={...v,servicio:c};}}
+      if(k.startsWith('rec|')){const p=k.split('|'),nid=(D.ridmap||{})[p[1]];if(nid&&nid!==p[1]){k=['rec',nid].concat(p.slice(2)).join('|');v={...v,recinto:nid};}}
+      const loc=EST[k];
+      if(!loc||new Date(v.ts)>=new Date(loc.ts||0)){if(!COLA.some(c=>c.clave===k))EST[k]=v;}
+    });
+    guardaLocal();setSync(COLA.length?'pend':'');
+  }catch(e){setSync('off');}
+}
+let vaciando=false;
+async function vaciarCola(){
+  if(vaciando||!SES)return; if(!COLA.length){setSync('');return;}
+  vaciando=true;
+  while(COLA.length){
+    const it=COLA[0];
+    try{
+      const r=await api({...it,token:SES.token});
+      if(r&&r.ok===false){
+        if(r.error==='sesion'){vaciando=false;sesionVencida();return;}
+        it._int=(it._int||0)+1;
+        if(it._int>=3){COLA.shift();LS.set(P+'fallidos',[...LS.get(P+'fallidos',[]),{...it,error:r.error}]);toast('⚠ No se pudo guardar: '+(r.error||'error del servidor'));}
+        guardaLocal();setSync('err');break;
+      }
+      COLA.shift();guardaLocal();
+    }catch(e){setSync('off');break;}
+  }
+  vaciando=false; if(!COLA.length)setSync(''); else setSync('pend');
+  vaciarAdjuntos();
+}
+setInterval(vaciarCola,15000);addEventListener('online',vaciarCola);
+function encolar(clave,servicio,recinto,pauta,datos,avance){
+  EST[clave]={servicio,recinto,pauta,datos,avance,usuario:SES.nombre,mio:true,ts:new Date().toISOString()};
+  COLA=COLA.filter(c=>c.clave!==clave);
+  COLA.push({accion:'estado',clave,servicio,recinto,pauta,datos,avance});
+  guardaLocal();setSync('pend');clearTimeout(encolar._t);encolar._t=setTimeout(vaciarCola,700);
+}
+
+/* ── adjuntos: cola en IndexedDB (los archivos no caben en localStorage) ─ */
+const IDB={db:null,async abrir(){if(this.db)return this.db;return this.db=await new Promise((ok,ko)=>{const q=indexedDB.open(P+'adj',1);
+  q.onupgradeneeded=()=>q.result.createObjectStore('pend',{keyPath:'k'});q.onsuccess=()=>ok(q.result);q.onerror=()=>ko(q.error);});},
+  async tx(modo,fn){const db=await this.abrir();return new Promise((ok,ko)=>{const t=db.transaction('pend',modo);const r=fn(t.objectStore('pend'));t.oncomplete=()=>ok(r&&r.result);t.onerror=()=>ko(t.error);});},
+  put(v){return this.tx('readwrite',s=>s.put(v));},del(k){return this.tx('readwrite',s=>s.delete(k));},
+  async todos(){const db=await this.abrir();return new Promise(ok=>{const q=db.transaction('pend').objectStore('pend').getAll();q.onsuccess=()=>ok(q.result||[]);q.onerror=()=>ok([]);});}};
+let subiendo=false;
+async function vaciarAdjuntos(){
+  if(subiendo||!SES||!navigator.onLine)return; subiendo=true;
+  try{
+    for(const a of await IDB.todos()){
+      const r=await api({accion:'adjunto',token:SES.token,servicio:a.servicio,recinto:a.recNom,clave:a.clave,req:a.req,nombre:a.nombre,mime:a.mime,b64:a.b64});
+      if(r&&r.ok){
+        const e=EST[a.clave]; const datos={...((e&&e.datos)||{})}; const adj={...(datos._adj||{})};
+        const lista=(adj[a.slot]||[]).filter(x=>x.k!==a.k); lista.push({id:r.id,n:r.nombre,kb:r.kb,m:r.mime});
+        adj[a.slot]=lista; datos._adj=adj;
+        encolar(a.clave,a.servicio,a.recinto,a.pauta,datos,e?e.avance:0);
+        await IDB.del(a.k);
+        if(RUTA.startsWith('#/p/')){const f=document.activeElement;if(f&&f.tagName==='TEXTAREA')f.blur();render();}   // blur guarda la observación a medio escribir
+      }else if(r&&r.error==='sesion'){sesionVencida();break;}
+      else{toast('⚠ '+(r&&r.error||'No se pudo subir '+a.nombre));await IDB.del(a.k);}
+    }
+  }catch(e){} subiendo=false;
+}
+
+/* ── UI básica ───────────────────────────────────────────────────────── */
+function toast(t,ms){const e=$('toast');e.textContent=t;e.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>e.hidden=true,ms||2800);}
+function titulo(t,s){$('tit').innerHTML=esc(t)+(s?'<small>'+esc(s)+'</small>':'');}
+function hoja(html){cerrarHoja();const h=document.createElement('div');h.id='hoja';h.innerHTML='<div>'+html+'</div>';
+  h.onclick=e=>{if(e.target===h)cerrarHoja();};document.body.appendChild(h);return h;}
+function cerrarHoja(){const h=$('hoja');if(h)h.remove();}
+function ring(p){if(p===null||p===undefined)return '';return `<span class="ring ${p>=100?'full':p?'':'cero'}" style="--p:${p}"><span>${p>=100?'✓':p+'%'}</span></span>`;}
+function menu(){
+  hoja(`<h2>${esc(SES.nombre||'')}</h2><p class="sub">${esc(SES.correo||'')} · ${esRef()?'Referente AS':'Responsable de servicio'}</p>
+  <button class="item" onclick="cerrarHoja();ir('#/normas')"><span class="tx"><b>📚 Normas</b><span class="sub">Lee cualquier requisito de las ${Object.keys(D.normas).length} normas</span></span></button>
+  ${esRef()?`<button class="item" onclick="cerrarHoja();ir('#/expediente')"><span class="tx"><b>📂 Expediente de la solicitud</b><span class="sub">Trámites y documentos para la SEREMI</span></span></button>
+  <a class="item" href="16.AutorizacionSanitaria.html" style="text-decoration:none;color:inherit"><span class="tx"><b>🛠 Modo avanzado</b><span class="sub">La plataforma anterior (biblioteca de normas, informes tipo)</span></span></a>`:''}
+  <button class="item" onclick="instalar()"><span class="tx"><b>📲 Agregar a la pantalla de inicio</b><span class="sub">Abre como una app, también sin señal</span></span></button>
+  <button class="btn sec full" onclick="salir()">Cerrar sesión</button>`);
+}
+function instalar(){
+  if(window._bip){window._bip.prompt();return;}
+  hoja(`<h2>Agregar a la pantalla de inicio</h2><p><b>iPhone:</b> toca <b>Compartir</b> ⬆︎ y luego <b>Agregar a pantalla de inicio</b>.</p>
+  <p><b>Android:</b> menú ⋮ del navegador → <b>Instalar app</b> o <b>Agregar a pantalla principal</b>.</p><button class="btn full" onclick="cerrarHoja()">Listo</button>`);
+}
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();window._bip=e;});
+async function salir(){try{if(!DEMO)await api({accion:'salir',token:SES.token});}catch(e){}SES=null;LS.set(P+'ses',null);cerrarHoja();ir('#/');}
+function ayuda(){
+  const abrir=()=>window.CATYMEY&&window.CATYMEY.abrir();
+  if(window.CATYMEY)return abrir();
+  toast('Abriendo a Catymey…');
+  window.CATYMEY_CONFIG={lado:'right',sinBoton:true};
+  const s1=document.createElement('script');s1.src='SHARED_DATA/catymey_kb.js';
+  s1.onload=()=>{const s2=document.createElement('script');s2.src='SHARED_DATA/catymey.js';s2.onload=abrir;document.body.appendChild(s2);};
+  s1.onerror=()=>toast('Catymey no está disponible aquí');document.body.appendChild(s1);
+}
+
+/* ── rutas ───────────────────────────────────────────────────────────── */
+let RUTA='#/';
+function ir(h){if(location.hash===h)render();else location.hash=h;}
+addEventListener('hashchange',render);
+function render(){
+  RUTA=location.hash||'#/'; cerrarHoja();
+  document.body.classList.toggle('con-nav',!!(SES&&esRef()));
+  $('bMenu').hidden=!SES;
+  if(!SES)return vLogin();
+  const [, v, ...resto]=RUTA.split('/'); const arg=decodeURIComponent(resto.join('/'));
+  $('bAtras').hidden=!v||(v==='s'&&!esRef()&&misServicios().length===1);
+  pintaNav(v);
+  if(v==='s')return vServicio(arg);
+  if(v==='r')return vRecinto(arg);
+  if(v==='p')return vPauta(arg);
+  if(v==='asignar')return vAsignar(arg);
+  if(v==='revision')return vRevision();
+  if(v==='normas')return vNormas(arg);
+  if(v==='expediente')return vExpediente();
+  return vInicio();
+}
+function pintaNav(v){
+  const n=$('nav'); if(!esRef()){n.hidden=true;return;}
+  n.hidden=false;
+  const it=[['','🏥','Servicios'],['asignar','🧩','Asignar'],['revision','📊','Avance'],['normas','📚','Normas']];
+  n.innerHTML=it.map(([k,i,t])=>`<button class="${(v||'')===k||((v==='s'||v==='r'||v==='p')&&k==='')?'on':''}" onclick="ir('#/${k}')"><i>${i}</i>${t}</button>`).join('');
+}
+
+/* ── login por código al correo ──────────────────────────────────────── */
+function vLogin(){
+  titulo('Autorización Sanitaria','Nuevo Hospital del Salvador'); $('bAtras').hidden=true; $('nav').hidden=true;
+  const correo=LS.get(P+'correo','');
+  $('app').innerHTML=`<div class="login">
+    <svg class="logo" viewBox="0 0 72 72"><rect width="72" height="72" rx="18" fill="#222944"/><path d="M20 37l10 10 22-24" fill="none" stroke="#00A1DF" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <h2>Pautas de Autorización Sanitaria</h2>
+    <p class="sub">Entra con tu correo institucional. Te llegará un código de 6 dígitos.</p>
+    <div id="pasoCorreo"><input id="inCorreo" type="email" inputmode="email" autocomplete="email" placeholder="nombre@hsalvador.cl" value="${esc(correo)}">
+      <button class="btn acc full" id="bCod" onclick="pedirCodigo()">Recibir código</button></div>
+    <div id="pasoCod" hidden><p class="sub" id="dest"></p>
+      <input id="inCod" class="cod" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="······">
+      <button class="btn full" id="bEntrar" onclick="validarCodigo()">Entrar</button>
+      <p><button class="btn sec" onclick="$('pasoCod').hidden=true;$('pasoCorreo').hidden=false">Usar otro correo</button></p></div>
+    <p class="msg" id="msg"></p>
+    ${DEMO?'<p class="pill warn">Modo demostración · el código es 123456</p>':''}
+  </div>`;
+  $('inCorreo').onkeydown=e=>{if(e.key==='Enter')pedirCodigo();};
+  $('inCod').oninput=e=>{if(e.target.value.replace(/\D/g,'').length===6)validarCodigo();};
+}
+async function pedirCodigo(){
+  const c=$('inCorreo').value.trim().toLowerCase();
+  if(!/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/.test(c)){$('msg').textContent='Escribe tu correo institucional.';return;}
+  $('bCod').disabled=true;$('msg').textContent='';
+  try{
+    const r=await api({accion:'pedir_codigo',correo:c});
+    if(!r.ok){$('msg').textContent=r.error||'No se pudo enviar el código.';$('bCod').disabled=false;return;}
+    LS.set(P+'correo',c);$('dest').textContent='Revisa tu correo '+c+' e ingresa el código.';
+    $('pasoCorreo').hidden=true;$('pasoCod').hidden=false;$('inCod').focus();
+  }catch(e){$('msg').textContent='Sin señal con el servidor. Intenta de nuevo.';}
+  $('bCod').disabled=false;
+}
+async function validarCodigo(){
+  const c=LS.get(P+'correo',''), cod=$('inCod').value.replace(/\D/g,'');
+  if(cod.length!==6)return; $('bEntrar').disabled=true;
+  try{
+    const r=await api({accion:'validar_codigo',correo:c,codigo:cod});
+    if(!r.ok){$('msg').textContent=r.error||'Código incorrecto.';$('bEntrar').disabled=false;$('inCod').value='';return;}
+    SES={token:r.token,correo:r.correo,nombre:r.nombre,nivel:r.nivel,servicios:r.servicios||[],expira:r.expira};
+    LS.set(P+'ses',SES); setSync('pend'); await bajarEstados(); vaciarCola();
+    const s=Q.get('s'), rr=Q.get('r');
+    ir(rr?'#/r/'+encodeURIComponent(rr):s?'#/s/'+encodeURIComponent(svcCanon(s)):'#/');
+  }catch(e){$('msg').textContent='Sin señal con el servidor. Intenta de nuevo.';$('bEntrar').disabled=false;}
+}
+
+/* ── inicio: mis servicios ───────────────────────────────────────────── */
+function vInicio(){
+  const mios=misServicios();
+  if(!esRef()&&mios.length===1)return ir('#/s/'+encodeURIComponent(mios[0]));
+  titulo(esRef()?'Servicios':'Mis servicios',SES.nombre);
+  const lista=mios.map(n=>({n,a:avanceSvc(n),s:SVC[n]})).filter(x=>esRef()?x.a.n||!x.s.cong:true)
+    .sort((a,b)=>(b.a.n?1:0)-(a.a.n?1:0)||a.n.localeCompare(b.n));
+  $('app').innerHTML=`<input class="buscar" placeholder="Buscar servicio…" oninput="filtra(this.value,'.item')">
+    ${!mios.length?'<div class="vacio">Tu correo no tiene servicios asignados. Avisa a las referentes de Autorización Sanitaria.</div>':''}
+    ${lista.map(x=>`<button class="item" data-q="${esc(nrm(x.n))}" onclick="ir('#/s/${encodeURIComponent(x.n)}')">
+      <span class="tx"><b>${esc(x.n)}</b><span class="sub">${x.a.n?x.a.n+(x.a.n===1?' pauta · ':' pautas · ')+x.a.listas+(x.a.listas===1?' completa':' completas'):'Sin pautas asignadas'}${x.s.cong?' · en pausa':''}</span></span>${x.a.n?ring(x.a.p):''}</button>`).join('')}
+    ${esRef()?`<h3>Hospital y puntos específicos</h3>${['HOSPITAL','EDIFICIO AA'].map(k=>{const n=pautasSvc(k).length;return `<button class="item" onclick="ir('#/s/${encodeURIComponent(k)}')"><span class="tx"><b>${esc(NIVELES[k])}</b><span class="sub">${n} pautas</span></span>${n?ring(avanceSvc(k).p):''}</button>`;}).join('')}`:''}`;
+}
+function filtra(q,sel){q=nrm(q);document.querySelectorAll(sel).forEach(e=>{e.hidden=q&&!(e.dataset.q||'').includes(q);});}
+
+/* ── servicio: sus recintos y pautas de unidad ───────────────────────── */
+function listaServicio(svc,selRid){
+  const unidad=pautasSvc(svc);
+  const recs=(RECS[svc]||[]).map(rid=>({rid,r:REC[rid],a:avanceRec(rid),n:pautasRec(rid).length})).filter(x=>x.n||esRef());
+  const ptos=D.puntos.filter(p=>p.svc===svc||(svc==='HOSPITAL'&&p.svc==='HOSPITAL'));
+  recs.sort((a,b)=>(b.n?1:0)-(a.n?1:0)||a.r[1].localeCompare(b.r[1],'es',{numeric:true})||nomRec(a.rid).localeCompare(nomRec(b.rid),'es',{numeric:true}));
+  const sinPauta=recs.filter(x=>!x.n).length;
+  return `${unidad.length?`<h3>Pautas de la unidad</h3>${unidad.map(a=>itemPauta('svc|'+svc+'|'+a,a)).join('')}`:''}
+    ${ptos.length?`<h3>Puntos específicos</h3>${ptos.map(p=>{const n=pautasRec(p.id).length;return `<button class="item ${selRid===p.id?'sel':''}" onclick="ir('#/r/${encodeURIComponent(p.id)}')"><span class="tx"><b>${esc(p.n)}</b><span class="sub">${n?n+' pautas':'Sin pautas asignadas'}</span></span>${n?ring(avanceRec(p.id)):''}</button>`;}).join('')}`:''}
+    ${recs.length?`<h3>Recintos</h3><input class="buscar" placeholder="Buscar recinto o código…" oninput="filtra(this.value,'.item.rc')">
+    ${recs.filter(x=>x.n).map(x=>itemRec(x,selRid)).join('')}
+    ${sinPauta?`<details class="pl"><summary>${sinPauta} recintos sin pauta</summary><div>${recs.filter(x=>!x.n).map(x=>itemRec(x,selRid)).join('')}</div></details>`:''}`:''}
+    ${!unidad.length&&!recs.length&&!ptos.length?'<div class="vacio">Este servicio no tiene pautas asignadas todavía.</div>':''}`;
+}
+function itemRec(x,selRid){return `<button class="item rc ${selRid===x.rid?'sel':''}" data-q="${esc(nrm(x.r[1]+' '+x.r[2]))}" onclick="ir('#/r/${encodeURIComponent(x.rid)}')">
+  <span class="tx"><b>${esc(nomRec(x.rid))}</b><span class="sub">${esc(x.r[1])} · ${esc(x.r[4])}${x.n>1?' · '+x.n+' pautas':''}</span></span>${x.n?ring(x.a):''}</button>`;}
+function itemPauta(clave,a,sel){
+  const n=reqsAmb(a).length,av=avanceDe(clave);
+  return `<button class="item ${sel?'sel':''}" onclick="ir('#/p/${encodeURIComponent(clave)}')"><span class="tx"><b>${esc(nomAmb(a))}</b>
+    <span class="sub">${esc(normaAmb(a))} · ${n} requisitos</span></span>${ring(av)}</button>`;
+}
+function vServicio(svc){
+  svc=svcCanon(svc);
+  if(!puedo(svc))return sinAcceso();
+  const a=avanceSvc(svc);
+  titulo(NIVELES[svc]||svc,a.n?a.n+' pautas · '+a.p+'% de avance':'');
+  $('app').innerHTML=`<div class="cols"><div class="izq">${listaServicio(svc)}
+    ${esRef()?`<button class="btn sec full" style="margin-top:8px" onclick="ir('#/asignar/${encodeURIComponent(svc)}')">🧩 Asignar pautas en este servicio</button>`:''}</div>
+    <div class="solo-ancho"><div class="vacio">Elige un recinto o una pauta para empezar.</div></div></div>`;
+}
+function sinAcceso(){titulo('Sin acceso');$('app').innerHTML='<div class="vacio">Este servicio no está entre los tuyos. Si debería estarlo, avisa a las referentes de Autorización Sanitaria.</div>';}
+
+/* ── recinto ─────────────────────────────────────────────────────────── */
+function vRecinto(rid){
+  rid=(D.ridmap||{})[rid]||rid;
+  const pto=PTO[rid], r=REC[rid];
+  if(!pto&&!r){titulo('No encontrado');$('app').innerHTML='<div class="vacio">Ese recinto no existe en el catastro vigente.</div>';return;}
+  const svc=svcDeRec(rid); if(!puedo(svc))return sinAcceso();
+  const ps=pautasRec(rid);
+  titulo(nomRec(rid),pto?'Punto específico · '+(NIVELES[svc]||svc):r[1]+' · '+r[4]+' · '+svc);
+  const loc=pto?(pto.loc[0]||null):rid;
+  const der=`${ps.length?`<h3>Pautas de este ${pto?'punto':'recinto'}</h3>${ps.map(a=>itemPauta('rec|'+rid+'|'+a,a)).join('')}`
+      :'<div class="vacio">Este recinto no tiene pautas asignadas.</div>'}
+    ${loc&&REC[loc]&&REC[loc][5]?`<details class="pl" id="dPlano"><summary>📍 ¿Dónde queda?</summary><div><div class="plano" id="plano"></div>
+      <p class="sub" style="margin:8px 0 0">Piso ${esc(REC[loc][4])} · el recinto está marcado en rojo.</p></div></details>`:''}
+    ${esRef()?`<button class="btn sec full" onclick="pickPauta('rec','${esc(rid)}')">＋ Asignar otra pauta</button>`:''}`;
+  $('app').innerHTML=`<div class="cols"><div class="izq solo-ancho">${listaServicio(svc,rid)}</div><div>${der}</div></div>`;
+  const dp=$('dPlano'); if(dp)dp.addEventListener('toggle',()=>{if(dp.open)pintaPlano(loc);},{once:true});
+}
+function pintaPlano(rid){
+  const r=REC[rid], pl=D.planos[r[4]], box=r[5], cont=$('plano'); if(!pl||!box||!cont)return;
+  const W=cont.clientWidth,H=cont.clientHeight, vista=Math.max(box[2]*5,box[3]*5,420);
+  const k=Math.min(W/vista,H/vista*1.4);
+  cont.innerHTML=`<img src="${esc(pl[0])}" width="${pl[1]}" height="${pl[2]}" alt="Plano piso ${esc(r[4])}"><span class="box"></span>`;
+  const cx=(box[0]+box[2]/2)*k, cy=(box[1]+box[3]/2)*k, dx=W/2-cx, dy=H/2-cy;
+  const img=cont.querySelector('img'); img.style.transform=`translate(${dx}px,${dy}px) scale(${k})`;
+  const b=cont.querySelector('.box'); Object.assign(b.style,{left:(box[0]*k+dx-3)+'px',top:(box[1]*k+dy-3)+'px',width:(box[2]*k+6)+'px',height:(box[3]*k+6)+'px'});
+}
+
+/* ── pauta: el cotejo ────────────────────────────────────────────────── */
+let FILTRO='todos', PA=null;
+function ctxDe(clave){
+  const [tipo,id,amb]=clave.split('|');
+  if(tipo==='svc')return {clave,tipo,svc:id,rid:'',amb,lugar:NIVELES[id]||id,recNom:''};
+  return {clave,tipo,svc:svcDeRec(id),rid:id,amb,lugar:nomRec(id),recNom:(PTO[id]?PTO[id].n:(REC[id]?REC[id][1]+' '+REC[id][2]:id)).replace(/[\\/:*?"<>|]+/g,'-')};
+}
+function vPauta(clave){
+  PA=ctxDe(clave); const a=AMB[PA.amb];
+  if(!a){titulo('Pauta no encontrada');$('app').innerHTML='<div class="vacio">Esta pauta ya no existe en las normas vigentes.</div>';return;}
+  if(!puedo(PA.svc))return sinAcceso();
+  titulo(nomAmb(PA.amb),PA.lugar+' · '+normaAmb(PA.amb));
+  const e=EST[clave]||{}, d=e.datos||{}, reqs=a[4], grupos=a[3];
+  const resp=respondidos(d), total=reqs.length, nc=reqs.filter(r=>d['r'+r[0]]==='NC').length;
+  const ver=r=>FILTRO==='todos'||(FILTRO==='pend'&&!d['r'+r[0]])||(FILTRO==='nc'&&d['r'+r[0]]==='NC');
+  let gPrev=-2, html='';
+  reqs.filter(ver).forEach(r=>{
+    if(r[2]!==gPrev&&r[2]>=0)html+=`<div class="grupo">${esc(grupos[r[2]])}</div>`; gPrev=r[2];
+    const v=d['r'+r[0]]||'', o=d['obs_r'+r[0]]||'', adj=((d._adj||{})['r'+r[0]])||[];
+    html+=`<div class="req ${v}" id="q${r[0]}" data-n="${r[0]}">
+      <div class="t"><span class="n">${r[0]}.</span>${esc(r[1])}</div>
+      <div class="est">${['C','NC','NA'].map(k=>`<button class="${k} ${v===k?'on':''}" onclick="marca(${r[0]},'${k}')">${{C:'CUMPLE',NC:'NO CUMPLE',NA:'N/A'}[k]}</button>`).join('')}</div>
+      ${v==='NC'||v==='NA'||o?`<textarea class="obs ${(v==='NC'||v==='NA')&&!o.trim()?'falta':''}" placeholder="${v==='NA'?'¿Por qué no aplica?':'¿Qué falta y dónde? Sé concreto.'}" onchange="obs(${r[0]},this.value)">${esc(o)}</textarea>`:''}
+      <div class="adj">${adj.map(x=>chipAdj(x)).join('')}${pendientesHtml('r'+r[0])}
+        ${d['foto_r'+r[0]]&&!adj.length?'<span class="pill">📷 foto en el teléfono de origen</span>':''}
+        <button class="mini" onclick="adjuntar(${r[0]},'foto')">📷 Foto</button><button class="mini" onclick="adjuntar(${r[0]},'doc')">📎 Documento</button></div></div>`;
+  });
+  const firma=d._firma, cien=resp===total&&total>0;
+  const hermanas=(PA.tipo==='svc'?pautasSvc(PA.svc):pautasRec(PA.rid)).map(x=>[PA.tipo+'|'+(PA.tipo==='svc'?PA.svc:PA.rid)+'|'+x,x]);
+  $('app').innerHTML=`<div class="cols"><div class="izq solo-ancho"><h3>${esc(PA.lugar)}</h3>${hermanas.map(([k,x])=>itemPauta(k,x,k===clave)).join('')}</div><div><div id="prog"><div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px">
+      <b>${resp} de ${total} requisitos</b><span class="sub">${nc?nc+' no cumple':''}</span></div>
+    <div class="barra"><i style="width:${total?resp*100/total:0}%"></i></div>
+    <div class="filtros">${[['todos','Todos'],['pend','Pendientes ('+(total-resp)+')'],['nc','No cumple ('+nc+')']].map(([k,t])=>`<button class="${FILTRO===k?'on':''}" onclick="FILTRO='${k}';render()">${t}</button>`).join('')}</div></div>
+    ${html||'<div class="vacio">Nada en este filtro. 👍</div>'}
+    <h3>Documentos de la pauta</h3>
+    <div class="soltar" id="soltarPauta">${((d._adj||{}).pauta||[]).map(x=>chipAdj(x)).join(' ')}${pendientesHtml('pauta')}
+      <p style="margin:8px 0">Protocolos, actas, certificados: <button class="mini btn sec" style="min-height:40px" onclick="adjuntar(0,'doc')">📎 Agregar documento</button></p>
+      <p class="sub solo-ancho" style="margin:0">…o arrástralos aquí desde el computador. También puedes soltarlos sobre un requisito.</p></div>
+    ${firma?`<div class="card" style="margin-top:12px;background:var(--ok-bg);border-color:#bfe0c9"><b>✓ Firmada</b> por ${esc(firma.nombre)} el ${new Date(firma.ts).toLocaleString('es-CL')}</div>`:''}
+    ${cien&&!firma?`<div class="fijo"><button class="btn ok" onclick="firmar()">✍️ Firmar y archivar el informe</button></div>`:''}</div></div>`;
+  pintaPendientes(); activarArrastre();
+}
+function chipAdj(x){return `<button class="chip" onclick="verAdjunto('${esc(x.id)}','${esc(x.n)}')" title="${esc(x.n)}">${/^image\//.test(x.m)?'🖼':'📄'} <span>${esc(x.n)}</span></button>`;}
+function pendientesHtml(slot){return `<span data-pend="${slot}"></span>`;}
+async function pintaPendientes(){
+  if(!PA)return; const ps=(await IDB.todos()).filter(a=>a.clave===PA.clave);
+  document.querySelectorAll('[data-pend]').forEach(el=>{el.innerHTML=ps.filter(a=>a.slot===el.dataset.pend)
+    .map(a=>`<span class="chip pend">⏳ <span>${esc(a.nombre)}</span></span>`).join('');});
+}
+function datosPA(){return {...((EST[PA.clave]||{}).datos||{})};}
+function guardarPA(d){
+  const total=reqsAmb(PA.amb).length, av=total?Math.round(respondidos(d)*100/total):0;
+  encolar(PA.clave,PA.svc,PA.rid,PA.amb,d,av);
+}
+function desfirma(d){if(d._firma){delete d._firma;toast('La pauta cambió después de firmarla: hay que volver a firmarla.',4000);}}
+function marca(n,v){
+  const d=datosPA();
+  if(d['r'+n]===v)delete d['r'+n]; else d['r'+n]=v;
+  desfirma(d);
+  guardarPA(d);
+  const y=$('q'+n)?$('q'+n).getBoundingClientRect().top:0; render();
+  const el=$('q'+n); if(el)window.scrollBy(0,el.getBoundingClientRect().top-y);
+  if((v==='NC'||v==='NA')&&d['r'+n]){const t=el&&el.querySelector('textarea');if(t&&!t.value)t.focus();}
+}
+function obs(n,t){const d=datosPA();if(t.trim())d['obs_r'+n]=t.trim();else delete d['obs_r'+n];desfirma(d);guardarPA(d);
+  const ta=document.querySelector('#q'+n+' textarea');if(ta)ta.classList.toggle('falta',!t.trim()&&(d['r'+n]==='NC'||d['r'+n]==='NA'));}
+
+/* adjuntar: foto (comprimida) o documento (≤ 10 MB), desde el celular o arrastrando en el computador */
+let ADJ_N=0;
+function adjuntar(n,tipo){ADJ_N=n;const i=$(tipo==='foto'?'fFoto':'fDoc');i.value='';i.click();}
+$('fFoto').onchange=e=>{const f=e.target.files[0];if(f)subir(f,ADJ_N);};
+$('fDoc').onchange=e=>{const f=e.target.files[0];if(f)subir(f,ADJ_N);};
+async function comprimir(f){
+  if(!/^image\/(jpeg|png|webp|heic|heif)/.test(f.type)||f.size<350*1024)return f;
+  try{const bmp=await createImageBitmap(f);const k=Math.min(1,1600/Math.max(bmp.width,bmp.height));
+    const c=document.createElement('canvas');c.width=Math.round(bmp.width*k);c.height=Math.round(bmp.height*k);
+    c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+    const b=await new Promise(ok=>c.toBlob(ok,'image/jpeg',.78));return new File([b],f.name.replace(/\.\w+$/,'')+'.jpg',{type:'image/jpeg'});}
+  catch(e){return f;}
+}
+const MIMES=/^(application\/pdf|application\/msword|application\/vnd\.openxmlformats-officedocument\.(wordprocessingml\.document|spreadsheetml\.sheet|presentationml\.presentation)|application\/vnd\.ms-excel|image\/(jpeg|png|webp|heic|heif))$/;
+async function subir(f,n){
+  if(!PA)return; f=await comprimir(f);
+  if(!MIMES.test(f.type)){toast('Ese tipo de archivo no se acepta. Usa PDF, Word, Excel o imagen.');return;}
+  if(f.size>10*1024*1024){toast('El archivo pesa más de 10 MB.');return;}
+  const b64=await new Promise(ok=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(',')[1]);r.readAsDataURL(f);});
+  const slot=n?'r'+n:'pauta';
+  const nombre=(n?'R'+n+'_':'')+f.name.replace(/[\\/:*?"<>|]+/g,'-');
+  await IDB.put({k:Date.now()+'_'+Math.random().toString(36).slice(2,6),clave:PA.clave,servicio:PA.svc,recinto:PA.rid,recNom:PA.recNom,pauta:PA.amb,slot,req:n||'',nombre,mime:f.type,b64});
+  toast(navigator.onLine?'Subiendo '+nombre+'…':'Sin señal: se sube solo al volver la señal');
+  pintaPendientes(); vaciarAdjuntos();
+}
+function activarArrastre(){
+  const sobre=(el,n)=>{if(!el)return;
+    el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('drag');});
+    el.addEventListener('dragleave',()=>el.classList.remove('drag'));
+    el.addEventListener('drop',e=>{e.preventDefault();el.classList.remove('drag');[...e.dataTransfer.files].forEach(f=>subir(f,n));});};
+  document.querySelectorAll('.req').forEach(el=>sobre(el,Number(el.dataset.n)));
+  sobre($('soltarPauta'),0);
+}
+async function verAdjunto(id,nombre){
+  toast('Abriendo '+nombre+'…');
+  try{const r=await apiGet({token:SES.token,archivo:id});
+    if(!r.ok){toast('No se pudo abrir: '+(r.error||''));return;}
+    const bin=atob(r.b64),u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);
+    const url=URL.createObjectURL(new Blob([u8],{type:r.mime}));
+    if(/^image\//.test(r.mime)){hoja(`<h2 style="font-size:16px">${esc(nombre)}</h2><img src="${url}" style="width:100%;border-radius:12px"><p><button class="btn full" onclick="cerrarHoja()">Cerrar</button></p>`);}
+    else{const a=document.createElement('a');a.href=url;a.download=nombre;a.target='_blank';document.body.appendChild(a);a.click();a.remove();}
+  }catch(e){toast('Sin señal: no se pudo abrir el archivo.');}
+}
+
+/* firma e informe archivado en el Drive del proceso */
+function firmar(){
+  const d=datosPA(), falta=reqsAmb(PA.amb).filter(r=>(d['r'+r[0]]==='NC'||d['r'+r[0]]==='NA')&&!(d['obs_r'+r[0]]||'').trim());
+  if(falta.length){toast('Falta la observación en '+falta.length+' requisito(s) NO CUMPLE o N/A.');FILTRO='todos';render();
+    const el=$('q'+falta[0][0]);if(el)el.scrollIntoView({block:'center'});return;}
+  hoja(`<h2>Firmar la pauta</h2><p>${esc(nomAmb(PA.amb))}<br><span class="sub">${esc(PA.lugar)}</span></p>
+    <label class="sub">Nombre de quien verificó</label><input id="fNom" class="buscar" value="${esc(SES.nombre||'')}">
+    <label style="display:flex;gap:10px;align-items:flex-start;margin:6px 0 14px"><input type="checkbox" id="fOk" class="ck">
+      <span>Declaro haber verificado en terreno los ${reqsAmb(PA.amb).length} requisitos de esta pauta.</span></label>
+    <button class="btn ok full" onclick="confirmarFirma()">Firmar y archivar</button>`);
+}
+async function confirmarFirma(){
+  const nom=$('fNom').value.trim(); if(!nom||!$('fOk').checked){toast('Escribe tu nombre y marca la declaración.');return;}
+  const d=datosPA(); d._firma={nombre:nom,ts:new Date().toISOString()}; guardarPA(d); cerrarHoja(); render();
+  toast('Firmada. Archivando el informe en el Drive…',4000);
+  try{
+    const hoy=new Date().toISOString().slice(0,10);
+    const r=await api({accion:'informe_html',token:SES.token,servicio:PA.svc,recinto:PA.recNom,pauta:PA.amb,html:informeHtml(d),
+      nombre:'Informe_AS_'+(PA.rid?PA.recNom+(REC[PA.rid]&&REC[PA.rid][6]?'_'+REC[PA.rid][6].split(' ')[0]:''):PA.svc).replace(/\s+/g,'_')+'_'+PA.amb.slice(0,40)+'_'+hoy+'.pdf'});
+    toast(r.ok?'✓ Informe archivado en el Drive del proceso':'No se pudo archivar: '+(r.error||''),4500);
+  }catch(e){toast('Sin señal: la firma quedó guardada; el informe se archiva desde el computador.',4500);}
+}
+function informeHtml(d){
+  const a=AMB[PA.amb], reqs=a[4], grupos=a[3], E={C:'CUMPLE',NC:'NO CUMPLE',NA:'N/A'};
+  const n=k=>reqs.filter(r=>d['r'+r[0]]===k).length, adjs=Object.values(d._adj||{}).flat();
+  let g=-2, filas='';
+  reqs.forEach(r=>{if(r[2]!==g&&r[2]>=0)filas+=`<tr><td colspan="3" style="background:#eef2f8;font-weight:bold">${esc(grupos[r[2]])}</td></tr>`;g=r[2];
+    const v=d['r'+r[0]]; filas+=`<tr><td>${r[0]}</td><td>${esc(r[1])}${d['obs_r'+r[0]]?`<br><i style="color:#555">Obs.: ${esc(d['obs_r'+r[0]])}</i>`:''}</td>
+      <td style="font-weight:bold;color:${v==='C'?'#0E7C66':v==='NC'?'#B91C1C':'#5B6B85'}">${E[v]||'—'}</td></tr>`;});
+  return `<html><head><meta charset="utf-8"><style>body{font-family:Arial,sans-serif;font-size:11px;color:#222944}h1{font-size:16px}
+    table{border-collapse:collapse;width:100%}td{border:1px solid #ccd;padding:4px;vertical-align:top}</style></head><body>
+    <h1>Informe de cotejo · Autorización Sanitaria</h1>
+    <p><b>Nuevo Hospital del Salvador</b><br>Servicio: ${esc(NIVELES[PA.svc]||PA.svc)}<br>${PA.rid?'Recinto: '+esc(PA.lugar)+(REC[PA.rid]?' ('+esc(REC[PA.rid][1])+', piso '+esc(REC[PA.rid][4])+')':'')+'<br>':''}
+    Pauta: ${esc(nomAmb(PA.amb))}<br>Norma: ${esc(D.normas[a[1]]?D.normas[a[1]].n:a[1])}<br>Fecha: ${new Date().toLocaleString('es-CL')}</p>
+    <p><b>Resultado:</b> ${n('C')} cumple · ${n('NC')} no cumple · ${n('NA')} no aplica · ${reqs.length} requisitos.</p>
+    <table><tr><td><b>N°</b></td><td><b>Requisito</b></td><td><b>Estado</b></td></tr>${filas}</table>
+    ${adjs.length?`<p><b>Evidencia adjunta en el Drive (carpeta evidencia del recinto):</b> ${adjs.map(x=>esc(x.n)).join(' · ')}</p>`:''}
+    <p style="margin-top:18px"><b>Declaración:</b> ${esc(d._firma.nombre)} declara haber verificado en terreno los ${reqs.length} requisitos de esta pauta el ${new Date(d._firma.ts).toLocaleString('es-CL')}.</p>
+    <p style="color:#5B6B85">Referentes de Autorización Sanitaria: C. Sepúlveda · M. Canales</p></body></html>`;
+}
+
+/* ── asignar (referentes) ────────────────────────────────────────────── */
+let REFOK=false;
+function cargarRef(){return new Promise(ok=>{if(REFOK||window.ASR)return ok(REFOK=true);const s=document.createElement('script');s.src=REF_SRC;
+  s.onload=()=>ok(REFOK=true);s.onerror=()=>{toast('No se pudo cargar la propuesta de Catymey');ok(false);};document.body.appendChild(s);});}
+let MODO_ASG='svc';
+async function vAsignar(arg){
+  if(!esRef())return sinAcceso();
+  titulo('Asignar pautas','Se ve al instante');
+  $('app').innerHTML='<div class="esq"></div><div class="esq"></div>'; await cargarRef();
+  const R=window.ASR||{prop:{},reglas:{},unidades:{},hospital:[],edificio:[]};
+  if(['pauta','catymey','puntos'].includes(arg))MODO_ASG=arg; else if(arg)MODO_ASG='svc';
+  const seg=`<div class="seg">${[['svc','Servicio'],['pauta','Pauta'],['catymey','Catymey'],['puntos','Hospital']]
+    .map(([k,t])=>`<button class="${MODO_ASG===k?'on':''}" onclick="MODO_ASG='${k}';ir('#/asignar/${k==='svc'?'':k}')">${t}</button>`).join('')}</div>`;
+  let cuerpo='';
+  if(MODO_ASG==='svc'){
+    const svc=arg&&SVC[svcCanon(arg)]?svcCanon(arg):'';
+    if(!svc){cuerpo=`<input class="buscar" placeholder="Buscar servicio…" oninput="filtra(this.value,'.item')">
+      ${D.servicios.map(s=>{const sug=(RECS[s.n]||[]).reduce((t,rid)=>t+sugeridas(rid).length,0)+((R.unidades[s.n]||[]).filter(x=>!pautasSvc(s.n).includes(x[0])).length);
+        return `<button class="item" data-q="${esc(nrm(s.n))}" onclick="ir('#/asignar/${encodeURIComponent(s.n)}')"><span class="tx"><b>${esc(s.n)}</b>
+        <span class="sub">${(RECS[s.n]||[]).length} recintos${sug?' · <b style="color:var(--acc)">'+sug+' sugeridas</b>':''}</span></span></button>`;}).join('')}`;}
+    else cuerpo=asgServicio(svc,R);
+  }else if(MODO_ASG==='pauta')cuerpo=asgPorPauta();
+  else if(MODO_ASG==='catymey')cuerpo=asgCatymey(R);
+  else cuerpo=asgPuntos(R);
+  $('app').innerHTML=seg+cuerpo;
+}
+function sugeridas(rid){const R=window.ASR;if(!R||!R.prop[rid])return [];const ya=pautasRec(rid);return R.prop[rid][0].filter(a=>AMB[a]&&!ya.includes(a));}
+let MARCADAS=new Set();
+function asgServicio(svc,R){
+  MARCADAS=new Set();
+  const unidadSug=(R.unidades[svc]||[]).filter(x=>AMB[x[0]]&&!pautasSvc(svc).includes(x[0]));
+  unidadSug.forEach(x=>MARCADAS.add('svc|'+svc+'|'+x[0]));
+  const recs=(RECS[svc]||[]).map(rid=>({rid,r:REC[rid],vig:pautasRec(rid),sug:sugeridas(rid)}))
+    .sort((a,b)=>(b.sug.length?1:0)-(a.sug.length?1:0)||(b.vig.length?1:0)-(a.vig.length?1:0)||a.r[1].localeCompare(b.r[1],'es',{numeric:true}));
+  recs.forEach(x=>x.sug.forEach(a=>MARCADAS.add('rec|'+x.rid+'|'+a)));
+  return `<h2>${esc(svc)}</h2><p class="sub">Las pautas con borde punteado son las que sugiere Catymey: vienen marcadas. Toca para desmarcar.</p>
+    <div class="asg"><div class="cab"><b>Pautas de la unidad</b><button class="mini btn sec" style="min-height:36px" onclick="pickPauta('svc','${esc(svc)}')">＋</button></div>
+      <div class="pa">${pautasSvc(svc).map(a=>tagVig('svc|'+svc+'|'+a,a)).join('')}${unidadSug.map(x=>tagSug('svc|'+svc+'|'+x[0],x[0],x[1])).join('')}
+      ${!pautasSvc(svc).length&&!unidadSug.length?'<span class="sub">Sin pautas de unidad</span>':''}</div></div>
+    <input class="buscar" placeholder="Buscar recinto o código…" oninput="filtra(this.value,'.asg.rc')">
+    ${recs.map(x=>`<div class="asg rc" data-q="${esc(nrm(x.r[1]+' '+x.r[2]))}"><div class="cab"><b>${esc(nomRec(x.rid))}</b><span class="sub">${esc(x.r[1])}</span>
+      <button class="mini btn sec" style="min-height:36px" onclick="pickPauta('rec','${esc(x.rid)}')">＋</button></div>
+      <div class="pa">${x.vig.map(a=>tagVig('rec|'+x.rid+'|'+a,a)).join('')}${x.sug.map(a=>tagSug('rec|'+x.rid+'|'+a,a)).join('')}
+      ${!x.vig.length&&!x.sug.length?'<span class="sub">Sin pauta</span>':''}</div></div>`).join('')}
+    ${botonAplicar()}`;
+}
+const botonAplicar=()=>MARCADAS.size?`<div class="fijo"><button class="btn acc" id="bAplicar" onclick="aplicarMarcadas()">Aplicar ${MARCADAS.size} sugeridas</button></div>`:'';
+function tagVig(clave,a){const av=avanceDe(clave);return `<span class="tg vig" title="${esc(normaAmb(a))}">${esc(nomAmb(a).slice(0,60))}${av?' · '+av+'%':`<button title="Quitar" onclick="quitar('${esc(clave)}')">✕</button>`}</span>`;}
+function tagSug(clave,a,f){return `<button class="tg sug on" data-k="${esc(clave)}" title="${esc(f||normaAmb(a))}" onclick="toggleSug(this)">✓ ${esc(nomAmb(a).slice(0,60))}</button>`;}
+function toggleSug(b){const k=b.dataset.k;if(MARCADAS.has(k)){MARCADAS.delete(k);b.classList.remove('on');b.textContent=b.textContent.replace(/^✓ /,'');}
+  else{MARCADAS.add(k);b.classList.add('on');b.textContent='✓ '+b.textContent;}
+  const bt=$('bAplicar');if(bt){bt.textContent='Aplicar '+MARCADAS.size+' sugeridas';bt.disabled=!MARCADAS.size;}}
+async function aplicarMarcadas(){await asignarLote([...MARCADAS]);render();}
+async function asignarLote(claves){
+  claves=claves.filter(k=>{const e=EST[k];return !e||!e.datos||e.datos._borrada||!avanceDe(k);});
+  if(!claves.length){toast('Nada nuevo que asignar');return;}
+  const items=claves.map(k=>{const [t,id,amb]=k.split('|');return {clave:k,servicio:t==='svc'?id:svcDeRec(id),recinto:t==='rec'?id:'',pauta:amb,datos:{},avance:0};});
+  items.forEach(it=>EST[it.clave]={...it,usuario:SES.nombre,mio:true,ts:new Date().toISOString()}); guardaLocal();
+  toast('Asignando '+items.length+' pauta(s)…');
+  try{const r=await api({accion:'lote',token:SES.token,items});
+    if(r.ok)toast('✓ '+r.guardados+' pauta(s) asignadas'+(r.rechazados?' · '+r.rechazados+' rechazadas':''));
+    else{if(r.error==='sesion')return sesionVencida();throw new Error(r.error);}
+  }catch(e){items.forEach(it=>{COLA=COLA.filter(c=>c.clave!==it.clave);COLA.push({accion:'estado',...it});});guardaLocal();setSync('pend');
+    toast('Sin señal: las asignaciones quedaron en cola y se suben solas.');}
+}
+function quitar(clave){
+  if(avanceDe(clave)){toast('No se puede quitar: la pauta ya tiene avance.');return;}
+  if(!confirm('¿Quitar «'+nomAmb(clave.split('|')[2])+'»?'))return;
+  const [t,id,amb]=clave.split('|'); encolar(clave,t==='svc'?id:svcDeRec(id),t==='rec'?id:'',amb,{_borrada:1},0); render();
+}
+function pickPauta(tipo,id){
+  const svc=tipo==='svc'?id:svcDeRec(id), ya=tipo==='svc'?pautasSvc(id):pautasRec(id);
+  const sug=new Set([...(tipo==='rec'?sugeridas(id):[]),...(PTO[id]?PTO[id].sug:[]),...((D.fund||{})[svc]?[]:[])]);
+  const lista=Object.keys(AMB).filter(a=>!ya.includes(a)).sort((a,b)=>(sug.has(b)?1:0)-(sug.has(a)?1:0)||normaAmb(a).localeCompare(normaAmb(b)));
+  hoja(`<h2>Asignar a ${esc(tipo==='svc'?(NIVELES[id]||id):nomRec(id))}</h2>
+    <input class="buscar" placeholder="Buscar pauta o norma…" oninput="filtra(this.value,'.lista-pick label')">
+    <div class="lista-pick">${lista.map(a=>`<label data-q="${esc(nrm(nomAmb(a)+' '+normaAmb(a)))}"><input type="checkbox" class="ck" value="${esc(a)}" ${sug.has(a)?'checked':''}>
+      <span>${sug.has(a)?'⭐ ':''}${esc(nomAmb(a))}<small>${esc(normaAmb(a))} · ${reqsAmb(a).length} requisitos</small></span></label>`).join('')}</div>
+    <div style="position:sticky;bottom:-16px;background:#fff;padding:10px 0"><button class="btn acc full" onclick="confirmaPick('${tipo}','${esc(id)}')">Asignar seleccionadas</button></div>`);
+}
+async function confirmaPick(tipo,id){
+  const as=[...document.querySelectorAll('.lista-pick input:checked')].map(i=>i.value); cerrarHoja();
+  if(!as.length)return; await asignarLote(as.map(a=>tipo+'|'+id+'|'+a)); render();
+}
+function asgPorPauta(){
+  return `<input class="buscar" placeholder="Busca la pauta: sala de procedimientos, box de consulta, REAS…" oninput="filtra(this.value,'.item')">
+    ${Object.keys(AMB).sort((a,b)=>normaAmb(a).localeCompare(normaAmb(b))).map(a=>`<button class="item" data-q="${esc(nrm(nomAmb(a)+' '+normaAmb(a)))}" onclick="pickRecintos('${esc(a)}')">
+      <span class="tx"><b>${esc(nomAmb(a))}</b><span class="sub">${esc(normaAmb(a))} · ${reqsAmb(a).length} requisitos</span></span></button>`).join('')}`;
+}
+function pickRecintos(a){
+  hoja(`<h2>${esc(nomAmb(a))}</h2><p class="sub">Marca los recintos que deben aplicarla.</p>
+    <input class="buscar" placeholder="Filtra por servicio, código o nombre…" oninput="filtra(this.value,'.lista-pick label')">
+    <div class="lista-pick">${D.recintos.filter(r=>!pautasRec(r[0]).includes(a)).map(r=>`<label data-q="${esc(nrm(r[3]+' '+r[1]+' '+r[2]))}">
+      <input type="checkbox" class="ck" value="${esc(r[0])}"><span>${esc(nomRec(r[0]))}<small>${esc(r[3])} · ${esc(r[1])} · ${esc(r[4])}</small></span></label>`).join('')}</div>
+    <div style="position:sticky;bottom:-16px;background:#fff;padding:10px 0"><button class="btn acc full" onclick="confirmaRecintos('${esc(a)}')">Asignar a los marcados</button></div>`);
+  document.querySelectorAll('.lista-pick label').forEach((l,i)=>{if(i>400)l.hidden=true;});
+}
+async function confirmaRecintos(a){const rids=[...document.querySelectorAll('.lista-pick input:checked')].map(i=>i.value);cerrarHoja();
+  if(rids.length)await asignarLote(rids.map(rid=>'rec|'+rid+'|'+a));}
+function asgCatymey(R){
+  const reglas=Object.entries(R.reglas).map(([k,v])=>{
+    const pend=Object.entries(R.prop).filter(([rid,p])=>p[2]===k&&REC[rid]).flatMap(([rid,p])=>p[0].filter(a=>AMB[a]&&!pautasRec(rid).includes(a)).map(a=>'rec|'+rid+'|'+a));
+    return {k,v,pend};}).filter(x=>x.pend.length).sort((a,b)=>b.pend.length-a.pend.length);
+  return `<p class="sub">Cada regla de Catymey agrupa recintos del mismo tipo con su pauta y fundamento. Apruébala completa con un toque.</p>
+    ${!reglas.length?'<div class="vacio">No quedan propuestas pendientes. 👍</div>':''}
+    ${reglas.map(x=>`<div class="asg"><div class="cab"><b>${esc(x.k.replace(/_/g,' ').replace(/^./,c=>c.toUpperCase()))}</b><span class="pill ${x.v.c==='alta'?'ok':'warn'}">${esc(x.v.c||'—')}</span></div>
+      <p class="sub" style="margin:4px 0">${esc(x.v.f)}</p><p class="sub" style="margin:0 0 8px">${esc((x.v.ej||[]).join(' · '))}</p>
+      <button class="btn acc full" onclick="aprobarRegla('${esc(x.k)}')">Aprobar · ${x.pend.length} asignaciones</button></div>`).join('')}`;
+}
+async function aprobarRegla(k){const R=window.ASR;
+  const claves=Object.entries(R.prop).filter(([rid,p])=>p[2]===k&&REC[rid]).flatMap(([rid,p])=>p[0].filter(a=>AMB[a]&&!pautasRec(rid).includes(a)).map(a=>'rec|'+rid+'|'+a));
+  if(!confirm('Aprobar «'+k.replace(/_/g,' ')+'»: '+claves.length+' asignaciones. ¿Seguro?'))return;
+  await asignarLote(claves);render();}
+function asgPuntos(R){
+  const bloque=(svc,lista)=>{const ya=pautasSvc(svc),sug=lista.filter(x=>AMB[x[0]]&&!ya.includes(x[0]));sug.forEach(x=>MARCADAS.add('svc|'+svc+'|'+x[0]));
+    return `<div class="asg"><div class="cab"><b>${esc(NIVELES[svc])}</b><button class="mini btn sec" style="min-height:36px" onclick="pickPauta('svc','${esc(svc)}')">＋</button></div>
+      <div class="pa">${ya.map(a=>tagVig('svc|'+svc+'|'+a,a)).join('')}${sug.map(x=>tagSug('svc|'+svc+'|'+x[0],x[0],x[1]+' · '+x[2])).join('')}</div></div>`;};
+  MARCADAS=new Set();
+  const pts=D.puntos.map(p=>{const ya=pautasRec(p.id),sug=p.sug.filter(a=>!ya.includes(a));sug.forEach(a=>MARCADAS.add('rec|'+p.id+'|'+a));
+    return `<div class="asg"><div class="cab"><b>${esc(p.n)}</b><button class="mini btn sec" style="min-height:36px" onclick="pickPauta('rec','${esc(p.id)}')">＋</button></div>
+      <div class="pa">${ya.map(a=>tagVig('rec|'+p.id+'|'+a,a)).join('')}${sug.map(a=>tagSug('rec|'+p.id+'|'+a,a)).join('')}${!ya.length&&!sug.length?'<span class="sub">Sin norma digitalizada todavía: asígnala con ＋ cuando exista</span>':''}</div></div>`;}).join('');
+  const cuerpo=`${bloque('HOSPITAL',R.hospital)}${bloque('EDIFICIO AA',R.edificio)}<h3>Puntos específicos</h3>${pts}`;
+  return cuerpo+botonAplicar();
+}
+
+/* ── avance por servicio (referentes) ─────────────────────────────────── */
+function vRevision(){
+  if(!esRef())return sinAcceso();
+  const xs=[...D.servicios.map(s=>s.n),'HOSPITAL','EDIFICIO AA'].map(n=>({n,a:avanceSvc(n)})).filter(x=>x.a.n).sort((a,b)=>a.a.p-b.a.p);
+  const tot=xs.reduce((t,x)=>t+x.a.n,0),listas=xs.reduce((t,x)=>t+x.a.listas,0);
+  titulo('Avance',listas+' de '+tot+' pautas completas');
+  $('app').innerHTML=`<p class="sub">De menor a mayor avance. Toca un servicio para ver sus recintos.</p>
+    ${xs.map(x=>`<button class="item" onclick="ir('#/s/${encodeURIComponent(x.n)}')"><span class="tx"><b>${esc(NIVELES[x.n]||x.n)}</b>
+      <span class="sub">${x.a.listas} de ${x.a.n} pautas completas${SVC[x.n]&&SVC[x.n].resp.length?' · '+esc(SVC[x.n].resp[0]):''}</span></span>${ring(x.a.p)}</button>`).join('')}`;
+}
+
+/* ── normas (lectura) ─────────────────────────────────────────────────── */
+function vNormas(arg){
+  if(arg&&AMB[arg]){const a=AMB[arg];titulo(nomAmb(arg),normaAmb(arg));let g=-2;
+    $('app').innerHTML=a[4].map(r=>{let h='';if(r[2]!==g&&r[2]>=0)h=`<div class="grupo">${esc(a[3][r[2]])}</div>`;g=r[2];
+      return h+`<div class="req"><div class="t" style="margin:0"><span class="n">${r[0]}.</span>${esc(r[1])}</div></div>`;}).join('');return;}
+  titulo('Normas',Object.keys(D.normas).length+' normas digitalizadas');
+  $('app').innerHTML=`<input class="buscar" placeholder="Buscar un ámbito o requisito…" oninput="filtra(this.value,'.item')">
+    ${Object.entries(D.normas).map(([k,n])=>`<h3>${esc(n.n)}</h3>${n.s.flatMap(s=>s[1]).filter(a=>AMB[a]).map(a=>`<button class="item" data-q="${esc(nrm(nomAmb(a)+' '+AMB[a][4].map(r=>r[1]).join(' ')))}" onclick="ir('#/normas/${encodeURIComponent(a)}')">
+      <span class="tx"><b>${esc(nomAmb(a))}</b><span class="sub">${AMB[a][4].length} requisitos</span></span></button>`).join('')}`).join('')}`;
+}
+
+/* ── expediente (referentes, lectura) ─────────────────────────────────── */
+function vExpediente(){
+  if(!esRef())return sinAcceso();
+  titulo('Expediente de la solicitud','Trámites y documentos para la SEREMI');
+  const pinta=()=>{const E=window.AS_EXPEDIENTE;if(!E){$('app').innerHTML='<div class="vacio">El expediente no está disponible aquí.</div>';return;}
+    const docs=E.documentos||[], cuenta=k=>docs.filter(d=>(d.estado||'pendiente')===k).length;
+    $('app').innerHTML=`<div class="card"><b>${cuenta('listo')} de ${docs.length}</b> documentos listos · <span class="sub">${cuenta('en_curso')} en curso · ${cuenta('por_verificar')} por verificar · ${cuenta('pendiente')} pendientes</span></div>
+      ${E.aviso?`<div class="card" style="background:var(--warn-bg);border-color:#f5d37a">${E.aviso}</div>`:''}
+      <h3>Trámites prioritarios</h3>${(E.tramites||[]).filter(t=>t.prioridad===1).map(t=>{const dd=docs.filter(d=>d.tramite===t.id);
+        return `<details class="pl"><summary>${esc(t.nombre)}</summary><div><p class="sub">${esc(t.autoridad)} · ${esc(t.estado_actual||'')}</p>
+        ${dd.slice(0,40).map(d=>`<p style="margin:6px 0"><span class="pill ${d.estado==='listo'?'ok':d.estado==='pendiente'?'no':'warn'}">${esc(d.estado||'pendiente')}</span> ${esc(d.nombre)}</p>`).join('')}</div></details>`;}).join('')}
+      <a class="btn sec full" href="16.AutorizacionSanitaria.html#expediente">Editar en el Expediente completo</a>`;};
+  if(window.AS_EXPEDIENTE)return pinta();
+  $('app').innerHTML='<div class="esq"></div><div class="esq"></div>';
+  const s=document.createElement('script');s.src='SHARED_DATA/as_expediente.js';s.onload=pinta;s.onerror=pinta;document.body.appendChild(s);
+}
+
+/* ── modo demostración: backend simulado en este navegador ────────────── */
+const demo={db:()=>LS.get('asdemo_db',{est:{},adj:{}}),
+  async post(b){await new Promise(r=>setTimeout(r,250));const db=this.db();
+    if(b.accion==='pedir_codigo')return /@/.test(b.correo)?{ok:true}:{ok:false,error:'Correo no válido'};
+    if(b.accion==='validar_codigo'){if(b.codigo!=='123456')return {ok:false,error:'Código incorrecto. En demostración es 123456.'};
+      const ref=/mpinto|csepulveda|mcanales|referente/.test(b.correo);
+      return {ok:true,token:'demo-'+Date.now(),correo:b.correo,nombre:ref?'Referente (demo)':'Responsable (demo)',nivel:ref?'total':'servicio',
+        servicios:ref?[]:[svcCanon(Q.get('s')||'OFTALMOLOGIA')],expira:new Date(Date.now()+30*864e5).toISOString()};}
+    if(b.accion==='estado'){db.est[b.clave]={servicio:b.servicio,recinto:b.recinto,pauta:b.pauta,datos:b.datos,avance:b.avance,usuario:'demo',ts:new Date().toISOString()};LS.set('asdemo_db',db);return {ok:true};}
+    if(b.accion==='lote'){b.items.forEach(it=>db.est[it.clave]={...it,usuario:'demo',ts:new Date().toISOString()});LS.set('asdemo_db',db);return {ok:true,guardados:b.items.length,rechazados:0};}
+    if(b.accion==='adjunto'){const id='d'+Date.now();db.adj[id]={b64:b.b64,mime:b.mime,nombre:b.nombre};LS.set('asdemo_db',db);return {ok:true,id,nombre:b.nombre,mime:b.mime,kb:Math.round(b.b64.length*.75/1024)};}
+    if(b.accion==='informe_html')return {ok:true,url:'#'};
+    return {ok:true};},
+  async get(p){await new Promise(r=>setTimeout(r,200));const db=this.db();
+    if(p.archivo){const a=db.adj[p.archivo];return a?{ok:true,...a}:{ok:false,error:'no existe'};}
+    return {ok:true,estados:db.est};}};
+
+/* ── arranque ─────────────────────────────────────────────────────────── */
+if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost')&&!DEMO)
+  navigator.serviceWorker.register('as_sw.js',{scope:'./50.AutorizacionSanitaria.html'}).catch(()=>{});   // solo esta página: no toca a las demás plataformas
+render();
+if(SES){bajarEstados().then(()=>{if(!RUTA.startsWith('#/p/'))render();});vaciarCola();}
+</script>
+</body>
+</html>

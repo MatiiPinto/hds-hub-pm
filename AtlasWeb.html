@@ -963,9 +963,8 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 .pm-kpi b{display:block;font-size:var(--fs-2xl);line-height:1.1;font-weight:var(--fw-bold)}.pm-kpi span{font-size:var(--fs-xs);color:var(--text-2)}
 </style>
 <script>
-// ── carga diferida en teléfono (AtlasWeb) ──
-window._ES_TEL=(function(){ try{ const q=new URLSearchParams(location.search).get('plano'); if(q==='full') return false; if(q==='lite') return true;
-  return /iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1)||((navigator.deviceMemory||8)<=4); }catch(e){ return false; } })();
+// ── carga diferida en la versión web (AtlasWeb): todo equipo, no sólo teléfono ──
+window._ES_TEL=true;
 window._LAZY_PEND={};
 function _lazyTag(src){ if(!window._ES_TEL) document.write('<script src="'+src+'"><\/script>'); else _LAZY_PEND[src]=null; }
 function _lazyFalta(L){ return L.some(s=>s in _LAZY_PEND && _LAZY_PEND[s]!=='ok'); }
@@ -1815,6 +1814,30 @@ const PLANO_LIVIANO=(function(){
     return ios || ((navigator.deviceMemory||8)<=4);
   }catch(e){ return false; }
 })();
+// ── Resolución del plano por niveles (20-10-2026) ─────────────────────────────
+// lite 4.096 px (~50 MB en memoria) · mid 8.192 px (~190 MB) · full ~16.000 px (~750 MB).
+// Base: equipo modesto o iPhone → lite; versión web (HUB) en computador → mid; Atlas maestro → full.
+// Al acercarse más de lo que la imagen alcanza a mostrar nítido, sube UN nivel (el modesto llega
+// a mid, nunca a full) y al alejarse vuelve a la base. ?plano=lite|mid|full lo fija.
+const _PLANO_FORZADO=(function(){ try{ const q=new URLSearchParams(location.search).get('plano'); return ['lite','mid','full'].includes(q)?q:null; }catch(e){ return null; } })();
+const _PLANO_DENS={lite:4096/16000, mid:8192/16000, full:1};
+let _planTier=null;
+function _planBase(){ if(_PLANO_FORZADO) return _PLANO_FORZADO; if(PLANO_LIVIANO) return 'lite'; return (typeof S!=='undefined'&&S.viewOnly)?'mid':'full'; }
+function _planTope(){ if(_PLANO_FORZADO) return _PLANO_FORZADO; return PLANO_LIVIANO?'mid':'full'; }
+function _planObjetivo(){
+  const base=_planBase(), tope=_planTope(), orden=['lite','mid','full'];
+  if(_planTier===null) return base;          // primera carga: el zoom todavía no está encuadrado (vale 1)
+  const necesita=(S.zoom||0)*(window.devicePixelRatio||1);          // px de pantalla por px del plano
+  let t=base;
+  while(t!==tope && necesita>_PLANO_DENS[t]*1.6) t=orden[orden.indexOf(t)+1];
+  // histéresis: si ya está en un nivel más alto, no bajar hasta alejarse bastante
+  if(_planTier && orden.indexOf(_planTier)>orden.indexOf(t) && orden.indexOf(_planTier)<=orden.indexOf(tope)){
+    const baja=orden[orden.indexOf(_planTier)-1]; if(necesita>_PLANO_DENS[baja]*1.1) t=_planTier; }
+  return t;
+}
+let _planTierTimer=null;
+function _planRevisarTier(){ clearTimeout(_planTierTimer);
+  _planTierTimer=setTimeout(()=>{ try{ if(_planCurId && _planObjetivo()!==_planTier) setFloorPlan(_planCurId); }catch(e){} },450); }
 // escala entre la imagen cargada y el marco del piso (1 con el plano completo)
 function _imgK(){ return (floorImg && floorImg.naturalWidth && IMG_W) ? floorImg.naturalWidth/IMG_W : 1; }
 function setFloorPlan(id){
@@ -1827,8 +1850,10 @@ function setFloorPlan(id){
   const color = (S.planKind==='color');
   // Cada modo prefiere su tipo y cae al otro si el piso no lo tiene (p. ej. P-3/P5
   // sólo tienen color; P-2 sólo mobiliario).
-  const chain = PLANO_LIVIANO
-    ? (color ? ['lite/|_color.webp','lite/|.webp'] : ['lite/|.webp','lite/|_color.webp'])   // nunca el plano completo en iOS
+  const tier=_planObjetivo(); _planTier=tier;
+  const pre0=tier==='full'?'':(tier+'/');
+  const chain = tier!=='full'
+    ? (color ? [pre0+'|_color.webp',pre0+'|.webp'] : [pre0+'|.webp',pre0+'|_color.webp']).concat(PLANO_LIVIANO?[]:(color?['_color.webp','.webp']:['.webp','_color.webp']))   // nunca el completo en iOS
     : (color ? ['_color.webp','_color.jpg','.webp','.jpg'] : ['.webp','.jpg','_color.webp','_color.jpg']);
   // iOS: Safari cambiaba el src pero seguía pintando el plano anterior (capa
   // compuesta gigante que no se invalida). En modo liviano el plano se oculta
@@ -4114,7 +4139,7 @@ const viewer=document.getElementById('viewer'),imgWrap=document.getElementById('
       mergeHint=document.getElementById('mergeHint'),delHint=document.getElementById('delHint');
 
 // ═══ TRANSFORM ══════════════════════════════════════════════════════════════
-const applyT = () => { imgWrap.style.transform=`translate(${S.ox}px,${S.oy}px) scale(${S.zoom})`; try{ _escRescale(); }catch(e){} };
+const applyT = () => { imgWrap.style.transform=`translate(${S.ox}px,${S.oy}px) scale(${S.zoom})`; try{ _escRescale(); }catch(e){} try{ _planRevisarTier(); }catch(e){} };
 
 // ═══ JARDINES Y ESCULTURAS (capa del piso 1) ═════════════════════════════════
 // Siembra SHARED_DATA/paisajismo.js (la genera _DEV/build_paisajismo_p1.py desde
@@ -4191,7 +4216,7 @@ function _jardinesSync(){
       im=document.createElement('img'); im.id='jardinImg'; im.alt=''; im.draggable=false;
       const fi=document.getElementById('floorImg'); fi.parentNode.insertBefore(im, fi.nextSibling);   // sobre el plano, bajo el SVG
     }
-    const jsrc=PLANO_LIVIANO?String(P.img).replace(/(^|\/)(jardines_[^\/]+)$/,'$1lite/$2'):P.img;
+    const _jt=_planTier||_planBase(); const jsrc=(_jt!=='full')?String(P.img).replace(/(^|\/)(jardines_[^\/]+)$/,'$1'+_jt+'/$2'):P.img;
     if(im.dataset.src!==jsrc){ im.dataset.src=jsrc; im.src=jsrc; }
     im.style.left=P.x+'px'; im.style.top=P.y+'px'; im.style.width=P.w+'px'; im.style.height=P.h+'px'; im.style.display='';
   } else if(im) im.style.display='none';

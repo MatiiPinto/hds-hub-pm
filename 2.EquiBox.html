@@ -451,7 +451,19 @@ table.excel-tbl tr:nth-child(even) td{background:#f8fafc}
   </div>
 </div>
 
-<script src="data/equibox_eett_data.js"></script>
+<script src="data/equibox_eett_codigos.js"></script>
+<script>
+// Especificaciones técnicas (6 MB): ya no se cargan al abrir EquiBox, sino al abrir una ficha
+// o al buscar texto (20-10-2026, computadores de gama media/baja). Al abrir sólo hace falta
+// saber qué códigos tienen EETT (equibox_eett_codigos.js).
+function _eettCargar(){
+  if(window.EETT_DATA) return Promise.resolve();
+  if(window._eettP) return window._eettP;
+  window._eettP=new Promise(function(ok){ var e=document.createElement('script'); e.src='data/equibox_eett_data.js';
+    e.onload=function(){ try{ _searchIdx=null; }catch(x){} ok(); }; e.onerror=function(){ window._eettP=null; ok(); }; document.head.appendChild(e); });
+  return window._eettP;
+}
+</script>
 <script src="data/equibox_accesorios_eett.js"></script>
 <script src="SHARED_DATA/equibox_componentes_defacto.js"></script>
 <script src="SHARED_DATA/necesidades_no_consideradas.js"></script>
@@ -860,7 +872,7 @@ function _buildSearchIdx(){
     _searchIdx[b.id] = parts.join(' ').toLowerCase();
   });
 }
-  const EETT_CODES = new Set(Object.keys((window.EETT_DATA)||{}).map(String));
+  const EETT_CODES = new Set((window.EETT_DATA?Object.keys(window.EETT_DATA):(window.EETT_CODIGOS||[])).map(String));
   let onlyEett = true;  // por defecto: solo equipos con ficha técnica (EETT) — HDS
 
 // ── HELPERS ───────────────────────────────────────────────────
@@ -1776,6 +1788,7 @@ function renderGrid(){
     if(activeSvcFilter && !(b.servicios_clinicos||[]).includes(activeSvcFilter)) return false;
     if(activeSubtype){ var st=SUBTYPES.find(function(t){ return t.key===activeSubtype; }); if(st && !st.cats.includes(b.category)) return false; }
     if(term){
+      if(!window.EETT_DATA && !window._eettP) _eettCargar().then(function(){ _searchIdx=null; renderGrid(); });   // la búsqueda incluye el texto de la EETT
       // búsqueda INTEGRAL: nombre, marca, modelo, proveedor, código, categoría,
       // tecnología, área, especialidades, servicios clínicos, texto completo de
       // la EETT, accesorios EETT y componentes asociados. Índice perezoso (se
@@ -1917,6 +1930,7 @@ function driveBtnHtml(code){
 
 function openModal(id){
   const b=BOXES.find(x=>x.id===id); if(!b)return;
+  if(!window.EETT_DATA) _eettCargar().then(function(){ if(modalOpen===id && window.EETT_DATA) openModal(id); });   // EETT diferida
   const color=badgeColor(b);
   const locRows=b.locations.length
     ?b.locations.map(l=>`<tr><td>${l.service}</td><td style="color:#64748b">${l.floor}</td><td class="loc-qty">${l.qty}</td></tr>`).join('')
@@ -2200,7 +2214,7 @@ function openModal(id){
   if (!eettEntries.length) {
     eettHtml = '<div class="eett-empty">' +
       '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>' +
-      '<div class="eett-empty-title">Sin EETT comparativas disponibles</div>' +
+      (window.EETT_DATA ? '<div class="eett-empty-title">Sin EETT comparativas disponibles</div>' : '<div class="eett-empty-title">Cargando especificaciones técnicas…</div>') +
       '<div class="eett-empty-msg">Aún no se ha cargado el resumen Solicitado vs Adjudicado para este equipo (código ' + b.code + ').</div>' +
       '</div>';
   } else {

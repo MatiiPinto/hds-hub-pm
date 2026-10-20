@@ -1,0 +1,29 @@
+{
+ "name": "Autorización Sanitaria · NHDS",
+ "short_name": "Pautas AS",
+ "description": "Cotejo de pautas de Autorización Sanitaria del Nuevo Hospital del Salvador",
+ "start_url": "50.AutorizacionSanitaria.html",
+ "scope": "50.AutorizacionSanitaria.html",
+ "display": "standalone",
+ "background_color": "#F4F6FA",
+ "theme_color": "#222944",
+ "lang": "es-CL",
+ "icons": [
+  {
+   "src": "assets/as_app/icono.svg",
+   "sizes": "any",
+   "type": "image/svg+xml"
+  },
+  {
+   "src": "assets/as_app/icono_192.png",
+   "sizes": "192x192",
+   "type": "image/png"
+  },
+  {
+   "src": "assets/as_app/icono_512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any maskable"
+  }
+ ]
+}
