@@ -837,7 +837,12 @@
 <script src="SHARED_DATA/dotacion.js"></script>
 <script src="SHARED_DATA/equipamiento.js"></script>
 <script src="SHARED_DATA/recintos.js"></script>
-<script src="SHARED_DATA/cartera.js"></script>
+<script>
+// Cartera de servicio (1,4 MB): no frena la apertura de la plataforma; se trae en segundo plano
+// apenas la página quedó cargada (20-10-2026, computadores de gama media/baja). Quien la usa lee
+// window.SHARED_CARTERA con respaldo vacío, así que antes de llegar sólo muestra 0 prestaciones.
+window.addEventListener('load',()=>setTimeout(()=>{ const e=document.createElement('script'); e.src='SHARED_DATA/cartera.js'; document.head.appendChild(e); },800));
+</script>
 <script src="SHARED_DATA/fichas_as.js"></script>
 <script src="SHARED_DATA/pautas_recintos.js"></script>
 <script src="SHARED_DATA/pauta_labels.js"></script>

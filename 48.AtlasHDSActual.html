@@ -756,6 +756,8 @@ body.view-only #dkPmCentral,body.view-only #dkPmDelta,body.view-only #backupBadg
 #ccddLegend b{display:block;margin-bottom:3px}
 #ppLegend{position:absolute;right:12px;bottom:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-2);padding:8px 10px;font-size:11px;line-height:1.5;z-index:9;display:none;max-width:280px}
 #ppLegend .pp-tit{display:block;font-weight:700;margin-bottom:3px}
+#lpLegend{position:absolute;left:12px;bottom:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-2);padding:8px 10px;font-size:11px;line-height:1.6;z-index:9;display:none;max-width:300px}
+#lpLegend .lp-sw{display:inline-block;width:18px;height:4px;border-radius:2px;vertical-align:middle;margin-right:5px}
 #ccddLegend[style*="block"]+#ppLegend{bottom:auto;top:12px}
 .fk-pp-det summary{cursor:pointer;font-size:11.5px;color:var(--text-2);margin:2px 0}
 .fk-pp-lista{font-size:11px;color:var(--text-1);line-height:1.5;margin:2px 0 4px;word-break:break-word}
@@ -950,8 +952,36 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 .pm-kpi div{flex:1;min-width:120px;background:var(--surface-sunken);border:1px solid var(--border);border-radius:var(--r-md);padding:8px 12px}
 .pm-kpi b{display:block;font-size:var(--fs-2xl);line-height:1.1;font-weight:var(--fw-bold)}.pm-kpi span{font-size:var(--fs-xs);color:var(--text-2)}
 </style>
+<script>
+// ── carga diferida (48 · Atlas HDS Actual) ──
+window._LAZY_PEND={};
+function _lazyFalta(L){ return L.some(s=>s in _LAZY_PEND && _LAZY_PEND[s]!=='ok'); }
+function _cargarJS(L){
+  return Promise.all(L.filter(s=>s in _LAZY_PEND).map(s=>{
+    if(_LAZY_PEND[s]==='ok') return null;
+    if(_LAZY_PEND[s]) return _LAZY_PEND[s];
+    return (_LAZY_PEND[s]=new Promise(ok=>{ const e=document.createElement('script'); e.src=s;
+      e.onload=()=>{ _LAZY_PEND[s]='ok'; ok(); }; e.onerror=()=>{ delete _LAZY_PEND[s]; ok(); }; document.head.appendChild(e); }));
+  }));
+}
+window.addEventListener('DOMContentLoaded',()=>{
+  const XL=['assets/vendor/xlsx-js-style-1.2.0.bundle.js'];
+  const FICHA=['SHARED_DATA/ccdd_recinto.js','SHARED_DATA/puntos_pins_recinto.js','SHARED_DATA/telefonia_ip.js'];
+  const envolver=(nombre, L, antes)=>{ const f=window[nombre]; if(typeof f!=='function') return;
+    window[nombre]=function(){ const a=arguments, self=this;
+      if(_lazyFalta(L)) return _cargarJS(L).then(()=>{ if(antes) antes(); return f.apply(self,a); });
+      return f.apply(self,a); }; };
+  envolver('openFichaRecinto', FICHA, ()=>{ try{ _TELIP_IDX=null; }catch(e){} });
+  envolver('togglePP', ['SHARED_DATA/puntos_pins_recinto.js']);
+  envolver('toggleCcdd', ['SHARED_DATA/ccdd_recinto.js']);
+  ['toggleExpMenu','xlsxDownload','xlsxLibro','exportAsignaciones'].forEach(n=>envolver(n, XL));
+  // la 48 es herramienta de trabajo con exportaciones en varios botones: la librería Excel (0,4 MB) se trae
+  // en segundo plano apenas el Atlas quedó dibujado, para que ningún botón la encuentre sin cargar
+  setTimeout(()=>_cargarJS(XL), 6000);
+});
+</script>
 <!-- xlsx-js-style: fork de SheetJS con soporte de estilos de celda (para colorear filas en el export de dotación) -->
-<script src="assets/vendor/xlsx-js-style-1.2.0.bundle.js"></script>
+<script>_LAZY_PEND["assets/vendor/xlsx-js-style-1.2.0.bundle.js"]=null;</script>
 </head>
 <body>
 <div id="hdr">
@@ -1080,6 +1110,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <button class="tb-btn" id="btnMetas" onclick="toggleMetas()" title="Metas oficiales de recintos (Resumen Ejecutivo HDS): asignados vs meta">🎯 Metas</button>
       <button class="tb-btn" id="btnAsigN" onclick="toggleAsigNum()" title="Mostrar en cada recinto cuántos funcionarios tiene asignados (solo el número, abajo a la derecha)">🧑 N° asignados</button>
       <button class="tb-btn" id="btnTiPrint" onclick="toggleTiPrint()" title="Mostrar en cada recinto (vista de servicio) las impresoras del HDS según el archivo Comodatos Jun-2026 cruzado con el PMA/BIM, abajo a la izquierda: 🖨 + 👤 láser monousuario · 👥 láser multiusuario · 📠 multifuncional · 🎨 multifuncional color. Clic abre la ficha.">🖨 Impresoras</button>
+      <button class="tb-btn" id="btnLineas" onclick="toggleLineasPiso()" title="Líneas de piso de circulación general: el recorrido de color hacia cada destino (Oftalmología, Farmacia, Toma de muestras…), de los planos de señalización de recorridos (PE 21). Leyenda con filtro por destino. Sólo lectura.">🟩 Líneas de piso</button>
       <button class="tb-btn" id="btnPP" onclick="togglePP()" title="Puntos de datos y enchufes · planos PINS 2024-2025: cada punto de corrientes débiles (datos, comunicaciones, seguridad, llamado de enfermería) y cada enchufe (normal o circuito C), registrados sobre el Atlas. En vista de piso, un testigo por recinto. Sólo lectura.">📐 Puntos PINS</button>
       <button class="tb-btn" id="btnCcdd" onclick="toggleCcdd()" title="Mostrar sobre el plano los puntos de corrientes débiles (CE y CCDD) leídos de los planos CDE rev. 20-03-2020: llamada enfermera, seguridad y control de accesos, CCTV, megafonía, gestión de turnos, telefonía, WiFi/celular. Pasa el mouse por un punto para ver qué es. Las clases «por confirmar» se muestran con su letra del plano.">📡 Corrientes débiles</button>
       <button class="tb-btn" id="btnSoloReemp" onclick="toggleSoloReemp()" title="Filtro del plano: resaltar SOLO los puestos con reemplazo vigente (titular ausente según RRHH o informado en terreno). En vista 3 los demás puestos se atenúan; en vista 2 cada recinto muestra 🔁 y cuántos reemplazos tiene.">🔁 Sólo reemplazos</button>
@@ -1140,6 +1171,7 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
       <div class="float-hint" id="vertHint"></div>
       <div id="ccddLegend"></div>
       <div id="ppLegend"></div>
+      <div id="lpLegend"></div>
       <div id="structEdit"></div>
       <div id="navPanel"></div>
       <div class="float-hint" id="stampHint">🪑 Duplicar mueble — arrastra un rectángulo sobre el mueble a copiar (como una captura de pantalla); al soltar, la copia queda junto al original · muévela arrastrándola · doble clic la elimina · ESC para salir</div>
@@ -1634,9 +1666,10 @@ body.view-only #btnBedMode, body.view-only .bedkind-seg, body.view-only .rp-bedb
 <script src="SHARED_DATA/equipamiento.js"></script>
 <script src="data/equibox_icons_map.js"></script>
 <script src="SHARED_DATA/instalaciones_recinto.js"></script>
-<script src="SHARED_DATA/ccdd_recinto.js"></script>
-<script src="SHARED_DATA/puntos_pins_recinto.js"></script>
-<script src="SHARED_DATA/telefonia_ip.js"></script>
+<script>_LAZY_PEND["SHARED_DATA/ccdd_recinto.js"]=null;</script>
+<script>_LAZY_PEND["SHARED_DATA/puntos_pins_recinto.js"]=null;</script>
+<script src="SHARED_DATA/lineas_piso.js"></script>
+<script>_LAZY_PEND["SHARED_DATA/telefonia_ip.js"]=null;</script>
 <script src="SHARED_DATA/recintos_revisar.js"></script>
 <script src="SHARED_DATA/observaciones_unidades.js"></script>
 <script src="SHARED_DATA/dotacion_bajas.js"></script>
@@ -1772,6 +1805,30 @@ const PLANO_LIVIANO=(function(){
     return ios || ((navigator.deviceMemory||8)<=4);
   }catch(e){ return false; }
 })();
+// ── Resolución del plano por niveles (20-10-2026) ─────────────────────────────
+// lite 4.096 px (~50 MB en memoria) · mid 8.192 px (~190 MB) · full ~16.000 px (~750 MB).
+// Base: equipo modesto o iPhone → lite; versión web (HUB) en computador → mid; Atlas maestro → full.
+// Al acercarse más de lo que la imagen alcanza a mostrar nítido, sube UN nivel (el modesto llega
+// a mid, nunca a full) y al alejarse vuelve a la base. ?plano=lite|mid|full lo fija.
+const _PLANO_FORZADO=(function(){ try{ const q=new URLSearchParams(location.search).get('plano'); return ['lite','mid','full'].includes(q)?q:null; }catch(e){ return null; } })();
+const _PLANO_DENS={lite:4096/16000, mid:8192/16000, full:1};
+let _planTier=null;
+function _planBase(){ if(_PLANO_FORZADO) return _PLANO_FORZADO; if(PLANO_LIVIANO) return 'lite'; return (typeof S!=='undefined'&&S.viewOnly)?'mid':'full'; }
+function _planTope(){ if(_PLANO_FORZADO) return _PLANO_FORZADO; return PLANO_LIVIANO?'mid':'full'; }
+function _planObjetivo(){
+  const base=_planBase(), tope=_planTope(), orden=['lite','mid','full'];
+  if(_planTier===null) return base;          // primera carga: el zoom todavía no está encuadrado (vale 1)
+  const necesita=(S.zoom||0)*(window.devicePixelRatio||1);          // px de pantalla por px del plano
+  let t=base;
+  while(t!==tope && necesita>_PLANO_DENS[t]*1.6) t=orden[orden.indexOf(t)+1];
+  // histéresis: si ya está en un nivel más alto, no bajar hasta alejarse bastante
+  if(_planTier && orden.indexOf(_planTier)>orden.indexOf(t) && orden.indexOf(_planTier)<=orden.indexOf(tope)){
+    const baja=orden[orden.indexOf(_planTier)-1]; if(necesita>_PLANO_DENS[baja]*1.1) t=_planTier; }
+  return t;
+}
+let _planTierTimer=null;
+function _planRevisarTier(){ clearTimeout(_planTierTimer);
+  _planTierTimer=setTimeout(()=>{ try{ if(_planCurId && _planObjetivo()!==_planTier) setFloorPlan(_planCurId); }catch(e){} },450); }
 // escala entre la imagen cargada y el marco del piso (1 con el plano completo)
 function _imgK(){ return (floorImg && floorImg.naturalWidth && IMG_W) ? floorImg.naturalWidth/IMG_W : 1; }
 function setFloorPlan(id){
@@ -1784,8 +1841,10 @@ function setFloorPlan(id){
   const color = (S.planKind==='color');
   // Cada modo prefiere su tipo y cae al otro si el piso no lo tiene (p. ej. P-3/P5
   // sólo tienen color; P-2 sólo mobiliario).
-  const chain = PLANO_LIVIANO
-    ? (color ? ['lite/|_color.webp','lite/|.webp'] : ['lite/|.webp','lite/|_color.webp'])   // nunca el plano completo en iOS
+  const tier=_planObjetivo(); _planTier=tier;
+  const pre0=tier==='full'?'':(tier+'/');
+  const chain = tier!=='full'
+    ? (color ? [pre0+'|_color.webp',pre0+'|.webp'] : [pre0+'|.webp',pre0+'|_color.webp']).concat(PLANO_LIVIANO?[]:(color?['_color.webp','.webp']:['.webp','_color.webp']))   // nunca el completo en iOS
     : (color ? ['_color.webp','_color.jpg','.webp','.jpg'] : ['.webp','.jpg','_color.webp','_color.jpg']);
   // iOS: Safari cambiaba el src pero seguía pintando el plano anterior (capa
   // compuesta gigante que no se invalida). En modo liviano el plano se oculta
@@ -4062,6 +4121,32 @@ const AREA_LOGOS=[
   {piso:'P1', area:'CASINO GENERAL', img:'CABIDA_DATA/logos/casa_y_cafe.png', ar:1400/707,
    nombre:'Casa y Café · «Sabores de siempre»', nota:'Cafetería del casino general · recinto 68.2.13 · BIM H2516 (letrero instalado, foto 15-10-2026)'},
 ];
+// ── 🟩 Líneas de piso de circulación general (20-10-2026) ────────────────────
+// SHARED_DATA/lineas_piso.js (_DEV/lineas_piso/build_lineas_piso.py): un color por destino, como en los
+// planos SEN-PL-EXT «Señalización de recorridos». Ancho = cinta de piso (~10 cm) con mínimo en pantalla.
+function _lpD(){ const D=window.LINEAS_PISO; return (D&&D.pisos)?D:null; }
+function toggleLineasPiso(){ S.showLineas=!S.showLineas; _lsPref('hdsact_show_lineas', S.showLineas?'1':'0');
+  const b=document.getElementById('btnLineas'); if(b) b.classList.toggle('active',!!S.showLineas); renderSVG(); }
+function lpFiltro(d){ S.lpOff=S.lpOff||{}; S.lpOff[d]=!S.lpOff[d]; renderSVG(); }
+function _lineasPisoLayer(){
+  const lg=document.getElementById('lpLegend'), D=_lpD();
+  if(S.showLineas===undefined){ let v=null; try{ v=localStorage.getItem('hdsact_show_lineas'); }catch(e){} S.showLineas=(v==='1'); const b=document.getElementById('btnLineas'); if(b) b.classList.toggle('active',!!S.showLineas); }
+  if(!S.showLineas || !D){ if(lg) lg.style.display='none'; return; }
+  S.lpOff=S.lpOff||{};
+  const capas=(D.pisos[S.floorId]||[]), C=D._meta.leyenda||{};
+  const w=Math.max(10/_cmPorPx(S.floorId), 3/Math.max(S.zoom,0.001));     // ~10 cm, mínimo 3 px en pantalla
+  const g=el('g',{class:'lp-layer','pointer-events':'none'});
+  capas.forEach(c=>{ if(S.lpOff[c.d]) return;
+    const d=c.s.map(q=>'M'+q[0]+' '+q[1]+'L'+q[2]+' '+q[3]).join('');
+    g.appendChild(el('path',{d, stroke:C[c.d]||'#64748b','stroke-width':w,'stroke-linecap':'round',fill:'none',opacity:0.9})); });
+  svg.appendChild(g);
+  if(lg){ lg.style.display='block';
+    const todos=Object.keys(C), aqui=new Set(capas.map(c=>c.d));
+    lg.innerHTML='<b>🟩 Líneas de piso · '+esc(curFloor()?curFloor().label:S.floorId)+'</b><br>'
+      +(aqui.size?'':'<span style="color:#b45309">Este piso no tiene recorridos en los planos de señalización</span><br>')
+      +todos.filter(d=>aqui.has(d)).map(d=>'<label style="cursor:pointer;display:block"><input type="checkbox" '+(S.lpOff[d]?'':'checked')+' onchange="lpFiltro(\''+d.replace(/'/g,"\\'")+'\')"> <span class="lp-sw" style="background:'+C[d]+'"></span>'+esc(d.charAt(0)+d.slice(1).toLowerCase())+'</label>').join('')
+      +'<div style="color:var(--text-2);margin-top:3px">Planos SEN-PL-EXT · señalización de recorridos</div>'; }
+}
 function _areaLogo(area){ const f=(FLOORS.find(x=>x.areas.includes(area))||{}).id;
   return AREA_LOGOS.find(L=>L.piso===f && norm(aName(area.id)||area.name||'')===norm(L.area))||null; }
 function _logosLayer(){
@@ -4152,7 +4237,7 @@ const viewer=document.getElementById('viewer'),imgWrap=document.getElementById('
       mergeHint=document.getElementById('mergeHint'),delHint=document.getElementById('delHint');
 
 // ═══ TRANSFORM ══════════════════════════════════════════════════════════════
-const applyT = () => { imgWrap.style.transform=`translate(${S.ox}px,${S.oy}px) scale(${S.zoom})`; try{ _escRescale(); }catch(e){} };
+const applyT = () => { imgWrap.style.transform=`translate(${S.ox}px,${S.oy}px) scale(${S.zoom})`; try{ _escRescale(); }catch(e){} try{ _planRevisarTier(); }catch(e){} };
 
 // ═══ JARDINES Y ESCULTURAS (capa del piso 1) ═════════════════════════════════
 // Siembra SHARED_DATA/paisajismo.js (la genera _DEV/build_paisajismo_p1.py desde
@@ -4229,7 +4314,7 @@ function _jardinesSync(){
       im=document.createElement('img'); im.id='jardinImg'; im.alt=''; im.draggable=false;
       const fi=document.getElementById('floorImg'); fi.parentNode.insertBefore(im, fi.nextSibling);   // sobre el plano, bajo el SVG
     }
-    const jsrc=PLANO_LIVIANO?String(P.img).replace(/(^|\/)(jardines_[^\/]+)$/,'$1lite/$2'):P.img;
+    const _jt=_planTier||_planBase(); const jsrc=(_jt!=='full')?String(P.img).replace(/(^|\/)(jardines_[^\/]+)$/,'$1'+_jt+'/$2'):P.img;
     if(im.dataset.src!==jsrc){ im.dataset.src=jsrc; im.src=jsrc; }
     im.style.left=P.x+'px'; im.style.top=P.y+'px'; im.style.width=P.w+'px'; im.style.height=P.h+'px'; im.style.display='';
   } else if(im) im.style.display='none';
@@ -5021,6 +5106,7 @@ function renderSVG(){
     if(_cpOn){ try{ _cpLayer(); }catch(e){ console.warn('carros de paro',e); } } else if(lg) lg.style.display='none'; }
   if(S.level===1) try{ _instLayer(fl); }catch(e){ console.warn('instituciones',e); }
   try{ renderEscSel(); }catch(e){}
+  try{ _lineasPisoLayer(); }catch(e){ console.warn('líneas de piso',e); }
   try{ _logosLayer(); }catch(e){ console.warn('logos de áreas',e); }
   try{ _capasArriba(); }catch(e){ console.warn('orden de capas',e); }
   try{ _capaActual(); }catch(e){ console.warn('patrimonio · instituciones',e); }
@@ -7714,7 +7800,7 @@ const CAPAS_BARRA=[
   ['btnDotNames','Nombres'],['btnDotLista','En lista'],['btnAsigN','N° asignados'],['btnSoloReemp','Reemplazos'],'|',
   ['btnVert','Ascensores'],['btnReloj','Relojes'],['btnCorreoN','Correo N.'],['btnEstac','Estacionam.'],['btnPuertasVis','Puertas'],['btnJardines','Jardines'],'|',
   ['dkUbicCarro','Carros de paro'],['dkUbicDea','DEA'],['dkUbicTotem','Tótems'],['btnImpresoras','Impresoras'],['btnShowPC','PC'],'|',
-  ['btnShowTomas','Tomas'],['btnShowGases','Gases'],['btnCcdd','C. débiles'],['btnPP','Puntos PINS']
+  ['btnShowTomas','Tomas'],['btnShowGases','Gases'],['btnCcdd','C. débiles'],['btnPP','Puntos PINS'],['btnLineas','Líneas de piso']
 ];
 const DOCK_MAPA=[
   ['dkIr',    ['btnBuscaRec']],
@@ -14602,6 +14688,12 @@ function _salidaTodas(){
 function _salidaPendientes(){
   return _salidaTodas().filter(x=>x.nombre && !nameState.salidaRev[norm(x.nombre)] && !_esBaja(x.nombre));
 }
+// Desde el 19-10-2026 la planilla trae la hoja «Egresos»: las salidas que vienen
+// con causal ya NO hay que preguntarlas, sólo darlas de baja con ese motivo. Las
+// que no, siguen siendo consulta a la jefatura. Son dos trabajos distintos y por
+// eso son dos categorías distintas en la Revisión.
+function _salidaConMotivo(){ return _salidaPendientes().filter(x=>x.causal); }
+function _salidaSinMotivo(){ return _salidaPendientes().filter(x=>!x.causal); }
 function _salidaConPuesto(){ return _salidaTodas().filter(x=>x.rid); }
 const SALIDA_GRUPO={salida_sin_respaldo:'posible renuncia o desvinculación',
   alejamiento_registrado:'alejamiento ya registrado en la matriz', fin_de_reemplazo:'fin de reemplazo',
@@ -14618,7 +14710,8 @@ function _salidaConfirmar(p){
   const k=norm(p.nombre);
   nameState.bajas=nameState.bajas||{};
   nameState.bajas[k]={n:p.nombre, m:p.motivo_sugerido||'otro',
-    nota:'salió del corte '+(((window.DOT_BAJAS||{}).corte_vigente)||'')+' · confirmado con '+(p.a_quien_preguntar||'la jefatura'),
+    nota:(p.causal ? ('Unidad de Dotación: '+p.causal+(p.fecha_termino?(' · término '+p.fecha_termino):''))
+                   : ('salió del corte '+(((window.DOT_BAJAS||{}).corte_vigente)||'')+' · confirmado con '+(p.a_quien_preguntar||'la jefatura'))),
     ts:Date.now()};
   nameState.salidaRev[k]=1;
   _mtxSrc=null; try{ _parecCache.clear(); _inMatrixCache.clear(); }catch(e){}
@@ -14999,8 +15092,21 @@ const REV_CHECKS={
       return 'No quedan asignaciones pedidas por las unidades con recinto dibujado.'
         + (n ? ' Ojo: '+n+' traen un código que todavía no existe en el plano ('
               + _sentarSinRecinto().map(x=>x.codigo_pma).join(', ')+').' : ''); })()},
-  dot_salida:{label:'Personal: salió de la matriz (confirmar con la jefatura)',
-    find:_salidaPendientes, flat:true, approve:true,
+  dot_salida:{label:'Personal: egreso informado por Dotación (dar de baja con su motivo)',
+    find:_salidaConMotivo, flat:true, approve:true,
+    okTitle:'Dar de baja con el motivo que informó la Unidad de Dotación',
+    allLabel:n=>'✓ Dar de baja las '+n+' con motivo informado',
+    allMsg:n=>'¿Dar de baja a las '+n+' personas visibles?\n\nLa Unidad de Dotación ya informó la causal y la fecha de término de cada una en la hoja «Egresos» de la planilla: no hay que preguntarle a la jefatura. Quedan marcadas fuera de la matriz con ese motivo, y las que todavía tengan puesto en el plano pasan a «fuera de la matriz con puesto» para liberarlo.',
+    apply:p=>_salidaConfirmar(p), go:p=>_goSalida(p), goDestino:()=>true,
+    subText:p=>'🚪 '+(p.causal||'')+(p.fecha_termino?(' · término '+p.fecha_termino):'')
+      +(p.retirada_de_la_planilla?' · ya retirada de la planilla':'')+' · '
+      +[p.cargo,p.u,p.sd].filter(Boolean).join(' · ')
+      +(p.acceso_por_revocar?' · ⚠ mantiene acceso o huella activa':'')
+      +(p.rid?(' · 📍 sigue con puesto en «'+(rName(p.rid)||p.rid)+'»'):'')
+      +' · ✓ la da de baja',
+    done:'Todos los egresos informados por la Unidad de Dotación están dados de baja.'},
+  dot_salida_consulta:{label:'Personal: salió de la matriz sin motivo informado (consultar)',
+    find:_salidaSinMotivo, flat:true, approve:true,
     okTitle:'Confirmar la salida: queda marcada fuera de la matriz con su motivo (si sigue con puesto, se libera en «fuera de la matriz con puesto»)',
     allLabel:n=>'✓ Confirmar las '+n+' salidas',
     allMsg:n=>'¿Confirmar las '+n+' salidas visibles?\n\nSon personas que la matriz traía y el corte nuevo de Rodrigo ya no: quedan marcadas fuera de la matriz con el motivo propuesto, y las que todavía tengan puesto en el plano pasan a «fuera de la matriz con puesto» para liberarlo.\n\nSi alguna SIGUE trabajando, usá 🚫 en su fila: queda como aviso de que a la matriz le falta.',
@@ -15011,7 +15117,7 @@ const REV_CHECKS={
       +(p.acceso_por_revocar?' · ⚠ mantiene acceso o huella activa':'')
       +(p.rid?(' · 📍 sigue con puesto en «'+(rName(p.rid)||p.rid)+'»'):' · sin puesto en el Atlas')
       +' · preguntar a '+(p.a_quien_preguntar||'RR.HH.')+' · ✓ confirma la salida · 🚫 sigue trabajando',
-    done:'Cada persona que el corte nuevo dejó fuera está confirmada o descartada.'},
+    done:'Cada salida sin motivo informado está confirmada o descartada.'},
   pma:{label:'BIM oficial (PMA)',
     find:_pmaPendientes, approve:true, noDialog:true,
     subText:p=>(p.current?('actual '+p.current):'sin BIM')+' → '+p.proposed,
@@ -17481,17 +17587,37 @@ async function runSelfTest(){
 
   // Salidas de la matriz (dotacion_bajas.js): el dataset llega y el ✓ confirma
   T('Salidas de la matriz: dataset cargado', ()=>!!(window.DOT_BAJAS && Array.isArray(DOT_BAJAS.bajas)));
-  T('Salidas de la matriz: el ✓ confirma la baja y saca la fila', ()=>{
+  T('Salidas sin motivo: van a «consultar» y el ✓ confirma la baja', ()=>{
     const prev=window.DOT_BAJAS, bPrev=JSON.stringify(nameState.bajas||{}), sPrev=JSON.stringify(nameState.salidaRev||{});
     try{
       window.DOT_BAJAS={corte_vigente:'9999-99-99', bajas:[{nombre:'ZZQ PRUEBA SALIDA', cargo:'AUXILIAR',
         estamento:'AUXILIARES', u:'UNIDAD DE PRUEBA', sd:'SUBDIRECCION DE PRUEBA', grupo:'salida_sin_respaldo',
         motivo_sugerido:'otro', prioridad:'alta', ultimo_corte:'2026-09-24', a_quien_preguntar:'UNIDAD DE PRUEBA'}]};
-      const pend=_salidaPendientes(); if(pend.length!==1) return false;
-      const txt=REV_CHECKS.dot_salida.subText(pend[0]);
-      REV_CHECKS.dot_salida.apply(pend[0]);
+      if(_salidaConMotivo().length!==0) return false;          // sin causal no entra a «egresos»
+      const pend=_salidaSinMotivo(); if(pend.length!==1) return false;
+      const txt=REV_CHECKS.dot_salida_consulta.subText(pend[0]);
+      REV_CHECKS.dot_salida_consulta.apply(pend[0]);
       return /posible renuncia/.test(txt) && /UNIDAD DE PRUEBA/.test(txt)
         && _salidaPendientes().length===0 && _esBaja('ZZQ PRUEBA SALIDA');
+    } finally {
+      window.DOT_BAJAS=prev;
+      nameState.bajas=JSON.parse(bPrev); nameState.salidaRev=JSON.parse(sPrev);
+    }
+  });
+  T('Egresos informados: la causal manda el motivo de la baja', ()=>{
+    const prev=window.DOT_BAJAS, bPrev=JSON.stringify(nameState.bajas||{}), sPrev=JSON.stringify(nameState.salidaRev||{});
+    try{
+      window.DOT_BAJAS={corte_vigente:'9999-99-99', bajas:[{nombre:'ZZQ PRUEBA EGRESO', cargo:'ENFERMERA',
+        estamento:'PROFESIONALES', u:'UNIDAD DE PRUEBA', sd:'SUBDIRECCION DE PRUEBA', grupo:'egreso_confirmado',
+        motivo_sugerido:'renuncia', prioridad:'alta', ultimo_corte:'2026-10-13',
+        causal:'RENUNCIA VOLUNTARIA', fecha_termino:'2026-09-30', retirada_de_la_planilla:true}]};
+      if(_salidaSinMotivo().length!==0) return false;          // con causal no se pregunta
+      const pend=_salidaConMotivo(); if(pend.length!==1) return false;
+      const txt=REV_CHECKS.dot_salida.subText(pend[0]);
+      REV_CHECKS.dot_salida.apply(pend[0]);
+      const b=(nameState.bajas||{})[norm('ZZQ PRUEBA EGRESO')]||{};
+      return /RENUNCIA VOLUNTARIA/.test(txt) && /2026-09-30/.test(txt) && /ya retirada/.test(txt)
+        && b.m==='renuncia' && /Unidad de Dotación/.test(b.nota||'') && _salidaConMotivo().length===0;
     } finally {
       window.DOT_BAJAS=prev;
       nameState.bajas=JSON.parse(bPrev); nameState.salidaRev=JSON.parse(sPrev);
