@@ -768,6 +768,8 @@ body.view-only #dkPmCentral,body.view-only #dkPmDelta,body.view-only #backupBadg
 #ccddLegend b{display:block;margin-bottom:3px}
 #ppLegend{position:absolute;right:12px;bottom:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-2);padding:8px 10px;font-size:11px;line-height:1.5;z-index:9;display:none;max-width:280px}
 #ppLegend .pp-tit{display:block;font-weight:700;margin-bottom:3px}
+#lpLegend{position:absolute;left:12px;bottom:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-2);padding:8px 10px;font-size:11px;line-height:1.6;z-index:9;display:none;max-width:300px}
+#lpLegend .lp-sw{display:inline-block;width:18px;height:4px;border-radius:2px;vertical-align:middle;margin-right:5px}
 #ccddLegend[style*="block"]+#ppLegend{bottom:auto;top:12px}
 .fk-pp-det summary{cursor:pointer;font-size:11.5px;color:var(--text-2);margin:2px 0}
 .fk-pp-lista{font-size:11px;color:var(--text-1);line-height:1.5;margin:2px 0 4px;word-break:break-word}
@@ -1107,6 +1109,7 @@ function _cargarJS(L){
       <button class="tb-btn" id="btnMetas" onclick="toggleMetas()" title="Metas oficiales de recintos (Resumen Ejecutivo HDS): asignados vs meta">🎯 Metas</button>
       <button class="tb-btn" id="btnAsigN" onclick="toggleAsigNum()" title="Mostrar en cada recinto cuántos funcionarios tiene asignados (solo el número, abajo a la derecha)">🧑 N° asignados</button>
       <button class="tb-btn" id="btnTiPrint" onclick="toggleTiPrint()" title="Mostrar en cada recinto (vista de servicio) las impresoras del HDS según el archivo Comodatos Jun-2026 cruzado con el PMA/BIM, abajo a la izquierda: 🖨 + 👤 láser monousuario · 👥 láser multiusuario · 📠 multifuncional · 🎨 multifuncional color. Clic abre la ficha.">🖨 Impresoras</button>
+      <button class="tb-btn" id="btnLineas" onclick="toggleLineasPiso()" title="Líneas de piso de circulación general: el recorrido de color hacia cada destino (Oftalmología, Farmacia, Toma de muestras…), de los planos de señalización de recorridos (PE 21). Leyenda con filtro por destino. Sólo lectura.">🟩 Líneas de piso</button>
       <button class="tb-btn" id="btnPP" onclick="togglePP()" title="Puntos de datos y enchufes · planos PINS 2024-2025: cada punto de corrientes débiles (datos, comunicaciones, seguridad, llamado de enfermería) y cada enchufe (normal o circuito C), registrados sobre el Atlas. En vista de piso, un testigo por recinto. Sólo lectura.">📐 Puntos PINS</button>
       <button class="tb-btn" id="btnCcdd" onclick="toggleCcdd()" title="Mostrar sobre el plano los puntos de corrientes débiles (CE y CCDD) leídos de los planos CDE rev. 20-03-2020: llamada enfermera, seguridad y control de accesos, CCTV, megafonía, gestión de turnos, telefonía, WiFi/celular. Pasa el mouse por un punto para ver qué es. Las clases «por confirmar» se muestran con su letra del plano.">📡 Corrientes débiles</button>
       <button class="tb-btn" id="btnSoloReemp" onclick="toggleSoloReemp()" title="Filtro del plano: resaltar SOLO los puestos con reemplazo vigente (titular ausente según RRHH o informado en terreno). En vista 3 los demás puestos se atenúan; en vista 2 cada recinto muestra 🔁 y cuántos reemplazos tiene.">🔁 Sólo reemplazos</button>
@@ -1167,6 +1170,7 @@ function _cargarJS(L){
       <div class="float-hint" id="vertHint"></div>
       <div id="ccddLegend"></div>
       <div id="ppLegend"></div>
+      <div id="lpLegend"></div>
       <div id="structEdit"></div>
       <div id="navPanel"></div>
       <div class="float-hint" id="stampHint">🪑 Duplicar mueble — arrastra un rectángulo sobre el mueble a copiar (como una captura de pantalla); al soltar, la copia queda junto al original · muévela arrastrándola · doble clic la elimina · ESC para salir</div>
@@ -1656,6 +1660,7 @@ function _cargarJS(L){
 <script src="SHARED_DATA/instalaciones_recinto.js"></script>
 <script>_lazyTag("SHARED_DATA/ccdd_recinto.js")</script>
 <script>_lazyTag("SHARED_DATA/puntos_pins_recinto.js")</script>
+<script src="SHARED_DATA/lineas_piso.js"></script>
 <script>_lazyTag("SHARED_DATA/telefonia_ip.js")</script>
 <script src="SHARED_DATA/recintos_revisar.js"></script>
 <script src="SHARED_DATA/observaciones_unidades.js"></script>
@@ -4049,6 +4054,32 @@ const AREA_LOGOS=[
   {piso:'P1', area:'CASINO GENERAL', img:'CABIDA_DATA/logos/casa_y_cafe.png', ar:1400/707,
    nombre:'Casa y Café · «Sabores de siempre»', nota:'Cafetería del casino general · recinto 68.2.13 · BIM H2516 (letrero instalado, foto 15-10-2026)'},
 ];
+// ── 🟩 Líneas de piso de circulación general (20-10-2026) ────────────────────
+// SHARED_DATA/lineas_piso.js (_DEV/lineas_piso/build_lineas_piso.py): un color por destino, como en los
+// planos SEN-PL-EXT «Señalización de recorridos». Ancho = cinta de piso (~10 cm) con mínimo en pantalla.
+function _lpD(){ const D=window.LINEAS_PISO; return (D&&D.pisos)?D:null; }
+function toggleLineasPiso(){ S.showLineas=!S.showLineas; _lsPref('cabida_show_lineas', S.showLineas?'1':'0');
+  const b=document.getElementById('btnLineas'); if(b) b.classList.toggle('active',!!S.showLineas); renderSVG(); }
+function lpFiltro(d){ S.lpOff=S.lpOff||{}; S.lpOff[d]=!S.lpOff[d]; renderSVG(); }
+function _lineasPisoLayer(){
+  const lg=document.getElementById('lpLegend'), D=_lpD();
+  if(S.showLineas===undefined){ let v=null; try{ v=localStorage.getItem('cabida_show_lineas'); }catch(e){} S.showLineas=(v==='1'); const b=document.getElementById('btnLineas'); if(b) b.classList.toggle('active',!!S.showLineas); }
+  if(!S.showLineas || !D){ if(lg) lg.style.display='none'; return; }
+  S.lpOff=S.lpOff||{};
+  const capas=(D.pisos[S.floorId]||[]), C=D._meta.leyenda||{};
+  const w=Math.max(10/_cmPorPx(S.floorId), 3/Math.max(S.zoom,0.001));     // ~10 cm, mínimo 3 px en pantalla
+  const g=el('g',{class:'lp-layer','pointer-events':'none'});
+  capas.forEach(c=>{ if(S.lpOff[c.d]) return;
+    const d=c.s.map(q=>'M'+q[0]+' '+q[1]+'L'+q[2]+' '+q[3]).join('');
+    g.appendChild(el('path',{d, stroke:C[c.d]||'#64748b','stroke-width':w,'stroke-linecap':'round',fill:'none',opacity:0.9})); });
+  svg.appendChild(g);
+  if(lg){ lg.style.display='block';
+    const todos=Object.keys(C), aqui=new Set(capas.map(c=>c.d));
+    lg.innerHTML='<b>🟩 Líneas de piso · '+esc(curFloor()?curFloor().label:S.floorId)+'</b><br>'
+      +(aqui.size?'':'<span style="color:#b45309">Este piso no tiene recorridos en los planos de señalización</span><br>')
+      +todos.filter(d=>aqui.has(d)).map(d=>'<label style="cursor:pointer;display:block"><input type="checkbox" '+(S.lpOff[d]?'':'checked')+' onchange="lpFiltro(\''+d.replace(/'/g,"\\'")+'\')"> <span class="lp-sw" style="background:'+C[d]+'"></span>'+esc(d.charAt(0)+d.slice(1).toLowerCase())+'</label>').join('')
+      +'<div style="color:var(--text-2);margin-top:3px">Planos SEN-PL-EXT · señalización de recorridos</div>'; }
+}
 function _areaLogo(area){ const f=(FLOORS.find(x=>x.areas.includes(area))||{}).id;
   return AREA_LOGOS.find(L=>L.piso===f && norm(aName(area.id)||area.name||'')===norm(L.area))||null; }
 function _logosLayer(){
@@ -5008,6 +5039,7 @@ function renderSVG(){
     if(_cpOn){ try{ _cpLayer(); }catch(e){ console.warn('carros de paro',e); } } else if(lg) lg.style.display='none'; }
   if(S.level===1) try{ _instLayer(fl); }catch(e){ console.warn('instituciones',e); }
   try{ renderEscSel(); }catch(e){}
+  try{ _lineasPisoLayer(); }catch(e){ console.warn('líneas de piso',e); }
   try{ _logosLayer(); }catch(e){ console.warn('logos de áreas',e); }
   try{ _capasArriba(); }catch(e){ console.warn('orden de capas',e); }
   // Overlay de diagnóstico DXF (siempre encima de todo, no interactivo)
@@ -7678,7 +7710,7 @@ const CAPAS_BARRA=[
   ['btnDotNames','Nombres'],['btnDotLista','En lista'],['btnAsigN','N° asignados'],['btnSoloReemp','Reemplazos'],'|',
   ['btnVert','Ascensores'],['btnReloj','Relojes'],['btnCorreoN','Correo N.'],['btnEstac','Estacionam.'],['btnPuertasVis','Puertas'],['btnJardines','Jardines'],'|',
   ['dkUbicCarro','Carros de paro'],['dkUbicDea','DEA'],['dkUbicTotem','Tótems'],['btnImpresoras','Impresoras'],['btnShowPC','PC'],'|',
-  ['btnShowTomas','Tomas'],['btnShowGases','Gases'],['btnCcdd','C. débiles'],['btnPP','Puntos PINS']
+  ['btnShowTomas','Tomas'],['btnShowGases','Gases'],['btnCcdd','C. débiles'],['btnPP','Puntos PINS'],['btnLineas','Líneas de piso']
 ];
 const DOCK_MAPA=[
   ['dkIr',    ['btnBuscaRec']],
