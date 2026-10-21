@@ -1681,6 +1681,7 @@ function _cargarJS(L){
 <script src="SHARED_DATA/propuestos_plano.js"></script>
 <script src="SHARED_DATA/paisajismo.js"></script>
 <script src="SHARED_DATA/laminas_proyecto.js"></script>
+<script src="SHARED_DATA/ascensores_revision.js"></script>
 <script src="SHARED_DATA/impresoras_hds.js"></script>
 <script src="SHARED_DATA/planos_meta.js"></script>
 <script src="SHARED_DATA/recinto_mnc2.js"></script>
@@ -12254,16 +12255,16 @@ function _avCuantos(){
   // versión web (dotacion_slim: sin RUT ni ley por persona): usa el agregado `cuantos` que trae el
   // slim con las mismas definiciones; si no lo trae, el recuadro no se muestra (mejor nada que ceros)
   if(!D.staff.some(p=>p.ley)) return D.cuantos ? Object.assign({version:D.cuantos.corte||String(D.version||'').split(' · ')[0]}, D.cuantos) : null;
-  const L=D.staff, GEN=/^\s*(BECAD|COMPRAS?\s+DE\s+SERVICIO)/i;
+  const L=D.staff;
   const cuenta=L.filter(p=>_AV_LEYES.includes(p.ley) && !p.no_cuenta_cargo);
   const pers=a=>new Set(a.map(p=>p.i)).size;
   const porLey=_AV_LEYES.map(l=>{ const x=cuenta.filter(p=>p.ley===l); return {ley:l, cargos:x.length, personas:pers(x), horas:x.reduce((a,p)=>a+_avHoras(p),0)}; });
-  const conNombre=L.filter(p=>!GEN.test(String(p.n||'')));
+  const conNombre=L.filter(p=>!_dotSinPersona(p));
   const compras=L.filter(p=>p.ley==='COMPRAS DE SERVICIO');
   const bec=(dotDB&&dotDB.staff)?dotDB.staff.filter(s=>s.beca).length:0;
   return { version:String(D.version||'').split(' · ')[0], cargos:cuenta.length, personas:pers(cuenta), porLey,
     registros:L.length, conNombre:conNombre.length, personasMatriz:pers(L.filter(p=>p.i)),
-    compras:compras.length, comprasNombre:compras.filter(p=>!GEN.test(String(p.n||''))).length,
+    compras:compras.length, comprasNombre:compras.filter(p=>!_dotSinPersona(p)).length,
     becados:bec, cuposBecas:L.filter(p=>p.ley==='BECADOS').length,
     honorarios:L.filter(p=>p.ley==='HONORARIO').length, docentes:L.filter(p=>p.ley==='DOCENTE UCH').length,
     externos:L.filter(p=>/^EXTERNO\s/i.test(String(p.tipo_vinculo||''))).length,
@@ -15110,8 +15111,46 @@ const REV_CHECKS={
     // guardar la ficha del recinto lo marca revisado aunque el BIM no cambie
     test:r=>((rBim(r)||'').match(/[A-Za-z]\d{3,5}/g)||[]).length>1 && rType(r)!=='bano' && !nameState.bimMultiRev[r],
     subText:p=>'BIM '+rBim(p.r.id),
-    done:'No quedan recintos multi-BIM por revisar (baños excluidos).'}
+    done:'No quedan recintos multi-BIM por revisar (baños excluidos).'},
+  asc_rev:{label:'Ascensores: paradas, recorridos y tipos por confirmar',
+    find:_ascRevPendientes, approve:true, noDialog:true, allIf:()=>false,
+    groupOf:p=>p.it.grupo,
+    okTitle:'Revisado: queda resuelto y sale de la lista (corrige el dibujo en el plano si hace falta)',
+    apply:p=>{ (nameState.ascRev=nameState.ascRev||{})[p.it.id]=1; }, go:p=>_goAscRev(p),
+    subText:p=>p.it.detalle+(p.it.accion?(' → '+p.it.accion):''),
+    done:'No quedan ascensores por confirmar.'}
 };
+// Ascensores por confirmar (SHARED_DATA/ascensores_revision.js, _DEV/ascensores/build_ascensores_revision.py):
+// cruce PAPS × directorio × señalética. El ✓ lo deja resuelto (nameState.ascRev); «ir» lleva a la cabina.
+if(!nameState.ascRev) nameState.ascRev={};
+function _ascRevPendientes(){
+  const hechos=nameState.ascRev||{};
+  return (window.ASCENSORES_REVISION||[]).filter(it=>!hechos[it.id]).map(it=>{
+    const fl=FLOORS.find(f=>f.id===it.piso)||FLOORS.find(f=>f.id==='P1')||FLOORS[0];
+    const nombre=(it.etq?('Ascensor '+it.etq):(it.nucleo?('Núcleo '+it.nucleo):'Ascensor'))+(it.piso?(' · '+fl.label):'');
+    return {it, fl, code:'asc|'+it.id, nombre};
+  });
+}
+function _goAscRev(p){
+  const it=p.it, etqs=(it.etqs&&it.etqs.length?it.etqs:[]).concat(it.ref?[it.ref]:[]);
+  const es=s=>String(s.kind||'').startsWith('asc') && etqs.includes(s.etq);
+  // piso: el del ítem; si no trae, donde esté la cabina (P1 primero)
+  let fid=it.piso; if(!fid){ const f=['P1'].concat(FLOORS.map(f=>f.id)).find(id=>structsOf(id).some(es)); fid=f||'P1'; }
+  const cambia=S.floorId!==fid; if(cambia) goFloor(fid);
+  let c=structsOf(fid).filter(es);
+  if(!c.length){   // no está dibujada en ese piso: se muestra dónde va (misma cabina en otro piso; los pisos calzan a ±1 m)
+    const otro=FLOORS.map(f=>f.id).find(id=>structsOf(id).some(es)); if(otro) c=structsOf(otro).filter(es);
+  }
+  if(!c.length && it.etq==='' && it.x!=null){   // trazo sin letra: por su posición
+    c=structsOf(fid).filter(s=>String(s.kind||'').startsWith('asc') && !s.etq && Math.hypot(s.x-it.x,s.y-it.y)<60);
+  }
+  if(!c.length) return;
+  const x0=Math.min(...c.map(s=>s.x)), y0=Math.min(...c.map(s=>s.y)), x1=Math.max(...c.map(s=>s.x+(s.w||150))), y1=Math.max(...c.map(s=>s.y+(s.h||150)));
+  const ir=()=>{ try{ zoomTo({x:x0-600,y:y0-450,w:(x1-x0)+1200,h:(y1-y0)+900},60); }catch(e){} };
+  if(!cambia){ ir(); return; }
+  // piso nuevo: esperar el encuadre de goFloor y la carga del plano, si no el ajuste a pantalla lo pisa
+  setTimeout(()=>{ if(floorImg.complete) ir(); else floorImg.addEventListener('load',()=>setTimeout(ir,120),{once:true}); }, 450);
+}
 // Clave estable de una sugerencia (para poder rechazarla y que no vuelva):
 // prioriza el identificador natural de cada chequeo (RUT, código, recinto).
 function _revKey(check,p){
@@ -15403,9 +15442,10 @@ function renderBimPending(){
   let html='<div class="rev-resumen">'+(total?('<b>'+total+'</b> pendiente'+(total===1?'':'s')+' en '+nCat+' categoría'+(nCat===1?'':'s')+' · el número de la pestaña es este total. Elige la categoría:'):'✅ Sin pendientes en ninguna categoría.')+'</div>'
     +'<select id="revSel" onchange="revSetCheck(this.value)">'
     +(()=>{ const opt=c=>'<option value="'+c+'"'+(c===_revCheck?' selected':'')+'>'+REV_CHECKS[c].label+' ('+counts[c]+')</option>';
-            const con=Object.keys(REV_CHECKS).filter(c=>counts[c]), sin=Object.keys(REV_CHECKS).filter(c=>!counts[c]);
-            return '<optgroup label="Con pendientes">'+con.map(opt).join('')+'</optgroup>'
-                  +(sin.length?('<optgroup label="Al día">'+sin.map(opt).join('')+'</optgroup>'):''); })()
+            // sólo lo realmente pendiente (21-10-2026): las categorías en 0 no se listan; la que se está
+            // mirando se mantiene mientras esté abierta, para ver su «✅ 0 pendientes».
+            const con=Object.keys(REV_CHECKS).filter(c=>counts[c] || c===_revCheck);
+            return con.map(opt).join(''); })()
     +'</select>';
   const pend=_revPend(_revCheck);
   // Exportar puntualmente la categoría que se está mirando (petición 15-sep-2026):
@@ -15673,20 +15713,32 @@ function updateUI(){
 // ═══ DOTACIÓN DATABASE ═══════════════════════════════════════════════════════
 let dotDB = null;
 
+// ¿La fila de la matriz es un cupo y no una persona? «BECADOS …», «COMPRA(S) DE SERVICIO …», sin nombre,
+// o una compra de servicio con el nombre de la empresa en vez del de la persona. No tener RUT es la señal
+// (Matías, 21-10-2026), pero no basta sola: de las 133 filas sin RUT, 16 son personas con nombre (ingresos
+// pendientes SIRH, provisorios, docentes, «SINRUT-…» que RRHH debe corregir) y se siguen cubicando.
+// Empresas de compra de servicio confirmadas: SOCIAL MED, MEDICAL y LAYNER (confirmada por Matías 21-10).
+const _DOT_EMPRESAS_COMPRA=/^\s*(SOCIAL\s*MED|MEDICAL|LAYNER)\s*$/i;
+function _dotSinPersona(p){
+  const n=String(p.n||'').trim();
+  if(!n || /^(BECAD|COMPRAS?\s+DE\s+SERVICIO)/i.test(n)) return true;
+  const compra=p.ley==='COMPRAS DE SERVICIO' || p.q==='COMPRAS DE SERVICIO' || /^COMPRA DE SERVICIO$/i.test(String(p.tipo_vinculo||''));
+  return _DOT_EMPRESAS_COMPRA.test(n) && (compra || !p.i);
+}
 function loadDotDB(){
   // Cargar dotación desde SHARED_DATA/dotacion.js (cargada por <script src>; compatible con file://).
   // Mapeo del formato compartido corto (i,n,e,c,...) al formato extendido legacy.
   try {
     const data = window.SHARED_DOTACION;
     if(!data || !data.staff) throw new Error('window.SHARED_DOTACION no disponible');
-    // Plazas sin persona detrás —«BECADOS <servicio>», «COMPRAS DE SERVICIO»— no
+    // Plazas sin persona detrás —«BECADOS <servicio>», «COMPRAS DE SERVICIO», filas sin
+    // nombre o con el de la empresa proveedora (21-10-2026: SOCIAL MED, MEDICAL, LAYNER)— no
     // se ofrecen para asignar: la matriz del Atlas es de personas con nombre
     // (decisión 2026-09-12). Se cuentan aparte en dotDB.genericos para que el
     // dato no se pierda en los resúmenes. Las compras de servicio CON nombre
     // siguen siendo asignables.
-    const _GENERICO = /^\s*(BECAD|COMPRAS?\s+DE\s+SERVICIO)/i;
-    const _personas = data.staff.filter(p => !_GENERICO.test(String(p.n||'')));
-    const _genericos = data.staff.filter(p => _GENERICO.test(String(p.n||'')));
+    const _personas = data.staff.filter(p => !_dotSinPersona(p));
+    const _genericos = data.staff.filter(p => _dotSinPersona(p));
     dotDB = {
       version: data.version || '',
       generado: data.g || '',
@@ -18410,6 +18462,30 @@ async function runSelfTest(){
       S.floorId='P2'; renderSVG(); const otro=im.style.display==='none' && !svg.querySelector('.esc-layer') && document.getElementById('btnJardines').classList.contains('dis');
       return dentro && seis && img && mks.length===6 && k1 && k2 && ficha && cierra && apaga && prende && otro;
     } finally { S.floorId=fPrev; S.level=lPrev; S.areaId=aPrev; S.roomId=rPrev; S.jardines=jPrev; S.zoom=zPrev; _escTipOff(); renderSVG(); }
+  });
+  T('Dotación: sólo se cubican personas con nombre (fuera becados genéricos, compras sin nombre y con nombre de empresa)', ()=>{
+    const cs=(n,extra)=>Object.assign({n, ley:'COMPRAS DE SERVICIO', q:'COMPRAS DE SERVICIO', tipo_vinculo:'COMPRA DE SERVICIO', i:''}, extra||{});
+    const fuera=[cs('SOCIAL MED'), cs('MEDICAL'), cs('LAYNER'), cs(''), cs('COMPRA DE SERVICIO UTO 1 PLAZA'), {n:'BECADOS ODONTOLOGIA', ley:'BECADOS'}].every(_dotSinPersona);
+    const dentro=[cs('RAMIREZ SURA ALEJANDRA'), {n:'PEREZ SOTO ANA', ley:'LEY 18.834', i:'1-9'}, {n:'MEDICAL', ley:'LEY 18.834', i:'2-7'}].every(p=>!_dotSinPersona(p));
+    const enAtlas=!!dotDB && !dotDB.staff.some(s=>!String(s.nombre||'').trim() || _DOT_EMPRESAS_COMPRA.test(s.nombre||''));
+    return fuera && dentro && enAtlas;
+  });
+  T('Revisión: ascensores por confirmar (✓ los resuelve) y el desplegable sólo lista categorías con pendientes', ()=>{
+    const prevRev=JSON.stringify(nameState.ascRev||{}), prevChk=_revCheck, prevOpen=_revOpen, prevList=window.ASCENSORES_REVISION;
+    try{
+      window.ASCENSORES_REVISION=[{id:'t-a',grupo:'G',etq:'A2',etqs:['A2'],piso:'P-2',detalle:'d',accion:'a'},{id:'t-b',grupo:'G',etq:'',etqs:[],piso:'',detalle:'d2',accion:''}];
+      nameState.ascRev={};
+      const dos=_revPend('asc_rev').length===2 && _revPend('asc_rev')[0].fl.id==='P-2';
+      REV_CHECKS.asc_rev.apply(_revPend('asc_rev')[0]); const uno=_revPend('asc_rev').length===1;
+      REV_CHECKS.asc_rev.apply(_revPend('asc_rev')[0]);
+      // en 0 y sin mirarla, no aparece en el desplegable; mirándola, sí (para ver su «0 pendientes»)
+      _revOpen=true; _revCheck=Object.keys(REV_CHECKS).find(c=>c!=='asc_rev' && _revPend(c).length)||'senalnum';
+      renderBimPending(); const sel=document.getElementById('revSel');
+      const vals=sel?[...sel.options].map(o=>o.value):[];
+      const sinCeros=!!sel && !vals.includes('asc_rev') && vals.every(v=>v===_revCheck || _revPend(v).length>0);
+      _revCheck='asc_rev'; renderBimPending(); const actual=[...document.getElementById('revSel').options].some(o=>o.value==='asc_rev');
+      return dos && uno && _revPend('asc_rev').length===0 && sinCeros && actual;
+    } finally { nameState.ascRev=JSON.parse(prevRev); window.ASCENSORES_REVISION=prevList; _revCheck=prevChk; _revOpen=prevOpen; renderBimPending(); }
   });
   T('Láminas de proyecto: la Droguería va sobre el plano del P-1 y bajo las cajas, calibrada, y se apaga; otro piso no la muestra', ()=>{
     const fPrev=S.floorId, lPrev=S.level, aPrev=S.areaId, rPrev=S.roomId, mPrev=S.laminas;
