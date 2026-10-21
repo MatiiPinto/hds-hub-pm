@@ -590,6 +590,7 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 .bim-undo:hover{background:var(--accent-600);color:#fff}
 /* jardines (imagen entre el plano y las cajas) y esculturas (marcador + ficha flotante) */
 #jardinImg{position:absolute;pointer-events:none;user-select:none;image-rendering:auto}
+.laminaImg{position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:none;user-select:none;max-width:none}
 .esc-mk{cursor:help;pointer-events:all}
 .esc-mk:hover circle.bola{stroke:#0f172a}
 #escTip{display:none;position:fixed;z-index:1300;width:330px;max-width:calc(100vw - 16px);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-3);padding:12px 14px;font-size:var(--fs-sm);color:var(--text);pointer-events:none;line-height:1.45}
@@ -1097,6 +1098,7 @@ function _cargarJS(L){
       <button class="tb-btn" id="btnServPuestos" onclick="openServPuestos()" style="display:none" title="Ver todos los puestos asignados del servicio: en cantidad o con el nombre de cada funcionario">👥 Puestos del servicio</button>
       <button class="tb-btn tog" id="btnBoxVis" onclick="cycleBoxVis()" title="Ver u ocultar las cajas dibujadas y su información (para ver el plano de fondo)">👁 Cajas</button>
       <button class="tb-btn tog" id="btnJardines" onclick="toggleJardines()" title="Mostrar u ocultar los jardines y las esculturas del piso 1 (lámina de Paisajismo PAI-PL-GEN-X-P-E-081, calibrada contra el plano). Pasa el mouse por una 🗿 para ver su ficha y fechas de traslado.">🌳 Jardines</button>
+      <button class="tb-btn tog" id="btnLaminas" onclick="toggleLaminas()" title="Mostrar u ocultar las láminas de proyecto del piso (Droguería ISP en el P-1), calibradas contra el plano.">📄 Láminas</button>
       <button class="tb-btn" id="btnNav" onclick="toggleNavPanel()" title="🧭 Ruta animada de un recinto a otro sobre la red de circulación (ejes reales del plano) y los ascensores/escaleras, con restricciones: perfil (público, camilla, clínico, logística), zonas a evitar, sin escaleras, ascensores o servicios a evitar.">🧭 Ruta</button>
       <button class="tb-btn tog" id="btnVert" onclick="toggleVerticales()" title="Mostrar u ocultar los ascensores, escaleras y escaleras mecánicas (se ven en todas las vistas). Las líneas de circulación no se tocan.">🛗 Ascensores</button>
       <button class="tb-btn tog" id="btnReloj" onclick="toggleRelojes()" title="Mostrar u ocultar los relojes control (lectores biométricos del control horario, ORD SSMO 5040029-145). Se ven en todas las vistas.">⏱ Relojes</button>
@@ -1678,6 +1680,7 @@ function _cargarJS(L){
 <script>_lazyTag("SHARED_DATA/circulacion_red.js")</script>
 <script src="SHARED_DATA/propuestos_plano.js"></script>
 <script src="SHARED_DATA/paisajismo.js"></script>
+<script src="SHARED_DATA/laminas_proyecto.js"></script>
 <script src="SHARED_DATA/impresoras_hds.js"></script>
 <script src="SHARED_DATA/planos_meta.js"></script>
 <script src="SHARED_DATA/recinto_mnc2.js"></script>
@@ -4268,6 +4271,35 @@ function _jardinesSync(){
     g.appendChild(mk);
   });
   svg.appendChild(g);
+}
+
+// ═══ LÁMINAS DE PROYECTO (capa por piso) ═════════════════════════════════════
+// Siembra SHARED_DATA/laminas_proyecto.js (la genera _DEV/build_laminas_drogueria.py): láminas de
+// proyecto (por ahora la Droguería ISP del P-1, 2 láminas 1:75) registradas contra los muros del plano
+// (residuo mediano < 1 px). Cada una es una imagen transparente ENTRE el plano y las cajas, puesta con
+// su matriz imagen→plano (mtx), así que calza al píxel aunque traiga giro o escala propios.
+function _laminas(){ const L=window.LAMINAS_PROYECTO||{}; return L[S.floorId]||[]; }
+function toggleLaminas(){
+  S.laminas=(S.laminas===false);
+  _lsPref('cabida_laminas', S.laminas?'1':'0');
+  _laminasSync();
+}
+function _laminasSync(){
+  if(S.laminas===undefined){ let v=null; try{ v=localStorage.getItem('cabida_laminas'); }catch(e){} S.laminas=PLANO_LIVIANO?(v==='1'):(v!=='0'); }   // equipo modesto: parte apagada
+  const L=_laminas(), on=L.length>0 && S.laminas!==false;
+  { const b=document.getElementById('btnLaminas'); if(b){ b.classList.toggle('active',S.laminas!==false); b.classList.toggle('dis',!L.length);
+      b.title=L.length?'Mostrar u ocultar las láminas de proyecto de este piso, calibradas contra el plano: '+L.map(l=>l.nombre+' ('+l.lamina+')').join(' · ')+'.'
+                      :'Láminas de proyecto: por ahora sólo hay de la Droguería (P-1)'; } }
+  const wrap=document.getElementById('imgWrap'), sv=document.getElementById('svgLayer'); if(!wrap||!sv) return;
+  const ids=new Set(on?L.map(l=>'lam-'+l.id):[]);
+  wrap.querySelectorAll('img.laminaImg').forEach(im=>{ if(!ids.has(im.id)) im.remove(); });
+  if(!on) return;
+  L.forEach(l=>{
+    let im=document.getElementById('lam-'+l.id);
+    if(!im){ im=document.createElement('img'); im.id='lam-'+l.id; im.className='laminaImg'; im.alt=''; im.draggable=false; im.title=l.nombre; wrap.insertBefore(im, sv); }   // sobre el plano, bajo el SVG
+    if(im.dataset.src!==l.img){ im.dataset.src=l.img; im.src=l.img; }
+    im.style.width=l.w+'px'; im.style.height=l.h+'px'; im.style.transform='matrix('+l.mtx.join(',')+')';
+  });
 }
 
 function fitView(){
@@ -7708,7 +7740,7 @@ function exportDEA(){
 const CAPAS_BARRA=[
   ['btnBoxVis','Cajas'],['dkLabels','Etiquetas'],['btnSen','Señalética'],['btnPlanKind','Color'],'|',
   ['btnDotNames','Nombres'],['btnDotLista','En lista'],['btnAsigN','N° asignados'],['btnSoloReemp','Reemplazos'],'|',
-  ['btnVert','Ascensores'],['btnReloj','Relojes'],['btnCorreoN','Correo N.'],['btnEstac','Estacionam.'],['btnPuertasVis','Puertas'],['btnJardines','Jardines'],'|',
+  ['btnVert','Ascensores'],['btnReloj','Relojes'],['btnCorreoN','Correo N.'],['btnEstac','Estacionam.'],['btnPuertasVis','Puertas'],['btnJardines','Jardines'],['btnLaminas','Láminas'],'|',
   ['dkUbicCarro','Carros de paro'],['dkUbicDea','DEA'],['dkUbicTotem','Tótems'],['btnImpresoras','Impresoras'],['btnShowPC','PC'],'|',
   ['btnShowTomas','Tomas'],['btnShowGases','Gases'],['btnCcdd','C. débiles'],['btnPP','Puntos PINS'],['btnLineas','Líneas de piso']
 ];
@@ -7779,6 +7811,7 @@ function toggleRoomLabels(){
 }
 function _dockSync(){
   try{ _jardinesSync(); }catch(e){}            // capa de jardines y esculturas (corre al final de cada render)
+  try{ _laminasSync(); }catch(e){}             // láminas de proyecto del piso (Droguería P-1)
   const d=document.getElementById('dock'); if(!d) return;
   if(S.roomLabels===undefined){
     let v=null, rep=null;
@@ -18377,6 +18410,22 @@ async function runSelfTest(){
       S.floorId='P2'; renderSVG(); const otro=im.style.display==='none' && !svg.querySelector('.esc-layer') && document.getElementById('btnJardines').classList.contains('dis');
       return dentro && seis && img && mks.length===6 && k1 && k2 && ficha && cierra && apaga && prende && otro;
     } finally { S.floorId=fPrev; S.level=lPrev; S.areaId=aPrev; S.roomId=rPrev; S.jardines=jPrev; S.zoom=zPrev; _escTipOff(); renderSVG(); }
+  });
+  T('Láminas de proyecto: la Droguería va sobre el plano del P-1 y bajo las cajas, calibrada, y se apaga; otro piso no la muestra', ()=>{
+    const fPrev=S.floorId, lPrev=S.level, aPrev=S.areaId, rPrev=S.roomId, mPrev=S.laminas;
+    try{
+      const L=(window.LAMINAS_PROYECTO||{})['P-1']||[], D=FLOOR_DIMS['P-1'];
+      const datos=L.length===2 && L.every(l=>l.mtx && l.mtx.length===6 && l.calibracion && l.calibracion.residuo_med_px<1.5
+        && l.caja[0]>=0 && l.caja[1]>=0 && l.caja[0]+l.caja[2]<=D.w && l.caja[1]+l.caja[3]<=D.h);
+      S.floorId='P-1'; S.level=1; S.areaId=null; S.roomId=null; S.laminas=true; renderSVG();
+      const ims=[...document.querySelectorAll('#imgWrap img.laminaImg')];
+      const orden=ims.length===2 && ims.every(im=>im.nextElementSibling && (im.nextElementSibling.id==='svgLayer'||im.nextElementSibling.classList.contains('laminaImg'))
+        && /^matrix\(/.test(im.style.transform));
+      toggleLaminas(); const apaga=S.laminas===false && !document.querySelector('#imgWrap img.laminaImg');
+      toggleLaminas(); const prende=document.querySelectorAll('#imgWrap img.laminaImg').length===2;
+      S.floorId='P2'; renderSVG(); const otro=!document.querySelector('#imgWrap img.laminaImg') && document.getElementById('btnLaminas').classList.contains('dis');
+      return datos && orden && apaga && prende && otro;
+    } finally { S.floorId=fPrev; S.level=lPrev; S.areaId=aPrev; S.roomId=rPrev; S.laminas=mPrev; renderSVG(); }
   });
   T('Respaldo a archivo: sólo desde el Atlas de trabajo (un preview en otro puerto no pisa el estado)', ()=>{
     return FBAK_PUERTOS.indexOf('8790')>=0 && FBAK_PUERTOS.length<=2

@@ -741,5 +741,117 @@ window.VERTICALES_PARCHES = [
     }
    }
   ]
+ },
+ {
+  "id": "ascensores-paradas-publico-2026-10-21-P1",
+  "piso": "P1",
+  "motivo": "F, K y P (núcleos N_E.02, N_E.03, N_E.05) paran en P1 según la señalética y no estaban dibujados. Posición por similitud con los ascensores comunes entre pisos (_DEV/ascensores/parche_paradas_publico.py).",
+  "agregar": [
+   {
+    "id": "P1-par-F",
+    "kind": "asc-G",
+    "x": 3468.0,
+    "y": 1695.0,
+    "w": 181.0,
+    "h": 163.0,
+    "etq": "F",
+    "salida": "e",
+    "salida_fuente": "misma cabina en P-2",
+    "origen": "parada de público según señalética (cruce 15-10-2026); ducto de P-2"
+   },
+   {
+    "id": "P1-par-K",
+    "kind": "asc-G",
+    "x": 3394.0,
+    "y": 6919.0,
+    "w": 175.0,
+    "h": 159.0,
+    "etq": "K",
+    "salida": "w",
+    "salida_fuente": "misma cabina en P-2",
+    "origen": "parada de público según señalética (cruce 15-10-2026); ducto de P-2"
+   },
+   {
+    "id": "P1-par-P",
+    "kind": "asc-G",
+    "x": 9878.0,
+    "y": 6921.0,
+    "w": 171.0,
+    "h": 152.0,
+    "etq": "P",
+    "salida": "e",
+    "salida_fuente": "misma cabina en P-2",
+    "origen": "parada de público según señalética (cruce 15-10-2026); ducto de P-2"
+   }
+  ]
+ },
+ {
+  "id": "ascensores-paradas-publico-2026-10-21-P-1",
+  "piso": "P-1",
+  "motivo": "C1 y C2 (núcleo N_P.02) paran en P-1 según la señalética y no estaban dibujados. Posición por similitud con los ascensores comunes entre pisos (_DEV/ascensores/parche_paradas_publico.py).",
+  "agregar": [
+   {
+    "id": "P-1-par-C2",
+    "kind": "asc-G",
+    "x": 327.5,
+    "y": 6908.0,
+    "w": 143.0,
+    "h": 143.0,
+    "etq": "C2",
+    "salida": "e",
+    "salida_fuente": "misma cabina en P1",
+    "origen": "parada de público según señalética (cruce 15-10-2026); ducto de P1"
+   },
+   {
+    "id": "P-1-par-C1",
+    "kind": "asc-G",
+    "x": 328.5,
+    "y": 7056.0,
+    "w": 145.0,
+    "h": 139.0,
+    "etq": "C1",
+    "salida": "e",
+    "salida_fuente": "misma cabina en P1",
+    "origen": "parada de público según señalética (cruce 15-10-2026); ducto de P1"
+   }
+  ]
+ },
+ {
+  "id": "ascensores-paradas-publico-2026-10-21-P-2",
+  "piso": "P-2",
+  "motivo": "A2 (núcleo N_P.01) para en P-2 según la señalética; sólo estaba A1. Posición por similitud con los ascensores comunes entre pisos (_DEV/ascensores/parche_paradas_publico.py).",
+  "agregar": [
+   {
+    "id": "P-2-par-A2",
+    "kind": "asc-G",
+    "x": 302.6,
+    "y": 2088.5,
+    "w": 137.4,
+    "h": 232.4,
+    "etq": "A2",
+    "salida": "n",
+    "salida_fuente": "misma cabina en P-1 (gemelo de A1)",
+    "origen": "parada de público según señalética (cruce 15-10-2026); ducto de P-1 (gemelo de A1)"
+   }
+  ]
+ },
+ {
+  "id": "ascensores-paradas-publico-2026-10-21-P-3",
+  "piso": "P-3",
+  "motivo": "A2 (núcleo N_P.01) para en P-3 según la señalética; sólo estaba A1. Posición por similitud con los ascensores comunes entre pisos (_DEV/ascensores/parche_paradas_publico.py).",
+  "agregar": [
+   {
+    "id": "P-3-par-A2",
+    "kind": "asc-G",
+    "x": 550.0,
+    "y": 1815.0,
+    "w": 102.0,
+    "h": 152.0,
+    "etq": "A2",
+    "salida": "n",
+    "salida_fuente": "misma cabina en P-1 (gemelo de A1)",
+    "origen": "parada de público según señalética (cruce 15-10-2026); ducto de P-1 (gemelo de A1)"
+   }
+  ]
  }
 ];
