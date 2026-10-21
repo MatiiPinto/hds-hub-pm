@@ -189,7 +189,7 @@ details.rp-det{margin:0 0 18px}details.rp-det>summary{cursor:pointer;font-size:.
 </div>
 
 <div class="info-modal" id="infoModal" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="im-box"><div class="im-hd"><span>¿Qué muestra esta reportería?</span><button class="im-x" onclick="document.getElementById('infoModal').classList.remove('open')">×</button></div><div class="im-bd">Dos pestañas. <b>📦 PINS</b>: despliegue del equipamiento médico y mobiliario clínico ítem por ítem (planilla PINS-EMMC de la Sociedad Concesionaria), filtrable por edificio. Un ítem está <b>desplegado</b> si está Posicionado o Conectado/N-A; el <b>lugar</b> dice dónde está físicamente: sin recepción → bulto → zona de despliegue → recinto definitivo. <b>🧰 Instrumental</b>: llegada de las cajas al hospital («recibida» no significa revisada), revisión caja por caja (conforme = acta cerrada) y entregas comprometidas por la Concesionaria. Cada bloque indica su fecha de corte: los cortes son distintos y no se suman. Los datos salen de SHARED_DATA/reporteria_pins_instrumental.js (_DEV/build_reporteria_pins_instrumental.py).</div></div></div>
+  <div class="im-box"><div class="im-hd"><span>¿Qué muestra esta reportería?</span><button class="im-x" onclick="document.getElementById('infoModal').classList.remove('open')">×</button></div><div class="im-bd">Cuatro pestañas. <b>📦 PINS</b>: despliegue del equipamiento médico y mobiliario clínico ítem por ítem (planilla PINS-EMMC de la Sociedad Concesionaria), filtrable por edificio. Un ítem está <b>desplegado</b> si está Posicionado o Conectado/N-A; el <b>lugar</b> dice dónde está físicamente: sin recepción → bulto → zona de despliegue → recinto definitivo. <b>🧰 Instrumental</b>: llegada de las cajas al hospital («recibida» no significa revisada), revisión caja por caja (conforme = acta cerrada) y entregas comprometidas por la Concesionaria. Cada bloque indica su fecha de corte: los cortes son distintos y no se suman. Los datos salen de SHARED_DATA/reporteria_pins_instrumental.js (_DEV/build_reporteria_pins_instrumental.py). <b>✅ Existencias</b>: estado de firma de las actas EQM por recinto BIM (Firma 2 / Firma 1 / No se puede declarar) y cumplimiento equipo por equipo; se actualiza con python3 ~/Desktop/ClaudeCode/ExistenciasConsolidacion/actualizar_existencias.py (SHARED_DATA/existencias_estado.js).</div></div></div>
 
 <div class="container">
 
@@ -320,6 +320,7 @@ details.rp-det{margin:0 0 18px}details.rp-det>summary{cursor:pointer;font-size:.
     <button class="rp-tab on" data-p="pins" onclick="rpTab('pins')">📦 PINS · despliegue EMMC</button>
     <button class="rp-tab" data-p="inst" onclick="rpTab('inst')">🧰 Instrumental quirúrgico</button>
     <button class="rp-tab" data-p="plan" onclick="rpTab('plan')">📜 Plan de Instalación · cumplimiento</button>
+    <button class="rp-tab" data-p="exi" onclick="rpTab('exi')">✅ Existencias · firmas y cumplimiento</button>
   </div>
 
   <!-- ═══ PESTAÑA PINS ═══ -->
@@ -565,6 +566,8 @@ details.rp-det{margin:0 0 18px}details.rp-det>summary{cursor:pointer;font-size:.
 
   <!-- ═══ PESTAÑA PLAN DE INSTALACIÓN (bases, letra D, puntos i–x) ═══ -->
   <div class="rp-pane" id="pane-plan"></div>
+  <!-- ═══ PESTAÑA EXISTENCIAS (firma por BIM y cumplimiento equipo por equipo) ═══ -->
+  <div class="rp-pane" id="pane-exi"><div class="rp-nota">Cargando…</div></div>
 
   <div class="footer" id="rp-footer"></div>
 </div>
@@ -845,6 +848,58 @@ function rPlan(){
 }
 if(!R){ document.getElementById('pane-pins').insertAdjacentHTML('afterbegin','<div class="rp-alerta">Falta SHARED_DATA/reporteria_pins_instrumental.js (python3 _DEV/build_reporteria_pins_instrumental.py).</div>'); }
 else { rPins(); rInst(); rPlan(); try{ const t=localStorage.getItem('rp22_tab'); if(t) rpTab(t); }catch(e){} }
+</script>
+<script>
+/* ✅ Existencias — dato: SHARED_DATA/existencias_estado.js (Desktop/ClaudeCode/ExistenciasConsolidacion/actualizar_existencias.py).
+   Se carga al abrir la pestaña (≈1,3 MB). Sin observaciones manuscritas ni nombres: esos quedan en el Excel. */
+const EXI = {edif:'', firma:'', cumple:'', q:'', abierto:null, lim:200};
+const EXI_COL = {'Firma 2':'#27ae60','Firma 1':'#f39c12','No se puede declarar':'#e74c3c','CUMPLE':'#27ae60','NO CUMPLE':'#e74c3c','POR CONFIRMAR':'#f39c12'};
+function exiCargar(){
+  if (window.EXISTENCIAS_ESTADO) return exiRender();
+  if (window._exiCargando) return; window._exiCargando = true;
+  const e = document.createElement('script'); e.src = 'SHARED_DATA/existencias_estado.js?v=' + Date.now();
+  e.onload = exiRender;
+  e.onerror = () => document.getElementById('pane-exi').innerHTML = '<div class="rp-alerta">Falta SHARED_DATA/existencias_estado.js: correr python3 ~/Desktop/ClaudeCode/ExistenciasConsolidacion/actualizar_existencias.py</div>';
+  document.head.appendChild(e);
+}
+const _rpTabOrig = rpTab; rpTab = function(t){ _rpTabOrig(t); if (t === 'exi') exiCargar(); };
+function exiEsc(x){ return String(x == null ? '' : x).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function exiBadge(t){ const c = EXI_COL[t] || '#6b7a99'; return `<span style="display:inline-block;padding:2px 8px;border-radius:99px;background:${c}1f;color:${c};font-weight:700;white-space:nowrap">${exiEsc(t)}</span>`; }
+function exiSet(k, v){ EXI[k] = (EXI[k] === v ? '' : v); EXI.abierto = null; EXI.lim = 200; exiRender(); }
+function exiRender(){
+  const D = window.EXISTENCIAS_ESTADO, P = document.getElementById('pane-exi'); if (!D) return;
+  const porB = {}; D.eq.forEach(e => (porB[e.b] = porB[e.b] || []).push(e));
+  const q = EXI.q.trim().toLowerCase();
+  const bims = D.bim.filter(b => (!EXI.edif || b.e === EXI.edif) && (!EXI.firma || b.f === EXI.firma)
+    && (!EXI.cumple || (porB[b.b] || []).some(e => e.cu === EXI.cumple))
+    && (!q || [b.b, b.r, b.d].join(' ').toLowerCase().includes(q) || (porB[b.b] || []).some(e => (e.n + ' ' + e.c).toLowerCase().includes(q))));
+  const eqs = bims.flatMap(b => porB[b.b] || []);
+  const cnt = (arr, k, v) => arr.filter(x => x[k] === v).length, pct = (a, t) => t ? (a / t * 100).toFixed(1).replace('.', ',') + ' %' : '—';
+  const kpi = (lbl, v, t, col, filtro, val) => `<div class="kpi-card" style="cursor:pointer;${EXI[filtro] === val ? 'outline:2px solid ' + col : ''}" onclick="exiSet('${filtro}','${val}')"><div class="kpi-label">${lbl}</div><div class="kpi-val" style="color:${col}">${v.toLocaleString('es-CL')}</div><div class="kpi-sub">${pct(v, t)} de ${t.toLocaleString('es-CL')}</div></div>`;
+  const edifs = ['AA', 'HDS', 'PABH'].map(e => { const bs = D.bim.filter(b => b.e === e); return {e, t: bs.length, s: D.estados_firma.map(f => cnt(bs, 'f', f))}; });
+  const barras = edifs.filter(x => x.t).map(x => `<div class="stacked-row"><div class="stacked-lbl">${x.e}</div><div class="stacked-bar-bg">${x.s.map((v, i) => v ? `<div class="stacked-seg" style="width:${(v / x.t * 100).toFixed(2)}%;background:${EXI_COL[D.estados_firma[i]]}" title="${D.estados_firma[i]}: ${v}">${v > 15 ? v : ''}</div>` : '').join('')}</div><div class="stacked-nums" title="Firma 2: ${x.s[0]} de ${x.t} BIM"><strong>${pct(x.s[0], x.t)}</strong> <span style="color:var(--muted)">F2</span></div></div>`).join('');
+  const chip = (k, v, l) => `<button class="rp-chip${EXI[k] === v ? ' on' : ''}" onclick="exiSet('${k}','${v}')">${l}</button>`;
+  const filas = bims.slice(0, EXI.lim).map(b => {
+    const abierto = EXI.abierto === b.b;
+    const det = abierto ? `<tr><td colspan="9" style="background:#f8fafc;padding:8px 14px"><table class="tbl" style="font-size:.6rem"><tr><th>Código</th><th>Equipo</th><th>Existe</th><th>Enciende</th><th>Partes</th><th>Cumplimiento</th><th>Qué falta</th></tr>${(porB[b.b] || []).map(e => `<tr><td>${e.c}</td><td>${exiEsc(e.n)}</td><td>${e.x}</td><td>${e.en || '—'}</td><td>${e.pp || '—'}</td><td>${exiBadge(e.cu)}</td><td style="color:var(--muted)">${exiEsc(e.m)}${e.src === 'auto' ? ' · <i>lectura automática</i>' : ''}</td></tr>`).join('')}</table></td></tr>` : '';
+    return `<tr style="cursor:pointer" onclick="EXI.abierto=(EXI.abierto==='${b.b}'?null:'${b.b}');exiRender()"><td>${b.e}</td><td>${exiEsc(b.p)}</td><td>${exiEsc(b.d)}</td><td><b>${b.b}</b> ${abierto ? '▾' : '▸'}</td><td>${exiEsc(b.r)}</td><td class="n">${b.n}</td><td class="n"><span style="color:#27ae60">${b.cu}</span> · <span style="color:#e74c3c">${b.nc}</span> · <span style="color:#f39c12">${b.pc}</span></td><td>${exiBadge(b.f)}${b.ok === 'NO' ? ` <span title="La SC registra ${exiEsc(b.sc)} en su planilla LINKS" style="color:#b45309;font-weight:700;cursor:help">⚠ SC: ${exiEsc(b.sc)}</span>` : ''}</td><td style="color:var(--muted)">${exiEsc(b.m)}</td></tr>` + det;
+  }).join('');
+  P.innerHTML = `
+    <div class="sec-title">Estado de firma EQM por recinto (BIM) <span class="rp-corte">corte ${exiEsc(D.generado)}</span></div>
+    <div class="rp-nota">Universo: recintos con equipamiento EQM del Anexo Ib (AA + HDS + PABH, sin Apoyo TI). <b>Firma 2</b> = bloque 2 del acta con las tres firmas (recinto cerrado) · <b>Firma 1</b> = revisado con pendientes · <b>No se puede declarar</b> = sin acta, sin página de firmas legible o sin firmas. Clic en una tarjeta para filtrar.</div>
+    <div class="kpi-grid">${D.estados_firma.map(f => kpi(f === 'No se puede declarar' ? 'No se puede declarar' : f, cnt(D.bim, 'f', f), D.bim.length, EXI_COL[f], 'firma', f)).join('')}</div>
+    <div class="card" style="margin-bottom:22px">${barras}</div>
+    <div class="sec-title">Cumplimiento equipo por equipo</div>
+    <div class="rp-nota"><b>Cumple</b> = existe, enciende (o N/A) y tiene sus partes y piezas · <b>No cumple</b> = no existe, no enciende / no se probó o faltan partes · <b>Por confirmar</b> = falta un dato.</div>
+    <div class="kpi-grid">${D.estados_cumplimiento.map(c => kpi(c.charAt(0) + c.slice(1).toLowerCase(), cnt(D.eq, 'cu', c), D.eq.length, EXI_COL[c], 'cumple', c)).join('')}</div>
+    <div class="sec-title">Recintos <span class="rp-corte">${bims.length.toLocaleString('es-CL')} BIM · ${eqs.length.toLocaleString('es-CL')} equipos</span></div>
+    <div class="rp-edif">${chip('edif', '', 'Todos')}${['AA', 'HDS', 'PABH'].map(e => chip('edif', e, e)).join('')}</div>
+    <input class="dc-buscar" placeholder="Buscar BIM, recinto, departamento, equipo o código…" value="${exiEsc(EXI.q)}" oninput="EXI.q=this.value;EXI.lim=200;clearTimeout(window._exiT);window._exiT=setTimeout(()=>{exiRender();const i=document.querySelector('#pane-exi .dc-buscar');i.focus();i.setSelectionRange(i.value.length,i.value.length)},250)">
+    <div class="card" style="padding:0;overflow-x:auto"><table class="tbl"><tr><th>Edif.</th><th>Piso</th><th>Departamento</th><th>BIM</th><th>Recinto</th><th class="n">Equipos</th><th class="n">✅ · ❌ · 🟡</th><th>Firma</th><th>Motivo / detalle</th></tr>${filas}</table></div>
+    ${bims.length > EXI.lim ? `<div style="text-align:center;margin:10px 0"><button class="rp-chip" onclick="EXI.lim+=300;exiRender()">Mostrar más (${(bims.length - EXI.lim).toLocaleString('es-CL')} restantes)</button></div>` : ''}
+    <div class="rp-nota" style="margin-top:12px">Fuentes: ${exiEsc(D.fuentes.anexo_ib)} · ${exiEsc(D.fuentes.actas)} · ${exiEsc(D.fuentes.revision)}. ⚠ SC = la Concesionaria registra otra firma en su planilla LINKS. El detalle completo (observaciones de las actas y página) está en el Excel Estado_firmas_EQM_por_BIM de Existencias_23_09_26.</div>`;
+}
+if (document.getElementById('pane-exi').classList.contains('on')) exiCargar();
 </script>
 <script src="hub-home.js"></script>
 </body>
