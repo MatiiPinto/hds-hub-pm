@@ -4117,7 +4117,7 @@ function aShapes(area){ return boxState.areas[area.id]||[]; }
 // Por piso + nombre del área (no por id: sobrevive a re-dibujar el área). La imagen va
 // en la parte baja de la caja del área, bajo el nombre, en vista de piso y de servicio.
 const AREA_LOGOS=[
-  // espacio concesionado: el logo REEMPLAZA al nombre del área y va en la parte baja del bloque dibujado
+  // espacio concesionado: el logo REEMPLAZA al nombre del área y va al centro del bloque dibujado
   {piso:'P1', area:'CASINO GENERAL', img:'CABIDA_DATA/logos/casa_y_cafe.png', ar:1400/707,
    nombre:'Casa y Café · «Sabores de siempre»', nota:'Cafetería del casino general · recinto 68.2.13 · BIM H2516 (letrero instalado, foto 15-10-2026)'},
 ];
@@ -4157,7 +4157,7 @@ function _logosLayer(){
     const a=fl.areas.find(x=>norm(aName(x.id)||x.name||'')===norm(L.area)); if(!a) return;
     if(S.level===2 && S.areaId!==a.id) return;
     const sh=aShapes(a); if(!sh.length) return; const b=bounds(sh);
-    const w=Math.min(b.w*0.42, b.h*0.30*L.ar), h=w/L.ar, x=b.x+(b.w-w)/2, y=b.y+b.h-h-Math.min(b.w,b.h)*0.04;
+    const w=Math.min(b.w*0.42, b.h*0.30*L.ar), h=w/L.ar, x=b.x+(b.w-w)/2, y=b.y+(b.h-h)/2;   // al centro del bloque dibujado (21-10-2026)
     const im=el('image',{x, y, width:w, height:h, preserveAspectRatio:'xMidYMid meet', opacity:0.92});
     im.setAttribute('href', L.img); im.setAttributeNS('http://www.w3.org/1999/xlink','href', L.img);
     const t=el('title'); t.textContent=L.nombre+' — '+L.nota; im.appendChild(t);

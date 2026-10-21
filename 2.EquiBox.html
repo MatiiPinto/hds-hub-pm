@@ -2215,7 +2215,7 @@ function openModal(id){
     eettHtml = '<div class="eett-empty">' +
       '<svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>' +
       (window.EETT_DATA ? '<div class="eett-empty-title">Sin EETT comparativas disponibles</div>' : '<div class="eett-empty-title">Cargando especificaciones técnicas…</div>') +
-      '<div class="eett-empty-msg">Aún no se ha cargado el resumen Solicitado vs Adjudicado para este equipo (código ' + b.code + ').</div>' +
+      '<div class="eett-empty-msg">Aún no se ha cargado el resumen Solicitado vs evaluado en la CTAR para este equipo (código ' + b.code + ').</div>' +
       '</div>';
   } else {
     const renderVariant = function(entry, idx, total) {
@@ -2230,9 +2230,9 @@ function openModal(id){
           '<div class="eett-info-item"><span class="lbl">Familia</span><span class="val">' + (eq.familia||'—') + '</span></div>' +
           '<div class="eett-info-item"><span class="lbl">UMDNS</span><span class="val">' + (eq.umdns||'—') + '</span></div>' +
           '<div class="eett-info-item"><span class="lbl">Cantidad</span><span class="val">' + (eq.cantidad||'—') + '</span></div>' +
-          '<div class="eett-info-item adj"><span class="lbl">Empresa Adjudicada</span><span class="val">' + (adj.empresa||'—') + '</span></div>' +
-          '<div class="eett-info-item adj"><span class="lbl">Marca</span><span class="val">' + (adj.marca||'—') + '</span></div>' +
-          '<div class="eett-info-item adj"><span class="lbl">Modelo</span><span class="val">' + (adj.modelo||'—') + '</span></div>' +
+          '<div class="eett-info-item adj"><span class="lbl">Empresa evaluada (CTAR)</span><span class="val">' + (adj.empresa||'—') + '</span></div>' +
+          '<div class="eett-info-item adj"><span class="lbl">Marca evaluada</span><span class="val">' + (adj.marca||'—') + '</span></div>' +
+          '<div class="eett-info-item adj"><span class="lbl">Modelo evaluado</span><span class="val">' + (adj.modelo||'—') + '</span></div>' +
           '<div class="eett-info-item adj"><span class="lbl">País</span><span class="val">' + (adj.pais||'—') + '</span></div>' +
         '</div>';
       const cumpleBadge = function(v) {
@@ -2273,7 +2273,21 @@ function openModal(id){
         '</tr></thead>' +
         '<tbody>' + rows + '</tbody>' +
         '</table>';
-      return variantBar + infoBar + table;
+      // La CTAR evaluó una oferta; la OC puede ser de otra marca (200 tipologías, cruce_modelos 12-10).
+      // Lo comprado manda: se avisa arriba de la tabla, que sigue siendo la evaluación CTAR.
+      const _n = function(x){ return String(x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,''); };
+      const _pal = function(x){ return _n(String(x||'').split(/\s+/)[0]); };
+      const _am = _pal(adj.marca);
+      const _oc = adjList.filter(function(a){ return a.marca; });
+      const difiere = _am && _oc.length && !_oc.some(function(a){ const m=_n(a.marca); return m.indexOf(_am)>=0 || _am.indexOf(_pal(a.marca))>=0; });
+      const avisoOC = difiere
+        ? '<div style="margin:0 0 12px;padding:10px 12px;border-radius:8px;background:#fff7ed;border:1px solid #fdba74;color:#7c2d12;font-size:12px;line-height:1.5">' +
+            '<b>⚠ Lo comprado no es lo evaluado en la CTAR.</b> Comprado (OC): <b>' +
+            _oc.map(function(a){ return (a.marca||'') + ' ' + (a.modelo||''); }).join(' · ') +
+            '</b>. La CTAR evaluó ' + (adj.marca||'') + ' ' + (adj.modelo||'') + ' (' + (adj.empresa||'') + '). ' +
+            'La tabla de abajo corresponde a la oferta evaluada; para el equipo instalado usar la OC, el PINS y los manuales.</div>'
+        : '';
+      return variantBar + avisoOC + infoBar + table;
     };
     eettHtml = '<div id="eett-content-' + b.code + '">' + renderVariant(eettEntries[0], 0, eettEntries.length) + '</div>';
     window._eettCurrentEntries = window._eettCurrentEntries || {};
@@ -2301,7 +2315,7 @@ function openModal(id){
       <button class="modal-tab-btn active" onclick="switchModalTab(this,'tab-equip')">Equipamiento</button>
       <button class="modal-tab-btn" onclick="switchModalTab(this,'tab-acc')">${accTabLabel}</button>
       <button class="modal-tab-btn" onclick="switchModalTab(this,'tab-lic')">${licTabLabel}</button>
-      <button class="modal-tab-btn" onclick="switchModalTab(this,'tab-eett')">EETT vs Adjudicado${eettTabSuffix}</button>
+      <button class="modal-tab-btn" onclick="switchModalTab(this,'tab-eett')">EETT vs evaluado CTAR${eettTabSuffix}</button>
       <button class="modal-tab-btn" onclick="switchModalTab(this,'tab-pins')">${pinsTabLabel}</button>
       <button class="modal-tab-btn" onclick="switchModalTab(this,'tab-doc')">${fxDocLabel(b)}</button>
       <button class="modal-tab-btn" onclick="switchModalTab(this,'tab-compra')">🧾 Compra y reposición</button>

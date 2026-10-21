@@ -567,7 +567,7 @@ function renderTable(){
       if(c.actas) return actasCell(r);
       var v=valOf(r,c.key);
       if(c.lista) return '<td class="lista">'+String(v||"").split(/[\n;]+/).map(function(x){return x.trim();}).filter(Boolean).map(esc).join('<br>')+'</td>';
-      if(c.edit) return '<td class="edit"><input type="'+(c.type||"text")+'" value="'+esc(v)+'" onchange="setField(\''+r.id+'\',\''+c.key+'\',this.value)"></td>';
+      if(c.edit) return '<td class="edit"><input type="'+(c.type||"text")+'" value="'+esc(v)+'" onchange="setField(\''+r.id+'\',\''+c.key+'\',this.value)">'+(c.key==="duracion"&&r.aviso_excel?'<span title="'+esc(r.aviso_excel)+'" style="cursor:help;color:#b45309;font-weight:700;margin-left:4px">⚠</span>':'')+'</td>';
       return '<td>'+esc(v)+'</td>';
     }).join("");
     var notas=(overrides[r.id]&&overrides[r.id].notas)||"";
