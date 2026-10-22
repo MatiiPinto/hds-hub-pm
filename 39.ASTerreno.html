@@ -431,6 +431,31 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 .vw-menu .tb-btn{width:100%;text-align:left;justify-content:flex-start;border:0;height:32px;background:transparent;color:var(--text-2)}
 .vw-menu .tb-btn:hover{background:var(--surface-sunken);color:var(--text)}
 .vw-menu .tb-btn.active{background:var(--accent-50);color:var(--accent-700)}
+#agregarMenu{position:fixed;display:none;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-2);padding:8px;width:300px;max-width:calc(100vw - 24px);max-height:min(78vh,720px);overflow-y:auto;z-index:1200}
+#agregarMenu .sm-h{font-size:10px;font-weight:var(--fw-medium);color:var(--text-3);text-transform:uppercase;letter-spacing:var(--tracking-caps);padding:8px 8px 4px}
+#agregarMenu .sm-note{font-size:var(--fs-xs);color:var(--text-2);padding:6px 8px 2px;line-height:1.4}
+#capasCfg{position:fixed;inset:0;background:rgba(15,22,34,.45);display:none;align-items:center;justify-content:center;z-index:1300}
+#capasCfg.show{display:flex}
+#capasCfg .cc-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-3);padding:16px 18px;width:min(1080px,96vw);max-height:92vh;overflow:auto}
+#capasCfg .cc-h{display:flex;align-items:center;justify-content:space-between;font-size:var(--fs-lg)}
+#capasCfg .cc-x{border:0;background:none;font-size:16px;cursor:pointer;color:var(--text-2)}
+#capasCfg .cc-sub{font-size:var(--fs-xs);color:var(--text-2);margin:4px 0 10px;line-height:1.4}
+#capasCfg .cc-fila{display:grid;grid-template-columns:18px repeat(8,minmax(0,1fr));gap:5px;margin-bottom:5px;align-items:stretch}
+#capasCfg .cc-n{font-size:10px;color:var(--text-3);align-self:center;text-align:center}
+#capasCfg .cc-slot{min-height:30px;border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;padding:2px;background:var(--surface)}
+#capasCfg .cc-slot.vacio{border-style:dashed;background:var(--surface-sunken)}
+#capasCfg .sobre{outline:2px solid var(--accent-300);background:var(--accent-50)}
+#capasCfg .cc-chip{display:flex;align-items:center;gap:4px;width:100%;min-width:0;font-size:10.5px;padding:3px 4px 3px 6px;border-radius:6px;background:var(--accent-50);color:var(--accent-700);cursor:grab;white-space:nowrap;overflow:hidden;user-select:none}
+#capasCfg .cc-chip.sel{outline:2px solid var(--accent-700)}
+#capasCfg .cc-ic{font-size:12px}
+#capasCfg .cc-ojo{margin-left:auto;border:0;background:none;cursor:pointer;font-size:11px;padding:0 2px;opacity:.7}
+#capasCfg .cc-h2{font-size:10px;font-weight:var(--fw-medium);color:var(--text-3);text-transform:uppercase;letter-spacing:var(--tracking-caps);margin:10px 0 4px}
+#capasCfg .cc-ocultos{display:flex;flex-wrap:wrap;gap:5px;min-height:34px;border:1px dashed var(--border);border-radius:8px;padding:4px}
+#capasCfg .cc-ocultos .cc-chip{width:auto;background:var(--surface-sunken);color:var(--text-2)}
+#capasCfg .cc-vacio{font-size:var(--fs-xs);color:var(--text-3);align-self:center;padding:0 4px}
+#capasCfg .cc-pie{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+#capasCfg .cc-pie button{height:30px;padding:0 14px;border-radius:var(--r-md);border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:var(--fs-sm)}
+#capasCfg .cc-pie .pri{background:var(--accent-700);border-color:var(--accent-700);color:#fff}
 #structMenu{position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-2);padding:8px;min-width:240px;width:320px;max-width:calc(100vw - 24px);max-height:min(76vh,700px);overflow-y:auto}
 #structMenu .sm-note .ayuda{cursor:help;text-decoration:underline dotted}
 #structMenu .sm-h{font-size:10px;font-weight:var(--fw-medium);color:var(--text-3);text-transform:uppercase;letter-spacing:var(--tracking-caps);padding:8px 8px 4px}
@@ -1238,6 +1263,8 @@ function _cargarJS(L){
       <button class="tb-btn" id="btnBuscaRec" onclick="openRoomSearch()" title="Buscar recinto por nombre, código, BIM o señalética y saltar a él (Ctrl+K)">🔎 Recinto</button>
       <span class="tb-div"></span>
       <button class="tb-btn tog" id="btnEdit" onclick="toggleEdit()">✏️ Editar cajas</button>
+      <button class="tb-btn" id="btnAgregar" onclick="toggleAgregarMenu()" title="Agregar al plano, todo en un lugar y agrupado: recintos y puertas, ascensores y escaleras, DEA, puestos, tótems, impresoras, relojes, correo neumático y estacionamientos. Enciende la edición si hace falta.">➕ Agregar</button>
+      <button class="tb-btn" id="btnCapasCfg" onclick="abrirCapasCfg()" title="Ordenar, ocultar y mostrar los botones de esta barra en una grilla (se guarda en este navegador)">⚙ Botones</button>
       <button class="tb-btn" id="btnUndo" onclick="doUndo()" title="Deshacer el último cambio (Ctrl+Z)" style="display:none">↩ Deshacer</button>
       <span class="tb-div"></span>
       <button class="tb-btn" id="btnFicha" onclick="toggleFichaMode()" title="Ver ficha del recinto: equipamiento, mobiliario y pauta de Autorización Sanitaria">🔍 Ficha recinto</button>
@@ -8008,6 +8035,156 @@ const DOCK_MAPA=[
   ['dkAdd',   ['btnPuertas','puertaTipoSel','btnPuertaDel','btnPuertaDelAll','btnPuertasAuto','btnDupMueble','btnStruct']],
   ['dkExp',   ['btnExpServ','btnMapaServ','btnMurosServ','btnDotServ']]
 ];
+// ═══ ➕ AGREGAR (22-10-2026) ════════════════════════════════════════════════
+// Un solo botón junto a ✏️ Editar con TODO lo que se coloca en el plano, agrupado. Cada opción
+// enciende la edición si hace falta y abre la herramienta que ya existía (no hay lógica nueva de colocar).
+const AGREGAR_MENU=[
+  {g:'Recintos y puertas', it:[
+    {ic:'⬛', lb:'Recinto · dibujar', c:'#475569', f:()=>{ if(S.level>=3){ _agAviso('⬛ Para dibujar un recinto vuelve a la vista del servicio o del piso'); return; } if(!S.drawMode) toggleDraw(); }},
+    {ic:'🚪', lb:'Puerta normal · 90 cm', c:PUERTA_DEF.n.col, f:()=>_agPuerta('n')},
+    {ic:'🚪', lb:'Puerta camilla · 120 cm', c:PUERTA_DEF.c.col, f:()=>_agPuerta('c')},
+    {ic:'🚪', lb:'Puerta pabellón · 200 cm', c:PUERTA_DEF.p.col, f:()=>_agPuerta('p')}]},
+  {g:'Ascensores y escaleras', it:[
+    {ic:'🛗', lb:'Ascensor público', c:'#7AC143', k:'asc-G'}, {ic:'🛗', lb:'Ascensor de servicio', c:'#FBB000', k:'asc-S'},
+    {ic:'🛗', lb:'Montacamas', c:'#29ABE2', k:'asc-P'}, {ic:'🛗', lb:'Montacamas mayor', c:'#0B2A6B', k:'asc-Pplus'},
+    {ic:'🪜', lb:'Escalera', c:'#7c3aed', k:'stair'}, {ic:'⬆', lb:'Escalera mecánica', c:'#0891b2', k:'escalator'},
+    {ic:'〰', lb:'Línea de circulación', c:'#475569', k:'circulation'}]},
+  {g:'Equipos y puestos', it:[
+    {ic:'💚', lb:'DEA', c:PROP_DEF.dea.col, p:'dea'}, {ic:'🖥', lb:'Puesto de trabajo nuevo', c:PROP_DEF.desk.col, p:'desk'},
+    {ic:'🎫', lb:'Tótem / gestor de fila', c:PROP_DEF.totem.col, p:'totem'}, {ic:'🖨', lb:'Impresora', c:PROP_DEF.printer.col, p:'printer'},
+    {ic:'🛏', lb:'Camilla o sillón numerado', c:'#0e7490', f:()=>{ if(!S.bedMode) toggleBedMode(); }},
+    {ic:'🪑', lb:'Duplicar mueble del plano', c:'#a16207', f:()=>{ if(!S.stampMode) toggleStampMode(); }}]},
+  {g:'Instalaciones', it:[
+    {ic:'⏱', lb:'Reloj control', c:'#C026D3', k:'reloj'}, {ic:'📮', lb:'Correo neumático', c:'#DB2777', k:'cn'},
+    {ic:'🅿', lb:'Estacionamiento', c:'#38bdf8', k:'est'}]}
+];
+function _agAviso(t){ if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent=t; setTimeout(()=>{ if(tbInfo&&tbInfo.textContent===t) tbInfo.textContent=''; },3500); } }
+function _agPuerta(t){ if(S.level<2){ _agAviso('🚪 Entra a un servicio o recinto para colocar puertas'); return; } if(!S.puertaMode) togglePuertaMode(); setPuertaTipo(t); }
+function agregarElegir(gi,ii){
+  const o=(AGREGAR_MENU[gi]||{}).it?.[ii]; if(!o||S.viewOnly) return;
+  cerrarAgregarMenu();
+  if(!S.editMode) toggleEdit();
+  try{ _cierraModosColocar(); if(typeof closeStructMode==='function' && (o.k||o.p||o.f)) closeStructMode(); }catch(e){}
+  if(o.k) startStructMode(o.k);
+  else if(o.p){ if(S.propMode!==o.p) setPropMode(o.p); }
+  else if(o.f) o.f();
+}
+function toggleAgregarMenu(){
+  if(S.viewOnly) return;
+  let m=document.getElementById('agregarMenu');
+  if(m && m.style.display==='block'){ cerrarAgregarMenu(); return; }
+  if(!m){
+    m=document.createElement('div'); m.id='agregarMenu'; m.className='dock-pop';
+    m.innerHTML=AGREGAR_MENU.map((g,gi)=>'<div class="sm-h">'+g.g+'</div>'+g.it.map((o,ii)=>
+      '<button class="struct-opt ag-opt" style="--c:'+o.c+'" onclick="agregarElegir('+gi+','+ii+')">'+o.ic+' <b>'+o.lb+'</b></button>').join('')).join('')
+      +'<div class="sm-note">Elige qué colocar y haz clic en el plano. Lo que se importa desde planos sigue en 🧰 → Agregar.</div>';
+    document.body.appendChild(m);
+  }
+  m.style.display='block';
+  const b=document.getElementById('btnAgregar').getBoundingClientRect(), w=m.getBoundingClientRect().width||300;
+  m.style.left=Math.max(6, Math.min(b.right-w, window.innerWidth-w-6))+'px'; m.style.top=(b.bottom+6)+'px';
+  document.getElementById('btnAgregar').classList.add('active');
+  setTimeout(()=>document.addEventListener('mousedown', _agFuera, true), 30);
+}
+function cerrarAgregarMenu(){
+  const m=document.getElementById('agregarMenu'); if(m) m.style.display='none';
+  const b=document.getElementById('btnAgregar'); if(b) b.classList.remove('active');
+  document.removeEventListener('mousedown', _agFuera, true);
+}
+function _agFuera(e){ const m=document.getElementById('agregarMenu'); if(m && !m.contains(e.target) && !document.getElementById('btnAgregar').contains(e.target)) cerrarAgregarMenu(); }
+
+// ═══ ⚙ BOTONES DE LA BARRA EN GRILLA (22-10-2026) ════════════════════════════
+// Grilla fija de 6 filas × 8 espacios: cada fila es un grupo de la barra de capas. Se arrastra (o se toca y
+// se toca el destino) para mover/intercambiar, 👁 oculta, y lo oculto se vuelve a mostrar desde abajo.
+// Preferencia de cada navegador (localStorage «cabida_capas_layout»); sin ella, el orden de CAPAS_BARRA.
+const CAPAS_GRILLA={filas:6, cols:8};
+function _capasIds(){ return CAPAS_BARRA.filter(x=>x!=='|').map(x=>x[0]); }
+function _capasDefault(){
+  const filas=[[]]; CAPAS_BARRA.forEach(x=>{ if(x==='|') filas.push([]); else filas[filas.length-1].push(x[0]); });
+  while(filas.length<CAPAS_GRILLA.filas) filas.push([]);
+  return {filas:filas.slice(0,CAPAS_GRILLA.filas).map(f=>Array.from({length:CAPAS_GRILLA.cols},(_,i)=>f[i]||null)), ocultos:[]};
+}
+function _capasLayout(){
+  let L=null; try{ L=JSON.parse(localStorage.getItem('cabida_capas_layout')||'null'); }catch(e){}
+  const D=_capasDefault(); if(!L||!Array.isArray(L.filas)) return D;
+  const ids=new Set(_capasIds()), vistos=new Set();
+  const filas=Array.from({length:CAPAS_GRILLA.filas},(_,r)=>Array.from({length:CAPAS_GRILLA.cols},(_,c)=>{
+    const id=(L.filas[r]||[])[c]||null; if(!id||!ids.has(id)||vistos.has(id)) return null; vistos.add(id); return id; }));
+  const ocultos=(L.ocultos||[]).filter(id=>ids.has(id)&&!vistos.has(id)); ocultos.forEach(id=>vistos.add(id));
+  // un botón nuevo (no estaba cuando se guardó la grilla) entra en su fila por defecto, o en el primer espacio libre
+  D.filas.forEach((f,r)=>f.forEach(id=>{ if(!id||vistos.has(id)) return; vistos.add(id);
+    let rr=r, cc=filas[r].indexOf(null);
+    if(cc<0){ rr=filas.findIndex(x=>x.includes(null)); cc=rr>=0?filas[rr].indexOf(null):-1; }
+    if(cc>=0) filas[rr][cc]=id; else ocultos.push(id); }));
+  return {filas, ocultos};
+}
+function _capasGuardar(L){ _lsPref('cabida_capas_layout', JSON.stringify(L)); _capasAplicar(L); }
+function _capasAplicar(L){
+  const bar=document.getElementById('capasBar'); if(!bar) return;
+  L=L||_capasLayout();
+  const el={}; _capasIds().forEach(id=>{ el[id]=document.getElementById(id); });   // antes de mover nada
+  const fin=bar.querySelector('.cp-fin'), src=document.getElementById('capasSrc');
+  bar.querySelectorAll('.cp-g').forEach(g=>{ [...g.children].forEach(c=>src&&src.appendChild(c)); g.remove(); });
+  L.filas.forEach(f=>{ const bs=f.filter(Boolean).map(id=>el[id]).filter(Boolean); if(!bs.length) return;
+    const g=document.createElement('span'); g.className='cp-g'; bs.forEach(e=>g.appendChild(e)); bar.insertBefore(g, fin); });
+  L.ocultos.forEach(id=>{ if(el[id]&&src) src.appendChild(el[id]); });
+}
+let _ccSel=null;   // toque: elemento elegido para mover (sin arrastre, p. ej. en el iPad)
+function abrirCapasCfg(){
+  let m=document.getElementById('capasCfg');
+  if(!m){ m=document.createElement('div'); m.id='capasCfg'; m.onclick=e=>{ if(e.target===m) cerrarCapasCfg(); }; document.body.appendChild(m); }
+  _ccSel=null; _ccRender(); m.classList.add('show');
+}
+function cerrarCapasCfg(){ const m=document.getElementById('capasCfg'); if(m) m.classList.remove('show'); _ccSel=null; }
+function capasCfgReset(){ try{ localStorage.removeItem('cabida_capas_layout'); }catch(e){} _ccSel=null; _capasAplicar(_capasDefault()); _ccRender(); }
+function _ccChip(id,oculto){
+  const e=document.getElementById(id); if(!e) return '';
+  return '<span class="cc-chip'+(_ccSel===id?' sel':'')+'" draggable="true" data-id="'+id+'" title="Arrastra, o toca y luego toca el espacio de destino">'
+    +'<span class="cc-ic">'+(e.getAttribute('data-ic')||'')+'</span>'+(e.getAttribute('data-lb')||id)
+    +'<button class="cc-ojo" data-ojo="'+id+'" title="'+(oculto?'Mostrar en la barra':'Ocultar de la barra')+'">'+(oculto?'＋':'👁')+'</button></span>';
+}
+function _ccRender(){
+  const m=document.getElementById('capasCfg'); if(!m) return;
+  const L=_capasLayout();
+  m.innerHTML='<div class="cc-box"><div class="cc-h"><b>⚙ Botones de la barra</b><button class="cc-x" onclick="cerrarCapasCfg()">✕</button></div>'
+    +'<div class="cc-sub">Cada fila es un grupo de la barra ('+CAPAS_GRILLA.filas+' × '+CAPAS_GRILLA.cols+' espacios). Arrastra un botón a otro espacio para moverlo (si está ocupado, se intercambian) · 👁 lo oculta · ＋ lo vuelve a mostrar. Se guarda en este navegador.</div>'
+    +'<div class="cc-grid">'+L.filas.map((f,r)=>'<div class="cc-fila"><span class="cc-n">'+(r+1)+'</span>'+f.map((id,c)=>
+        '<span class="cc-slot'+(id?'':' vacio')+'" data-r="'+r+'" data-c="'+c+'">'+(id?_ccChip(id,false):'')+'</span>').join('')+'</div>').join('')+'</div>'
+    +'<div class="cc-h2">Ocultos · '+L.ocultos.length+'</div><div class="cc-ocultos" data-oc="1">'+(L.ocultos.map(id=>_ccChip(id,true)).join('')||'<span class="cc-vacio">Ninguno: arrastra aquí lo que no uses</span>')+'</div>'
+    +'<div class="cc-pie"><button onclick="capasCfgReset()">↺ Restablecer</button><button class="pri" onclick="cerrarCapasCfg()">Listo</button></div></div>';
+  const mover=(id,dest)=>{   // dest = {r,c} | 'oculto'
+    const L2=_capasLayout(); let from=null;
+    L2.filas.forEach((f,r)=>f.forEach((x,c)=>{ if(x===id) from={r,c}; }));
+    const oi=L2.ocultos.indexOf(id);
+    if(dest==='oculto'){ if(from){ L2.filas[from.r][from.c]=null; L2.ocultos.push(id); } }
+    else { const ocup=L2.filas[dest.r][dest.c];
+      if(from){ L2.filas[from.r][from.c]=ocup; } else if(oi>=0){ L2.ocultos.splice(oi,1); if(ocup) L2.ocultos.push(ocup); }
+      L2.filas[dest.r][dest.c]=id; }
+    _ccSel=null; _capasGuardar(L2); _ccRender();
+  };
+  const destino=(el,ev)=>{ ev.preventDefault(); const id=(ev.dataTransfer&&ev.dataTransfer.getData('text/plain'))||_ccSel; if(!id) return;
+    if(el.dataset.oc) mover(id,'oculto'); else mover(id,{r:+el.dataset.r, c:+el.dataset.c}); };
+  m.querySelectorAll('.cc-chip').forEach(ch=>{
+    ch.addEventListener('dragstart',ev=>{ ev.dataTransfer.setData('text/plain', ch.dataset.id); });
+    ch.addEventListener('click',ev=>{ if(ev.target.closest('.cc-ojo')) return; ev.stopPropagation();
+      const s=ch.closest('.cc-slot,.cc-ocultos');
+      if(_ccSel && _ccSel!==ch.dataset.id && s){ destino(s,{preventDefault(){}}); return; }   // toque sobre otro: intercambian
+      _ccSel=(_ccSel===ch.dataset.id)?null:ch.dataset.id; _ccRender(); });
+  });
+  m.querySelectorAll('.cc-ojo').forEach(b=>b.addEventListener('click',ev=>{ ev.stopPropagation(); const id=b.dataset.ojo, L2=_capasLayout();
+    if(L2.ocultos.includes(id)){ // vuelve a su fila por defecto o al primer espacio libre
+      const D=_capasDefault(); let r=D.filas.findIndex(f=>f.includes(id)); let c=r>=0?L2.filas[r].indexOf(null):-1;
+      if(c<0){ r=L2.filas.findIndex(f=>f.includes(null)); c=r>=0?L2.filas[r].indexOf(null):-1; }
+      if(c>=0) mover(id,{r,c}); }
+    else mover(id,'oculto'); }));
+  m.querySelectorAll('.cc-slot,.cc-ocultos').forEach(s=>{
+    s.addEventListener('dragover',ev=>{ ev.preventDefault(); s.classList.add('sobre'); });
+    s.addEventListener('dragleave',()=>s.classList.remove('sobre'));
+    s.addEventListener('drop',ev=>destino(s,ev));
+    s.addEventListener('click',ev=>{ if(_ccSel && !ev.target.closest('.cc-chip')) destino(s,{preventDefault(){}}); });
+  });
+}
+
 function _dockMonta(){
   const dock=document.getElementById('dock'); if(!dock||dock._montado) return;
   dock._montado=true;
@@ -8043,12 +8220,13 @@ function _dockMonta(){
       const m=ICO.exec(e.textContent||''); e.setAttribute('data-ic', m?m[1]:(e.textContent||'?').trim().slice(0,2));
       e.setAttribute('data-lb', lb); e.setAttribute('aria-label', lb); cont.appendChild(e); };
     // cada grupo es un bloque que no se parte: si no cabe, baja entero a la fila siguiente
-    let grp=null; const nuevoGrupo=()=>{ grp=document.createElement('span'); grp.className='cp-g'; bar2.appendChild(grp); }; nuevoGrupo();
-    CAPAS_BARRA.forEach(x=>{ if(x==='|') nuevoGrupo(); else pon(grp,x[0],x[1]); });
+    // 22-10-2026: los grupos salen de la grilla ⚙ (orden y ocultos de cada navegador; si no hay, CAPAS_BARRA)
+    CAPAS_BARRA.forEach(x=>{ if(x!=='|') pon(bar2,x[0],x[1]); });
     const fin=document.createElement('div'); fin.className='cp-fin';
-    pon(fin,'btnNav','Ruta'); pon(fin,'btnEdit','Editar'); bar2.appendChild(fin);
+    pon(fin,'btnNav','Ruta'); pon(fin,'btnEdit','Editar'); pon(fin,'btnAgregar','Agregar'); pon(fin,'btnCapasCfg','Botones'); bar2.appendChild(fin);
     // a todo el ancho de la ventana, entre la cabecera y el plano (caben más interruptores por fila)
     const lay=document.getElementById('layout'); if(lay&&lay.parentNode) lay.parentNode.insertBefore(bar2, lay); else nav.parentNode.insertBefore(bar2, nav.nextSibling);
+    _capasAplicar();
   }
   { const rc=document.getElementById('revCapas');
     if(rc) ['btnAudit','btnMetas'].forEach(id=>{ const e=document.getElementById(id); if(e) rc.appendChild(e); }); }
@@ -8069,6 +8247,7 @@ function toggleRoomLabels(){
 function _dockSync(){
   try{ _jardinesSync(); }catch(e){}            // capa de jardines y esculturas (corre al final de cada render)
   try{ _laminasSync(); }catch(e){}             // láminas de proyecto del piso (Droguería P-1)
+  { const ba=document.getElementById('btnAgregar'); if(ba) ba.style.display=S.viewOnly?'none':''; }
   const d=document.getElementById('dock'); if(!d) return;
   if(S.roomLabels===undefined){
     let v=null, rep=null;
@@ -15386,7 +15565,20 @@ const REV_CHECKS={
     go:p=>p.porColocar?abrirRevisionDEA():deaVer(p.fid,p.it.id),
     subText:p=>p.porColocar?p.sub:(p.L?('equipo '+p.L.id+' · '+p.L.servicio):(p.sug?('sugerido '+p.sug.id+' · '+p.sug.servicio+' (revísalo)'):'sin equipo: asígnalo en 📋 Revisión DEA'))
       +(p.d!==null&&p.d<3?(' · ⚠ otro DEA a '+p.d.toFixed(1).replace('.',',')+' m: borra el que sobre'):'')+' · '+p.fl.label,
-    done:'Todos los DEA están colocados y confirmados.'}
+    done:'Todos los DEA están colocados y confirmados.'},
+  dis_rev:{label:'Diseño: pendientes del Atlas (estacionamientos, Droguería, comercios)',
+    find:()=>{ const h=nameState.disRev||{};
+      return (window.ATLAS_PENDIENTES_DISENO||[]).filter(it=>!h[it.id]).map(it=>({it, fl:FLOORS.find(f=>f.id===it.piso)||FLOORS[0],
+        code:'dis|'+it.id, nombre:it.titulo})); },
+    approve:true, noDialog:true, allIf:()=>false, groupOf:p=>p.it.grupo,
+    okTitle:'Resuelto: sale de la lista',
+    apply:p=>{ (nameState.disRev=nameState.disRev||{})[p.it.id]=1; },
+    go:p=>{ const it=p.it, cambia=S.floorId!==p.fl.id; if(cambia) goFloor(p.fl.id);
+      const ir=()=>{ try{ if(it.zona) zoomTo({x:it.zona[0],y:it.zona[1],w:it.zona[2],h:it.zona[3]},60);
+        if(it.accion==='estacOficial' && typeof openEstacOficial==='function') openEstacOficial(); }catch(e){} };
+      if(!cambia) ir(); else setTimeout(()=>{ if(floorImg.complete) ir(); else floorImg.addEventListener('load',()=>setTimeout(ir,120),{once:true}); },450); },
+    subText:p=>p.it.detalle+' · '+p.fl.label,
+    done:'No quedan pendientes de diseño.'}
 };
 // DEA en la pestaña Revisión (22-10-2026): los colocados sin confirmar (primero los que están a < 3 m
 // de otro, posibles repetidos) y una fila con los que faltan por colocar según el Anexo Ib. El detalle
@@ -18756,6 +18948,37 @@ async function runSelfTest(){
       return dentro && seis && img && mks.length===6 && k1 && k2 && ficha && cierra && apaga && prende && otro;
     } finally { S.floorId=fPrev; S.level=lPrev; S.areaId=aPrev; S.roomId=rPrev; S.jardines=jPrev; S.zoom=zPrev; _escTipOff(); renderSVG(); }
   });
+  T('➕ Agregar: junto a Editar, agrupado, y cada opción abre su herramienta (enciende la edición si hace falta)', ()=>{
+    const ed=S.editMode, lv=S.level;
+    try{
+      toggleAgregarMenu(); const m=document.getElementById('agregarMenu');
+      const abre=m && m.style.display==='block' && m.querySelectorAll('.sm-h').length===AGREGAR_MENU.length
+        && m.querySelectorAll('.ag-opt').length===AGREGAR_MENU.reduce((a,g)=>a+g.it.length,0) && /DEA/.test(m.textContent) && /Escalera/.test(m.textContent) && /Puerta/.test(m.textContent);
+      if(S.editMode) toggleEdit();
+      const gi=AGREGAR_MENU.findIndex(g=>g.it.some(o=>o.k==='stair')), ii=AGREGAR_MENU[gi].it.findIndex(o=>o.k==='stair');
+      agregarElegir(gi,ii); const esc=S.editMode && _structKind==='stair' && m.style.display==='none';
+      closeStructMode();
+      S.level=2; const gd=AGREGAR_MENU.findIndex(g=>g.it.some(o=>o.p==='dea')), id_=AGREGAR_MENU[gd].it.findIndex(o=>o.p==='dea');
+      agregarElegir(gd,id_); const dea=S.propMode==='dea'; setPropMode(null);
+      return abre && esc && dea;
+    } finally { try{ closeStructMode(); setPropMode(null); cerrarAgregarMenu(); }catch(e){} S.level=lv; if(S.editMode!==ed) toggleEdit(); renderSVG(); }
+  });
+  T('⚙ Botones: la grilla mueve, oculta y vuelve a mostrar botones de la barra (sin tocar su función)', ()=>{
+    const bar=document.getElementById('capasBar'), src=document.getElementById('capasSrc');
+    try{
+      const L=_capasDefault(); let pos=null; L.filas.forEach((f,r)=>f.forEach((x,c)=>{ if(x==='btnLaminas') pos={r,c}; }));
+      L.filas[pos.r][pos.c]=null; L.filas[5][0]='btnLaminas';                          // a la fila 6
+      let pj=null; L.filas.forEach((f,r)=>f.forEach((x,c)=>{ if(x==='btnJardines') pj={r,c}; })); L.filas[pj.r][pj.c]=null; L.ocultos.push('btnJardines');
+      _capasAplicar(L);
+      const gs=[...bar.querySelectorAll('.cp-g')], ultimo=gs[gs.length-1];
+      const movido=ultimo.children.length===1 && ultimo.firstElementChild.id==='btnLaminas';
+      const oculto=!bar.contains(document.getElementById('btnJardines')) && src.contains(document.getElementById('btnJardines'));
+      const sigue=typeof document.getElementById('btnJardines').onclick==='function';
+      _capasAplicar(_capasDefault()); const vuelve=bar.contains(document.getElementById('btnJardines')) && bar.querySelectorAll('.cp-g').length===5;
+      abrirCapasCfg(); const grilla=document.querySelectorAll('#capasCfg .cc-slot').length===CAPAS_GRILLA.filas*CAPAS_GRILLA.cols; cerrarCapasCfg();
+      return movido && oculto && sigue && vuelve && grilla;
+    } finally { _capasAplicar(); }
+  });
   T('Revisión: DEA sin confirmar (repetidos primero, ✓ confirma con el equipo) y fila de los que faltan por colocar', ()=>{
     const prev=JSON.stringify(propState), cat=window.DEA_CATALOGO;
     try{
@@ -19799,11 +20022,11 @@ async function runSelfTest(){
   });
   T('Barra de capas: todos los interruptores de mostrar/ocultar arriba, agrupados, con ✏️ Editar al final; el gestor ya no los repite', ()=>{
     const bar=document.getElementById('capasBar'), dock=document.getElementById('dock'); if(!bar) return false;
-    const ids=CAPAS_BARRA.filter(x=>x!=='|').map(x=>x[0]);
-    const todos=ids.length>=20 && ids.every(id=>{ const e=document.getElementById(id); return e && bar.contains(e) && !dock.contains(e) && (e.getAttribute('data-lb')||'').length>0 && (e.getAttribute('data-ic')||'').length>0; });
+    const _oc=new Set(_capasLayout().ocultos), ids=CAPAS_BARRA.filter(x=>x!=='|').map(x=>x[0]).filter(id=>!_oc.has(id));
+    const todos=ids.length>=20-_oc.size && ids.every(id=>{ const e=document.getElementById(id); return e && bar.contains(e) && !dock.contains(e) && (e.getAttribute('data-lb')||'').length>0 && (e.getAttribute('data-ic')||'').length>0; });
     const bts=[...bar.querySelectorAll('button')];
-    const alFinal=bts[bts.length-1].id==='btnEdit' && bts[bts.length-2].id==='btnNav';
-    const grupos=bar.querySelectorAll('.cp-g').length===5;
+    const alFinal=bts.slice(-4).map(b=>b.id).join(',')==='btnNav,btnEdit,btnAgregar,btnCapasCfg';
+    const grupos=bar.querySelectorAll('.cp-g').length===_capasLayout().filas.filter(f=>f.some(Boolean)).length;
     const sinRepetir=!document.getElementById('dkVer') && !/Ubicación en planta/.test(dock.textContent) && dock.contains(document.getElementById('dkCarrosXls'));
     // «Cajas» encendido = cajas visibles, como el resto
     const bv=S.boxVis; S.boxVis='on'; applyBoxVis(); const on=document.getElementById('btnBoxVis').classList.contains('active');
