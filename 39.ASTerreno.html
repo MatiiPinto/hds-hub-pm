@@ -3008,6 +3008,7 @@ function sNames(){ _codeBoxIndex=null; _areaCol=null; _rcMemo=null; const k=ls('
 // localStorage) y como mucho una vez por minuto por clave.
 const _idbBakT={};
 function _idbBak(k,v){
+  if(_SELFTEST) return;   // el selftest altera el estado en memoria: no debe quedar como respaldo
   const now=Date.now();
   if(_idbBakT[k] && now-_idbBakT[k]<60000) return;
   _idbBakT[k]=now;
@@ -18623,12 +18624,17 @@ async function runSelfTest(){
       confirmAddTurno();
       const t=wsState.dots['st_r1'][1].turnos.slice(-1)[0];
       const turno=!!t && !t.externa && !t.cds;
-      // refresco: con la Revisión abierta en «no está en la matriz», guardar saca la fila del DOM
-      wsState.dots['st_r1']=[{id:'st_rf',x:3,y:3,tipo:'fijo',nombre:'ZZQ PRUEBA REFRESCO',cargo:'',estamento:'',externa:true}];
+      // refresco: con la Revisión abierta en «no está en la matriz», guardar saca la fila del DOM.
+      // (22-10-2026) En un recinto REAL (la Revisión sólo lista recintos dibujados) y con alguien SIN
+      // puesto ni reemplazo vigente: si ya tiene puesto, saveWs pregunta si moverlo y no guarda.
+      let rid=null; FLOORS.some(f=>f.areas.some(a=>(a.rooms||[]).some(r=>{ if((boxState.rooms[r.id]||[]).length){ rid=r.id; return true; } })));
+      const s2=dotDB.staff.find(x=>x.nombre && !x.comision && !findExclusiveConflict(x.nombre,'__selftest__',-1)
+        && !((_staffDe(x.nombre)||{}).reemplaza||{}).vigente);
+      wsState.dots[rid]=[{id:'st_rf',x:3,y:3,tipo:'fijo',nombre:'ZZQ PRUEBA REFRESCO',cargo:'',estamento:'',externa:true}];
       _revOpen=true; _revCheck='dot_fuera'; renderBimPending();
       const box=document.getElementById('bimList');
       const antes=/ZZQ PRUEBA REFRESCO/.test(box.innerText);
-      openModal('st_r1',0); document.getElementById('mNombre').value=s1.nombre; saveWs();
+      openModal(rid,0); document.getElementById('mNombre').value=s2.nombre; saveWs();
       const despues=/ZZQ PRUEBA REFRESCO/.test(box.innerText);
       return limpio && turno && antes && !despues;
     } finally {
