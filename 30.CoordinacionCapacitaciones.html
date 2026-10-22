@@ -1370,6 +1370,13 @@ function gBuildWsReporte(sello){
 #risMask .h-tb .ap{color:var(--h-naranjo)}
 #risMask .h-foot{border-top:1px solid var(--h-bd);padding:9px 14px;display:flex;align-items:center;gap:8px;font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--h-mute)}
 #risMask .h-foot .sp{flex:1}
+#risMask .h-rutas{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));border:1px solid var(--h-bd)}
+#risMask .h-rutas>div{padding:9px 12px;border-right:1px solid var(--h-bd);border-bottom:1px solid var(--h-bd)}
+#risMask .h-rutas b{font:500 22px/1.1 var(--h-grot)}#risMask .h-rutas .u{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--h-mute)}
+#risMask .h-rutas p{margin:5px 0 0;font:400 12px/1.35 var(--h-grot);color:var(--h-tx2)}
+#risMask .h-tb th.pf,#risMask .h-tb td.pf{width:6%;text-align:center}
+#risMask .h-tb .dot{display:inline-block;width:8px;height:8px;background:var(--h-acento)}
+#risMask .h-tb .tem{display:block;font:400 11px/1.35 var(--h-grot);color:var(--h-tx2);margin-top:2px}
 @keyframes h-entra{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes h-linea{from{width:0}to{width:46px}}
 @keyframes h-sube{to{transform:translateY(-50%)}}
@@ -1393,24 +1400,38 @@ function risAbrir(){
   function mmss(s){ return Math.floor(s/60)+":"+("0"+Math.round(s%60)).slice(-2); }
   function dos(n){ return ("0"+n).slice(-2); }
   if(!R){ B.innerHTML='<div class="h-m" data-h="[--]"><span class="txt">Sin datos del RIS-PACS en cap_seguimiento.js.</span></div>'; m.className="segmask on"; return; }
-  var pend=R.pendientes.filter(function(p){return p.estado!=="ok";}), mins=String(R.videos_total_min).replace(".",",");
+  var abiertos=R.pendientes.filter(function(p){return p.estado!=="ok";}),
+      pSC=abiertos.filter(function(p){return /^SC/.test(p.responsable);}),
+      pHDS=abiertos.filter(function(p){return !/^SC/.test(p.responsable);}),
+      okx=R.pendientes.filter(function(p){return p.estado==="ok";}),
+      mins=String(R.videos_total_min).replace(".",",");
   document.getElementById("risSub").textContent="· GE Centricity · ECM Ingeniería";
   document.getElementById("risAct").textContent="Actualizado "+dmy(R.actualizado);
   document.getElementById("risRet").innerHTML='<span class="cota0">[60009] · ficha de capacitación</span>'+
-    '<div class="h-est"><span class="k'+(pend.length?' alerta':'')+'">'+(pend.length?'En espera':'Listo')+'</span><span class="e">// '+pend.length+' pendientes de la SC · material recibido '+dmy(R.actualizado)+'</span></div>'+
-    '<div class="h-kpi"><div><b>'+R.videos.length+'</b><span>videos MP4</span></div><div><b>'+mins+'</b><span>minutos</span></div><div><b>'+(R.nomina_corte?R.nomina_corte.total:"–")+'</b><span>nómina 1er corte</span></div><div><b style="color:var(--h-naranjo)">'+pend.length+'</b><span>pendientes</span></div></div>';
-  var t=' <b>RIS-PACS</b> ▸ '+R.videos.length+' videos ▸ '+mins+' min ▸ <em>'+pend.length+' pendientes</em> ▸ '+R.perfiles.length+' perfiles ▸ '+dmy(R.actualizado)+' ▸';
+    '<div class="h-est"><span class="k'+(abiertos.length?' alerta':'')+'">'+(abiertos.length?'En espera':'Listo')+'</span><span class="e">// '+pSC.length+' de la SC · '+pHDS.length+' del Hospital · '+okx.length+' resueltos</span></div>'+
+    '<div class="h-kpi"><div><b>'+R.videos.length+'</b><span>videos MP4</span></div><div><b>'+mins+'</b><span>minutos</span></div><div><b>'+(R.perfiles_resumen?R.perfiles_resumen.length:R.perfiles.length)+'</b><span>perfiles</span></div><div><b style="color:var(--h-naranjo)">'+abiertos.length+'</b><span>pendientes</span></div></div>';
+  var t=' <b>RIS-PACS</b> ▸ '+R.videos.length+' videos ▸ '+mins+' min ▸ <em>'+pSC.length+' pendientes SC</em> ▸ <em>'+pHDS.length+' pendientes HDS</em> ▸ '+dmy(R.actualizado)+' ▸';
   var T=document.getElementById("risTate"); T.innerHTML=t+t; T.style.animationDuration=Math.max(26,t.replace(/<[^>]+>/g,"").length*0.9)+"s";
   var h="", k=0, d=function(){ return ' style="animation-delay:'+(0.04*(k++)).toFixed(2)+'s"'; };
-  h+='<div class="h-sec">// Pendientes <i>['+dos(pend.length)+']</i></div>';
-  R.pendientes.forEach(function(p,i){ h+='<div class="h-m" data-h="['+dos(i+1)+']"'+d()+'><span class="lab"><span class="tag'+(p.estado==="ok"?" ok":"")+'">['+(p.estado==="ok"?"listo":"pendiente")+']</span> · '+e(p.responsable)+'</span><span class="txt">'+e(p.item)+'</span>'+(p.nota?'<span class="cota">'+e(p.nota)+'</span>':'')+'</div>'; });
+  function lista(arr,tit){
+    if(!arr.length) return;
+    h+='<div class="h-sec">// '+tit+' <i>['+dos(arr.length)+']</i></div>';
+    arr.forEach(function(p,i){ var ok=p.estado==="ok"; h+='<div class="h-m" data-h="['+dos(i+1)+']"'+d()+'><span class="lab"><span class="tag'+(ok?" ok":"")+'">['+(ok?"resuelto":"pendiente")+']</span> · '+e(p.responsable)+'</span><span class="txt">'+e(p.item)+'</span>'+(p.nota?'<span class="cota">'+e(p.nota)+'</span>':'')+'</div>'; });
+  }
+  lista(pSC,"Pendientes de la SC"); lista(pHDS,"Pendientes del Hospital");
+  if(R.perfiles_resumen){
+    h+='<div class="h-sec">// Rutas por perfil <i>['+dos(R.perfiles_resumen.length)+']</i></div><div class="h-m" data-h="[PERF]"'+d()+'><div class="h-rutas">';
+    R.perfiles_resumen.forEach(function(q){ h+='<div><span class="lab">'+e(q.perfil)+'</span><b>'+q.videos+'</b><span class="u"> videos · '+e(q.dur)+'</span><p>'+e(q.objetivo)+'</p></div>'; });
+    h+='</div>'; if(R.evaluacion) h+='<span class="cota">'+e(R.evaluacion)+'</span>'; h+='</div>';
+  }
+  var n=R.nomina_corte; if(n){ h+='<div class="h-sec">// Nómina · primer corte</div><div class="h-m" data-h="[NOM]"'+d()+'><span class="lab">'+e(n.servicio)+' · '+dmy(n.fecha)+'</span><div class="h-nom"><div><b>'+n.total+'</b><span>total</span></div>'+Object.keys(n.por_perfil).map(function(q){return '<div><b>'+n.por_perfil[q]+'</b><span>'+e(q)+'</span></div>';}).join("")+'</div></div>'; }
+  var PF=["Adm.","TENS","TM","Méd.","Sys."];
+  h+='<div class="h-sec">// Videos del curso por perfil <i>['+dos(R.videos.length)+'] · '+mins+' min</i></div><div class="h-m" data-h="[MP4]"'+d()+'><table class="h-tb"><thead><tr><th style="width:6%">ID</th><th>Video · temario</th><th style="width:8%">Dur.</th>'+PF.map(function(x){return '<th class="pf">'+x+'</th>';}).join("")+'</tr></thead><tbody>';
+  R.videos.forEach(function(v,i){ var pf=v.perfiles||[]; h+='<tr style="animation-delay:'+(0.03*i+0.2).toFixed(2)+'s"><td class="'+(/^A/.test(v.id||"")?"ap":"")+'">'+e(v.id||dos(i+1))+'</td><td class="t">'+e(v.titulo)+(v.temario?'<span class="tem">'+e(v.temario)+'</span>':'')+'</td><td>'+mmss(v.dur_s)+'</td>'+PF.map(function(x){return '<td class="pf">'+(pf.indexOf(x)>=0?'<i class="dot"></i>':'')+'</td>';}).join("")+'</tr>'; });
+  h+='<tr class="tot"><td></td><td>Total archivos únicos</td><td>'+mins+'</td>'+PF.map(function(){return '<td></td>';}).join("")+'</tr></tbody></table>'+(R.fuente_guia?'<span class="cota">'+e(R.fuente_guia)+'</span>':'')+'</div>';
+  if(okx.length) lista(okx,"Resueltos");
   h+='<div class="h-sec">// Material recibido <i>['+dos(R.material.length)+']</i></div>';
   R.material.forEach(function(x,i){ h+='<div class="h-m" data-h="['+dos(i+1)+']"'+d()+'><span class="lab"><span class="tag ok">[recibido]</span> · '+dmy(x.fecha)+'</span><span class="txt">'+e(x.item)+'</span>'+(x.nota?'<span class="cota">'+e(x.nota)+'</span>':'')+'</div>'; });
-  h+='<div class="h-sec">// Perfiles y nómina</div><div class="h-m" data-h="[01]"'+d()+'><span class="lab">Perfiles del curso</span><span class="txt">'+R.perfiles.map(e).join(" · ")+'</span>';
-  var n=R.nomina_corte; if(n){ h+='<span class="lab" style="margin-top:9px">Nómina '+e(n.servicio)+' · '+dmy(n.fecha)+'</span><div class="h-nom"><div><b>'+n.total+'</b><span>total</span></div>'+Object.keys(n.por_perfil).map(function(q){return '<div><b>'+n.por_perfil[q]+'</b><span>'+e(q)+'</span></div>';}).join("")+'</div>'; }
-  h+='</div><div class="h-sec">// Videos del curso <i>['+dos(R.videos.length)+'] · '+mins+' min</i></div><div class="h-m" data-h="[MP4]"'+d()+'><table class="h-tb"><thead><tr><th style="width:7%">#</th><th>Video</th><th style="width:13%">Tipo</th><th style="width:11%">Duración</th></tr></thead><tbody>';
-  R.videos.forEach(function(v,i){ h+='<tr style="animation-delay:'+(0.03*i+0.2).toFixed(2)+'s"><td>['+dos(i+1)+']</td><td class="t">'+e(v.titulo)+'</td><td class="'+(v.tipo==="modulo"?"":"ap")+'">'+(v.tipo==="modulo"?"módulo":"apoyo")+'</td><td>'+mmss(v.dur_s)+'</td></tr>'; });
-  h+='<tr class="tot"><td></td><td>Total</td><td></td><td>'+mins+' min</td></tr></tbody></table></div>';
   B.innerHTML=h; B.scrollTop=0; m.className="segmask on";
 }
 </script>

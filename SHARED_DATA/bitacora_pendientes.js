@@ -3810,12 +3810,12 @@ window.BITACORA = {
   {
    "id": "P166",
    "titulo": "Comité de Farmacia 28-10 · proyecto de perfusión ex situ XVIVO (hígado y riñón): cerrar pendientes antes de la sesión",
-   "detalle": "Proyecto, presentación (13 láminas) y modelo económico listos en 11.PROYECTOS Y PUESTA EN MARCHA/PROYECTOS ADICIONALES/PERFUSION EX SITU XVIVO - TRASPLANTE. Falta antes del 28-10: nombre y cargo del Dr. Fanfan; registro renal HDS 2024-2026 (Unidad de Trasplante); oferta ALMEDIS para Kidney Assist Transport; cotización de solución para máquina (MPS); costos reales GRD (día UCI, sesión HD, retrasplante, ingreso por TX); consulta de clasificación de la solución al ISP.",
+   "detalle": "Proyecto, presentación (13 láminas) y modelo económico listos en 11.PROYECTOS Y PUESTA EN MARCHA/PROYECTOS ADICIONALES/PERFUSION EX SITU XVIVO - TRASPLANTE. Falta antes del 28-10: cargo del Dr. Felipe Farfán; registro renal HDS 2024-2026 (Unidad de Trasplante); oferta ALMEDIS para Kidney Assist Transport; cotización de solución para máquina (MPS); costos reales GRD (día UCI, sesión HD, retrasplante, ingreso por TX); consulta de clasificación de la solución al ISP.",
    "ambito": "EMMC",
    "prioridad": "Alta",
    "estado": "Abierto",
    "responsable": "Matías Pinto",
-   "contraparte": "Dr. Fanfan · Dra. Rebolledo · Unidad de Trasplante · Farmacia",
+   "contraparte": "Dr. Felipe Farfán () · Dra. Rebolledo · Unidad de Trasplante · Farmacia",
    "origen_tipo": "Instrucción de Matías",
    "origen_ref": "Proyecto XVIVO-HDS (Rebolledo, sept-2026)",
    "origen_fecha": "2026-10-22",
@@ -3826,6 +3826,10 @@ window.BITACORA = {
     {
      "fecha": "2026-10-22",
      "texto": "Documentos generados: docx, pptx y xlsx. Precedentes de Mercado Público: INT 2025 y Grant Benavente 2026 por trato directo."
+    },
+    {
+     "fecha": "2026-10-22",
+     "texto": "Borrador de correo al Dr. Farfán con los 3 archivos y los 6 pendientes (sin enviar; adjuntar a mano)."
     }
    ]
   }
