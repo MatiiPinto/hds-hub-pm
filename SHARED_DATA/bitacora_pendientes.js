@@ -3806,6 +3806,28 @@ window.BITACORA = {
    "contraparte": "Loreto Pérez · Puesta en Marcha",
    "titulo": "Cabida NHDS · 97 personas aparecen en dos o más hojas de cabida",
    "detalle": "Noventa y siete personas están en dos o más hojas de cabida distintas, lo que puede terminar en dos puestos de trabajo reservados para la misma persona. Los grupos: Hospitalización Domiciliaria y Paciente Ambulatorio (21), Archivo e Información Sanitaria (19), Operaciones y USNE (15), Farmacia de Emergencia contada en Farmacia y en Emergencia (8), y médicos de Medicina que también figuran en UCI (8) o en UTI (3). Varios son correctos —la misma persona reparte horas entre dos unidades— pero hay que decidir en qué hoja queda su puesto. Aparte, 15 traumatólogos y cirujanos que la matriz tiene en URGENCIA aparecen en las hojas de subespecialidad (Cadera, CMA Cirugía): ahí el desacuerdo es de unidad, no de puesto."
+  },
+  {
+   "id": "P166",
+   "titulo": "Comité de Farmacia 28-10 · proyecto de perfusión ex situ XVIVO (hígado y riñón): cerrar pendientes antes de la sesión",
+   "detalle": "Proyecto, presentación (13 láminas) y modelo económico listos en 11.PROYECTOS Y PUESTA EN MARCHA/PROYECTOS ADICIONALES/PERFUSION EX SITU XVIVO - TRASPLANTE. Falta antes del 28-10: nombre y cargo del Dr. Fanfan; registro renal HDS 2024-2026 (Unidad de Trasplante); oferta ALMEDIS para Kidney Assist Transport; cotización de solución para máquina (MPS); costos reales GRD (día UCI, sesión HD, retrasplante, ingreso por TX); consulta de clasificación de la solución al ISP.",
+   "ambito": "EMMC",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Matías Pinto",
+   "contraparte": "Dr. Fanfan · Dra. Rebolledo · Unidad de Trasplante · Farmacia",
+   "origen_tipo": "Instrucción de Matías",
+   "origen_ref": "Proyecto XVIVO-HDS (Rebolledo, sept-2026)",
+   "origen_fecha": "2026-10-22",
+   "compromiso": "Antes del Comité de Farmacia del 28-10-2026.",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": [
+    {
+     "fecha": "2026-10-22",
+     "texto": "Documentos generados: docx, pptx y xlsx. Precedentes de Mercado Público: INT 2025 y Grant Benavente 2026 por trato directo."
+    }
+   ]
   }
  ],
  "criticos": [
