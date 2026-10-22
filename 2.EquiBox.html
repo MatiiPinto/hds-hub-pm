@@ -2317,8 +2317,8 @@ function openModal(id){
       <button class="modal-tab-btn" onclick="switchModalTab(this,'tab-lic')">${licTabLabel}</button>
       <button class="modal-tab-btn" onclick="switchModalTab(this,'tab-eett')">EETT vs evaluado CTAR${eettTabSuffix}</button>
       <button class="modal-tab-btn" onclick="switchModalTab(this,'tab-pins')">${pinsTabLabel}</button>
-      <button class="modal-tab-btn" onclick="switchModalTab(this,'tab-doc')">${fxDocLabel(b)}</button>
-      <button class="modal-tab-btn" onclick="switchModalTab(this,'tab-compra')">🧾 Compra y reposición</button>
+      ${window.EQUIBOX_FICHA ? `<button class="modal-tab-btn" onclick="switchModalTab(this,'tab-doc')">${fxDocLabel(b)}</button>
+      <button class="modal-tab-btn" onclick="switchModalTab(this,'tab-compra')">🧾 Compra y reposición</button>` : ''}
     </div>
     <div class="modal-tab-panel active" id="tab-equip">
       ${necAviso}
@@ -2480,6 +2480,9 @@ function _filterPinsRows(q){
 // Dato: SHARED_DATA/equibox_ficha.js ← _DEV/equibox_v2/build_equibox_ficha.py
 // ══════════════════════════════════════════════════════════════════
 const FX = ((window.EQUIBOX_FICHA||{}).fichas)||{};
+// Sin equibox_ficha.js (p. ej. la copia del HUB público) no se muestran la dimensión ni las pestañas
+// 📄 Documentación / 🧾 Compra: dirían «sin datos» cuando sí los hay en la versión local.
+if (!window.EQUIBOX_FICHA) document.querySelectorAll('[data-dim="documentacion"]').forEach(el => el.remove());
 const FX_SUB = [['1.1','Manual de usuario'],['1.2','Manual de servicio técnico'],['1.3','Protocolo de mantención preventiva'],
   ['1.4','Fichas técnicas y brochures'],['1.5','Otros · por clasificar'],['2.1','EETT madre (licitación)'],
   ['2.2','EETT trabajadas (CTAR · adjudicado)'],['3','PINS'],['4','Insumos'],['5','Oferta'],['6','Ubicación']];

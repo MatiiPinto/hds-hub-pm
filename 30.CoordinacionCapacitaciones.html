@@ -180,6 +180,7 @@ th.sortable{cursor:pointer;user-select:none}th.sortable:hover{background:#0a558f
 .segtabs button{border:1px solid var(--bd);background:var(--card);border-radius:20px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--tx2);cursor:pointer}
 .segtabs button.on{background:var(--azul);border-color:var(--azul);color:#fff}
 .eqcell{padding:4px 9px!important}
+
 .eqrow{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:3px 0;border-bottom:1px dashed #eef2f6}
 .eqrow:last-child{border-bottom:none}
 .eqnom{flex:1 1 220px;min-width:180px}
@@ -231,6 +232,7 @@ th.sortable{cursor:pointer;user-select:none}th.sortable:hover{background:#0a558f
       <button class="btn" id="btnCapUpd" onclick="actualizarDesdeExcel()" title="Vuelve a leer la hoja '4. Prog Capacitacion HDS' del Excel de Seguimiento y Control (Drive sincronizado) y regenera la reportería. Requiere el servidor local: python3 _DEV/deploy_server.py (o usá Actualizar-Capacitaciones.command).">⟳ Actualizar desde Excel</button>
       <button class="btn" onclick="gAbrir()" title="Vista cronológica del programa con los colores de estado; exportable a Excel para el Servicio de Salud.">📊 Carta Gantt</button>
       <button class="btn" id="btnSeg" onclick="segAbrir()" title="Jornadas propuestas a la CSSO (89 correos enviados el 20-08-2026): solo consulta. El estado oficial se corrige en la hoja 4 del Excel.">🎓 Jornadas CSSO</button>
+      <button class="btn" onclick="risAbrir()" title="Capacitación del Sistema RIS-PACS [60009]: material recibido de la SC, videos del curso y pendientes.">💻 RIS-PACS</button>
       <button class="btn" onclick="exportEstam()" title="Descarga un JSON con los estamentos marcados por equipo para llevarlos a la columna S de la hoja 4 (_DEV/ingesta_estamentos.py).">👥 Exportar estamentos</button>
       <button class="btn" onclick="exportCSV()">⬇ Exportar CSV</button>
       <button class="btn" onclick="resetEstados()">↺ Reiniciar estados</button>
@@ -898,7 +900,7 @@ function pintaLista(){
      ["sin","En CSSO ("+cnt.sin+")"]].map(function(t){
        return '<button class="'+(fJor===t[0]?"on":"")+'" onclick="setFJor(\''+t[0]+'\')">'+t[1]+'</button>';
      }).join("")+'</div>';
-  h+='<table class="segtb"><colgroup><col class="c-n"><col class="c-f"><col class="c-h"><col class="c-sv"><col class="c-eq2"><col class="c-e"></colgroup>'+
+  h+='<table class="segtb ristb"><colgroup><col class="c-n"><col class="c-f"><col class="c-h"><col class="c-sv"><col class="c-eq2"><col class="c-e"></colgroup>'+
      '<thead><tr><th>#</th><th>Fecha propuesta</th><th>Hora</th><th>Servicio clínico</th>'+
      '<th>Equipamiento · estado oficial (hoja 4)</th><th>Jornada</th></tr></thead><tbody>';
   rows.forEach(function(j){
@@ -1312,6 +1314,105 @@ function gBuildWsReporte(sello){
   if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", arranca);
   else arranca();
 })();
+</script>
+
+<!-- ══ Panel RIS-PACS [60009] · estilo «Hoja de especificación D2» (mismo ADN que el Agente HDS, sin japonés)
+     Fuente: CAP_SEG.rispacs (seguimiento.json → build_cap_seguimiento.py). Solo consulta. CSS acotado a #risMask. ══ -->
+<style>
+@font-face{font-family:"Clash Grotesk";font-weight:400;src:url(assets/fonts/hoja/ClashGrotesk-400.woff2) format("woff2");font-display:swap}
+@font-face{font-family:"Clash Grotesk";font-weight:500;src:url(assets/fonts/hoja/ClashGrotesk-500.woff2) format("woff2");font-display:swap}
+@font-face{font-family:"Clash Grotesk";font-weight:600;src:url(assets/fonts/hoja/ClashGrotesk-600.woff2) format("woff2");font-display:swap}
+@font-face{font-family:"Space Mono";font-weight:400;src:url(assets/fonts/hoja/SpaceMono-400.woff2) format("woff2");font-display:swap}
+@font-face{font-family:"Space Mono";font-weight:700;src:url(assets/fonts/hoja/SpaceMono-700.woff2) format("woff2");font-display:swap}
+#risMask{--h-bg:#FAFAFB;--h-panel:#F3F3F6;--h-bd:#D9D9DE;--h-bd2:#ECECEF;--h-tx:#1E1E1E;--h-tx2:#4A4A52;--h-mute:#888890;--h-acento:#0C5EFF;--h-naranjo:#FF550C;--h-rojo:#E0231E;
+ --h-mono:"Space Mono","SF Mono",Menlo,monospace;--h-grot:"Clash Grotesk","Helvetica Neue",Helvetica,Arial,sans-serif;--h-curva:cubic-bezier(.075,.82,.165,1);background:rgba(250,250,251,.86)}
+#risMask .hoja{background:var(--h-bg);color:var(--h-tx);border:1px solid var(--h-bd);border-radius:0;box-shadow:none;width:100%;max-width:1040px;font:12px var(--h-mono);display:flex;flex-direction:column;max-height:calc(100vh - 52px);animation:h-entra .4s var(--h-curva) both}
+#risMask .hoja *{box-sizing:border-box}
+#risMask .h-head{display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;padding:10px 14px 9px;border-bottom:1px solid var(--h-bd);font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--h-tx2)}
+#risMask .h-head b{color:var(--h-tx);font-weight:700}#risMask .h-head .sp{flex:1}
+#risMask button.h-btn{font:9px var(--h-mono);text-transform:uppercase;letter-spacing:.08em;border:1px solid var(--h-tx);background:transparent;color:var(--h-tx);padding:7px 10px;cursor:pointer;border-radius:0;transition:all .2s var(--h-curva)}
+#risMask button.h-btn:hover{background:var(--h-tx);color:#fff}
+#risMask button.h-btn.p{background:var(--h-tx);color:#fff}#risMask button.h-btn.p:hover{background:var(--h-acento);border-color:var(--h-acento)}
+#risMask .h-ret{display:flex;align-items:center;gap:18px;min-height:84px;border-bottom:1px solid var(--h-bd);padding:24px 16px 12px;position:relative;overflow:hidden;
+ background:linear-gradient(var(--h-bd2) 1px,transparent 1px) 0 0/100% 21px,linear-gradient(90deg,var(--h-bd2) 1px,transparent 1px) 0 0/21px 100%}
+#risMask .h-est{display:flex;flex-direction:column;gap:4px}
+#risMask .h-est .k{font:700 22px/1.1 var(--h-mono);letter-spacing:.06em;text-transform:uppercase}
+#risMask .h-est .e{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--h-naranjo)}
+#risMask .h-est .k.alerta{animation:h-rec 1.2s ease-in-out infinite}
+#risMask .h-kpi{display:flex;gap:0;margin-left:auto}
+#risMask .h-kpi div{border-left:1px solid var(--h-bd);padding:2px 16px;min-width:96px}
+#risMask .h-kpi b{display:block;font:500 24px/1.1 var(--h-grot);color:var(--h-tx)}
+#risMask .h-kpi span{font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--h-mute)}
+#risMask .h-ret .cota0{position:absolute;right:12px;top:6px;font-size:8px;text-transform:uppercase;letter-spacing:.1em;color:var(--h-mute)}
+#risMask .h-main{flex:1;display:flex;min-height:0}
+#risMask .h-tate{width:30px;flex:0 0 30px;border-right:1px solid var(--h-bd);background:var(--h-panel);overflow:hidden;position:relative}
+#risMask .h-tate div{position:absolute;left:0;top:0;writing-mode:vertical-rl;text-orientation:mixed;font:10px/30px var(--h-mono);text-transform:uppercase;color:var(--h-tx2);letter-spacing:.14em;white-space:nowrap;padding-top:8px;will-change:transform;animation:h-sube 40s linear infinite}
+#risMask .h-tate em{font-style:normal;color:var(--h-naranjo)}#risMask .h-tate b{color:var(--h-acento);font-weight:700}
+#risMask .h-cuerpo{flex:1;overflow:auto;padding:14px 18px 14px 12px;background:linear-gradient(90deg,transparent 41px,var(--h-bd2) 41px,var(--h-bd2) 42px,transparent 42px)}
+#risMask .h-m{position:relative;padding:5px 0 8px 52px;animation:h-entra .4s var(--h-curva) both}
+#risMask .h-m::before{content:attr(data-h);position:absolute;left:0;top:7px;font-size:9px;color:var(--h-mute);letter-spacing:.02em}
+#risMask .h-sec{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--h-tx);font-weight:700;margin:14px 0 4px 52px}
+#risMask .h-sec:first-child{margin-top:0}#risMask .h-sec i{font-style:normal;color:var(--h-mute);font-weight:400}
+#risMask .lab{display:block;font-size:9px;text-transform:uppercase;letter-spacing:.1em;color:var(--h-mute);margin-bottom:2px}
+#risMask .lab .tag{color:var(--h-rojo)}#risMask .lab .tag.ok{color:var(--h-acento)}
+#risMask .txt{font:500 13.5px/1.42 var(--h-grot);color:var(--h-tx)}
+#risMask .cota{display:block;margin:5px 0 0;font:9px/1.6 var(--h-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--h-naranjo)}
+#risMask .cota::before{content:"";display:inline-block;vertical-align:middle;height:1px;background:var(--h-naranjo);width:46px;margin-right:6px;animation:h-linea .8s var(--h-curva) both}
+#risMask .h-nom{display:flex;flex-wrap:wrap;gap:0;margin-top:6px;border:1px solid var(--h-bd)}
+#risMask .h-nom div{padding:7px 12px;border-right:1px solid var(--h-bd)}#risMask .h-nom div:last-child{border-right:0}
+#risMask .h-nom b{display:block;font:500 18px/1.1 var(--h-grot)}#risMask .h-nom span{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--h-mute)}
+#risMask table.h-tb{width:100%;border-collapse:collapse;margin-top:4px}
+#risMask .h-tb th{font:400 9px var(--h-mono);text-transform:uppercase;letter-spacing:.1em;color:var(--h-mute)!important;background:transparent!important;text-align:left;padding:5px 8px;border-bottom:1px solid var(--h-tx);position:static;box-shadow:none}
+#risMask .h-tb td{padding:7px 8px;border-bottom:1px solid var(--h-bd2);vertical-align:top;font-size:11px;color:var(--h-tx2)}
+#risMask .h-tb td.t{font:500 13px/1.35 var(--h-grot);color:var(--h-tx)}
+#risMask .h-tb tr{animation:h-entra .4s var(--h-curva) both}
+#risMask .h-tb tr.tot td{border-top:1px solid var(--h-tx);border-bottom:0;font-weight:700;color:var(--h-tx)}
+#risMask .h-tb .ap{color:var(--h-naranjo)}
+#risMask .h-foot{border-top:1px solid var(--h-bd);padding:9px 14px;display:flex;align-items:center;gap:8px;font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--h-mute)}
+#risMask .h-foot .sp{flex:1}
+@keyframes h-entra{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@keyframes h-linea{from{width:0}to{width:46px}}
+@keyframes h-sube{to{transform:translateY(-50%)}}
+@keyframes h-rec{0%,100%{opacity:1}50%{opacity:.6}}
+@media (prefers-reduced-motion:reduce){#risMask *{animation:none!important}}
+@media (max-width:720px){#risMask .h-kpi,#risMask .h-tate,#risMask #risSub,#risMask .h-ret .cota0{display:none}#risMask .h-ret{padding-top:12px}#risMask .h-cuerpo{background:none;padding-left:4px}#risMask .h-m,#risMask .h-sec{padding-left:0;margin-left:0}#risMask .h-m::before{display:none}}
+</style>
+<div class="segmask" id="risMask" onclick="if(event.target===this)risCerrar()"><div class="hoja" role="dialog" aria-label="Capacitación Sistema RIS-PACS">
+  <div class="h-head"><span>// <b>[60009] Sistema RIS-PACS</b></span><span id="risSub"></span><span class="sp"></span><span id="risAct"></span><button class="h-btn" onclick="risCerrar()">Cerrar ×</button></div>
+  <div class="h-ret" id="risRet"></div>
+  <div class="h-main"><div class="h-tate" aria-hidden="true"><div id="risTate"></div></div><div class="h-cuerpo" id="risBody"></div></div>
+  <div class="h-foot"><span>// Fuente: registro de seguimiento del programa · correos con la SC · solo consulta</span><span class="sp"></span><button class="h-btn p" onclick="risCerrar()">Cerrar</button></div>
+</div></div>
+<script>
+"use strict";
+function risCerrar(){ document.getElementById("risMask").className="segmask"; }
+function risAbrir(){
+  var R=(window.CAP_SEG||{}).rispacs, m=document.getElementById("risMask"), B=document.getElementById("risBody");
+  function e(x){ return String(x==null?"":x).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); }
+  function dmy(f){ return String(f||"").split("-").reverse().join("-"); }
+  function mmss(s){ return Math.floor(s/60)+":"+("0"+Math.round(s%60)).slice(-2); }
+  function dos(n){ return ("0"+n).slice(-2); }
+  if(!R){ B.innerHTML='<div class="h-m" data-h="[--]"><span class="txt">Sin datos del RIS-PACS en cap_seguimiento.js.</span></div>'; m.className="segmask on"; return; }
+  var pend=R.pendientes.filter(function(p){return p.estado!=="ok";}), mins=String(R.videos_total_min).replace(".",",");
+  document.getElementById("risSub").textContent="· GE Centricity · ECM Ingeniería";
+  document.getElementById("risAct").textContent="Actualizado "+dmy(R.actualizado);
+  document.getElementById("risRet").innerHTML='<span class="cota0">[60009] · ficha de capacitación</span>'+
+    '<div class="h-est"><span class="k'+(pend.length?' alerta':'')+'">'+(pend.length?'En espera':'Listo')+'</span><span class="e">// '+pend.length+' pendientes de la SC · material recibido '+dmy(R.actualizado)+'</span></div>'+
+    '<div class="h-kpi"><div><b>'+R.videos.length+'</b><span>videos MP4</span></div><div><b>'+mins+'</b><span>minutos</span></div><div><b>'+(R.nomina_corte?R.nomina_corte.total:"–")+'</b><span>nómina 1er corte</span></div><div><b style="color:var(--h-naranjo)">'+pend.length+'</b><span>pendientes</span></div></div>';
+  var t=' <b>RIS-PACS</b> ▸ '+R.videos.length+' videos ▸ '+mins+' min ▸ <em>'+pend.length+' pendientes</em> ▸ '+R.perfiles.length+' perfiles ▸ '+dmy(R.actualizado)+' ▸';
+  var T=document.getElementById("risTate"); T.innerHTML=t+t; T.style.animationDuration=Math.max(26,t.replace(/<[^>]+>/g,"").length*0.9)+"s";
+  var h="", k=0, d=function(){ return ' style="animation-delay:'+(0.04*(k++)).toFixed(2)+'s"'; };
+  h+='<div class="h-sec">// Pendientes <i>['+dos(pend.length)+']</i></div>';
+  R.pendientes.forEach(function(p,i){ h+='<div class="h-m" data-h="['+dos(i+1)+']"'+d()+'><span class="lab"><span class="tag'+(p.estado==="ok"?" ok":"")+'">['+(p.estado==="ok"?"listo":"pendiente")+']</span> · '+e(p.responsable)+'</span><span class="txt">'+e(p.item)+'</span>'+(p.nota?'<span class="cota">'+e(p.nota)+'</span>':'')+'</div>'; });
+  h+='<div class="h-sec">// Material recibido <i>['+dos(R.material.length)+']</i></div>';
+  R.material.forEach(function(x,i){ h+='<div class="h-m" data-h="['+dos(i+1)+']"'+d()+'><span class="lab"><span class="tag ok">[recibido]</span> · '+dmy(x.fecha)+'</span><span class="txt">'+e(x.item)+'</span>'+(x.nota?'<span class="cota">'+e(x.nota)+'</span>':'')+'</div>'; });
+  h+='<div class="h-sec">// Perfiles y nómina</div><div class="h-m" data-h="[01]"'+d()+'><span class="lab">Perfiles del curso</span><span class="txt">'+R.perfiles.map(e).join(" · ")+'</span>';
+  var n=R.nomina_corte; if(n){ h+='<span class="lab" style="margin-top:9px">Nómina '+e(n.servicio)+' · '+dmy(n.fecha)+'</span><div class="h-nom"><div><b>'+n.total+'</b><span>total</span></div>'+Object.keys(n.por_perfil).map(function(q){return '<div><b>'+n.por_perfil[q]+'</b><span>'+e(q)+'</span></div>';}).join("")+'</div>'; }
+  h+='</div><div class="h-sec">// Videos del curso <i>['+dos(R.videos.length)+'] · '+mins+' min</i></div><div class="h-m" data-h="[MP4]"'+d()+'><table class="h-tb"><thead><tr><th style="width:7%">#</th><th>Video</th><th style="width:13%">Tipo</th><th style="width:11%">Duración</th></tr></thead><tbody>';
+  R.videos.forEach(function(v,i){ h+='<tr style="animation-delay:'+(0.03*i+0.2).toFixed(2)+'s"><td>['+dos(i+1)+']</td><td class="t">'+e(v.titulo)+'</td><td class="'+(v.tipo==="modulo"?"":"ap")+'">'+(v.tipo==="modulo"?"módulo":"apoyo")+'</td><td>'+mmss(v.dur_s)+'</td></tr>'; });
+  h+='<tr class="tot"><td></td><td>Total</td><td></td><td>'+mins+' min</td></tr></tbody></table></div>';
+  B.innerHTML=h; B.scrollTop=0; m.className="segmask on";
+}
 </script>
 </body>
 </html>

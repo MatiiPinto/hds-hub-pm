@@ -1,7 +1,7 @@
 // SHARED_DATA/bitacora_pendientes.js — versión publicada en el HUB-PM (saneada por deploy_web_pm.py)
 window.BITACORA = {
  "version": "2026-10-05 · Bitácora y huddle de Puesta en Marcha",
- "generado": "2026-10-15",
+ "generado": "2026-10-22",
  "proposito": "Reunir en un solo lugar los pendientes que hoy viven dispersos en correos, ORD, cartas CS-IF, actas de mesas de trabajo y sesiones de trabajo.",
  "ambitos": [
   "Comunicaciones",
@@ -2830,12 +2830,16 @@ window.BITACORA = {
    "plazo": "",
    "responsable": "No consta",
    "creado": "2026-10-05",
-   "actualizado": "2026-10-05",
+   "actualizado": "2026-10-22",
    "frente": "Puesta en Marcha",
    "notas": [
     {
      "fecha": "2026-10-05",
      "texto": "Levantado de la reunión del equipo PM del 05-10 [2·20:36–21:06]. Ver minuta en Minutas/minutas/2026-10-05_puesta-en-marcha-equipo-comunicaciones-discurso.md."
+    },
+    {
+     "fecha": "2026-10-22",
+     "texto": "Entrega PM (19-10): capacidad de cabida al 65 %, falta finalizarla; planos con puestos de trabajo en el HUB. Dotación validada 3.725 (HDS 3.069 + becados 131 + compras de servicio 507 + honorarios 9 + docentes UCH 9)."
     }
    ]
   },
@@ -3320,18 +3324,488 @@ window.BITACORA = {
    "titulo": "Gremios · ubicación y dotación de los profesionales no enfermeros",
    "detalle": "Reunión PM 15-10-2026 [00:24:37]: tras la carta de los gremios, quedó claro lo de enfermería y TENS, pero sigue pendiente responder sobre kinesiólogos, nutricionistas (incluida la compra de servicios), fonoaudiólogos, psicólogos y terapeutas. Discurso acordado: «los otros profesionales se están ubicando según sus unidades y funciones». Un solo vocero; a la reunión de hoy a las 9:00 se fue solo a escuchar. Minuta: Minutas/minutas/2026-10-15_puesta-en-marcha.md",
    "responsable": "Equipo PM (voceros)",
-   "ambito": "Dotación"
+   "ambito": "Dotación",
+   "notas": [
+    {
+     "fecha": "2026-10-22",
+     "texto": "Entrega PM (19-10): dotación pendiente para atención cerrada: médicos de residencia, kinesiólogos, nutricionistas, psicólogos, fonoaudiólogos y terapeutas ocupacionales."
+    }
+   ],
+   "actualizado": "2026-10-22"
   },
   {
    "id": "P146",
-   "estado": "Esperando terceros",
+   "estado": "En curso",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-15",
    "titulo": "Dotación · conciliar con RR.HH. 130 funcionarios y los reemplazos",
-   "detalle": "Reunión PM 15-10-2026 [00:29:30]: se envió a Rodrigo Quijada un correo con 130 funcionarios para aclararlos uno por uno; el corte de dotación ya está al 13-10. Se cuestionan 85 reemplazos [sic?] y siguen apareciendo funcionarios que renunciaron (p. ej., en marzo). Se pide que RR.HH. informe el motivo de cada baja. Minuta: Minutas/minutas/2026-10-15_puesta-en-marcha.md",
+   "detalle": "Reunión PM 15-10-2026 [00:29:30]: se envió a Rodrigo Quijada un correo con 130 funcionarios para aclararlos uno por uno; el corte de dotación ya está al 13-10. Se cuestionan 85 reemplazos [sic?] y siguen apareciendo funcionarios que renunciaron (p. ej., en marzo). Se pide que RR.HH. informe el motivo de cada baja. Minuta: Minutas/minutas/2026-10-15_puesta-en-marcha.md || 19-10-2026: Rodrigo Quijada agregó al libro la hoja «Egresos» con la causal y la fecha de término de cada salida, y retiró 36 personas de la base. Con eso la matriz quedó al corte 19-10 y de las 207 salidas detectadas NINGUNA queda por preguntar a las jefaturas: 143 con causal de la Unidad de Dotación, 31 becados con fin de programa, 29 becados por confirmar con el RAD, 2 contratadas por la Concesionaria y 2 que resultaron vigentes (la planilla las había perdido). La hoja de Egresos queda en el Drive y se actualiza junto con la dotación los días 15 de cada mes.",
    "responsable": "Loreto [sic?]",
-   "ambito": "Dotación"
+   "ambito": "Dotación",
+   "actualizado": "2026-10-19"
+  },
+  {
+   "id": "P147",
+   "titulo": "Dotación · becados: servicio y rotación de los que el listado de postgrado no permite ubicar",
+   "detalle": "El listado oficial de postgrado del RAD (Pamela Segovia, al 19-10-2026, 560 personas) actualizó la nómina de becados: 512 personas al día, 66 que salieron del listado (fin de programa). Quedan dos grupos sin poder cargar: 48 del listado nuevo que no traen el servicio del hospital donde rotan —sin eso entran a la matriz sin unidad ni subdirección— y 29 becados que la matriz tenía con nombre y que no figuran ni en el listado nuevo ni en la nómina RAD anterior. Planilla enviada: _DOCS/Informes_Servicios/Becados_pendientes_RAD_2026-10-19.xlsx. Incluye además 1 RUT con dígito verificador inválido en la nómina RAD (Tauton Muzio María José). || 20-10-2026: el RAD devolvió la planilla completa. Los 48 nuevos quedaron ubicados con su servicio (y se guardó la equivalencia de nombres RAD↔matriz, incluida la nueva SERVICIO DE PSIQUIATRIA → DEPARTAMENTO PACIENTE SALUD MENTAL Y PSIQUIATRIA). De los 29 sin referencia: 8 siguen en formación (7 ya venían en el listado nuevo y 1, Stockle Medina, se repuso a la nómina) y 20 terminaron su programa con fecha confirmada. Queda 1 sin responder: Parada Escobar Jorge Pedro (Cirugía General). El RUT con dígito verificador inválido (Tauton Muzio) sigue pendiente de corregir en el origen.",
+   "ambito": "Dotación",
+   "prioridad": "Media",
+   "estado": "En curso",
+   "responsable": "Matías",
+   "contraparte": "Pamela Segovia · Relación Asistencial Docente",
+   "servicio": "",
+   "origen_tipo": "correo",
+   "origen_ref": "Listado postgrado al 19.10.2026.xlsx",
+   "origen_fecha": "2026-10-19",
+   "compromiso": "",
+   "creado": "2026-10-19",
+   "actualizado": "2026-10-20",
+   "notas": ""
+  },
+  {
+   "id": "P148",
+   "titulo": "Dotación · registrar como empresa externa a las contratadas por la Concesionaria",
+   "detalle": "La Unidad de Dotación informó que Javiera del Pilar Flores Díaz (Departamento de Eficiencia Hospitalaria) y Constanza Poch Trabucco (Unidad de Puesta en Marcha) no tienen registro en SIRH porque las contrató la Sociedad Concesionaria. No son dotación del hospital, pero trabajan en esas unidades: corresponde cargarlas con el overlay de personal de empresa externa (dotacion_externos_empresa.json), que las ubica en su unidad sin contar dotación. Falta confirmar el nombre de la empresa y el contrato que las respalda.",
+   "ambito": "Dotación",
+   "prioridad": "Baja",
+   "estado": "Abierto",
+   "responsable": "Matías",
+   "contraparte": "Rodrigo Quijada · Unidad de Dotación",
+   "servicio": "",
+   "origen_tipo": "correo",
+   "origen_ref": "Re: Matriz de dotación · 130 personas para retirar de la planilla",
+   "origen_fecha": "2026-10-19",
+   "compromiso": "",
+   "creado": "2026-10-19",
+   "actualizado": "2026-10-19",
+   "notas": ""
+  },
+  {
+   "id": "P149",
+   "titulo": "Dotación · Giannina Desireé Mendoza (Diálisis): única honoraria sin causal",
+   "detalle": "De los 5 honorarios consultados a la Unidad de Dotación el 15-10, cuatro quedaron con causal en la hoja de Egresos. Giannina Desireé Mendoza, de la Unidad de Diálisis, no aparece ni en la hoja de Egresos ni en el corte vigente, y no fue respondida en el correo del 19-10. Falta saber si terminó su convenio o si corresponde reponerla en la planilla. Es la única de las 207 salidas detectadas que no tiene explicación. El 22-10 apareció en los registros de cabida de Puesta en Marcha, en la hoja DIÁLISIS, con contrato de honorario: el dato de Loreto dice que seguía en la unidad. Sirve para repreguntarle a Dotación con antecedente, no la cierra.",
+   "ambito": "Dotación",
+   "prioridad": "Baja",
+   "estado": "Esperando terceros",
+   "responsable": "Matías",
+   "contraparte": "Rodrigo Quijada · Unidad de Dotación",
+   "servicio": "UNIDAD DE DIALISIS",
+   "origen_tipo": "correo",
+   "origen_ref": "Re: Matriz de dotación · 130 personas para retirar de la planilla",
+   "origen_fecha": "2026-10-19",
+   "compromiso": "",
+   "creado": "2026-10-19",
+   "actualizado": "2026-10-22",
+   "notas": ""
+  },
+  {
+   "id": "P150",
+   "titulo": "Dotación · compras de servicio sin nombre de persona (109 filas)",
+   "detalle": "De las 113 compras de servicio de la planilla, 100 vienen con el nombre vacío y 9 con el nombre de la EMPRESA (SOCIAL MED ×3, MEDICAL ×3, LAYNER ×3, estas últimas con 3 cargos distintos en Pabellón). Ninguna de las 113 trae RUT. El Atlas y el slim ya las tratan como cupos y no como personas (regla `_dotSinPersona` / `sin_persona`), así que no inflan la cuenta: compras 113 = 3 con nombre + 110 cupos. Falta pedirle a Rodrigo Quijada que la planilla traiga el nombre de la persona o deje la fila explícitamente como cupo. Consultado a Rodrigo Quijada el 22-10-2026 junto con las 28 personas sin clasificación.",
+   "ambito": "Dotación",
+   "prioridad": "Baja",
+   "estado": "Esperando terceros",
+   "responsable": "Matías",
+   "contraparte": "Rodrigo Quijada · Unidad de Dotación",
+   "servicio": "",
+   "origen_tipo": "revisión",
+   "origen_ref": "Atlas · cubicación sólo de personas con nombre",
+   "origen_fecha": "2026-10-21",
+   "compromiso": "",
+   "creado": "2026-10-21",
+   "actualizado": "2026-10-22",
+   "notas": ""
+  },
+  {
+   "id": "P151",
+   "titulo": "Dotación · 28 personas sin clasificación que el Atlas no puede ubicar",
+   "detalle": "Al corte 19-10 quedan 28 registros que el Atlas no puede ubicar por falta de clasificación: 7 marcados PENDIENTE DE CLASIFICAR POR RRHH (informados el 23-09 con recinto pero sin departamento ni subdirección, y ninguno vigente en SIRH; 3 de ellos sin RUT: Marillán Huiquimil, Montalbán Rivereli y Silva Calquín), 10 de la Unidad de Diálisis cuyo departamento dice REVISAR, 9 de la Subdirección Médica cuya unidad dice REVISAR, 1 reemplazo sin subdirección (González Elgueta, ya corregida en la planilla) y 1 compra de servicio de Soporte Nutricional sin nombre. Consultado por correo a Rodrigo Quijada el 22-10-2026.",
+   "ambito": "Dotación",
+   "prioridad": "Media",
+   "estado": "Esperando terceros",
+   "responsable": "Matías",
+   "contraparte": "Rodrigo Quijada · Unidad de Dotación",
+   "servicio": "",
+   "origen_tipo": "revisión",
+   "origen_ref": "Atlas · panel de dotación asignada a recinto",
+   "origen_fecha": "2026-10-22",
+   "compromiso": "",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": ""
+  },
+  {
+   "id": "P152",
+   "titulo": "Dotación · cargar el personal de empresa externa que levanta Loreto por unidad",
+   "detalle": "Loreto Pérez está revisando unidad por unidad con cada jefatura y enviando la planilla de funcionarios y compras de servicio. El 22-10 llegaron las dos primeras: Área Hospitalizados (20 HDS + 16 compras de servicio de LAYNER, SOCIALMED y MEDICAL, con RUT, cargadas como EXTERNO EMPRESA) y Farmacia Atención Abierta (31 HDS, sin compras de servicio). A medida que lleguen las demás unidades hay que cargarlas en dotacion_externos_empresa.json y correr el overlay. Pendiente de Loreto/Dan: el RUT de Katherine Peñaloza (MEDICAL). Hallazgo: «Farmacia Atención Abierta» del NHDS = Área Ambulatorio (16) + Área Polimedicina (14) + Servicio Farmacia (1) en la planilla de dotación; conviene escribir esa equivalencia de nombres antes de que alguien compare las listas y crea que faltan 31 personas.",
+   "ambito": "Dotación",
+   "prioridad": "Media",
+   "estado": "En curso",
+   "responsable": "Matías",
+   "contraparte": "Loreto Pérez · Puesta en Marcha",
+   "servicio": "",
+   "origen_tipo": "correo",
+   "origen_ref": "Envío de planilla actualizada de dotación HDS y compras de servicios",
+   "origen_fecha": "2026-10-22",
+   "compromiso": "",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": ""
+  },
+  {
+   "id": "P153",
+   "titulo": "Dotación · cruzar los archivos de cabida por subdirección que lleva Loreto",
+   "detalle": "La carpeta de Loreto en el Drive tiene un archivo de cabida por subdirección (SDA, Dirección, SDGC, SDM Áreas Administrativas, SD Gestión de Personas) más las carpetas SDADT y SDM Servicios Clínicos. CRUZADO el 22-10 con los 23 libros que bajó Matías: 119 hojas con datos, 102 de ellas de cabida, 7.111 registros y 3.173 personas. Contra la matriz sin becados (3.292): 1.058 con ubicación en el edificio nuevo (32%), 1.944 en el registro sin ubicación asignada (59%) y 290 que no aparecen (8%). Los becados quedan fuera del alcance: no ocupan puesto permanente, y por eso los 650 médicos que «faltaban» en el primer conteo no son una brecha. El cruce queda en _DEV/cargar_cabida_loreto.py → SHARED_DATA/dotacion_cabida.json/.js, y el informe sin RUT en _DOCS/Informes_Servicios/Cabida_NHDS_Cruce_2026-10-22.xlsx. Lo que abrió este cruce está en P154 (Urgencia), P155 (fuera de la matriz), P156 (vocabulario de ubicación) y P157 (doble puesto).",
+   "ambito": "Dotación",
+   "prioridad": "Media",
+   "estado": "En curso",
+   "responsable": "Matías",
+   "contraparte": "Loreto Pérez · Puesta en Marcha",
+   "servicio": "",
+   "origen_tipo": "revisión",
+   "origen_ref": "Carpeta de registros de cabida (Drive de Loreto)",
+   "origen_fecha": "2026-10-22",
+   "compromiso": "",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": ""
+  },
+  {
+   "id": "P154",
+   "titulo": "Plan Piloto · antecedentes que pide la Inspección Fiscal para la versión actualizada",
+   "detalle": "La IF pide incorporar al Plan Piloto: (1) programar los casos de la Unidad de Emergencia en los últimos días; (2) cantidad y nómina diaria de profesionales participantes, para coordinar almuerzos; (3) pacientes ficticios con nombre ficticio o código numérico, habitación y cama; (4) documento que acredite el cierre de la capacitación de quienes participan. Estado en la entrega: PENDIENTE. Avance de preparación: enrolados 158/251 (63 %), capacitación general 224 (89 %), SIC general 215 (86 %), SIC directivo 90/109, SIC nutricionistas 5/5. Relacionado: P141.",
+   "ambito": "Puesta en Marcha",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Por asignar (ex Coordinación PM, G. Brignardello)",
+   "contraparte": "",
+   "origen_tipo": "Otro",
+   "origen_ref": "Entrega de Puesta en Marcha · G. Brignardello (PPT, 33 láminas, corte 19-10-2026)",
+   "origen_fecha": "2026-10-19",
+   "compromiso": "",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": [
+    {
+     "fecha": "2026-10-22",
+     "texto": "Incorporado desde la entrega de Puesta en Marcha de Gabriella Brignardello."
+    }
+   ]
+  },
+  {
+   "id": "P155",
+   "titulo": "PAPS · revisar las observaciones de Alimentación y Ropería antes de la entrada en operación",
+   "detalle": "El cruce por RUT dejó 207 personas que los registros de Puesta en Marcha listan y la matriz de dotación no tiene. La mayoría se explica: 115 son salidas ya detectadas y con causal en la hoja de Egresos, y 43 están en las nóminas SIS de compras de servicio u honorarios. Quedan 49 sin rastro en ninguna fuente, concentradas en Farmacia (11), Gestión de la Demanda (7), la dotación revisada de Pabellón (7) y Toma de Muestras (5). De esas 49, 18 traen contrato de compra de servicios y 21 vienen con la casilla en blanco, varias escritas con el nombre antes del apellido, lo que apunta a gente tipeada a mano y no bajada del SIRH. Hay que preguntarle a Loreto qué vínculo tienen antes de agregar a nadie a la matriz. La planilla para consultar, sin RUT, es la hoja «Fuera de la matriz» de _DOCS/Informes_Servicios/Cabida_NHDS_Cruce_2026-10-22.xlsx.",
+   "ambito": "Puesta en Marcha",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "responsable": "Por asignar (ex Coordinación PM, G. Brignardello)",
+   "contraparte": "",
+   "origen_tipo": "Otro",
+   "origen_ref": "Entrega de Puesta en Marcha · G. Brignardello (PPT, 33 láminas, corte 19-10-2026)",
+   "origen_fecha": "2026-10-19",
+   "compromiso": "",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": [
+    {
+     "fecha": "2026-10-22",
+     "texto": "Incorporado desde la entrega de Puesta en Marcha de Gabriella Brignardello."
+    }
+   ]
+  },
+  {
+   "id": "P156",
+   "titulo": "ORD SSMO 1893 · el SSMO solicita informe favorable de las capacitaciones",
+   "detalle": "Ordinario recibido al 19-10 (lista de la entrega). El SSMO pide al HDS un informe favorable de las capacitaciones. Toca al Programa de Capacitación EMMC y al de la CSSO (bases de licitación). Revisar alcance exacto en el ORD.",
+   "ambito": "Capacitación",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Matías Pinto",
+   "contraparte": "SSMO",
+   "origen_tipo": "Otro",
+   "origen_ref": "Entrega de Puesta en Marcha · G. Brignardello (PPT, 33 láminas, corte 19-10-2026)",
+   "origen_fecha": "2026-10-19",
+   "compromiso": "",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": [
+    {
+     "fecha": "2026-10-22",
+     "texto": "Incorporado desde la entrega de Puesta en Marcha de Gabriella Brignardello."
+    }
+   ]
+  },
+  {
+   "id": "P157",
+   "titulo": "ORD SSMO 1876 → IF · números de serie de EMMC para la Autorización Sanitaria",
+   "detalle": "El SSMO solicita a la IF los números de serie del EMMC para la AS. Sirven los datos por serie de PINS-EMMC (corte 31-07) y las actas de existencia; conviene preparar el cruce por recinto antes de que llegue la respuesta de la SC.",
+   "ambito": "EMMC",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Matías Pinto",
+   "contraparte": "SSMO · Inspección Fiscal",
+   "origen_tipo": "Otro",
+   "origen_ref": "Entrega de Puesta en Marcha · G. Brignardello (PPT, 33 láminas, corte 19-10-2026)",
+   "origen_fecha": "2026-10-19",
+   "compromiso": "",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": [
+    {
+     "fecha": "2026-10-22",
+     "texto": "Incorporado desde la entrega de Puesta en Marcha de Gabriella Brignardello."
+    }
+   ]
+  },
+  {
+   "id": "P158",
+   "titulo": "Ordinarios recibidos al 19-10 sin seguimiento en la Bitácora",
+   "detalle": "De la lista de la entrega: 1838 (SSMO–HDS, especificaciones técnicas de climatización), 1877 (SSMO–HDS, proyecto de clima), 1874 (SSMO–IF, planos para la AS), 1879 (SSMO–IF, informe de IAAS por las cortinas), 1896 (SSMO–IF, aclaración de telefonía), 1142/1143 (HDS–SSMO, integraciones y RCE), 1163 (HDS–SSMO, cartera de servicios). Ya en la Bitácora: 1106/1837 (P135), 1053 (P078), 1683 (perfiles SIC). Ojo: 1838/1877 (clima) se relacionan con el informe del sensor de temperatura en UCI H1887.",
+   "ambito": "Puesta en Marcha",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "responsable": "Por asignar (ex Coordinación PM, G. Brignardello)",
+   "contraparte": "",
+   "origen_tipo": "Otro",
+   "origen_ref": "Entrega de Puesta en Marcha · G. Brignardello (PPT, 33 láminas, corte 19-10-2026)",
+   "origen_fecha": "2026-10-19",
+   "compromiso": "",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": [
+    {
+     "fecha": "2026-10-22",
+     "texto": "Incorporado desde la entrega de Puesta en Marcha de Gabriella Brignardello."
+    }
+   ]
+  },
+  {
+   "id": "P159",
+   "titulo": "Equipamiento · 6 equipos pendientes, Plan de Instalación (PINS) desconocido y CEFE por ejecutar",
+   "detalle": "La entrega informa: existirían 6 equipos aún pendientes; aún no se conoce el Plan de Instalación del EMMC; el CORE de Laboratorio ya está adjudicado; CEFE: recursos asignados, debe ejecutarlo el HDS. Identificar los 6 equipos y aclarar qué es y quién ejecuta lo de CEFE.",
+   "ambito": "EMMC",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Matías Pinto",
+   "contraparte": "",
+   "origen_tipo": "Otro",
+   "origen_ref": "Entrega de Puesta en Marcha · G. Brignardello (PPT, 33 láminas, corte 19-10-2026)",
+   "origen_fecha": "2026-10-19",
+   "compromiso": "",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": [
+    {
+     "fecha": "2026-10-22",
+     "texto": "Incorporado desde la entrega de Puesta en Marcha de Gabriella Brignardello."
+    }
+   ]
+  },
+  {
+   "id": "P160",
+   "titulo": "Apertura progresiva de camas · falta la validación de la Subsecretaría de Redes (SSRA)",
+   "detalle": "La apertura progresiva de camas según la dotación actual se presentó al SSMO y a los gremios; falta la validación de la SSRA.",
+   "ambito": "Puesta en Marcha",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Por asignar (ex Coordinación PM, G. Brignardello)",
+   "contraparte": "",
+   "origen_tipo": "Otro",
+   "origen_ref": "Entrega de Puesta en Marcha · G. Brignardello (PPT, 33 láminas, corte 19-10-2026)",
+   "origen_fecha": "2026-10-19",
+   "compromiso": "",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": [
+    {
+     "fecha": "2026-10-22",
+     "texto": "Incorporado desde la entrega de Puesta en Marcha de Gabriella Brignardello."
+    }
+   ]
+  },
+  {
+   "id": "P161",
+   "titulo": "Ubicación por definir: HOSDOM, Unidad de la Memoria y Equipo de Somatoprótesis",
+   "detalle": "Según la entrega, la ubicación de estas tres unidades en el NHDS sigue por definir.",
+   "ambito": "PMA",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "responsable": "Por asignar (ex Coordinación PM, G. Brignardello)",
+   "contraparte": "",
+   "origen_tipo": "Otro",
+   "origen_ref": "Entrega de Puesta en Marcha · G. Brignardello (PPT, 33 láminas, corte 19-10-2026)",
+   "origen_fecha": "2026-10-19",
+   "compromiso": "",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": [
+    {
+     "fecha": "2026-10-22",
+     "texto": "Incorporado desde la entrega de Puesta en Marcha de Gabriella Brignardello."
+    }
+   ]
+  },
+  {
+   "id": "P162",
+   "titulo": "Autorización Sanitaria · documentos pendientes según la entrega",
+   "detalle": "Estado de la documentación AS (con la Oficina de Calidad): Ficha clínica / Registros (transformación digital) PENDIENTE; Comité de Ética Asistencial en ACTUALIZACIÓN; Cartera de prestaciones y Manuales de Procedimientos (UMT, Laboratorio, Diálisis, Imagenología, Esterilización, Farmacia) EN TRABAJO. OK: Manual de Organización y Funcionamiento, dotación de camas y complejidad, Reglamento Interno. Organismos: SEREMI con 2 visitas y observaciones remitidas a la IF (en espera); ISP (Farmacia y Droguería) con 3 informes; Instituto Médico Legal revisó la caja de alcoholemia de Urgencia.",
+   "ambito": "Aut. Sanitaria",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Catherine Sepúlveda",
+   "contraparte": "",
+   "origen_tipo": "Otro",
+   "origen_ref": "Entrega de Puesta en Marcha · G. Brignardello (PPT, 33 láminas, corte 19-10-2026)",
+   "origen_fecha": "2026-10-19",
+   "compromiso": "",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": [
+    {
+     "fecha": "2026-10-22",
+     "texto": "Incorporado desde la entrega de Puesta en Marcha de Gabriella Brignardello."
+    }
+   ]
+  },
+  {
+   "id": "P163",
+   "titulo": "Gestión del Cambio · brechas del plan (66/82 acciones, 80,5 %)",
+   "detalle": "Líneas pendientes: Formación en modelos y macroprocesos 0/5; Acompañamiento a quienes no se trasladan 0/4 (parte cuando se oficialicen las nóminas de quien se queda, ver P121); Manuales de uso 2/6 (faltan Casilleros, Residencias, Salas de reuniones/Auditorios y Kitchenettes); Campaña informativa en terreno 1/3 (jornada con líderes y gremiales, material visual y cápsulas); lanzamiento del Libro Voces del Salvador (4/5). Reglamento de Uso 80 % (falta edición final y Plan de Emergencia).",
+   "ambito": "Comunicaciones",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "responsable": "Por asignar (ex Coordinación PM, G. Brignardello)",
+   "contraparte": "",
+   "origen_tipo": "Otro",
+   "origen_ref": "Entrega de Puesta en Marcha · G. Brignardello (PPT, 33 láminas, corte 19-10-2026)",
+   "origen_fecha": "2026-10-19",
+   "compromiso": "",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": [
+    {
+     "fecha": "2026-10-22",
+     "texto": "Incorporado desde la entrega de Puesta en Marcha de Gabriella Brignardello."
+    }
+   ]
+  },
+  {
+   "id": "P164",
+   "titulo": "Señalética · monolitos, tótems y cintas de navegación",
+   "detalle": "Con la SC, la IF y el SSMO: denominación, numeración, ubicación y directorio OK. Pendiente: revisar señalética y denominación de los monolitos; revisar en planos la ubicación definitiva de los tótems; cintas de navegación en proceso.",
+   "ambito": "Obra",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "responsable": "Por asignar (ex Coordinación PM, G. Brignardello)",
+   "contraparte": "",
+   "origen_tipo": "Otro",
+   "origen_ref": "Entrega de Puesta en Marcha · G. Brignardello (PPT, 33 láminas, corte 19-10-2026)",
+   "origen_fecha": "2026-10-19",
+   "compromiso": "",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": [
+    {
+     "fecha": "2026-10-22",
+     "texto": "Incorporado desde la entrega de Puesta en Marcha de Gabriella Brignardello."
+    }
+   ]
+  },
+  {
+   "id": "P165",
+   "titulo": "28 proyectos presentados para las modificaciones de contrato · seguimiento",
+   "detalle": "La entrega informa 28 proyectos presentados para incorporar en las modificaciones de contrato; el detalle y estado están en la carpeta de Puesta en Marcha. Falta asignar quién les hace seguimiento.",
+   "ambito": "Puesta en Marcha",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "responsable": "Por asignar (ex Coordinación PM, G. Brignardello)",
+   "contraparte": "",
+   "origen_tipo": "Otro",
+   "origen_ref": "Entrega de Puesta en Marcha · G. Brignardello (PPT, 33 láminas, corte 19-10-2026)",
+   "origen_fecha": "2026-10-19",
+   "compromiso": "",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": [
+    {
+     "fecha": "2026-10-22",
+     "texto": "Incorporado desde la entrega de Puesta en Marcha de Gabriella Brignardello."
+    }
+   ]
+  },
+  {
+   "ambito": "Dotación",
+   "responsable": "Matías",
+   "servicio": "URGENCIA",
+   "origen_tipo": "revisión",
+   "origen_ref": "Cruce de los registros de cabida de Puesta en Marcha",
+   "origen_fecha": "2026-10-22",
+   "compromiso": "",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": "",
+   "id": "P154",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "contraparte": "Loreto Pérez · Puesta en Marcha / Unidad de Emergencia Hospitalaria",
+   "titulo": "Cabida NHDS · la Unidad de Emergencia Hospitalaria no tiene cabida asignada",
+   "detalle": "De las 105 unidades con gente sin ubicar, Urgencia es la más grande y la única donde el faltante es dotación titular: 77 funcionarios de vínculo TOTAL sin ninguna ubicación en el edificio nuevo (58 médicos de la ley 15.076 con 28 horas, 10 de la ley 19.664 con 22 horas y 9 de la ley 18.834 con 44, entre ellos 6 kinesiólogos). No es que no estén en el registro: 67 de los 77 figuran en «EMERGENCIA DOTACIÓN MÉDICA CON CORRELATIVO», pero esa hoja está en la etapa del correlativo de dotación médica y no tiene columnas de HDS, NHDS ni ubicación. Hay que pedir que Urgencia haga su cabida sobre ese mismo libro."
+  },
+  {
+   "ambito": "Dotación",
+   "responsable": "Matías",
+   "servicio": "",
+   "origen_tipo": "revisión",
+   "origen_ref": "Cruce de los registros de cabida de Puesta en Marcha",
+   "origen_fecha": "2026-10-22",
+   "compromiso": "",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": "",
+   "id": "P155",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "contraparte": "Loreto Pérez · Puesta en Marcha",
+   "titulo": "Cabida NHDS · 207 personas en los registros de cabida que no están en la matriz",
+   "detalle": "El cruce por RUT dejó 207 personas que los registros de Puesta en Marcha listan y la matriz de dotación no tiene. La mayoría se explica: 115 son salidas ya detectadas y con causal en la hoja de Egresos, y 43 están en las nóminas SIS de compras de servicio u honorarios. Quedan 49 sin rastro en ninguna fuente, concentradas en Farmacia (11), Gestión de la Demanda (7), la dotación revisada de Pabellón (7) y Toma de Muestras (5). De esas 49, 18 traen contrato de compra de servicios y 21 vienen con la casilla en blanco, varias escritas con el nombre antes del apellido, lo que apunta a gente tipeada a mano y no bajada del SIRH. Hay que preguntarle a Loreto qué vínculo tienen antes de agregar a nadie a la matriz. La planilla para consultar, sin RUT, es la hoja «Fuera de la matriz» de _DOCS/Informes_Servicios/Cabida_NHDS_Cruce_2026-10-22.xlsx."
+  },
+  {
+   "ambito": "Dotación",
+   "responsable": "Matías",
+   "servicio": "",
+   "origen_tipo": "revisión",
+   "origen_ref": "Cruce de los registros de cabida de Puesta en Marcha",
+   "origen_fecha": "2026-10-22",
+   "compromiso": "",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": "",
+   "id": "P156",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "contraparte": "Loreto Pérez · Puesta en Marcha",
+   "titulo": "Cabida NHDS · normalizar el vocabulario de ubicación y las equivalencias de unidad",
+   "detalle": "Cada unidad escribió la ubicación a su manera. La traducción al vocabulario del Atlas quedó resuelta en 890 de 1.264 celdas (AA = Atención Ambulatoria; AC y MQ = Atención Cerrada = edificio HDS; «3 MQ» = HDS P3; «P 21» = pabellón 21). Quedan 241 celdas con piso pero sin edificio, donde no se puede saber si es Atención Abierta o Cerrada, y 74 valores que no se pueden traducir («VENTANILLA UEH», «PRE ALTA 4 TURNO», «EU SUPERVISORA», «PENDIENTE», un «JUBILÓ» y una celda con un RUT pegado al nombre en la columna de ubicación, de Imagenología). Aparte: de las 88 hojas que calzaron con una unidad, 21 son equivalencia uno a uno (UMT = Servicio Medicina Transfusional, HOSDOM = Hospitalización Domiciliaria, UPPQ = Unidad del Paciente Prequirúrgico, MF&R, DIAU, UCASE, las AT del laboratorio) y conviene escribirlas como dato formal; las otras son hojas de departamento que agrupan varias unidades y no son alias. Es el tercer caso de nombres distintos para lo mismo, después de Farmacia Atención Abierta (P152) y las secretarias."
+  },
+  {
+   "ambito": "Dotación",
+   "responsable": "Matías",
+   "servicio": "",
+   "origen_tipo": "revisión",
+   "origen_ref": "Cruce de los registros de cabida de Puesta en Marcha",
+   "origen_fecha": "2026-10-22",
+   "compromiso": "",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": "",
+   "id": "P157",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "contraparte": "Loreto Pérez · Puesta en Marcha",
+   "titulo": "Cabida NHDS · 97 personas aparecen en dos o más hojas de cabida",
+   "detalle": "Noventa y siete personas están en dos o más hojas de cabida distintas, lo que puede terminar en dos puestos de trabajo reservados para la misma persona. Los grupos: Hospitalización Domiciliaria y Paciente Ambulatorio (21), Archivo e Información Sanitaria (19), Operaciones y USNE (15), Farmacia de Emergencia contada en Farmacia y en Emergencia (8), y médicos de Medicina que también figuran en UCI (8) o en UTI (3). Varios son correctos —la misma persona reparte horas entre dos unidades— pero hay que decidir en qué hoja queda su puesto. Aparte, 15 traumatólogos y cirujanos que la matriz tiene en URGENCIA aparecen en las hojas de subespecialidad (Cadera, CMA Cirugía): ahí el desacuerdo es de unidad, no de puesto."
   }
  ],
  "criticos": [
