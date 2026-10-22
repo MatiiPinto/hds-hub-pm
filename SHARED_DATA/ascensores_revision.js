@@ -2,53 +2,6 @@
 // pestaña Revisión del Atlas. Generado por _DEV/ascensores/build_ascensores_revision.py; no editar a mano.
 window.ASCENSORES_REVISION=[
 {
-"id": "asc-A2-P-2",
-"grupo": "Paradas a confirmar en terreno",
-"etq": "A2",
-"piso": "P-2",
-"nucleo": "N_P.01",
-"detalle": "Dibujada el 21-10 porque la señalética dice que para en -2, pero el plano de P-2 muestra un solo ducto en el núcleo A.",
-"accion": "Confirmar en terreno si A2 llega a P-2; si no, borrarla del Atlas.",
-"etqs": [
-"A2"
-]
-},
-{
-"id": "asc-A2-P-3",
-"grupo": "Paradas a confirmar en terreno",
-"etq": "A2",
-"piso": "P-3",
-"nucleo": "N_P.01",
-"detalle": "Dibujada el 21-10 porque la señalética dice que para en -3, pero el plano de P-3 muestra un solo ducto en el núcleo A.",
-"accion": "Confirmar en terreno si A2 llega a P-3; si no, borrarla del Atlas.",
-"etqs": [
-"A2"
-]
-},
-{
-"id": "asc-sinletra-P1",
-"grupo": "Dibujo a corregir",
-"etq": "",
-"piso": "P1",
-"nucleo": "",
-"x": 12952,
-"y": 6414,
-"detalle": "Ascensor de público dibujado sin letra en P1, a ~11 m de N_P.04; mide 2,3 × 0,14 m: parece un trazo accidental.",
-"accion": "Borrarlo si sobra, o ponerle su letra.",
-"etqs": []
-},
-{
-"id": "asc-paps-SUM.2_N_H.03-P3",
-"grupo": "Cabina del plano PAPS sin ascensor en el Atlas",
-"etq": "",
-"ref": "M1",
-"piso": "P3",
-"nucleo": "N_H.03",
-"detalle": "P3: el plano PAPS rotula SUM.2_N_H.03 y el Atlas no tiene ascensor ahí",
-"accion": "Ver si la parada existe (señalética / terreno) y dibujarla",
-"etqs": []
-},
-{
 "id": "asc-paps-SUM.2_N_H.03-P4",
 "grupo": "Cabina del plano PAPS sin ascensor en el Atlas",
 "etq": "",
@@ -56,17 +9,6 @@ window.ASCENSORES_REVISION=[
 "piso": "P4",
 "nucleo": "N_H.03",
 "detalle": "P4: el plano PAPS rotula SUM.2_N_H.03 y el Atlas no tiene ascensor ahí",
-"accion": "Ver si la parada existe (señalética / terreno) y dibujarla",
-"etqs": []
-},
-{
-"id": "asc-paps-SUM.1_N_H.07-P4",
-"grupo": "Cabina del plano PAPS sin ascensor en el Atlas",
-"etq": "",
-"ref": "D",
-"piso": "P4",
-"nucleo": "N_H.07",
-"detalle": "P4: el plano PAPS rotula SUM.1_N_H.07 y el Atlas no tiene ascensor ahí",
 "accion": "Ver si la parada existe (señalética / terreno) y dibujarla",
 "etqs": []
 },
@@ -117,18 +59,6 @@ window.ASCENSORES_REVISION=[
 "accion": "Confirmar parada y corregir el Atlas o el directorio",
 "etqs": [
 "W2"
-]
-},
-{
-"id": "asc-rec-D",
-"grupo": "Recorrido: directorio PPT ≠ Atlas",
-"etq": "D",
-"piso": "P4",
-"nucleo": "N_H.07",
-"detalle": "D: directorio PPT «-1 al 4» · Atlas -1,1,2,3 · falta en 4",
-"accion": "Confirmar parada y corregir el Atlas o el directorio",
-"etqs": [
-"D"
 ]
 },
 {

@@ -852,6 +852,8 @@ body.view-only #dkPmCentral,body.view-only #dkPmDelta,body.view-only #backupBadg
 #wsModal.show{display:flex}
 .modal-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 22px;width:360px;max-width:90vw;box-shadow:var(--shadow-3)}
 #wsModal .modal-wrap{display:flex;gap:14px;align-items:flex-start;max-height:92vh}
+#wsModal .modal-box{max-height:92vh;overflow-y:auto}
+#wsModal .modal-actions{margin:0 0 12px;position:sticky;top:-20px;z-index:6;background:var(--surface);padding:8px 0;border-bottom:1px solid var(--border)}
 .modal-box h3{font-size:var(--fs-lg);font-weight:var(--fw-bold);color:var(--text);margin-bottom:14px}
 .dot-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);width:330px;max-width:44vw;max-height:92vh;display:flex;flex-direction:column;box-shadow:var(--shadow-3);overflow:hidden}
 .dot-panel .dp-h{padding:12px 14px 8px;border-bottom:1px solid var(--border);flex-shrink:0}
@@ -1575,6 +1577,14 @@ window.addEventListener('DOMContentLoaded',()=>{
  <div class="modal-wrap">
   <div class="modal-box"><form autocomplete="off" onsubmit="return false" style="margin:0">
     <h3 id="mTitle">Puesto</h3>
+    <!-- Acciones arriba, junto al nombre (22-10-2026): con la página muy ampliada el cuadro crece y
+         los botones al pie quedaban fuera de la pantalla. Quedan fijos al desplazar el cuadro. -->
+    <div class="modal-actions">
+      <button class="btn-save" id="btnSaveWs" onclick="saveWs()">Guardar</button>
+      <button class="btn-add-turno" id="btnAddTurno" onclick="confirmAddTurno()" style="display:none;flex:1;padding:8px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:600">✓ Agregar al turno</button>
+      <button class="btn-del" onclick="deleteWs()">Eliminar</button>
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+    </div>
     <div class="form-row">
       <label>Nombre</label>
       <div class="ac-wrap">
@@ -1610,12 +1620,6 @@ window.addEventListener('DOMContentLoaded',()=>{
         <div id="mTurnosList"></div>
         <button class="turno-add-btn" onclick="startAddTurno()">➕ Agregar funcionario al turno</button>
       </div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn-save" id="btnSaveWs" onclick="saveWs()">Guardar</button>
-      <button class="btn-add-turno" id="btnAddTurno" onclick="confirmAddTurno()" style="display:none;flex:1;padding:8px;border-radius:8px;border:none;cursor:pointer;font-size:12px;font-weight:600">✓ Agregar al turno</button>
-      <button class="btn-del" onclick="deleteWs()">Eliminar</button>
-      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
     </div>
   </form>
   </div>
@@ -15204,8 +15208,41 @@ const REV_CHECKS={
     okTitle:'Revisado: queda resuelto y sale de la lista (corrige el dibujo en el plano si hace falta)',
     apply:p=>{ (nameState.ascRev=nameState.ascRev||{})[p.it.id]=1; }, go:p=>_goAscRev(p),
     subText:p=>p.it.detalle+(p.it.accion?(' → '+p.it.accion):''),
-    done:'No quedan ascensores por confirmar.'}
+    done:'No quedan ascensores por confirmar.'},
+  dea_rev:{label:'DEA: colocados sin confirmar y por colocar',
+    find:_deaRevPendientes, approve:true, noDialog:true, allIf:()=>false,
+    groupOf:p=>p.grupo,
+    okIf:p=>!p.porColocar && !!(p.it.cat||p.sug) && !(p.d!==null && p.d<3),
+    okTitle:'Confirmar el DEA en su posición actual con el equipo asignado o sugerido (queda fijo; ↺ en 📋 Revisión DEA lo libera)',
+    apply:p=>{ const f=propFind(p.it.id); if(!f) return; const cat=f.it.cat||(p.sug&&p.sug.id); if(cat) f.it.cat=cat;
+      f.it.conf={ts:Date.now(), por:'atlas · revisión'}; sProp(); },
+    go:p=>p.porColocar?abrirRevisionDEA():deaVer(p.fid,p.it.id),
+    subText:p=>p.porColocar?p.sub:(p.L?('equipo '+p.L.id+' · '+p.L.servicio):(p.sug?('sugerido '+p.sug.id+' · '+p.sug.servicio+' (revísalo)'):'sin equipo: asígnalo en 📋 Revisión DEA'))
+      +(p.d!==null&&p.d<3?(' · ⚠ otro DEA a '+p.d.toFixed(1).replace('.',',')+' m: borra el que sobre'):'')+' · '+p.fl.label,
+    done:'Todos los DEA están colocados y confirmados.'}
 };
+// DEA en la pestaña Revisión (22-10-2026): los colocados sin confirmar (primero los que están a < 3 m
+// de otro, posibles repetidos) y una fila con los que faltan por colocar según el Anexo Ib. El detalle
+// completo (asociar equipo, ↺, 🗑) sigue en el panel 📋 Revisión DEA.
+function _deaRevPendientes(){
+  const Ls=_deaLineas(), porId={}; Ls.forEach(L=>porId[L.id]=L);
+  const I=_deaItems(), usadas=new Set(I.filter(x=>x.it.cat&&porId[x.it.cat]).map(x=>x.it.cat)), out=[];
+  const fo=FLOORS.map(f=>f.id);
+  I.slice().sort((a,b)=>fo.indexOf(a.fid)-fo.indexOf(b.fid)).forEach(({fid,it})=>{
+    if(it.conf) return;
+    const fl=FLOORS.find(f=>f.id===fid)||FLOORS[0], a=_deaAreaDe(fid,it), d=_deaCerca(fid,it);
+    const L=it.cat&&porId[it.cat], sug=L?null:_deaSugerir(fid,it,usadas); if(sug) usadas.add(sug.id);
+    out.push({fl, fid, it, L, sug, d, area:a||undefined, code:'dea|'+it.id,
+      nombre:'DEA · '+(it.rid?(rName(it.rid)||it.rid):(a?aName(a.id):'fuera de recinto')),
+      grupo:(d!==null&&d<3)?'Posible repetido (a menos de 3 m de otro DEA)':'Colocado, falta confirmar'});
+  });
+  out.sort((x,y)=>(y.grupo<x.grupo?-1:y.grupo>x.grupo?1:0));        // «Posible repetido» primero
+  const faltan=Ls.length-I.length;
+  if(faltan>0) out.push({porColocar:true, fl:FLOORS[0], grupo:'Por colocar', code:'dea|por-colocar', d:null,
+    nombre:'Faltan '+faltan+' DEA por colocar en el plano',
+    sub:'El Anexo Ib trae '+Ls.length+' equipos y hay '+I.length+' en el plano: clic abre 📋 Revisión DEA con los equipos sin ubicar; se colocan con 💚 DEA en la barra del editor.'});
+  return out;
+}
 // Ascensores por confirmar (SHARED_DATA/ascensores_revision.js, _DEV/ascensores/build_ascensores_revision.py):
 // cruce PAPS × directorio × señalética. El ✓ lo deja resuelto (nameState.ascRev); «ir» lleva a la cabina.
 if(!nameState.ascRev) nameState.ascRev={};
@@ -15319,12 +15356,14 @@ function revSetCheck(c){ _revCheck=c; _revElegida=true; renderBimPending(); }
 // ¿su clave es única? Nada se guarda: el ✓ se prueba sobre una copia y se revierte.
 function revAuditar(opts){
   opts=opts||{}; const maxOk=opts.maxOk||400;
-  const snapN=JSON.stringify(nameState), snapW=JSON.stringify(wsState), snapD=JSON.stringify(floorsDelta);
+  const snapN=JSON.stringify(nameState), snapW=JSON.stringify(wsState), snapD=JSON.stringify(floorsDelta), snapP=JSON.stringify(propState);
   const snapA=FLOORS.map(f=>f.areas.map(a=>[a,(a.rooms||[]).slice()]));
   const revert=()=>{ const n=JSON.parse(snapN), w=JSON.parse(snapW), d=JSON.parse(snapD);
     Object.keys(nameState).forEach(k=>delete nameState[k]); Object.assign(nameState,n);
     Object.keys(wsState).forEach(k=>delete wsState[k]); Object.assign(wsState,w);
     Object.keys(floorsDelta).forEach(k=>delete floorsDelta[k]); Object.assign(floorsDelta,d);
+    // propuestos (DEA, carros…): el ✓ de «DEA» los confirma y guarda; la auditoría no debe dejarlos así
+    if(JSON.stringify(propState)!==snapP){ propState=JSON.parse(snapP); try{ sProp(); }catch(e){} }
     FLOORS.forEach((f,i)=>{ f.areas=snapA[i].map(([a,rooms])=>{ a.rooms=rooms.slice(); return a; }); });
     try{ _candCache.clear(); }catch(e){} };
   const res={};
@@ -18549,6 +18588,21 @@ async function runSelfTest(){
       S.floorId='P2'; renderSVG(); const otro=im.style.display==='none' && !svg.querySelector('.esc-layer') && document.getElementById('btnJardines').classList.contains('dis');
       return dentro && seis && img && mks.length===6 && k1 && k2 && ficha && cierra && apaga && prende && otro;
     } finally { S.floorId=fPrev; S.level=lPrev; S.areaId=aPrev; S.roomId=rPrev; S.jardines=jPrev; S.zoom=zPrev; _escTipOff(); renderSVG(); }
+  });
+  T('Revisión: DEA sin confirmar (repetidos primero, ✓ confirma con el equipo) y fila de los que faltan por colocar', ()=>{
+    const prev=JSON.stringify(propState), cat=window.DEA_CATALOGO;
+    try{
+      window.DEA_CATALOGO={total:3, lineas:[{id:'E1',servicio:'Urgencia',area:'',codigo:'x'},{id:'E2',servicio:'Pabellon',area:'',codigo:'y'},{id:'E3',servicio:'UCI',area:'',codigo:'z'}]};
+      propState={'P1':[{id:'t1',k:'dea',x:1000,y:1000,cat:'E1'},{id:'t2',k:'dea',x:1060,y:1000,cat:'E2'}],'P2':[{id:'t3',k:'dea',x:5000,y:5000,cat:'E3',conf:{ts:1}}]};
+      const P=_revPend('dea_rev'), filas=P.filter(p=>!p.porColocar), falta=P.filter(p=>p.porColocar);
+      const ok1=filas.length===2 && filas.every(p=>/repetido/.test(p.grupo)) && falta.length===0;   // 3 colocados = 3 equipos
+      const noConfRep=!REV_CHECKS.dea_rev.okIf(filas[0]);                                          // repetido: no se confirma desde acá
+      propState.P1[1].x=9000; const P2=_revPend('dea_rev').filter(p=>!p.porColocar);
+      const ok2=P2.length===2 && P2.every(p=>/falta confirmar/.test(p.grupo)) && REV_CHECKS.dea_rev.okIf(P2[0]);
+      REV_CHECKS.dea_rev.apply(P2[0]); const ok3=_revPend('dea_rev').filter(p=>!p.porColocar).length===1 && !!propFind(P2[0].it.id).it.conf;
+      propState.P2=[]; const ok4=_revPend('dea_rev').some(p=>p.porColocar && /Faltan 1 DEA/.test(p.nombre) && !REV_CHECKS.dea_rev.okIf(p));
+      return ok1 && noConfRep && ok2 && ok3 && ok4;
+    } finally { propState=JSON.parse(prev); sProp(); window.DEA_CATALOGO=cat; renderSVG(); }
   });
   T('Dotación: sólo se cubican personas con nombre (fuera becados genéricos, compras sin nombre y con nombre de empresa)', ()=>{
     const cs=(n,extra)=>Object.assign({n, ley:'COMPRAS DE SERVICIO', q:'COMPRAS DE SERVICIO', tipo_vinculo:'COMPRA DE SERVICIO', i:''}, extra||{});
