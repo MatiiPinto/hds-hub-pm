@@ -189,7 +189,7 @@ details.rp-det{margin:0 0 18px}details.rp-det>summary{cursor:pointer;font-size:.
 </div>
 
 <div class="info-modal" id="infoModal" onclick="if(event.target===this)this.classList.remove('open')">
-  <div class="im-box"><div class="im-hd"><span>¿Qué muestra esta reportería?</span><button class="im-x" onclick="document.getElementById('infoModal').classList.remove('open')">×</button></div><div class="im-bd">Cuatro pestañas. <b>📦 PINS</b>: despliegue del equipamiento médico y mobiliario clínico ítem por ítem (planilla PINS-EMMC de la Sociedad Concesionaria), filtrable por edificio. Un ítem está <b>desplegado</b> si está Posicionado o Conectado/N-A; el <b>lugar</b> dice dónde está físicamente: sin recepción → bulto → zona de despliegue → recinto definitivo. <b>🧰 Instrumental</b>: llegada de las cajas al hospital («recibida» no significa revisada), revisión caja por caja (conforme = acta cerrada) y entregas comprometidas por la Concesionaria. Cada bloque indica su fecha de corte: los cortes son distintos y no se suman. Los datos salen de SHARED_DATA/reporteria_pins_instrumental.js (_DEV/build_reporteria_pins_instrumental.py). <b>✅ Existencias</b>: estado de firma de las actas EQM por recinto BIM (Firma 2 / Firma 1 / No se puede declarar) y cumplimiento equipo por equipo; se actualiza con python3 ~/Desktop/ClaudeCode/ExistenciasConsolidacion/actualizar_existencias.py (SHARED_DATA/existencias_estado.js).</div></div></div>
+  <div class="im-box"><div class="im-hd"><span>¿Qué muestra esta reportería?</span><button class="im-x" onclick="document.getElementById('infoModal').classList.remove('open')">×</button></div><div class="im-bd">Cinco pestañas. <b>📦 PINS</b>: despliegue del equipamiento médico y mobiliario clínico ítem por ítem (planilla PINS-EMMC de la Sociedad Concesionaria), filtrable por edificio. Un ítem está <b>desplegado</b> si está Posicionado o Conectado/N-A; el <b>lugar</b> dice dónde está físicamente: sin recepción → bulto → zona de despliegue → recinto definitivo. <b>🧰 Instrumental</b>: llegada de las cajas al hospital («recibida» no significa revisada), revisión caja por caja (conforme = acta cerrada) y entregas comprometidas por la Concesionaria. Cada bloque indica su fecha de corte: los cortes son distintos y no se suman. Los datos salen de SHARED_DATA/reporteria_pins_instrumental.js (_DEV/build_reporteria_pins_instrumental.py). <b>✅ Existencias</b>: estado de firma de las actas EQM por recinto BIM (Firma 2 / Firma 1 / No se puede declarar) y cumplimiento equipo por equipo; se actualiza con python3 ~/Desktop/ClaudeCode/ExistenciasConsolidacion/actualizar_existencias.py (SHARED_DATA/existencias_estado.js). <b>🪑 Existencias MNC</b>: lo mismo para las actas de Mobiliario No Clínico (Anexo Ia): firma por BIM y existencia ítem por ítem (SHARED_DATA/existencias_mnc_estado.js).</div></div></div>
 
 <div class="container">
 
@@ -321,6 +321,7 @@ details.rp-det{margin:0 0 18px}details.rp-det>summary{cursor:pointer;font-size:.
     <button class="rp-tab" data-p="inst" onclick="rpTab('inst')">🧰 Instrumental quirúrgico</button>
     <button class="rp-tab" data-p="plan" onclick="rpTab('plan')">📜 Plan de Instalación · cumplimiento</button>
     <button class="rp-tab" data-p="exi" onclick="rpTab('exi')">✅ Existencias · firmas y cumplimiento</button>
+    <button class="rp-tab" data-p="mnc" onclick="rpTab('mnc')">🪑 Existencias MNC · mobiliario no clínico</button>
   </div>
 
   <!-- ═══ PESTAÑA PINS ═══ -->
@@ -568,6 +569,7 @@ details.rp-det{margin:0 0 18px}details.rp-det>summary{cursor:pointer;font-size:.
   <div class="rp-pane" id="pane-plan"></div>
   <!-- ═══ PESTAÑA EXISTENCIAS (firma por BIM y cumplimiento equipo por equipo) ═══ -->
   <div class="rp-pane" id="pane-exi"><div class="rp-nota">Cargando…</div></div>
+  <div class="rp-pane" id="pane-mnc"><div class="rp-nota">Cargando…</div></div>
 
   <div class="footer" id="rp-footer"></div>
 </div>
@@ -900,6 +902,57 @@ function exiRender(){
     <div class="rp-nota" style="margin-top:12px">Fuentes: ${exiEsc(D.fuentes.anexo_ib)} · ${exiEsc(D.fuentes.actas)} · ${exiEsc(D.fuentes.revision)}. ⚠ SC = la Concesionaria registra otra firma en su planilla LINKS. El detalle completo (observaciones de las actas y página) está en el Excel Estado_firmas_EQM_por_BIM de Existencias_23_09_26.</div>`;
 }
 if (document.getElementById('pane-exi').classList.contains('on')) exiCargar();
+</script>
+<script>
+/* 🪑 Existencias MNC — dato: SHARED_DATA/existencias_mnc_estado.js (actualizar_existencias.py → estado_mnc_bim.py).
+   Actas Anexo Ia: firma por BIM y mobiliario ítem por ítem (solo existencia). Sin observaciones manuscritas ni nombres. */
+const MNC = {edif:'', firma:'', cumple:'', q:'', abierto:null, lim:200};
+function mncCargar(){
+  if (window.EXISTENCIAS_MNC) return mncRender();
+  if (window._mncCargando) return; window._mncCargando = true;
+  const e = document.createElement('script'); e.src = 'SHARED_DATA/existencias_mnc_estado.js?v=' + Date.now();
+  e.onload = mncRender;
+  e.onerror = () => document.getElementById('pane-mnc').innerHTML = '<div class="rp-alerta">Falta SHARED_DATA/existencias_mnc_estado.js: correr python3 ~/Desktop/ClaudeCode/ExistenciasConsolidacion/actualizar_existencias.py</div>';
+  document.head.appendChild(e);
+}
+const _rpTabMnc = rpTab; rpTab = function(t){ _rpTabMnc(t); if (t === 'mnc') mncCargar(); };
+function mncSet(k, v){ MNC[k] = (MNC[k] === v ? '' : v); MNC.abierto = null; MNC.lim = 200; mncRender(); }
+function mncRender(){
+  const D = window.EXISTENCIAS_MNC, P = document.getElementById('pane-mnc'); if (!D) return;
+  const porB = {}; D.it.forEach(e => (porB[e.b] = porB[e.b] || []).push(e));
+  const q = MNC.q.trim().toLowerCase(), EDS = ['AA', 'HDS', 'ING'];
+  const bims = D.bim.filter(b => (!MNC.edif || b.e === MNC.edif) && (!MNC.firma || b.f === MNC.firma)
+    && (!MNC.cumple || (porB[b.b] || []).some(e => e.cu === MNC.cumple))
+    && (!q || [b.b, b.r, b.d].join(' ').toLowerCase().includes(q) || (porB[b.b] || []).some(e => (e.n + ' ' + e.c + ' ' + e.mm).toLowerCase().includes(q))));
+  const its = bims.flatMap(b => porB[b.b] || []);
+  const cnt = (arr, k, v) => arr.filter(x => x[k] === v).length, pct = (a, t) => t ? (a / t * 100).toFixed(1).replace('.', ',') + ' %' : '—';
+  const kpi = (lbl, v, t, col, filtro, val) => `<div class="kpi-card" style="cursor:pointer;${MNC[filtro] === val ? 'outline:2px solid ' + col : ''}" onclick="mncSet('${filtro}','${val}')"><div class="kpi-label">${lbl}</div><div class="kpi-val" style="color:${col}">${v.toLocaleString('es-CL')}</div><div class="kpi-sub">${pct(v, t)} de ${t.toLocaleString('es-CL')}</div></div>`;
+  const barras = EDS.map(e => { const bs = D.bim.filter(b => b.e === e); return {e, t: bs.length, s: D.estados_firma.map(f => cnt(bs, 'f', f))}; }).filter(x => x.t)
+    .map(x => `<div class="stacked-row"><div class="stacked-lbl">${x.e}</div><div class="stacked-bar-bg">${x.s.map((v, i) => v ? `<div class="stacked-seg" style="width:${(v / x.t * 100).toFixed(2)}%;background:${EXI_COL[D.estados_firma[i]]}" title="${D.estados_firma[i]}: ${v}">${v > 15 ? v : ''}</div>` : '').join('')}</div><div class="stacked-nums"><strong>${pct(x.s[0], x.t)}</strong> <span style="color:var(--muted)">F2</span></div></div>`).join('');
+  const chip = (k, v, l) => `<button class="rp-chip${MNC[k] === v ? ' on' : ''}" onclick="mncSet('${k}','${v}')">${l}</button>`;
+  const cant = D.bim.reduce((s, b) => s + b.n, 0);
+  const filas = bims.slice(0, MNC.lim).map(b => {
+    const abierto = MNC.abierto === b.b;
+    const det = abierto ? `<tr><td colspan="9" style="background:#f8fafc;padding:8px 14px"><table class="tbl" style="font-size:.6rem"><tr><th>Código</th><th>Mobiliario</th><th>Marca / modelo</th><th>Existencia</th><th>Cumplimiento</th><th>Detalle</th></tr>${(porB[b.b] || []).map(e => `<tr><td>${e.c}</td><td>${exiEsc(e.n)}</td><td>${exiEsc(e.mm)}</td><td>${e.x || '—'}</td><td>${exiBadge(e.cu)}</td><td style="color:var(--muted)">${exiEsc(e.m)}</td></tr>`).join('') || '<tr><td colspan="6" style="color:var(--muted)">Sin acta MNC leída para este recinto.</td></tr>'}</table></td></tr>` : '';
+    const dif = b.n - b.l;
+    return `<tr style="cursor:pointer" onclick="MNC.abierto=(MNC.abierto==='${b.b}'?null:'${b.b}');mncRender()"><td>${b.e}</td><td>${exiEsc(b.p)}</td><td>${exiEsc(b.d)}</td><td><b>${b.b}</b> ${abierto ? '▾' : '▸'}</td><td>${exiEsc(b.r)}</td><td class="n">${b.n}${b.l && dif > 0 ? ` <span title="El acta lista ${b.l} de ${b.n} ítems de la planilla SC" style="color:#b45309;font-weight:700;cursor:help">(${b.l})</span>` : ''}</td><td class="n"><span style="color:#27ae60">${b.cu}</span> · <span style="color:#e74c3c">${b.nc}</span> · <span style="color:#f39c12">${b.pc}</span></td><td>${exiBadge(b.f)}${b.ok === 'NO' ? ` <span title="La SC registra ${exiEsc(b.sc)} en su planilla LINKS" style="color:#b45309;font-weight:700;cursor:help">⚠ SC: ${exiEsc(b.sc)}</span>` : ''}</td><td style="color:var(--muted)">${exiEsc(b.m)}</td></tr>` + det;
+  }).join('');
+  P.innerHTML = `
+    <div class="sec-title">Estado de firma MNC por recinto (BIM) <span class="rp-corte">corte ${exiEsc(D.generado)}</span></div>
+    <div class="rp-nota">Actas <b>Anexo Ia · Mobiliario No Clínico</b> (solo existencia física). Universo: recintos con MNC en la planilla LINKS de la Concesionaria (AA + HDS + ING). <b>Firma 2</b> = bloque 2 con las tres firmas (recinto cerrado) · <b>Firma 1</b> = revisado con pendientes · <b>No se puede declarar</b> = sin acta, sin página de firmas legible o sin firmas. Clic en una tarjeta para filtrar.</div>
+    <div class="kpi-grid">${D.estados_firma.map(f => kpi(f, cnt(D.bim, 'f', f), D.bim.length, EXI_COL[f], 'firma', f)).join('')}</div>
+    <div class="card" style="margin-bottom:22px">${barras}</div>
+    <div class="sec-title">Mobiliario ítem por ítem <span class="rp-corte">${D.it.length.toLocaleString('es-CL')} ítems leídos en actas de ${cant.toLocaleString('es-CL')} declarados por la SC</span></div>
+    <div class="rp-nota"><b>Cumple</b> = ✓ en Existencia · <b>No cumple</b> = ✗ o «NO» (no está en el recinto) · <b>Por confirmar</b> = sin marca, N/A o marca dudosa.</div>
+    <div class="kpi-grid">${D.estados_cumplimiento.map(c => kpi(c.charAt(0) + c.slice(1).toLowerCase(), cnt(D.it, 'cu', c), D.it.length, EXI_COL[c], 'cumple', c)).join('')}</div>
+    <div class="sec-title">Recintos <span class="rp-corte">${bims.length.toLocaleString('es-CL')} BIM · ${its.length.toLocaleString('es-CL')} ítems</span></div>
+    <div class="rp-edif">${chip('edif', '', 'Todos')}${EDS.map(e => chip('edif', e, e)).join('')}</div>
+    <input class="dc-buscar" placeholder="Buscar BIM, recinto, unidad, mobiliario, marca o código…" value="${exiEsc(MNC.q)}" oninput="MNC.q=this.value;MNC.lim=200;clearTimeout(window._mncT);window._mncT=setTimeout(()=>{mncRender();const i=document.querySelector('#pane-mnc .dc-buscar');i.focus();i.setSelectionRange(i.value.length,i.value.length)},250)">
+    <div class="card" style="padding:0;overflow-x:auto"><table class="tbl"><tr><th>Edif.</th><th>Piso</th><th>Unidad</th><th>BIM</th><th>Recinto</th><th class="n">MNC (en acta)</th><th class="n">✅ · ❌ · 🟡</th><th>Firma</th><th>Motivo / detalle</th></tr>${filas}</table></div>
+    ${bims.length > MNC.lim ? `<div style="text-align:center;margin:10px 0"><button class="rp-chip" onclick="MNC.lim+=300;mncRender()">Mostrar más (${(bims.length - MNC.lim).toLocaleString('es-CL')} restantes)</button></div>` : ''}
+    <div class="rp-nota" style="margin-top:12px">Fuentes: ${exiEsc(D.fuentes.actas)} · ${exiEsc(D.fuentes.links_sc)}. La SC escanea en lote: cada acta se separa por su RC-IA y se asigna al BIM de su encabezado. (n) = ítems que trae el acta cuando son menos que los declarados. ⚠ SC = la Concesionaria registra otra firma MNC en su planilla. Observaciones y página de cada ítem: Excel Estado_firmas_MNC_por_BIM en Existencias_23_09_26.</div>`;
+}
+if (document.getElementById('pane-mnc').classList.contains('on')) mncCargar();
 </script>
 <script src="hub-home.js"></script>
 </body>
