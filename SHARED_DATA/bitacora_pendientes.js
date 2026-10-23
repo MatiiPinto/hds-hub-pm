@@ -1,7 +1,7 @@
 // SHARED_DATA/bitacora_pendientes.js — versión publicada en el HUB-PM (saneada por deploy_web_pm.py)
 window.BITACORA = {
  "version": "2026-10-05 · Bitácora y huddle de Puesta en Marcha",
- "generado": "2026-10-22",
+ "generado": "2026-10-22T22:35:15",
  "proposito": "Reunir en un solo lugar los pendientes que hoy viven dispersos en correos, ORD, cartas CS-IF, actas de mesas de trabajo y sesiones de trabajo.",
  "ambitos": [
   "Comunicaciones",
@@ -3830,6 +3830,144 @@ window.BITACORA = {
     {
      "fecha": "2026-10-22",
      "texto": "Borrador de correo al Dr. Farfán con los 3 archivos y los 6 pendientes (sin enviar; adjuntar a mano)."
+    }
+   ]
+  },
+  {
+   "id": "P167",
+   "titulo": "Programadores de marcapasos de Cardiología: zanjar si son traslado o comodato (duplicidad en las dos planillas)",
+   "detalle": "La hoja «Traslado 19-25 en Revisión SSMO» los declara como traslado («Computador … para Programadores de marcapasos, SW QLAB»), mientras Cardiología los declara en comodato con los proveedores: Medtronic, Biotronik ICS 3000 y St. Jude Medical. Están cargados en las DOS planillas vivas, de modo que se cuentan dos veces y no está definido quién paga el traslado (en comodato lo paga el dueño del equipo). Hay que decidir la calidad jurídica con Cardiología y la UEM, y eliminar el registro que corresponda.",
+   "ambito": "EMMC",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "responsable": "Matías Pinto",
+   "contraparte": "Marcela Díaz (Enf. Supervisora Cardiología) · Mariana Bravo (jefatura UEM)",
+   "origen_tipo": "Correo",
+   "origen_ref": "Hilo «Comodato» (M. Díaz, )",
+   "origen_fecha": "2026-06-11",
+   "servicio": "Cardiología",
+   "compromiso": "Antes del próximo corte a SSMO, para no informar el mismo equipo dos veces.",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": [
+    {
+     "fecha": "2026-10-22",
+     "texto": "Detectado en el cruce de factibilidad del 05-08-2026 (informes en 10.EQUIPAMIENTO Y TRASLADOS/ARCHIVO_HISTORICO/). Sigue abierto en el corte del 15-10-2026."
+    }
+   ]
+  },
+  {
+   "id": "P168",
+   "titulo": "Comodatos que no llegaron al corte del 15-10: 30 RENASYS EZ MAX de presión negativa y 18 CNAF AIRVO 2 de Mediplex",
+   "detalle": "Dos grupos de equipos en comodato declarados con serie individual que no están en el corte «Traslados y Comodatos EMMC HDS 15OCT26»: (1) 30 equipos de presión negativa RENASYS EZ MAX, códigos ACO.1261 a ACO.1290, fuente «Comodato LBF.xlsx»; (2) 18 unidades de oxigenoterapia de alto flujo Fisher & Paykel AIRVO 2 en comodato con MEDIPLEX S.A. El corte informa solo 6 CNAF para la Unidad de Emergencia con la nota «HAY 8». Hay que confirmar los contratos vigentes, su dueño y si se trasladan, e incorporarlos al corte siguiente.",
+   "ambito": "EMMC",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "responsable": "Matías Pinto",
+   "contraparte": "Mariana Bravo (jefatura UEM) · MEDIPLEX S.A.",
+   "origen_tipo": "Instrucción de Matías",
+   "origen_ref": "Cruce de factibilidad 05-08-2026 · archivos Comodato LBF.xlsx y CNAF comodato Mediplex.xlsx",
+   "origen_fecha": "2026-08-05",
+   "compromiso": "Incorporar al corte siguiente de traslados y comodatos.",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": [
+    {
+     "fecha": "2026-10-22",
+     "texto": "Ambos grupos están cargados en la hoja «2026 (extra)» de Comodatos_HDS-ING.xlsx con Aprobación = Pendiente y la procedencia del correo por confirmar."
+    }
+   ]
+  },
+  {
+   "id": "P169",
+   "titulo": "Cruzar el catastro serie a serie del parque crítico (583 equipos): los 111 en ARRIENDO no están en ninguna planilla",
+   "detalle": "El archivo «CNAF comodato Mediplex.xlsx» (Downloads/📊 Planillas y Datos) es en realidad un catastro serie a serie de 583 equipos críticos del HDS con columna MODALIDAD: 318 propios · 116 MINSAL · 111 ARRIENDO · 18 comodato · 20 de otros establecimientos (Tisné 3, Calvo Mackenna 14, Instituto de Neurocirugía 3). Los 111 en arriendo —53 monitores Edan X12, 16 Spacelabs Xprezzon, 7 desfibriladores CU Medical HD1, 6 ventiladores Event Medical Inspiration 7, 5 ventiladores de transporte STEPHAN EVE IN, entre otros— no tienen representación ni en traslados ni en comodatos, y por el marco del 8-sep-2026 el arriendo pasa el MISMO filtro de factibilidad (la calidad jurídica solo cambia quién paga). Hay que cruzar el catastro completo contra las dos planillas vivas y decidir qué entra.",
+   "ambito": "EMMC",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Matías Pinto",
+   "contraparte": "Mariana Bravo (jefatura UEM)",
+   "origen_tipo": "Instrucción de Matías",
+   "origen_ref": "Catastro CNAF comodato Mediplex.xlsx (583 equipos)",
+   "origen_fecha": "2026-08-05",
+   "compromiso": "Cruce completo antes del corte siguiente a SSMO.",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "notas": [
+    {
+     "fecha": "2026-10-22",
+     "texto": "Pendiente levantado al fusionar el chat del cruce de factibilidad (05-08-2026). También quedan por definir los 116 equipos MINSAL y los 20 de otros establecimientos."
+    }
+   ]
+  },
+  {
+   "ambito": "EMMC",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Matías Pinto",
+   "origen_tipo": "Instrucción de Matías",
+   "origen_ref": "Diff del corte «Traslados y Comodatos EMMC HDS» 16-09-2026 → 15-10-2026 (SHARED_DATA/traslados_comodatos_2026.json)",
+   "origen_fecha": "2026-10-22",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "id": "P170",
+   "contraparte": "Felipe Rojas y Francisca Cid (CT SSMO) · Mariana Bravo (UEM) · Rodrigo Hermosilla (PM)",
+   "titulo": "268 registros de traslado y comodato esperan pronunciamiento del SSMO; el HDS pidió respuesta para el 23-10 y la mesa de cierre es el 26-10",
+   "detalle": "Entre el corte del 16-09 y el del 15-10 el listado pasó de 373 a 521 registros (1.447 → 1.936 unidades) y todo el crecimiento está en el grupo «presentados 2026, sin respuesta del SSMO», que pasó de 120 a 268 registros. No es acumulación de solicitudes sin tramitar: es lo contrario. Los 73 traslados que el 16-09 figuraban como «aún no presentados» se presentaron al SSMO ese mismo día, y el 15-10 se presentaron 134 traslados más en una sexta pestaña nueva del Excel; se suman 61 comodatos presentados durante 2026. Los otros tres estados no se movieron (40 aprobados 2018 · 178 validados SSMO · 35 rechazados o en revisión). Empujan el alza MFR (28 registros), UEH (19), Dermatología (15), Laboratorio Clínico (15), UPC (15), UHI (10), Oftalmología (9), Neurología (9) y Odontología (5 registros / 78 unidades), y aparecen 13 servicios por primera vez: Nefrología, Diabetología, Neurología, Urología, Alivio del Dolor, Soporte Nutricional, Vascular, Endocrinología, Procedimientos Cirugía, UPC y Camas Básicas y Medias. Entre lo presentado están 16 equipos que los casos del correo marcaban como «no está en el corte»: los 6 de Oftalmología (C053), los ventiladores y CNAF de la UEH (C023, C043), el electromiógrafo de Neurología (C020), el monitor PiCCO de la UPC (C039) y los VMNI y CNAF de MFR (C056). La pelota está en el SSMO: R. Hermosilla pidió a la CT SSMO pronunciarse «idealmente dentro de la próxima semana» (vence el 23-10) y el cierre es la reunión del lunes 26-10, 12:00-14:00 en SDADT. Lo que no se apruebe necesita informe de justificación por cartera de prestaciones.",
+   "compromiso": "Llegar a la mesa del 26-10 con el estado del listado y la justificación de lo que el SSMO no apruebe.",
+   "notas": [
+    {
+     "fecha": "2026-10-22",
+     "texto": "Levantado del diff automático entre los dos cortes. El detalle registro a registro quedó en la pestaña 🚚 Traslados de 🔴 EquiBox, filtrando por estado 4."
+    },
+    {
+     "fecha": "2026-10-22",
+     "texto": "Corregido el mismo día: la primera redacción decía «no informados al SSMO», tomando la etiqueta del corte del 16-09. En el corte del 15-10 ese grupo son los PRESENTADOS sin respuesta, con fecha de presentación por registro (134 el 15-10, 73 el 16-09, 61 comodatos en 2026)."
+    }
+   ],
+   "plazo": "2026-10-26"
+  },
+  {
+   "ambito": "EMMC",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Matías Pinto",
+   "origen_tipo": "Instrucción de Matías",
+   "origen_ref": "Diff del corte «Traslados y Comodatos EMMC HDS» 16-09-2026 → 15-10-2026 (SHARED_DATA/traslados_comodatos_2026.json)",
+   "origen_fecha": "2026-10-22",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "id": "P171",
+   "contraparte": "Mariana Bravo (UEM)",
+   "titulo": "16 registros desaparecieron del corte del 15-10 sin constancia, uno de ellos aprobado en 2018",
+   "detalle": "Comparando los dos cortes, 16 equipos dejaron de aparecer (no cambiaron de cantidad ni de recinto: ya no están). El más delicado es el EQUIPO MULTILASER Suton Joule de Dermatología, que estaba en estado 1, aprobado por la comisión 2018: si sale del listado, su traslado deja de pagarlo la Concesionaria. Los otros 15: 4 comodatos del Laboratorio Clínico (Abbott Architect c8000, i100 y ci820, y Biomérieux MiniVidas) —posiblemente por la licitación del CORE, pero no está escrito en ninguna parte—; mesa quirúrgica Steris EasyMax 220 de Pabellón Central; trípode Dinon y espejo de Otorrino; carro de paro de Psiquiatría; fuentes de poder de marcapaso intracavitario Biotronik y monitor de fibrobroncoscopía Ambu aView de UTI; carros medianos de Farmacia Atención Cerrada; selladoras de polietileno de pie y de mesón de Farmacia Magistral; y vórtex Heidolph y televisor Samsung del Laboratorio. Hay que confirmar si cada salida fue una decisión (baja, reemplazo por equipamiento nuevo de la Concesionaria, fin de comodato) o si se perdieron al rehacer la planilla.",
+   "compromiso": "Confirmar con la UEM el motivo de cada salida, equipo por equipo.",
+   "notas": [
+    {
+     "fecha": "2026-10-22",
+     "texto": "Se relaciona con P168: comodatos declarados que tampoco llegaron al corte del 15-10."
+    }
+   ]
+  },
+  {
+   "ambito": "EMMC",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "responsable": "Matías Pinto",
+   "origen_tipo": "Instrucción de Matías",
+   "origen_ref": "Diff del corte «Traslados y Comodatos EMMC HDS» 16-09-2026 → 15-10-2026 (SHARED_DATA/traslados_comodatos_2026.json)",
+   "origen_fecha": "2026-10-22",
+   "creado": "2026-10-22",
+   "actualizado": "2026-10-22",
+   "id": "P172",
+   "contraparte": "Mariana Bravo (UEM) · Felipe Rojas (SSMO)",
+   "titulo": "El analizador de glucosa de Diabetología pasó de validado SSMO a presentado sin respuesta",
+   "detalle": "Es el único equipo que cambió de estado entre los dos cortes y lo hizo hacia atrás: el Analizador de Glucosa Roche Accu-Chek de Diabetología figuraba el 16-09 como «Autorizado SSMO con cambios de marca/modelo» y en el corte del 15-10 aparece como «Presentados en 2026 a SSMO», es decir, otra vez a la espera de pronunciamiento. Además quedó sin código de recinto. O se corrigió una clasificación errónea o se perdió la autorización al rehacer la planilla; hay que dejar constancia de cuál fue.",
+   "compromiso": "Aclarar con la UEM antes de presentar el lote del estado 4.",
+   "notas": [
+    {
+     "fecha": "2026-10-22",
+     "texto": "Detectado en el diff de estados entre cortes: 1 cambio en 521 registros."
     }
    ]
   }

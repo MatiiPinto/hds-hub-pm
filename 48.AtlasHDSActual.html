@@ -15467,6 +15467,9 @@ function _goAscRev(p){
   // piso nuevo: esperar el encuadre de goFloor y la carga del plano, si no el ajuste a pantalla lo pisa
   setTimeout(()=>{ if(floorImg.complete) ir(); else floorImg.addEventListener('load',()=>setTimeout(ir,120),{once:true}); }, 450);
 }
+// Atlas HDS Actual: la Revisión sólo trae lo que aplica al edificio actual (los puestos de personas).
+const REV_48=['dot_matriz','dot_probable','dot_baja','dot_generico','dot_incompleto','dot_fuera','dot_cds','dot_reemplazo','dot_reemplazo_fin','recdup'];
+if(!_SELFTEST){ Object.keys(REV_CHECKS).forEach(k=>{ if(!REV_48.includes(k)) delete REV_CHECKS[k]; }); if(!REV_CHECKS[_revCheck]) _revCheck='dot_fuera'; }
 // Clave estable de una sugerencia (para poder rechazarla y que no vuelva):
 // prioriza el identificador natural de cada chequeo (RUT, código, recinto).
 function _revKey(check,p){
@@ -15670,7 +15673,7 @@ function revAuditarUI(){
 }
 // Lo que no se resuelve en el Atlas no va como pendiente (no tiene recinto, ni
 // botón, ni rechazo posible): va como informe exportable al pie de la Revisión.
-function _revPieFuera(){
+function _revPieFuera(){ if(!_SELFTEST) return '';   /* 48: los códigos del Despliegue son del NHDS */
   const n=(window.EMMC_PEND||[]).length; if(!n) return '';
   const u=(window.EMMC_PEND||[]).reduce((a,d)=>a+(d.unidades||0),0);
   return '<div style="margin-top:8px;padding:7px 9px;border:1px dashed #94a3b8;border-radius:8px;background:#f8fafc;font-size:10.5px;color:#475569;line-height:1.4">'
