@@ -900,6 +900,12 @@ body.view-only #dkPmCentral,body.view-only #dkPmDelta,body.view-only #backupBadg
 .beca-tag{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:9px;font-size:9.5px;font-weight:var(--fw-medium);letter-spacing:.2px;vertical-align:1px;background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd;white-space:nowrap}
 .beca-tag.vencido{background:#fef3c7;color:#b45309;border-color:#fcd34d}
 .dp-row{display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;border-bottom:1px solid var(--n-100)}
+.dp-opts{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:6px;font-size:10px;color:var(--text-2)}
+.dp-opts label{display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap}
+.dp-seg{display:inline-flex;border:1px solid #cbd5e1;border-radius:7px;overflow:hidden}
+.dp-seg button{border:0;background:#fff;padding:3px 9px;font-size:10px;cursor:pointer;color:var(--text-2);font-family:inherit}
+.dp-seg button.on{background:var(--accent-50);color:var(--accent-700);font-weight:700}
+.dp-est{padding:7px 12px 3px;font-size:9.5px;font-weight:700;letter-spacing:.04em;color:var(--text-3);text-transform:uppercase;background:var(--surface-sunken);border-bottom:1px solid var(--n-100)}
 .dp-row:hover{background:var(--accent-50)}
 .dp-row.kb{background:var(--accent-100);box-shadow:inset 3px 0 0 var(--accent-600)}
 .dp-row .nm{flex:1;min-width:0;font-size:var(--fs-sm);color:var(--text);font-weight:var(--fw-medium);line-height:1.25}
@@ -1919,6 +1925,12 @@ function _cargarJS(L){
         <label style="display:flex;align-items:center;gap:4px;font-size:10px;color:#b91c1c;font-weight:700;cursor:pointer;white-space:nowrap">
           <input type="checkbox" id="dpSoloLibres" onchange="renderDotPanel()" style="width:auto;margin:0"> por asignar
         </label>
+      </div>
+      <div class="dp-opts">
+        <span class="dp-seg" title="Orden del listado de personas">
+          <button type="button" id="dpOrdAZ" onclick="dpOrden('az')">A–Z</button><button type="button" id="dpOrdEst" onclick="dpOrden('est')">Estamento</button>
+        </span>
+        <label title="Ocultar a los becados del listado y de los conteos"><input type="checkbox" id="dpSinBecados" onchange="dpSinBecados(this.checked)" style="width:auto;margin:0"> sin becados</label>
       </div>
     </div>
     <div class="dp-body" id="dpBody"></div>
@@ -4502,8 +4514,12 @@ function _escTip(e,ev){
   if(y+h>window.innerHeight-8) y=Math.max(8,window.innerHeight-h-8);
   t.style.left=Math.max(8,x)+'px'; t.style.top=y+'px';
 }
+// DEA: escala del grupo en unidades de pantalla → ~26 px en pantalla, o el tamaño real si es mayor
+function _deaEscala(gi){ const wr=parseFloat(gi.getAttribute('data-wr'))||26, z=Math.max(S.zoom,1e-4);
+  gi.setAttribute('transform','scale('+Math.max(1/z, wr/26).toFixed(5)+')'); }
 function _escRescale(){
   if(typeof svg==='undefined'||!svg) return;
+  svg.querySelectorAll('.dea-esc').forEach(_deaEscala);
   const k=1/Math.max(S.zoom,1e-4);
   svg.querySelectorAll('.esc-mk').forEach(m=>{
     const t=m.getAttribute('transform')||''; m.setAttribute('transform', t.replace(/scale\([^)]*\)/,'scale('+k+')'));
@@ -6719,16 +6735,19 @@ function _propSymbol(it){
     g.appendChild(el('rect',{x:-W/2+10*f,y:H/2-4*f,width:W-20*f,height:12*f,rx:2*f,fill:'#fff',stroke:D.col,'stroke-width':sw*.7}));   // bandeja con hoja
     g.appendChild(txt(0,2*f,'🖨',{'font-size':Math.max(12,22*f*1.6),'pointer-events':'none'}));
   } else {  // dea
-    // a tamaño real (60 cm) en un teléfono mide ~3 px y no se ve: se agranda hasta ~26 px en pantalla
-    f=f*Math.max(1, 26/(60*f*Math.max(S.zoom,0.001)));
-    const W=60*f;
-    g.appendChild(el('rect',{x:-W/2,y:-W/2,width:W,height:W,rx:10*f,fill:D.col,stroke:'#fff','stroke-width':sw}));
-    if(!it.conf) g.appendChild(el('rect',{x:-W/2-3*f,y:-W/2-3*f,width:W+6*f,height:W+6*f,rx:12*f,fill:'none',stroke:D.col,'stroke-width':sw*.8,'stroke-dasharray':`${8*f} ${5*f}`}));
-    else { g.appendChild(el('circle',{cx:W/2,cy:-W/2,r:12*f,fill:'#fff',stroke:D.col,'stroke-width':sw*.8}));
-      g.appendChild(txt(W/2,-W/2+5*f,'✓',{fill:D.col,'font-size':Math.max(9,16*f),'font-weight':900,'text-anchor':'middle','pointer-events':'none'})); }
-    g.appendChild(txt(0,2*f,'♥',{fill:'#fff','font-size':Math.max(14,44*f*1.6),'font-weight':900,'pointer-events':'none','font-family':'Segoe UI,sans-serif'}));
-    g.appendChild(txt(0,4*f,'⚡',{fill:D.col,'font-size':Math.max(8,18*f*1.6),'pointer-events':'none'}));
-    g.appendChild(txt(0,W/2+16*f,'DEA',{fill:D.col,'font-size':Math.max(11,14*f*1.6),'font-weight':900,'font-family':'Segoe UI,sans-serif','pointer-events':'none',stroke:'#fff','stroke-width':3,'paint-order':'stroke fill'}));
+    // 23-10-2026: se dibuja en unidades de PANTALLA (caja de 26 px) dentro de un grupo que _escRescale
+    // reescala en cada zoom: ~26 px siempre, o su tamaño real (60 cm) si al acercarse es mayor. Antes el
+    // tamaño se fijaba al dibujar y, al hacer zoom sin redibujar, el DEA quedaba enorme sobre el plano.
+    const gi=el('g',{class:'dea-esc','data-wr':(60*f).toFixed(2)}); _deaEscala(gi);
+    const W=26, u=W/60;
+    gi.appendChild(el('rect',{x:-W/2,y:-W/2,width:W,height:W,rx:4,fill:D.col,stroke:'#fff','stroke-width':1.5}));
+    if(!it.conf) gi.appendChild(el('rect',{x:-W/2-2,y:-W/2-2,width:W+4,height:W+4,rx:5,fill:'none',stroke:D.col,'stroke-width':1.2,'stroke-dasharray':'3.5 2.2'}));
+    else { gi.appendChild(el('circle',{cx:W/2,cy:-W/2,r:5,fill:'#fff',stroke:D.col,'stroke-width':1.2}));
+      gi.appendChild(txt(W/2,-W/2+2.4,'✓',{fill:D.col,'font-size':7,'font-weight':900,'text-anchor':'middle','pointer-events':'none'})); }
+    gi.appendChild(txt(0,1,'♥',{fill:'#fff','font-size':30*u*1.6,'font-weight':900,'pointer-events':'none','font-family':'Segoe UI,sans-serif'}));
+    gi.appendChild(txt(0,2,'⚡',{fill:D.col,'font-size':12*u*1.6,'pointer-events':'none'}));
+    gi.appendChild(txt(0,W/2+8,'DEA',{fill:D.col,'font-size':9,'font-weight':900,'font-family':'Segoe UI,sans-serif','pointer-events':'none',stroke:'#fff','stroke-width':2,'paint-order':'stroke fill'}));
+    g.appendChild(gi);
   }
   return g;
 }
@@ -13215,6 +13234,18 @@ function buildDotPanel(){
   if(_dpNavFijo) _dpNav={..._dpNavFijo};
   renderDotPanel();
 }
+// Orden del listado de personas (23-10-2026): A–Z o por estamento (orden estamental, A–Z dentro de cada uno).
+const DP_ESTAMENTOS=['DIRECTIVOS','MEDICOS','ODONTOLOGOS','QUIMICOS','BIOQUIMICOS','PROFESIONALES','TECNICOS','ADMINISTRATIVOS','AUXILIARES','CARGO EN EXTINCION'];
+let _dpOrd=null;
+function _dpEstRank(s){ const i=DP_ESTAMENTOS.indexOf(String(s.estamento||'').toUpperCase()); return i<0?DP_ESTAMENTOS.length:i; }
+function _dpPrefsSync(){
+  if(_dpOrd===null){ let v=null, b=null; try{ v=localStorage.getItem('cabida_dp_orden'); b=localStorage.getItem('cabida_dp_sinbec'); }catch(e){}
+    _dpOrd=(v==='est')?'est':'az'; const cb=document.getElementById('dpSinBecados'); if(cb) cb.checked=(b==='1'); }
+  const a=document.getElementById('dpOrdAZ'), e=document.getElementById('dpOrdEst');
+  if(a) a.classList.toggle('on',_dpOrd==='az'); if(e) e.classList.toggle('on',_dpOrd==='est');
+}
+function dpOrden(o){ _dpOrd=(o==='est')?'est':'az'; _lsPref('cabida_dp_orden',_dpOrd); renderDotPanel(); }
+function dpSinBecados(on){ _lsPref('cabida_dp_sinbec',on?'1':'0'); renderDotPanel(); }
 function renderDotPanel(){
   if(!dotDB||!dotDB.staff) return;
   // Asignar en bloque solo tiene sentido con un recinto abierto (vista 3) y
@@ -13239,7 +13270,9 @@ function renderDotPanel(){
   if(_dpNav.u){ mig.push('<span>'+esc(corto(_dpNav.u))+'</span>'); }
   document.getElementById('dpCrumb').innerHTML=buscando?'<span>🔎 búsqueda en toda la dotación</span>':mig.join('<span class="sep">›</span>');
   // ── contenido ──
-  const base=buscando?_dpStaffAll():_dpNodo();
+  // 23-10-2026: «sin becados» los saca del listado y de los conteos (preferencia de este navegador)
+  _dpPrefsSync(); const sinBec=!!(document.getElementById('dpSinBecados')||{}).checked;
+  const base=(buscando?_dpStaffAll():_dpNodo()).filter(s=>!(sinBec && s.beca));
   const c=_dpCnt(base,asg);
   { const nB=Object.keys(nameState.bajas||{}).length;
     document.getElementById('dpSub').innerHTML=esc(c.n+' personas · '+c.a+' asignadas · '+c.p+' por asignar')
@@ -13250,8 +13283,11 @@ function renderDotPanel(){
       if(solo&&asg[norm(s.nombre)]) return false;
       if(!buscando) return true;
       return norm(s.nombre+' '+(s.cargo||'')+' '+(s.estamento||'')+' '+(s.servicio||'')).includes(q);
-    }).sort((a,b)=>(asg[norm(a.nombre)]?1:0)-(asg[norm(b.nombre)]?1:0)||String(a.nombre).localeCompare(String(b.nombre),'es'));
+    }).sort((a,b)=>(_dpOrd==='est'?(_dpEstRank(a)-_dpEstRank(b)):0)||String(a.nombre).localeCompare(String(b.nombre),'es'));
+    let estPrev=null;
     vis.forEach(s=>{
+      if(_dpOrd==='est'){ const e=String(s.estamento||'Sin estamento'); if(e!==estPrev){ estPrev=e;
+        filas.push('<div class="dp-est">'+esc(e)+' · '+vis.filter(x=>String(x.estamento||'Sin estamento')===e).length+'</div>'); } }
       const rid=asg[norm(s.nombre)];
       _dpPeople.push(s.nombre);
       const sub=[s.cargo||s.funcion,s.estamento].filter(Boolean).join(' · ');
@@ -18953,6 +18989,24 @@ async function runSelfTest(){
       S.floorId='P2'; renderSVG(); const otro=im.style.display==='none' && !svg.querySelector('.esc-layer') && document.getElementById('btnJardines').classList.contains('dis');
       return dentro && seis && img && mks.length===6 && k1 && k2 && ficha && cierra && apaga && prende && otro;
     } finally { S.floorId=fPrev; S.level=lPrev; S.areaId=aPrev; S.roomId=rPrev; S.jardines=jPrev; S.zoom=zPrev; _escTipOff(); renderSVG(); }
+  });
+  T('Personal: listado A–Z o por estamento (con títulos) y opción «sin becados» que los saca del listado y los conteos', ()=>{
+    const ordPrev=_dpOrd, cb=document.getElementById('dpSinBecados'), cbPrev=cb.checked, navPrev={..._dpNav}, f=document.getElementById('dpFiltro'), fPrev=f.value;
+    try{
+      f.value=''; const sv=dotDB.staff.filter(x=>x.beca).map(x=>x.servicio).find(v=>v && dotDB.staff.filter(y=>y.servicio===v && !y.beca).length>3);
+      const s0=dotDB.staff.find(x=>x.servicio===sv); _dpNav={sd:s0.subdireccion, sv:sv, u:null};
+      const nombres=()=>[...document.querySelectorAll('#dpBody .dp-row .nm')].map(e=>e.childNodes[0].textContent);
+      cb.checked=false; _dpOrd='az'; renderDotPanel();
+      const unids=new Set(_dpNodo().map(x=>String(x.unidad||''))).size;
+      if(unids>1) _dpNav.u=String(_dpNodo()[0].unidad||''); renderDotPanel();
+      const L=nombres(), az=L.length>2 && L.every((n,i)=>!i || L[i-1].localeCompare(n,'es')<=0);
+      _dpOrd='est'; renderDotPanel();
+      const tit=document.querySelectorAll('#dpBody .dp-est').length>=1;
+      const nB=_dpNodo().filter(x=>x.beca).length; const conB=nombres().length;
+      cb.checked=true; renderDotPanel(); const sinB=nombres().length;
+      const filtra=nB===0 || (sinB===conB-nB && /^\d+ personas/.test(document.getElementById('dpSub').textContent));
+      return az && tit && filtra;
+    } finally { _dpOrd=ordPrev; cb.checked=cbPrev; _dpNav=navPrev; f.value=fPrev; renderDotPanel(); }
   });
   T('➕ Agregar: junto a Editar, agrupado, y cada opción abre su herramienta (enciende la edición si hace falta)', ()=>{
     const ed=S.editMode, lv=S.level;
