@@ -118,7 +118,13 @@ window.PM_CONFIG = {
     'gbrignardello': '4d605ea08497f067cf03dac710513d59eb17cb14b56bb7317faf35d3222ad8d9',
     // Dra. Mariluz Lozano González · odontóloga, Departamento de Atención
     // Abierta (Subdirección Médica) — consulta
-    'mlozano':    '66b49203d548e902e2e72a945f7f141813d756d70d3930e955b86e361f6a9f5f'
+    'mlozano':    '66b49203d548e902e2e72a945f7f141813d756d70d3930e955b86e361f6a9f5f',
+    // Servicio de Farmacia — actualización de paquetes quirúrgicos en FarmaBox
+    // (encargo M.E. Sepúlveda, 26-10-2026). Clave inicial: primeros 4 dígitos del RUT.
+    // Ivana Milio Cepa · Química Farmacéutica
+    'imilio':     '2353256ec97ec6cdec3a8725033da0aa4786b7524986372f8fc96a05e73a0721',
+    // Alejandra Díaz Chacón · Química Farmacéutica, Área Pabellón
+    'adiazch':    '3b56cc0059218c744b1033697b498288673073094636679b47b9b39329230672'
   }
 };
 
