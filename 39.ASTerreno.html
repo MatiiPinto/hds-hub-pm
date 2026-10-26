@@ -237,17 +237,20 @@ code,.mono{font-family:var(--font-mono)}
 .tb-div,.tb-sep{display:none}
 /* ── Barra de CAPAS (30-09-2026): todo lo que se enciende o apaga sobre el plano,
    en un solo lugar y agrupado; al final 🧭 Ruta y ✏️ Editar. Dos filas si no cabe. */
-#capasBar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 0;padding:4px 12px;background:var(--surface);border-bottom:1px solid var(--panel-border);flex-shrink:0;z-index:5;min-height:33px}
-#capasBar .tb-btn,#capasBar .dk-btn{display:inline-flex;align-items:center;gap:0;width:auto;height:23px;padding:0 7px;margin:0;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--text-2);font-size:0;font-weight:var(--fw-regular);cursor:pointer;white-space:nowrap;flex-shrink:0;line-height:1;overflow:visible;text-align:center;justify-content:center}
+/* Barra de capas en BLOQUES de 2 × 2 (23-10-2026, estándar de widgets de RoboticaCX: unidades fijas, un solo
+   tamaño de botón). Cada bloque = 4 espacios; el bloque fijo de la derecha = Ruta · Editar · Agregar · Botones. */
+#capasBar{--cpw:86px;--cph:19px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 0;padding:4px 12px;background:var(--surface);border-bottom:1px solid var(--panel-border);flex-shrink:0;z-index:5;min-height:33px}
+#capasBar .tb-btn,#capasBar .dk-btn{display:inline-flex;align-items:center;justify-content:flex-start;gap:0;width:var(--cpw);height:var(--cph);padding:0 6px;margin:0;border:1px solid var(--border);border-radius:999px;background:var(--surface);color:var(--text-2);font-size:0;font-weight:var(--fw-regular);cursor:pointer;white-space:nowrap;flex-shrink:0;line-height:1;overflow:hidden;text-align:left;box-sizing:border-box}
 #capasBar .dk-btn>span{display:none}
-#capasBar .tb-btn::before,#capasBar .dk-btn::before{content:attr(data-ic);font-size:12px;line-height:1}
-#capasBar .tb-btn::after,#capasBar .dk-btn::after{content:attr(data-lb);font-size:10.5px;line-height:1;width:auto;height:auto;margin:0 0 0 4px;border-radius:0;background:none;flex-shrink:0}
+#capasBar .tb-btn::before,#capasBar .dk-btn::before{content:attr(data-ic);font-size:10px;line-height:1;flex-shrink:0}
+#capasBar .tb-btn::after,#capasBar .dk-btn::after{content:attr(data-lb);font-size:9px;line-height:1;width:auto;height:auto;margin:0 0 0 4px;border-radius:0;background:none;min-width:0;overflow:hidden;text-overflow:ellipsis}
 #capasBar .tb-btn:hover,#capasBar .dk-btn:hover{background:var(--surface-sunken);border-color:var(--border-strong);color:var(--text)}
 #capasBar .tb-btn.active,#capasBar .dk-btn.on{background:var(--accent-50);border-color:var(--accent-300);color:var(--accent-700);font-weight:var(--fw-medium)}
 #capasBar .dis{opacity:.4}
-#capasBar .cp-g{display:inline-flex;align-items:center;gap:3px;flex-shrink:0;padding-right:7px;margin-right:4px;border-right:1px solid var(--border)}
+#capasBar .cp-g,#capasBar .cp-fin{display:inline-grid;grid-template-columns:repeat(2,var(--cpw));grid-template-rows:repeat(2,var(--cph));grid-auto-flow:column;gap:3px 4px;flex-shrink:0}
+#capasBar .cp-g{padding-right:8px;margin-right:6px;border-right:1px solid var(--border)}
 #capasBar .cp-g:last-of-type{border-right:0}
-#capasBar .cp-fin{margin-left:auto;display:inline-flex;align-items:center;gap:4px;padding-left:8px}
+#capasBar .cp-fin{margin-left:auto;padding-left:8px}
 #capasBar .cp-fin .tb-btn{border-radius:var(--r-md);color:var(--text)}
 #capasBar #btnEdit.active{background:var(--accent-600);border-color:var(--accent-600);color:#fff}
 @media (max-width:840px){#capasBar{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch}#capasBar .cp-fin{margin-left:0}}
@@ -440,8 +443,10 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 #capasCfg .cc-h{display:flex;align-items:center;justify-content:space-between;font-size:var(--fs-lg)}
 #capasCfg .cc-x{border:0;background:none;font-size:16px;cursor:pointer;color:var(--text-2)}
 #capasCfg .cc-sub{font-size:var(--fs-xs);color:var(--text-2);margin:4px 0 10px;line-height:1.4}
-#capasCfg .cc-fila{display:grid;grid-template-columns:18px repeat(8,minmax(0,1fr));gap:5px;margin-bottom:5px;align-items:stretch}
-#capasCfg .cc-n{font-size:10px;color:var(--text-3);align-self:center;text-align:center}
+#capasCfg .cc-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+#capasCfg .cc-bloque{position:relative;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,30px);grid-auto-flow:column;gap:5px;padding:16px 6px 6px;border:1px solid var(--border);border-radius:10px;background:var(--surface)}
+#capasCfg .cc-n{position:absolute;top:2px;left:8px;font-size:9px;color:var(--text-3)}
+@media (max-width:760px){#capasCfg .cc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 #capasCfg .cc-slot{min-height:30px;border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;padding:2px;background:var(--surface)}
 #capasCfg .cc-slot.vacio{border-style:dashed;background:var(--surface-sunken)}
 #capasCfg .sobre{outline:2px solid var(--accent-300);background:var(--accent-50)}
@@ -900,6 +905,18 @@ body.view-only #dkPmCentral,body.view-only #dkPmDelta,body.view-only #backupBadg
 .beca-tag{display:inline-block;margin-left:6px;padding:1px 6px;border-radius:9px;font-size:9.5px;font-weight:var(--fw-medium);letter-spacing:.2px;vertical-align:1px;background:#ede9fe;color:#6d28d9;border:1px solid #c4b5fd;white-space:nowrap}
 .beca-tag.vencido{background:#fef3c7;color:#b45309;border-color:#fcd34d}
 .dp-row{display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;border-bottom:1px solid var(--n-100)}
+.wp-res{font-size:11px;color:var(--text-2);padding:2px 0 6px;border-bottom:1px solid var(--border);margin-bottom:4px}
+.wp-sub{font-size:9.5px;color:var(--text-3);text-transform:uppercase;letter-spacing:.04em;padding:4px 0 2px}
+.av-cq-ex{font-size:9.5px;color:#b91c1c;font-weight:700;margin-top:1px}
+.av-cds{margin-top:10px;padding:9px 10px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:10px;color:#3b0764}
+.av-cds .av-cq-t span{color:#7c3aed}
+.av-cds-k{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0}
+.av-cds-k>div{background:#fff;border:1px solid #ede9fe;border-radius:8px;padding:5px 6px;text-align:center}
+.av-cds-k b{display:block;font-size:16px;color:#5b21b6}
+.av-cds-k span{font-size:9.5px;color:#6b21a8;line-height:1.2;display:block}
+.av-cds-acc{font-size:10.5px;margin:4px 0 2px}
+.av-cds-acc a{color:#6d28d9;font-weight:600;text-decoration:none}
+.av-cds-tab td.t{font-size:9.5px;color:#6b7280;white-space:normal;text-align:left}
 .dp-opts{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:6px;font-size:10px;color:var(--text-2)}
 .dp-opts label{display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap}
 .dp-seg{display:inline-flex;border:1px solid #cbd5e1;border-radius:7px;overflow:hidden}
@@ -1480,7 +1497,7 @@ function _cargarJS(L){
       <div id="srvFoot" style="font-size:10px;color:#94a3b8;margin-top:7px;font-style:italic"></div>
     </div>
     <div class="rp-card" id="rpWpCard" style="display:none">
-      <div class="rp-t">💼 Puestos de trabajo <span class="rp-total-badge">Total <b id="wpTotal">0</b></span></div>
+      <div class="rp-t">💼 Puestos libres <span class="rp-total-badge">Dibujados <b id="wpTotal">0</b></span></div>
       <div id="wpBody" style="font-size:11px"></div>
     </div>
     </div>
@@ -1704,7 +1721,9 @@ function _cargarJS(L){
     <div class="form-row"><label>Subdirección</label>
       <select id="edfSd" onchange="_edfServicios()" style="width:100%;height:30px;border:1px solid var(--border);border-radius:8px;padding:0 8px;font-size:13px"></select></div>
     <div class="form-row"><label>Servicio</label>
-      <select id="edfSv" onchange="_edfCuenta()" style="width:100%;height:30px;border:1px solid var(--border);border-radius:8px;padding:0 8px;font-size:13px"></select></div>
+      <select id="edfSv" onchange="_edfUnidades()" style="width:100%;height:30px;border:1px solid var(--border);border-radius:8px;padding:0 8px;font-size:13px"></select></div>
+    <div class="form-row"><label>Unidad</label>
+      <select id="edfU" onchange="_edfCuenta()" style="width:100%;height:30px;border:1px solid var(--border);border-radius:8px;padding:0 8px;font-size:13px"></select></div>
     <div class="rp-hint" id="edfCuenta"></div>
     <div class="modal-actions">
       <button class="btn-save" onclick="_edfExportar()">⬇ Exportar XLSX</button>
@@ -8043,10 +8062,10 @@ function exportDEA(){
 // (plano · personas · planta · equipos · instalaciones · revisión).
 const CAPAS_BARRA=[
   ['btnBoxVis','Cajas'],['dkLabels','Etiquetas'],['btnSen','Señalética'],['btnPlanKind','Color'],'|',
-  ['btnDotNames','Nombres'],['btnDotLista','En lista'],['btnAsigN','N° asignados'],['btnSoloReemp','Reemplazos'],'|',
-  ['btnVert','Ascensores'],['btnReloj','Relojes'],['btnCorreoN','Correo N.'],['btnEstac','Estacionam.'],['btnPuertasVis','Puertas'],['btnJardines','Jardines'],['btnLaminas','Láminas'],'|',
-  ['dkUbicCarro','Carros de paro'],['dkUbicDea','DEA'],['dkUbicTotem','Tótems'],['btnImpresoras','Impresoras'],['btnShowPC','PC'],'|',
-  ['btnShowTomas','Tomas'],['btnShowGases','Gases'],['btnCcdd','C. débiles'],['btnPP','Puntos PINS'],['btnLineas','Líneas de piso']
+  ['btnDotNames','Nombres'],['btnDotLista','En lista'],['btnAsigN','N° asig.'],['btnSoloReemp','Reemplazos'],'|',
+  ['btnVert','Ascensores'],['btnReloj','Relojes'],['btnCorreoN','Correo N.'],['btnEstac','Estacion.'],['btnPuertasVis','Puertas'],['btnJardines','Jardines'],['btnLaminas','Láminas'],'|',
+  ['dkUbicCarro','Carros paro'],['dkUbicDea','DEA'],['dkUbicTotem','Tótems'],['btnImpresoras','Impresoras'],['btnShowPC','PC'],'|',
+  ['btnShowTomas','Tomas'],['btnShowGases','Gases'],['btnCcdd','C. débiles'],['btnPP','PINS'],['btnLineas','Líneas piso']
 ];
 const DOCK_MAPA=[
   ['dkIr',    ['btnBuscaRec']],
@@ -8113,19 +8132,25 @@ function cerrarAgregarMenu(){
 }
 function _agFuera(e){ const m=document.getElementById('agregarMenu'); if(m && !m.contains(e.target) && !document.getElementById('btnAgregar').contains(e.target)) cerrarAgregarMenu(); }
 
-// ═══ ⚙ BOTONES DE LA BARRA EN GRILLA (22-10-2026) ════════════════════════════
-// Grilla fija de 6 filas × 8 espacios: cada fila es un grupo de la barra de capas. Se arrastra (o se toca y
-// se toca el destino) para mover/intercambiar, 👁 oculta, y lo oculto se vuelve a mostrar desde abajo.
-// Preferencia de cada navegador (localStorage «cabida_capas_layout»); sin ella, el orden de CAPAS_BARRA.
-const CAPAS_GRILLA={filas:6, cols:8};
+// ═══ ⚙ BOTONES DE LA BARRA EN BLOQUES (22-10-2026 · bloques 2 × 2 desde el 23-10) ═══════════════
+// 8 bloques de 4 espacios (2 × 2), como los widgets de RoboticaCX: unidades fijas y un solo tamaño de botón.
+// Se arrastra (o se toca y se toca el destino) para mover/intercambiar, 👁 oculta, y lo oculto vuelve desde abajo.
+// Preferencia de cada navegador («cabida_capas_bloques»; se migra la grilla anterior «cabida_capas_layout»).
+const CAPAS_GRILLA={filas:8, cols:4};
 function _capasIds(){ return CAPAS_BARRA.filter(x=>x!=='|').map(x=>x[0]); }
+function _capasEnBloques(grupos){   // cada grupo se parte en bloques de 4, sin mezclar temas
+  const b=[]; grupos.forEach(g=>{ const ids=g.filter(Boolean); for(let i=0;i<ids.length;i+=CAPAS_GRILLA.cols) b.push(ids.slice(i,i+CAPAS_GRILLA.cols)); });
+  while(b.length<CAPAS_GRILLA.filas) b.push([]);
+  return b.slice(0,CAPAS_GRILLA.filas).map(f=>Array.from({length:CAPAS_GRILLA.cols},(_,i)=>f[i]||null));
+}
 function _capasDefault(){
-  const filas=[[]]; CAPAS_BARRA.forEach(x=>{ if(x==='|') filas.push([]); else filas[filas.length-1].push(x[0]); });
-  while(filas.length<CAPAS_GRILLA.filas) filas.push([]);
-  return {filas:filas.slice(0,CAPAS_GRILLA.filas).map(f=>Array.from({length:CAPAS_GRILLA.cols},(_,i)=>f[i]||null)), ocultos:[]};
+  const g=[[]]; CAPAS_BARRA.forEach(x=>{ if(x==='|') g.push([]); else g[g.length-1].push(x[0]); });
+  return {filas:_capasEnBloques(g), ocultos:[]};
 }
 function _capasLayout(){
-  let L=null; try{ L=JSON.parse(localStorage.getItem('cabida_capas_layout')||'null'); }catch(e){}
+  let L=null; try{ L=JSON.parse(localStorage.getItem('cabida_capas_bloques')||'null'); }catch(e){}
+  if(!L){ let V=null; try{ V=JSON.parse(localStorage.getItem('cabida_capas_layout')||'null'); }catch(e){}   // grilla anterior (filas de 8)
+    if(V&&Array.isArray(V.filas)) L={filas:_capasEnBloques([V.filas.flat()]), ocultos:V.ocultos||[]}; }   // en orden, bloques llenos
   const D=_capasDefault(); if(!L||!Array.isArray(L.filas)) return D;
   const ids=new Set(_capasIds()), vistos=new Set();
   const filas=Array.from({length:CAPAS_GRILLA.filas},(_,r)=>Array.from({length:CAPAS_GRILLA.cols},(_,c)=>{
@@ -8138,15 +8163,17 @@ function _capasLayout(){
     if(cc>=0) filas[rr][cc]=id; else ocultos.push(id); }));
   return {filas, ocultos};
 }
-function _capasGuardar(L){ _lsPref('cabida_capas_layout', JSON.stringify(L)); _capasAplicar(L); }
+function _capasGuardar(L){ _lsPref('cabida_capas_bloques', JSON.stringify(L)); _capasAplicar(L); }
 function _capasAplicar(L){
   const bar=document.getElementById('capasBar'); if(!bar) return;
   L=L||_capasLayout();
   const el={}; _capasIds().forEach(id=>{ el[id]=document.getElementById(id); });   // antes de mover nada
   const fin=bar.querySelector('.cp-fin'), src=document.getElementById('capasSrc');
-  bar.querySelectorAll('.cp-g').forEach(g=>{ [...g.children].forEach(c=>src&&src.appendChild(c)); g.remove(); });
-  L.filas.forEach(f=>{ const bs=f.filter(Boolean).map(id=>el[id]).filter(Boolean); if(!bs.length) return;
-    const g=document.createElement('span'); g.className='cp-g'; bs.forEach(e=>g.appendChild(e)); bar.insertBefore(g, fin); });
+  bar.querySelectorAll('.cp-g').forEach(g=>{ [...g.children].forEach(c=>{ if(c.classList.contains('cp-vacio')) c.remove(); else if(src) src.appendChild(c); }); g.remove(); });
+  L.filas.forEach(f=>{ const ult=f.map((id,i)=>(id&&el[id])?i:-1).reduce((a,b)=>Math.max(a,b),-1); if(ult<0) return;
+    const g=document.createElement('span'); g.className='cp-g';
+    for(let i=0;i<=ult;i++){ const e=f[i]&&el[f[i]]; if(e) g.appendChild(e); else { const v=document.createElement('span'); v.className='cp-vacio'; g.appendChild(v); } }   // el espacio vacío conserva la posición del 2 × 2
+    bar.insertBefore(g, fin); });
   L.ocultos.forEach(id=>{ if(el[id]&&src) src.appendChild(el[id]); });
 }
 let _ccSel=null;   // toque: elemento elegido para mover (sin arrastre, p. ej. en el iPad)
@@ -8156,7 +8183,7 @@ function abrirCapasCfg(){
   _ccSel=null; _ccRender(); m.classList.add('show');
 }
 function cerrarCapasCfg(){ const m=document.getElementById('capasCfg'); if(m) m.classList.remove('show'); _ccSel=null; }
-function capasCfgReset(){ try{ localStorage.removeItem('cabida_capas_layout'); }catch(e){} _ccSel=null; _capasAplicar(_capasDefault()); _ccRender(); }
+function capasCfgReset(){ try{ localStorage.removeItem('cabida_capas_bloques'); localStorage.removeItem('cabida_capas_layout'); }catch(e){} _ccSel=null; _capasAplicar(_capasDefault()); _ccRender(); }
 function _ccChip(id,oculto){
   const e=document.getElementById(id); if(!e) return '';
   return '<span class="cc-chip'+(_ccSel===id?' sel':'')+'" draggable="true" data-id="'+id+'" title="Arrastra, o toca y luego toca el espacio de destino">'
@@ -8167,8 +8194,8 @@ function _ccRender(){
   const m=document.getElementById('capasCfg'); if(!m) return;
   const L=_capasLayout();
   m.innerHTML='<div class="cc-box"><div class="cc-h"><b>⚙ Botones de la barra</b><button class="cc-x" onclick="cerrarCapasCfg()">✕</button></div>'
-    +'<div class="cc-sub">Cada fila es un grupo de la barra ('+CAPAS_GRILLA.filas+' × '+CAPAS_GRILLA.cols+' espacios). Arrastra un botón a otro espacio para moverlo (si está ocupado, se intercambian) · 👁 lo oculta · ＋ lo vuelve a mostrar. Se guarda en este navegador.</div>'
-    +'<div class="cc-grid">'+L.filas.map((f,r)=>'<div class="cc-fila"><span class="cc-n">'+(r+1)+'</span>'+f.map((id,c)=>
+    +'<div class="cc-sub">La barra se arma en bloques de 2 × 2 ('+CAPAS_GRILLA.filas+' bloques, de izquierda a derecha; los vacíos no se muestran). Arrastra un botón a otro espacio para moverlo (si está ocupado, se intercambian) · 👁 lo oculta · ＋ lo vuelve a mostrar. Ruta · Editar · Agregar · Botones van fijos a la derecha. Se guarda en este navegador.</div>'
+    +'<div class="cc-grid">'+L.filas.map((f,r)=>'<div class="cc-bloque"><span class="cc-n">'+(r+1)+'</span>'+f.map((id,c)=>
         '<span class="cc-slot'+(id?'':' vacio')+'" data-r="'+r+'" data-c="'+c+'">'+(id?_ccChip(id,false):'')+'</span>').join('')+'</div>').join('')+'</div>'
     +'<div class="cc-h2">Ocultos · '+L.ocultos.length+'</div><div class="cc-ocultos" data-oc="1">'+(L.ocultos.map(id=>_ccChip(id,true)).join('')||'<span class="cc-vacio">Ninguno: arrastra aquí lo que no uses</span>')+'</div>'
     +'<div class="cc-pie"><button onclick="capasCfgReset()">↺ Restablecer</button><button class="pri" onclick="cerrarCapasCfg()">Listo</button></div></div>';
@@ -12262,11 +12289,16 @@ function _wpItems(kind){
   return out;
 }
 // Listado de puestos de una categoría: clic → va al recinto y abre el puesto.
-function openWpList(kind){
+function openWpList(kind,modo){
   const lbl=kind==='din'?'Médicos dinámicos':(kind==='sincargo'?'Sin cargo definido':(kind==='otros'?'Otros con cargo':(WP_CATS.find(c=>c.k===kind)||{}).lbl||kind));
-  const items=_wpItems(kind);
+  // modo 'libre' = sólo los puestos sin persona · 'asig' = sólo con persona (26-10-2026, panel «Puestos libres»)
+  const ok=it=>it.d.tipo==='dinamico'?(it.d.turnos||[]).length>0:!!(it.d.nombre&&it.d.nombre.trim());
+  const items=_wpItems(kind).filter(it=>_findRoom(it.rid) && (modo==='libre'?!ok(it):modo==='asig'?ok(it):true));
+  _wpListaAbrir('💼 '+lbl+(modo==='libre'?' · libres':modo==='asig'?' · con persona sin cargo':''), items);
+}
+function _wpListaAbrir(titulo, items){
   const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
-  document.getElementById('wplTitle').textContent='💼 '+lbl;
+  document.getElementById('wplTitle').textContent=titulo;
   document.getElementById('wplSub').textContent=items.length+' puesto'+(items.length===1?'':'s')+' — clic para ir al recinto y trabajarlo';
   const body=document.getElementById('wplBody');
   body._items=items;
@@ -12294,35 +12326,27 @@ function wplGo(i){
   if(!S.viewOnly) setTimeout(()=>{ try{ openModal(it.rid,it.idx); }catch(e){} },820);
 }
 function renderWorkpoints(){
+  // 26-10-2026 «Puestos libres»: lo asignado ya está en el Avance; acá sólo lo que sirve para seguir ubicando:
+  // cuántos puestos hay, cuántos con persona y DÓNDE quedan libres por tipo (clic → lista). Sin «Otros con cargo»
+  // asignados ni «Administrativo 198/0» (no informaban), y «sin cargo» separado en libres vs con persona.
   const el=document.getElementById('wpBody'); if(!el) return;
-  // por categoría: asignados (con persona) vs disponibles (vacantes)
-  const cnt={}; WP_CATS.forEach(c=>cnt[c.k]={a:0,d:0});
-  let total=0, dinA=0, dinD=0, otros={a:0,d:0}, sinCargo=0;
+  const lib={}, ok=d=>d.tipo==='dinamico'?(d.turnos||[]).length>0:!!(d.nombre&&d.nombre.trim());
+  let total=0, conP=0, huerf=0, sinCargoP=0;
   for(const [rid,arr] of Object.entries(wsState.dots||{})){
-    for(const d of arr){
-      total++;
-      const kind=_wpKind(d,rid);
-      if(kind==='din'){ ((d.turnos||[]).length?dinA++:dinD++); continue; }
-      if(kind==='sincargo'){ sinCargo++; continue; }
-      const asig=!!(d.nombre&&d.nombre.trim());
-      const slot=(kind==='otros')?otros:cnt[kind];
-      asig?slot.a++:slot.d++;
-    }
+    if(!Array.isArray(arr)) continue;
+    if(!_findRoom(rid)){ huerf+=arr.length; continue; }
+    for(const d of arr){ total++; const k=_wpKind(d,rid);
+      if(ok(d)){ conP++; if(k==='sincargo') sinCargoP++; } else lib[k]=(lib[k]||0)+1; }
   }
-  const tot=document.getElementById('wpTotal'); if(tot) tot.textContent=total;
-  const row=(lbl,a,d,col,kind)=>{
-    const tt=a+d;
-    const car=tt?'<span onclick="wpToggleMx(\''+kind+'\',event)" title="Desglose por piso · AA/AC" style="cursor:pointer;color:#94a3b8;font-size:8px;margin-right:4px">▶</span>':'';
-    return '<div class="wp-row" '+(tt?('onclick="openWpList(\''+kind+'\')" style="cursor:pointer"'):'style="opacity:.45"')+'><span>'+car+(col?'<span class="sw" style="background:'+col+';display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px"></span>':'')+lbl+'</span>'
-      +'<b style="font-variant-numeric:tabular-nums"><span style="color:#15803d">'+a+'</span><span style="color:#94a3b8;font-weight:400"> / </span><span style="color:#b45309">'+d+'</span></b></div>'
-      +'<div id="wpmx-'+kind+'" style="display:none;padding:0 0 3px 16px"></div>';
-  };
-  el.innerHTML=
-    '<div style="display:flex;justify-content:space-between;color:#94a3b8;font-size:9px;text-transform:uppercase;letter-spacing:.4px;padding-bottom:3px;border-bottom:1px solid #e2e8f0;margin-bottom:3px"><span></span><span><span style="color:#15803d;font-weight:700">asig</span> / <span style="color:#b45309;font-weight:700">disp</span></span></div>'
-    +row('🔄 Médicos dinámicos',dinA,dinD,'#3b82f6','din')
-    +WP_CATS.map(c=>row(c.lbl,cnt[c.k].a,cnt[c.k].d,null,c.k)).join('')
-    +row('Otros con cargo',otros.a,otros.d,null,'otros')
-    +'<div class="wp-row" '+(sinCargo?'onclick="openWpList(\'sincargo\')" style="cursor:pointer"':'style="opacity:.45"')+'><span><span class="sw" style="background:#ef4444;display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px"></span>Sin cargo definido</span><b style="font-variant-numeric:tabular-nums">'+sinCargo+'</b></div>';
+  const nLib=total-conP;
+  const tot=document.getElementById('wpTotal'); if(tot) tot.textContent=_avNum(total);
+  const LBL=k=>k==='din'?'🔄 Médicos dinámicos':k==='sincargo'?'Sin tipo (sin cargo)':k==='otros'?'Otros con cargo':((WP_CATS.find(c=>c.k===k)||{}).lbl||k);
+  const fila=(lbl,n,on,col)=>'<div class="wp-row" onclick="'+on+'" style="cursor:pointer"><span>'+lbl+'</span><b style="font-variant-numeric:tabular-nums;color:'+(col||'#b45309')+'">'+_avNum(n)+'</b></div>';
+  el.innerHTML='<div class="wp-res"><b>'+_avNum(total)+'</b> puestos dibujados · <b style="color:#15803d">'+_avNum(conP)+'</b> con persona · <b style="color:#b45309">'+_avNum(nLib)+'</b> libres</div>'
+    +(nLib?'<div class="wp-sub">Libres por tipo · clic para ir a cada uno</div>'
+      +Object.entries(lib).sort((a,b)=>(a[0]==='sincargo')-(b[0]==='sincargo')||b[1]-a[1]).map(([k,n])=>fila(LBL(k),n,"openWpList('"+k+"','libre')")).join(''):'<div class="wp-sub">✅ Sin puestos libres</div>')
+    +(sinCargoP?fila('⚠ Con persona pero sin cargo (completar)',sinCargoP,"openWpList('sincargo','asig')",'#b91c1c'):'')
+    +(huerf?'<div class="wp-sub" title="Puestos guardados en recintos que ya no están dibujados: no se ven en el plano ni cuentan arriba">'+_avNum(huerf)+' puestos en recintos que ya no existen (no cuentan)</div>':'');
 }
 // AA/AC desde el BIM del recinto: A#### = Atención Abierta, H#### = Atención Cerrada.
 function roomAAC(rid){
@@ -12680,7 +12704,7 @@ function _avArbol(){
   const nBec=_dpStaffAll().filter(s=>s.beca).length;
   const nExt=_dpStaffAll().filter(s=>s.externo&&!s.beca).length;
   _avStaffFiltrado().forEach(s=>{
-    const sd=String(s.subdireccion||'(sin subdirección)');
+    const sd=String(s.subdireccion||'(sin subdirección · RRHH no la clasificó)');
     const sv=String(s.servicio||'(sin departamento)');
     // Sin unidad NO puede significar "sin fila": antes esta gente contaba en el
     // total del servicio pero no aparecía en ningún hijo, y al desplegar no salía
@@ -12735,13 +12759,19 @@ function _avCuantosHtml(){
     +'<div class="av-cq-s">Dotación oficial = cargos de las leyes 18.834, 19.664 y 15.076. Son más cargos que personas porque '+_avNum(C.cargos-C.personas)+' son segundos cargos de la misma persona (p. ej. un médico 19.664 + 15.076). Los reemplazantes no suman: el cargo es del titular.</div>'
     +'<table class="av-cq-tab"><thead><tr><th>Por ley</th><th class="n">Dotación</th><th class="t">Tope Ley de Presupuestos</th></tr></thead><tbody>'
     +C.porLey.map(x=>{ const t=T[x.ley]||{}; const v=x.ley==='LEY 19.664'?(_avNum(Math.round(x.horas))+' h <span>('+_avNum(x.cargos)+' cargos)</span>'):(_avNum(x.cargos)+' cargos');
-        return fila(esc(x.ley.replace('LEY ','')), v, t.tope?(_avNum(t.tope)+' '+(t.unidad==='horas'?'h':'cargos')):'—'); }).join('')
+        const val=x.ley==='LEY 19.664'?Math.round(x.horas):x.cargos, ex=t.tope?val-t.tope:0;
+        const tp=t.tope?(_avNum(t.tope)+' '+(t.unidad==='horas'?'h':'cargos')
+          +(ex>0?'<div class="av-cq-ex" title="La dotación de la matriz supera el tope de la Ley de Presupuestos en '+_avNum(ex)+' '+(t.unidad==='horas'?'horas':'cargos')+'">⚠ +'+_avNum(ex)+' sobre el tope</div>':'')):'—';
+        return fila(esc(x.ley.replace('LEY ','')), v, tp); }).join('')
     +'</tbody></table>'
-    +'<div class="av-cq-s">La 19.664 se mide en horas médicas semanales, no en cargos. La comparación oficial contra el tope está en ⚖️ Ley de Presupuestos (11.Dotación).</div>'
+    +'<div class="av-cq-s">La 19.664 se mide en horas médicas semanales, no en cargos. Topes 2026: Ley de Presupuestos N° 21.772 y Res. Ex. SSMO N° 279 (16-03-2026); rigen hasta la resolución del próximo año. La comparación oficial está en ⚖️ Ley de Presupuestos (11.Dotación).</div>'
     +'<div class="av-cq-sub">No son dotación del HDS (están en la matriz para ubicarlos)</div>'
     +'<table class="av-cq-tab"><tbody>'
     +fila('🛒 Compra de servicio', _avNum(C.compras), _avNum(C.comprasNombre)+' con nombre')
-    +fila('🎓 Becados en formación', _avNum(C.becados), _avNum(C.cuposBecas)+' cupos por programa')
+    +(()=>{ const bajas=(dotDB&&dotDB.staff)?Math.max(0,C.becados-_dpStaffAll().filter(s=>s.beca).length):0;
+        const L=((window.SHARED_DOTACION||{}).staff)||[], gen=L.filter(p=>p.ley==='BECADOS' && /^\s*BECAD/i.test(p.n||'')).length;
+        return fila('🎓 Becados en formación', _avNum(C.becados)+(bajas?'<div class="av-cq-ex" style="color:#64748b" title="Becados de la matriz marcados en el Atlas como fuera de la matriz (por eso el avance cuenta '+_avNum(C.becados-bajas)+')">'+bajas+' fuera de la matriz</div>':''),
+          _avNum(C.cuposBecas)+' cupos en la planilla'+(gen?(' · '+gen+' sin nombre'):'')); })()
     +(C.honorarios?fila('📝 Honorarios', _avNum(C.honorarios), ''):'')
     +(C.docentes?fila('🏫 Docentes U. de Chile', _avNum(C.docentes), ''):'')
     +(C.externos?fila('🏛 Otra institución o empresa', _avNum(C.externos), ''):'')
@@ -12839,9 +12869,64 @@ function renderAvance(){
       else if(d.cds&&d.nombre) cds++;
     }
   }
-  if(cds) H.push('<div style="margin-top:10px;padding:7px 8px;background:#f5f3ff;border:1px solid #ddd6fe;border-radius:8px;font-size:10.5px;color:#5b21b6">'
-    +'🛒 <b>'+cds+'</b> puesto(s) de Compra de Servicio. No cuentan en los porcentajes: ocupan recinto pero no son parte de la matriz de dotación.</div>');
+  H.push(_cdsHtml(cds));
   cont.innerHTML=H.join('');
+}
+// ── 🛒 COMPRAS DE SERVICIO (26-10-2026) ── RRHH nunca la tiene clara: tres fuentes cuadradas en un solo lugar.
+// · Nómina RRHH-SIS (SHARED_DATA/compras_servicio_atlas.js, sin nombres ni RUT): personas por unidad y profesión.
+// · Matriz de dotación: cupos de compra de servicio (casi todos sin nombre o con el de la empresa).
+// · Plano: puestos marcados 🛒 en el Atlas (personas de empresa ubicadas a mano).
+function _cdsMatriz(){
+  const L=((window.SHARED_DOTACION||{}).staff)||[];
+  const rows=L.filter(p=>p.ley==='COMPRAS DE SERVICIO' || p.q==='COMPRAS DE SERVICIO' || /^COMPRA DE SERVICIO$/i.test(String(p.tipo_vinculo||'')));
+  const porSv={}; rows.forEach(p=>{ const k=String(p.sv||p.u||'(sin servicio)'); (porSv[k]=porSv[k]||{n:0,emp:{},nom:0}).n++;
+    const n=String(p.n||'').trim(); if(_DOT_EMPRESAS_COMPRA.test(n)) porSv[k].emp[n.toUpperCase()]=(porSv[k].emp[n.toUpperCase()]||0)+1; else if(n && !_dotSinPersona(p)) porSv[k].nom++; });
+  return {n:rows.length, conNombre:rows.filter(p=>!_dotSinPersona(p)).length, porSv};
+}
+function _cdsPlano(){
+  const out=[]; for(const [rid,arr] of Object.entries(wsState.dots||{})){ const ctx=_findRoom(rid); if(!ctx||!Array.isArray(arr)) continue;
+    arr.forEach((d,idx)=>{ if(d.tipo==='dinamico') (d.turnos||[]).forEach(t=>{ if(t.cds&&t.nombre) out.push({rid,idx,ctx,nombre:t.nombre,cargo:t.cargo||''}); });
+      else if(d.cds&&d.nombre) out.push({rid,idx,ctx,nombre:d.nombre,cargo:d.cargo||''}); }); }
+  return out;
+}
+let _cdsAbierto=false;
+function _cdsHtml(cdsPlano){
+  const R=window.COMPRAS_SERVICIO, M=_cdsMatriz(), P=_cdsPlano();
+  if(!R && !M.n && !P.length) return '';
+  const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  let h='<div class="av-cds"><div class="av-cq-t">🛒 Compras de servicio <span>no son dotación · no cuentan en el %</span></div>'
+    +'<div class="av-cds-k">'
+    +(R?('<div><b>'+_avNum(R.totales.personas)+'</b><span>personas en la nómina RRHH-SIS'+(R.fuente&&R.fuente.archivo?(' ('+esc(String(R.fuente.archivo).match(/\(([^)]+)\)/)?.[1]||'')+')'):'')+'</span></div>'):'')
+    +'<div><b>'+_avNum(M.n)+'</b><span>cupos en la matriz · '+_avNum(M.conNombre)+' con nombre</span></div>'
+    +'<div><b>'+_avNum(P.length)+'</b><span>puestos 🛒 en el plano</span></div></div>';
+  if(R) h+='<div class="av-cq-s">'+_avNum(R.totales.en_matriz)+' de las '+_avNum(R.totales.personas)+' personas además tienen un registro en la matriz (doble vínculo) · '
+    +_avNum(R.totales.inscritos)+' inscritas en el Registro de Prestadores · '+R.totales.unidades+' unidades. Profesiones: '
+    +Object.entries(R.por_profesion).slice(0,6).map(([k,v])=>esc(k.toLowerCase())+' '+v).join(' · ')+'.</div>';
+  h+='<div class="av-cds-acc"><a href="#" onclick="_cdsAbierto=!_cdsAbierto;renderAvance();return false">'+(_cdsAbierto?'▾ Ocultar el detalle':'▸ Ver dónde están')+'</a>'
+    +' · <a href="#" onclick="exportComprasServicio();return false">⬇ Excel</a>'
+    +(P.length?' · <a href="#" onclick="openCdsPlano();return false">📍 Puestos en el plano</a>':'')+'</div>';
+  if(_cdsAbierto){
+    if(R) h+='<div class="av-cq-sub">Por unidad (nómina RRHH-SIS)</div><table class="av-cq-tab av-cds-tab"><thead><tr><th>Unidad SIS</th><th class="n">Personas</th><th class="n">En matriz</th><th>Profesiones</th></tr></thead><tbody>'
+      +R.unidades.map(u=>'<tr title="'+esc(u.unidad_matriz?('≈ '+u.unidad_matriz+(u.confianza>=0.9&&u.servicio_matriz?(' · '+u.servicio_matriz):'')+' (equivalencia '+Math.round(u.confianza*100)+' %)'):'Sin equivalencia con una unidad de la matriz')+'"><td>'+esc(u.unidad_sis)+'</td><td class="n">'+u.personas+'</td><td class="n">'+u.en_matriz+'</td><td class="t">'
+        +Object.entries(u.por_profesion).slice(0,3).map(([k,v])=>esc(k.toLowerCase())+' '+v).join(', ')+'</td></tr>').join('')+'</tbody></table>';
+    h+='<div class="av-cq-sub">Cupos en la matriz, por servicio</div><table class="av-cq-tab av-cds-tab"><tbody>'
+      +Object.entries(M.porSv).sort((a,b)=>b[1].n-a[1].n).map(([k,v])=>'<tr><td>'+esc(k)+'</td><td class="n">'+v.n+'</td><td class="t">'
+        +[Object.entries(v.emp).map(([e,c])=>e+' '+c).join(', '), v.nom?(v.nom+' con nombre'):''].filter(Boolean).join(' · ')+'</td></tr>').join('')+'</tbody></table>';
+  }
+  return h+'</div>';
+}
+function openCdsPlano(){
+  const items=_cdsPlano().map(x=>({rid:x.rid,idx:x.idx,d:{nombre:x.nombre,cargo:x.cargo}}));
+  _wpListaAbrir('🛒 Compras de servicio en el plano', items);
+}
+function exportComprasServicio(){
+  const R=window.COMPRAS_SERVICIO, M=_cdsMatriz(), P=_cdsPlano();
+  const rows=[['Fuente','Unidad / servicio / recinto','Personas o cupos','En matriz (doble vínculo)','Detalle','Piso','Área']];
+  if(R) R.unidades.forEach(u=>rows.push(['Nómina RRHH-SIS',u.unidad_sis,u.personas,u.en_matriz,
+    Object.entries(u.por_profesion).map(([k,v])=>k+' '+v).join(', ')+(u.unidad_matriz?(' · ≈ '+u.unidad_matriz+' ('+Math.round(u.confianza*100)+' %)'):''),'','']));
+  Object.entries(M.porSv).forEach(([k,v])=>rows.push(['Matriz de dotación',k,v.n,'',Object.entries(v.emp).map(([e,c])=>e+' '+c).join(', ')+(v.nom?(' · '+v.nom+' con nombre'):''),'','']));
+  P.forEach(x=>rows.push(['Plano (Atlas)',rName(x.rid)||x.rid,1,'',x.nombre+(x.cargo?(' · '+x.cargo):''),x.ctx.floor.label,aName(x.ctx.area.id)]));
+  xlsxDownload(rows,'Compras de servicio','Compras_de_servicio_HDS_'+new Date().toISOString().slice(0,10)+'.xlsx',[{wch:18},{wch:40},{wch:10},{wch:12},{wch:60},{wch:12},{wch:28}]);
 }
 // ── RECINTOS POR TIPO DEL SERVICIO (vista 2/3) ──────────────────────────────
 // Al entrar a un servicio, el panel derecho responde de inmediato "de qué está
@@ -17566,10 +17651,11 @@ function toggleExpMenu(e){ if(e)e.stopPropagation(); try{expDestLabel();}catch(e
 function closeExpMenu(){ const m=document.getElementById('expMenu'); if(m) m.classList.remove('show'); }
 document.addEventListener('click',function(e){ const dd=document.getElementById('expDD'); if(dd && !dd.contains(e.target)) closeExpMenu(); });
 
-// Diálogo: dotación completa o filtrada por subdirección, servicio o ambos
+// Diálogo: dotación completa o filtrada por subdirección, servicio y/o unidad (3er nivel desde el 26-10-2026,
+// p. ej. sólo la Unidad de Cuidados de Emergencia)
 const _edfVal = v => String(v||'').trim();
-function _edfStaff(sd, sv){
-  return dotDB.staff.filter(s => (!sd || _edfVal(s.subdireccion)===sd) && (!sv || _edfVal(s.servicio)===sv));
+function _edfStaff(sd, sv, u){
+  return dotDB.staff.filter(s => (!sd || _edfVal(s.subdireccion)===sd) && (!sv || _edfVal(s.servicio)===sv) && (!u || _edfVal(s.unidad)===u));
 }
 function exportAsignacionesDialogo(){
   if(!dotDB || !dotDB.staff || !dotDB.staff.length){
@@ -17591,24 +17677,34 @@ function _edfServicios(){
   sel.innerHTML = '<option value="">Todos los servicios</option>'
     + svs.map(x=>`<option value="${esc(x)}">${esc(x)} (${cnt[x]})</option>`).join('');
   sel.value = svs.includes(prev) ? prev : '';
+  _edfUnidades();
+}
+function _edfUnidades(){
+  const sd = document.getElementById('edfSd').value, sv = document.getElementById('edfSv').value;
+  const sel = document.getElementById('edfU'), prev = sel.value, cnt = {};
+  _edfStaff(sd, sv, '').forEach(s=>{ const k=_edfVal(s.unidad); if(k) cnt[k]=(cnt[k]||0)+1; });
+  const us = Object.keys(cnt).sort((a,b)=>a.localeCompare(b,'es'));
+  sel.innerHTML = '<option value="">Todas las unidades'+(sv?'':' (elige un servicio para acotar)')+'</option>'
+    + us.map(x=>`<option value="${esc(x)}">${esc(x)} (${cnt[x]})</option>`).join('');
+  sel.value = us.includes(prev) ? prev : '';
   _edfCuenta();
 }
 function _edfCuenta(){
-  const sd = document.getElementById('edfSd').value, sv = document.getElementById('edfSv').value;
-  const n = _edfStaff(sd, sv).length;
-  document.getElementById('edfCuenta').textContent = (sd||sv)
+  const sd = document.getElementById('edfSd').value, sv = document.getElementById('edfSv').value, u = document.getElementById('edfU').value;
+  const n = _edfStaff(sd, sv, u).length;
+  document.getElementById('edfCuenta').textContent = (sd||sv||u)
     ? n.toLocaleString('es-CL')+' funcionarios con este filtro. El archivo trae sus asignaciones, los sin asignar y el resumen.'
     : 'Dotación completa: '+n.toLocaleString('es-CL')+' funcionarios (incluye fuera de matriz, compras de servicio y aforo de recintos).';
 }
 function closeExportDot(){ document.getElementById('edfModal').classList.remove('show'); }
 function _edfExportar(){
-  const sd = document.getElementById('edfSd').value, sv = document.getElementById('edfSv').value;
-  if((sd||sv) && !_edfStaff(sd, sv).length){ alert('No hay funcionarios con ese filtro.'); return; }
+  const sd = document.getElementById('edfSd').value, sv = document.getElementById('edfSv').value, u = document.getElementById('edfU').value;
+  if((sd||sv||u) && !_edfStaff(sd, sv, u).length){ alert('No hay funcionarios con ese filtro.'); return; }
   closeExportDot();
-  exportAsignaciones({sd, sv});
+  exportAsignaciones({sd, sv, u});
 }
 
-// filtro opcional {sd, sv}: subdirección y/o servicio (sin filtro = dotación completa)
+// filtro opcional {sd, sv, u}: subdirección, servicio y/o unidad (sin filtro = dotación completa)
 function exportAsignaciones(filtro){
   if(typeof XLSX==='undefined'){
     alert('La librería XLSX no se cargó. Verifica tu conexión a internet (se descarga de CDN al abrir la plataforma).');
@@ -17618,10 +17714,10 @@ function exportAsignaciones(filtro){
     alert('La base de dotación no está cargada. No se puede exportar.');
     return;
   }
-  const F = {sd: _edfVal(filtro&&filtro.sd), sv: _edfVal(filtro&&filtro.sv)};
-  const filtrado = !!(F.sd || F.sv);
-  const STAFF = filtrado ? _edfStaff(F.sd, F.sv) : dotDB.staff;
-  const filtroLbl = [F.sd, F.sv].filter(Boolean).join(' · ');
+  const F = {sd: _edfVal(filtro&&filtro.sd), sv: _edfVal(filtro&&filtro.sv), u: _edfVal(filtro&&filtro.u)};
+  const filtrado = !!(F.sd || F.sv || F.u);
+  const STAFF = filtrado ? _edfStaff(F.sd, F.sv, F.u) : dotDB.staff;
+  const filtroLbl = [F.sd, F.sv, F.u].filter(Boolean).join(' · ');
   if(!STAFF.length){ alert('No hay funcionarios con ese filtro.'); return; }
 
   // 1) Indexar asignaciones por nombre normalizado
@@ -17953,7 +18049,7 @@ function exportAsignaciones(filtro){
   XLSX.utils.book_append_sheet(wb, wsSum, 'Resumen');
 
   const _slug = x => x.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Za-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,40);
-  const sufijo = filtrado ? [F.sd, F.sv].filter(Boolean).map(_slug).join('_') + '_' : '';
+  const sufijo = filtrado ? [F.sd, F.sv, F.u].filter(Boolean).map(_slug).join('_') + '_' : '';
   const filename = `Cubicacion_Dotacion_HDS_${sufijo}${new Date().toISOString().slice(0,10)}.xlsx`;
   XLSX.writeFile(wb, filename);
 }
@@ -18990,6 +19086,33 @@ async function runSelfTest(){
       return dentro && seis && img && mks.length===6 && k1 && k2 && ficha && cierra && apaga && prende && otro;
     } finally { S.floorId=fPrev; S.level=lPrev; S.areaId=aPrev; S.roomId=rPrev; S.jardines=jPrev; S.zoom=zPrev; _escTipOff(); renderSVG(); }
   });
+  T('Exportar dotación: 3er nivel «Unidad» (p. ej. sólo Cuidados de Emergencia) que acota la cuenta y el archivo', ()=>{
+    try{
+      exportAsignacionesDialogo();
+      const sdS=document.getElementById('edfSd'), svS=document.getElementById('edfSv'), uS=document.getElementById('edfU');
+      const s0=dotDB.staff.find(x=>x.subdireccion&&x.servicio&&x.unidad && dotDB.staff.filter(y=>y.servicio===x.servicio && y.unidad!==x.unidad).length>0);
+      sdS.value=_edfVal(s0.subdireccion); _edfServicios(); svS.value=_edfVal(s0.servicio); _edfUnidades();
+      const opciones=[...uS.options].length>2; uS.value=_edfVal(s0.unidad); _edfCuenta();
+      const n=_edfStaff(sdS.value, svS.value, uS.value).length, nSv=_edfStaff(sdS.value, svS.value, '').length;
+      const cuenta=new RegExp('^'+n.toLocaleString('es-CL')+' funcionarios').test(document.getElementById('edfCuenta').textContent);
+      return opciones && n>0 && n<nSv && cuenta;
+    } finally { closeExportDot(); }
+  });
+  T('Avance: compras de servicio cuadradas (nómina SIS · matriz · plano), ⚠ sobre el tope por ley y «Puestos libres» que suma', ()=>{
+    const ab=_cdsAbierto;
+    try{
+      const C=_avCuantos(), M=_cdsMatriz();
+      const cuadra=!C || !C.compras || M.n===C.compras;
+      _cdsAbierto=true; const h=_cdsHtml(0);
+      const panel=/Compras de servicio/.test(h) && /cupos en la matriz/.test(h) && /puestos 🛒 en el plano/.test(h)
+        && (!window.COMPRAS_SERVICIO || (/nómina RRHH-SIS/.test(h) && /Por unidad/.test(h)));
+      const q=_avCuantosHtml(); const tope=!q || /Res\. Ex\. SSMO N° 279/.test(q);
+      renderWorkpoints(); const w=document.getElementById('wpBody');
+      const nums=(w.querySelector('.wp-res').textContent.match(/[\d.]+/g)||[]).map(x=>+x.replace(/\./g,''));
+      const suma=nums.length>=3 && nums[0]===nums[1]+nums[2] && !/Otros con cargo<\/span><b[^>]*>\s*\d+\s*\/\s*/.test(w.innerHTML);
+      return cuadra && panel && tope && suma;
+    } finally { _cdsAbierto=ab; }
+  });
   T('Personal: listado A–Z o por estamento (con títulos) y opción «sin becados» que los saca del listado y los conteos', ()=>{
     const ordPrev=_dpOrd, cb=document.getElementById('dpSinBecados'), cbPrev=cb.checked, navPrev={..._dpNav}, f=document.getElementById('dpFiltro'), fPrev=f.value;
     try{
@@ -19026,15 +19149,16 @@ async function runSelfTest(){
   T('⚙ Botones: la grilla mueve, oculta y vuelve a mostrar botones de la barra (sin tocar su función)', ()=>{
     const bar=document.getElementById('capasBar'), src=document.getElementById('capasSrc');
     try{
-      const L=_capasDefault(); let pos=null; L.filas.forEach((f,r)=>f.forEach((x,c)=>{ if(x==='btnLaminas') pos={r,c}; }));
-      L.filas[pos.r][pos.c]=null; L.filas[5][0]='btnLaminas';                          // a la fila 6
+      const L=_capasDefault(), ult=L.filas.length-1; let pos=null; L.filas.forEach((f,r)=>f.forEach((x,c)=>{ if(x==='btnLaminas') pos={r,c}; }));
+      L.filas[pos.r][pos.c]=null; L.ocultos.push(...L.filas[ult].filter(x=>x&&x!=='btnLaminas')); L.filas[ult]=[null,null,null,null]; L.filas[ult][0]='btnLaminas';   // solo, al último bloque
       let pj=null; L.filas.forEach((f,r)=>f.forEach((x,c)=>{ if(x==='btnJardines') pj={r,c}; })); L.filas[pj.r][pj.c]=null; L.ocultos.push('btnJardines');
       _capasAplicar(L);
       const gs=[...bar.querySelectorAll('.cp-g')], ultimo=gs[gs.length-1];
       const movido=ultimo.children.length===1 && ultimo.firstElementChild.id==='btnLaminas';
       const oculto=!bar.contains(document.getElementById('btnJardines')) && src.contains(document.getElementById('btnJardines'));
       const sigue=typeof document.getElementById('btnJardines').onclick==='function';
-      _capasAplicar(_capasDefault()); const vuelve=bar.contains(document.getElementById('btnJardines')) && bar.querySelectorAll('.cp-g').length===5;
+      _capasAplicar(_capasDefault()); const vuelve=bar.contains(document.getElementById('btnJardines')) && bar.querySelectorAll('.cp-g').length===_capasDefault().filas.filter(f=>f.some(Boolean)).length
+        && [...bar.querySelectorAll('.cp-g')].every(g=>g.children.length<=4);
       abrirCapasCfg(); const grilla=document.querySelectorAll('#capasCfg .cc-slot').length===CAPAS_GRILLA.filas*CAPAS_GRILLA.cols; cerrarCapasCfg();
       return movido && oculto && sigue && vuelve && grilla;
     } finally { _capasAplicar(); }
