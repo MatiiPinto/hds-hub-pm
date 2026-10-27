@@ -391,7 +391,7 @@ function filtra(){
     if(a&&x.ambito!==a) return false;
     if(p&&x.prioridad!==p) return false;
     if(!q) return true;
-    return nrm([x.titulo,x.detalle,x.origen_tipo,x.origen_ref,x.contraparte,x.servicio,x.ambito,
+    return nrm([x.id,x.titulo,x.detalle,x.origen_tipo,x.origen_ref,x.contraparte,x.responsable,x.servicio,x.ambito,
                 (x.notas||[]).map(n=>n.texto).join(' ')].join(' ')).includes(q);
   }).sort((a,b)=>esCritico(b)-esCritico(a));   // los críticos primero; el resto conserva su orden
 }
@@ -1073,13 +1073,14 @@ function seccion(ico,tit,ayuda,L,abiertoDef=true){
 function renderReunion(){
   const R=(SEMILLA.huddle||{}).reunion_diaria, el=document.getElementById('hud-rd'); if(!R||!el) return;
   const U=(R.reuniones||[]).slice(-1)[0]||null, ab=D.filter(abierto);
+  const hoyR=x=>U&&(U.pendientes||[]).includes(x.id)?1:0;   // lo de la última reunión, primero
   const de=a=>{ const k=[a.nombre,...(a.alias||[])].map(x=>x.toLowerCase());
     return ab.filter(x=>{ const r=(x.responsable||'').toLowerCase(); return k.some(n=>new RegExp('(^|[^a-záéíóúñ])'+n.replace(/\./g,'\\.')+'($|[^a-záéíóúñ])').test(r)); }); };
   const li=L=>L.length?'<ul>'+L.map(t=>'<li>'+t+'</li>').join('')+'</ul>':'<div class="vac">—</div>';
   const cards=R.asistentes.map(a=>{ const P=de(a), v=(U&&(U.por_participante||{})[a.nombre])||{};
     return `<div class="p"><b>${esc(a.nombre)}</b><span class="c">${P.length} abiertos</span>
       <h4>✅ Avances${U?' · '+fmt(U.fecha):''}</h4>${li((v.avances||[]).map(esc))}
-      <h4>📌 Pendientes</h4>${li(P.sort((x,y)=>(plazoDe(x)||'9').localeCompare(plazoDe(y)||'9')).slice(0,6).map(x=>`<b>${x.id}</b> ${esc(x.titulo)}${plazoDe(x)?' · '+fmt(plazoDe(x)):''}`).concat(P.length>6?['… y '+(P.length-6)+' más']:[]))}</div>`; }).join('');
+      <h4>📌 Pendientes</h4>${li(P.sort((x,y)=>hoyR(y)-hoyR(x)||(plazoDe(x)||'9').localeCompare(plazoDe(y)||'9')).slice(0,6).map(x=>`<b>${x.id}</b> ${esc(x.titulo)}${plazoDe(x)?' · '+fmt(plazoDe(x)):''}`).concat(P.length>6?['… y '+(P.length-6)+' más']:[]))}</div>`; }).join('');
   el.innerHTML=`<details class="fr" open><summary>👥 ${esc(R.nombre)} · ${esc(R.hora)} · ${esc(R.lugar)} · ${R.asistentes.length} asistentes
     <span style="font-weight:400;color:var(--dim)"> · ${U?'última: '+fmt(U.fecha)+(U.minuta?' · minuta '+esc(U.minuta):''):'sin reuniones cargadas'}</span></summary><div class="rd">${cards}</div></details>`;
 }
@@ -1217,6 +1218,9 @@ function exportarPiloto(){
 
 initFiltros(); render();
 (function(){ let p='hud'; try{ p=localStorage.getItem('hds_bitacora_tab')||'hud'; }catch(e){}
+  // 14.Bitacora.html#q=P123 (desde el organigrama): abre Pendientes ya filtrado
+  const q=decodeURIComponent(((location.hash||'').match(/q=([^&]+)/)||[])[1]||'');
+  if(q){ const tp=document.querySelector('.tab[data-p="pend"]'); if(tp) tab(tp); try{ localStorage.setItem('hds_bitacora_tab',p); }catch(e){} document.getElementById('q').value=q; render(); return; }   // no cambia la pestaña recordada
   const t=document.querySelector('.tab[data-p="'+p+'"]'); if(t&&p!=='hud') tab(t); })();
 traerEventos(); setInterval(traerEventos,60000);
 </script>

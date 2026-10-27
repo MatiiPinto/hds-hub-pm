@@ -3402,7 +3402,7 @@ window.BITACORA = {
   {
    "id": "P150",
    "titulo": "Dotación · compras de servicio sin nombre de persona (109 filas)",
-   "detalle": "De las 113 compras de servicio de la planilla, 100 vienen con el nombre vacío y 9 con el nombre de la EMPRESA (SOCIAL MED ×3, MEDICAL ×3, LAYNER ×3, estas últimas con 3 cargos distintos en Pabellón). Ninguna de las 113 trae RUT. El Atlas y el slim ya las tratan como cupos y no como personas (regla `_dotSinPersona` / `sin_persona`), así que no inflan la cuenta: compras 113 = 3 con nombre + 110 cupos. Falta pedirle a Rodrigo Quijada que la planilla traiga el nombre de la persona o deje la fila explícitamente como cupo. Consultado a Rodrigo Quijada el 22-10-2026 junto con las 28 personas sin clasificación. Reiterado el 26-10 en el correo de P173, planteado como que la fila quede marcada explícitamente como cupo.",
+   "detalle": "De las 113 compras de servicio de la planilla, 100 vienen con el nombre vacío y 9 con el nombre de la EMPRESA (SOCIAL MED ×3, MEDICAL ×3, LAYNER ×3, estas últimas con 3 cargos distintos en Pabellón). Ninguna de las 113 trae RUT. El Atlas y el slim ya las tratan como cupos y no como personas (regla `_dotSinPersona` / `sin_persona`), así que no inflan la cuenta: compras 113 = 3 con nombre + 110 cupos. Falta pedirle a Rodrigo Quijada que la planilla traiga el nombre de la persona o deje la fila explícitamente como cupo. Consultado a Rodrigo Quijada el 22-10-2026 junto con las 28 personas sin clasificación. Reiterado el 26-10 en el correo de P173, planteado como que la fila quede marcada explícitamente como cupo. El 27-10 llegó la primera respuesta nominal, de Nutrición: 17 nutricionistas con nombre y RUT. Ver P174.",
    "ambito": "Dotación",
    "prioridad": "Baja",
    "estado": "Esperando terceros",
@@ -3414,7 +3414,7 @@ window.BITACORA = {
    "origen_fecha": "2026-10-21",
    "compromiso": "",
    "creado": "2026-10-21",
-   "actualizado": "2026-10-26",
+   "actualizado": "2026-10-27",
    "notas": ""
   },
   {
@@ -3980,14 +3980,14 @@ window.BITACORA = {
    "origen_fecha": "2026-10-26",
    "compromiso": "",
    "creado": "2026-10-26",
-   "actualizado": "2026-10-26",
+   "actualizado": "2026-10-27",
    "notas": "",
    "id": "P158",
    "prioridad": "Alta",
    "estado": "En curso",
    "contraparte": "Rodrigo Quijada · Unidad de Dotación",
    "titulo": "Dotación · dos funcionarios con egreso informado siguen contados como dotación activa",
-   "detalle": "La hoja «Egresos» que viene con los archivos de enrolamiento de la Inspección Fiscal trae tres egresos que la hoja de Rodrigo del 19-10 no tiene. Dos de ellos siguen en la matriz con vínculo TOTAL y sin fecha de alejamiento: Valencia Castro Camilo, auxiliar del Servicio Farmacia, con DESTITUCION al 15-10-2026, y Morales Aravena Branco Antonio, administrativo del Departamento Integral de Atención al Usuario, con SIN RENOVACION al 04-08-2026. El tercero, Cabrera Cabrera Paulina, con SIN RENOVACION al 30-04-2026, no está en la matriz y era una de las 49 personas sin rastro del cruce de la cabida de Loreto (P155): queda explicada. Llama la atención que la copia de la Inspección Fiscal tenga 190 filas y la de Rodrigo 303, y que aun así traiga egresos que la más larga no tiene. Los tres quedaron cargados en dotacion_egresos.json con la procedencia anotada, pero NO se marcó a nadie como egresado en la matriz: eso lo confirma la Unidad de Dotación. Consultado el 26-10 en el correo de P173, punto 2."
+   "detalle": "La hoja «Egresos» que viene con los archivos de enrolamiento de la Inspección Fiscal trae tres egresos que la hoja de Rodrigo del 19-10 no tiene. Dos de ellos siguen en la matriz con vínculo TOTAL y sin fecha de alejamiento: Valencia Castro Camilo, auxiliar del Servicio Farmacia, con DESTITUCION al 15-10-2026, y Morales Aravena Branco Antonio, administrativo del Departamento Integral de Atención al Usuario, con SIN RENOVACION al 04-08-2026. El tercero, Cabrera Cabrera Paulina, con SIN RENOVACION al 30-04-2026, no está en la matriz y era una de las 49 personas sin rastro del cruce de la cabida de Loreto (P155): queda explicada. Llama la atención que la copia de la Inspección Fiscal tenga 190 filas y la de Rodrigo 303, y que aun así traiga egresos que la más larga no tiene. Los tres quedaron cargados en dotacion_egresos.json con la procedencia anotada, pero NO se marcó a nadie como egresado en la matriz: eso lo confirma la Unidad de Dotación. Consultado el 26-10 en el correo de P173, punto 2. El 27-10 se sumó un tercer caso del mismo tipo, informado por la jefatura y no por Dotación: Rosso Ávila, renuncia al 19-10 (ver P175). El 27-10 el histórico mostró que no eran 3 casos sino 60, con 15 de señal alta: ver P176, que lo reemplaza."
   },
   {
    "ambito": "Dotación",
@@ -4052,14 +4052,14 @@ window.BITACORA = {
    "origen_fecha": "2026-10-26",
    "compromiso": "",
    "creado": "2026-10-26",
-   "actualizado": "2026-10-26",
+   "actualizado": "2026-10-27",
    "notas": "",
    "id": "P162",
    "prioridad": "Media",
    "estado": "En curso",
    "contraparte": "Rodrigo Quijada · Unidad de Dotación",
    "titulo": "Dotación · 15 funcionarios de dotación titular sin registro en el control de acceso",
-   "detalle": "Quince personas con vínculo TOTAL en la matriz no aparecen en el maestro del control de acceso del 19-10, así que hoy no tendrían credencial para el edificio nuevo: cuatro médicos (Imagenología, UTI, Anestesia y Servicio de Medicina), cinco auxiliares (Operaciones, Bodega de Medicamentos, Paciente Crítico, Movilización y Farmacia), tres profesionales (Cuidados Médicos, Cuidados Ambulatorios Neurológicos y Licencias Médicas), un administrativo del DIAU y dos más de Cuidados Quirúrgicos y Paciente Crítico. Dos de los quince son justamente los del P158, que según la Inspección Fiscal ya egresaron. Los otros trece hay que enrolarlos o explicar por qué no están. Consultado el 26-10 en el correo de P173, punto 4."
+   "detalle": "Quince personas con vínculo TOTAL en la matriz no aparecen en el maestro del control de acceso del 19-10, así que hoy no tendrían credencial para el edificio nuevo: cuatro médicos (Imagenología, UTI, Anestesia y Servicio de Medicina), cinco auxiliares (Operaciones, Bodega de Medicamentos, Paciente Crítico, Movilización y Farmacia), tres profesionales (Cuidados Médicos, Cuidados Ambulatorios Neurológicos y Licencias Médicas), un administrativo del DIAU y dos más de Cuidados Quirúrgicos y Paciente Crítico. Dos de los quince son justamente los del P158, que según la Inspección Fiscal ya egresaron. Los otros trece hay que enrolarlos o explicar por qué no están. Consultado el 26-10 en el correo de P173, punto 4. El correo del 26-10 de Rodrigo Hermosilla fija la regla: los archivos de enrolamiento y perfiles incluyen titulares, contrata, honorarios, docentes UCH y reemplazos, y excluyen compras de servicio y becados. Con esa regla las 15 de vínculo titular, más 6 marcadas PENDIENTE SIRH, son la anomalía real; los 556 becados y los 23 de empresa externa están fuera por diseño. RESUELTO EN SU MAYOR PARTE el 27-10: 15 de las 18 ya tienen egreso informado, así que no les falta credencial, se fueron; las otras 3 son cupos vacantes sin persona. Pasa a ser parte de P176."
   },
   {
    "id": "P173",
@@ -4074,9 +4074,9 @@ window.BITACORA = {
    "origen_fecha": "2026-10-26",
    "compromiso": "",
    "creado": "2026-10-26",
-   "actualizado": "2026-10-26",
+   "actualizado": "2026-10-27",
    "titulo": "Dotación · consulta consolidada a la Unidad de Dotación: cinco frentes en un solo correo",
-   "detalle": "Borrador del 26-10 dentro del hilo de las personas sin clasificación, con copia a Loreto Pérez y Yoselin Calderón, que junta en un solo correo todo lo que la planilla tiene pendiente. Adjunto _DOCS/Informes_Servicios/Consultas_Dotacion_2026-10-26.xlsx, cinco hojas sin RUT con la columna de respuesta en blanco. Los cinco frentes: (1) 29 personas sin clasificar, de las cuales las 9 de la Subdirección Médica ya traen la unidad que sugiere el maestro SIC del 19-10 y sólo hay que confirmarla, mientras siguen abiertas las 10 de Diálisis sin departamento y las 10 marcadas PENDIENTE DE CLASIFICAR POR RRHH, tres de ellas sin RUT; (2) egresos, con los dos funcionarios que siguen contados como activos, el caso que no está en la planilla y las 36 salidas sin causal; (3) compras de servicio, pidiendo que la fila quede marcada como cupo cuando no haya persona, que es lo que resuelve nuestro conteo sin forzarlo a inventar nombres; (4) control de acceso, con las 15 sin credencial y las 17 con credencial que no están en la planilla; (5) un paquete de correcciones chicas de la fuente. Se le dijo que la prioridad son el 1 y el 2, porque son los que impiden cerrar la ubicación en el Atlas. Reúne y reemplaza como vía de consulta a P011, P012, P150, P151, P158 y P162. Emergencia quedó fuera a propósito: se espera lo que haga Loreto Pérez con la cabida de la UEH (P154). ⛔ El correo está en borrador, sin enviar, esperando el visto bueno de Matías; hay que adjuntar la planilla a mano."
+   "detalle": "Borrador del 26-10 dentro del hilo de las personas sin clasificación, con copia a Loreto Pérez y Yoselin Calderón, que junta en un solo correo todo lo que la planilla tiene pendiente. Adjunto _DOCS/Informes_Servicios/Consultas_Dotacion_2026-10-26.xlsx, cinco hojas sin RUT con la columna de respuesta en blanco. Los cinco frentes: (1) 29 personas sin clasificar, de las cuales las 9 de la Subdirección Médica ya traen la unidad que sugiere el maestro SIC del 19-10 y sólo hay que confirmarla, mientras siguen abiertas las 10 de Diálisis sin departamento y las 10 marcadas PENDIENTE DE CLASIFICAR POR RRHH, tres de ellas sin RUT; (2) egresos, con los dos funcionarios que siguen contados como activos, el caso que no está en la planilla y las 36 salidas sin causal; (3) compras de servicio, pidiendo que la fila quede marcada como cupo cuando no haya persona, que es lo que resuelve nuestro conteo sin forzarlo a inventar nombres; (4) control de acceso, con las 15 sin credencial y las 17 con credencial que no están en la planilla; (5) un paquete de correcciones chicas de la fuente. Se le dijo que la prioridad son el 1 y el 2, porque son los que impiden cerrar la ubicación en el Atlas. Reúne y reemplaza como vía de consulta a P011, P012, P150, P151, P158 y P162. Emergencia quedó fuera a propósito: se espera lo que haga Loreto Pérez con la cabida de la UEH (P154). ⛔ El correo está en borrador, sin enviar, esperando el visto bueno de Matías; hay que adjuntar la planilla a mano. Antes de enviarlo conviene sumar los dos movimientos de Soporte Nutricional (P175) y el descuadre de cupos de nutricionista (P174). Sumar también P176: los 15 con causal de salida y señal alta son el caso más fuerte para pedirle a Dotación que los retire de la hoja Total."
   },
   {
    "id": "P174",
@@ -4394,6 +4394,78 @@ window.BITACORA = {
    "actualizado": "2026-10-27",
    "titulo": "Logística en terreno: racks según la observación del ISP y destino de la bodega de 200 m² de Anatomía Patológica",
    "detalle": "⚠ Atribución por confirmar (dos Rodrigo en el acta). Hoy en la tarde hay visita en terreno con los proveedores de logística, para ver si se pueden instalar los racks revisados ayer. Nadie ha explicado aún qué mobiliario va en la bodega de 200 m², que además requiere fumigación. Las oficinas de logística vistas ayer requieren sacar mobiliario."
+  },
+  {
+   "ambito": "Dotación",
+   "responsable": "Matías",
+   "servicio": "UNIDAD DE ATENCION NUTRICIONAL",
+   "origen_tipo": "correo",
+   "origen_ref": "Correo «ARCHIVO ENROLAMIENTO FUNCIONARIOS HDS V.19/10/2026 Y ARCHIVO PERFILES SIC HDS V.19/10/2026»",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "notas": "",
+   "id": "P174",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "contraparte": "Dra. Sheila Cerda · Jefatura Nutricional Especializado / Rodrigo Quijada",
+   "titulo": "Dotación · 17 nutricionistas de compra de servicio con nombre, y 5 cupos para 17 personas",
+   "detalle": "La Dra. Sheila Cerda respondió el 27-10 al correo de los archivos de enrolamiento con la planilla «personal con compra de servicios.xlsx»: 17 nutricionistas de compra de servicio con nombre, RUT, correo, unidad y cargo, repartidos en Servicio de Alimentación (13), Unidad de Soporte Nutricional (1) y Hospital de Día (3). Es la primera respuesta nominal a lo que venimos pidiendo en P150. Quedaron cargados en dotacion_compras_servicio_sis.json con su procedencia: 13 eran nuevos y 4 ya estaban en la nómina SIS, a los que se les completó la unidad. Ninguno de los 17 está en la matriz, porque las compras de servicio entran como cupo sin nombre. El descuadre a resolver con la Unidad de Dotación: la matriz tiene unos 5 cupos de nutricionista entre Alimentación, Hospital de Día y uno con unidad REVISAR, y la jefatura nombra 17 personas. Los otros 11 cupos de Alimentación son de auxiliares, técnico gastronómico y transportista, no de nutricionistas. Hay que saber si faltan cupos en la planilla o si estas personas se reparten los existentes. Ojo con el perfil SIC: la planilla propone PERFIL NUTRICIONISTA para los 17, pero el archivo de perfiles al 19-10 no incluye compras de servicio y la Inspección Fiscal todavía no lo autoriza. Quedó guardado como perfil_sic_propuesto, no como perfil autorizado."
+  },
+  {
+   "ambito": "Dotación",
+   "responsable": "Matías",
+   "servicio": "UNIDAD DE SOPORTE NUTRICIONAL",
+   "origen_tipo": "correo",
+   "origen_ref": "Correo «ARCHIVO ENROLAMIENTO FUNCIONARIOS HDS V.19/10/2026 Y ARCHIVO PERFILES SIC HDS V.19/10/2026»",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "notas": "",
+   "id": "P175",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "contraparte": "Rodrigo Quijada · Unidad de Dotación",
+   "titulo": "Dotación · dos movimientos de Soporte Nutricional que informó la jefatura y la planilla no tiene",
+   "detalle": "En el mismo correo del 27-10 la Dra. Cerda informó dos movimientos que el corte del 19-10 no refleja. La Dra. Francisca Rosso Ávila renunció a partir del 19-10-2026 y sigue en la matriz como dotación activa, sin fecha de alejamiento: quedó anotada en dotacion_confirmaciones.json con estado egreso, y hay que pedirle a Dotación que la retire de la hoja Total. La Dra. Trinidad Preuss Ostornol se incorpora el 01-11-2026 a la Unidad de Soporte Nutricional y no estaba en ninguna fuente: quedó cargada en dotacion_ingresos_pendientes con estado INGRESO PENDIENTE, así que ya aparece en la matriz y se puede cubicar. Es el mismo patrón de P158: egresos y altas que las jefaturas conocen antes que la planilla. Ambos casos se suman al correo de P173, que aún está en borrador."
+  },
+  {
+   "id": "P176",
+   "ambito": "Dotación",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Matías",
+   "contraparte": "Rodrigo Quijada · Unidad de Dotación",
+   "servicio": "",
+   "origen_tipo": "revisión",
+   "origen_ref": "Histórico de egresos de la plataforma de dotación",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "notas": "",
+   "titulo": "Dotación · 60 personas con causal de salida siguen en la planilla, 15 con señal alta",
+   "detalle": "Al armar el histórico de egresos de la plataforma salió un descuadre mayor que el de P158. La hoja «Egresos» le anota causal de salida a 60 personas que el corte del 19-10 todavía trae como dotación activa. De esas, 15 tienen las tres señales juntas: causal de salida, sin credencial en el control de acceso y sin fecha de alejamiento en la planilla, con una sola fila en la matriz. Son renuncias y destituciones con fecha entre el 04-08 y el 15-10-2026, de Imagenología, UTI, Anestesia, Farmacia, Movilización, Bodega de Medicamentos, Operaciones, Licencias Médicas, Cuidados Médicos, Cuidados Quirúrgicos, Paciente Crítico, Ambulatorios y el DIAU. Esto EXPLICA P162: las 15 que parecían no tener credencial no es que falte enrolarlas, es que ya se fueron. Las otras 45 tienen credencial o fecha de alejamiento, así que son menos claras y pueden ser recontrataciones. Hallazgo aparte y necesario para leer bien la hoja: de los 322 egresos, 77 no son salidas de personas sino movimientos del cargo (ACEPTACION DE CARGO 50, ADECUACION 20, CAMBIO DE CORRELATIVO 6, DESTINACION 1); el cargo termina y se vuelve a crear, la persona sigue. El histórico los clasifica aparte y no los cuenta como salida. ⛔ No se descontó a nadie de la dotación: la lista está en la plataforma para confirmarla."
+  },
+  {
+   "id": "P177",
+   "ambito": "Dotación",
+   "prioridad": "Baja",
+   "estado": "Abierto",
+   "responsable": "Matías",
+   "contraparte": "",
+   "servicio": "",
+   "origen_tipo": "revisión",
+   "origen_ref": "Histórico de egresos de la plataforma de dotación",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "notas": "",
+   "titulo": "Dotación · 28 egresos del histórico sin unidad, por ser anteriores al roster",
+   "detalle": "De las 227 personas del histórico «Ya no están», 199 traen unidad, departamento y cargo, que salen de las salidas detectadas al comparar cortes y del roster histórico. Las otras 28 vienen sólo de la hoja «Egresos», que no trae unidad, y salieron antes del 01-07-2026, que es el primer corte del roster: no hay ficha de dónde trabajaban. Se puede completar pidiéndole a Dotación la unidad de esos 28 casos, o dejarlo así y asumir que el histórico tiene unidad desde julio de 2026 en adelante. No es urgente: ninguno cuenta dotación."
   }
  ],
  "criticos": [

@@ -308,6 +308,13 @@
   .oe-col button.c-azul{background:#E3EEFB}.oe-col button.c-verde{background:#E3F4EA}.oe-col button.c-durazno{background:#FDEBDD}.oe-col button.c-lila{background:#ECE7FA}.oe-col button.c-navy{background:#1F2A55}
   .oe-col button.on{box-shadow:0 0 0 3px #2563eb}
   .oe-panel .oe-chk{display:flex;gap:6px;align-items:center;font-weight:600}
+  .ow .bp{position:absolute;left:6px;bottom:5px;background:#b45309;color:#fff;border-radius:9px;padding:0 7px;font-size:11.5px;font-weight:800;line-height:18px}
+  .ox .tv{cursor:pointer;position:relative} .ox .tv .bp{position:absolute;right:10px;top:9px;background:#b45309;color:#fff;border-radius:9px;padding:0 7px;font-size:11.5px;font-weight:800;line-height:18px}
+  .bp-panel{width:380px;max-height:calc(100vh - 140px);overflow:auto}
+  .bp-g{font-weight:800;color:#1F2A55;margin:10px 0 4px;font-size:12.5px;border-bottom:1px solid #e2e8f0;padding-bottom:3px}
+  .bp-i{display:block;padding:6px 0;border-bottom:1px dashed #e2e8f0;color:#0f172a;text-decoration:none;font-size:12.5px;line-height:1.35}
+  .bp-i:hover{background:#f8fafc} .bp-i b{color:#1F2A55} .bp-i small{display:block;color:#64748b;font-size:11px;margin-top:1px}
+  .bp-a{display:inline-block;border-radius:6px;padding:0 5px;font-size:10.5px;font-weight:800;margin-right:4px} .bp-a.Alta{background:#fee2e2;color:#991b1b} .bp-a.Media{background:#fef3c7;color:#92400e} .bp-a.Baja{background:#e2e8f0;color:#475569}
   .oe-acc{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:12px} .oe-acc button{border:1px solid #cbd5e1;background:#f8fafc;border-radius:8px;padding:7px;font-weight:700;font-size:11.5px;cursor:pointer;color:#1F2A55}
   .oe-acc button:first-child,.oe-acc button[data-a=hermano]{grid-column:1/-1}.oe-acc button:first-child{background:#E3F4EA;border-color:#97d3b1} .oe-acc .rojo{grid-column:1/-1;color:#b91c1c;background:#fef2f2;border-color:#fecaca}
 </style>
@@ -1276,10 +1283,56 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <script src="hub-home.js"></script>
 <script src="data/organigramas_extra.js"></script>
+<script src="SHARED_DATA/bitacora_pendientes.js"></script>
 <script>
 /* Organigramas adicionales (data/organigramas_extra.js): Puesta en Marcha (editable, widgets) y hospital concesionado. */
 (function(){
   const E = window.ORG_EXTRA; if(!E) return;
+
+  /* ── Bitácora (27-10): pendientes abiertos de cada persona y de cada frente ──
+     Semilla SHARED_DATA/bitacora_pendientes.js + lo editado en la 14 de este navegador
+     (localStorage hds_bitacora_v1, manda por id). Persona: «J. Pacheco» calza con el
+     responsable «Javiera Pacheco»; frente: por ámbito de la Bitácora. */
+  const BIT = (() => { const m = new Map(((window.BITACORA || {}).items || []).map(x => [x.id, x]));
+    try{ JSON.parse(localStorage.getItem('hds_bitacora_v1') || '[]').forEach(x => m.set(x.id, x)); }catch(e){}
+    return [...m.values()].filter(x => x.estado !== 'Cerrado'); })();
+  const nr = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  const respDe = x => nr(x.responsable).replace(/^matias\b(?!\s+[a-z]*\s*pinto)/, 'matias pinto');   // «Matías» a secas = Matías Pinto
+  function calza(persona){
+    const t = nr(persona).replace(/\(.*?\)/g, '').trim(), m = t.match(/^([a-z])\.\s*([a-z]+)/);
+    if(!m) return () => false;                       // nombres sueltos («Javi») no se adivinan
+    const rx = new RegExp('\\b' + m[1] + '[a-z]*\\.?\\s+(?:[a-z]+\\s+)?' + m[2] + '\\b');
+    return x => rx.test(respDe(x));
+  }
+  const AMBITO = { 'autorizacion sanitaria': ['Aut. Sanitaria'], 'emmc': ['EMMC', 'MNC', 'Instrumental', 'CCDD', 'PMA'], 'revision emmc · mnc': ['EMMC', 'MNC'],
+    'capacitacion': ['Capacitación'], 'cabida': ['Dotación'], 'tic': ['TI'], 'comunicaciones': ['Comunicaciones'], 'recepcion instrumental quirurgico': ['Instrumental'] };
+  const PRI = { Alta: 0, Media: 1, Baja: 2 }, orden = (a, b) => (PRI[a.prioridad] ?? 3) - (PRI[b.prioridad] ?? 3) || String(a.plazo || '9').localeCompare(String(b.plazo || '9'));
+  /* Recuadro con frente (ámbito): sus pendientes son los del frente, y de cada persona se
+     muestran los suyos dentro del frente + cuántos tiene en total. Sin frente: los de sus personas. */
+  function pendDe(titulo, personas){
+    const amb = AMBITO[nr(titulo).trim()] || [], grupos = [], gente = [];
+    const enF = x => !amb.length || amb.includes(x.ambito);
+    if(amb.length) grupos.push({ g: 'Frente · ' + amb.join(' · '), L: BIT.filter(x => amb.includes(x.ambito)).sort(orden) });
+    (personas || []).forEach(p => { const f = calza(p), todos = BIT.filter(f);
+      gente.push({ p, total: todos.length, ap: (p.match(/[A-Za-zÁÉÍÓÚÑáéíóúñ]+$/) || [''])[0] });
+      if(!amb.length) grupos.push({ g: p, L: todos.sort(orden) });
+      else if(todos.some(enF)) grupos.push({ g: p + ' · en este frente', L: todos.filter(enF).sort(orden) }); });
+    const ids = new Set(); grupos.forEach(g => g.L.forEach(x => ids.add(x.id)));
+    return { grupos: grupos.filter(g => g.L.length), n: ids.size, gente };
+  }
+  const personasTv = t => String(t.p || '').split(/\s*·\s*/).filter(x => /^[A-ZÁÉÍÓÚÑ]\.?\s|^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]+\s+[A-ZÁÉÍÓÚÑ]/.test(x)).map(x => x.replace(/^([A-ZÁÉÍÓÚÑ])[a-záéíóúñ]+\s+/, '$1. '));
+  let verPend = null;                                  // { t, p } del recuadro abierto
+  function panelPend(){
+    if(!verPend) return '';
+    const R = pendDe(verPend.t, verPend.p), item = x => `<a class="bp-i" href="14.Bitacora.html#q=${encodeURIComponent(x.id)}" target="_blank" rel="noopener">
+        <span class="bp-a ${esc(x.prioridad || '')}">${esc(x.prioridad || '—')}</span><b>${esc(x.id)}</b> ${esc(x.titulo)}
+        <small>${esc(x.estado)} · ${esc(x.ambito || '')}${x.plazo ? ' · plazo ' + esc(x.plazo) : ''} · resp.: ${esc(x.responsable || 'no consta')}</small></a>`;
+    return `<aside class="oe-panel bp-panel"><div class="oe-ph">📌 ${esc(verPend.t)}<button data-a="cerrarPend">×</button></div>
+      <div style="color:#64748b">${R.n ? R.n + ' pendiente' + (R.n > 1 ? 's' : '') + ' abiertos en la Bitácora' : 'Sin pendientes abiertos en la Bitácora para este recuadro.'}</div>
+      ${R.gente.length ? `<div class="bp-g">Personas</div>${R.gente.map(g => `<div style="padding:3px 0">${esc(g.p)} · ${g.total ? `<a href="14.Bitacora.html#q=${encodeURIComponent(g.ap)}" target="_blank" rel="noopener" style="color:#1F2A55;font-weight:700">${g.total} pendiente${g.total > 1 ? 's' : ''} en total →</a>` : '<span style="color:#94a3b8">sin pendientes a su nombre</span>'}</div>`).join('')}` : ''}
+      ${R.grupos.map(g => `<div class="bp-g">${esc(g.g)} · ${g.L.length}</div>${g.L.slice(0, 40).map(item).join('')}${g.L.length > 40 ? `<div style="color:#64748b;padding:4px 0">… y ${g.L.length - 40} más en la Bitácora</div>` : ''}`).join('')}
+      <div style="margin-top:10px"><a href="14.Bitacora.html" target="_blank" rel="noopener" style="font-weight:700;color:#1F2A55">Abrir la Bitácora →</a></div></aside>`;
+  }
   const esc = x => String(x==null?'':x).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
   /* ───────── Editor de organigrama por widgets ─────────
@@ -1348,7 +1401,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return `<div class="ow c-${n.c || 'azul'} z${n.z}${sel === n.id ? ' sel' : ''}${n.lat ? ' lat' : ''}" data-id="${n.id}" draggable="${editar}" style="left:${n.x}px;top:${n.y}px;width:${w}px;height:${h}px">
       <div class="t">${esc(n.t)}</div>${n.s ? `<div class="s">${esc(n.s)}</div>` : ''}
       ${pp.length ? `<div class="pp">${pp.map(x => `<span>${esc(x)}</span>`).join('')}</div>` : ''}
-      ${n.q ? `<span class="q" title="${esc(n.q)}">por confirmar</span>` : ''}</div>`;
+      ${n.q ? `<span class="q" title="${esc(n.q)}">por confirmar</span>` : ''}${(() => { const k = pendDe(n.t, n.p).n; return k ? `<span class="bp" title="Pendientes abiertos en la Bitácora (clic para verlos)">📌 ${k}</span>` : ''; })()}</div>`;
   }
   function pintar(){
     if(!cont) return;
@@ -1365,7 +1418,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="oe-wrap"><div class="oe-lienzo" style="width:${W}px;height:${H}px;transform:scale(${zoom})">
         <svg width="${W}" height="${H}">${out.lineas.map(l => `<path d="${l.d}" class="${l.lat ? 'lat' : ''}"/>`).join('')}</svg>
         ${out.nodos.map(widget).join('')}</div></div>
-      ${editar && n ? panel(n.n, n.p) : ''}`;
+      ${editar && n ? panel(n.n, n.p) : ''}${!editar ? panelPend() : ''}`;
     const lz = cont.querySelector('.oe-lienzo'); lz.parentElement.style.height = Math.min(H * zoom + 10, 900) + 'px';
   }
   function imagen(){
@@ -1414,6 +1467,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const s = sel && buscar(sel);
     if(a === 'editar'){ editar = !editar; if(!editar) sel = null; return pintar(); }
     if(a === 'cerrar'){ sel = null; return pintar(); }
+    if(a === 'cerrarPend'){ verPend = null; return pintar(); }
     if(a === 'mas' || a === 'menos'){ zoom = Math.max(.4, Math.min(1.6, zoom + (a === 'mas' ? .1 : -.1))); return pintar(); }
     if(a === 'ajustar'){ medir(arbol); zoom = Math.max(.75, Math.min(1, (cont.clientWidth - 20) / (arbol.W + 60))); return pintar(); }   // piso 75 %: legible al proyectar (lo que sobra se recorre)
     if(a === 'deshacer') return deshacer();
@@ -1437,6 +1491,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const z = ev.target.closest('[data-z]'), c = ev.target.closest('[data-c]');
       if((z || c) && sel){ const s = buscar(sel); snap(); if(z) s.n.z = z.dataset.z; if(c) s.n.c = c.dataset.c; guardar(); return pintar(); }
       const w = ev.target.closest('.ow'); if(w && editar){ sel = w.dataset.id; pintar(); }
+      else if(w){ const s = buscar(w.dataset.id); verPend = s ? { t: s.n.t, p: s.n.p || [] } : null; pintar(); }
     });
     div.addEventListener('change', ev => {
       if(ev.target.dataset.a === 'importar'){ const f = ev.target.files[0]; if(!f) return; f.text().then(t => { try{ snap(); arbol = conIds(JSON.parse(t)); guardar(); pintar(); }catch(e){ alert('El archivo no es un organigrama válido.'); } }); return; }
@@ -1465,7 +1520,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="sec">Fases</div><div class="fases">${D.fases.map(f=>`<div class="card fase c-${f.c}"><span class="n">${f.n}</span><span class="t">${esc(f.t)}</span>${f.cuando?`<div class="w">${esc(f.cuando)}</div>`:'<div class="w">&nbsp;</div>'}<ul>${f.items.map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>`).join('')}</div>
       <div class="sec">Estructura</div><div id="oeHost"></div>
       <div class="sec">Frentes transversales</div>
-      <div class="grid">${D.transversales.map(t=>`<div class="card tv c-${t.c}"><div class="t">${esc(t.t)}${t.ok?`<span class="ok">${esc(t.ok)}</span>`:''}</div><div class="p">${esc(t.p)}</div></div>`).join('')}</div>
+      <div class="grid">${D.transversales.map((t,i)=>{ const k=pendDe(t.t,personasTv(t)).n; return `<div class="card tv c-${t.c}" data-tv="${i}" title="Ver sus pendientes de la Bitácora"><div class="t">${esc(t.t)}${t.ok?`<span class="ok">${esc(t.ok)}</span>`:''}</div><div class="p">${esc(t.p)}</div>${k?`<span class="bp">📌 ${k}</span>`:''}</div>`; }).join('')}</div>
       <div class="sec">Agenda del día</div><div class="agenda">${D.agenda.map(a=>`<span>${esc(a)}</span>`).join('')}</div>
       <div class="nota">${D.notas.map(esc).join('<br>')} Las etiquetas «por confirmar» marcan lo que no se lee con certeza en la pizarra. Los cambios del editor quedan guardados en este navegador; «Exportar» descarga el organigrama para compartirlo.</div></div>`;
   }
@@ -1485,7 +1540,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('subnav').style.display = hds ? '' : 'none';
     document.getElementById('main').style.display = hds ? '' : 'none';
     alt.style.display = hds ? 'none' : 'block';
-    if(!hds){ alt.innerHTML = v === 'pm' ? pm() : conc(); if(v === 'pm'){ montar(document.getElementById('oeHost')); accion('ajustar'); } }
+    if(!hds){ alt.innerHTML = v === 'pm' ? pm() : conc(); if(v === 'pm'){ montar(document.getElementById('oeHost')); accion('ajustar');
+      alt.querySelectorAll('[data-tv]').forEach(c => c.addEventListener('click', () => { const t = E.pm.transversales[+c.dataset.tv]; verPend = { t: t.t, p: personasTv(t) }; editar = false; pintar(); })); } }
     document.querySelectorAll('#orgSwitch button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
     try{ localStorage.setItem('org15_vista', v); }catch(e){}
   }
