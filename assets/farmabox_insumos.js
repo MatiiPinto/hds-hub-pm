@@ -17,6 +17,8 @@ const M = window.INSUMOS_MATRIZ;
 const KITS = window.FARMABOX_KITS || [];
 if(!M) { console.warn('FarmaBox: falta SHARED_DATA/insumos_matriz.js'); return; }
 const KBY = {}; KITS.forEach(k => KBY[k.id] = k);
+const SG = window.FARMABOX_SUGERENCIAS || {por_kit: {}, refs: {}};   // ← _DEV/build_farmabox_sugerencias.py
+const sgKit = id => (SG.por_kit[id] || []).filter(x => x.t !== 'repetida');
 const LS_PROP = 'farmabox_propuesta_v1', LS_CORTE = 'farmabox_corte_local_v1', LS_PRECIO = 'farmabox_ver_precio';
 const lsGet = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch(e) { return d; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e) { alert('No se pudo guardar en este navegador: ' + e.message); return false; } };
@@ -100,6 +102,11 @@ body.fx-otra .filter-bar,body.fx-otra .results-bar,body.fx-otra #gridWrap,body.f
 .fx-sug{position:absolute;z-index:20;background:#fff;border:1px solid #cbd5e1;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);max-height:320px;overflow:auto;width:100%}
 .fx-sug div{padding:8px 10px;font-size:13px;cursor:pointer;border-bottom:1px solid #f1f5f9}.fx-sug div:hover{background:#f0fdfa}
 .fx-bar{height:8px;background:#e2e8f0;border-radius:6px;overflow:hidden;margin-top:6px}.fx-bar i{display:block;height:100%;background:#0d9488}
+.fx-sgbox{background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:10px 12px;margin-top:10px}
+.fx-sgbox summary{cursor:pointer;font-weight:700;color:#92400e;font-size:13.5px}
+.fx-sg{display:flex;gap:8px;align-items:flex-start;padding:7px 0;border-top:1px solid #fde68a;font-size:12.5px;color:#334155}
+.fx-sg:first-of-type{border-top:0}.fx-sg b{color:#0f172a}.fx-sg .fx-btn{padding:4px 9px;font-size:12px}
+.fx-ref{font-size:11px;color:#64748b}
 .fx-banner{background:#fef3c7;color:#92400e;border-radius:10px;padding:9px 12px;font-size:13px;margin-bottom:12px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 `;
 document.head.appendChild(css);
@@ -220,7 +227,7 @@ function vActualizar(){
     + '<button class="fx-btn sec" onclick="FX.respaldo()">💾 Respaldo</button><label class="fx-btn sec" style="cursor:pointer">📂 Cargar respaldo<input type="file" accept=".json" style="display:none" onchange="FX.cargarResp(this)"></label></div></div>'
     + '<div class="fx-d" style="margin-top:8px"><b>' + R + ' de ' + T + '</b> paquetes revisados</div><div class="fx-bar"><i style="width:' + Math.round(100 * R / T) + '%"></i></div></div>'
     + '<div class="fx-cols"><div class="fx-card" style="padding:12px"><input class="fx-q" style="font-size:14px;padding:9px 12px;margin-top:0" id="fxKQ" placeholder="Buscar paquete…" value="' + esc(fA.q) + '">'
-    + '<div class="fx-row" style="margin-bottom:8px">' + [['todos','Todos'],['alertas','⚠ Con alertas'],['pend','Sin revisar'],['rev','Revisados']].map(([k, t]) => '<button class="fx-chip' + (fA.filtro === k ? ' on' : '') + '" onclick="FX.fa(\'' + k + '\')">' + t + '</button>').join('') + '</div>'
+    + '<div class="fx-row" style="margin-bottom:8px">' + [['todos','Todos'],['alertas','⚠ Con alertas'],['sug','💡 Con sugerencias'],['pend','Sin revisar'],['rev','Revisados']].map(([k, t]) => '<button class="fx-chip' + (fA.filtro === k ? ' on' : '') + '" onclick="FX.fa(\'' + k + '\')">' + t + '</button>').join('') + '</div>'
     + '<div class="fx-list" id="fxKL"></div></div><div class="fx-card" id="fxKE"></div></div>';
   const q = document.getElementById('fxKQ'); q.addEventListener('input', () => { fA.q = q.value; pintarListaKits(); });
   pintarListaKits(); pintarEditor();
@@ -228,11 +235,11 @@ function vActualizar(){
 function pintarListaKits(){
   const toks = nrm(fA.q).split(/\s+/).filter(Boolean);
   const L = KITS.filter(k => { const e = estadoKit(k); const h = nrm(k.nombre + ' ' + k.categoria);
-    if(fA.filtro === 'alertas' && !e.alertas) return false; if(fA.filtro === 'pend' && e.rev) return false; if(fA.filtro === 'rev' && !e.rev) return false;
+    if(fA.filtro === 'alertas' && !e.alertas) return false; if(fA.filtro === 'pend' && e.rev) return false; if(fA.filtro === 'rev' && !e.rev) return false; if(fA.filtro === 'sug' && !sgKit(k.id).length) return false;
     return toks.every(t => h.indexOf(t) >= 0); });
   document.getElementById('fxKL').innerHTML = L.map(k => { const e = estadoKit(k);
     return '<div class="fx-li' + (fA.kit === k.id ? ' on' : '') + '" onclick="FX.kit(\'' + k.id + '\')">' + (e.rev ? '✅ ' : '') + '<b>' + esc(k.nombre) + '</b><small>' + esc(k.categoria) + ' · ' + lineasKit(k).length + ' insumos'
-      + (e.alertas ? ' · <span style="color:#b45309;font-weight:700">⚠ ' + e.alertas + '</span>' : '') + (e.cambios ? ' · <span style="color:#0f766e;font-weight:700">' + e.cambios + ' cambio' + (e.cambios > 1 ? 's' : '') + '</span>' : '') + '</small></div>'; }).join('')
+      + (e.alertas ? ' · <span style="color:#b45309;font-weight:700">⚠ ' + e.alertas + '</span>' : '') + (e.cambios ? ' · <span style="color:#0f766e;font-weight:700">' + e.cambios + ' cambio' + (e.cambios > 1 ? 's' : '') + '</span>' : '') + (sgKit(k.id).length ? ' · 💡 ' + sgKit(k.id).length : '') + '</small></div>'; }).join('')
     || '<div class="fx-d" style="padding:10px">Sin paquetes con ese filtro.</div>';
 }
 function pintarEditor(){
@@ -242,7 +249,8 @@ function pintarEditor(){
   const pk = P.kits[k.id] || {items: {}, nuevos: []}, cod = POR_COD();
   const filas = lineasKit(k).map(it => {
     const x = (pk.items || {})[it.id] || {}, r = cod[it.id], q = x.q != null ? x.q : it.cantidad;
-    return '<tr class="' + (x.quitar ? 'fx-quitado' : '') + '"><td><b>' + esc(it.id) + '</b></td><td>' + esc(it.nombre) + (it.rep ? ' <span class="fx-pill" style="background:#fef3c7;color:#92400e" title="Esta línea venía repetida en el catálogo">repetida</span>' : '') + (it.nota_cantidad ? '<br><small style="color:#64748b">' + esc(it.nota_cantidad) + '</small>' : '') + '</td>'
+    const sgi = sgKit(k.id).filter(z => z.c === it.id).map(z => SGT[z.t][0]).join(' ');
+    return '<tr class="' + (x.quitar ? 'fx-quitado' : '') + '"><td><b>' + esc(it.id) + '</b>' + (sgi ? ' <span title="Hay una sugerencia para este insumo (ver 💡 arriba)">' + sgi + '</span>' : '') + '</td><td>' + esc(it.nombre) + (it.rep ? ' <span class="fx-pill" style="background:#fef3c7;color:#92400e" title="Esta línea venía repetida en el catálogo">repetida</span>' : '') + (it.nota_cantidad ? '<br><small style="color:#64748b">' + esc(it.nota_cantidad) + '</small>' : '') + '</td>'
       + '<td>' + (r ? pill(r.e) : pill('fuera')) + '</td><td style="text-align:center">' + it.cantidad + '</td>'
       + '<td class="fx-keep"><input class="fx-in" type="number" min="0" value="' + q + '" onchange="FX.cant(\'' + it.id + '\',this.value,' + it.cantidad + ')"' + (x.quitar ? ' disabled' : '') + '></td>'
       + '<td class="fx-keep"><button class="fx-btn ' + (x.quitar ? 'sec' : 'warn') + '" style="padding:5px 10px" onclick="FX.quitar(\'' + it.id + '\')">' + (x.quitar ? '↩ Volver' : '✕ Quitar') + '</button></td>'
@@ -255,6 +263,7 @@ function pintarEditor(){
     + '<div class="fx-row"><button class="fx-btn ' + (pk.rev ? 'sec' : 'ok') + '" onclick="FX.rev()">' + (pk.rev ? '↩ Marcar como pendiente' : '✅ Marcar paquete revisado') + '</button>'
     + '<button class="fx-btn sec" onclick="FX.reset()">Deshacer cambios</button></div></div>'
     + (pk.rev ? '<div class="fx-d" style="margin-top:4px">Revisado por <b>' + esc(pk.por || '—') + '</b> el ' + fmtF(pk.fecha) + '</div>' : '')
+    + cajaSugerencias(k, pk)
     + '<div style="position:relative;margin-top:10px"><input class="fx-q" style="font-size:14px;padding:9px 12px;margin:0" id="fxAdd" placeholder="➕ Agregar insumo al paquete: escribe código o nombre…" autocomplete="off"><div class="fx-sug" id="fxSug" style="display:none"></div></div>'
     + '<div class="fx-tw"><table class="fx-t"><thead><tr><th>Código</th><th>Insumo</th><th>Corte</th><th>Actual</th><th>Propuesta</th><th></th><th>Comentario</th></tr></thead><tbody>' + filas + nuevos + '</tbody></table></div>';
   const a = document.getElementById('fxAdd'), s = document.getElementById('fxSug');
@@ -263,6 +272,27 @@ function pintarEditor(){
     const L = INS.filter(r => r.e !== 'interno' && toks.every(t => r._h.indexOf(t) >= 0)).slice(0, 10);
     s.innerHTML = L.map(r => '<div onclick="FX.agregar(\'' + esc(r.c) + '\')"><b>' + esc(r.c) + '</b> · ' + esc(r.g) + ' ' + pill(r.e) + '</div>').join('') || '<div style="color:#64748b">Sin resultados</div>';
     s.style.display = 'block'; });
+}
+const SGT = {reemplazo: ['🔁', 'Reemplazo'], alto_costo: ['💲', 'Alto costo'], cantidad: ['📉', 'Cantidad'], suturas: ['🧵', 'Suturas'], similares: ['🧩', 'Paquetes parecidos']};
+function cajaSugerencias(k, pk){
+  const L = sgKit(k.id); if(!L.length) return '';
+  const nom = c => { const it = k.items.find(i => i.id === c); return it ? it.nombre : c; };
+  const hecho = c => (pk.items || {})[c] && ((pk.items[c].quitar) || pk.items[c].q != null);
+  const filas = L.map(z => {
+    let acc = '';
+    if(z.t === 'reemplazo') acc = (z.cand || []).map(c => '<div style="margin-top:4px">' + (c.eq ? '✅ misma medida' : '≈ parecido') + ': <b>' + esc(c.c) + '</b> ' + esc(c.g) + (c.paq ? ' <small>(ya en ' + c.paq + ' paquete' + (c.paq > 1 ? 's' : '') + ')</small>' : '')
+      + ' <button class="fx-btn" onclick="FX.sgRee(\'' + esc(z.c) + '\',\'' + esc(c.c) + '\',' + (z.q || 1) + ')">Usar este</button></div>').join('');
+    else if(z.t === 'alto_costo') acc = ' <button class="fx-btn warn" onclick="FX.sgPed(\'' + esc(z.c) + '\')">Pasar a pedido</button>';
+    else if(z.t === 'cantidad') acc = ' <button class="fx-btn" onclick="FX.sgCant(\'' + esc(z.c) + '\',' + z.med + ')">Usar ' + z.med + '</button>';
+    else if(z.t === 'similares') acc = ' <button class="fx-btn sec" onclick="FX.kit(\'' + z.kit + '\')">Abrir «' + esc(z.nom) + '»</button>';
+    const cab = z.c ? '<b>' + esc(z.c) + '</b> ' + esc(nom(z.c)) + (z.pu ? ' · ' + clp(z.pu) : '') + (z.q != null && z.t === 'cantidad' ? ' · hoy ' + z.q : '') + '<br>' : '';
+    return '<div class="fx-sg"' + (z.c && hecho(z.c) ? ' style="opacity:.5"' : '') + '><span style="font-size:16px">' + SGT[z.t][0] + '</span><div style="flex:1">' + cab + esc(z.txt) + acc
+      + ' <span class="fx-ref">[' + z.ref.map(r => Object.keys(SG.refs).indexOf(r) + 1).join(', ') + ']</span></div></div>';
+  }).join('');
+  const refs = [...new Set(L.flatMap(z => z.ref))].map(r => '<div class="fx-ref">[' + (Object.keys(SG.refs).indexOf(r) + 1) + '] ' + esc(SG.refs[r]) + '</div>').join('');
+  return '<details class="fx-sgbox"' + (L.length <= 6 ? ' open' : '') + '><summary>💡 ' + L.length + ' sugerencia' + (L.length > 1 ? 's' : '') + ' para este paquete (literatura × arsenal del HDS)</summary>'
+    + '<div class="fx-d" style="margin:4px 0 6px">Son propuestas, no cambios: se aplican solo si aprietas el botón, y quedan anotadas en el comentario.</div>' + filas
+    + '<details style="margin-top:6px"><summary class="fx-ref" style="font-weight:400;color:#64748b">📚 Referencias</summary>' + refs + '</details></details>';
 }
 function pk(){ const id = fA.kit; P.kits[id] = P.kits[id] || {items: {}, nuevos: []}; P.kits[id].items = P.kits[id].items || {}; P.kits[id].nuevos = P.kits[id].nuevos || []; return P.kits[id]; }
 function refrescar(){ guardarP(); pintarEditor(); pintarListaKits(); }
@@ -377,6 +407,10 @@ window.FX = {
   rev: () => { const x = pk(); x.rev = !x.rev; x.por = P.por; x.fecha = hoy(); if(x.rev && !P.por) setTimeout(() => alert('Anota tu nombre en «Revisado por» (arriba) para que quede registrado.'), 50); refrescar(); },
   reset: () => { if(confirm('¿Deshacer todos los cambios de este paquete?')){ delete P.kits[fA.kit]; refrescar(); } },
   expProp,
+  sgRee: (c, n, q) => { const x = pk(); x.items[c] = x.items[c] || {}; x.items[c].quitar = true; x.items[c].com = 'Reemplazado por ' + n + ' (sugerencia: fuera de corte)';
+    const r = INS.find(z => z.c === n); if(!x.nuevos.some(z => z.c === n)) x.nuevos.push({c: n, g: r ? r.g : '', q: q || 1, com: 'Reemplaza a ' + c}); refrescar(); },
+  sgPed: c => { const x = pk(); x.items[c] = x.items[c] || {}; x.items[c].quitar = true; x.items[c].com = 'Pasa a pedido (sugerencia: alto costo)'; refrescar(); },
+  sgCant: (c, m) => { const x = pk(); x.items[c] = x.items[c] || {}; delete x.items[c].quitar; x.items[c].q = m; x.items[c].com = 'Ajustado a la mediana del HDS (sugerencia)'; refrescar(); },
   respaldo: () => { const b = new Blob([JSON.stringify(P, null, 1)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'Respaldo propuesta paquetes – ' + fmtF(hoy()) + '.json'; a.click(); },
   cargarResp: inp => { const f = inp.files[0]; if(!f) return; const rd = new FileReader(); rd.onload = e => { try { const R = JSON.parse(e.target.result);
       const n = Object.keys(R.kits || {}).length; if(!confirm('El respaldo trae ' + n + ' paquetes con trabajo. Se SUMARÁ a lo que hay en este navegador (si un paquete está en ambos, queda el del respaldo). ¿Continuar?')) return;

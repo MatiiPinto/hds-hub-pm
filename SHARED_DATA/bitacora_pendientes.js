@@ -1,7 +1,7 @@
 // SHARED_DATA/bitacora_pendientes.js — versión publicada en el HUB-PM (saneada por deploy_web_pm.py)
 window.BITACORA = {
  "version": "2026-10-05 · Bitácora y huddle de Puesta en Marcha",
- "generado": "2026-10-22T22:35:15",
+ "generado": "2026-10-26",
  "proposito": "Reunir en un solo lugar los pendientes que hoy viven dispersos en correos, ORD, cartas CS-IF, actas de mesas de trabajo y sesiones de trabajo.",
  "ambitos": [
   "Comunicaciones",
@@ -3762,14 +3762,14 @@ window.BITACORA = {
    "origen_fecha": "2026-10-22",
    "compromiso": "",
    "creado": "2026-10-22",
-   "actualizado": "2026-10-22",
+   "actualizado": "2026-10-26",
    "notas": "",
    "id": "P155",
    "prioridad": "Media",
    "estado": "Abierto",
    "contraparte": "Loreto Pérez · Puesta en Marcha",
    "titulo": "Cabida NHDS · 207 personas en los registros de cabida que no están en la matriz",
-   "detalle": "El cruce por RUT dejó 207 personas que los registros de Puesta en Marcha listan y la matriz de dotación no tiene. La mayoría se explica: 115 son salidas ya detectadas y con causal en la hoja de Egresos, y 43 están en las nóminas SIS de compras de servicio u honorarios. Quedan 49 sin rastro en ninguna fuente, concentradas en Farmacia (11), Gestión de la Demanda (7), la dotación revisada de Pabellón (7) y Toma de Muestras (5). De esas 49, 18 traen contrato de compra de servicios y 21 vienen con la casilla en blanco, varias escritas con el nombre antes del apellido, lo que apunta a gente tipeada a mano y no bajada del SIRH. Hay que preguntarle a Loreto qué vínculo tienen antes de agregar a nadie a la matriz. La planilla para consultar, sin RUT, es la hoja «Fuera de la matriz» de _DOCS/Informes_Servicios/Cabida_NHDS_Cruce_2026-10-22.xlsx."
+   "detalle": "El cruce por RUT dejó 207 personas que los registros de Puesta en Marcha listan y la matriz de dotación no tiene. La mayoría se explica: 115 son salidas ya detectadas y con causal en la hoja de Egresos, y 43 están en las nóminas SIS de compras de servicio u honorarios. Quedan 49 sin rastro en ninguna fuente, concentradas en Farmacia (11), Gestión de la Demanda (7), la dotación revisada de Pabellón (7) y Toma de Muestras (5). De esas 49, 18 traen contrato de compra de servicios y 21 vienen con la casilla en blanco, varias escritas con el nombre antes del apellido, lo que apunta a gente tipeada a mano y no bajada del SIRH. Hay que preguntarle a Loreto qué vínculo tienen antes de agregar a nadie a la matriz. La planilla para consultar, sin RUT, es la hoja «Fuera de la matriz» de _DOCS/Informes_Servicios/Cabida_NHDS_Cruce_2026-10-22.xlsx. Al 26-10, el maestro de enrolamiento de la Inspección Fiscal explicó tres de las 49: Cabrera Cabrera Paulina egresó por sin renovación el 30-04-2026 (ver P158), y Grimaldos Morales Yendery y Henríquez Palma María José tienen acceso SIC vigente sin estar en la dotación (ver P161)."
   },
   {
    "ambito": "Dotación",
@@ -3970,6 +3970,96 @@ window.BITACORA = {
      "texto": "Detectado en el diff de estados entre cortes: 1 cambio en 521 registros."
     }
    ]
+  },
+  {
+   "ambito": "Dotación",
+   "responsable": "Matías",
+   "servicio": "",
+   "origen_tipo": "revisión",
+   "origen_ref": "Archivos de enrolamiento y perfiles SIC de la Inspección Fiscal (corte 19-10-2026)",
+   "origen_fecha": "2026-10-26",
+   "compromiso": "",
+   "creado": "2026-10-26",
+   "actualizado": "2026-10-26",
+   "notas": "",
+   "id": "P158",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "contraparte": "Rodrigo Quijada · Unidad de Dotación",
+   "titulo": "Dotación · dos funcionarios con egreso informado siguen contados como dotación activa",
+   "detalle": "La hoja «Egresos» que viene con los archivos de enrolamiento de la Inspección Fiscal trae tres egresos que la hoja de Rodrigo del 19-10 no tiene. Dos de ellos siguen en la matriz con vínculo TOTAL y sin fecha de alejamiento: Valencia Castro Camilo, auxiliar del Servicio Farmacia, con DESTITUCION al 15-10-2026, y Morales Aravena Branco Antonio, administrativo del Departamento Integral de Atención al Usuario, con SIN RENOVACION al 04-08-2026. El tercero, Cabrera Cabrera Paulina, con SIN RENOVACION al 30-04-2026, no está en la matriz y era una de las 49 personas sin rastro del cruce de la cabida de Loreto (P155): queda explicada. Llama la atención que la copia de la Inspección Fiscal tenga 190 filas y la de Rodrigo 303, y que aun así traiga egresos que la más larga no tiene. Los tres quedaron cargados en dotacion_egresos.json con la procedencia anotada, pero NO se marcó a nadie como egresado en la matriz: eso lo confirma la Unidad de Dotación."
+  },
+  {
+   "ambito": "Dotación",
+   "responsable": "Matías",
+   "servicio": "",
+   "origen_tipo": "revisión",
+   "origen_ref": "Archivos de enrolamiento y perfiles SIC de la Inspección Fiscal (corte 19-10-2026)",
+   "origen_fecha": "2026-10-26",
+   "compromiso": "",
+   "creado": "2026-10-26",
+   "actualizado": "2026-10-26",
+   "notas": "",
+   "id": "P159",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "contraparte": "Inspección Fiscal · usuarios SIC",
+   "titulo": "SIC · 98 funcionarios suben a perfil de jefatura y 19 bajan a usuario",
+   "detalle": "El maestro del 19-10 reclasifica perfiles respecto del corte del 31-08: 98 personas pasan de USUARIO GENERAL a DIRECTIVO Y JEFES UNIDAD y 19 hacen el camino inverso, más 66 que no tenían perfil y ahora sí. El total de perfiles de jefatura sube de 171 a 259. El control de coherencia del cargador pasó al 100 por ciento: los 259 directivos son jefes, coordinadores, supervisores o subdirectores, y los 18 nutricionistas están en Alimentación. Hay que contrastar esos 259 con las 112 jefaturas que declara el maestro de biométricos, porque el arnés acusa 16 incoherencias entre perfil y jefatura declarada (O29) y 26 diferencias con el listado nominal que autorizó la Inspección Fiscal para el plan piloto (O40). La nómina autorizada sigue siendo la del plan piloto de 250 personas."
+  },
+  {
+   "ambito": "Dotación",
+   "responsable": "Matías",
+   "servicio": "",
+   "origen_tipo": "revisión",
+   "origen_ref": "Archivos de enrolamiento y perfiles SIC de la Inspección Fiscal (corte 19-10-2026)",
+   "origen_fecha": "2026-10-26",
+   "compromiso": "",
+   "creado": "2026-10-26",
+   "actualizado": "2026-10-26",
+   "notas": "",
+   "id": "P160",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "contraparte": "Inspección Fiscal · usuarios SIC",
+   "titulo": "SIC · el enrolamiento no avanzó entre agosto y octubre: 1.273 funcionarios sin ID propio",
+   "detalle": "En el maestro del 19-10, 1.736 personas traen un identificador propio del sistema de control de acceso y 1.273 traen el cuerpo del RUT como relleno, que es la marca de que todavía no están enroladas. Contra el corte del 31-08 no hay ni un enrolamiento nuevo: cuatro personas incluso perdieron el identificador propio que tenían. Si el enrolamiento es requisito para operar el control de acceso del edificio nuevo, al ritmo actual no alcanza. Conviene preguntar por el plan y el plazo antes de la marcha blanca. Aparte, hay un caso con identificador distinto al de biométricos (RUT [RUT]) que el arnés acusa en O32."
+  },
+  {
+   "ambito": "Dotación",
+   "responsable": "Matías",
+   "servicio": "",
+   "origen_tipo": "revisión",
+   "origen_ref": "Archivos de enrolamiento y perfiles SIC de la Inspección Fiscal (corte 19-10-2026)",
+   "origen_fecha": "2026-10-26",
+   "compromiso": "",
+   "creado": "2026-10-26",
+   "actualizado": "2026-10-26",
+   "notas": "",
+   "id": "P161",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "contraparte": "Inspección Fiscal · usuarios SIC",
+   "titulo": "SIC · 17 personas con acceso al hospital que no están en la dotación",
+   "detalle": "El maestro del 19-10 trae 17 personas que la matriz no tiene, todas con empresa HDS y perfil USUARIO GENERAL: nueve enfermeras, dos kinesiólogos, dos auxiliares, un tecnólogo médico, un técnico de nivel superior, un administrativo y un docente de la Universidad de Chile. Tres de ellas resuelven casos que estaban abiertos: Gatica Lagos José Miguel aparece en Unidad Emergencia como enfermera, y es el titular del primer cargo del registro de reemplazos de la UEH que no figuraba en ninguna fuente; Grimaldos Morales Yendery y Henríquez Palma María José estaban entre las 49 sin rastro del cruce de la cabida (P155). Hay que preguntar si son dotación que falta en el Excel, compras de servicio o personal externo, porque hoy tienen acceso y no cuentan en ningún conteo."
+  },
+  {
+   "ambito": "Dotación",
+   "responsable": "Matías",
+   "servicio": "",
+   "origen_tipo": "revisión",
+   "origen_ref": "Archivos de enrolamiento y perfiles SIC de la Inspección Fiscal (corte 19-10-2026)",
+   "origen_fecha": "2026-10-26",
+   "compromiso": "",
+   "creado": "2026-10-26",
+   "actualizado": "2026-10-26",
+   "notas": "",
+   "id": "P162",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "contraparte": "Rodrigo Quijada · Unidad de Dotación",
+   "titulo": "Dotación · 15 funcionarios de dotación titular sin registro en el control de acceso",
+   "detalle": "Quince personas con vínculo TOTAL en la matriz no aparecen en el maestro del control de acceso del 19-10, así que hoy no tendrían credencial para el edificio nuevo: cuatro médicos (Imagenología, UTI, Anestesia y Servicio de Medicina), cinco auxiliares (Operaciones, Bodega de Medicamentos, Paciente Crítico, Movilización y Farmacia), tres profesionales (Cuidados Médicos, Cuidados Ambulatorios Neurológicos y Licencias Médicas), un administrativo del DIAU y dos más de Cuidados Quirúrgicos y Paciente Crítico. Dos de los quince son justamente los del P158, que según la Inspección Fiscal ya egresaron. Los otros trece hay que enrolarlos o explicar por qué no están."
   }
  ],
  "criticos": [
