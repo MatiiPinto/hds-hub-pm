@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<script src="pm_config.js"></script>
+<script src="pm_gate.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HDS · Organigrama · RE-1674</title>
+<link rel="icon" type="image/png" href="Logos%20HUB-HDS/favicon-nhds-amarillo-64.png">
+<link rel="icon" type="image/png" sizes="512x512" href="Logos%20HUB-HDS/favicon-nhds-amarillo-512.png">
+<link rel="shortcut icon" href="Logos%20HUB-HDS/favicon-nhds-amarillo-64.png">
+<link rel="apple-touch-icon" href="Logos%20HUB-HDS/favicon-nhds-amarillo-512.png">
+
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{
+    --inst:#1D2D5B; --inst-2:#2a3f7a; --bg:#f4f6fa; --text:#1e293b; --muted:#64748b;
+    --med:#dc2626; --adm:#d97706; --gc:#0891b2; --adt:#7c3aed; --per:#16a34a; --dir:#1D2D5B;
+  }
+  body{background:var(--bg);color:var(--text);font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+
+  /* ── HEADER ── */
+  #hdr{background:linear-gradient(180deg,var(--inst) 0%,var(--inst-2) 100%);padding:0 20px;height:62px;display:flex;align-items:center;gap:14px;flex-shrink:0;box-shadow:0 2px 12px rgba(0,0,0,.18);position:sticky;top:0;z-index:60}
+  #hdr a.hubBtn{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);color:#fff;text-decoration:none;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px;transition:all .15s}
+  #hdr a.hubBtn:hover{background:rgba(255,255,255,.22)}
+  #hdr h1{font-size:17px;font-weight:800;color:#fff;letter-spacing:.3px;display:flex;align-items:center;gap:10px}
+  #hdr h1 .logo{width:30px;height:30px;background:#fff;border-radius:8px;color:var(--inst);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px}
+  .hdr-sep{width:1px;height:36px;background:rgba(255,255,255,.18)}
+  .res-chip{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:9px;padding:5px 10px 5px 12px;display:flex;align-items:center;gap:8px;cursor:pointer;transition:all .15s}
+  .res-chip:hover{background:rgba(255,255,255,.22)}
+  .res-chip .lbl{font-size:9px;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.7px;font-weight:700}
+  .res-chip strong{color:#fff;font-size:13px;font-weight:800;line-height:1.1}
+  .res-chip .date{color:#bfdbfe;font-size:10px;margin-top:1px}
+  .res-chip svg{opacity:.8}
+  .hdr-spacer{flex:1}
+  .hdr-stat{font-size:10px;color:#bfdbfe;text-align:center}
+  .hdr-stat strong{display:block;font-size:16px;color:#fff;font-weight:800}
+  #gSearch{position:relative;flex:1;max-width:320px}
+  #gSearchInput{width:100%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:22px;color:#fff;padding:7px 12px 7px 34px;font-size:12.5px;outline:none}
+  #gSearchInput::placeholder{color:rgba(255,255,255,.5)}
+  #gSearchInput:focus{background:rgba(255,255,255,.2);border-color:#bfdbfe}
+  #gSearchIcon{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;color:rgba(255,255,255,.7)}
+  #gSearchDrop{position:absolute;left:0;right:0;top:calc(100% + 4px);background:#fff;border:1px solid #cbd5e1;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.15);z-index:600;display:none;max-height:340px;overflow-y:auto}
+  .sr-item{padding:8px 12px;cursor:pointer;border-bottom:1px solid #f1f5f9}
+  .sr-item:last-child{border-bottom:none}
+  .sr-item:hover{background:#eff6ff}
+  .sr-item strong{display:block;font-size:12.5px;color:#1e293b;font-weight:700}
+  .sr-item span{font-size:10.5px;color:#64748b;display:block;margin-top:2px}
+
+  /* Modal resolución */
+  .modal-mask{position:fixed;inset:0;background:rgba(2,6,23,.55);display:none;align-items:flex-start;justify-content:center;z-index:200;padding:60px 20px}
+  .modal-mask.open{display:flex}
+  .modal{background:#fff;border-radius:14px;max-width:740px;width:100%;box-shadow:0 22px 60px rgba(0,0,0,.28);overflow:hidden;max-height:85vh;display:flex;flex-direction:column}
+  .modal-hd{padding:18px 22px;background:linear-gradient(180deg,var(--inst) 0%,var(--inst-2) 100%);color:#fff;display:flex;align-items:center;justify-content:space-between}
+  .modal-hd h2{font-size:17px;font-weight:800;letter-spacing:.3px}
+  .modal-x{background:rgba(255,255,255,.15);border:none;color:#fff;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:15px;font-weight:700}
+  .modal-x:hover{background:rgba(255,255,255,.25)}
+  .modal-bd{padding:22px;overflow:auto;font-size:13px;line-height:1.55}
+  .modal-bd h3{font-size:13px;font-weight:800;color:var(--inst);margin:14px 0 8px;letter-spacing:.3px;text-transform:uppercase}
+  .modal-bd h3:first-child{margin-top:0}
+  .modal-bd ul{padding-left:20px;margin:4px 0 10px}
+  .modal-bd li{margin-bottom:4px;color:#334155}
+  .modal-bd code{background:#f1f5f9;border-radius:5px;padding:1px 6px;font-size:11.5px;color:#1e293b}
+  .modal-bd .director-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:12px;margin-bottom:12px}
+  .modal-bd .director-card .avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#1D2D5B,#2a3f7a);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800}
+  .modal-bd .director-card .lbl{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+  .modal-bd .director-card .name{font-size:14px;font-weight:800;color:#1e293b}
+  .modal-bd .pill{display:inline-block;background:#eff6ff;color:#1D2D5B;border-radius:9px;padding:3px 9px;font-size:10.5px;font-weight:700;margin-right:5px}
+
+  /* ── NAV TABS (subdirecciones) ── */
+  #subnav{background:#fff;border-bottom:1px solid #e2e8f0;padding:0 20px;display:flex;gap:6px;overflow-x:auto;position:sticky;top:62px;z-index:50;box-shadow:0 1px 0 #e2e8f0}
+  .tab{padding:14px 14px 12px;font-size:13px;font-weight:700;color:#64748b;cursor:pointer;display:flex;align-items:center;gap:8px;border-bottom:3px solid transparent;white-space:nowrap;flex-shrink:0;transition:all .15s}
+  .tab:hover{color:#1e293b;background:#f8fafc}
+  .tab.active{color:#1e293b}
+  .tab .dot{width:10px;height:10px;border-radius:50%;display:inline-block;flex-shrink:0}
+  .tab[data-org="direccion"].active{border-bottom-color:var(--dir);color:var(--dir)}
+  .tab[data-org="medica"].active{border-bottom-color:var(--med);color:var(--med)}
+  .tab[data-org="administrativa"].active{border-bottom-color:var(--adm);color:var(--adm)}
+  .tab[data-org="gestion-cuidado"].active{border-bottom-color:var(--gc);color:var(--gc)}
+  .tab[data-org="apoyo-diag-ter"].active{border-bottom-color:var(--adt);color:var(--adt)}
+  .tab[data-org="personas"].active{border-bottom-color:var(--per);color:var(--per)}
+  .tab .badge{background:#f1f5f9;color:#64748b;font-size:10px;padding:2px 7px;border-radius:9px;font-weight:700}
+  .tab.active .badge{background:#eff6ff;color:#1D2D5B}
+
+  /* ── MAIN ── */
+  #main{flex:1;padding:22px 20px 80px;overflow-x:auto}
+  .panel{max-width:1700px;margin:0 auto}
+  .panel-hdr{display:flex;align-items:flex-start;gap:18px;margin-bottom:22px;padding:0 8px}
+  .panel-hdr .icon-big{width:54px;height:54px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:24px;color:#fff;font-weight:800;box-shadow:0 6px 18px rgba(0,0,0,.12)}
+  .panel-hdr .title{font-size:22px;font-weight:800;color:#0f172a;letter-spacing:.2px;line-height:1.18}
+  .panel-hdr .subtitle{font-size:12.5px;color:#64748b;margin-top:3px;font-weight:500}
+  .panel-hdr .panel-meta{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .panel-meta .meta-chip{background:#fff;border:1px solid #e2e8f0;border-radius:8px;padding:6px 11px;font-size:11px}
+  .panel-meta .meta-chip strong{display:block;font-size:14px;color:#0f172a;font-weight:800;letter-spacing:.2px;line-height:1.05}
+  .panel-meta .meta-chip span{display:block;font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-top:2px;font-weight:700}
+  .view-switch{display:flex;gap:0;border:1px solid #e2e8f0;background:#fff;border-radius:9px;overflow:hidden}
+  .view-switch button{background:transparent;border:none;padding:7px 12px;font-size:11.5px;font-weight:700;color:#64748b;cursor:pointer;transition:all .15s}
+  .view-switch button:hover{background:#f8fafc}
+  .view-switch button.active{background:var(--inst);color:#fff}
+
+  /* ── ORGCHART zoom-pan canvas ── */
+  .org-canvas{background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;position:relative;cursor:grab;user-select:none;min-height:540px;height:calc(100vh - 272px)}
+  .org-canvas.dragging{cursor:grabbing}
+
+/* ── Nodos estilo PDF (Organigrama_HDS_doble_carta) ───────────────── */
+.pdfn{box-sizing:border-box;display:flex;align-items:center;justify-content:center;
+      text-align:center;border-radius:7px;cursor:pointer;overflow:hidden;
+      padding:4px 8px;transition:box-shadow .15s,transform .12s,filter .15s;}
+.pdfn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(15,40,50,.18);filter:brightness(1.04);z-index:5}
+.pdfn-tx{line-height:1.18;font-weight:700;letter-spacing:.2px;text-transform:uppercase}
+.pdfn-cnt{position:absolute;top:3px;right:5px;font-size:8.5px;font-weight:800;
+          background:rgba(255,255,255,.85);color:#125f5b;border-radius:8px;padding:0 4px;line-height:13px}
+/* raíz y línea: teal sólido, texto blanco */
+.pdfn-root{background:#17807B;color:#fff;border:1px solid #12645f;font-size:14px}
+.pdfn-root .pdfn-tx{font-size:14px}
+.pdfn-l2{background:#1E7F7A;color:#fff;border:1px solid #17706b}
+.pdfn-l2 .pdfn-tx{font-size:11px}
+/* nivel 3+: celeste claro, texto oscuro */
+.pdfn-l3{background:#D7E7EC;color:#123c47;border:1px solid #b9d2da}
+.pdfn-l3 .pdfn-tx{font-size:10px;font-weight:600}
+.pdfn-l3 .pdfn-cnt{background:#17807B;color:#fff}
+/* asesorías: punteado, muy claro */
+.pdfn-staff{background:#EFF5F5;color:#33555e;border:1px dashed #9db9c2}
+.pdfn-staff .pdfn-tx{font-size:9px;font-weight:600}
+.pdfn-staff .pdfn-cnt{background:#17807B;color:#fff}
+.pdfn.is-new{outline:2px solid #f59e0b;outline-offset:1px}
+  #zpWrapper{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform}
+  .zp-controls{position:absolute;bottom:14px;right:14px;z-index:10;display:flex;gap:6px;align-items:center}
+  .zp-btn{background:#fff;border:1px solid #cbd5e1;border-radius:8px;width:32px;height:32px;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.09);font-weight:800;color:#1D2D5B;transition:all .15s;line-height:1}
+  .zp-btn:hover{background:#eff6ff;border-color:#93c5fd}
+  .zp-scale{font-size:10px;color:#64748b;background:#fff;border:1px solid #cbd5e1;border-radius:8px;padding:0 10px;height:32px;display:flex;align-items:center;font-weight:700;min-width:52px;justify-content:center}
+  .org-hint{position:absolute;bottom:14px;left:14px;font-size:10px;color:#94a3b8;z-index:10;pointer-events:none;background:rgba(255,255,255,.8);border-radius:6px;padding:3px 8px}
+
+  /* Casillas (cards) — optimizadas y claras */
+  .ocell{position:relative;background:#fff;border:1.5px solid #cbd5e1;border-radius:11px;min-width:210px;max-width:240px;display:flex;flex-direction:column;cursor:pointer;transition:all .18s;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .ocell:hover{transform:translateY(-2px);box-shadow:0 8px 22px rgba(0,0,0,.12);border-color:#94a3b8}
+  .ocell .ocell-band{height:5px;width:100%}
+  .ocell .ocell-body{padding:11px 13px}
+  .ocell .ocell-type{font-size:9px;color:#64748b;text-transform:uppercase;letter-spacing:.7px;font-weight:800;display:flex;align-items:center;gap:5px;margin-bottom:5px}
+  .ocell .ocell-type .typedot{width:6px;height:6px;border-radius:50%;display:inline-block}
+  .ocell .ocell-name{font-size:12.5px;font-weight:800;color:#0f172a;line-height:1.22;letter-spacing:.1px}
+  .ocell .ocell-meta{margin-top:8px;display:flex;align-items:center;gap:8px;font-size:10.5px;color:#64748b;border-top:1px dashed #e2e8f0;padding-top:7px}
+  .ocell .ocell-meta .dotation{display:flex;align-items:center;gap:4px;font-weight:700}
+  .ocell .ocell-meta .dotation strong{color:#0f172a;font-size:11.5px}
+  .ocell .drill{margin-left:auto;background:#f1f5f9;color:#1D2D5B;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;transition:all .15s}
+  .ocell:hover .drill{background:var(--accent,#1D2D5B);color:#fff}
+
+  /* Variants por nivel */
+  .ocell.lv-direccion{min-width:280px;max-width:320px}
+  .ocell.lv-direccion .ocell-body{padding:14px 16px}
+  .ocell.lv-direccion .ocell-name{font-size:15px}
+  .ocell.lv-subdir{min-width:240px;max-width:280px}
+  .ocell.lv-subdir .ocell-name{font-size:13.5px}
+  .ocell.lv-depto .ocell-name{font-size:12px}
+  .ocell.lv-unidad{min-width:180px;max-width:210px}
+  .ocell.lv-unidad .ocell-name{font-size:11px}
+  .ocell.lv-area{min-width:150px;max-width:180px;background:#fafbfc;border-style:dashed}
+  .ocell.lv-area .ocell-name{font-size:10.5px}
+  .ocell.lv-apoyo{background:#fffbeb;border-color:#fde68a;border-style:dashed;min-width:160px;max-width:200px}
+  .ocell.lv-apoyo .ocell-name{font-size:10.5px;color:#78350f}
+  .ocell.lv-apoyo .ocell-type{color:#92400e}
+  .ocell.is-new{border-color:#10b981;background:linear-gradient(180deg,#ecfdf5,#fff 40%)}
+  .ocell.is-new::after{content:'NUEVO · RE-1674';position:absolute;top:-7px;right:8px;background:#10b981;color:#fff;font-size:8px;font-weight:800;padding:2px 7px;border-radius:9px;letter-spacing:.4px}
+
+  /* Color por subdirección */
+  .org-direccion .ocell.lv-subdir .ocell-band{background:var(--dir)}
+  .org-direccion .ocell.lv-direccion .ocell-band{background:linear-gradient(90deg,var(--dir),var(--inst-2))}
+  .org-medica .ocell .ocell-band{background:var(--med)}
+  .org-administrativa .ocell .ocell-band{background:var(--adm)}
+  .org-gestion-cuidado .ocell .ocell-band{background:var(--gc)}
+  .org-apoyo-diag-ter .ocell .ocell-band{background:var(--adt)}
+  .org-personas .ocell .ocell-band{background:var(--per)}
+
+  /* Sub-org panels color band */
+  .org-medica          .panel-hdr .icon-big{background:linear-gradient(135deg,#dc2626,#991b1b)}
+  .org-administrativa  .panel-hdr .icon-big{background:linear-gradient(135deg,#d97706,#92400e)}
+  .org-gestion-cuidado .panel-hdr .icon-big{background:linear-gradient(135deg,#0891b2,#0e7490)}
+  .org-apoyo-diag-ter  .panel-hdr .icon-big{background:linear-gradient(135deg,#7c3aed,#5b21b6)}
+  .org-personas        .panel-hdr .icon-big{background:linear-gradient(135deg,#16a34a,#15803d)}
+  .org-direccion       .panel-hdr .icon-big{background:linear-gradient(135deg,#1D2D5B,#2a3f7a)}
+
+  /* Panel staff modal */
+  .staff-panel{display:none;position:fixed;top:0;right:0;height:100vh;width:420px;background:#fff;box-shadow:-12px 0 30px rgba(0,0,0,.18);z-index:90;flex-direction:column;border-left:1px solid #e2e8f0}
+  .staff-panel.open{display:flex}
+  .staff-hd{padding:16px 20px;border-bottom:1px solid #e2e8f0;background:#fff;flex-shrink:0}
+  .staff-hd .stype{font-size:9px;text-transform:uppercase;letter-spacing:.7px;color:#64748b;font-weight:800;margin-bottom:3px;display:flex;align-items:center;gap:6px}
+  .staff-hd .sname{font-size:16.5px;font-weight:800;color:#0f172a;line-height:1.18}
+  .staff-hd .smeta{font-size:11.5px;color:#64748b;margin-top:5px;display:flex;gap:10px;flex-wrap:wrap}
+  .staff-hd .smeta span strong{color:#0f172a}
+  .staff-x{position:absolute;top:14px;right:14px;background:#f1f5f9;border:none;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700}
+  .staff-x:hover{background:#e2e8f0}
+  .staff-bd{flex:1;overflow-y:auto;padding:14px 20px}
+  .staff-row{display:flex;align-items:flex-start;gap:11px;padding:9px 0;border-bottom:1px solid #f1f5f9}
+  .staff-row:last-child{border-bottom:none}
+  .staff-row .avatar{width:34px;height:34px;border-radius:50%;background:var(--accent,#1D2D5B);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;text-transform:uppercase}
+  .staff-row .info{flex:1;min-width:0}
+  .staff-row .info .nm{font-size:12px;font-weight:700;color:#0f172a;line-height:1.2}
+  .staff-row .info .cg{font-size:10.5px;color:#475569;margin-top:2px;line-height:1.25}
+  .staff-row .info .em{font-size:10.5px;margin-top:3px;color:#1D2D5B}
+  .staff-row .info .em a{color:#2563eb;text-decoration:none}
+  .staff-row .info .em a:hover{text-decoration:underline}
+  .staff-empty{text-align:center;padding:40px 20px;color:#64748b;font-size:12px}
+  .staff-foot{padding:12px 20px;border-top:1px solid #e2e8f0;background:#f8fafc;font-size:10.5px;color:#64748b}
+
+  /* Toolbar */
+  .panel-info{background:#eff6ff;border:1px solid #dbeafe;border-left:4px solid var(--accent,#1D2D5B);border-radius:9px;padding:11px 14px;margin-bottom:16px;display:flex;align-items:flex-start;gap:11px;font-size:12px;color:#1e3a8a}
+  .panel-info svg{flex-shrink:0;margin-top:2px}
+  .panel-info strong{display:block;margin-bottom:2px}
+
+  /* Footer mini */
+  #footer{text-align:center;padding:24px 16px 12px;font-size:11px;color:#64748b;background:#f4f6fa}
+  #footer a{color:#1D2D5B;font-weight:700;text-decoration:none}
+
+  @media (max-width:900px){
+    #hdr{flex-wrap:wrap;height:auto;padding:8px 14px;gap:8px}
+    #hdr h1{font-size:14px}
+    .res-chip strong{font-size:11.5px}
+    #gSearch{order:10;max-width:none;flex-basis:100%}
+    .panel-hdr{flex-direction:column}
+    .panel-hdr .panel-meta{margin-left:0;width:100%}
+    .ocell.lv-direccion{min-width:240px}
+  }
+
+  /* ── Selector de organigrama (HDS · Puesta en Marcha · Concesionado) y vistas extra ── */
+  #orgSwitch{background:#eef2f9;border-bottom:1px solid #e2e8f0;padding:8px 20px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  #orgSwitch .lbl{font-size:10.5px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.6px;margin-right:4px}
+  #orgSwitch button{border:1px solid #cbd5e1;background:#fff;border-radius:20px;padding:6px 14px;font-size:12px;font-weight:700;color:#334155;cursor:pointer}
+  #orgSwitch button.on{background:var(--inst);border-color:var(--inst);color:#fff}
+  #altView{padding:22px 20px 80px;display:none}
+  .ox{--azul:#E3EEFB;--azulB:#9cc2ee;--verde:#E3F4EA;--verdeB:#97d3b1;--durazno:#FDEBDD;--duraznoB:#f2b88d;--lila:#ECE7FA;--lilaB:#b8a8ea;--navy:#1F2A55;max-width:1750px;margin:0 auto;color:#1F2A55}
+  .ox h2{font-size:22px;font-weight:800;margin:0}
+  .ox .sub{font-size:12.5px;color:#64748b;margin:3px 0 18px}
+  .ox .sec{font-size:13px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;margin:22px 0 10px}
+  .ox .card{border-radius:14px;padding:10px 14px;border:1px solid transparent;box-shadow:0 1px 2px rgba(31,42,85,.06)}
+  .ox .c-azul{background:var(--azul);border-color:var(--azulB)} .ox .c-verde{background:var(--verde);border-color:var(--verdeB)}
+  .ox .c-durazno{background:var(--durazno);border-color:var(--duraznoB)} .ox .c-lila{background:var(--lila);border-color:var(--lilaB)}
+  .ox .c-navy{background:var(--navy);color:#fff}
+  .ox .fases{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .ox .fase .n{display:inline-flex;width:30px;height:30px;border-radius:50%;background:#fff;color:#1F2A55;font-weight:900;align-items:center;justify-content:center;margin-right:8px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .ox .fase .t{font-weight:800;font-size:14.5px}
+  .ox .fase .w{font-size:11px;color:#475569;margin:2px 0 6px 38px}
+  .ox .fase ul{margin:6px 0 0 18px;padding:0;font-size:12px;line-height:1.5}
+  /* árbol */
+  .ox .tree{overflow-x:auto;padding:6px 4px 14px}
+  .ox .tree ul{display:flex;justify-content:center;padding-top:22px;position:relative;margin:0;padding-left:0}
+  .ox .tree li{list-style:none;position:relative;padding:22px 7px 0;display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+  .ox .tree li::before,.ox .tree li::after{content:'';position:absolute;top:0;right:50%;border-top:2px solid #b6c3d9;width:50%;height:22px}
+  .ox .tree li::after{right:auto;left:50%;border-left:2px solid #b6c3d9}
+  .ox .tree li:only-child::after,.ox .tree li:only-child::before{display:none}
+  .ox .tree li:only-child{padding-top:0}
+  .ox .tree li:first-child::before,.ox .tree li:last-child::after{border:0 none}
+  .ox .tree li:last-child::before{border-right:2px solid #b6c3d9;border-radius:0 7px 0 0}
+  .ox .tree li:first-child::after{border-radius:7px 0 0 0}
+  .ox .tree ul ul::before{content:'';position:absolute;top:0;left:50%;border-left:2px solid #b6c3d9;height:22px}
+  .ox .tree .in{width:max-content;min-width:100%;margin:0 auto}
+  .ox .tree .in > ul{padding-top:22px}
+  .ox .tree .in > ul::before{content:'';position:absolute;top:0;left:50%;border-left:2px solid #b6c3d9;height:22px}
+  .ox .nodo{min-width:132px;max-width:210px;text-align:center}
+  .ox .nodo .t{font-weight:800;font-size:13px;line-height:1.2}
+  .ox .nodo .s{font-size:10.5px;opacity:.75;margin-top:2px}
+  .ox .nodo .pp{margin-top:6px;display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+  .ox .nodo .pp span{background:rgba(255,255,255,.75);border-radius:10px;padding:2px 7px;font-size:10.5px;font-weight:600;color:#1F2A55}
+  .ox .nodo .q{display:inline-block;margin-top:5px;font-size:9.5px;font-weight:800;color:#B45309;background:#fff7ed;border:1px dashed #f2b88d;border-radius:8px;padding:1px 6px;cursor:help}
+  .ox .raiz{display:flex;justify-content:center;position:relative}
+  .ox .raiz .lado{position:absolute;left:calc(50% + 120px);top:50%;transform:translateY(-50%)} .ox .raiz .lado::before{content:'';position:absolute;right:100%;top:50%;width:16px;border-top:2px dashed #b6c3d9}
+  .ox .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  .ox .tv .t{font-weight:800;font-size:13px} .ox .tv .p{font-size:11.5px;color:#334155;margin-top:3px}
+  .ox .ok{font-size:10px;font-weight:800;color:#0E7C66;background:#fff;border-radius:8px;padding:1px 6px;margin-left:6px}
+  .ox .agenda{display:flex;gap:8px;flex-wrap:wrap} .ox .agenda span{background:#fff;border:1px solid #cbd5e1;border-radius:18px;padding:5px 12px;font-size:12px;font-weight:700}
+  .ox .flujo{display:flex;align-items:stretch;gap:0;flex-wrap:wrap}
+  .ox .flujo .card{flex:1;min-width:170px} .ox .flujo .fl{display:flex;align-items:center;padding:0 6px;font-size:20px;color:#94a3b8}
+  .ox .cat{margin-bottom:12px} .ox .cat .ct{font-weight:800;font-size:13px;margin-bottom:8px}
+  .ox .serv{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+  .ox .serv div{background:#fff;border-radius:11px;padding:8px 11px;font-size:12px;font-weight:600;display:flex;gap:8px;align-items:center}
+  .ox .serv b{display:inline-flex;min-width:26px;height:26px;border-radius:50%;align-items:center;justify-content:center;font-size:11px;background:#1F2A55;color:#fff}
+  .ox .nota{font-size:11.5px;color:#475569;margin-top:10px}
+  @media (max-width:900px){.ox .fases,.ox .grid{grid-template-columns:1fr 1fr}}
+
+  /* ── Editor de organigrama por widgets (vista Puesta en Marcha) ── */
+  #oeHost{position:relative}
+  .oe-bar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+  .oe-b{border:1px solid #cbd5e1;background:#fff;border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;color:#1F2A55;cursor:pointer}
+  .oe-b.on{background:#1F2A55;color:#fff;border-color:#1F2A55} .oe-b:disabled{opacity:.4;cursor:default}
+  .oe-sp{flex:1} .oe-z{font-size:11.5px;font-weight:700;color:#64748b;min-width:42px;text-align:center}
+  .oe-ayuda{font-size:11.5px;color:#1F2A55;background:#E3EEFB;border:1px solid #9cc2ee;border-radius:9px;padding:6px 10px;margin-bottom:8px}
+  .oe-wrap{overflow:auto;background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px}
+  .oe-lienzo{position:relative;transform-origin:0 0}
+  .oe-lienzo svg{position:absolute;left:0;top:0;overflow:visible}
+  .oe-lienzo path{fill:none;stroke:#b6c3d9;stroke-width:2;stroke-linejoin:round} .oe-lienzo path.lat{stroke-dasharray:5 4}
+  .ow{position:absolute;border-radius:14px;padding:8px 10px;border:1px solid transparent;box-shadow:0 1px 3px rgba(31,42,85,.08);overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#1F2A55;transition:box-shadow .15s,transform .15s}
+  .ow.c-azul{background:#E3EEFB;border-color:#9cc2ee} .ow.c-verde{background:#E3F4EA;border-color:#97d3b1} .ow.c-durazno{background:#FDEBDD;border-color:#f2b88d}
+  .ow.c-lila{background:#ECE7FA;border-color:#b8a8ea} .ow.c-navy{background:#1F2A55;color:#fff}
+  .ow .t{font-weight:800;font-size:12.5px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .ow.zL .t{font-size:14px} .ow .s{font-size:10px;opacity:.75;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .ow .pp{margin-top:5px;display:flex;flex-wrap:wrap;gap:3px;justify-content:center;overflow:hidden;max-height:40px} .ow.zS .pp{max-height:19px} .ow.zL .pp{max-height:62px}
+  .ow .pp span{background:rgba(255,255,255,.78);border-radius:9px;padding:1px 6px;font-size:9.8px;font-weight:600;color:#1F2A55;white-space:nowrap}
+  .ow .q{position:absolute;top:4px;right:5px;width:9px;height:9px;border-radius:50%;background:#f59e0b;font-size:0;cursor:help}
+  .ow.sel{box-shadow:0 0 0 3px #2563eb,0 6px 16px rgba(31,42,85,.18);z-index:2}
+  .ow[draggable="true"]{cursor:grab} .ow.drag{opacity:.4} .ow.drop{box-shadow:0 0 0 3px #10b981;transform:scale(1.04)}
+  .oe-panel{position:fixed;right:18px;top:120px;width:290px;background:#fff;border:1px solid #cbd5e1;border-radius:14px;box-shadow:0 12px 32px rgba(31,42,85,.18);padding:12px 14px;z-index:90;font-size:12px;color:#1F2A55;max-height:calc(100vh - 140px);overflow:auto}
+  .oe-ph{font-weight:800;font-size:13.5px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .oe-ph button{border:none;background:#f1f5f9;border-radius:50%;width:24px;height:24px;cursor:pointer;font-size:15px}
+  .oe-panel label{display:block;font-weight:700;margin:8px 0 2px} .oe-panel small{font-weight:500;color:#64748b}
+  .oe-panel input:not([type=checkbox]),.oe-panel textarea{width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:8px;padding:6px 8px;font:inherit;font-weight:500;margin-top:3px}
+  .oe-l{font-weight:700;margin:9px 0 4px} .oe-seg{display:flex;gap:4px} .oe-seg button{flex:1;border:1px solid #cbd5e1;background:#fff;border-radius:8px;padding:5px;font-weight:800;cursor:pointer}
+  .oe-seg button.on{background:#1F2A55;color:#fff;border-color:#1F2A55}
+  .oe-col{display:flex;gap:6px} .oe-col button{width:30px;height:30px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #cbd5e1;cursor:pointer}
+  .oe-col button.c-azul{background:#E3EEFB}.oe-col button.c-verde{background:#E3F4EA}.oe-col button.c-durazno{background:#FDEBDD}.oe-col button.c-lila{background:#ECE7FA}.oe-col button.c-navy{background:#1F2A55}
+  .oe-col button.on{box-shadow:0 0 0 3px #2563eb}
+  .oe-panel .oe-chk{display:flex;gap:6px;align-items:center;font-weight:600}
+  .oe-acc{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:12px} .oe-acc button{border:1px solid #cbd5e1;background:#f8fafc;border-radius:8px;padding:7px;font-weight:700;font-size:11.5px;cursor:pointer;color:#1F2A55}
+  .oe-acc button:first-child,.oe-acc button[data-a=hermano]{grid-column:1/-1}.oe-acc button:first-child{background:#E3F4EA;border-color:#97d3b1} .oe-acc .rojo{grid-column:1/-1;color:#b91c1c;background:#fef2f2;border-color:#fecaca}
+</style>
+</head>
+<body>
+
+<!-- SHARED_DATA matrices -->
+<script src="data/organigrama.js"></script>
+<script src="SHARED_DATA/dotacion.js"></script>
+<script src="SHARED_DATA/directorio_huerfanos.js"></script>
+
+<!-- ═════ HEADER ═════ -->
+<header id="hdr">
+  <a class="hubBtn" href="index.html" title="Volver al HUB">
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    HUB
+  </a>
+  <h1 onclick="setOrg('direccion')"><span class="logo">H</span> HDS · Organigrama</h1>
+  <div class="hdr-sep"></div>
+  <div class="res-chip" onclick="document.getElementById('resModal').classList.add('open')" title="Ver detalles de la Resolución Exenta">
+    <div>
+      <div class="lbl">Resolución Exenta</div>
+      <strong>RE-1674</strong>
+      <div class="date">18 · MAY · 2026</div>
+    </div>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+  </div>
+  <div class="hdr-sep"></div>
+  <div class="hdr-stat"><strong id="statTotal">—</strong>funcionarios</div>
+  <div class="hdr-sep"></div>
+  <div id="gSearch">
+    <span id="gSearchIcon">🔍</span>
+    <input id="gSearchInput" type="text" placeholder="Buscar funcionario, servicio, unidad…" autocomplete="off">
+    <div id="gSearchDrop"></div>
+  </div>
+  <div class="hdr-spacer"></div>
+</header>
+
+<!-- ═════ NAV: Subdirecciones (tabs) ═════ -->
+<!-- ═════ Selector de organigrama ═════ -->
+<div id="orgSwitch">
+  <span class="lbl">Organigrama</span>
+  <button data-v="hds" class="on">🏛 HDS · RE-1674</button>
+  <button data-v="pm">🚀 Puesta en Marcha NHDS</button>
+  <button data-v="concesionado">🤝 Hospital concesionado</button>
+</div>
+
+<nav id="subnav">
+  <div class="tab" data-org="direccion"><span class="dot" style="background:var(--dir)"></span>Dirección<span class="badge" id="cnt-direccion">—</span></div>
+  <div class="tab" data-org="medica"><span class="dot" style="background:var(--med)"></span>Subdir. Médica<span class="badge" id="cnt-medica">—</span></div>
+  <div class="tab" data-org="administrativa"><span class="dot" style="background:var(--adm)"></span>Subdir. Administrativa<span class="badge" id="cnt-administrativa">—</span></div>
+  <div class="tab" data-org="gestion-cuidado"><span class="dot" style="background:var(--gc)"></span>Subdir. Gestión del Cuidado<span class="badge" id="cnt-gestion-cuidado">—</span></div>
+  <div class="tab" data-org="apoyo-diag-ter"><span class="dot" style="background:var(--adt)"></span>Subdir. Apoyo Dx y Terap.<span class="badge" id="cnt-apoyo-diag-ter">—</span></div>
+  <div class="tab" data-org="personas"><span class="dot" style="background:var(--per)"></span>Subdir. de Personas<span class="badge" id="cnt-personas">—</span></div>
+</nav>
+
+<!-- ═════ MAIN ═════ -->
+<main id="main">
+  <div class="panel" id="panel">
+    <div class="panel-hdr">
+      <div class="icon-big" id="panel-icon">🏛</div>
+      <div>
+        <div class="title" id="panel-title">Dirección</div>
+        <div class="subtitle" id="panel-sub">Estructura organizacional según RE-1674 · 18-may-2026</div>
+      </div>
+      <div class="panel-meta">
+        <div class="meta-chip"><strong id="panel-cnt">—</strong><span>Dependencias</span></div>
+        <div class="meta-chip"><strong id="panel-staff">—</strong><span>Funcionarios</span></div>
+        <div class="meta-chip"><strong id="panel-email">—</strong><span>Con email</span></div>
+      </div>
+    </div>
+
+    <div class="panel-info" id="panel-info" style="display:none">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+      <div id="panel-info-txt"></div>
+    </div>
+
+    <div class="panel-modelo" id="panel-modelo" style="display:none;background:#ecfeff;border:1px solid #a5f3fc;border-left:4px solid #0891b2;border-radius:9px;padding:11px 14px;margin-bottom:16px;display:flex;align-items:center;gap:11px">
+      <span style="font-size:20px">🩺</span>
+      <div style="flex:1;font-size:12px;color:#155e75">
+        <strong style="display:block;margin-bottom:2px" id="panel-modelo-tit">Modelo de Gestión del Cuidado</strong>
+        <span id="panel-modelo-sub"></span>
+      </div>
+      <button onclick="document.getElementById('modeloModal').classList.add('open')" style="background:#0891b2;color:#fff;border:none;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">Ver modelo</button>
+    </div>
+
+    <div class="org-canvas" id="orgCanvas"></div>
+  </div>
+</main>
+<section id="altView"></section>
+
+<div class="modal-mask" id="modeloModal">
+  <div class="modal" style="max-width:760px">
+    <div class="modal-hd"><div><div style="font-size:15px;font-weight:800" id="mm-tit">Modelo de Gestión del Cuidado</div><div style="font-size:11px;opacity:.8" id="mm-autor"></div></div>
+      <button onclick="document.getElementById('modeloModal').classList.remove('open')" style="background:rgba(255,255,255,.15);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:15px">×</button>
+    </div>
+    <div class="modal-bd" id="mm-body"></div>
+  </div>
+</div>
+
+<!-- ═════ STAFF PANEL (drawer) ═════ -->
+<aside class="staff-panel" id="staffPanel">
+  <div class="staff-hd">
+    <div class="stype" id="staffType">—</div>
+    <div class="sname" id="staffName">—</div>
+    <div class="smeta" id="staffMeta"></div>
+    <button class="staff-x" onclick="closeStaff()">✕</button>
+  </div>
+  <div class="staff-bd" id="staffList"></div>
+  <div class="staff-foot" id="staffFoot"></div>
+</aside>
+
+<!-- ═════ MODAL RESOLUCIÓN EXENTA ═════ -->
+<div class="modal-mask" id="resModal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal">
+    <div class="modal-hd">
+      <h2>📄 Resolución Exenta N° 1674 · 18-may-2026</h2>
+      <button class="modal-x" onclick="document.getElementById('resModal').classList.remove('open')">✕</button>
+    </div>
+    <div class="modal-bd">
+      <div class="director-card">
+        <div class="avatar">JR</div>
+        <div>
+          <div class="lbl">Firma · Director HDS</div>
+          <div class="name">Dr. Jorge Rashid Zajjur Castro</div>
+        </div>
+      </div>
+      <h3>Antecedentes normativos</h3>
+      <p>Resolución dictada por el Director del Hospital del Salvador en uso de las facultades conferidas por el <strong>DFL N° 1/2005 del MINSAL</strong> y el <strong>Decreto N° 38</strong> sobre Reglamento Orgánico de Establecimientos de Salud de Menor Complejidad y de Autogestión.</p>
+      <h3>Resoluciones que actualiza</h3>
+      <ul>
+        <li><span class="pill">RE-5407</span> 30-dic-2025 — Última actualización del organigrama HDS</li>
+        <li><span class="pill">RE-0814</span> 13-mar-2026 — Traspaso de Puesta en Marcha a Subdirección Apoyo Diagnóstico y Terapéutico</li>
+      </ul>
+      <h3>Cambios estructurales · Resumen (8 numerales)</h3>
+      <ul>
+        <li><strong>Traspasos</strong>: Unidad Informática → Subdir. Administrativa · Unidad Transformación Digital → Subdir. Apoyo Diag. y Terap.</li>
+        <li><strong>Eliminaciones</strong>: Depto. Tecnología de la Información (Dirección) y 3 unidades específicas de Gestión del Cuidado</li>
+        <li><strong>Renombramientos</strong>: 12 dependencias actualizan su denominación (ver tooltip en cada casilla)</li>
+        <li><strong>Creaciones</strong>: 10+ nuevas dependencias (marcadas con badge <code>NUEVO</code> en el organigrama)</li>
+        <li><strong>Traspasos internos</strong>: 7 servicios re-asignados a nuevos departamentos</li>
+        <li><strong>Coordinación Reposición HDS</strong>: bajo Unidad Puesta en Marcha (Subdir. Apoyo Diag. y Terap.)</li>
+      </ul>
+      <h3>Vigencia</h3>
+      <p>La presente resolución entra en vigencia a contar de la total tramitación del acto administrativo.</p>
+      <h3>Distribución</h3>
+      <p>Dirección · Subdirecciones (Médica, Administrativa, Gestión del Cuidado, Personas, Apoyo Diagnóstico y Terapéutico) · Jefes de Servicios Clínicos y Unidades Administrativas · Oficina de Partes · Archivo.</p>
+    </div>
+  </div>
+</div>
+
+<div id="footer">
+  Plataforma HDS · Organigrama institucional según <a onclick="document.getElementById('resModal').classList.add('open')">RE-1674 (18-may-2026)</a> · Dotación: <strong id="ftStaff">—</strong> funcionarios desde SHARED_DOTACION
+</div>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   DATA: estructura organizacional según RE-1674
+   Cada nodo: { id, name, type, mapKeys?, isNew?, note?, children? }
+   - mapKeys: array de strings/regex que se buscan contra
+     SHARED_DOTACION.staff[].sd, .sv y .u para vincular funcionarios.
+   - type: 'direccion'|'subdir'|'depto'|'unidad'|'area'|'oficina'|'comite'|'apoyo'|'programa'|'servicio'
+════════════════════════════════════════════════════════════ */
+/* Estructura completa desde el PDF (data/organigrama.js). El literal de
+   abajo queda como respaldo si el archivo externo no cargara. */
+const ORG = window.ORG_DATA || {
+  direccion: {
+    color: '#1D2D5B', icon: '🏛', accent: 'var(--dir)',
+    title: 'Dirección',
+    sub: 'Primer nivel jerárquico del HDS — Dr. Jorge Rashid Zajjur Castro',
+    info: 'Unidades de apoyo transversal y asesoría (Auditoría, Calidad, IAAS, Comunicaciones, RAD, Asesoría Jurídica, Planificación y Control de Gestión, Transparencia, Atención al Usuario) y las 5 subdirecciones.',
+    root: {
+      id: 'direccion', name: 'DIRECCIÓN', type: 'direccion',
+      mapKeys: ['DIRECCION'],
+      children: [
+        { id: 'comites-dir', name: 'Comités · Consejos Asesores', type: 'apoyo', note:'Apoyo transversal a la Dirección' },
+        { id: 'auditoria', name: 'Unidad Auditoría Interna', type: 'unidad', mapKeys:['AUDITORIA'] },
+        { id: 'calidad-seg', name: 'Unidad Calidad y Seguridad', type: 'unidad', mapKeys:['CALIDAD Y SEGURIDAD','CALIDAD'] },
+        { id: 'iaas', name: 'Unidad IAAS', type: 'unidad', mapKeys:['IAAS'] },
+        { id: 'comunicaciones', name: 'Unidad Comunicaciones', type: 'unidad', mapKeys:['COMUNICACION'] },
+        { id: 'rai', name: 'Unidad Relación Asistencial Docente e Innovación', type: 'unidad', mapKeys:['ASISTENCIAL DOCENTE','INVESTIGAC','DOCENTE'], note:'Antes: Unidad Investigación, Innovación y RAD' },
+        { id: 'juridica', name: 'Departamento Asesoría Jurídica', type: 'depto', mapKeys:['JURIDIC','ABOGAD'], children:[
+          { id: 'a-compras', name: 'Área Compras', type: 'area' },
+          { id: 'a-litigios', name: 'Área Litigios', type: 'area' },
+          { id: 'a-gp-jur', name: 'Área Gestión de Personas', type: 'area' },
+        ]},
+        { id: 'atenusuario', name: 'Departamento Integral de Atención al Usuario', type: 'depto', mapKeys:['ATENCION AL USUARIO','OIRS'], children:[
+          { id: 'u-part-social', name: 'Unidad Participación Social y Proyectos', type: 'unidad', mapKeys:['PARTICIPACION SOCIAL'] },
+          { id: 'u-gestion-social', name: 'Unidad Gestión Social', type: 'unidad', mapKeys:['GESTION SOCIAL'] },
+          { id: 'u-humanizacion', name: 'Unidad Humanización y Experiencia Usuaria', type: 'unidad', mapKeys:['HUMANIZACION','EXPERIENCIA USUARIA'] },
+        ]},
+        { id: 'pcg', name: 'Departamento Planificación y Control de Gestión', type: 'depto', mapKeys:['PLANIFICACION Y CONTROL','PLANIFICACION','CONTROL DE GESTION'], children:[
+          { id: 'u-planif', name: 'Unidad Planificación', type: 'unidad', mapKeys:['PLANIFICACION'] },
+          { id: 'u-ctrl-gest', name: 'Unidad Control de Gestión', type: 'unidad', mapKeys:['CONTROL DE GESTION'] },
+        ]},
+        { id: 'transparencia', name: 'Departamento Transparencia Información y Gestión Documental', type: 'depto', mapKeys:['TRANSPARENCIA','GESTION DOCUMENTAL'], children:[
+          { id: 'partes', name: 'Oficina de Partes', type: 'oficina', mapKeys:['OFICINA DE PARTES','PARTES'] },
+          { id: 'oirs', name: 'OIRS', type: 'oficina', mapKeys:['OIRS'] },
+        ]},
+      ],
+      subdirs: [
+        { id:'medica', name:'Subdirección Médica', color:'var(--med)' },
+        { id:'gc', name:'Subdir. Gestión del Cuidado', color:'var(--gc)' },
+        { id:'adt', name:'Subdir. Apoyo Diagnóstico y Terapéutico', color:'var(--adt)' },
+        { id:'adm', name:'Subdirección Administrativa', color:'var(--adm)' },
+        { id:'per', name:'Subdirección de Personas', color:'var(--per)' },
+      ]
+    }
+  },
+
+  medica: {
+    color: '#dc2626', icon: '🩺', accent: 'var(--med)',
+    title: 'Subdirección Médica',
+    sub: 'Departamentos clínicos y servicios médicos',
+    info: 'Estructura clínica completa: PACTO, Hospital de Día, Recuperación Avanzada, Trasplante, Procuración, Soporte Nutricional, Depto. Atención Abierta y Cerrada, Depto. Gestión de la Demanda (9 unidades), 3 nuevos departamentos (Paciente Médico, Crítico, Salud Mental/Psiquiatría) y 6 servicios (Cirugía, Odontología, Oftalmología, Otorrino, Traumatología, Urología).',
+    root: {
+      id:'medica', name:'SUBDIRECCIÓN MÉDICA', type:'subdir', mapKeys:['SUBDIRECCION MEDICA'],
+      children:[
+        { id:'comites-med', name:'Comités · Consejos Asesores', type:'apoyo' },
+        { id:'oficina-clinica', name:'Oficina Investigación Clínica', type:'oficina', isNew:true, mapKeys:['INVESTIGACION CLINICA'] },
+        { id:'pacto', name:'PACTO', type:'programa', mapKeys:['PACTO'] },
+        { id:'hospital-dia', name:'Hospital de Día', type:'unidad', mapKeys:['HOSPITAL DE DIA'] },
+        { id:'recuperacion', name:'Recuperación Avanzada', type:'unidad', mapKeys:['RECUPERACION AVANZADA','RECUPERACION'] },
+        { id:'procuracion', name:'Procuración de Órganos y Tejidos', type:'unidad', mapKeys:['PROCURACION','ORGANOS Y TEJIDOS'] },
+        { id:'soporte-nut', name:'Soporte Nutricional', type:'unidad', mapKeys:['SOPORTE NUTRICIONAL','NUTRICION'] },
+        { id:'u-trasplante', name:'Unidad Trasplante', type:'unidad', mapKeys:['TRASPLANTE'] },
+        { id:'depto-aten-ab', name:'Departamento Atención Abierta', type:'depto', mapKeys:['ATENCION ABIERTA'] },
+        { id:'depto-aten-cerr', name:'Departamento Atención Cerrada', type:'depto', mapKeys:['ATENCION CERRADA'] },
+        { id:'depto-gest-dem', name:'Departamento Gestión de la Demanda', type:'depto', mapKeys:['GESTION DE LA DEMANDA','GESTION DEMANDA'], children:[
+          { id:'u-admision', name:'Unidad Admisión', type:'unidad', mapKeys:['ADMISION'] },
+          { id:'u-gest-amb', name:'Unidad Gestión Ambulatoria', type:'unidad', mapKeys:['GESTION AMBULATORIA'] },
+          { id:'u-agenda', name:'Unidad Agenda y Contactabilidad', type:'unidad', mapKeys:['AGENDA','CONTACTABILIDAD'] },
+          { id:'u-gest-ges', name:'Unidad Gestión GES', type:'unidad', mapKeys:['GES'] },
+          { id:'u-gest-camas', name:'Unidad Gestión Camas', type:'unidad', mapKeys:['GESTION CAMAS'] },
+          { id:'u-deriv-ext', name:'Unidad Gestión Derivaciones Extrasistema', type:'unidad', mapKeys:['DERIVACIONES','EXTRASISTEMA'] },
+          { id:'u-ley-urg', name:'Unidad Ley de Urgencia', type:'unidad', mapKeys:['LEY DE URGENCIA'] },
+          { id:'u-casos-hosp', name:'Unidad Gestión Casos Hospitalizados', type:'unidad', mapKeys:['CASOS HOSPITALIZADOS'] },
+          { id:'u-gest-estrat', name:'Unidad Gestión Estratégica', type:'unidad', mapKeys:['GESTION ESTRATEGICA'] },
+        ]},
+        { id:'depto-medico', name:'Departamento Paciente Médico', type:'depto', isNew:true, mapKeys:['PACIENTE MEDICO'], children:[
+          { id:'sv-cardio', name:'Servicio Cardiología', type:'servicio', mapKeys:['CARDIOLOGIA'] },
+          { id:'sv-derma', name:'Servicio Dermatología', type:'servicio', mapKeys:['DERMATOLOGIA'] },
+          { id:'sv-medicina', name:'Servicio Medicina', type:'servicio', mapKeys:['MEDICINA','MEDICINA INTERNA'] },
+          { id:'sv-mfyr', name:'Servicio Medicina Física y Rehabilitación', type:'servicio', mapKeys:['FISICA Y REHABILITAC','REHABILITACION'] },
+          { id:'sv-neuro', name:'Servicio Neurología', type:'servicio', mapKeys:['NEUROLOGIA'] },
+          { id:'sv-oncol', name:'Servicio Oncología', type:'servicio', mapKeys:['ONCOLOGIA'] },
+          { id:'sv-paliativos', name:'Servicio Cuidados Paliativos y Unidad Del Dolor', type:'servicio', mapKeys:['PALIATIVOS','DOLOR'] },
+        ]},
+        { id:'depto-critico', name:'Departamento Paciente Crítico', type:'depto', note:'Antes: Unidad Paciente Crítico', mapKeys:['PACIENTE CRITICO','UPC'], children:[
+          { id:'u-tih', name:'Unidad Tratamiento Intermedio Hematológico', type:'unidad', isNew:true, mapKeys:['TRATAMIENTO INTERMEDIO HEMATOLOG'] },
+          { id:'u-ucih', name:'Unidad de Cuidados Intensivos Hematológicos', type:'unidad', note:'Antes: Unidad Hematología Intensiva', mapKeys:['INTENSIVOS HEMATOLOG','HEMATOLOGIA INTENSIVA'] },
+        ]},
+        { id:'depto-salud-mental', name:'Departamento Paciente Salud Mental y Psiquiatría', type:'depto', isNew:true, mapKeys:['SALUD MENTAL','PSIQUIATRIA'], children:[
+          { id:'u-hcip', name:'Unidad Hospitalizados Cuidados Intensivos en Psiquiatría', type:'unidad', isNew:true, mapKeys:['CUIDADOS INTENSIVOS EN PSIQUIATRIA'] },
+          { id:'u-enlace', name:'Unidad Enlace', type:'unidad', isNew:true, mapKeys:['ENLACE PSIQUIATRIA','UNIDAD ENLACE'] },
+          { id:'u-tec', name:'Unidad Terapia Electroconvulsiva', type:'unidad', isNew:true, mapKeys:['ELECTROCONVULSIVA','TEC'] },
+        ]},
+        { id:'sv-cirugia', name:'Servicio Cirugía', type:'servicio', mapKeys:['CIRUGIA'] },
+        { id:'sv-odonto', name:'Servicio Odontología', type:'servicio', mapKeys:['ODONTOLOGIA','DENTAL'] },
+        { id:'sv-oftalmo', name:'Servicio Oftalmología', type:'servicio', mapKeys:['OFTALMOLOGIA'] },
+        { id:'sv-otorrino', name:'Servicio Otorrinolaringología', type:'servicio', mapKeys:['OTORRINO','ORL'] },
+        { id:'sv-traumato', name:'Servicio Traumatología y Ortopedia', type:'servicio', mapKeys:['TRAUMATOLOGIA','ORTOPEDIA'] },
+        { id:'sv-urologia', name:'Servicio Urología', type:'servicio', mapKeys:['UROLOGIA'] },
+        { id:'u-emergencia', name:'Unidad Emergencia Hospitalaria', type:'unidad', mapKeys:['EMERGENCIA','URGENCIA'] },
+        { id:'u-hosp-dom-med', name:'Hospitalización Domiciliaria', type:'unidad', mapKeys:['HOSPITALIZACION DOMICILIARIA'] },
+      ]
+    }
+  },
+
+  administrativa: {
+    color:'#d97706', icon:'📋', accent:'var(--adm)',
+    title:'Subdirección Administrativa',
+    sub:'Gestión administrativa, financiera, logística y de soporte tecnológico',
+    info: 'Recibió el traspaso de la antigua Unidad de Informática (ahora elevada a Departamento) desde la Dirección.',
+    root: {
+      id:'adm', name:'SUBDIRECCIÓN ADMINISTRATIVA', type:'subdir', mapKeys:['SUBDIRECCION ADMINISTRATIVA'],
+      children:[
+        { id:'comites-adm', name:'Comités', type:'apoyo' },
+        { id:'depto-abast', name:'Departamento Abastecimiento', type:'depto', mapKeys:['ABASTECIMIENTO'] },
+        { id:'depto-log', name:'Departamento Logística', type:'depto', mapKeys:['LOGISTICA'] },
+        { id:'depto-fin', name:'Departamento Finanzas', type:'depto', mapKeys:['FINANZAS','RECURSOS FINANCIEROS'] },
+        { id:'depto-ope', name:'Departamento Operaciones', type:'depto', mapKeys:['OPERACIONES'] },
+        { id:'depto-info', name:'Departamento Información', type:'depto', mapKeys:['INFORMACION'] },
+        { id:'depto-inf', name:'Departamento Informática', type:'depto', isNew:true, note:'Antes: Unidad de Informática (estaba en Dirección)', mapKeys:['INFORMATICA','TI '], children:[
+          { id:'a-infra', name:'Área Infraestructura TI', type:'area' },
+          { id:'a-apl', name:'Área Aplicaciones TI', type:'area' },
+          { id:'a-sop', name:'Área Soporte TI', type:'area' },
+        ]},
+      ]
+    }
+  },
+
+  'gestion-cuidado': {
+    color:'#0891b2', icon:'🤝', accent:'var(--gc)',
+    title:'Subdirección Gestión del Cuidado',
+    sub:'Cuidados de enfermería y gestión del cuidado del paciente',
+    info: 'Departamentos reorganizados según RE-1674: Paciente Ambulatorio, Hospitalizado, Crítico y Salud Mental y Psiquiatría.',
+    modelo: {
+      autor:'Virginia Henderson (1897–1996)',
+      titulo:'Modelo de Gestión del Cuidado · Virginia Henderson',
+      enfoque:'Teoría de las 14 Necesidades Básicas',
+      definicion:'La función propia de enfermería es asistir a la persona, sana o enferma, en la realización de las actividades que contribuyen a su salud, su recuperación o a una muerte digna; actividades que realizaría por sí misma si tuviera la fuerza, la voluntad o el conocimiento necesarios. El fin es ayudarla a recuperar su independencia lo más rápido posible.',
+      conceptos:[
+        ['Persona','Ser integral (biológico, psicológico, social y espiritual) con 14 necesidades básicas que busca satisfacer de forma independiente.'],
+        ['Salud','Capacidad de la persona de satisfacer por sí misma sus 14 necesidades básicas; equivale a independencia.'],
+        ['Entorno','Conjunto de factores externos que influyen en la vida y el desarrollo del individuo.'],
+        ['Enfermería','Suplir o ayudar a satisfacer las necesidades cuando falta fuerza, voluntad o conocimiento, promoviendo la autonomía.']
+      ],
+      niveles:[
+        ['Sustituta','Hace por el paciente lo que él no puede (dependencia total).'],
+        ['Ayudante','Apoya y complementa para que recupere capacidades.'],
+        ['Compañera','Acompaña y supervisa; el paciente es autónomo.']
+      ],
+      necesidades:[
+        'Respirar normalmente','Comer y beber adecuadamente','Eliminar los desechos corporales',
+        'Moverse y mantener una postura adecuada','Dormir y descansar','Vestirse y desvestirse',
+        'Mantener la temperatura corporal','Mantener la higiene corporal y la integridad de la piel',
+        'Evitar peligros del entorno y no dañar a otros','Comunicarse (expresar emociones y necesidades)',
+        'Vivir según sus valores y creencias','Trabajar y sentirse realizado',
+        'Participar en actividades recreativas','Aprender, descubrir y satisfacer la curiosidad'
+      ],
+      aplicacion:'En la gestión del cuidado, el modelo orienta la valoración por necesidades, la planificación de cuidados centrados en la persona y la medición de la independencia/autonomía como resultado clave.'
+    },
+    root: {
+      id:'gc', name:'SUBDIRECCIÓN GESTIÓN DEL CUIDADO', type:'subdir', mapKeys:['GESTION DEL CUIDADO'],
+      children:[
+        { id:'comites-gc', name:'Comités', type:'apoyo' },
+        { id:'prog-evidencia', name:'Programa de Cuidados Basados en Evidencia', type:'programa', isNew:true, note:'Apoyo transversal a la Subdirección' },
+        { id:'depto-gc-amb', name:'Depto. Gestión del Cuidado Paciente Ambulatorio', type:'depto', note:'Antes: Depto. G.C. Atención Abierta', mapKeys:['ATENCION ABIERTA','PACIENTE AMBULATORIO'], children:[
+          { id:'u-hosp-dom', name:'Unidad de Cuidados Hospitalización Domiciliaria', type:'unidad', isNew:true, mapKeys:['HOSPITALIZACION DOMICILIARIA'] },
+          { id:'u-paliativos-amb', name:'Unidad de Cuidados Ambulatorios Paliativos y Alivio del Dolor', type:'unidad', note:'Antes: Unidad de Cuidados de Alivio del Dolor y Cuidados Paliativos', mapKeys:['ALIVIO DEL DOLOR','PALIATIVOS'] },
+        ]},
+        { id:'depto-gc-hosp', name:'Depto. Gestión del Cuidado Paciente Hospitalizado', type:'depto', note:'Antes: Depto. G.C. Atención Cerrada', mapKeys:['ATENCION CERRADA','PACIENTE HOSPITALIZADO'] },
+        { id:'depto-gc-cri', name:'Depto. Gestión del Cuidado Paciente Crítico', type:'depto', isNew:true, mapKeys:['CUIDADO PACIENTE CRITICO','CUIDADOS CRITICOS'], children:[
+          { id:'u-cpc', name:'Unidad de Cuidados del Paciente Crítico', type:'unidad', note:'Antes: Unidad de Cuidados Críticos', mapKeys:['CUIDADOS CRITICOS','PACIENTE CRITICO'] },
+          { id:'u-cpch', name:'Unidad de Cuidados del Paciente Crítico Hematológico', type:'unidad', note:'Antes: Unidad de Cuidados Hematológicos', mapKeys:['HEMATOLOGICO'] },
+        ]},
+        { id:'depto-gc-sm', name:'Depto. Gestión del Cuidado Paciente Salud Mental y Psiquiatría', type:'depto', isNew:true, mapKeys:['SALUD MENTAL','PSIQUIATRIA'], children:[
+          { id:'u-enlace-psi', name:'Unidad de Cuidados Enlace Psiquiatría', type:'unidad', isNew:true, mapKeys:['ENLACE PSIQUIATRIA'] },
+          { id:'u-hcip-gc', name:'Unidad de Hospitalización de Cuidados Intensivos en Psiquiatría', type:'unidad', isNew:true, mapKeys:['CUIDADOS INTENSIVOS EN PSIQUIATRIA'] },
+        ]},
+      ]
+    }
+  },
+
+  'apoyo-diag-ter': {
+    color:'#7c3aed', icon:'🔬', accent:'var(--adt)',
+    title:'Subdirección Apoyo Diagnóstico y Terapéutico',
+    sub:'Imagenología, laboratorio, farmacia, anatomía patológica y eficiencia hospitalaria',
+    info: 'Recibe la Unidad de Transformación Digital (traspasada del antiguo Depto. Tec. Información) y aloja la Unidad de Puesta en Marcha + Coordinación Reposición HDS.',
+    root: {
+      id:'adt', name:'SUBDIRECCIÓN APOYO DIAGNÓSTICO Y TERAPÉUTICO', type:'subdir', mapKeys:['APOYO DIAGNOSTICO','APOYO DIAGN','DIAGNOSTICO Y TERAPEUTICO'],
+      children:[
+        { id:'comites-adt', name:'Comités', type:'apoyo' },
+        { id:'sv-imag', name:'Servicio Imagenología', type:'servicio', mapKeys:['IMAGENOLOGIA','RADIOLOGIA'] },
+        { id:'sv-anatpat', name:'Servicio Anatomía Patológica', type:'servicio', mapKeys:['ANATOMIA PATOLOGICA','ANATOMOPATOLOG'] },
+        { id:'sv-lab', name:'Servicio Laboratorio Clínico', type:'servicio', mapKeys:['LABORATORIO'] },
+        { id:'sv-farm', name:'Servicio Farmacia', type:'servicio', mapKeys:['FARMACIA'] },
+        { id:'depto-eh', name:'Departamento Eficiencia Hospitalaria', type:'depto', note:'Antes: Unidad Eficiencia Hospitalaria', mapKeys:['EFICIENCIA HOSPITALARIA'], children:[
+          { id:'u-td', name:'Unidad Transformación Digital', type:'unidad', isNew:true, note:'Traspasada desde Direc. Tec. Info', mapKeys:['TRANSFORMACION DIGITAL'] },
+        ]},
+        { id:'u-pem', name:'Unidad Puesta en Marcha', type:'unidad', mapKeys:['PUESTA EN MARCHA'], children:[
+          { id:'c-reposicion', name:'Coordinación Técnica Proyecto Reposición HDS', type:'oficina', isNew:true, mapKeys:['REPOSICION'] },
+        ]},
+      ]
+    }
+  },
+
+  personas: {
+    color:'#16a34a', icon:'👥', accent:'var(--per)',
+    title:'Subdirección de Personas',
+    sub:'Gestión de personas, calidad de vida laboral y desarrollo organizacional',
+    info: 'Antes denominada "Subdirección Gestión y Desarrollo de Personas". Reorganización completa de denominaciones según RE-1674.',
+    root: {
+      id:'per', name:'SUBDIRECCIÓN DE PERSONAS', type:'subdir', note:'Antes: Subdir. Gestión y Desarrollo de Personas', mapKeys:['SUBDIRECCION DE GESTION Y DESARROLLO DE PERSONAS','SUBDIRECCION DE PERSONAS'],
+      children:[
+        { id:'comites-per', name:'Comités', type:'apoyo' },
+        { id:'depto-gp', name:'Departamento Gestión de Personas', type:'depto', mapKeys:['GESTION DE PERSONAS','RECURSOS HUMANOS','RRHH'], children:[
+          { id:'u-pep', name:'Unidad Procesos Estratégicos del Personal', type:'unidad', note:'Antes: Unidad Procesos Estratégicos de Personas', mapKeys:['PROCESOS ESTRATEGICOS'] },
+        ]},
+        { id:'depto-cvl', name:'Departamento Calidad de Vida Laboral', type:'depto', note:'Antes: Depto. Calidad de Vida', mapKeys:['CALIDAD DE VIDA'], children:[
+          { id:'u-psicosocial', name:'Unidad Psicosocial Laboral', type:'unidad', isNew:true, mapKeys:['PSICOSOCIAL'] },
+        ]},
+        { id:'depto-do', name:'Departamento Desarrollo Organizacional', type:'depto', mapKeys:['DESARROLLO ORGANIZACIONAL'] },
+      ]
+    }
+  }
+};
+
+/* ════════════════════════════════════════════════════════════
+   SHARED_DOTACION integration
+════════════════════════════════════════════════════════════ */
+let DOT = { staff: [], total: 0 };
+let nodeStaffCache = {}; // id → staff[]
+
+function normUp(s){
+  if(!s) return '';
+  return String(s).toUpperCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g,'');
+}
+
+function loadDotacion(){
+  if(window.SHARED_DOTACION && window.SHARED_DOTACION.staff){
+    DOT = window.SHARED_DOTACION;
+    document.getElementById('statTotal').textContent = DOT.total.toLocaleString('es-CL');
+    document.getElementById('ftStaff').textContent = DOT.total.toLocaleString('es-CL');
+  } else {
+    console.warn('SHARED_DOTACION no disponible');
+    document.getElementById('statTotal').textContent = '—';
+  }
+}
+
+/** matchesNode: ¿este staff pertenece a este nodo? */
+function matchesNode(st, node){
+  if(!node.mapKeys || !node.mapKeys.length) return false;
+  // Caso especial: root de "Dirección" — match estricto contra sd exacto
+  if(node.type === 'direccion'){
+    return normUp(st.sd||'') === 'DIRECCION';
+  }
+  // Caso especial: root de subdirecciones — match estricto contra sd
+  if(node.type === 'subdir'){
+    const sd = normUp(st.sd||'');
+    return node.mapKeys.some(k => {
+      const kk = normUp(k);
+      return sd === kk || sd.startsWith(kk) || sd.includes(kk);
+    });
+  }
+  const txt = normUp([st.sv,st.sd,st.u,st.c].filter(Boolean).join(' '));
+  return node.mapKeys.some(k => txt.includes(normUp(k)));
+}
+
+/** Cuenta funcionarios por subdirección (raíz de ORG) */
+function countOrg(org){
+  if(nodeStaffCache[org]) return nodeStaffCache[org].length;
+  const data = ORG[org];
+  if(!data) return 0;
+  const root = data.root;
+  // Mapea por subdirección entera
+  const all = DOT.staff.filter(st => matchesNode(st, root));
+  nodeStaffCache[org] = all;
+  return all.length;
+}
+
+/** Funcionarios para un nodo específico (incluyendo descendientes) */
+function staffForNode(node, scope){
+  // scope = subset of staff (de la subdirección actual)
+  let bag = new Set();
+  function walk(n){
+    if(n.mapKeys){
+      scope.forEach(st => { if(matchesNode(st, n)) bag.add(st); });
+    }
+    (n.children||[]).forEach(walk);
+  }
+  walk(node);
+  return Array.from(bag);
+}
+
+/* ════════════════════════════════════════════════════════════
+   RENDER — zoom/pan tree with SVG connectors
+════════════════════════════════════════════════════════════ */
+let currentOrg = 'direccion';
+let currentScope = [];
+
+const TYPE_LABELS = {
+  direccion:'Dirección', subdir:'Subdirección', depto:'Departamento',
+  unidad:'Unidad', area:'Área', oficina:'Oficina', comite:'Comité',
+  apoyo:'Apoyo transversal', programa:'Programa', servicio:'Servicio'
+};
+
+function nodeStaffCount(node){ return staffForNode(node, currentScope).length; }
+
+/* ── Layout estilo PDF (Organigrama_HDS_doble_carta) ──────────────────
+   Forma: raíz arriba · asesorías punteadas colgando del eje vertical ·
+   bus horizontal · columnas de línea (teal) con sus hijos APILADOS en
+   vertical e indentados, unidos por codos a la izquierda.            */
+const ROOT_W=300, ROOT_H=54;
+const STAFF_W=270, STAFF_H=28, STAFF_G=7, STAFF_LEAD=34;
+const L2_W=214, L2_MINH=46;
+const L3_W=198, L3_MINH=40, L3_INDENT=20, L3_VG=9;
+const COL_G=24, ROOT_GAP=20, BUS_GAP=30, BUS_DROP=26;
+/* compat: alto/ancho nominal usado por código heredado */
+const NW=L2_W, NH=L2_MINH;
+
+/* alto estimado de una caja según cuánto texto envuelve */
+function estH(name,w,minH,fs){
+  const cpl=Math.max(8,Math.floor(w/(fs*0.55)));
+  const lines=Math.max(1,Math.ceil(String(name||'').length/cpl));
+  return Math.max(minH, 13+lines*(fs+3));
+}
+/* ancho total que ocupa una columna (la caja o sus hijos indentados) */
+function colW(node,depth){
+  let mx = depth===0?L2_W:L3_W;
+  (node.children||[]).forEach(c=>{ mx=Math.max(mx, L3_INDENT+colW(c,depth+1)); });
+  return mx;
+}
+/* ubica un nodo y apila sus hijos debajo; devuelve el borde inferior */
+function place(node,x,y,depth,all){
+  const w = depth===0?L2_W:L3_W;
+  const fs = depth===0?11:10;
+  node._x=x; node._y=y; node._w=w; node._depth=depth;
+  node._h=estH(node.name,w,depth===0?L2_MINH:L3_MINH,fs);
+  all.push(node);
+  let cy=y+node._h+L3_VG, bottom=y+node._h;
+  for(const c of (node.children||[])){
+    bottom=place(c,x+L3_INDENT,cy,depth+1,all);
+    cy=bottom+L3_VG;
+  }
+  return bottom;
+}
+
+/* Construye todo el diagrama. Devuelve {nodes,staff,lines,W,H} */
+function layoutPDF(root,lineNodes,staffNodes){
+  const all=[], staff=[];
+  /* ancho del bloque de columnas */
+  const widths=lineNodes.map(nd=>colW(nd,0));
+  const colsW=widths.reduce((a,b)=>a+b,0)+COL_G*Math.max(0,lineNodes.length-1);
+  /* espacio a la izquierda para la columna de asesorías */
+  const needLeft=staffNodes.length?(STAFF_W+STAFF_LEAD):0;
+  const leftPad=Math.max(0, needLeft-colsW/2);
+  const spineX=leftPad+Math.max(colsW,ROOT_W)/2;
+
+  /* raíz */
+  root._x=spineX-ROOT_W/2; root._y=0; root._w=ROOT_W; root._h=ROOT_H; root._depth=-1;
+
+  /* asesorías: apiladas a la izquierda del eje */
+  let sy=ROOT_H+ROOT_GAP;
+  staffNodes.forEach(nd=>{
+    nd._w=STAFF_W; nd._h=estH(nd.name,STAFF_W,STAFF_H,9);
+    nd._x=spineX-STAFF_LEAD-STAFF_W; nd._y=sy; nd._depth=-2; nd._isStaff=true;
+    staff.push(nd); sy+=nd._h+STAFF_G;
+  });
+
+  const busY = (staffNodes.length? sy-STAFF_G : ROOT_H) + BUS_GAP;
+  const topY = busY+BUS_DROP;
+
+  /* columnas de línea */
+  let cx=leftPad;
+  lineNodes.forEach((nd,i)=>{ place(nd,cx,topY,0,all); cx+=widths[i]+COL_G; });
+
+  /* ── conectores ── */
+  const lines=[], C='#7d9aa6', CS='#9fb6bf';
+  lines.push(`<line x1="${spineX}" y1="${ROOT_H}" x2="${spineX}" y2="${busY}" stroke="${C}" stroke-width="1.6"/>`);
+  staff.forEach(nd=>{
+    const my=(nd._y+nd._h/2).toFixed(1);
+    lines.push(`<line x1="${(nd._x+nd._w).toFixed(1)}" y1="${my}" x2="${spineX}" y2="${my}" stroke="${CS}" stroke-width="1.3" stroke-dasharray="3,3"/>`);
+  });
+  if(lineNodes.length){
+    const cs=lineNodes.map(nd=>nd._x+L2_W/2);
+    lines.push(`<line x1="${Math.min(...cs,spineX).toFixed(1)}" y1="${busY}" x2="${Math.max(...cs,spineX).toFixed(1)}" y2="${busY}" stroke="${C}" stroke-width="1.6"/>`);
+    cs.forEach(x=>lines.push(`<line x1="${x.toFixed(1)}" y1="${busY}" x2="${x.toFixed(1)}" y2="${topY}" stroke="${C}" stroke-width="1.6"/>`));
+  }
+  /* codos de los hijos apilados */
+  lineNodes.forEach(nd=>{(function elb(n2){
+    const ch=n2.children||[]; if(!ch.length) return;
+    const sx=(n2._x+11).toFixed(1); const last=ch[ch.length-1];
+    lines.push(`<line x1="${sx}" y1="${(n2._y+n2._h).toFixed(1)}" x2="${sx}" y2="${(last._y+last._h/2).toFixed(1)}" stroke="${C}" stroke-width="1.4"/>`);
+    ch.forEach(c=>{
+      lines.push(`<line x1="${sx}" y1="${(c._y+c._h/2).toFixed(1)}" x2="${c._x.toFixed(1)}" y2="${(c._y+c._h/2).toFixed(1)}" stroke="${C}" stroke-width="1.4"/>`);
+      elb(c);
+    });
+  })(nd);});
+
+  return {nodes:all, staff, lines, spineX, busY};
+}
+
+function nodeLvClass(node,isRoot){
+  if(isRoot) return node.type==='direccion'?'lv-direccion':'lv-subdir';
+  if(node.type==='apoyo') return 'lv-apoyo';
+  if(node.type==='area') return 'lv-area';
+  if(node.type==='unidad'||node.type==='servicio'||node.type==='oficina'||node.type==='programa') return 'lv-unidad';
+  return 'lv-'+node.type;
+}
+
+function renderOrg(orgKey){
+  currentOrg=orgKey;
+  const data=ORG[orgKey];
+  if(!data) return;
+
+  currentScope=nodeStaffCache[orgKey]||(function(){
+    const all=DOT.staff.filter(st=>matchesNode(st,data.root));
+    nodeStaffCache[orgKey]=all; return all;
+  })();
+
+  document.getElementById('main').className='';
+  document.getElementById('panel').className=`panel org-${orgKey}`;
+  document.getElementById('panel-icon').textContent=data.icon;
+  document.getElementById('panel-title').textContent=data.title;
+  document.getElementById('panel-sub').textContent=data.sub;
+  const accentVal=data.accent.startsWith('var')?getComputedStyle(document.documentElement).getPropertyValue(data.accent.replace(/var\((--\w+)\)/,'$1').trim()):data.accent;
+  document.documentElement.style.setProperty('--accent',accentVal);
+
+  if(data.info){ document.getElementById('panel-info').style.display='flex'; document.getElementById('panel-info-txt').innerHTML=`<strong>Cambios RE-1674 en esta subdirección</strong> ${data.info}`; }
+  else document.getElementById('panel-info').style.display='none';
+
+  // Reseña: Modelo de Gestión (si la subdirección lo define)
+  const pm=document.getElementById('panel-modelo');
+  if(data.modelo){
+    const m=data.modelo;
+    pm.style.display='flex';
+    document.getElementById('panel-modelo-tit').textContent=m.titulo;
+    document.getElementById('panel-modelo-sub').textContent=m.enfoque+' · '+m.autor;
+    document.getElementById('mm-tit').textContent=m.titulo;
+    document.getElementById('mm-autor').textContent=m.autor+' · '+m.enfoque;
+    let h='<p style="color:#334155;font-size:12.5px;line-height:1.5;margin-bottom:6px"><em>'+m.definicion+'</em></p>';
+    h+='<h3>Conceptos centrales</h3><ul>'+m.conceptos.map(c=>'<li><strong>'+c[0]+':</strong> '+c[1]+'</li>').join('')+'</ul>';
+    h+='<h3>Niveles de relación enfermera–paciente</h3><ul>'+m.niveles.map(n=>'<li><strong>'+n[0]+':</strong> '+n[1]+'</li>').join('')+'</ul>';
+    h+='<h3>Las 14 necesidades básicas</h3><ol style="padding-left:20px;margin:4px 0 10px;columns:2;column-gap:24px">'+m.necesidades.map(n=>'<li style="margin-bottom:4px;color:#334155">'+n+'</li>').join('')+'</ol>';
+    h+='<h3>Aplicación a la gestión del cuidado</h3><p style="color:#334155;font-size:12.5px;line-height:1.5">'+m.aplicacion+'</p>';
+    h+='<p style="font-size:10.5px;color:#94a3b8;margin-top:10px">Reseña simplificada con fines de referencia. Fuente: literatura de enfermería sobre el Modelo de Virginia Henderson.</p>';
+    document.getElementById('mm-body').innerHTML=h;
+  } else { pm.style.display='none'; }
+
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.org===orgKey));
+
+  const root=data.root;
+  let nDeps=0;
+  function cDeps(n){ if(n!==root)nDeps++; (n.children||[]).forEach(cDeps); }
+  (root.children||[]).forEach(cDeps);
+  if(orgKey==='direccion'&&root.subdirs) nDeps+=root.subdirs.length;
+  document.getElementById('panel-cnt').textContent=nDeps;
+  document.getElementById('panel-staff').textContent=currentScope.length;
+  document.getElementById('panel-email').textContent=currentScope.filter(s=>s.m).length;
+
+  /* ── LAYOUT estilo PDF ── */
+  const kids=(root.children||[]);
+  const staffNodes=kids.filter(k=>k.staff);
+  let lineNodes=kids.filter(k=>!k.staff);
+
+  /* En Dirección la línea son las 5 subdirecciones (nodos navegables) */
+  if(orgKey==='direccion'&&root.subdirs){
+    lineNodes=root.subdirs.map(sd=>{
+      const tk=sd.id==='gc'?'gestion-cuidado':sd.id==='adt'?'apoyo-diag-ter':sd.id==='adm'?'administrativa':sd.id==='per'?'personas':sd.id;
+      return {_isSubdir:true,id:sd.id,_target:tk,name:sd.name,color:sd.color,type:'subdir',cnt:countOrg(tk)};
+    });
+  }
+
+  const L=layoutPDF(root,lineNodes,staffNodes);
+  const allNodes=[root,...L.staff,...L.nodes];
+
+  /* Bounding box */
+  const PAD=40;
+  let minX=Infinity,maxX=-Infinity,minY=Infinity,maxY=-Infinity;
+  allNodes.forEach(n=>{
+    minX=Math.min(minX,n._x); maxX=Math.max(maxX,n._x+n._w);
+    minY=Math.min(minY,n._y); maxY=Math.max(maxY,n._y+n._h);
+  });
+  const OX=-minX+PAD, OY=-minY+PAD;
+  const totalW=maxX-minX+PAD*2, totalH=maxY-minY+PAD*2;
+  const lines=L.lines.map(l=>l.replace(/x1="([-\d.]+)"/,(m,v)=>`x1="${(+v+OX).toFixed(1)}"`)
+                        .replace(/x2="([-\d.]+)"/,(m,v)=>`x2="${(+v+OX).toFixed(1)}"`)
+                        .replace(/y1="([-\d.]+)"/,(m,v)=>`y1="${(+v+OY).toFixed(1)}"`)
+                        .replace(/y2="([-\d.]+)"/,(m,v)=>`y2="${(+v+OY).toFixed(1)}"`));
+
+  /* ── DOM ── */
+  const canvas=document.getElementById('orgCanvas');
+  canvas.innerHTML='';
+
+  const wrapper=document.createElement('div');
+  wrapper.id='zpWrapper';
+  wrapper.style.cssText=`width:${totalW}px;height:${totalH}px;position:relative;`;
+
+  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+  svg.setAttribute('width',totalW); svg.setAttribute('height',totalH);
+  svg.style.cssText='position:absolute;top:0;left:0;pointer-events:none;overflow:visible;';
+  svg.innerHTML=lines.join('');
+  wrapper.appendChild(svg);
+
+  const esc=t=>String(t==null?'':t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  allNodes.forEach(node=>{
+    const isRoot=node===root;
+    const el=document.createElement('div');
+    const cls = isRoot ? 'pdfn-root'
+              : node._isStaff ? 'pdfn-staff'
+              : node._isSubdir ? 'pdfn-l2'
+              : node._depth===0 ? 'pdfn-l2' : 'pdfn-l3';
+    el.className=`pdfn ${cls}${node.isNew?' is-new':''}`;
+    el.dataset.node=node.id||'';
+    if(node.note) el.title=node.note;
+    el.style.cssText=`position:absolute;left:${(node._x+OX).toFixed(0)}px;top:${(node._y+OY).toFixed(0)}px;width:${node._w}px;height:${node._h}px;`;
+    if(node._isSubdir && node.color){ el.style.background=node.color; el.style.borderColor=node.color; }
+
+    const cnt = node._isSubdir ? node.cnt : nodeStaffCount(node);
+    const badge = cnt ? `<span class="pdfn-cnt">${cnt}</span>` : '';
+    el.innerHTML=`<span class="pdfn-tx">${esc(node.name)}</span>${badge}`;
+
+    if(node._isSubdir) el.addEventListener('click',()=>{renderOrg(node._target);window.scrollTo(0,0);});
+    else el.addEventListener('click',()=>openStaff(node.id));
+    wrapper.appendChild(el);
+  });
+
+  canvas.appendChild(wrapper);
+
+  /* Zoom controls */
+  const ctrl=document.createElement('div');
+  ctrl.className='zp-controls';
+  ctrl.innerHTML=`<button class="zp-btn" id="zpIn" title="Ampliar">＋</button><span class="zp-scale" id="zpScale">100%</span><button class="zp-btn" id="zpOut" title="Reducir">－</button><button class="zp-btn" id="zpFit" title="Ajustar a pantalla" style="font-size:13px">⊡ Ajustar</button>`;
+  canvas.appendChild(ctrl);
+  document.getElementById('zpIn').addEventListener('click',()=>zpZoom(1.2));
+  document.getElementById('zpOut').addEventListener('click',()=>zpZoom(1/1.2));
+  document.getElementById('zpFit').addEventListener('click',zpFit);
+
+  const hint=document.createElement('div');
+  hint.className='org-hint';
+  hint.textContent='Scroll = mover · Pinch o Ctrl+scroll = zoom · Arrastrar = mover';
+  canvas.appendChild(hint);
+
+  setupZoomPan(canvas,wrapper);
+  setTimeout(zpFit,80);
+}
+
+/* ════════════════════════════════════════════════════════════
+   ZOOM / PAN ENGINE
+════════════════════════════════════════════════════════════ */
+let _zpFitTry=0,_zpS=1,_zpTx=0,_zpTy=0,_zpDrag=false,_zpSX,_zpSY,_zpSTx,_zpSTy,_zpCont=null,_zpWrap=null;
+
+function _zpApply(){
+  if(!_zpWrap) return;
+  _zpWrap.style.transform=`translate(${_zpTx.toFixed(1)}px,${_zpTy.toFixed(1)}px) scale(${_zpS.toFixed(4)})`;
+  const el=document.getElementById('zpScale');
+  if(el) el.textContent=Math.round(_zpS*100)+'%';
+}
+
+function zpZoom(factor,mx,my){
+  const cw=_zpCont?_zpCont.clientWidth:800, ch=_zpCont?_zpCont.clientHeight:500;
+  if(mx===undefined) mx=cw/2; if(my===undefined) my=ch/2;
+  const ns=Math.max(0.08,Math.min(4,_zpS*factor));
+  _zpTx=mx-(mx-_zpTx)*(ns/_zpS); _zpTy=my-(my-_zpTy)*(ns/_zpS);
+  _zpS=ns; _zpApply();
+}
+
+function zpFit(){
+  if(!_zpCont||!_zpWrap) return;
+  /* Si el contenedor aun no tiene medidas (render antes del layout), no
+     calcular: daba escala negativa (cw = 0-32) y el arbol quedaba invisible. */
+  const r=_zpCont.getBoundingClientRect();
+  const CW0=_zpCont.clientWidth||Math.round(r.width)||_zpCont.offsetWidth;
+  const CH0=_zpCont.clientHeight||Math.round(r.height)||_zpCont.offsetHeight;
+  if(CW0<80||CH0<80){                       // aun sin medidas: reintentar acotado
+    if((_zpFitTry=(_zpFitTry||0)+1)<12){ setTimeout(zpFit,120); return; }
+    _zpFitTry=0; _zpS=1; _zpTx=0; _zpTy=16; _zpApply(); return;
+  }
+  _zpFitTry=0;
+  const cw=CW0-32, ch=CH0-32;
+  const ww=parseInt(_zpWrap.style.width)||800, wh=parseInt(_zpWrap.style.height)||600;
+  const s=Math.min(cw/ww,ch/wh,1);
+  _zpS=Math.max(0.08,Math.min(4,s||1));
+  _zpTx=Math.max(0,(CW0-ww*_zpS)/2); _zpTy=16;
+  _zpApply();
+}
+
+function setupZoomPan(container,wrapper){
+  _zpCont=container; _zpWrap=wrapper; _zpS=1; _zpTx=0; _zpTy=0;
+
+  /* Trackpad Mac: el scroll de dos dedos DESPLAZA (como en Figma/Maps) y el
+     zoom queda para el pinch, que el navegador envia como wheel+ctrlKey.
+     Antes se aplicaba un 12% fijo por evento y el trackpad dispara decenas
+     por gesto -> el zoom se disparaba de golpe. Ahora es proporcional al
+     gesto y acotado por evento. */
+  container.addEventListener('wheel',e=>{
+    e.preventDefault();
+    const r=container.getBoundingClientRect();
+    if(e.ctrlKey||e.metaKey){                       // pinch o Ctrl/Cmd + rueda
+      const f=Math.exp(-e.deltaY*0.012);
+      zpZoom(Math.max(0.90,Math.min(1.11,f)), e.clientX-r.left, e.clientY-r.top);
+    }else if(e.shiftKey){                           // Shift = desplazar horizontal
+      _zpTx-=(e.deltaY||e.deltaX); _zpApply();
+    }else{                                          // scroll normal = mover
+      _zpTx-=e.deltaX; _zpTy-=e.deltaY; _zpApply();
+    }
+  },{passive:false});
+
+  container.addEventListener('mousedown',e=>{
+    if(e.target.closest('.pdfn')||e.target.closest('.ocell')||e.target.closest('.zp-controls')) return;
+    _zpDrag=true; _zpSX=e.clientX; _zpSY=e.clientY; _zpSTx=_zpTx; _zpSTy=_zpTy;
+    container.classList.add('dragging');
+    e.preventDefault();
+  });
+
+  document.addEventListener('mousemove',e=>{
+    if(!_zpDrag) return;
+    _zpTx=_zpSTx+(e.clientX-_zpSX); _zpTy=_zpSTy+(e.clientY-_zpSY); _zpApply();
+  });
+
+  document.addEventListener('mouseup',()=>{ _zpDrag=false; if(_zpCont) _zpCont.classList.remove('dragging'); });
+
+  /* Touch */
+  let _td=0;
+  container.addEventListener('touchstart',e=>{
+    if(e.touches.length===2){ _td=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); }
+    else if(e.touches.length===1){ _zpDrag=true; _zpSX=e.touches[0].clientX; _zpSY=e.touches[0].clientY; _zpSTx=_zpTx; _zpSTy=_zpTy; }
+  },{passive:true});
+
+  container.addEventListener('touchmove',e=>{
+    e.preventDefault();
+    if(e.touches.length===2){
+      const nd=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+      const r=container.getBoundingClientRect();
+      zpZoom(nd/_td,(e.touches[0].clientX+e.touches[1].clientX)/2-r.left,(e.touches[0].clientY+e.touches[1].clientY)/2-r.top);
+      _td=nd;
+    } else if(e.touches.length===1&&_zpDrag){
+      _zpTx=_zpSTx+(e.touches[0].clientX-_zpSX); _zpTy=_zpSTy+(e.touches[0].clientY-_zpSY); _zpApply();
+    }
+  },{passive:false});
+
+  container.addEventListener('touchend',()=>{ _zpDrag=false; });
+}
+
+/* ════════════════════════════════════════════════════════════
+   STAFF PANEL
+════════════════════════════════════════════════════════════ */
+function findNode(orgKey, id){
+  let found = null;
+  function walk(n){
+    if(n.id===id){ found = n; return; }
+    (n.children||[]).forEach(walk);
+  }
+  walk(ORG[orgKey].root);
+  return found;
+}
+
+function openStaff(nodeId){
+  const node = findNode(currentOrg, nodeId);
+  if(!node) return;
+  const orgData = ORG[currentOrg];
+  const lst = staffForNode(node, currentScope);
+
+  document.getElementById('staffType').innerHTML = `<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${orgData.accent}"></span>${TYPE_LABELS[node.type]||node.type}${node.isNew ? ' · NUEVO RE-1674':''}`;
+  document.getElementById('staffName').textContent = node.name;
+  const meta = [];
+  meta.push(`<span><strong>${lst.length}</strong> funcionarios</span>`);
+  const withEm = lst.filter(s=>s.m).length;
+  meta.push(`<span><strong>${withEm}</strong> con email</span>`);
+  if(node.note) meta.push(`<span style="color:#92400e">⚠ ${node.note}</span>`);
+  document.getElementById('staffMeta').innerHTML = meta.join('');
+
+  const body = document.getElementById('staffList');
+  if(!lst.length){
+    body.innerHTML = '<div class="staff-empty">Sin funcionarios asignados a este nodo según los keys de búsqueda.<br><br>Esto puede deberse a que la denominación en SHARED_DOTACION difiere (la dotación aún tiene los nombres anteriores a RE-1674) o que el nodo es de apoyo transversal.</div>';
+  } else {
+    body.innerHTML = lst.map(s => {
+      const ini = (s.n||'').split(' ').slice(2,4).map(x=>x[0]).join('').slice(0,2) || (s.n||'?')[0];
+      const emHtml = s.m ? `<div class="em">✉ <a href="mailto:${s.m}">${s.m}</a></div>` : '';
+      const cgo = s.c + (s.sp && s.sp!=='s/d' ? ' · '+s.sp : '');
+      return `<div class="staff-row">
+        <div class="avatar" style="background:${orgData.accent}">${ini}</div>
+        <div class="info">
+          <div class="nm">${s.n}</div>
+          <div class="cg">${cgo}</div>
+          ${emHtml}
+          <div class="cg" style="color:#94a3b8;font-size:9.5px;margin-top:2px">${s.u||s.sv||'—'}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('staffFoot').innerHTML = `Datos desde SHARED_DOTACION (${DOT.version||'—'}) · matches por keys: ${node.mapKeys?node.mapKeys.join(', '):'—'}`;
+  document.getElementById('staffPanel').classList.add('open');
+}
+function closeStaff(){ document.getElementById('staffPanel').classList.remove('open'); }
+
+function setOrg(o){ renderOrg(o); window.scrollTo(0,0); }
+document.getElementById('modeloModal').addEventListener('click',function(e){ if(e.target===this) this.classList.remove('open'); });
+
+/* ════════════════════════════════════════════════════════════
+   SEARCH
+════════════════════════════════════════════════════════════ */
+function initSearch(){
+  const inp = document.getElementById('gSearchInput');
+  const drop = document.getElementById('gSearchDrop');
+  inp.addEventListener('input', () => {
+    const q = normUp(inp.value.trim());
+    if(q.length < 2){ drop.style.display='none'; return; }
+    const matches = DOT.staff.filter(s => {
+      return normUp(s.n).includes(q) || normUp(s.c).includes(q) || normUp(s.u||'').includes(q) || normUp(s.sv||'').includes(q);
+    }).slice(0, 12);
+    if(!matches.length){ drop.innerHTML='<div class="sr-item"><strong>Sin resultados</strong></div>'; drop.style.display='block'; return; }
+    drop.innerHTML = matches.map(s => `<div class="sr-item" onclick="picked('${s.i}')">
+      <strong>${s.n}</strong>
+      <span>${s.c} · ${s.u||s.sv}</span>
+    </div>`).join('');
+    drop.style.display='block';
+  });
+  document.addEventListener('click', e => {
+    if(!document.getElementById('gSearch').contains(e.target)) drop.style.display='none';
+  });
+}
+function picked(rut){
+  const s = DOT.staff.find(x => x.i===rut);
+  if(!s) return;
+  // Determinar a qué subdirección pertenece
+  const txt = normUp([s.sv,s.sd,s.u,s.c].filter(Boolean).join(' '));
+  let targetOrg = 'direccion';
+  for(const [k,v] of Object.entries(ORG)){
+    if(v.root.mapKeys && v.root.mapKeys.some(kk => txt.includes(normUp(kk)))){
+      targetOrg = k; break;
+    }
+  }
+  renderOrg(targetOrg);
+  // Open panel with this staff alone, highlight
+  document.getElementById('staffType').textContent = 'Funcionario';
+  document.getElementById('staffName').textContent = s.n;
+  document.getElementById('staffMeta').innerHTML = `<span><strong>RUT</strong> ${s.i}</span>`;
+  const ini = (s.n||'').split(' ').slice(2,4).map(x=>x[0]).join('').slice(0,2)||'?';
+  document.getElementById('staffList').innerHTML = `<div class="staff-row">
+    <div class="avatar" style="background:${ORG[targetOrg].accent}">${ini}</div>
+    <div class="info">
+      <div class="nm">${s.n}</div>
+      <div class="cg">${s.c}${s.sp&&s.sp!=='s/d'?' · '+s.sp:''}</div>
+      ${s.m?`<div class="em">✉ <a href="mailto:${s.m}">${s.m}</a></div>`:''}
+      <div class="cg" style="color:#94a3b8">${s.u||''}</div>
+      <div class="cg" style="color:#94a3b8">${s.sv||''}</div>
+      <div class="cg" style="color:#94a3b8">${s.sd||''}</div>
+    </div>
+  </div>`;
+  document.getElementById('staffPanel').classList.add('open');
+  document.getElementById('gSearchInput').value='';
+  document.getElementById('gSearchDrop').style.display='none';
+}
+
+/* ════════════════════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  loadDotacion();
+  // Update counts in tabs
+  ['direccion','medica','administrativa','gestion-cuidado','apoyo-diag-ter','personas'].forEach(k => {
+    const cnt = countOrg(k);
+    const el = document.getElementById('cnt-'+k);
+    if(el) el.textContent = cnt;
+  });
+  // Bind tabs
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => renderOrg(t.dataset.org));
+  });
+  initSearch();
+  renderOrg('direccion');
+});
+</script>
+
+<script src="hub-home.js"></script>
+<script src="data/organigramas_extra.js"></script>
+<script>
+/* Organigramas adicionales (data/organigramas_extra.js): Puesta en Marcha (editable, widgets) y hospital concesionado. */
+(function(){
+  const E = window.ORG_EXTRA; if(!E) return;
+  const esc = x => String(x==null?'':x).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+  /* ───────── Editor de organigrama por widgets ─────────
+     Cada nodo = widget de tamaño fijo (S · M · L). El orden es automático:
+     hijos con sub-hijos → en fila; 3 o más hojas → en columnas de hasta 4.
+     Un nodo «lateral» (asesoría) va al costado de su padre con línea punteada. */
+  const TAM = { S: [168, 74], M: [210, 108], L: [262, 140] };
+  const GX = 22, GY = 46, GS = 12;           // separación horizontal, entre niveles y dentro de columnas
+  const COLORES = { azul: 'Azul', verde: 'Verde', durazno: 'Durazno', lila: 'Lila', navy: 'Navy' };
+  const KEY = 'org15_pm_editor_v1';
+  let uid = 0;
+  const conIds = n => { n.id = n.id || ('n' + (++uid)); (n.h || []).forEach(conIds); return n; };
+  function desdeDato(){                     // dato original → árbol del editor (el «lado» pasa a hijo lateral)
+    const r = JSON.parse(JSON.stringify(E.pm.arbol));
+    if(r.lado){ r.h = [Object.assign({ lat: true, z: 'S' }, r.lado)].concat(r.h || []); delete r.lado; }
+    const tam = (n, d) => { n.z = n.z || (d <= 1 ? 'M' : ((n.p || []).length > 3 ? 'M' : 'S')); (n.h || []).forEach(h => tam(h, d + 1)); };
+    tam(r, 0); return conIds(r);
+  }
+  let arbol, hist = [], sel = null, editar = false, zoom = 1, cont = null;
+  try{ const g = JSON.parse(localStorage.getItem(KEY) || 'null'); arbol = g ? conIds(g) : desdeDato(); }catch(e){ arbol = desdeDato(); }
+  const guardar = () => { try{ localStorage.setItem(KEY, JSON.stringify(arbol)); }catch(e){} };
+  const snap = () => { hist.push(JSON.stringify(arbol)); if(hist.length > 60) hist.shift(); };
+  const deshacer = () => { if(!hist.length) return; arbol = JSON.parse(hist.pop()); guardar(); pintar(); };
+  function buscar(id, n = arbol, p = null){ if(n.id === id) return { n, p }; for(const h of n.h || []){ const r = buscar(id, h, n); if(r) return r; } return null; }
+  const desciende = (a, b) => a.id === b.id || (a.h || []).some(h => desciende(h, b));
+
+  // ── medir y ubicar ──
+  function medir(n){
+    const [w, h] = TAM[n.z] || TAM.S, hijos = (n.h || []).filter(x => !x.lat), lats = (n.h || []).filter(x => x.lat);
+    hijos.forEach(medir); lats.forEach(medir);
+    const latW = lats.reduce((a, l) => a + GX + l.W, 0);
+    n.modo = hijos.length >= 3 && hijos.every(x => !(x.h || []).length) ? 'col' : 'fila';
+    if(!hijos.length){ n.W = w + latW; n.H = h; return; }
+    if(n.modo === 'col'){
+      const filas = Math.min(4, Math.ceil(hijos.length / Math.ceil(hijos.length / 4))), cols = Math.ceil(hijos.length / filas);
+      const cw = Math.max(...hijos.map(x => x.W)), ch = Math.max(...hijos.map(x => x.H));
+      n.cols = cols; n.filas = filas; n.cw = cw; n.ch = ch;
+      n.W = Math.max(w + 2 * latW, cols * (cw + 18) + (cols - 1) * GX); n.H = h + GY + filas * (ch + GS) - GS;
+    } else {
+      const ancho = hijos.reduce((a, x) => a + x.W, 0) + GX * (hijos.length - 1);
+      n.W = Math.max(w + 2 * latW, ancho); n.H = h + GY + Math.max(...hijos.map(x => x.H));
+    }
+  }
+  function ubicar(n, x, y, out){
+    const [w, h] = TAM[n.z] || TAM.S, hijos = (n.h || []).filter(c => !c.lat), lats = (n.h || []).filter(c => c.lat);
+    n.x = x + n.W / 2 - w / 2; n.y = y; out.nodos.push(n);
+    let lx = n.x + w + GX;
+    lats.forEach(l => { ubicar(l, lx, y + (h - (TAM[l.z] || TAM.S)[1]) / 2, out); out.lineas.push({ d: `M${n.x + w},${y + h / 2} H${lx}`, lat: 1 }); lx += l.W + GX; });
+    if(!hijos.length) return;
+    const pcx = n.x + w / 2, py = y + h, yh = y + h + GY;
+    if(n.modo === 'col'){
+      const tot = n.cols * (n.cw + 18) + (n.cols - 1) * GX; let cx0 = x + (n.W - tot) / 2;
+      for(let c = 0; c < n.cols; c++){
+        const grupo = hijos.slice(c * n.filas, (c + 1) * n.filas), bx = cx0 + c * (n.cw + 18 + GX);
+        out.lineas.push({ d: `M${pcx},${py} V${py + GY / 2} H${bx + 6} V${yh + (grupo.length - 1) * (n.ch + GS) + (TAM[grupo[grupo.length - 1].z] || TAM.S)[1] / 2}` });
+        grupo.forEach((k, i) => { const ky = yh + i * (n.ch + GS); ubicar(k, bx + 18, ky, out); out.lineas.push({ d: `M${bx + 6},${ky + (TAM[k.z] || TAM.S)[1] / 2} H${k.x}` }); });
+      }
+    } else {
+      const ancho = hijos.reduce((a, k) => a + k.W, 0) + GX * (hijos.length - 1); let cx = x + (n.W - ancho) / 2;
+      hijos.forEach(k => { ubicar(k, cx, yh, out); const kcx = k.x + (TAM[k.z] || TAM.S)[0] / 2;
+        out.lineas.push({ d: `M${pcx},${py} V${py + GY / 2} H${kcx} V${yh}` }); cx += k.W + GX; });
+    }
+  }
+  function widget(n){
+    const [w, h] = TAM[n.z] || TAM.S, pp = n.p || [];
+    return `<div class="ow c-${n.c || 'azul'} z${n.z}${sel === n.id ? ' sel' : ''}${n.lat ? ' lat' : ''}" data-id="${n.id}" draggable="${editar}" style="left:${n.x}px;top:${n.y}px;width:${w}px;height:${h}px">
+      <div class="t">${esc(n.t)}</div>${n.s ? `<div class="s">${esc(n.s)}</div>` : ''}
+      ${pp.length ? `<div class="pp">${pp.map(x => `<span>${esc(x)}</span>`).join('')}</div>` : ''}
+      ${n.q ? `<span class="q" title="${esc(n.q)}">por confirmar</span>` : ''}</div>`;
+  }
+  function pintar(){
+    if(!cont) return;
+    medir(arbol); const out = { nodos: [], lineas: [] }; ubicar(arbol, 20, 20, out);
+    const W = arbol.W + 60, H = arbol.H + 60, n = sel && buscar(sel);
+    cont.innerHTML = `<div class="oe-bar">
+        <button class="oe-b ${editar ? 'on' : ''}" data-a="editar">${editar ? '✓ Listo' : '✏️ Editar'}</button>
+        ${editar ? `<button class="oe-b" data-a="deshacer" ${hist.length ? '' : 'disabled'}>↶ Deshacer</button>
+        <button class="oe-b" data-a="exportar">⬇ Exportar</button><label class="oe-b">⬆ Importar<input type="file" accept=".json" hidden data-a="importar"></label>
+        <button class="oe-b" data-a="original">↺ Original</button>` : ''}
+        <span class="oe-sp"></span><button class="oe-b" data-a="imagen" title="Descargar el organigrama como imagen PNG">🖼 Imagen</button><button class="oe-b" data-a="menos">−</button><span class="oe-z">${Math.round(zoom * 100)} %</span><button class="oe-b" data-a="mas">+</button><button class="oe-b" data-a="ajustar">Ajustar</button>
+      </div>
+      ${editar ? `<div class="oe-ayuda">Clic en un widget para editarlo · arrástralo sobre otro para moverlo debajo de él · el orden se ajusta solo</div>` : ''}
+      <div class="oe-wrap"><div class="oe-lienzo" style="width:${W}px;height:${H}px;transform:scale(${zoom})">
+        <svg width="${W}" height="${H}">${out.lineas.map(l => `<path d="${l.d}" class="${l.lat ? 'lat' : ''}"/>`).join('')}</svg>
+        ${out.nodos.map(widget).join('')}</div></div>
+      ${editar && n ? panel(n.n, n.p) : ''}`;
+    const lz = cont.querySelector('.oe-lienzo'); lz.parentElement.style.height = Math.min(H * zoom + 10, 900) + 'px';
+  }
+  function imagen(){
+    medir(arbol); const out = { nodos: [], lineas: [] }; ubicar(arbol, 30, 90, out);
+    const K = 2, W = arbol.W + 80, H = arbol.H + 140, cv = document.createElement('canvas'); cv.width = W * K; cv.height = H * K;
+    const g = cv.getContext('2d'); g.scale(K, K); g.fillStyle = '#ffffff'; g.fillRect(0, 0, W, H);
+    const F = { azul: ['#E3EEFB', '#9cc2ee'], verde: ['#E3F4EA', '#97d3b1'], durazno: ['#FDEBDD', '#f2b88d'], lila: ['#ECE7FA', '#b8a8ea'], navy: ['#1F2A55', '#1F2A55'] };
+    g.fillStyle = '#1F2A55'; g.font = '800 22px Inter, Verdana, sans-serif'; g.fillText(E.pm.titulo, 30, 40);
+    g.fillStyle = '#64748b'; g.font = '13px Inter, Verdana, sans-serif'; g.fillText(E.pm.sub, 30, 62);
+    g.strokeStyle = '#b6c3d9'; g.lineWidth = 2;
+    out.lineas.forEach(l => { g.setLineDash(l.lat ? [5, 4] : []); g.stroke(new Path2D(l.d)); }); g.setLineDash([]);
+    const rr = (x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
+    const corta = (t, max) => { if(g.measureText(t).width <= max) return t; while(t.length > 1 && g.measureText(t + '…').width > max) t = t.slice(0, -1); return t + '…'; };
+    out.nodos.forEach(n => {
+      const [w, h] = TAM[n.z] || TAM.S, [bg, bd] = F[n.c] || F.azul, claro = n.c === 'navy';
+      rr(n.x, n.y, w, h, 14); g.fillStyle = bg; g.fill(); g.strokeStyle = bd; g.lineWidth = 1; g.stroke();
+      const lineas = [], pp = (n.p || []).join(' · ');
+      lineas.push(['800 ' + (n.z === 'L' ? 14 : 12.5) + 'px Inter, Verdana, sans-serif', n.t, claro ? '#fff' : '#1F2A55']);
+      if(n.s) lineas.push(['10.5px Inter, Verdana, sans-serif', n.s, claro ? '#cbd5e1' : '#475569']);
+      if(pp) lineas.push(['600 10.5px Inter, Verdana, sans-serif', pp, claro ? '#fff' : '#1F2A55']);
+      let y = n.y + h / 2 - (lineas.length - 1) * 8 + 4; g.textAlign = 'center';
+      lineas.forEach(([f, t, c]) => { g.font = f; g.fillStyle = c; g.fillText(corta(t, w - 16), n.x + w / 2, y); y += 16; });
+      g.textAlign = 'left';
+      if(n.q){ g.fillStyle = '#f59e0b'; g.beginPath(); g.arc(n.x + w - 10, n.y + 10, 4.5, 0, 7); g.fill(); }
+    });
+    g.fillStyle = '#94a3b8'; g.font = '11px Inter, Verdana, sans-serif'; g.fillText('● por confirmar · Hospital del Salvador · Puesta en Marcha NHDS', 30, H - 20);
+    cv.toBlob(b => { const l = document.createElement('a'); l.href = URL.createObjectURL(b); l.download = 'Organigrama_PM_NHDS.png'; l.click(); });
+  }
+  function panel(n, padre){
+    const raiz = !padre;
+    return `<aside class="oe-panel" data-id="${n.id}">
+      <div class="oe-ph">Editar widget <button data-a="cerrar" title="Cerrar">×</button></div>
+      <label>Nombre<input data-f="t" value="${esc(n.t)}"></label>
+      <label>Detalle<input data-f="s" value="${esc(n.s || '')}" placeholder="opcional"></label>
+      <label>Personas <small>(una por línea)</small><textarea data-f="p" rows="4">${esc((n.p || []).join('\n'))}</textarea></label>
+      <div class="oe-l">Tamaño</div><div class="oe-seg">${['S', 'M', 'L'].map(z => `<button data-z="${z}" class="${n.z === z ? 'on' : ''}">${z}</button>`).join('')}</div>
+      <div class="oe-l">Color</div><div class="oe-col">${Object.keys(COLORES).map(c => `<button data-c="${c}" class="c-${c}${(n.c || 'azul') === c ? ' on' : ''}" title="${COLORES[c]}"></button>`).join('')}</div>
+      <label class="oe-chk"><input type="checkbox" data-f="lat" ${n.lat ? 'checked' : ''} ${raiz ? 'disabled' : ''}> Al costado del superior (asesoría)</label>
+      <label>Nota «por confirmar»<input data-f="q" value="${esc(n.q || '')}" placeholder="vacío = confirmado"></label>
+      <div class="oe-acc">
+        <button data-a="hijo">＋ Agregar debajo</button>
+        ${raiz ? '' : `<button data-a="hermano">＋ Agregar al lado</button><button data-a="izq">◀ Mover</button><button data-a="der">Mover ▶</button><button data-a="borrar" class="rojo">🗑 Quitar</button>`}
+      </div></aside>`;
+  }
+  function accion(a, el){
+    const s = sel && buscar(sel);
+    if(a === 'editar'){ editar = !editar; if(!editar) sel = null; return pintar(); }
+    if(a === 'cerrar'){ sel = null; return pintar(); }
+    if(a === 'mas' || a === 'menos'){ zoom = Math.max(.4, Math.min(1.6, zoom + (a === 'mas' ? .1 : -.1))); return pintar(); }
+    if(a === 'ajustar'){ medir(arbol); zoom = Math.max(.4, Math.min(1, (cont.clientWidth - 20) / (arbol.W + 60))); return pintar(); }
+    if(a === 'deshacer') return deshacer();
+    if(a === 'imagen') return imagen();
+    if(a === 'original'){ if(!confirm('¿Volver al organigrama original de la pizarra? Se pierden los cambios hechos aquí (puedes exportarlos antes).')) return; snap(); arbol = desdeDato(); sel = null; guardar(); return pintar(); }
+    if(a === 'exportar'){ const b = new Blob([JSON.stringify(arbol, (k, v) => ['x', 'y', 'W', 'H', 'modo', 'cols', 'filas', 'cw', 'ch'].includes(k) ? undefined : v, 1)], { type: 'application/json' });
+      const l = document.createElement('a'); l.href = URL.createObjectURL(b); l.download = 'organigrama_PM_NHDS.json'; l.click(); return; }
+    if(!s) return;
+    snap();
+    if(a === 'hijo'){ const nn = conIds({ t: 'Nuevo', c: s.n.c === 'navy' ? 'azul' : s.n.c, z: 'S', p: [] }); (s.n.h = s.n.h || []).push(nn); sel = nn.id; }
+    if(a === 'hermano' && s.p){ const nn = conIds({ t: 'Nuevo', c: s.n.c, z: s.n.z, p: [] }); s.p.h.splice(s.p.h.indexOf(s.n) + 1, 0, nn); sel = nn.id; }
+    if((a === 'izq' || a === 'der') && s.p){ const L = s.p.h, i = L.indexOf(s.n), j = i + (a === 'izq' ? -1 : 1); if(j >= 0 && j < L.length){ [L[i], L[j]] = [L[j], L[i]]; } }
+    if(a === 'borrar' && s.p){ const k = (s.n.h || []).length; if(k && !confirm(`«${s.n.t}» tiene ${k} widget(s) debajo. ¿Quitarlo junto con ellos? (se puede deshacer)`)){ hist.pop(); return; }
+      s.p.h.splice(s.p.h.indexOf(s.n), 1); sel = null; }
+    guardar(); pintar();
+  }
+  function montar(div){
+    cont = div; pintar();
+    div.addEventListener('click', ev => {
+      const b = ev.target.closest('[data-a]'); if(b && b.tagName !== 'INPUT') return accion(b.dataset.a, b);
+      const z = ev.target.closest('[data-z]'), c = ev.target.closest('[data-c]');
+      if((z || c) && sel){ const s = buscar(sel); snap(); if(z) s.n.z = z.dataset.z; if(c) s.n.c = c.dataset.c; guardar(); return pintar(); }
+      const w = ev.target.closest('.ow'); if(w && editar){ sel = w.dataset.id; pintar(); }
+    });
+    div.addEventListener('change', ev => {
+      if(ev.target.dataset.a === 'importar'){ const f = ev.target.files[0]; if(!f) return; f.text().then(t => { try{ snap(); arbol = conIds(JSON.parse(t)); guardar(); pintar(); }catch(e){ alert('El archivo no es un organigrama válido.'); } }); return; }
+      const f = ev.target.dataset.f; if(!f || !sel) return; const s = buscar(sel); snap();
+      if(f === 'p') s.n.p = ev.target.value.split('\n').map(x => x.trim()).filter(Boolean);
+      else if(f === 'lat') s.n.lat = ev.target.checked;
+      else s.n[f] = ev.target.value.trim();
+      guardar(); pintar();
+    });
+    // arrastrar un widget sobre otro = pasa a depender de él
+    let arr = null;
+    div.addEventListener('dragstart', ev => { const w = ev.target.closest('.ow'); if(!w || !editar) return; arr = w.dataset.id; ev.dataTransfer.effectAllowed = 'move'; w.classList.add('drag'); });
+    div.addEventListener('dragover', ev => { const w = ev.target.closest('.ow'); if(!arr || !w || w.dataset.id === arr) return; ev.preventDefault();
+      div.querySelectorAll('.ow.drop').forEach(x => x.classList.remove('drop')); w.classList.add('drop'); });
+    div.addEventListener('dragend', () => { arr = null; div.querySelectorAll('.drag,.drop').forEach(x => x.classList.remove('drag', 'drop')); });
+    div.addEventListener('drop', ev => { const w = ev.target.closest('.ow'); if(!arr || !w) return; ev.preventDefault();
+      const a = buscar(arr), d = buscar(w.dataset.id); if(!a || !a.p || desciende(a.n, d.n)) return;
+      snap(); a.p.h.splice(a.p.h.indexOf(a.n), 1); (d.n.h = d.n.h || []).push(a.n); a.n.lat = false; sel = a.n.id; guardar(); pintar(); });
+    if(!window._oeKey && (window._oeKey = 1)) document.addEventListener('keydown', ev => { if(!editar || !cont.isConnected) return;
+      if((ev.metaKey || ev.ctrlKey) && ev.key === 'z' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)){ ev.preventDefault(); deshacer(); } });
+  }
+
+  function pm(){
+    const D = E.pm;
+    return `<div class="ox"><h2>${esc(D.titulo)}</h2><div class="sub">${esc(D.sub)}</div>
+      <div class="sec">Fases</div><div class="fases">${D.fases.map(f=>`<div class="card fase c-${f.c}"><span class="n">${f.n}</span><span class="t">${esc(f.t)}</span>${f.cuando?`<div class="w">${esc(f.cuando)}</div>`:'<div class="w">&nbsp;</div>'}<ul>${f.items.map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>`).join('')}</div>
+      <div class="sec">Estructura</div><div id="oeHost"></div>
+      <div class="sec">Frentes transversales</div>
+      <div class="grid">${D.transversales.map(t=>`<div class="card tv c-${t.c}"><div class="t">${esc(t.t)}${t.ok?`<span class="ok">${esc(t.ok)}</span>`:''}</div><div class="p">${esc(t.p)}</div></div>`).join('')}</div>
+      <div class="sec">Agenda del día</div><div class="agenda">${D.agenda.map(a=>`<span>${esc(a)}</span>`).join('')}</div>
+      <div class="nota">${D.notas.map(esc).join('<br>')} Las etiquetas «por confirmar» marcan lo que no se lee con certeza en la pizarra. Los cambios del editor quedan guardados en este navegador; «Exportar» descarga el organigrama para compartirlo.</div></div>`;
+  }
+  function conc(){
+    const D = E.concesionado;
+    return `<div class="ox"><h2>${esc(D.titulo)}</h2><div class="sub">${esc(D.sub)}</div>
+      <div class="sec">Conducto formal</div>
+      <div class="flujo">${D.conducto.map((n,i)=>(i?'<div class="fl">→</div>':'')+`<div class="card c-${n.c}"><div class="t" style="font-weight:800;font-size:13px">${esc(n.t)}</div><div style="font-size:11px;color:#475569;margin-top:3px">${esc(n.s)}</div></div>`).join('')}</div>
+      <div class="nota">${esc(D.nota)}</div>
+      <div class="sec">Servicios de la Sociedad Concesionaria · 14 PAPS</div>
+      ${D.categorias.map(c=>`<div class="card cat c-${c.c}"><div class="ct">${esc(c.t)} · ${c.s.length}</div><div class="serv">${c.s.map(x=>`<div><b>${x[0]}</b>${esc(x[1])}</div>`).join('')}</div></div>`).join('')}
+      <div class="nota">Detalle de cada servicio en la plataforma 13 · PAPS.</div></div>`;
+  }
+  const alt = document.getElementById('altView');
+  function ver(v){
+    const hds = v === 'hds';
+    document.getElementById('subnav').style.display = hds ? '' : 'none';
+    document.getElementById('main').style.display = hds ? '' : 'none';
+    alt.style.display = hds ? 'none' : 'block';
+    if(!hds){ alt.innerHTML = v === 'pm' ? pm() : conc(); if(v === 'pm'){ montar(document.getElementById('oeHost')); accion('ajustar'); } }
+    document.querySelectorAll('#orgSwitch button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+    try{ localStorage.setItem('org15_vista', v); }catch(e){}
+  }
+  document.querySelectorAll('#orgSwitch button').forEach(b => b.addEventListener('click', () => ver(b.dataset.v)));
+  let ini = (location.hash || '').slice(1);
+  if(!['hds','pm','concesionado'].includes(ini)){ try{ ini = localStorage.getItem('org15_vista') || 'hds'; }catch(e){ ini = 'hds'; } }
+  if(ini !== 'hds') ver(ini);
+})();
+</script>
+</body>
+</html>
