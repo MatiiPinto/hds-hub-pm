@@ -1,7 +1,7 @@
 // SHARED_DATA/bitacora_pendientes.js — versión publicada en el HUB-PM (saneada por deploy_web_pm.py)
 window.BITACORA = {
  "version": "2026-10-05 · Bitácora y huddle de Puesta en Marcha",
- "generado": "2026-10-26",
+ "generado": "2026-10-27",
  "proposito": "Reunir en un solo lugar los pendientes que hoy viven dispersos en correos, ORD, cartas CS-IF, actas de mesas de trabajo y sesiones de trabajo.",
  "ambitos": [
   "Comunicaciones",
@@ -3402,7 +3402,7 @@ window.BITACORA = {
   {
    "id": "P150",
    "titulo": "Dotación · compras de servicio sin nombre de persona (109 filas)",
-   "detalle": "De las 113 compras de servicio de la planilla, 100 vienen con el nombre vacío y 9 con el nombre de la EMPRESA (SOCIAL MED ×3, MEDICAL ×3, LAYNER ×3, estas últimas con 3 cargos distintos en Pabellón). Ninguna de las 113 trae RUT. El Atlas y el slim ya las tratan como cupos y no como personas (regla `_dotSinPersona` / `sin_persona`), así que no inflan la cuenta: compras 113 = 3 con nombre + 110 cupos. Falta pedirle a Rodrigo Quijada que la planilla traiga el nombre de la persona o deje la fila explícitamente como cupo. Consultado a Rodrigo Quijada el 22-10-2026 junto con las 28 personas sin clasificación.",
+   "detalle": "De las 113 compras de servicio de la planilla, 100 vienen con el nombre vacío y 9 con el nombre de la EMPRESA (SOCIAL MED ×3, MEDICAL ×3, LAYNER ×3, estas últimas con 3 cargos distintos en Pabellón). Ninguna de las 113 trae RUT. El Atlas y el slim ya las tratan como cupos y no como personas (regla `_dotSinPersona` / `sin_persona`), así que no inflan la cuenta: compras 113 = 3 con nombre + 110 cupos. Falta pedirle a Rodrigo Quijada que la planilla traiga el nombre de la persona o deje la fila explícitamente como cupo. Consultado a Rodrigo Quijada el 22-10-2026 junto con las 28 personas sin clasificación. Reiterado el 26-10 en el correo de P173, planteado como que la fila quede marcada explícitamente como cupo.",
    "ambito": "Dotación",
    "prioridad": "Baja",
    "estado": "Esperando terceros",
@@ -3414,13 +3414,13 @@ window.BITACORA = {
    "origen_fecha": "2026-10-21",
    "compromiso": "",
    "creado": "2026-10-21",
-   "actualizado": "2026-10-22",
+   "actualizado": "2026-10-26",
    "notas": ""
   },
   {
    "id": "P151",
    "titulo": "Dotación · 28 personas sin clasificación que el Atlas no puede ubicar",
-   "detalle": "Al corte 19-10 quedan 28 registros que el Atlas no puede ubicar por falta de clasificación: 7 marcados PENDIENTE DE CLASIFICAR POR RRHH (informados el 23-09 con recinto pero sin departamento ni subdirección, y ninguno vigente en SIRH; 3 de ellos sin RUT: Marillán Huiquimil, Montalbán Rivereli y Silva Calquín), 10 de la Unidad de Diálisis cuyo departamento dice REVISAR, 9 de la Subdirección Médica cuya unidad dice REVISAR, 1 reemplazo sin subdirección (González Elgueta, ya corregida en la planilla) y 1 compra de servicio de Soporte Nutricional sin nombre. Consultado por correo a Rodrigo Quijada el 22-10-2026.",
+   "detalle": "Al corte 19-10 quedan 28 registros que el Atlas no puede ubicar por falta de clasificación: 7 marcados PENDIENTE DE CLASIFICAR POR RRHH (informados el 23-09 con recinto pero sin departamento ni subdirección, y ninguno vigente en SIRH; 3 de ellos sin RUT: Marillán Huiquimil, Montalbán Rivereli y Silva Calquín), 10 de la Unidad de Diálisis cuyo departamento dice REVISAR, 9 de la Subdirección Médica cuya unidad dice REVISAR, 1 reemplazo sin subdirección (González Elgueta, ya corregida en la planilla) y 1 compra de servicio de Soporte Nutricional sin nombre. Consultado por correo a Rodrigo Quijada el 22-10-2026. Consolidado el 26-10 en el correo de P173, ya con la unidad sugerida por el maestro SIC para las 9 de la Subdirección Médica.",
    "ambito": "Dotación",
    "prioridad": "Media",
    "estado": "Esperando terceros",
@@ -3432,7 +3432,7 @@ window.BITACORA = {
    "origen_fecha": "2026-10-22",
    "compromiso": "",
    "creado": "2026-10-22",
-   "actualizado": "2026-10-22",
+   "actualizado": "2026-10-26",
    "notas": ""
   },
   {
@@ -3984,10 +3984,10 @@ window.BITACORA = {
    "notas": "",
    "id": "P158",
    "prioridad": "Alta",
-   "estado": "Abierto",
+   "estado": "En curso",
    "contraparte": "Rodrigo Quijada · Unidad de Dotación",
    "titulo": "Dotación · dos funcionarios con egreso informado siguen contados como dotación activa",
-   "detalle": "La hoja «Egresos» que viene con los archivos de enrolamiento de la Inspección Fiscal trae tres egresos que la hoja de Rodrigo del 19-10 no tiene. Dos de ellos siguen en la matriz con vínculo TOTAL y sin fecha de alejamiento: Valencia Castro Camilo, auxiliar del Servicio Farmacia, con DESTITUCION al 15-10-2026, y Morales Aravena Branco Antonio, administrativo del Departamento Integral de Atención al Usuario, con SIN RENOVACION al 04-08-2026. El tercero, Cabrera Cabrera Paulina, con SIN RENOVACION al 30-04-2026, no está en la matriz y era una de las 49 personas sin rastro del cruce de la cabida de Loreto (P155): queda explicada. Llama la atención que la copia de la Inspección Fiscal tenga 190 filas y la de Rodrigo 303, y que aun así traiga egresos que la más larga no tiene. Los tres quedaron cargados en dotacion_egresos.json con la procedencia anotada, pero NO se marcó a nadie como egresado en la matriz: eso lo confirma la Unidad de Dotación."
+   "detalle": "La hoja «Egresos» que viene con los archivos de enrolamiento de la Inspección Fiscal trae tres egresos que la hoja de Rodrigo del 19-10 no tiene. Dos de ellos siguen en la matriz con vínculo TOTAL y sin fecha de alejamiento: Valencia Castro Camilo, auxiliar del Servicio Farmacia, con DESTITUCION al 15-10-2026, y Morales Aravena Branco Antonio, administrativo del Departamento Integral de Atención al Usuario, con SIN RENOVACION al 04-08-2026. El tercero, Cabrera Cabrera Paulina, con SIN RENOVACION al 30-04-2026, no está en la matriz y era una de las 49 personas sin rastro del cruce de la cabida de Loreto (P155): queda explicada. Llama la atención que la copia de la Inspección Fiscal tenga 190 filas y la de Rodrigo 303, y que aun así traiga egresos que la más larga no tiene. Los tres quedaron cargados en dotacion_egresos.json con la procedencia anotada, pero NO se marcó a nadie como egresado en la matriz: eso lo confirma la Unidad de Dotación. Consultado el 26-10 en el correo de P173, punto 2."
   },
   {
    "ambito": "Dotación",
@@ -4056,10 +4056,344 @@ window.BITACORA = {
    "notas": "",
    "id": "P162",
    "prioridad": "Media",
-   "estado": "Abierto",
+   "estado": "En curso",
    "contraparte": "Rodrigo Quijada · Unidad de Dotación",
    "titulo": "Dotación · 15 funcionarios de dotación titular sin registro en el control de acceso",
-   "detalle": "Quince personas con vínculo TOTAL en la matriz no aparecen en el maestro del control de acceso del 19-10, así que hoy no tendrían credencial para el edificio nuevo: cuatro médicos (Imagenología, UTI, Anestesia y Servicio de Medicina), cinco auxiliares (Operaciones, Bodega de Medicamentos, Paciente Crítico, Movilización y Farmacia), tres profesionales (Cuidados Médicos, Cuidados Ambulatorios Neurológicos y Licencias Médicas), un administrativo del DIAU y dos más de Cuidados Quirúrgicos y Paciente Crítico. Dos de los quince son justamente los del P158, que según la Inspección Fiscal ya egresaron. Los otros trece hay que enrolarlos o explicar por qué no están."
+   "detalle": "Quince personas con vínculo TOTAL en la matriz no aparecen en el maestro del control de acceso del 19-10, así que hoy no tendrían credencial para el edificio nuevo: cuatro médicos (Imagenología, UTI, Anestesia y Servicio de Medicina), cinco auxiliares (Operaciones, Bodega de Medicamentos, Paciente Crítico, Movilización y Farmacia), tres profesionales (Cuidados Médicos, Cuidados Ambulatorios Neurológicos y Licencias Médicas), un administrativo del DIAU y dos más de Cuidados Quirúrgicos y Paciente Crítico. Dos de los quince son justamente los del P158, que según la Inspección Fiscal ya egresaron. Los otros trece hay que enrolarlos o explicar por qué no están. Consultado el 26-10 en el correo de P173, punto 4."
+  },
+  {
+   "id": "P173",
+   "ambito": "Dotación",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Matías",
+   "contraparte": "Rodrigo Quijada · Unidad de Dotación",
+   "servicio": "",
+   "origen_tipo": "correo",
+   "origen_ref": "Matriz de dotación · 28 personas sin clasificación para ubicarlas en el Atlas",
+   "origen_fecha": "2026-10-26",
+   "compromiso": "",
+   "creado": "2026-10-26",
+   "actualizado": "2026-10-26",
+   "titulo": "Dotación · consulta consolidada a la Unidad de Dotación: cinco frentes en un solo correo",
+   "detalle": "Borrador del 26-10 dentro del hilo de las personas sin clasificación, con copia a Loreto Pérez y Yoselin Calderón, que junta en un solo correo todo lo que la planilla tiene pendiente. Adjunto _DOCS/Informes_Servicios/Consultas_Dotacion_2026-10-26.xlsx, cinco hojas sin RUT con la columna de respuesta en blanco. Los cinco frentes: (1) 29 personas sin clasificar, de las cuales las 9 de la Subdirección Médica ya traen la unidad que sugiere el maestro SIC del 19-10 y sólo hay que confirmarla, mientras siguen abiertas las 10 de Diálisis sin departamento y las 10 marcadas PENDIENTE DE CLASIFICAR POR RRHH, tres de ellas sin RUT; (2) egresos, con los dos funcionarios que siguen contados como activos, el caso que no está en la planilla y las 36 salidas sin causal; (3) compras de servicio, pidiendo que la fila quede marcada como cupo cuando no haya persona, que es lo que resuelve nuestro conteo sin forzarlo a inventar nombres; (4) control de acceso, con las 15 sin credencial y las 17 con credencial que no están en la planilla; (5) un paquete de correcciones chicas de la fuente. Se le dijo que la prioridad son el 1 y el 2, porque son los que impiden cerrar la ubicación en el Atlas. Reúne y reemplaza como vía de consulta a P011, P012, P150, P151, P158 y P162. Emergencia quedó fuera a propósito: se espera lo que haga Loreto Pérez con la cabida de la UEH (P154). ⛔ El correo está en borrador, sin enviar, esperando el visto bueno de Matías; hay que adjuntar la planilla a mano."
+  },
+  {
+   "id": "P174",
+   "ambito": "Puesta en Marcha",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "María Elena Sepúlveda",
+   "contraparte": "Director HDS · Francisca Cid (SSMO)",
+   "servicio": "",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Reunión diaria PM 27-10-2026 (acta SDADT, grabación matii01)",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "titulo": "Nueva organización PM: María Elena asume la Coordinación Técnica y Francisca Cid es el canal oficial con el SSMO",
+   "detalle": "Lo plantea hoy al director. María Elena Sepúlveda (SDADT) queda encomendada como coordinadora técnica de la unidad de Puesta en Marcha y Gestión del Cambio; Catherine Sepúlveda se libera para dedicarse 100 % a Autorización Sanitaria. Francisca Cid (jefa del programa de Planificación y Proyectos del SSMO, encomendada como coordinadora técnica del director del Servicio) es el canal: lo oficial, de director a director, sale y llega a través de ella. Las coordinaciones del día a día siguen uno a uno, copiando a la coordinadora técnica. Fernando Lacalle pidió que TIC y Logística salgan de la estructura PM; lo administrativo-logístico queda con Rodrigo junto a Fernando Lacalle y Marisol Salvatierra.",
+   "plazo": "2026-10-27"
+  },
+  {
+   "id": "P175",
+   "ambito": "EMMC",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "María Elena Sepúlveda · Rodrigo Hermosilla · Matías Pinto",
+   "contraparte": "Francisca Cid (SSMO) · Mariana Bravo (Equipos Médicos) · Fernando Lacalle",
+   "servicio": "",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Reunión diaria PM 27-10-2026 (acta SDADT, grabación matii01)",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "titulo": "Reunión del jueves 29-10 sobre equipamiento médico de traslado y comodatos con Francisca Cid",
+   "detalle": "Se acordó dedicar la reunión del jueves sólo a equipamiento médico, por ser hoy lo más crítico. Mariana Bravo y Fernando Lacalle deben explicar en qué etapa de validación está cada equipo (servicio → SSMO → factibilidad de la Concesionaria → fecha de traslado). Contexto: ~800 equipos solicitados para traslado (sin contar comodatos), 18 autorizados por el decreto de 2018 y no más de 20 con visto bueno del Servicio; ningún comodato ha sido presentado aún a la Concesionaria y cada uno requiere su propio análisis (enchufe, agua, climatización). La CSSO advirtió que el proveedor toma 21 días, y ella probablemente más.",
+   "plazo": "2026-10-29"
+  },
+  {
+   "id": "P176",
+   "ambito": "EMMC",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Rodrigo Hermosilla",
+   "contraparte": "Francisca Cid (SSMO)",
+   "servicio": "",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Reunión diaria PM 27-10-2026 (acta SDADT, grabación matii01)",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "titulo": "Traslado de equipos: insistir a Francisca Cid por la respuesta del SSMO a lo ya enviado",
+   "detalle": "Los plazos se vienen encima y la lista se ha ido inflando (desde la reunión con subdirectores surgieron ~400 más). Riesgo: si el Servicio no responde antes de la PSP, el hospital tendría que pedirlo solo al MOP, con menos respaldo. Recordar la historia ante las críticas: entre 2021 y 2022 el equipo técnico se reunió con cada servicio, todo quedó firmado y el presupuesto de equipamiento de la Concesionaria subió ~15 % (decreto actualizado en 2023).",
+   "plazo": "2026-10-29"
+  },
+  {
+   "id": "P177",
+   "ambito": "Puesta en Marcha",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "responsable": "María Elena Sepúlveda · Matías Pinto",
+   "contraparte": "Jefes de servicio · subdirectores",
+   "servicio": "",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Reunión diaria PM 27-10-2026 (acta SDADT, grabación matii01)",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "titulo": "Reuniones uno a uno por servicio: plano, cabida, equipos, funcionamiento y Autorización Sanitaria",
+   "detalle": "Antes de la simulación clínica, María Elena se reúne con cada jefe de servicio, acompañada por Matías, partiendo por la SDADT: (1) plano, (2) cabida, (3) equipos, (4) cómo quieren funcionar y (5) Autorización Sanitaria. Se hace servicio por servicio y no en una reunión grande. Pedir justificación clínica (cartera y producción) de los equipos solicitados, que hoy falta en el listado de Mariana Bravo."
+  },
+  {
+   "id": "P178",
+   "ambito": "EMMC",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Meylin Canales",
+   "contraparte": "Equipo PM",
+   "servicio": "",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Reunión diaria PM 27-10-2026 (acta SDADT, grabación matii01)",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "titulo": "Proyectar mañana el detalle de los 14 equipos sin verificable y mandar el informe cada vez que se actualice",
+   "detalle": "De 6.460 equipos, 6.446 están recepcionados (99,7 %). Faltan 14 sin respaldo verificable en las pautas: 6 nunca revisados y los que quedaron con cruz, entre ellos 3 monitores de signos vitales de Diálisis (la pauta trae 8 y el Anexo IV 11; sólo la Concesionaria puede decir si tienen verificable en otro BIM). Hoy se envió a Catherine el informe por unidad, con el detalle de cada equipo que falta.",
+   "plazo": "2026-10-28"
+  },
+  {
+   "id": "P179",
+   "ambito": "EMMC",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Meylin Canales",
+   "contraparte": "Sociedad Concesionaria · equipo de Equipos Médicos",
+   "servicio": "",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Reunión diaria PM 27-10-2026 (acta SDADT, grabación matii01)",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "titulo": "Subsanaciones EMMC del miércoles al viernes: 1.166 equipos (52 % de los 2.201 que no cumplen)",
+   "detalle": "La programación llegó ayer cerca de las 17:00. Van 7 personas por día, según la carga de trabajo. Hay que completar las pautas que quedaron incompletas al inicio: si la observación dice que faltan partes y piezas, debe ir la cruz en esa columna, porque si no la Concesionaria lo da por cumplido. Estado: 4.245 cumplen y 2.201 no cumplen (34,1 %); 625 de 1.025 recintos siguen con firma 1.",
+   "plazo": "2026-10-30"
+  },
+  {
+   "id": "P180",
+   "ambito": "Aut. Sanitaria",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Catherine Sepúlveda · Javiera Flores",
+   "contraparte": "Jefes de unidades clínicas",
+   "servicio": "",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Reunión diaria PM 27-10-2026 (acta SDADT, grabación matii01)",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "titulo": "Cartera de prestaciones dividida por unidad clínica, para que cada jefe la valide y complete",
+   "detalle": "Lista para la consulta a los jefes de aquí a la próxima semana. La envía Catherine.",
+   "plazo": "2026-11-06"
+  },
+  {
+   "id": "P181",
+   "ambito": "Aut. Sanitaria",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "responsable": "Catherine Sepúlveda",
+   "contraparte": "Dr. Colorado (Medicina Nuclear) · Dr. Díaz · Dra. Herrera · Sergio Scotti",
+   "servicio": "",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Reunión diaria PM 27-10-2026 (acta SDADT, grabación matii01)",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "titulo": "Medicina Nuclear: el Dr. Colorado presenta al equipo qué requiere abrir el servicio",
+   "detalle": "El hospital no se presenta ahora a Autorización Sanitaria con Medicina Nuclear: el equipo está comprado y puesto, pero faltan recurso humano, protocolos, compra de radioisótopos y convenios. Igual conviene conocerlo para el proyecto 2027 y comparar el costo actual de la compra de servicios (que se declara a la SEREMI) contra el de abrir. Se fija una reunión en que el Dr. Colorado expone a todos."
+  },
+  {
+   "id": "P182",
+   "ambito": "Aut. Sanitaria",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "responsable": "Catherine Sepúlveda · Allison Davis (OPR)",
+   "contraparte": "Fernando Lacalle · Director",
+   "servicio": "",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Reunión diaria PM 27-10-2026 (acta SDADT, grabación matii01)",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "titulo": "Certificación de protección radiológica ante la SEREMI: quién la paga lo decide la Dirección",
+   "detalle": "Allison Davis, como Oficial de Protección Radiológica, se hace cargo de todo el proceso. Se manda a Fernando Lacalle cuánto cuesta (cuántos son médicos y cuántos no) para que la Dirección decida si lo paga. Se planteó que, si el funcionario está full time en el hospital, lo pague el hospital: TM de Rayos y de Pabellón lo están pagando ellos mismos. PM sólo coordina; resuelven los subdirectores y el director."
+  },
+  {
+   "id": "P183",
+   "ambito": "Aut. Sanitaria",
+   "prioridad": "Baja",
+   "estado": "Abierto",
+   "responsable": "Catherine Sepúlveda",
+   "contraparte": "Dr. Sajur",
+   "servicio": "",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Reunión diaria PM 27-10-2026 (acta SDADT, grabación matii01)",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "titulo": "Consultar al Dr. Sajur si se incluye OSDOM [sic?] y dónde",
+   "detalle": "Idea: junto a la urgencia, en el edificio de Psiquiatría, o en el estacionamiento poco conocido de Medicina Física (acceso independiente). Llevarla como alternativas A, B o C. Ponerlo trae beneficios, pero sacrifica áreas ya destinadas a otros usos."
+  },
+  {
+   "id": "P184",
+   "ambito": "Comunicaciones",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "responsable": "Catherine Sepúlveda",
+   "contraparte": "Inspección Fiscal · Esteban (señalética)",
+   "servicio": "",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Reunión diaria PM 27-10-2026 (acta SDADT, grabación matii01)",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "titulo": "Señalética: reunión del miércoles en la tarde con la Inspección; tótems, infografía y señalética tipo A",
+   "detalle": "Ya están listos el directorio, las líneas de piso y la ubicación de los directorios. Esteban aceptó cambiar los tótems de la avenida hospitalaria y del acceso por Alessandri con Infante, para incorporar una infografía con información más detallada. En revisión: la señalética tipo A, la de las unidades.",
+   "plazo": "2026-10-28"
+  },
+  {
+   "id": "P185",
+   "ambito": "Puesta en Marcha",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Fernando Araya · Costanza Poch · Catherine Sepúlveda",
+   "contraparte": "SSMO · Dr. Ramírez · Margarita",
+   "servicio": "",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Reunión diaria PM 27-10-2026 (acta SDADT, grabación matii01)",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "titulo": "Reunión de traslado del miércoles 28-10 (10:00–11:30): poblamiento, Comisión de Poblamiento y disponibilidad de camas",
+   "detalle": "Tabla: respuesta y avance sobre la estrategia de poblamiento (SSMO, coordinación intersectorial), la coordinación de la Comisión de Poblamiento (Dr. Ramírez y Margarita) y la disponibilidad de camas. Esta vez fue a las 10:00 y María Elena no puede asistir (visita del equipo da Vinci desde el extranjero), así que la reemplaza Catherine. Lo habitual es los miércoles de 11:00 a 12:30. Queda pendiente la pregunta de urgencia: cómo se frena la entrada para despoblar.",
+   "plazo": "2026-10-28"
+  },
+  {
+   "id": "P186",
+   "ambito": "Puesta en Marcha",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Fernando Araya",
+   "contraparte": "Director HDS → Director SSMO",
+   "servicio": "",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Reunión diaria PM 27-10-2026 (acta SDADT, grabación matii01)",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "titulo": "Programa de traslado (versión final, no borrador) se presenta oficialmente al Servicio, de director a director",
+   "detalle": "Sólo cambiaron los detalles de la metodología y del despoblamiento; el resto es lo mismo que ya se conocía. Lo revisará el Dr. Vargas [sic?]. Siguen abiertos temas que no se han resuelto, como los ~30 días que demora una prestación de los institutos vecinos para un paciente hospitalizado."
+  },
+  {
+   "id": "P187",
+   "ambito": "Dotación",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Loreto Pérez",
+   "contraparte": "Manuel Ramírez · Subdirección Médica · UGI [sic?]",
+   "servicio": "",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Reunión diaria PM 27-10-2026 (acta SDADT, grabación matii01)",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "titulo": "Cabida: confirmar que esté citada la revisión con la Subdirección Médica del miércoles en la tarde y cerrar esta semana",
+   "detalle": "Ha sido difícil porque el tema no ha estado claro; la meta es lograrlo durante la semana.",
+   "plazo": "2026-10-28"
+  },
+  {
+   "id": "P188",
+   "ambito": "Capacitación",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Javiera Pacheco",
+   "contraparte": "Plan Piloto · I. Rojas [sic?]",
+   "servicio": "",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Reunión diaria PM 27-10-2026 (acta SDADT, grabación matii01)",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "titulo": "Plan Piloto: al viernes 30-10, los 252 nominados enrolados y capacitados",
+   "detalle": "Enrolados: 152 (la última nómina venía con errores y duplicados; se corrige con el maestro del 19-10). Capacitación general: 224, faltan 20. Específicas: 216, faltan 26. Quien decida no capacitarse sale de la nómina y se reemplaza, porque es requisito. Falta asignar a qué cursos se inscribe cada persona, en coordinación con directores y jefes.",
+   "plazo": "2026-10-30"
+  },
+  {
+   "id": "P189",
+   "ambito": "Dotación",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "responsable": "María Elena Sepúlveda",
+   "contraparte": "Gestión de la Demanda · GRD · Auditoría · Trabajo Social",
+   "servicio": "",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Reunión diaria PM 27-10-2026 (acta SDADT, grabación matii01)",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "titulo": "Uniformes: casos por resolver como decisión institucional",
+   "detalle": "Casos: enfermeras en funciones administrativas (Gestión de la Demanda), GRD, Auditoría y Calidad, y Trabajo Social, que pide delantal. Las secretarias no llevan uniforme clínico. Distinguir la ropa de circulación del delantal, porque algunos no saben que tienen ropa de circulación. Los cambios mayores van para el próximo PAP (2028); se revisa si algo puede adelantarse."
+  },
+  {
+   "id": "P190",
+   "ambito": "EMMC",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "responsable": "Matías Pinto",
+   "contraparte": "María Elena Sepúlveda · Mariana Bravo",
+   "servicio": "",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Reunión diaria PM 27-10-2026 (acta SDADT, grabación matii01)",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "titulo": "Llevar a la reunión del jueves un seguimiento por etapa de cada equipo de traslado, para bajar la incertidumbre",
+   "detalle": "Propuesta de Matías en la reunión: el problema es la incertidumbre. Con ~800 equipos, cada uno debe mostrar en qué etapa está (solicitud del servicio → validación del SSMO → factibilidad de la Concesionaria → fecha en que se puede llevar), en lugar de «lo estamos viendo».",
+   "plazo": "2026-10-29"
+  },
+  {
+   "id": "P191",
+   "ambito": "Obra",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "responsable": "Rodrigo Espinoza",
+   "contraparte": "Logística · Concesionaria · ISP",
+   "servicio": "",
+   "origen_tipo": "Reunión",
+   "origen_ref": "Reunión diaria PM 27-10-2026 (acta SDADT, grabación matii01)",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-27",
+   "actualizado": "2026-10-27",
+   "titulo": "Logística en terreno: racks según la observación del ISP y destino de la bodega de 200 m² de Anatomía Patológica",
+   "detalle": "⚠ Atribución por confirmar (dos Rodrigo en el acta). Hoy en la tarde hay visita en terreno con los proveedores de logística, para ver si se pueden instalar los racks revisados ayer. Nadie ha explicado aún qué mobiliario va en la bodega de 200 m², que además requiere fumigación. Las oficinas de logística vistas ayer requieren sacar mobiliario."
   }
  ],
  "criticos": [
@@ -4122,13 +4456,211 @@ window.BITACORA = {
   "Todo el equipo PM",
   "Manuel Ramírez",
   "Lorena Encina",
+  "Costanza Poch",
+  "Fernando Araya",
+  "Horacio Díaz",
+  "Javiera Flores",
+  "Javiera Pacheco",
+  "María Elena Sepúlveda",
+  "Rodrigo Espinoza",
+  "Rodrigo Hermosilla",
   "No consta"
  ],
  "huddle": {
   "nombre": "Huddle de Puesta en Marcha",
   "primera_sesion": "2026-10-06",
-  "hora": "08:30",
+  "hora": "08:00",
   "formato": "Resueltos desde el último huddle → nuevos → críticos → vencidos y por vencer → frentes; cada pendiente sale con responsable y plazo.",
-  "privado": "Los pendientes con privado=true se ven solo en el 🔴 local: el deploy del 🟡 los quita."
+  "privado": "Los pendientes con privado=true se ven solo en el 🔴 local: el deploy del 🟡 los quita.",
+  "reunion_diaria": {
+   "nombre": "Reunión diaria Puesta en Marcha",
+   "dias": "lunes a viernes, en la medida de lo posible",
+   "hora": "08:00–09:00",
+   "lugar": "Oficina Puesta en Marcha",
+   "acta": "Acta de reunión SDADT",
+   "grabacion": "Matías la graba con matii01; la minuta queda en Minutas/minutas/",
+   "desde": "2026-10-27",
+   "asistentes": [
+    {
+     "nombre": "Catherine Sepúlveda",
+     "alias": [
+      "Catherine",
+      "C. Sepúlveda"
+     ]
+    },
+    {
+     "nombre": "Costanza Poch",
+     "alias": [
+      "Costanza",
+      "C. Poch"
+     ]
+    },
+    {
+     "nombre": "Fernando Araya",
+     "alias": [
+      "F. Araya"
+     ]
+    },
+    {
+     "nombre": "Horacio Díaz",
+     "alias": [
+      "Horacio",
+      "H. Díaz"
+     ]
+    },
+    {
+     "nombre": "Javiera Flores",
+     "alias": [
+      "J. Flores"
+     ]
+    },
+    {
+     "nombre": "Javiera Pacheco",
+     "alias": [
+      "J. Pacheco"
+     ]
+    },
+    {
+     "nombre": "Loreto Pérez",
+     "alias": [
+      "Loreto",
+      "L. Pérez"
+     ]
+    },
+    {
+     "nombre": "María Elena Sepúlveda",
+     "alias": [
+      "María Elena",
+      "M.E. Sepúlveda"
+     ]
+    },
+    {
+     "nombre": "Matías Pinto",
+     "alias": [
+      "Matías",
+      "M. Pinto"
+     ]
+    },
+    {
+     "nombre": "Meylin Canales",
+     "alias": [
+      "Meylin",
+      "Mey",
+      "M. Canales"
+     ]
+    },
+    {
+     "nombre": "Rodrigo Espinoza",
+     "alias": [
+      "R. Espinoza"
+     ]
+    },
+    {
+     "nombre": "Rodrigo Hermosilla",
+     "alias": [
+      "R. Hermosilla"
+     ]
+    }
+   ],
+   "reuniones": [
+    {
+     "fecha": "2026-10-27",
+     "minuta": "2026-10-27_reunion-diaria-pm.md",
+     "duracion": "01:06",
+     "pendientes": [
+      "P174",
+      "P175",
+      "P176",
+      "P177",
+      "P178",
+      "P179",
+      "P180",
+      "P181",
+      "P182",
+      "P183",
+      "P184",
+      "P185",
+      "P186",
+      "P187",
+      "P188",
+      "P189",
+      "P190",
+      "P191"
+     ],
+     "por_participante": {
+      "María Elena Sepúlveda": {
+       "avances": [
+        "Conduce la reunión: rutina L–J de 8:00 a 9:00; los viernes no hay, por el Comité Estratégico",
+        "Acordó con el director la nueva organización: ella como coordinadora técnica de PM y Francisca Cid como canal oficial con el SSMO",
+        "El proceso quirúrgico está medido y casi listo; hoy a las 10:00 se presenta con Carlos Jara"
+       ]
+      },
+      "Catherine Sepúlveda": {
+       "avances": [
+        "Reunión con el Dr. Colorado (Medicina Nuclear): se aclaró que no se presenta ahora",
+        "Señalética: listos el directorio, las líneas de piso y la ubicación de los directorios",
+        "Recibió el informe EMMC por unidad que mandó Meylin"
+       ]
+      },
+      "Javiera Flores": {
+       "avances": [
+        "Trabaja con Catherine en la cartera de prestaciones, dividida por unidad clínica"
+       ]
+      },
+      "Meylin Canales": {
+       "avances": [
+        "6.446 de 6.460 equipos recepcionados (99,7 %); pendientes bajaron de 20 a 14",
+        "4.245 cumplen y 2.201 no cumplen (34,1 %); informe por unidad enviado hoy",
+        "Subsanación programada para 1.166 equipos (mié–vie)"
+       ]
+      },
+      "Rodrigo Hermosilla": {
+       "avances": [
+        "Expuso el estado de los traslados: ~800 solicitados, 18 autorizados (2018) y ≤20 con visto bueno",
+        "Mantiene la planilla de traslados (4 pestañas) revisada con Mariana Bravo"
+       ]
+      },
+      "Rodrigo Espinoza": {
+       "avances": [
+        "⚠ Por confirmar: envió el maestro de funcionarios al 19-10 con formato de enrolamiento",
+        "⚠ Por confirmar: visitó las oficinas y la bodega de logística"
+       ]
+      },
+      "Fernando Araya": {
+       "avances": [
+        "Programa de traslado en versión final (ya no borrador): sólo cambian los detalles de metodología y despoblamiento"
+       ]
+      },
+      "Costanza Poch": {
+       "avances": [
+        "⚠ Por confirmar: entregó los datos de ingreso de urgencia (con Margarita) para el despoblamiento"
+       ]
+      },
+      "Javiera Pacheco": {
+       "avances": [
+        "Piloto: 152 enrolados, 224 con capacitación general y 216 con específica, de 252"
+       ]
+      },
+      "Loreto Pérez": {
+       "avances": [
+        "Sigue con la cabida; tiene acceso a la agenda de María Elena para coordinar"
+       ]
+      },
+      "Horacio Díaz": {
+       "avances": [
+        "⚠ Si es el Dr. Díaz: el viernes hizo terreno del piloto con Meylin: faltan ajustar 2 puntos en los 4 turnos",
+        "Confirmó que las solicitudes de traslado están firmadas por los equipos de cada unidad"
+       ]
+      },
+      "Matías Pinto": {
+       "avances": [
+        "Trajo la rutina de la reunión: la Bitácora tiene una tarjeta por asistente",
+        "Compartió la lección de las Jornadas de Biomédica (23-10): bajar la incertidumbre del equipamiento"
+       ]
+      }
+     }
+    }
+   ]
+  }
  }
 };

@@ -122,6 +122,12 @@ button.go{background:var(--teal)} button.warn{background:var(--amber)}
 .hud-add{padding:10px 12px}
 .hud-add .row{display:grid;grid-template-columns:2.4fr 1.2fr .9fr 1fr auto auto;gap:8px;align-items:center}
 .hud-add input,.hud-add select{width:100%}
+/* reunión diaria: una tarjeta por asistente */
+.rd{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px;padding:2px 0 6px}
+.rd .p{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 11px;font-size:12.5px}
+.rd .p b{font-size:13.5px}.rd .p .c{float:right;color:var(--dim);font-size:11.5px}
+.rd .p h4{margin:7px 0 3px;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--dim)}
+.rd .p ul{margin:0;padding-left:16px}.rd .p li{margin:2px 0}.rd .p .vac{color:var(--dim);font-style:italic}
 .hsec{margin:16px 0 8px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .hsec h2{margin:0;font-size:15px}
 .hsec .n{background:var(--chip);border-radius:20px;padding:1px 9px;font-size:11.5px;color:#cfe0f5}
@@ -183,6 +189,7 @@ body.pub .solo-local{display:none!important}
     <div class="hud-top" id="hud-top"></div>
     <div class="kpis" id="kpis-h"></div>
     <div class="form on hud-add" id="hud-add"></div>
+    <div id="hud-rd"></div>
     <div id="hud-body"></div>
   </div>
 
@@ -1062,6 +1069,20 @@ function seccion(ico,tit,ayuda,L,abiertoDef=true){
   return `<div class="hsec"><h2>${ico} ${tit}</h2><span class="n">${L.length}</span><span class="ayuda">${ayuda}</span></div>`+
     (L.length?L.map(filaH).join(''):'<div class="vacio" style="padding:10px">Nada aquí.</div>');
 }
+// Reunión diaria (acta SDADT, 08:00–09:00): avances de la última reunión y pendientes abiertos por asistente
+function renderReunion(){
+  const R=(SEMILLA.huddle||{}).reunion_diaria, el=document.getElementById('hud-rd'); if(!R||!el) return;
+  const U=(R.reuniones||[]).slice(-1)[0]||null, ab=D.filter(abierto);
+  const de=a=>{ const k=[a.nombre,...(a.alias||[])].map(x=>x.toLowerCase());
+    return ab.filter(x=>{ const r=(x.responsable||'').toLowerCase(); return k.some(n=>new RegExp('(^|[^a-záéíóúñ])'+n.replace(/\./g,'\\.')+'($|[^a-záéíóúñ])').test(r)); }); };
+  const li=L=>L.length?'<ul>'+L.map(t=>'<li>'+t+'</li>').join('')+'</ul>':'<div class="vac">—</div>';
+  const cards=R.asistentes.map(a=>{ const P=de(a), v=(U&&(U.por_participante||{})[a.nombre])||{};
+    return `<div class="p"><b>${esc(a.nombre)}</b><span class="c">${P.length} abiertos</span>
+      <h4>✅ Avances${U?' · '+fmt(U.fecha):''}</h4>${li((v.avances||[]).map(esc))}
+      <h4>📌 Pendientes</h4>${li(P.sort((x,y)=>(plazoDe(x)||'9').localeCompare(plazoDe(y)||'9')).slice(0,6).map(x=>`<b>${x.id}</b> ${esc(x.titulo)}${plazoDe(x)?' · '+fmt(plazoDe(x)):''}`).concat(P.length>6?['… y '+(P.length-6)+' más']:[]))}</div>`; }).join('');
+  el.innerHTML=`<details class="fr" open><summary>👥 ${esc(R.nombre)} · ${esc(R.hora)} · ${esc(R.lugar)} · ${R.asistentes.length} asistentes
+    <span style="font-weight:400;color:var(--dim)"> · ${U?'última: '+fmt(U.fecha)+(U.minuta?' · minuta '+esc(U.minuta):''):'sin reuniones cargadas'}</span></summary><div class="rd">${cards}</div></details>`;
+}
 function renderHuddle(){
   const el=document.getElementById('hud-body'); if(!el) return;
   const A=HS.activo, h=hoy(), dsd=A?A.desde:desde();
@@ -1085,7 +1106,7 @@ function renderHuddle(){
     ${A?`<button class="ghost" onclick="vistaPrevia()">👁 Acta en curso</button><button class="warn" onclick="cerrarHuddle()">■ Cerrar huddle</button>`
        :`<button class="go" onclick="iniciarHuddle()">▶ Iniciar huddle</button>`}
     ${(HS.sesiones||[]).length?`<select onchange="if(this.value!=='')verActa(+this.value);this.value=''"><option value="">Actas anteriores…</option>${HS.sesiones.map((s,i)=>`<option value="${i}">${fmt(s.fecha)} · ${s.inicio}</option>`).reverse().join('')}</select>`:''}`;
-  pintarSync();
+  pintarSync(); renderReunion();
   const k=[['abiertos',ab.length],['🚨 críticos',ab.filter(esCritico).length],['vencidos',venc],
            ['nuevos desde '+fmt(dsd).slice(0,5),nue.length],['✅ resueltos desde '+fmt(dsd).slice(0,5),res.length],
            ['sin responsable',ab.filter(noResp).length],['sin plazo',ab.filter(x=>!plazoDe(x)).length]];

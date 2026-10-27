@@ -105,23 +105,23 @@
 /* ── Nodos estilo PDF (Organigrama_HDS_doble_carta) ───────────────── */
 .pdfn{box-sizing:border-box;display:flex;align-items:center;justify-content:center;
       text-align:center;border-radius:7px;cursor:pointer;overflow:hidden;
-      padding:4px 8px;transition:box-shadow .15s,transform .12s,filter .15s;}
+      padding:5px 30px;transition:box-shadow .15s,transform .12s,filter .15s;}  /* 30px: el texto no queda bajo la cifra */
 .pdfn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(15,40,50,.18);filter:brightness(1.04);z-index:5}
-.pdfn-tx{line-height:1.18;font-weight:700;letter-spacing:.2px;text-transform:uppercase}
-.pdfn-cnt{position:absolute;top:3px;right:5px;font-size:8.5px;font-weight:800;
-          background:rgba(255,255,255,.85);color:#125f5b;border-radius:8px;padding:0 4px;line-height:13px}
+.pdfn-tx{line-height:1.2;font-weight:700;letter-spacing:.3px;text-transform:uppercase}
+.pdfn-cnt{position:absolute;top:3px;right:5px;font-size:11px;font-weight:800;
+          background:rgba(255,255,255,.9);color:#0d4f4b;border-radius:9px;padding:0 5px;line-height:16px}
 /* raíz y línea: teal sólido, texto blanco */
-.pdfn-root{background:#17807B;color:#fff;border:1px solid #12645f;font-size:14px}
-.pdfn-root .pdfn-tx{font-size:14px}
+.pdfn-root{background:#17807B;color:#fff;border:1px solid #12645f;font-size:20px}
+.pdfn-root .pdfn-tx{font-size:20px;font-weight:800}
 .pdfn-l2{background:#1E7F7A;color:#fff;border:1px solid #17706b}
-.pdfn-l2 .pdfn-tx{font-size:11px}
+.pdfn-l2 .pdfn-tx{font-size:15px;font-weight:800}
 /* nivel 3+: celeste claro, texto oscuro */
-.pdfn-l3{background:#D7E7EC;color:#123c47;border:1px solid #b9d2da}
-.pdfn-l3 .pdfn-tx{font-size:10px;font-weight:600}
+.pdfn-l3{background:#D7E7EC;color:#0b2e37;border:1px solid #a9c7d1}
+.pdfn-l3 .pdfn-tx{font-size:13.5px;font-weight:700}
 .pdfn-l3 .pdfn-cnt{background:#17807B;color:#fff}
 /* asesorías: punteado, muy claro */
-.pdfn-staff{background:#EFF5F5;color:#33555e;border:1px dashed #9db9c2}
-.pdfn-staff .pdfn-tx{font-size:9px;font-weight:600}
+.pdfn-staff{background:#EFF5F5;color:#123c47;border:1.5px dashed #86a9b4}
+.pdfn-staff .pdfn-tx{font-size:13px;font-weight:700}
 .pdfn-staff .pdfn-cnt{background:#17807B;color:#fff}
 .pdfn.is-new{outline:2px solid #f59e0b;outline-offset:1px}
   #zpWrapper{position:absolute;top:0;left:0;transform-origin:0 0;will-change:transform}
@@ -290,10 +290,10 @@
   .ow{position:absolute;border-radius:14px;padding:8px 10px;border:1px solid transparent;box-shadow:0 1px 3px rgba(31,42,85,.08);overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;color:#1F2A55;transition:box-shadow .15s,transform .15s}
   .ow.c-azul{background:#E3EEFB;border-color:#9cc2ee} .ow.c-verde{background:#E3F4EA;border-color:#97d3b1} .ow.c-durazno{background:#FDEBDD;border-color:#f2b88d}
   .ow.c-lila{background:#ECE7FA;border-color:#b8a8ea} .ow.c-navy{background:#1F2A55;color:#fff}
-  .ow .t{font-weight:800;font-size:12.5px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-  .ow.zL .t{font-size:14px} .ow .s{font-size:10px;opacity:.75;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-  .ow .pp{margin-top:5px;display:flex;flex-wrap:wrap;gap:3px;justify-content:center;overflow:hidden;max-height:40px} .ow.zS .pp{max-height:19px} .ow.zL .pp{max-height:62px}
-  .ow .pp span{background:rgba(255,255,255,.78);border-radius:9px;padding:1px 6px;font-size:9.8px;font-weight:600;color:#1F2A55;white-space:nowrap}
+  .ow .t{font-weight:800;font-size:17px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .ow.zL .t{font-size:20px} .ow .s{font-size:13px;opacity:.85;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+  .ow .pp{margin-top:5px;display:flex;flex-wrap:wrap;gap:3px;justify-content:center;overflow:hidden;max-height:50px} .ow.zS .pp{max-height:24px} .ow.zL .pp{max-height:76px}
+  .ow .pp span{background:rgba(255,255,255,.85);border-radius:9px;padding:1px 7px;font-size:12.5px;font-weight:600;color:#1F2A55;white-space:nowrap}
   .ow .q{position:absolute;top:4px;right:5px;width:9px;height:9px;border-radius:50%;background:#f59e0b;font-size:0;cursor:help}
   .ow.sel{box-shadow:0 0 0 3px #2563eb,0 6px 16px rgba(31,42,85,.18);z-index:2}
   .ow[draggable="true"]{cursor:grab} .ow.drag{opacity:.4} .ow.drop{box-shadow:0 0 0 3px #10b981;transform:scale(1.04)}
@@ -783,19 +783,19 @@ function nodeStaffCount(node){ return staffForNode(node, currentScope).length; }
    Forma: raíz arriba · asesorías punteadas colgando del eje vertical ·
    bus horizontal · columnas de línea (teal) con sus hijos APILADOS en
    vertical e indentados, unidos por codos a la izquierda.            */
-const ROOT_W=300, ROOT_H=54;
-const STAFF_W=270, STAFF_H=28, STAFF_G=7, STAFF_LEAD=34;
-const L2_W=214, L2_MINH=46;
-const L3_W=198, L3_MINH=40, L3_INDENT=20, L3_VG=9;
-const COL_G=24, ROOT_GAP=20, BUS_GAP=30, BUS_DROP=26;
+const ROOT_W=360, ROOT_H=64;   /* 27-10: cajas y letras más grandes, legibles al proyectar */
+const STAFF_W=360, STAFF_H=38, STAFF_G=8, STAFF_LEAD=40;
+const L2_W=236, L2_MINH=56;
+const L3_W=222, L3_MINH=46, L3_INDENT=20, L3_VG=10;
+const COL_G=24, ROOT_GAP=22, BUS_GAP=32, BUS_DROP=28;
 /* compat: alto/ancho nominal usado por código heredado */
 const NW=L2_W, NH=L2_MINH;
 
 /* alto estimado de una caja según cuánto texto envuelve */
 function estH(name,w,minH,fs){
-  const cpl=Math.max(8,Math.floor(w/(fs*0.55)));
+  const cpl=Math.max(8,Math.floor((w-62)/(fs*0.66)));          /* mayúsculas: ~0,66 em por carácter */
   const lines=Math.max(1,Math.ceil(String(name||'').length/cpl));
-  return Math.max(minH, 13+lines*(fs+3));
+  return Math.max(minH, 14+lines*Math.ceil(fs*1.25));
 }
 /* ancho total que ocupa una columna (la caja o sus hijos indentados) */
 function colW(node,depth){
@@ -806,7 +806,7 @@ function colW(node,depth){
 /* ubica un nodo y apila sus hijos debajo; devuelve el borde inferior */
 function place(node,x,y,depth,all){
   const w = depth===0?L2_W:L3_W;
-  const fs = depth===0?11:10;
+  const fs = depth===0?15:13.5;
   node._x=x; node._y=y; node._w=w; node._depth=depth;
   node._h=estH(node.name,w,depth===0?L2_MINH:L3_MINH,fs);
   all.push(node);
@@ -823,7 +823,20 @@ function layoutPDF(root,lineNodes,staffNodes){
   const all=[], staff=[];
   /* ancho del bloque de columnas */
   const widths=lineNodes.map(nd=>colW(nd,0));
-  const colsW=widths.reduce((a,b)=>a+b,0)+COL_G*Math.max(0,lineNodes.length-1);
+  /* 27-10 · filas: si las columnas no caben en pantalla a ≥ 85 %, pasan a una
+     segunda (tercera…) fila, para que al proyectar las letras no se achiquen. */
+  const cvW=(document.getElementById('orgCanvas')||{}).clientWidth||1300;
+  const MAXW=Math.max(900,(cvW-32)/0.85);
+  const total=widths.reduce((a,b)=>a+b,0)+COL_G*Math.max(0,lineNodes.length-1);
+  const nRows=Math.max(1,Math.ceil(total/MAXW)), target=total/nRows;
+  const rows=[[]]; let acc=0;
+  widths.forEach((w,i)=>{
+    const cur=rows[rows.length-1];
+    if(cur.length && acc+w>target+1 && rows.length<nRows){ rows.push([i]); acc=w+COL_G; }
+    else { cur.push(i); acc+=w+COL_G; }
+  });
+  const rowW=rows.map(r=>r.reduce((a,i)=>a+widths[i],0)+COL_G*Math.max(0,r.length-1));
+  const colsW=Math.max(0,...rowW);
   /* espacio a la izquierda para la columna de asesorías */
   const needLeft=staffNodes.length?(STAFF_W+STAFF_LEAD):0;
   const leftPad=Math.max(0, needLeft-colsW/2);
@@ -835,7 +848,7 @@ function layoutPDF(root,lineNodes,staffNodes){
   /* asesorías: apiladas a la izquierda del eje */
   let sy=ROOT_H+ROOT_GAP;
   staffNodes.forEach(nd=>{
-    nd._w=STAFF_W; nd._h=estH(nd.name,STAFF_W,STAFF_H,9);
+    nd._w=STAFF_W; nd._h=estH(nd.name,STAFF_W,STAFF_H,13);
     nd._x=spineX-STAFF_LEAD-STAFF_W; nd._y=sy; nd._depth=-2; nd._isStaff=true;
     staff.push(nd); sy+=nd._h+STAFF_G;
   });
@@ -843,9 +856,15 @@ function layoutPDF(root,lineNodes,staffNodes){
   const busY = (staffNodes.length? sy-STAFF_G : ROOT_H) + BUS_GAP;
   const topY = busY+BUS_DROP;
 
-  /* columnas de línea */
-  let cx=leftPad;
-  lineNodes.forEach((nd,i)=>{ place(nd,cx,topY,0,all); cx+=widths[i]+COL_G; });
+  /* columnas de línea, por filas */
+  const rowTop=[], rowBus=[];
+  let ry=topY;
+  rows.forEach((r,k)=>{
+    let cx=leftPad+(colsW-rowW[k])/2, bottom=ry;
+    rowTop.push(ry); rowBus.push(ry-BUS_DROP);
+    r.forEach(i=>{ bottom=Math.max(bottom,place(lineNodes[i],cx,ry,0,all)); cx+=widths[i]+COL_G; });
+    ry=bottom+BUS_GAP+BUS_DROP+12;
+  });
 
   /* ── conectores ── */
   const lines=[], C='#7d9aa6', CS='#9fb6bf';
@@ -855,9 +874,15 @@ function layoutPDF(root,lineNodes,staffNodes){
     lines.push(`<line x1="${(nd._x+nd._w).toFixed(1)}" y1="${my}" x2="${spineX}" y2="${my}" stroke="${CS}" stroke-width="1.3" stroke-dasharray="3,3"/>`);
   });
   if(lineNodes.length){
-    const cs=lineNodes.map(nd=>nd._x+L2_W/2);
-    lines.push(`<line x1="${Math.min(...cs,spineX).toFixed(1)}" y1="${busY}" x2="${Math.max(...cs,spineX).toFixed(1)}" y2="${busY}" stroke="${C}" stroke-width="1.6"/>`);
-    cs.forEach(x=>lines.push(`<line x1="${x.toFixed(1)}" y1="${busY}" x2="${x.toFixed(1)}" y2="${topY}" stroke="${C}" stroke-width="1.6"/>`));
+    /* filas 2+: se cuelgan de un tronco a la izquierda de todas las columnas */
+    const trunk=Math.min(...lineNodes.map(nd=>nd._x))-14;
+    rows.forEach((r,k)=>{
+      const cs=r.map(i=>lineNodes[i]._x+L2_W/2), by=rowBus[k];
+      const x0=k===0?Math.min(...cs,spineX,rows.length>1?trunk:Infinity):trunk, x1=k===0?Math.max(...cs,spineX):Math.max(...cs);
+      lines.push(`<line x1="${x0.toFixed(1)}" y1="${by}" x2="${x1.toFixed(1)}" y2="${by}" stroke="${C}" stroke-width="1.6"/>`);
+      cs.forEach(x=>lines.push(`<line x1="${x.toFixed(1)}" y1="${by}" x2="${x.toFixed(1)}" y2="${rowTop[k]}" stroke="${C}" stroke-width="1.6"/>`));
+    });
+    if(rows.length>1) lines.push(`<line x1="${trunk.toFixed(1)}" y1="${rowBus[0]}" x2="${trunk.toFixed(1)}" y2="${rowBus[rows.length-1]}" stroke="${C}" stroke-width="1.6"/>`);
   }
   /* codos de los hijos apilados */
   lineNodes.forEach(nd=>{(function elb(n2){
@@ -1053,7 +1078,9 @@ function zpFit(){
   _zpFitTry=0;
   const cw=CW0-32, ch=CH0-32;
   const ww=parseInt(_zpWrap.style.width)||800, wh=parseInt(_zpWrap.style.height)||600;
-  const s=Math.min(cw/ww,ch/wh,1);
+  /* 27-10: se ajusta al ANCHO (no al alto) para que las letras queden grandes al proyectar;
+     lo que no cabe abajo se recorre arrastrando o con la rueda. */
+  const s=Math.min(cw/ww,1);
   _zpS=Math.max(0.08,Math.min(4,s||1));
   _zpTx=Math.max(0,(CW0-ww*_zpS)/2); _zpTy=16;
   _zpApply();
@@ -1259,10 +1286,10 @@ document.addEventListener('DOMContentLoaded', () => {
      Cada nodo = widget de tamaño fijo (S · M · L). El orden es automático:
      hijos con sub-hijos → en fila; 3 o más hojas → en columnas de hasta 4.
      Un nodo «lateral» (asesoría) va al costado de su padre con línea punteada. */
-  const TAM = { S: [168, 74], M: [210, 108], L: [262, 140] };
+  const TAM = { S: [212, 92], M: [244, 126], L: [296, 162] };   // 27-10: más grandes, legibles al proyectar
   const GX = 22, GY = 46, GS = 12;           // separación horizontal, entre niveles y dentro de columnas
   const COLORES = { azul: 'Azul', verde: 'Verde', durazno: 'Durazno', lila: 'Lila', navy: 'Navy' };
-  const KEY = 'org15_pm_editor_v1';
+  const KEY = 'org15_pm_editor_v2';   // v2 (27-10): estructura del bosquejo en papel; v1 queda guardado aparte
   let uid = 0;
   const conIds = n => { n.id = n.id || ('n' + (++uid)); (n.h || []).forEach(conIds); return n; };
   function desdeDato(){                     // dato original → árbol del editor (el «lado» pasa a hijo lateral)
@@ -1356,11 +1383,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const [w, h] = TAM[n.z] || TAM.S, [bg, bd] = F[n.c] || F.azul, claro = n.c === 'navy';
       rr(n.x, n.y, w, h, 14); g.fillStyle = bg; g.fill(); g.strokeStyle = bd; g.lineWidth = 1; g.stroke();
       const lineas = [], pp = (n.p || []).join(' · ');
-      lineas.push(['800 ' + (n.z === 'L' ? 14 : 12.5) + 'px Inter, Verdana, sans-serif', n.t, claro ? '#fff' : '#1F2A55']);
-      if(n.s) lineas.push(['10.5px Inter, Verdana, sans-serif', n.s, claro ? '#cbd5e1' : '#475569']);
-      if(pp) lineas.push(['600 10.5px Inter, Verdana, sans-serif', pp, claro ? '#fff' : '#1F2A55']);
-      let y = n.y + h / 2 - (lineas.length - 1) * 8 + 4; g.textAlign = 'center';
-      lineas.forEach(([f, t, c]) => { g.font = f; g.fillStyle = c; g.fillText(corta(t, w - 16), n.x + w / 2, y); y += 16; });
+      lineas.push(['800 ' + (n.z === 'L' ? 20 : 17) + 'px Inter, Verdana, sans-serif', n.t, claro ? '#fff' : '#1F2A55']);
+      if(n.s) lineas.push(['13px Inter, Verdana, sans-serif', n.s, claro ? '#cbd5e1' : '#475569']);
+      if(pp) lineas.push(['600 12.5px Inter, Verdana, sans-serif', pp, claro ? '#fff' : '#1F2A55']);
+      let y = n.y + h / 2 - (lineas.length - 1) * 10 + 5; g.textAlign = 'center';
+      lineas.forEach(([f, t, c]) => { g.font = f; g.fillStyle = c; g.fillText(corta(t, w - 16), n.x + w / 2, y); y += 20; });
       g.textAlign = 'left';
       if(n.q){ g.fillStyle = '#f59e0b'; g.beginPath(); g.arc(n.x + w - 10, n.y + 10, 4.5, 0, 7); g.fill(); }
     });
@@ -1388,7 +1415,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(a === 'editar'){ editar = !editar; if(!editar) sel = null; return pintar(); }
     if(a === 'cerrar'){ sel = null; return pintar(); }
     if(a === 'mas' || a === 'menos'){ zoom = Math.max(.4, Math.min(1.6, zoom + (a === 'mas' ? .1 : -.1))); return pintar(); }
-    if(a === 'ajustar'){ medir(arbol); zoom = Math.max(.4, Math.min(1, (cont.clientWidth - 20) / (arbol.W + 60))); return pintar(); }
+    if(a === 'ajustar'){ medir(arbol); zoom = Math.max(.75, Math.min(1, (cont.clientWidth - 20) / (arbol.W + 60))); return pintar(); }   // piso 75 %: legible al proyectar (lo que sobra se recorre)
     if(a === 'deshacer') return deshacer();
     if(a === 'imagen') return imagen();
     if(a === 'original'){ if(!confirm('¿Volver al organigrama original de la pizarra? Se pierden los cambios hechos aquí (puedes exportarlos antes).')) return; snap(); arbol = desdeDato(); sel = null; guardar(); return pintar(); }

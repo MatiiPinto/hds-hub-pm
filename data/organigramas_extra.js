@@ -4,7 +4,7 @@
 window.ORG_EXTRA = {
   pm: {
     titulo: 'Puesta en Marcha · Nuevo HDS',
-    sub: 'Estructura de trabajo y responsables por frente · pizarra de Puesta en Marcha del 27-10-2026',
+    sub: 'Estructura de trabajo y responsables por frente · pizarra de Puesta en Marcha y bosquejo en papel del 27-10-2026',
     fases: [
       { n: 1, t: 'Pre-PSP', cuando: 'jun · jul · ago', c: 'azul', items: ['Planificación del Plan Piloto', 'Gestión documental (AS · ISP)', 'Capacitación general y específica (EMMC, mobiliario, servicios de apoyo)'] },
       { n: 2, t: 'PSP · Marcha blanca', cuando: '4 semanas', c: 'verde', items: ['Piloto: casos de uso y paciente ficticio', 'Autorización Sanitaria ✓ · ISP ✓', 'Simulacro de traslado (estrés)', 'Inspección conjunta → subsanación → recepción'] },
@@ -14,30 +14,34 @@ window.ORG_EXTRA = {
     // árbol: cada nodo { t, s (subtítulo), c (color), q (por confirmar), h (hijos) }
     arbol: {
       t: 'SSMO', s: 'Servicio de Salud Metropolitano Oriente', c: 'navy',
-      lado: { t: 'Coordinación Técnica', s: 'CT · SSMO', c: 'azul' },
+      lado: { t: 'Coordinación Técnica', s: 'CT · SSMO', c: 'azul', p: ['F. Cid'] },
       h: [
         { t: 'HDS', s: 'Hospital del Salvador', c: 'navy', h: [
-          { t: 'PM y Gestión del Cambio', s: 'PMGC · coordinación', c: 'azul', q: 'Sigla en pizarra: «PMGC C.T.»; al lado un recuadro «33An» sin leer', h: [
+          { t: 'Coordinación Técnica PM', s: 'CT · Puesta en Marcha', c: 'azul', lat: true },
+          { t: 'Subdirecciones', s: 'equipos directivos', c: 'lila', h: [
+            { t: 'SDA', s: 'Administrativa · ADP', c: 'lila' },
+            { t: 'SDM', s: 'Subdirección Médica', c: 'lila' },
+            { t: 'SDADT', s: 'Apoyo Diagnóstico y Terapéutico', c: 'lila', p: ['D = FR ✓', 'T = PH ✓'], q: 'Anotación «11K» junto a SDADT en la pizarra sin leer' },
+            { t: 'SDGC', s: 'Gestión del Cuidado', c: 'lila', q: 'En el bosquejo en papel la sigla de este recuadro está repasada' },
+            { t: 'SDGP', s: 'Gestión de Personas', c: 'lila' }
+          ]},
+          { t: 'PM y Gestión del Cambio', s: 'PM · GC', c: 'azul', h: [
             { t: 'Clínica', s: 'frentes clínicos', c: 'verde', h: [
+              { t: 'Plan Piloto (SCL)', c: 'verde', p: ['J. Pacheco', 'M. Salvatierra', 'M. Canales', 'H. Díaz'] },
               { t: 'Autorización Sanitaria', c: 'verde', p: ['C. Sepúlveda', 'M. Canales'] },
-              { t: 'Traslado', c: 'verde', p: ['F. Araya', 'C. Poch'] },
               { t: 'EMMC', c: 'verde', p: ['M. Canales (Mey)'] },
-              { t: 'Plan Piloto (SCL)', c: 'verde', p: ['J. Pacheco', 'M. Salvatierra', 'M. Canales', 'H. Díaz'], q: 'En el organigrama de la pizarra figura «?»' },
+              { t: 'Plan de Traslado', c: 'verde', p: ['F. Araya', 'C. Poch'] },
               { t: 'Capacitación', c: 'verde', p: ['C. Guerrero', 'Javi', 'I. Rojas', 'M. Pinto'] },
-              { t: 'Cabida', c: 'verde', p: ['L. Pérez', 'M. Pinto'] }
+              { t: 'Cabida', c: 'verde', p: ['L. Pérez', 'M. Pinto'] },
+              { t: 'Por definir', s: 'recuadro vacío en el bosquejo', c: 'verde', q: 'Frente clínico sin nombre en el bosquejo en papel' }
             ]},
             { t: 'Administración y Logística', s: 'frentes de soporte', c: 'durazno', h: [
-              { t: 'Inspección del contrato', s: 'IC · enlace con SDA', c: 'durazno', q: 'Sigla «IC» encerrada; flecha doble con SDA', h: [
-                { t: 'RSO · PAPS', s: 'J.P.', c: 'durazno', p: ['HUB · Equipamiento', 'Operaciones', 'CS · TIC', 'CC · TD', 'CC · Logística'], q: 'Siglas de la columna por confirmar' },
-                { t: 'Servicios concesionados', s: 'M. Salvatierra (por confirmar)', c: 'durazno', p: ['Seguridad ✓', 'Aseo ✓', 'Alimentación ✓', 'Ropería', 'Esterilización'] }
+              { t: 'TIC', s: 'CS · TIC', c: 'durazno', q: 'Iniciales bajo TIC por confirmar (CS / «CSil»)' },
+              { t: 'Logística', s: 'CC · Logística', c: 'durazno' },
+              { t: 'Sociedad Concesionaria', s: 'RSO · PAPS · J.P.', c: 'durazno', z: 'M', p: ['HUB · Equipamiento', 'Operaciones', 'CC · TD'], q: 'En la pizarra figura «IC» como enlace con la SDA', h: [
+                { t: 'Servicios concesionados', s: 'M. Salvatierra (por confirmar)', c: 'durazno', z: 'L', p: ['Seguridad ✓', 'Aseo ✓', 'Alimentación ✓', 'Ropería', 'Esterilización'] }
               ]}
             ]}
-          ]},
-          { t: 'Subdirecciones', s: 'equipos directivos', c: 'lila', h: [
-            { t: 'SDADT', s: 'Apoyo Diagnóstico y Terapéutico', c: 'lila', p: ['D = FR ✓', 'T = PH ✓'], q: 'Anotación «11K» junto a SDADT sin leer' },
-            { t: 'SDM', s: 'Subdirección Médica', c: 'lila' },
-            { t: 'SDGC', s: 'Gestión del Cuidado', c: 'lila' },
-            { t: 'SDA', s: 'Administrativa · ADP', c: 'lila' }
           ]}
         ]},
         { t: 'INGER', s: 'Instituto Nacional de Geriatría', c: 'navy' }
@@ -54,7 +58,7 @@ window.ORG_EXTRA = {
       { t: 'Comité Estratégico de Gestión Clínica', p: 'Loreto Pérez', c: 'lila' }
     ],
     agenda: ['09:00 · Core', '10:30 · Logística', '12:00 · TEP'],
-    notas: ['Comunicaciones canaliza la relación con el MOP y los mensajes («Habla» → DM en la pizarra).', 'La pizarra marca un «DM» como nodo que reparte Clínica y Administración y Logística: sigla por confirmar.']
+    notas: ['Comunicaciones canaliza la relación con el MOP y los mensajes («Habla» → DM en la pizarra).', 'El bosquejo en papel ordena la estructura: Coordinación Técnica PM al costado del HDS, cinco subdirecciones y PM · GC repartido en Clínica y Administración (TIC · Logística · Sociedad Concesionaria).']
   },
 
   concesionado: {
