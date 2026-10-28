@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<script src="pm_config.js"></script>
+<script src="pm_gate.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Organización de Puesta en Marcha · HDS</title>
+<link rel="icon" type="image/png" href="Logos%20HUB-HDS/favicon-nhds-amarillo-64.png">
+<!-- ════════════════════════════════════════════════════════════════════════════
+     52 · Presentación «Cada rol, una persona» (27-10-2026)
+     De María Elena Sepúlveda (Coordinadora Técnica de Puesta en Marcha) al Director.
+     Fuente: reunión del equipo PM del 27-10-2026 (Minutas/2026-10-27_reunion-diaria-pm.md
+     y 2026-10-27_reuni-on-equipo-pm-27-10.md) + organigrama PM de la 15.
+     La diapositiva 7 incrusta 15.Organigrama.html?embed=1: se edita ahí mismo y queda
+     guardado en este navegador (mismo dato que la 15 → Puesta en Marcha).
+     Teclas: ← → · espacio · Inicio/Fin · F pantalla completa. Botón 🖨 = PDF.
+     ════════════════════════════════════════════════════════════════════════════ -->
+<style>
+  :root{--navy:#222944;--navy2:#2E3766;--cel:#00A1DF;--cel2:#E2F4FC;--verde:#13894B;--verde2:#E3F4EA;
+        --nar:#C2610C;--nar2:#FDEBDD;--lila:#5B3CC4;--lila2:#ECE7FA;--amb:#B45309;--amb2:#FEF3C7;
+        --tx:#1B2240;--tx2:#4A5578;--line:#D6DCEA}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:#0f1530;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--tx)}
+  #stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:0 0}
+  .slide{position:absolute;inset:0;background:#fff;padding:58px 76px 70px;display:none;flex-direction:column;overflow:hidden}
+  .slide.on{display:flex}
+  .slide.dark{background:var(--navy);color:#fff}
+  .kick{font-size:17px;font-weight:800;letter-spacing:2.4px;text-transform:uppercase;color:var(--cel)}
+  h1{font-size:76px;line-height:1.02;font-weight:850;letter-spacing:-1.5px;margin-top:14px}
+  h2{font-size:44px;line-height:1.08;font-weight:850;letter-spacing:-.6px;color:var(--navy);margin-top:8px}
+  .lead{font-size:24px;line-height:1.4;color:var(--tx2);margin-top:14px;max-width:1040px}
+  .pie{position:absolute;left:76px;right:76px;bottom:24px;display:flex;justify-content:flex-start;gap:18px;align-items:center;font-size:14px;color:#8A93AE}
+  .pie img{height:26px}
+  .dark .pie{color:#9AA6CC}
+  .num{font-variant-numeric:tabular-nums;font-weight:700}
+  /* portada */
+  .portada{padding:64px 80px}
+  .portada .logo{height:58px;align-self:flex-start}
+  .portada .edif{position:absolute;right:-40px;bottom:-30px;width:820px;opacity:.13}
+  .portada .quien{margin-top:auto;display:grid;grid-template-columns:auto 1fr;gap:6px 18px;font-size:20px;line-height:1.35;color:#C9D3F0}
+  .portada .quien b{color:#fff;font-weight:800}
+  .portada .quien span.k{color:var(--cel);font-weight:800;font-size:14px;letter-spacing:1.6px;text-transform:uppercase;padding-top:4px}
+  /* tarjetas */
+  .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:34px}
+  .card{border-radius:18px;padding:24px 24px 26px;background:#F4F6FB;border:1px solid var(--line)}
+  .card .n{width:44px;height:44px;border-radius:50%;background:var(--navy);color:#fff;font-weight:850;font-size:22px;display:flex;align-items:center;justify-content:center}
+  .card h3{font-size:25px;line-height:1.2;margin-top:16px;color:var(--navy)}
+  .card p{font-size:19px;line-height:1.4;color:var(--tx2);margin-top:8px}
+  .cita{margin-top:auto;border-left:6px solid var(--cel);padding:10px 0 10px 22px;font-size:23px;line-height:1.4;color:var(--navy);font-style:italic}
+  .cita small{display:block;font-style:normal;font-size:15px;color:#8A93AE;margin-top:6px}
+  /* canal oficial */
+  .canal{display:grid;grid-template-columns:1fr 210px 1fr;align-items:center;margin-top:auto;gap:0}
+  .col{display:flex;flex-direction:column;gap:18px;align-items:stretch}
+  .bx{border-radius:16px;padding:18px 22px;border:2px solid var(--line);background:#fff}
+  .bx .r{font-size:15px;font-weight:800;letter-spacing:1.3px;text-transform:uppercase;color:var(--tx2)}
+  .bx .p{font-size:27px;font-weight:850;color:var(--navy);margin-top:4px;line-height:1.15}
+  .bx .d{font-size:17px;color:var(--tx2);margin-top:4px}
+  .bx.ct{border-color:var(--cel);background:var(--cel2)}
+  .bx.dir{background:var(--navy);border-color:var(--navy)} .bx.dir .r{color:#9FB2E6} .bx.dir .p{color:#fff} .bx.dir .d{color:#C9D3F0}
+  .inst{font-size:16px;font-weight:850;letter-spacing:2px;text-transform:uppercase;color:var(--cel);text-align:center}
+  .baja{width:3px;height:22px;background:var(--line);align-self:center;margin:-18px 0}
+  .puente{position:relative;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:44px;align-items:center}
+  .puente .fl{width:100%;height:6px;background:var(--cel);border-radius:3px;position:relative}
+  .puente .fl:before,.puente .fl:after{content:'';position:absolute;top:-9px;border:12px solid transparent}
+  .puente .fl:before{left:-14px;border-right-color:var(--cel)} .puente .fl:after{right:-14px;border-left-color:var(--cel)}
+  .puente .tx{font-size:16px;font-weight:800;color:var(--navy);text-align:center;margin-bottom:12px;line-height:1.3}
+  .nota{margin-top:auto;display:flex;gap:14px;align-items:flex-start;background:#F4F6FB;border-radius:14px;padding:16px 20px;font-size:20px;line-height:1.4;color:var(--tx2)}
+  .nota b{color:var(--navy)}
+  /* ámbitos */
+  .amb{display:grid;grid-template-columns:1fr 1fr;gap:16px 24px;margin-top:16px}
+  .amb .top{grid-column:1/-1;justify-self:center;width:760px;text-align:center;padding:12px 22px}
+  .ab{border-radius:18px;padding:14px 20px 16px}
+  .ab h3{font-size:25px;display:flex;justify-content:space-between;align-items:baseline}
+  .ab h3 small{font-size:16px;font-weight:700;opacity:.8}
+  .ab ul{list-style:none;margin-top:8px;display:grid;gap:6px}
+  .ab li{font-size:19px;line-height:1.25;display:flex;justify-content:space-between;gap:14px;background:rgba(255,255,255,.7);border-radius:10px;padding:6px 12px}
+  .ab li i{font-style:normal;color:var(--tx2);font-size:17px;text-align:right}
+  .ab.cl{background:var(--verde2);color:#0B5A31} .ab.ad{background:var(--nar2);color:#7A3A06}
+  .fuera{grid-column:1/-1;display:flex;gap:18px}
+  .fuera div{flex:1;border:2px dashed var(--line);border-radius:14px;padding:9px 16px;font-size:17px;line-height:1.3;color:var(--tx2)}
+  .fuera b{color:var(--navy)}
+  /* tablas rol → persona */
+  table.rp{width:100%;border-collapse:separate;border-spacing:0 5px;margin-top:12px}
+  .rp th{font-size:14px;letter-spacing:1.5px;text-transform:uppercase;color:#8A93AE;text-align:left;padding:0 16px 2px}
+  .rp td{font-size:19.5px;line-height:1.22;padding:8px 14px;background:#F4F6FB;vertical-align:middle}
+  .rp td:first-child{border-radius:12px 0 0 12px;font-weight:800;color:var(--navy);width:30%;border-left:7px solid var(--c,var(--navy))}
+  .rp td:last-child{border-radius:0 12px 12px 0;width:44px;text-align:center}
+  .rp td.per{font-weight:800;color:var(--tx);width:32%}
+  .rp td.que{color:var(--tx2);font-size:17px}
+  .rp td small{font-weight:600;color:var(--tx2);font-size:15.5px}
+  .ok,.pc{display:inline-block;width:26px;height:26px;border-radius:50%;font-size:15px;font-weight:900;line-height:26px;text-align:center}
+  .ok{background:#DCFCE7;color:#166534} .pc{background:var(--amb2);color:var(--amb)}
+  .ley{position:absolute;left:250px;bottom:26px;display:flex;gap:22px;font-size:15px;color:var(--tx2);align-items:center}
+  /* subdirecciones */
+  .subd{display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:auto}
+  .sd{border-radius:18px;padding:20px 18px 22px;background:var(--lila2);border-top:7px solid var(--lila)}
+  .sd .s{font-size:30px;font-weight:850;color:var(--lila);letter-spacing:.5px}
+  .sd .r{font-size:15px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--tx2);margin-top:6px;line-height:1.3;min-height:40px}
+  .sd .p{font-size:23px;font-weight:850;color:var(--navy);margin-top:12px;line-height:1.2}
+  .sd .d{font-size:16.5px;color:var(--tx2);margin-top:8px;line-height:1.35}
+  /* organigrama en vivo */
+  .vivo{padding:14px 20px 34px}
+  .vivo .cab{display:flex;justify-content:space-between;align-items:flex-end;gap:20px}
+  .vivo h2{font-size:28px;margin-top:2px}
+  .vivo .ay{font-size:15px;color:var(--tx2);line-height:1.38;text-align:right;max-width:720px}
+  .vivo .ay b{color:var(--navy)}
+  .vivo iframe{flex:1;width:100%;border:2px solid var(--line);border-radius:14px;margin-top:8px;background:#fff}
+  .vivo .sin{display:none}
+  /* cifras */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:auto}
+  .kp{border-radius:18px;padding:20px 20px 22px;background:#F4F6FB;border-top:7px solid var(--c)}
+  .kp .t{font-size:15px;font-weight:850;letter-spacing:1.4px;text-transform:uppercase;color:var(--c)}
+  .kp .v{font-size:54px;font-weight:850;color:var(--navy);line-height:1.05;margin-top:10px;letter-spacing:-1px}
+  .kp .v small{font-size:22px;color:var(--tx2);font-weight:700;letter-spacing:0}
+  .kp p{font-size:19px;line-height:1.38;color:var(--tx2);margin-top:8px}
+  .kp p b{color:var(--navy)}
+  /* rutina */
+  .rut{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:auto}
+  .rt{border-radius:18px;padding:22px;border:2px solid var(--line)}
+  .rt .d{font-size:16px;font-weight:850;letter-spacing:1.4px;text-transform:uppercase;color:var(--cel)}
+  .rt .h{font-size:34px;font-weight:850;color:var(--navy);margin-top:6px}
+  .rt p{font-size:18.5px;line-height:1.4;color:var(--tx2);margin-top:8px}
+  /* decisiones */
+  ol.dec{list-style:none;counter-reset:d;margin-top:auto;margin-bottom:auto;display:grid;grid-template-columns:1fr 1fr;grid-auto-flow:column;grid-template-rows:repeat(3,auto);gap:14px 20px}
+  ol.dec li{counter-increment:d;display:grid;grid-template-columns:50px 1fr;gap:14px;align-items:center;background:#F4F6FB;border-radius:14px;padding:16px 18px;min-height:118px}
+  ol.dec li:before{content:counter(d);width:44px;height:44px;border-radius:50%;background:var(--navy);color:#fff;font-weight:850;font-size:21px;display:flex;align-items:center;justify-content:center}
+  ol.dec b{font-size:22px;color:var(--navy);display:block;line-height:1.22}
+  ol.dec span{font-size:18px;color:var(--tx2);line-height:1.35;display:block;margin-top:4px}
+  /* cierre */
+  .cierre{justify-content:center;align-items:flex-start}
+  .cierre .edif{position:absolute;left:50%;bottom:-20px;transform:translateX(-50%);width:1100px;opacity:.12}
+  /* navegación */
+  #nav{position:fixed;right:16px;bottom:14px;display:flex;gap:6px;align-items:center;z-index:10;opacity:.12;transition:opacity .2s}
+  #nav:hover{opacity:1}
+  #nav button,#nav a{background:rgba(255,255,255,.95);border:1px solid #cbd5e1;border-radius:9px;height:34px;min-width:36px;padding:0 10px;font-size:15px;font-weight:800;color:var(--navy);cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center}
+  #cnt{background:rgba(255,255,255,.95);border-radius:9px;height:34px;padding:0 12px;font-size:14px;font-weight:800;color:var(--navy);display:flex;align-items:center}
+  #prog{position:fixed;left:0;bottom:0;height:4px;background:var(--cel);z-index:10;transition:width .25s}
+  /* ?print=1: todas las diapositivas apiladas (para generar el PDF con el organigrama a su tamaño) */
+  html.imprimir,html.imprimir body{overflow:visible;height:auto;background:#fff}
+  html.imprimir #stage{position:static;transform:none!important;width:auto;height:auto}
+  html.imprimir .slide{display:flex!important;position:relative;width:1280px;height:720px}
+  html.imprimir #nav,html.imprimir #prog{display:none}
+  @media print{
+    @page{size:1280px 720px;margin:0}
+    html,body{overflow:visible;background:#fff;height:auto}
+    #stage{position:static;transform:none!important;width:auto;height:auto}
+    .slide{display:flex!important;position:relative;width:1280px;height:720px;page-break-after:always;break-after:page}
+    #nav,#prog{display:none}
+    .vivo iframe:not([src]){display:none} .vivo iframe:not([src]) + .sin{display:flex;flex:1;align-items:center;justify-content:center;border:2px dashed var(--line);border-radius:16px;margin-top:14px;font-size:24px;color:var(--tx2);text-align:center;padding:40px}
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+
+<!-- 1 · Portada -->
+<section class="slide dark portada">
+  <img class="logo" src="assets/pm_deck/logo-hds-blanco.png" alt="Hospital del Salvador">
+  <img class="edif" src="assets/pm_deck/edificio-blanco.png" alt="">
+  <div style="margin-top:84px">
+    <div class="kick">Puesta en Marcha · Nuevo Hospital del Salvador</div>
+    <h1>Cada rol,<br>una persona</h1>
+    <div class="lead" style="color:#C9D3F0;font-size:27px">Organización de Puesta en Marcha y canal oficial con el Servicio de Salud</div>
+  </div>
+  <div class="quien">
+    <span class="k">Presenta</span><div><b>María Elena Sepúlveda Maldonado</b><br>Coordinadora Técnica de Puesta en Marcha · Subdirectora de Apoyo Diagnóstico y Terapéutico</div>
+    <span class="k">Para</span><div><b>Dr. Jorge Zajjur Castro</b> · Director · octubre de 2026</div>
+  </div>
+</section>
+
+<!-- 2 · Por qué -->
+<section class="slide">
+  <div class="kick">Por qué ordenarnos ahora</div>
+  <h2>Hoy hay muchas manos y pocos canales claros</h2>
+  <div class="cards">
+    <div class="card"><div class="n">1</div><h3>Los correos llegan por arriba y por abajo</h3><p>Lo oficial con el SSMO se cruza con las coordinaciones del día a día y se pierde quién responde.</p></div>
+    <div class="card"><div class="n">2</div><h3>Se confunde a Puesta en Marcha con las subdirecciones</h3><p>PM pone los temas en la mesa y coordina; quienes resuelven son los subdirectores y el Director.</p></div>
+    <div class="card"><div class="n">3</div><h3>El traslado está encima</h3><p>Cada frente necesita una cara visible que responda por su avance, sus plazos y sus pendientes.</p></div>
+  </div>
+  <div class="cita">«Nosotros solo ponemos la situación en la mesa, pero quienes tienen que resolver son los subdirectores y el Director.»<small>Reunión del equipo de Puesta en Marcha · 27-10-2026</small></div>
+  <div class="pie"><img src="assets/pm_deck/logo-hds-color.png" alt=""><span class="num" data-n></span></div>
+</section>
+
+<!-- 3 · Canal oficial -->
+<section class="slide">
+  <div class="kick">Un solo canal oficial</div>
+  <h2>De director a director, por las coordinaciones técnicas</h2>
+  <div class="canal">
+    <div class="col">
+      <div class="inst">SSMO</div>
+      <div class="bx dir"><div class="r">Director del Servicio</div><div class="p">Dirección SSMO</div></div>
+      <div class="baja"></div>
+      <div class="bx ct"><div class="r">Coordinación Técnica SSMO</div><div class="p">Francisca Cid</div><div class="d">Encomendada como coordinadora técnica del Director del Servicio</div></div>
+    </div>
+    <div class="puente"><div class="tx">Todo lo oficial<br>entra y sale por aquí</div><div class="fl"></div></div>
+    <div class="col">
+      <div class="inst">Hospital del Salvador</div>
+      <div class="bx dir"><div class="r">Director</div><div class="p">Dr. Jorge Zajjur Castro</div></div>
+      <div class="baja"></div>
+      <div class="bx ct"><div class="r">Coordinación Técnica de Puesta en Marcha</div><div class="p">María Elena Sepúlveda</div><div class="d">Encomendada en funciones · Subdirectora SDADT</div></div>
+    </div>
+  </div>
+  <div class="nota"><span style="font-size:26px">↔</span><div><b>Lo operativo sigue en el uno a uno</b> de cada referente con su par del SSMO (por ejemplo, Felipe Rojas), <b>siempre con copia a la Coordinación Técnica.</b></div></div>
+  <div class="pie"><img src="assets/pm_deck/logo-hds-color.png" alt=""><span class="num" data-n></span></div>
+</section>
+
+<!-- 4 · Dos ámbitos -->
+<section class="slide">
+  <div class="kick">Estructura</div>
+  <h2>Puesta en Marcha trabaja en dos ámbitos</h2>
+  <div class="amb">
+    <div class="bx ct top"><div class="r">Coordinación Técnica · Puesta en Marcha y Gestión del Cambio</div><div class="p">María Elena Sepúlveda</div></div>
+    <div class="ab cl"><h3>Ámbito clínico <small>6 frentes</small></h3><ul>
+      <li>Autorización Sanitaria <i>Catherine Sepúlveda</i></li><li>Equipamiento médico <i>M. Pinto · M. Canales</i></li>
+      <li>Plan Piloto <i>Javiera Pacheco</i></li><li>Traslado y poblamiento <i>F. Araya · C. Poch</i></li>
+      <li>Capacitación <i>Isabel Rojas</i></li><li>Cabida <i>Loreto Pérez</i></li></ul></div>
+    <div class="ab ad"><h3>Ámbito administrativo y logístico <small>3 frentes</small></h3><ul>
+      <li>Conducción, con la SDA <i>R. Hermosilla · F. Lacalle</i></li>
+      <li>Traslado de equipos y comodatos <i>R. Hermosilla · M. Pinto</i></li>
+      <li>Logística en terreno <i>Rodrigo Espinoza</i></li>
+      <li>Sociedad Concesionaria y servicios <i>Marisol Salvatierra</i></li></ul></div>
+    <div class="fuera"><div><b>Catherine Sepúlveda</b> queda al 100 % en Autorización Sanitaria.</div><div><b>TIC y Logística salen de Puesta en Marcha</b> y quedan en la Subdirección Administrativa (pedido de Fernando Lacalle).</div></div>
+  </div>
+  <div class="pie"><img src="assets/pm_deck/logo-hds-color.png" alt=""><span class="num" data-n></span></div>
+</section>
+
+<!-- 5 · Rol → persona · clínico -->
+<section class="slide">
+  <div class="kick">Rol y persona · ámbito clínico</div>
+  <h2>Quién responde por cada frente clínico</h2>
+  <table class="rp"><thead><tr><th>Rol</th><th>Persona</th><th>Qué hace</th><th></th></tr></thead><tbody>
+    <tr style="--c:var(--cel)"><td>Coordinación Técnica PM</td><td class="per">María Elena Sepúlveda</td><td class="que">Canal oficial con el SSMO; conduce la reunión diaria</td><td><span class="ok">✓</span></td></tr>
+    <tr style="--c:var(--verde)"><td>Autorización Sanitaria</td><td class="per">Catherine Sepúlveda<br><small>con Javiera Flores</small></td><td class="que">SEREMI e ISP; cartera de prestaciones por unidad</td><td><span class="ok">✓</span></td></tr>
+    <tr style="--c:var(--verde)"><td>Equipamiento médico (EMMC)</td><td class="per">Matías Pinto · Meylin Canales</td><td class="que">Existencias, subsanaciones con la Concesionaria, traslado</td><td><span class="ok">✓</span></td></tr>
+    <tr style="--c:var(--verde)"><td>Plan Piloto</td><td class="per">Javiera Pacheco<br><small>con Horacio Díaz y Meylin Canales</small></td><td class="que">Enrolamiento y capacitación de los 252 nominados</td><td><span class="pc" title="Falta un responsable único">?</span></td></tr>
+    <tr style="--c:var(--verde)"><td>Traslado y poblamiento</td><td class="per">Fernando Araya · Costanza Poch</td><td class="que">Programa de traslado y despoblamiento de servicios</td><td><span class="ok">✓</span></td></tr>
+    <tr style="--c:var(--verde)"><td>Capacitación</td><td class="per">Isabel Rojas<br><small>con C. Guerrero, Javi y Matías Pinto</small></td><td class="que">Capacitación general y específica</td><td><span class="pc" title="Confirmar los nombres de la pizarra">?</span></td></tr>
+    <tr style="--c:var(--verde)"><td>Cabida</td><td class="per">Loreto Pérez</td><td class="que">Quién trabaja dónde en el nuevo edificio</td><td><span class="ok">✓</span></td></tr>
+  </tbody></table>
+  <div class="ley"><span><span class="ok">✓</span> acordado el 27-10</span><span><span class="pc">?</span> por confirmar</span></div>
+  <div class="pie"><img src="assets/pm_deck/logo-hds-color.png" alt=""><span class="num" data-n></span></div>
+</section>
+
+<!-- 6 · Rol → persona · administrativo y apoyos -->
+<section class="slide">
+  <div class="kick">Rol y persona · ámbito administrativo y apoyos</div>
+  <h2>Quién responde por lo administrativo y lo transversal</h2>
+  <table class="rp"><thead><tr><th>Rol</th><th>Persona</th><th>Qué hace</th><th></th></tr></thead><tbody>
+    <tr style="--c:var(--nar)"><td>Conducción administrativa y logística</td><td class="per">Rodrigo Hermosilla<br><small>con Fernando Lacalle y Marisol Salvatierra</small></td><td class="que">Frentes de soporte, junto a la Subdirección Administrativa</td><td><span class="ok">✓</span></td></tr>
+    <tr style="--c:var(--nar)"><td>Traslado de equipos y comodatos</td><td class="per">Rodrigo Hermosilla · Matías Pinto</td><td class="que">Solicitudes de traslado y comodatos ante el SSMO y la CSSO</td><td><span class="ok">✓</span></td></tr>
+    <tr style="--c:var(--nar)"><td>Logística en terreno</td><td class="per">Rodrigo Espinoza</td><td class="que">Racks, bodegas y oficinas del nuevo edificio</td><td><span class="ok">✓</span></td></tr>
+    <tr style="--c:var(--nar)"><td>Sociedad Concesionaria</td><td class="per">Marisol Salvatierra</td><td class="que">Servicios concesionados: seguridad, aseo, alimentación, ropería</td><td><span class="pc">?</span></td></tr>
+    <tr style="--c:var(--lila)"><td>Protección radiológica</td><td class="per">Allyson Davis (OPR)</td><td class="que">Certificación del personal ante la SEREMI</td><td><span class="ok">✓</span></td></tr>
+    <tr style="--c:var(--lila)"><td>Señalética</td><td class="per">Catherine Sepúlveda</td><td class="que">Directorios, líneas de piso, tótems y señalética tipo A</td><td><span class="ok">✓</span></td></tr>
+    <tr style="--c:var(--lila)"><td>TIC y Logística</td><td class="per">Subdirección Administrativa</td><td class="que">Salen de Puesta en Marcha · Fernando Lacalle</td><td><span class="ok">✓</span></td></tr>
+  </tbody></table>
+  <div class="ley"><span><span class="ok">✓</span> acordado el 27-10</span><span><span class="pc">?</span> por confirmar</span></div>
+  <div class="pie"><img src="assets/pm_deck/logo-hds-color.png" alt=""><span class="num" data-n></span></div>
+</section>
+
+<!-- 6b · Subdirecciones -->
+<section class="slide">
+  <div class="kick">Quién resuelve</div>
+  <h2>Las subdirecciones deciden; Puesta en Marcha facilita</h2>
+  <div class="subd">
+    <div class="sd"><div class="s">SDA</div><div class="r">Subdirección Administrativa</div><div class="p">Fernando Lacalle</div><div class="d">TIC y Logística, fuera de PM</div></div>
+    <div class="sd"><div class="s">SDM</div><div class="r">Subdirección Médica</div><div class="p">Dr. Manuel Ramírez</div><div class="d">Departamentos clínicos y servicios asistenciales</div></div>
+    <div class="sd"><div class="s">SDADT</div><div class="r">Apoyo Diagnóstico y Terapéutico</div><div class="p">María Elena Sepúlveda</div><div class="d">Primera en los 1 a 1 por servicio</div></div>
+    <div class="sd"><div class="s">SDGC</div><div class="r">Gestión del Cuidado</div><div class="p">Lorena Encina</div><div class="d">Gestión del cuidado de los pacientes</div></div>
+    <div class="sd"><div class="s">SDGP</div><div class="r">Gestión de Personas</div><div class="p">Andrés Villarroel</div><div class="d">Personas y dotación</div></div>
+  </div>
+  <div class="nota"><span style="font-size:24px">↳</span><div>Puesta en Marcha pone cada tema en la mesa con datos y plazo; <b>la decisión es de la subdirección que corresponde y del Director</b>.</div></div>
+  <div class="pie"><img src="assets/pm_deck/logo-hds-color.png" alt=""><span class="num" data-n></span></div>
+</section>
+
+<!-- 7 · Organigrama en vivo -->
+<section class="slide vivo">
+  <div class="cab"><div><div class="kick">Organigrama de trabajo · en vivo</div><h2>Lo ajustamos aquí mismo</h2></div>
+    <div class="ay"><b>✏️ Editar</b> y clic en un recuadro: cambiar el rol, las personas, <b>agregar debajo o al lado</b> o <b>quitar</b>. Para cambiar una línea, <b>arrastra el recuadro</b> sobre su nuevo superior. <b>↶ Deshacer</b> y <b>🖼 Imagen</b> están arriba.</div></div>
+  <iframe data-src="15.Organigrama.html?embed=1" title="Organigrama de Puesta en Marcha (editable)"></iframe>
+  <div class="sin">El organigrama editable está en la plataforma 15 · Organigrama → Puesta en Marcha</div>
+  <div class="pie" style="bottom:9px;left:22px"><span class="num" data-n></span><span>Los cambios quedan guardados en este navegador y se ven también en la plataforma 15 · Organigrama → Puesta en Marcha · <b>＋ / −</b> para acercar</span></div>
+</section>
+
+<!-- 8 · Dónde estamos -->
+<section class="slide">
+  <div class="kick">Dónde estamos · 27-10-2026</div>
+  <h2>Cuatro frentes con cifras para seguir</h2>
+  <div class="kpis">
+    <div class="kp" style="--c:var(--verde)"><div class="t">Equipamiento médico</div><div class="v">99,7 %</div><p><b>6.446 de 6.460</b> equipos constatados. <b>2.201</b> no cumplen las tres condiciones: <b>1.166</b> se revisan del 28 al 30-10.</p></div>
+    <div class="kp" style="--c:var(--nar)"><div class="t">Traslado de equipos</div><div class="v">~800</div><p>solicitados. Solo <b>18</b> autorizados (2018) y <b>unos 20</b> con visto bueno del SSMO. <b>Ningún comodato</b> presentado a la CSSO.</p></div>
+    <div class="kp" style="--c:var(--cel)"><div class="t">Plan Piloto</div><div class="v">152 <small>de 252</small></div><p>enrolados. <b>224</b> con capacitación general y <b>216</b> con la específica. Cierre el viernes 30-10.</p></div>
+    <div class="kp" style="--c:var(--lila)"><div class="t">Autorización Sanitaria</div><div class="v">1 sem.</div><p>para enviar la <b>cartera de prestaciones</b>, dividida por unidad, a la validación de cada jefe.</p></div>
+  </div>
+  <div class="nota" style="margin-top:auto"><span style="font-size:24px">⚑</span><div>Lo más crítico es el <b>traslado de equipos</b>: depende de la respuesta del SSMO. El jueves 29-10 nos reunimos con <b>Francisca Cid</b>, Mariana Bravo y Fernando Lacalle solo por equipamiento médico.</div></div>
+  <div class="pie"><img src="assets/pm_deck/logo-hds-color.png" alt=""><span class="num" data-n></span></div>
+</section>
+
+<!-- 9 · Cómo trabajamos -->
+<section class="slide">
+  <div class="kick">Cómo trabajamos</div>
+  <h2>Pocas reuniones, las justas, y cada una con su dueño</h2>
+  <div class="rut">
+    <div class="rt"><div class="d">Lunes a jueves</div><div class="h">08:00</div><p>Reunión diaria de Puesta en Marcha: cada responsable informa el estado de su frente.</p></div>
+    <div class="rt"><div class="d">Miércoles</div><div class="h">10:00</div><p>Coordinación del traslado en la Dirección (poblamiento y camas).</p></div>
+    <div class="rt"><div class="d">Viernes</div><div class="h">Comité</div><p>Comité Estratégico de Gestión Clínica; ese día no hay reunión diaria.</p></div>
+    <div class="rt"><div class="d">Por servicio</div><div class="h">1 a 1</div><p>Con cada jefe: plano, cabida, equipos, funcionamiento y Autorización Sanitaria. Partimos por la SDADT.</p></div>
+  </div>
+  <div class="nota"><span style="font-size:24px">📌</span><div>Los compromisos de cada reunión quedan en la <b>Bitácora de Puesta en Marcha</b>, con responsable y plazo, y se ven en el organigrama frente por frente.</div></div>
+  <div class="pie"><img src="assets/pm_deck/logo-hds-color.png" alt=""><span class="num" data-n></span></div>
+</section>
+
+<!-- 10 · Lo que pedimos -->
+<section class="slide">
+  <div class="kick">Lo que pedimos al Director</div>
+  <h2>Seis definiciones para avanzar</h2>
+  <ol class="dec">
+    <li><div><b>Validar esta organización</b><span>y formalizar la encomendación de funciones de la Coordinación Técnica de Puesta en Marcha.</span></div></li>
+    <li><div><b>Instruir que lo oficial con el SSMO vaya por las coordinaciones técnicas</b><span>Francisca Cid ↔ María Elena Sepúlveda, de director a director.</span></div></li>
+    <li><div><b>Confirmar los roles pendientes</b><span>Un responsable único del Plan Piloto y los nombres del frente de Capacitación.</span></div></li>
+    <li><div><b>Protección radiológica: quién paga la certificación ante la SEREMI</b><span>Allyson Davis (OPR) envía los costos a Fernando Lacalle.</span></div></li>
+    <li><div><b>Medicina Nuclear: no se presenta ahora</b><span>Fijar una fecha para que el Dr. Colorado exponga lo que requiere abrir el servicio.</span></div></li>
+    <li><div><b>Uniformes y OSDOM</b><span>Resolver los casos de uniforme pendientes, y si se incluye OSDOM y dónde.</span></div></li>
+  </ol>
+  <div class="pie"><img src="assets/pm_deck/logo-hds-color.png" alt=""><span class="num" data-n></span></div>
+</section>
+
+<!-- 11 · Cierre -->
+<section class="slide dark cierre">
+  <img class="edif" src="assets/pm_deck/edificio-blanco.png" alt="">
+  <div class="kick">Puesta en Marcha · Nuevo Hospital del Salvador</div>
+  <h1 style="font-size:84px">Gracias</h1>
+  <div class="lead" style="color:#C9D3F0;font-size:26px">Puesta en Marcha facilita y coordina. Las decisiones las toman los subdirectores y el Director.</div>
+  <div class="lead" style="color:#9FB2E6;font-size:20px;margin-top:30px">María Elena Sepúlveda Maldonado · Coordinadora Técnica de Puesta en Marcha · mariaelenasepulveda@hsalvador.cl</div>
+  <div class="pie"><img src="assets/pm_deck/logo-hds-blanco.png" alt="" style="height:30px"><span class="num" data-n></span></div>
+</section>
+
+</div>
+
+<div id="prog"></div>
+<div id="nav">
+  <a href="index.html" title="Volver al HUB">HUB</a>
+  <button id="bPrev" title="Anterior (←)">◀</button><span id="cnt"></span><button id="bNext" title="Siguiente (→)">▶</button>
+  <button id="bFull" title="Pantalla completa (F)">⛶</button><button id="bPdf" title="Guardar como PDF">🖨</button>
+</div>
+
+<script>
+(function(){
+  const S = [...document.querySelectorAll('.slide')], stage = document.getElementById('stage');
+  let i = Math.max(0, Math.min(S.length - 1, (parseInt((location.hash || '').slice(1), 10) || 1) - 1));
+  S.forEach((s, k) => { const n = s.querySelector('[data-n]'); if(n) n.textContent = (k + 1) + ' / ' + S.length; });
+  function ajustar(){ const k = Math.min(innerWidth / 1280, innerHeight / 720);
+    stage.style.transform = `translate(${-640 * k}px,${-360 * k}px) scale(${k})`; }
+  function ir(n){
+    i = Math.max(0, Math.min(S.length - 1, n));
+    S.forEach((s, k) => s.classList.toggle('on', k === i));
+    const f = S[i].querySelector('iframe[data-src]'); if(f && !f.src) f.src = f.dataset.src;   // el organigrama carga al llegar
+    document.getElementById('cnt').textContent = (i + 1) + ' / ' + S.length;
+    document.getElementById('prog').style.width = (100 * (i + 1) / S.length) + '%';
+    try{ history.replaceState(null, '', '#' + (i + 1)); }catch(e){}
+  }
+  addEventListener('resize', ajustar);
+  addEventListener('keydown', e => {
+    if(/INPUT|TEXTAREA|SELECT/.test((document.activeElement || {}).tagName)) return;
+    if(['ArrowRight', 'PageDown', ' '].includes(e.key)){ e.preventDefault(); ir(i + 1); }
+    else if(['ArrowLeft', 'PageUp'].includes(e.key)){ e.preventDefault(); ir(i - 1); }
+    else if(e.key === 'Home') ir(0); else if(e.key === 'End') ir(S.length - 1);
+    else if(e.key === 'f' || e.key === 'F') pantalla();
+  });
+  function pantalla(){ if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen().catch(() => {}); }
+  document.getElementById('bPrev').onclick = () => ir(i - 1);
+  document.getElementById('bNext').onclick = () => ir(i + 1);
+  document.getElementById('bFull').onclick = pantalla;
+  document.getElementById('bPdf').onclick = () => window.print();
+  // clic en el borde derecho/izquierdo de la diapositiva = avanzar/retroceder (no en la diapositiva en vivo)
+  stage.addEventListener('click', e => { if(S[i].classList.contains('vivo') || e.target.closest('a,button,iframe')) return;
+    const r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width; if(x > .85) ir(i + 1); else if(x < .15) ir(i - 1); });
+  // ?print=1 (PDF): el organigrama se carga desde el inicio para que salga en la impresión
+  if(/[?&]print=1/.test(location.search)){ document.documentElement.classList.add('imprimir');
+    S.forEach(s => { const f = s.querySelector('iframe[data-src]'); if(f) f.src = f.dataset.src; }); return; }
+  addEventListener('beforeprint', () => S.forEach(s => { const f = s.querySelector('iframe[data-src]'); if(f && !f.src) f.src = f.dataset.src; }));
+  ajustar(); ir(i);
+})();
+</script>
+</body>
+</html>

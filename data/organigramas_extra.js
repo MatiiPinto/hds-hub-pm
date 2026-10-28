@@ -1,47 +1,47 @@
 // data/organigramas_extra.js — organigramas adicionales de la 15 (Puesta en Marcha y hospital concesionado).
-// PM: transcrito de la pizarra de Puesta en Marcha (foto IMG_0557, 27-10-2026). Lo que no se lee con certeza va con «por confirmar».
+// PM: pizarra de Puesta en Marcha (foto IMG_0557) + organización acordada en la reunión del 27-10-2026. Lo que no consta con certeza va con «por confirmar».
 // Concesionado: conducto formal del contrato + 14 servicios de los PAPS aprobados (SHARED_DATA/paps_full.js).
 window.ORG_EXTRA = {
   pm: {
     titulo: 'Puesta en Marcha · Nuevo HDS',
-    sub: 'Estructura de trabajo y responsables por frente · pizarra de Puesta en Marcha y bosquejo en papel del 27-10-2026',
+    sub: 'Organización acordada con el Director (reunión del equipo PM, 27-10-2026): cada rol con su persona · sobre la pizarra y el bosquejo en papel del 27-10',
     fases: [
       { n: 1, t: 'Pre-PSP', cuando: 'jun · jul · ago', c: 'azul', items: ['Planificación del Plan Piloto', 'Gestión documental (AS · ISP)', 'Capacitación general y específica (EMMC, mobiliario, servicios de apoyo)'] },
       { n: 2, t: 'PSP · Marcha blanca', cuando: '4 semanas', c: 'verde', items: ['Piloto: casos de uso y paciente ficticio', 'Autorización Sanitaria ✓ · ISP ✓', 'Simulacro de traslado (estrés)', 'Inspección conjunta → subsanación → recepción'] },
       { n: 3, t: 'Traslado', cuando: 'nov · 7 días', c: 'durazno', items: ['Modelo de Operación Dual Transitoria'] },
       { n: 4, t: 'Operativo', cuando: '', c: 'lila', items: ['Red AP-GC-O · financiamiento Gestión del Cambio'] }
     ],
-    // árbol: cada nodo { t, s (subtítulo), c (color), q (por confirmar), h (hijos) }
+    // árbol: cada nodo { t (rol), s (detalle), p (personas), c (color), q (por confirmar), h (hijos) }
+    // 27-10-2026 · reunión del equipo PM (Minutas/2026-10-27_reunion-diaria-pm.md): María Elena Sepúlveda
+    // coordinadora técnica de PM en espejo con Francisca Cid (SSMO); Catherine 100 % AS; TIC y Logística
+    // salen de PM (pedido de F. Lacalle); PM se divide en ámbito clínico y administrativo-logístico.
     arbol: {
-      t: 'SSMO', s: 'Servicio de Salud Metropolitano Oriente', c: 'navy',
-      lado: { t: 'Coordinación Técnica', s: 'CT · SSMO', c: 'azul', p: ['F. Cid'] },
+      t: 'SSMO', s: 'Servicio de Salud Metropolitano Oriente · Dirección del Servicio', c: 'navy',
+      lado: { t: 'Coordinación Técnica SSMO', s: 'canal oficial: todo entra y sale por ella', c: 'azul', p: ['Francisca Cid'],
+              q: 'Cargo de origen por confirmar: jefa del departamento de Planificación y Proyectos, dependiente del Subdirector Administrativo del SSMO, encomendada como coordinadora técnica del Director' },
       h: [
-        { t: 'HDS', s: 'Hospital del Salvador', c: 'navy', h: [
-          { t: 'Coordinación Técnica PM', s: 'CT · Puesta en Marcha', c: 'azul', lat: true },
-          { t: 'Subdirecciones', s: 'equipos directivos', c: 'lila', h: [
-            { t: 'SDA', s: 'Administrativa · ADP', c: 'lila' },
-            { t: 'SDM', s: 'Subdirección Médica', c: 'lila' },
-            { t: 'SDADT', s: 'Apoyo Diagnóstico y Terapéutico', c: 'lila', p: ['D = FR ✓', 'T = PH ✓'], q: 'Anotación «11K» junto a SDADT en la pizarra sin leer' },
-            { t: 'SDGC', s: 'Gestión del Cuidado', c: 'lila', q: 'En el bosquejo en papel la sigla de este recuadro está repasada' },
-            { t: 'SDGP', s: 'Gestión de Personas', c: 'lila' }
-          ]},
-          { t: 'PM y Gestión del Cambio', s: 'PM · GC', c: 'azul', h: [
-            { t: 'Clínica', s: 'frentes clínicos', c: 'verde', h: [
-              { t: 'Plan Piloto (SCL)', c: 'verde', p: ['J. Pacheco', 'M. Salvatierra', 'M. Canales', 'H. Díaz'] },
-              { t: 'Autorización Sanitaria', c: 'verde', p: ['C. Sepúlveda', 'M. Canales'] },
-              { t: 'EMMC', c: 'verde', p: ['M. Canales (Mey)'] },
-              { t: 'Plan de Traslado', c: 'verde', p: ['F. Araya', 'C. Poch'] },
-              { t: 'Capacitación', c: 'verde', p: ['C. Guerrero', 'Javi', 'I. Rojas', 'M. Pinto'] },
-              { t: 'Cabida', c: 'verde', p: ['L. Pérez', 'M. Pinto'] },
-              { t: 'Por definir', s: 'recuadro vacío en el bosquejo', c: 'verde', q: 'Frente clínico sin nombre en el bosquejo en papel' }
+        { t: 'Hospital del Salvador', s: 'Director', c: 'navy', z: 'M', p: ['Dr. Jorge Zajjur Castro'], h: [
+          { t: 'Coordinación Técnica de Puesta en Marcha', s: 'de director a director con la CT del SSMO', c: 'azul', z: 'M', p: ['María Elena Sepúlveda'], h: [
+            { t: 'Ámbito clínico', s: 'frentes clínicos', c: 'verde', h: [
+              { t: 'Autorización Sanitaria', s: 'SEREMI · ISP · cartera de prestaciones', c: 'verde', z: 'M', p: ['Catherine Sepúlveda (100 %)', 'Javiera Flores'] },
+              { t: 'Equipamiento médico (EMMC)', s: 'existencias · subsanaciones · traslado', c: 'verde', z: 'M', p: ['Matías Pinto', 'Meylin Canales'] },
+              { t: 'Plan Piloto (SCL)', s: 'enrolamiento y capacitación del piloto', c: 'verde', z: 'M', p: ['Javiera Pacheco', 'Horacio Díaz', 'Meylin Canales', 'Marisol Salvatierra'], q: 'Responsable único por definir (se trabaja en la presentación)' },
+              { t: 'Plan de Traslado y poblamiento', s: 'programa de traslado · despoblamiento', c: 'verde', z: 'M', p: ['Fernando Araya', 'Costanza Poch'] },
+              { t: 'Capacitación', s: 'general y específica', c: 'verde', z: 'M', p: ['C. Guerrero', 'Javi', 'Isabel Rojas', 'Matías Pinto'], q: 'Nombres de la pizarra: confirmar «Javi» y C. Guerrero' },
+              { t: 'Cabida', s: 'quién trabaja dónde en el NHDS', c: 'verde', z: 'M', p: ['Loreto Pérez', 'Matías Pinto'] }
             ]},
-            { t: 'Administración y Logística', s: 'frentes de soporte', c: 'durazno', h: [
-              { t: 'TIC', s: 'CS · TIC', c: 'durazno', q: 'Iniciales bajo TIC por confirmar (CS / «CSil»)' },
-              { t: 'Logística', s: 'CC · Logística', c: 'durazno' },
-              { t: 'Sociedad Concesionaria', s: 'RSO · PAPS · J.P.', c: 'durazno', z: 'M', p: ['HUB · Equipamiento', 'Operaciones', 'CC · TD'], q: 'En la pizarra figura «IC» como enlace con la SDA', h: [
-                { t: 'Servicios concesionados', s: 'M. Salvatierra (por confirmar)', c: 'durazno', z: 'L', p: ['Seguridad ✓', 'Aseo ✓', 'Alimentación ✓', 'Ropería', 'Esterilización'] }
-              ]}
+            { t: 'Ámbito administrativo y logístico', s: 'con la Subdirección Administrativa', c: 'durazno', z: 'M', p: ['Rodrigo Hermosilla', 'Fernando Lacalle', 'Marisol Salvatierra'], h: [
+              { t: 'Traslado de equipos propios y comodatos', s: 'con Mariana Bravo (SSMO)', c: 'durazno', z: 'M', p: ['Rodrigo Hermosilla', 'Matías Pinto'] },
+              { t: 'Logística en terreno', s: 'racks · bodegas · oficinas', c: 'durazno', z: 'M', p: ['Rodrigo Espinoza'] },
+              { t: 'Sociedad Concesionaria', s: 'servicios concesionados: seguridad, aseo, alimentación, ropería, esterilización', c: 'durazno', z: 'M', p: ['Marisol Salvatierra'], q: 'Responsable de los servicios concesionados por confirmar' }
             ]}
+          ]},
+          { t: 'Subdirecciones', s: 'resuelven; PM facilita y coordina', c: 'lila', h: [
+            { t: 'SDA · Administrativa', s: 'TIC y Logística (salen de PM)', c: 'lila', p: ['Fernando Lacalle'] },
+            { t: 'SDM · Médica', c: 'lila', p: ['Dr. Manuel Ramírez'] },
+            { t: 'SDADT · Apoyo Dx y Terapéutico', c: 'lila', p: ['María Elena Sepúlveda'] },
+            { t: 'SDGC · Gestión del Cuidado', c: 'lila', p: ['Lorena Encina'] },
+            { t: 'SDGP · Gestión de Personas', c: 'lila', p: ['Andrés Villarroel'] }
           ]}
         ]},
         { t: 'INGER', s: 'Instituto Nacional de Geriatría', c: 'navy' }
@@ -51,14 +51,14 @@ window.ORG_EXTRA = {
       { t: 'Comunicaciones', p: 'Martín Navarro · Javi', c: 'azul' },
       { t: 'Gestión documental', p: 'N. Jaramillo · T. Cataldo · V. Duque · K. Alfaro', c: 'azul', ok: 'Listo' },
       { t: 'Mesa de trabajo y manuales de uso', p: 'Javiera Pacheco · casilleros, residencia, auditorios', c: 'verde' },
-      { t: 'Señalética', p: 'C. Sepúlveda', c: 'verde' },
+      { t: 'Señalética', p: 'Catherine Sepúlveda', c: 'verde' },
       { t: 'Simulación de flujo clínico (SCL)', p: 'por definir', c: 'durazno' },
-      { t: 'Revisión EMMC · MNC', p: 'M. Canales', c: 'durazno' },
-      { t: 'Recepción instrumental quirúrgico', p: 'M. Pinto', c: 'lila' },
+      { t: 'Revisión EMMC · MNC', p: 'Meylin Canales', c: 'durazno' },
+      { t: 'Recepción instrumental quirúrgico', p: 'Matías Pinto', c: 'lila' },
       { t: 'Comité Estratégico de Gestión Clínica', p: 'Loreto Pérez', c: 'lila' }
     ],
-    agenda: ['09:00 · Core', '10:30 · Logística', '12:00 · TEP'],
-    notas: ['Comunicaciones canaliza la relación con el MOP y los mensajes («Habla» → DM en la pizarra).', 'El bosquejo en papel ordena la estructura: Coordinación Técnica PM al costado del HDS, cinco subdirecciones y PM · GC repartido en Clínica y Administración (TIC · Logística · Sociedad Concesionaria).']
+    agenda: ['L–J 08:00 · Reunión diaria PM', 'Mié 10:00 · Traslado (Dirección)', 'Jue 29-10 · Equipamiento con F. Cid', 'Vie · Comité Estratégico'],
+    notas: ['Lo oficial va de director a director: entra y sale por la Coordinación Técnica del SSMO (Francisca Cid) y la de Puesta en Marcha (María Elena Sepúlveda). Lo operativo sigue en el uno a uno (p. ej., con Felipe Rojas), siempre con copia a la coordinación técnica.', 'PM facilita y coordina; las decisiones las toman los subdirectores y el Director.']
   },
 
   concesionado: {

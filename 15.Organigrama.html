@@ -308,6 +308,11 @@
   .oe-col button.c-azul{background:#E3EEFB}.oe-col button.c-verde{background:#E3F4EA}.oe-col button.c-durazno{background:#FDEBDD}.oe-col button.c-lila{background:#ECE7FA}.oe-col button.c-navy{background:#1F2A55}
   .oe-col button.on{box-shadow:0 0 0 3px #2563eb}
   .oe-panel .oe-chk{display:flex;gap:6px;align-items:center;font-weight:600}
+  /* ?embed=1 · solo el organigrama de PM, para incrustarlo en la presentación */
+  body.embed #hdr,body.embed #orgSwitch,body.embed #subnav,body.embed #main,body.embed #footer{display:none!important}
+  body.embed{background:#fff;min-height:0} body.embed #altView{display:block!important;padding:8px 10px 0;margin:0}
+  body.embed .ox{max-width:none} body.embed .oe-wrap{height:calc(100vh - 62px)!important}
+  body.embed .oe-panel{top:56px;max-height:calc(100vh - 64px);overflow:auto} body.embed .ow .bp{display:none}
   .ow .bp{position:absolute;left:6px;bottom:5px;background:#b45309;color:#fff;border-radius:9px;padding:0 7px;font-size:11.5px;font-weight:800;line-height:18px}
   .ox .tv{cursor:pointer;position:relative} .ox .tv .bp{position:absolute;right:10px;top:9px;background:#b45309;color:#fff;border-radius:9px;padding:0 7px;font-size:11.5px;font-weight:800;line-height:18px}
   .bp-panel{width:380px;max-height:calc(100vh - 140px);overflow:auto}
@@ -1288,6 +1293,7 @@ document.addEventListener('DOMContentLoaded', () => {
 /* Organigramas adicionales (data/organigramas_extra.js): Puesta en Marcha (editable, widgets) y hospital concesionado. */
 (function(){
   const E = window.ORG_EXTRA; if(!E) return;
+  const EMBED = /[?&]embed=1/.test(location.search); if(EMBED) document.body.classList.add('embed');
 
   /* ── Bitácora (27-10): pendientes abiertos de cada persona y de cada frente ──
      Semilla SHARED_DATA/bitacora_pendientes.js + lo editado en la 14 de este navegador
@@ -1299,24 +1305,28 @@ document.addEventListener('DOMContentLoaded', () => {
   const nr = t => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
   const respDe = x => nr(x.responsable).replace(/^matias\b(?!\s+[a-z]*\s*pinto)/, 'matias pinto');   // «Matías» a secas = Matías Pinto
   function calza(persona){
-    const t = nr(persona).replace(/\(.*?\)/g, '').trim(), m = t.match(/^([a-z])\.\s*([a-z]+)/);
+    const t = nr(persona).replace(/\(.*?\)/g, '').replace(/^dra?\.\s*/, '').trim(),
+          m = t.match(/^([a-z])\.\s*([a-z]+)/) || t.match(/^([a-z])[a-z]+\s+([a-z]+)/);   // «J. Pacheco» o «Javiera Pacheco»
     if(!m) return () => false;                       // nombres sueltos («Javi») no se adivinan
     const rx = new RegExp('\\b' + m[1] + '[a-z]*\\.?\\s+(?:[a-z]+\\s+)?' + m[2] + '\\b');
     return x => rx.test(respDe(x));
   }
-  const AMBITO = { 'autorizacion sanitaria': ['Aut. Sanitaria'], 'emmc': ['EMMC', 'MNC', 'Instrumental', 'CCDD', 'PMA'], 'revision emmc · mnc': ['EMMC', 'MNC'],
-    'capacitacion': ['Capacitación'], 'cabida': ['Dotación'], 'tic': ['TI'], 'comunicaciones': ['Comunicaciones'], 'recepcion instrumental quirurgico': ['Instrumental'] };
+  const AMB_RX = [[/revision emmc/, ['EMMC', 'MNC']], [/emmc/, ['EMMC', 'MNC', 'Instrumental', 'CCDD', 'PMA']], [/autorizacion sanitaria/, ['Aut. Sanitaria']],
+    [/capacitacion/, ['Capacitación']], [/^cabida/, ['Dotación']], [/^tic$/, ['TI']], [/comunicaciones/, ['Comunicaciones']], [/instrumental/, ['Instrumental']]];
+  const ambitoDe = t => (AMB_RX.find(([rx]) => rx.test(nr(t).trim())) || [0, []])[1];
+  const VACIAS = new Set(['plan', 'propios', 'equipos', 'gestion', 'servicios', 'ambito', 'terreno', 'manuales', 'trabajo', 'tecnica', 'coordinacion']);
+  const claves = t => nr(t).replace(/\(.*?\)/g, ' ').split(/[^a-z]+/).filter(w => w.length >= 5 && !VACIAS.has(w)).map(w => w.slice(0, 7));
   const PRI = { Alta: 0, Media: 1, Baja: 2 }, orden = (a, b) => (PRI[a.prioridad] ?? 3) - (PRI[b.prioridad] ?? 3) || String(a.plazo || '9').localeCompare(String(b.plazo || '9'));
   /* Recuadro con frente (ámbito): sus pendientes son los del frente, y de cada persona se
      muestran los suyos dentro del frente + cuántos tiene en total. Sin frente: los de sus personas. */
   function pendDe(titulo, personas){
-    const amb = AMBITO[nr(titulo).trim()] || [], grupos = [], gente = [];
-    const enF = x => !amb.length || amb.includes(x.ambito);
+    const amb = ambitoDe(titulo), grupos = [], gente = [], kw = claves(titulo);
+    /* sin ámbito: de cada persona, solo lo que trata del tema del recuadro (palabras del título) */
+    const enF = x => amb.length ? amb.includes(x.ambito) : (!kw.length || kw.some(k => nr(x.titulo + ' ' + x.detalle).includes(k)));
     if(amb.length) grupos.push({ g: 'Frente · ' + amb.join(' · '), L: BIT.filter(x => amb.includes(x.ambito)).sort(orden) });
     (personas || []).forEach(p => { const f = calza(p), todos = BIT.filter(f);
       gente.push({ p, total: todos.length, ap: (p.match(/[A-Za-zÁÉÍÓÚÑáéíóúñ]+$/) || [''])[0] });
-      if(!amb.length) grupos.push({ g: p, L: todos.sort(orden) });
-      else if(todos.some(enF)) grupos.push({ g: p + ' · en este frente', L: todos.filter(enF).sort(orden) }); });
+      if(todos.some(enF)) grupos.push({ g: p + ' · en este frente', L: todos.filter(enF).sort(orden) }); });
     const ids = new Set(); grupos.forEach(g => g.L.forEach(x => ids.add(x.id)));
     return { grupos: grupos.filter(g => g.L.length), n: ids.size, gente };
   }
@@ -1342,7 +1352,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const TAM = { S: [212, 92], M: [244, 126], L: [296, 162] };   // 27-10: más grandes, legibles al proyectar
   const GX = 22, GY = 46, GS = 12;           // separación horizontal, entre niveles y dentro de columnas
   const COLORES = { azul: 'Azul', verde: 'Verde', durazno: 'Durazno', lila: 'Lila', navy: 'Navy' };
-  const KEY = 'org15_pm_editor_v2';   // v2 (27-10): estructura del bosquejo en papel; v1 queda guardado aparte
+  const KEY = 'org15_pm_editor_v3';   // v3 (27-10 tarde): organización acordada en la reunión PM (rol → persona); v2 y v1 quedan guardados aparte
   let uid = 0;
   const conIds = n => { n.id = n.id || ('n' + (++uid)); (n.h || []).forEach(conIds); return n; };
   function desdeDato(){                     // dato original → árbol del editor (el «lado» pasa a hijo lateral)
@@ -1367,7 +1377,8 @@ document.addEventListener('DOMContentLoaded', () => {
     n.modo = hijos.length >= 3 && hijos.every(x => !(x.h || []).length) ? 'col' : 'fila';
     if(!hijos.length){ n.W = w + latW; n.H = h; return; }
     if(n.modo === 'col'){
-      const filas = Math.min(4, Math.ceil(hijos.length / Math.ceil(hijos.length / 4))), cols = Math.ceil(hijos.length / filas);
+      const mf = EMBED ? 2 : 4;   // incrustado en la presentación: más ancho que alto (pantalla 16:9)
+      const filas = Math.min(mf, Math.ceil(hijos.length / Math.ceil(hijos.length / mf))), cols = Math.ceil(hijos.length / filas);
       const cw = Math.max(...hijos.map(x => x.W)), ch = Math.max(...hijos.map(x => x.H));
       n.cols = cols; n.filas = filas; n.cw = cw; n.ch = ch;
       n.W = Math.max(w + 2 * latW, cols * (cw + 18) + (cols - 1) * GX); n.H = h + GY + filas * (ch + GS) - GS;
@@ -1420,6 +1431,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ${out.nodos.map(widget).join('')}</div></div>
       ${editar && n ? panel(n.n, n.p) : ''}${!editar ? panelPend() : ''}`;
     const lz = cont.querySelector('.oe-lienzo'); lz.parentElement.style.height = Math.min(H * zoom + 10, 900) + 'px';
+    lz.style.marginLeft = Math.max(0, (lz.parentElement.clientWidth - W * zoom) / 2) + 'px';   // centrado cuando sobra ancho
   }
   function imagen(){
     medir(arbol); const out = { nodos: [], lineas: [] }; ubicar(arbol, 30, 90, out);
@@ -1469,7 +1481,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if(a === 'cerrar'){ sel = null; return pintar(); }
     if(a === 'cerrarPend'){ verPend = null; return pintar(); }
     if(a === 'mas' || a === 'menos'){ zoom = Math.max(.4, Math.min(1.6, zoom + (a === 'mas' ? .1 : -.1))); return pintar(); }
-    if(a === 'ajustar'){ medir(arbol); zoom = Math.max(.75, Math.min(1, (cont.clientWidth - 20) / (arbol.W + 60))); return pintar(); }   // piso 75 %: legible al proyectar (lo que sobra se recorre)
+    if(a === 'ajustar'){ medir(arbol); zoom = EMBED ? Math.max(.3, Math.min(1, (cont.clientWidth - 20) / (arbol.W + 60), (innerHeight - 74) / (arbol.H + 60)))   // incrustado: cabe entero (ancho y alto)
+      : Math.max(.75, Math.min(1, (cont.clientWidth - 20) / (arbol.W + 60))); return pintar(); }   // piso 75 %: legible al proyectar (lo que sobra se recorre)
     if(a === 'deshacer') return deshacer();
     if(a === 'imagen') return imagen();
     if(a === 'original'){ if(!confirm('¿Volver al organigrama original de la pizarra? Se pierden los cambios hechos aquí (puedes exportarlos antes).')) return; snap(); arbol = desdeDato(); sel = null; guardar(); return pintar(); }
@@ -1516,7 +1529,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function pm(){
     const D = E.pm;
-    return `<div class="ox"><h2>${esc(D.titulo)}</h2><div class="sub">${esc(D.sub)}</div>
+    if(EMBED) return `<div class="ox"><div id="oeHost"></div></div>`;
+    return `<div class="ox"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px"><div><h2>${esc(D.titulo)}</h2><div class="sub">${esc(D.sub)}</div></div>
+      <a href="52.PresentacionPM.html" style="flex-shrink:0;background:#1F2A55;color:#fff;border-radius:10px;padding:9px 14px;font-weight:800;font-size:13px;text-decoration:none">📽 Presentación al Director</a></div>
       <div class="sec">Fases</div><div class="fases">${D.fases.map(f=>`<div class="card fase c-${f.c}"><span class="n">${f.n}</span><span class="t">${esc(f.t)}</span>${f.cuando?`<div class="w">${esc(f.cuando)}</div>`:'<div class="w">&nbsp;</div>'}<ul>${f.items.map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>`).join('')}</div>
       <div class="sec">Estructura</div><div id="oeHost"></div>
       <div class="sec">Frentes transversales</div>
@@ -1543,10 +1558,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if(!hds){ alt.innerHTML = v === 'pm' ? pm() : conc(); if(v === 'pm'){ montar(document.getElementById('oeHost')); accion('ajustar');
       alt.querySelectorAll('[data-tv]').forEach(c => c.addEventListener('click', () => { const t = E.pm.transversales[+c.dataset.tv]; verPend = { t: t.t, p: personasTv(t) }; editar = false; pintar(); })); } }
     document.querySelectorAll('#orgSwitch button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
-    try{ localStorage.setItem('org15_vista', v); }catch(e){}
+    if(!EMBED) try{ localStorage.setItem('org15_vista', v); }catch(e){}
   }
   document.querySelectorAll('#orgSwitch button').forEach(b => b.addEventListener('click', () => ver(b.dataset.v)));
   let ini = (location.hash || '').slice(1);
+  if(EMBED) ini = 'pm';
   if(!['hds','pm','concesionado'].includes(ini)){ try{ ini = localStorage.getItem('org15_vista') || 'hds'; }catch(e){ ini = 'hds'; } }
   if(ini !== 'hds') ver(ini);
 })();
