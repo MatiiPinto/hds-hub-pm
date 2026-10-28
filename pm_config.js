@@ -124,7 +124,10 @@ window.PM_CONFIG = {
     // Ivana Milio Cepa · Química Farmacéutica
     'imilio':     '2353256ec97ec6cdec3a8725033da0aa4786b7524986372f8fc96a05e73a0721',
     // Alejandra Díaz Chacón · Química Farmacéutica, Área Pabellón
-    'adiazch':    '3b56cc0059218c744b1033697b498288673073094636679b47b9b39329230672'
+    'adiazch':    '3b56cc0059218c744b1033697b498288673073094636679b47b9b39329230672',
+    // María Elena Sepúlveda · Subdirectora SDADT y Coordinadora Técnica de Puesta en Marcha
+    // (27-10-2026). Clave inicial: primeros 4 dígitos del RUT.
+    'msepulveda': '10a0b7229c8dfee90e0e92c4a0f6b0c8e3641d70c3af00d431ce854196bf0b27'
   }
 };
 
