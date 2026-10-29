@@ -497,7 +497,7 @@ function renderFaltan(){
     if(!g.ins){ h+='<div class="fn"><div class="n">'+n+'</div><div class="l">'+g.l+'</div></div>'; return; }
     // Pabellones y Esterilización: mitad EMMC (tipologías del programa) y mitad Instrumental (tipologías de caja sin ejecutar)
     h+='<div class="fn sp" title="Arriba: tipologías EMMC pendientes · Abajo: tipologías de instrumental pendientes (aplica a Pabellones y Esterilización)">'+
-       '<div class="h"><b>'+n+'</b><span>EMMC</span></div><div class="h"><b>'+insPend+'</b><span>Instrumental</span></div><div class="l">'+g.l+'</div></div>';
+       '<div class="h"><b>'+n+'</b><span>EMMC</span></div><div class="h"><b>'+insPend+'</b><span>Inst Qx</span></div><div class="l">'+g.l+'</div></div>';
   });
   h+='<div class="fn g"><div class="n">'+pend.length+'</div><div class="l">Total · de '+D.capacitaciones.length+'</div></div>';
   if(typeof estamStats==="function"){ var es=estamStats(); h+='<div class="fn" title="Tipologías pendientes con al menos un estamento marcado"><div class="n">'+es.def+'<span style="font-size:13px;font-weight:600"> / '+es.pend+'</span></div><div class="l">👥 con estamentos</div></div>'; }

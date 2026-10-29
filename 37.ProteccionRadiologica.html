@@ -1277,7 +1277,7 @@ function vEqNhds(){
     +' salas fijas + '+R.moviles+' móviles, más Medicina Nuclear como instalación de 1ª categoría y sus fuentes selladas. '
     +esc(N.nota)+' <small>Fuente: '+esc(N.fuente)+' · generado '+esc(N.generado)+'</small></div>'
     +kpis([['Emisores',R.emisores,'var(--tx)'],['1ª categoría (CCHEN)',R.por_categoria['1ª']||0,'var(--bad)'],
-           ['2ª categoría (SEREMI)',R.por_categoria['2ª']||0,'var(--ok)'],['Serie leída en acta de recepción',(R.con_serie_acta||0)+' / '+R.emisores,'var(--ok)'],
+           ['2ª categoría (SEREMI)',R.por_categoria['2ª']||0,'var(--ok)'],['Serie leída en acta de recepción',(R.con_serie_acta||0)+' / '+R.emisores,'var(--ok)'],['Serie informada por la SC (26-10)',em.filter(e=>e.serie_sc).length+' / '+R.emisores,'var(--ok)'],['Serie SC ≠ acta',em.filter(e=>e.serie_coincide==='no').length,em.some(e=>e.serie_coincide==='no')?'var(--warn)':'var(--ok)'],
            ['Sin N° de serie',R.sin_serie,R.sin_serie?'var(--warn)':'var(--ok)'],['Sin acta de recepción',R.sin_acta,R.sin_acta?'var(--warn)':'var(--ok)']])
     /* marco */
     +'<div class="card" style="margin-top:12px"><h2>⚖️ Las tres categorías del D.S. 133/84 (art. 7)</h2><div class="d">'+esc(N.marco.norma)+'</div>'
@@ -1295,7 +1295,7 @@ function vEqNhds(){
     /* tabla de equipos */
     +'<div class="card" style="margin-top:12px"><h2>📋 Equipos emisores · uno por BIM <button class="btn" onclick="nhdsCSV()" style="float:right">⬇ CSV</button></h2>'
     +'<div class="d">El N° de serie sale de las <b>actas de recepción RC-IB</b> (Existencias 23-09-26, OCR LecturaActasEQM, verificadas a ojo'+(R.actas_fuente?'':'')+'); lo que falta (tubo, kV/mA, año, planos, memoria, levantamiento, aceptación) se pide a la Concesionaria en la planilla «Levantamiento Equipos Emisores NHDS» (17.Autorización Sanitaria / Radiaciones Ionizantes NHDS).</div>'
-    +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>N°</th><th>Cat.</th><th>Grupo</th><th>Código</th><th>Equipo</th><th>Marca · modelo (PINS)</th><th>Ubicación</th><th>Estado PINS</th><th>Acta · N° de serie</th><th>Recibido (CS-IF-9184)</th><th>Alerta</th></tr></thead><tbody>'
+    +'<div class="tw" style="margin-top:10px"><table><thead><tr><th>N°</th><th>Cat.</th><th>Grupo</th><th>Código</th><th>Equipo</th><th>Marca · modelo (PINS)</th><th>Ubicación</th><th>Estado PINS</th><th>Acta · N° de serie</th><th>Serie SC (listado 26-10)</th><th>Recibido (CS-IF-9184)</th><th>Alerta</th></tr></thead><tbody>'
     +em.map(e=>'<tr><td>'+e.n+'</td><td>'+pc(e.cat)+'</td><td><small>'+esc((GN[e.grupo]||{}).nombre||e.grupo)+'</small></td><td class="mono">'+esc(e.code)+'</td>'
       +'<td>'+esc(e.nombre)+'<br><small style="color:var(--tx2)">'+esc(e.clasif)+'</small></td><td>'+esc(e.marca||'—')+'<br><small>'+esc(e.modelo||'')+'</small></td>'
       +'<td><small>'+esc(e.edif)+' '+esc(e.piso)+' · <b>'+esc(e.pma)+'</b> · '+esc(e.bim)+'<br>'+esc(e.recinto)+'</small></td>'
@@ -1304,6 +1304,9 @@ function vEqNhds(){
         +(e.serie_acta?'<b class="mono">'+esc(e.serie_acta)+'</b>':'<span class="pill p-mute">sin serie</span>')+(e.serie_2_manuscrita?'<br><small class="mono">'+esc(e.serie_2_manuscrita)+'</small>':'')
         +(e.acta&&e.existe!==undefined?'<br><small>existe '+esc(e.existe||'—')+' · enciende '+esc(e.enciende||'—')+' · partes '+esc(e.partes||'—')+'</small>':'')
         +(e.obs_acta?'<br><small style="color:var(--tx2)">'+esc(e.obs_acta)+'</small>':'')+'</td>'
+      +'<td>'+(e.serie_sc?'<b class="mono">'+esc(e.serie_sc)+'</b>'+(e.serie_coincide==='no'?'<br><span class="pill p-warn">≠ acta</span>':e.serie_coincide==='sí'?'<br><span class="pill p-ok">= acta</span>':'')
+        :'<span class="pill p-mute">'+esc({correlativo:'correlativo, no serie',sin:'sin serie',nd:'no disponible'}[e.serie_sc_est]||(e.correlativo_pins?'—':'no es de la SC'))+'</span>')
+        +(e.n_item_as?'<br><small>ítem A.S. '+esc(e.n_item_as)+'</small>':'')+'</td>'
       +'<td><small>'+(e.garantia_recibida?'Garantía: '+esc(e.garantia_recibida)+'<br>Manual: '+esc(e.manual_recibido):'—')+'</small></td>'
       +'<td>'+(e.alerta?'<span class="pill p-warn">⚠</span> <small>'+esc(e.alerta)+'</small>':'')+'</td></tr>').join('')
     +'</tbody></table></div></div>'
@@ -1321,8 +1324,8 @@ function vEqNhds(){
 function nhdsCSV(){
   const N=window.PR_EQ_NHDS; if(!N) return;
   const cu=s=>'"'+String(s==null?'':s).replace(/"/g,'""')+'"';
-  const cab=['N°','Categoría','Autoridad','Grupo','Código','Equipo','Clasificación','Marca','Modelo','Proveedor','Edificio','Piso','PMA','BIM','Recinto','Servicio','N° ítem','Estado PINS','Acta','Fecha acta','N° de serie (acta)','2º N° manuscrito','Existe','Enciende','Partes','Obs. acta','Garantía recibida','Manual recibido','Alerta'].concat(N.campos_solicitados.map(c=>c[1]));
-  const filas=N.equipos.filter(e=>e.emisor).map(e=>[e.n,e.cat,e.autoridad,e.grupo,e.code,e.nombre,e.clasif,e.marca,e.modelo,e.proveedor,e.edif,e.piso,e.pma,e.bim,e.recinto,e.servicio,e.n_item,e.estado_pins,e.acta,e.acta_fecha,e.serie_acta,e.serie_2_manuscrita,e.existe,e.enciende,e.partes,e.obs_acta,e.garantia_recibida,e.manual_recibido,e.alerta].concat(N.campos_solicitados.map(()=>'' )).map(cu).join(';'));
+  const cab=['N°','Categoría','Autoridad','Grupo','Código','Equipo','Clasificación','Marca','Modelo','Proveedor','Edificio','Piso','PMA','BIM','Recinto','Servicio','N° ítem','Estado PINS','Acta','Fecha acta','N° de serie (acta)','2º N° manuscrito','N° de serie (SC 26-10)','Coincide con acta','N° ítem A.S.','Existe','Enciende','Partes','Obs. acta','Garantía recibida','Manual recibido','Alerta'].concat(N.campos_solicitados.map(c=>c[1]));
+  const filas=N.equipos.filter(e=>e.emisor).map(e=>[e.n,e.cat,e.autoridad,e.grupo,e.code,e.nombre,e.clasif,e.marca,e.modelo,e.proveedor,e.edif,e.piso,e.pma,e.bim,e.recinto,e.servicio,e.n_item,e.estado_pins,e.acta,e.acta_fecha,e.serie_acta,e.serie_2_manuscrita,e.serie_sc,e.serie_coincide,e.n_item_as,e.existe,e.enciende,e.partes,e.obs_acta,e.garantia_recibida,e.manual_recibido,e.alerta].concat(N.campos_solicitados.map(()=>'' )).map(cu).join(';'));
   bajar('equipos_emisores_NHDS_'+N.generado+'.csv','﻿'+cab.join(';')+'\n'+filas.join('\n'),'text/csv;charset=utf-8');
 }
 

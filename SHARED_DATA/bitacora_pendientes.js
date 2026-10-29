@@ -1,7 +1,7 @@
 // SHARED_DATA/bitacora_pendientes.js — versión publicada en el HUB-PM (saneada por deploy_web_pm.py)
 window.BITACORA = {
  "version": "2026-10-05 · Bitácora y huddle de Puesta en Marcha",
- "generado": "2026-10-27",
+ "generado": "2026-10-29",
  "proposito": "Reunir en un solo lugar los pendientes que hoy viven dispersos en correos, ORD, cartas CS-IF, actas de mesas de trabajo y sesiones de trabajo.",
  "ambitos": [
   "Comunicaciones",
@@ -2792,7 +2792,7 @@ window.BITACORA = {
   {
    "id": "P120",
    "titulo": "Tallaje de uniformes (07-10 al 16-11): difusión a jefaturas y monitoreo de asistencia",
-   "detalle": "Tallaje en el primer piso del edificio A [sic?], con carnet, para contratas y titulares. Enviar a cada jefatura para que organice a su gente y monitorear la asistencia con reporte de la Sociedad Concesionaria. Aclarar a quién aplica: el correo masivo llega también a honorarios y servicios externos.",
+   "detalle": "Tallaje en el primer piso del edificio A [sic?], con carnet, para contratas y titulares. Enviar a cada jefatura para que organice a su gente y monitorear la asistencia con reporte de la Sociedad Concesionaria. Aclarar a quién aplica: el correo masivo llega también a honorarios y servicios externos. · Avance 29-10-2026 (reunión PM): el personal de pabellón no puede salir a tallarse. Se hará en el mismo pabellón, dos viernes de 8:00 a 9:00, con un kit de una prenda por talla (delantal, kimono, etc.) y los QR en línea; no se paran pabellones (hoy hay 2,7 cirugías por pabellón al día). Ruta: Francisca Cid → Paz Fuentes → Carla (proveedora); coordinar con José Manuel y Daniela Núñez. Lo lleva la Javi. Plazo del tallaje: 16-11. Minuta: Minutas/minutas/2026-10-29_reuni-on-equipo-pm-jueves-29.md",
    "ambito": "Dotación",
    "origen_tipo": "Reunión",
    "origen_ref": "Minuta 05-10-2026 · Equipo de Puesta en Marcha (audios «Avenida Salvador 364 6» y «Hospital del Salvador 2»)",
@@ -2803,7 +2803,7 @@ window.BITACORA = {
    "estado": "Abierto",
    "compromiso": "Período 07-10 → 16-11-2026.",
    "plazo": "2026-11-16",
-   "responsable": "No consta",
+   "responsable": "Javiera",
    "creado": "2026-10-05",
    "actualizado": "2026-10-05",
    "frente": "Puesta en Marcha",
@@ -3184,12 +3184,16 @@ window.BITACORA = {
    "plazo": "2026-10-14",
    "responsable": "Matías Pinto · Catherine Sepúlveda",
    "creado": "2026-10-08",
-   "actualizado": "2026-10-08",
+   "actualizado": "2026-10-28",
    "frente": "Autorización Sanitaria",
    "notas": [
     {
      "fecha": "2026-10-08",
      "texto": "Borrador de ORD + anexo (29 equipos) y planilla de levantamiento en 17.Autorización Sanitaria/Radiaciones Ionizantes NHDS. Dato pr_equipos_nhds, pestaña 🏗 de la 37. Catherine preguntó a F. Cid por qué se le pide al HDS: la categoría la declara el titular (hospital) y define la autoridad (CCHEN vs SEREMI); los datos de equipo los tiene la SC."
+    },
+    {
+     "fecha": "2026-10-28",
+     "texto": "Series de los emisores según la SC (26-10): 25 de 29 con serie real; PET-CT y SPECT-CT traen el correlativo; el TAC H1718 repite la serie del H1712 (CJRBX2400007CN) y 3 de los 4 Rx Definium traen una serie distinta a la del acta. Excel 0.MAESTRO/Emisores_Series_SC_2026-10-28.xlsx; borradores a Catherine y a Allyson."
     }
    ]
   },
@@ -3551,11 +3555,15 @@ window.BITACORA = {
    "origen_fecha": "2026-10-19",
    "compromiso": "",
    "creado": "2026-10-22",
-   "actualizado": "2026-10-22",
+   "actualizado": "2026-10-28",
    "notas": [
     {
      "fecha": "2026-10-22",
      "texto": "Incorporado desde la entrega de Puesta en Marcha de Gabriella Brignardello."
+    },
+    {
+     "fecha": "2026-10-28",
+     "texto": "La SC respondió: F. Rojas reenvió el 28-10 el «Listado EMMC al 26-10-26 - A.S. Individualizado» (9.634 unidades, 6.678 con N° de serie del fabricante, 2.912 sin serie, 44 con el correlativo en vez de serie). Cargado en SHARED_DATA (emmc_series, emmc_por_bim, emmc_cuadratura, equibox_series) y en EquiBox, 22 (pestaña 🔢) y 37. Faltan inventario, año, instalación, garantía y software (puntos 2 a 5). Sigue en P316."
     }
    ]
   },
@@ -4207,10 +4215,16 @@ window.BITACORA = {
    "origen_fecha": "2026-10-27",
    "compromiso": "",
    "creado": "2026-10-27",
-   "actualizado": "2026-10-27",
+   "actualizado": "2026-10-28",
    "titulo": "Proyectar mañana el detalle de los 14 equipos sin verificable y mandar el informe cada vez que se actualice",
    "detalle": "De 6.460 equipos, 6.446 están recepcionados (99,7 %). Faltan 14 sin respaldo verificable en las pautas: 6 nunca revisados y los que quedaron con cruz, entre ellos 3 monitores de signos vitales de Diálisis (la pauta trae 8 y el Anexo IV 11; sólo la Concesionaria puede decir si tienen verificable en otro BIM). Hoy se envió a Catherine el informe por unidad, con el detalle de cada equipo que falta.",
-   "plazo": "2026-10-28"
+   "plazo": "2026-10-28",
+   "notas": [
+    {
+     "fecha": "2026-10-28",
+     "texto": "El listado de la SC (26-10) mueve monitores 130010 entre H1467 y H0805/H0806/H0818/H1865/H2058 (13 unidades) y 41 ítems de MFR de H0968 a H2717: cruzar con las actas antes de cerrar los 14 pendientes. Detalle en 0.MAESTRO/Auditoria_Series_EMMC_2026-10-28.xlsx, hojas «BIM movidos» y «Actas vs unidades»."
+    }
+   ]
   },
   {
    "id": "P179",
@@ -4263,7 +4277,7 @@ window.BITACORA = {
    "creado": "2026-10-27",
    "actualizado": "2026-10-27",
    "titulo": "Medicina Nuclear: el Dr. Colorado presenta al equipo qué requiere abrir el servicio",
-   "detalle": "El hospital no se presenta ahora a Autorización Sanitaria con Medicina Nuclear: el equipo está comprado y puesto, pero faltan recurso humano, protocolos, compra de radioisótopos y convenios. Igual conviene conocerlo para el proyecto 2027 y comparar el costo actual de la compra de servicios (que se declara a la SEREMI) contra el de abrir. Se fija una reunión en que el Dr. Colorado expone a todos."
+   "detalle": "El hospital no se presenta ahora a Autorización Sanitaria con Medicina Nuclear: el equipo está comprado y puesto, pero faltan recurso humano, protocolos, compra de radioisótopos y convenios. Igual conviene conocerlo para el proyecto 2027 y comparar el costo actual de la compra de servicios (que se declara a la SEREMI) contra el de abrir. Se fija una reunión en que el Dr. Colorado expone a todos. · Avance 28-10-2026: el proyecto de Medicina Nuclear lo hacen la Subdirección (Dra. Patricia Herrera) y su jefatura (Sergio Hodge [sic?]), no PM. PM solo plantea la situación. Las consultas técnicas de AS que hace la CSSO sobre Medicina Nuclear (problemas en documentos y diseño) las dirige Cati directo a Francisca, copiando a María Elena. Minuta: Minutas/minutas/2026-10-28_reuni-on-equipo-pm-miercoles-28.md"
   },
   {
    "id": "P182",
@@ -4339,7 +4353,7 @@ window.BITACORA = {
    "id": "P186",
    "ambito": "Puesta en Marcha",
    "prioridad": "Alta",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "responsable": "Fernando Araya",
    "contraparte": "Director HDS → Director SSMO",
    "servicio": "",
@@ -4348,9 +4362,16 @@ window.BITACORA = {
    "origen_fecha": "2026-10-27",
    "compromiso": "",
    "creado": "2026-10-27",
-   "actualizado": "2026-10-27",
+   "actualizado": "2026-10-28",
    "titulo": "Programa de traslado (versión final, no borrador) se presenta oficialmente al Servicio, de director a director",
-   "detalle": "Sólo cambiaron los detalles de la metodología y del despoblamiento; el resto es lo mismo que ya se conocía. Lo revisará el Dr. Vargas [sic?]. Siguen abiertos temas que no se han resuelto, como los ~30 días que demora una prestación de los institutos vecinos para un paciente hospitalizado."
+   "detalle": "Sólo cambiaron los detalles de la metodología y del despoblamiento; el resto es lo mismo que ya se conocía. Lo revisará el Dr. Vargas [sic?]. Siguen abiertos temas que no se han resuelto, como los ~30 días que demora una prestación de los institutos vecinos para un paciente hospitalizado.",
+   "cerrado": "2026-10-28",
+   "notas": [
+    {
+     "fecha": "2026-10-28",
+     "texto": "→ Cerrado. El Manual de Traslado v1.0 quedó aprobado por la Res. Ex. N°3986 del 27-10-2026 (Director Dr. Zajjur); elaboraron F. Araya y C. Poch, revisaron M.E. Sepúlveda, M. Ramírez y L. Encina. La resolución ordena comunicarlo a todas las unidades. PDF en Drive GESTOR DOCUMENTAL HDS/05_CIRCULARES Y RESOLUCIONES y en 03_NORMATIVA/RESOLUCIONES."
+    }
+   ]
   },
   {
    "id": "P187",
@@ -4560,7 +4581,7 @@ window.BITACORA = {
    "id": "P206",
    "ambito": "Puesta en Marcha",
    "prioridad": "Alta",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "responsable": "Fernando Araya",
    "contraparte": "María Elena Sepúlveda · Dirección",
    "servicio": "",
@@ -4569,10 +4590,17 @@ window.BITACORA = {
    "origen_fecha": "2026-10-26",
    "compromiso": "",
    "creado": "2026-10-27",
-   "actualizado": "2026-10-27",
+   "actualizado": "2026-10-28",
    "titulo": "Enviar a firma el documento del plan de traslado",
    "detalle": "Compromiso C2: lo envía el equipo de traslado para firma el mismo 26-10. Ajustarlo a la organización acordada el 27-10 (P174).",
-   "plazo": "2026-10-26"
+   "plazo": "2026-10-26",
+   "cerrado": "2026-10-28",
+   "notas": [
+    {
+     "fecha": "2026-10-28",
+     "texto": "→ Cerrado. Firmado y aprobado: Res. Ex. N°3986 del 27-10-2026 aprueba el Manual de Traslado v1.0 (vigencia 5 años)."
+    }
+   ]
   },
   {
    "id": "P207",
@@ -4827,12 +4855,12 @@ window.BITACORA = {
   },
   {
    "id": "P224",
-   "estado": "Abierto",
+   "estado": "Esperando terceros",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
    "titulo": "Traslado de equipos · reunión del jueves con Francisca y reuniones uno a uno por servicio",
-   "detalle": "Reunión PM 27-10-2026 [00:35:11]–[00:49:06]: hay unos 800 equipos de traslado solicitados (sin comodatos), 18 autorizados por la comisión de 2018 y unos 20 con visto bueno del SSMO. El SSMO demora la respuesta y no se ha presentado ningún comodato a la CSSO (cada uno requiere análisis eléctrico, de agua, etc.; el proveedor toma 21 días). Acuerdos: (1) insistir a Francisca por la respuesta; (2) jueves 29-10, reunión sobre equipos médicos con Francisca, Mariana Bravo y Fernando Lacalle; (3) reuniones uno a uno con cada jefe de servicio (plano, cabida, equipos, funcionamiento, AS), partiendo por la SDADT, con Matías. Faltan en el listado la justificación por cartera y producción y un seguimiento de cada equipo por etapa de validación (propuesta de Matías). Relacionado con P170. Minuta: Minutas/minutas/2026-10-27_reuni-on-equipo-pm-27-10.md",
+   "detalle": "Reunión PM 27-10-2026 [00:35:11]–[00:49:06]: hay unos 800 equipos de traslado solicitados (sin comodatos), 18 autorizados por la comisión de 2018 y unos 20 con visto bueno del SSMO. El SSMO demora la respuesta y no se ha presentado ningún comodato a la CSSO (cada uno requiere análisis eléctrico, de agua, etc.; el proveedor toma 21 días). Acuerdos: (1) insistir a Francisca por la respuesta; (2) jueves 29-10, reunión sobre equipos médicos con Francisca, Mariana Bravo y Fernando Lacalle; (3) reuniones uno a uno con cada jefe de servicio (plano, cabida, equipos, funcionamiento, AS), partiendo por la SDADT, con Matías. Faltan en el listado la justificación por cartera y producción y un seguimiento de cada equipo por etapa de validación (propuesta de Matías). Relacionado con P170. Minuta: Minutas/minutas/2026-10-27_reuni-on-equipo-pm-27-10.md · Avance 28-10-2026: el 27-10, a pedido del Dr. Zajjur, se envió a Francisca un correo más formal pidiendo la reunión suspendida el lunes, fijada para el 29-10 a las 10:00. Cifras: unos 1.200 «como dato» [sic?] y 700 pendientes de autorización, unos 1.900 en total; hay que prepararse para que no más del 10 % salga aprobado. Los comodatos se pidieron cerca de 2019 y ninguno quedó con la misma marca ni modelo. El director pide estar en copia de toda comunicación con Francisca. Referentes: Mariana Bravo, Rodrigo Hermosilla y Matías. Minuta: Minutas/minutas/2026-10-28_reuni-on-equipo-pm-miercoles-28.md · Avance 29-10-2026: a la hora de la reunión PM, Francisca Cid no había confirmado la reunión de las 10:00 (unas 10 llamadas y 3 correos sin respuesta); María Elena le escribe. Rodrigo habla de unos 1.800 equipos por trasladar con urgencia y pide tratarlo como proyecto. Minuta: Minutas/minutas/2026-10-29_reuni-on-equipo-pm-jueves-29.md",
    "plazo": "2026-10-29",
    "responsable": "María Elena Sepúlveda · Rodrigo · Matías Pinto",
    "ambito": "EMMC"
@@ -4969,7 +4997,7 @@ window.BITACORA = {
   },
   {
    "id": "P236",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -4993,7 +5021,7 @@ window.BITACORA = {
   },
   {
    "id": "P238",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5005,7 +5033,7 @@ window.BITACORA = {
   },
   {
    "id": "P239",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5017,7 +5045,7 @@ window.BITACORA = {
   },
   {
    "id": "P240",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5041,7 +5069,7 @@ window.BITACORA = {
   },
   {
    "id": "P242",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5053,7 +5081,7 @@ window.BITACORA = {
   },
   {
    "id": "P243",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5065,7 +5093,7 @@ window.BITACORA = {
   },
   {
    "id": "P244",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5077,7 +5105,7 @@ window.BITACORA = {
   },
   {
    "id": "P245",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5101,7 +5129,7 @@ window.BITACORA = {
   },
   {
    "id": "P247",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5113,7 +5141,7 @@ window.BITACORA = {
   },
   {
    "id": "P248",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5125,7 +5153,7 @@ window.BITACORA = {
   },
   {
    "id": "P249",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5137,7 +5165,7 @@ window.BITACORA = {
   },
   {
    "id": "P250",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5161,7 +5189,7 @@ window.BITACORA = {
   },
   {
    "id": "P252",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5173,7 +5201,7 @@ window.BITACORA = {
   },
   {
    "id": "P253",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5185,7 +5213,7 @@ window.BITACORA = {
   },
   {
    "id": "P254",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5209,7 +5237,7 @@ window.BITACORA = {
   },
   {
    "id": "P256",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5221,7 +5249,7 @@ window.BITACORA = {
   },
   {
    "id": "P257",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5233,19 +5261,19 @@ window.BITACORA = {
   },
   {
    "id": "P258",
-   "estado": "Abierto",
+   "estado": "En curso",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
    "titulo": "Cabida Hematología · coordinar la reunión clínica que defina el espacio de atención abierta del área de trasplante (AA P2)",
-   "detalle": "Revisión cabida Hematología 26-10-2026: en el piso 2 de AA, el cowork «coordinación de hematología» tiene 4 enfermeras de hematología clínica asignadas por una propuesta de hace meses; la Dra. Molina [sic?] sostiene que «ese espacio es de trasplante» [00:55:33]. Lo decide la Subdirección Médica, no Puesta en Marcha. Convocar a la Subdirección Médica (Dr. Ramírez [sic?] o su delegado Nicolás Cabello [sic?]), a Marilú [sic?] de atención abierta, a enfermería de hematología clínica y a la Dra. Molina. Matías: «nos llevamos la pega… coordinar la reunión» [01:07:59]. Bloquea el cierre de la unidad. Minuta: Minutas/minutas/2026-10-26_cabida-hematologia.md",
+   "detalle": "Revisión cabida Hematología 26-10-2026: en el piso 2 de AA, el cowork «coordinación de hematología» tiene 4 enfermeras de hematología clínica asignadas por una propuesta de hace meses; la Dra. Molina [sic?] sostiene que «ese espacio es de trasplante» [00:55:33]. Lo decide la Subdirección Médica, no Puesta en Marcha. Convocar a la Subdirección Médica (Dr. Ramírez [sic?] o su delegado Nicolás Cabello [sic?]), a Marilú [sic?] de atención abierta, a enfermería de hematología clínica y a la Dra. Molina. Matías: «nos llevamos la pega… coordinar la reunión» [01:07:59]. Bloquea el cierre de la unidad. Minuta: Minutas/minutas/2026-10-26_cabida-hematologia.md · Avance 28-10-2026 (Cabida UHI, con la Dra. Molina): el espacio es la atención ambulatoria de trasplante de médula ósea; se renombra «Coordinación de trasplante de médula ósea» y queda junto a las demás coordinaciones de trasplante. Allí se ubican Lorna Pizarro, Tamara Arellano, Felipe Silva y Jonathan Moscoso [sic?]. Hematología clínica (jefatura médica en el 4.º piso) se define aparte. Queda por confirmar si la Subdirección Médica valida la decisión. Minuta: Minutas/minutas/2026-10-28_cabida-uhi.md",
    "responsable": "Matías Pinto",
    "frente": "Cabida",
    "ambito": "Dotación"
   },
   {
    "id": "P259",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5257,7 +5285,7 @@ window.BITACORA = {
   },
   {
    "id": "P260",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5269,7 +5297,7 @@ window.BITACORA = {
   },
   {
    "id": "P261",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5281,12 +5309,12 @@ window.BITACORA = {
   },
   {
    "id": "P262",
-   "estado": "Abierto",
+   "estado": "En curso",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
    "titulo": "Cabida Hematología · cerrar la cabida de la UHI y la UIH (52 de 54 ubicados)",
-   "detalle": "Revisión cabida Hematología 26-10-2026: UHI (18 camas) y UIH (12 camas), piso 2 de atención cerrada; el personal de turno se asigna a la estación de enfermería. Hay 52 de 54 ubicados [00:39:52]; faltan 2 administrativos (Tamara Arellano y Lorna Pizarro [sic?]) y los puestos médicos. La unidad preguntó si se cierra «en tres de la próxima semana» y Matías respondió «yo creo que sí» [01:09:19] (plazo deducido: semana del 02-11; podría ser el martes 03-11). Depende de la reunión clínica del área de trasplante. Minuta: Minutas/minutas/2026-10-26_cabida-hematologia.md",
+   "detalle": "Revisión cabida Hematología 26-10-2026: UHI (18 camas) y UIH (12 camas), piso 2 de atención cerrada; el personal de turno se asigna a la estación de enfermería. Hay 52 de 54 ubicados [00:39:52]; faltan 2 administrativos (Tamara Arellano y Lorna Pizarro [sic?]) y los puestos médicos. La unidad preguntó si se cierra «en tres de la próxima semana» y Matías respondió «yo creo que sí» [01:09:19] (plazo deducido: semana del 02-11; podría ser el martes 03-11). Depende de la reunión clínica del área de trasplante. Minuta: Minutas/minutas/2026-10-26_cabida-hematologia.md · Avance 28-10-2026 (Cabida UHI): Tamara Arellano y Lorna Pizarro quedan en la coordinación de trasplante de médula ósea (AA P2); los médicos van a la oficina de la jefatura (jefe, subjefe y 3–4 médicos) y las coordinadoras con el supervisor (Juan Carvajal) a la oficina de la UTIH. Desde Gestión del Cuidado, la UHI queda al 100 % (88 personas con médicos, 68 clínicos). Falta enviar el acta escaneada a la unidad. Minuta: Minutas/minutas/2026-10-28_cabida-uhi.md",
    "plazo": "2026-11-06",
    "responsable": "Matías Pinto · Loreto Pérez",
    "frente": "Cabida",
@@ -5294,7 +5322,7 @@ window.BITACORA = {
   },
   {
    "id": "P263",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5307,7 +5335,7 @@ window.BITACORA = {
   },
   {
    "id": "P264",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5320,7 +5348,7 @@ window.BITACORA = {
   },
   {
    "id": "P265",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5333,7 +5361,7 @@ window.BITACORA = {
   },
   {
    "id": "P266",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5346,19 +5374,19 @@ window.BITACORA = {
   },
   {
    "id": "P267",
-   "estado": "Abierto",
+   "estado": "En curso",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
    "titulo": "Cabida Hematología · definir los puestos de trabajo de los 7 médicos y las 2 enfermeras coordinadoras de la UHI y la UIH",
-   "detalle": "Revisión cabida Hematología 26-10-2026 [01:05:08]: las salas de reuniones no pueden ser puesto de trabajo por contrato [00:45:27]. La oficina administrativa (código AH0597 [sic?]) admitiría 3–4 escritorios [00:51:42], a validar con la arquitecta del servicio. Según la doctora, se resuelve si se define el espacio de AA (ver reunión clínica del área de trasplante) [01:04:53]. Minuta: Minutas/minutas/2026-10-26_cabida-hematologia.md",
+   "detalle": "Revisión cabida Hematología 26-10-2026 [01:05:08]: las salas de reuniones no pueden ser puesto de trabajo por contrato [00:45:27]. La oficina administrativa (código AH0597 [sic?]) admitiría 3–4 escritorios [00:51:42], a validar con la arquitecta del servicio. Según la doctora, se resuelve si se define el espacio de AA (ver reunión clínica del área de trasplante) [01:04:53]. Minuta: Minutas/minutas/2026-10-26_cabida-hematologia.md · Avance 28-10-2026 (Cabida UHI): los médicos UHI/UIH (jefe, subjefe y 3–4 médicos: Dra. Puga, Angélica Fernández, María Vaz, María Proaño, Lorena Godoy [sic? en todos]) van a la oficina de la jefatura, un gran espacio dividido en dos, que se rotula «Médicos / hematólogos UHI». Las coordinadoras con el supervisor Juan Carvajal (Magdalena Puente, Catalina Gutiérrez [sic?]) van a la oficina de la UTIH, y la psicóloga al área clínica de la UCIH. Minuta: Minutas/minutas/2026-10-28_cabida-uhi.md",
    "responsable": "Subdirección Médica · jefatura UHI/UIH (inferido)",
    "frente": "Cabida",
    "ambito": "Dotación"
   },
   {
    "id": "P268",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5370,7 +5398,7 @@ window.BITACORA = {
   },
   {
    "id": "P269",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5382,7 +5410,7 @@ window.BITACORA = {
   },
   {
    "id": "P270",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5394,7 +5422,7 @@ window.BITACORA = {
   },
   {
    "id": "P271",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5411,14 +5439,14 @@ window.BITACORA = {
    "origen": "matii01",
    "creado": "2026-10-27",
    "titulo": "Dotación · informar a RRHH las diferencias de la matriz detectadas en la cabida de Hematología",
-   "detalle": "Revisión cabida Hematología 26-10-2026: el reemplazante médico que ingresa en noviembre (Dr. Carlos Moore Valdés [sic?]) no figura en la matriz [00:21:08]; la Dra. Paola Cárdenas [sic?], que renunció en marzo, sigue figurando en Endocrinología [00:22:24]. Matías: «esto después se lo mandamos a Recursos Humanos para que nos vaya actualizando» [00:21:14]. Minuta: Minutas/minutas/2026-10-26_cabida-hematologia.md",
+   "detalle": "Revisión cabida Hematología 26-10-2026: el reemplazante médico que ingresa en noviembre (Dr. Carlos Moore Valdés [sic?]) no figura en la matriz [00:21:08]; la Dra. Paola Cárdenas [sic?], que renunció en marzo, sigue figurando en Endocrinología [00:22:24]. Matías: «esto después se lo mandamos a Recursos Humanos para que nos vaya actualizando» [00:21:14]. Minuta: Minutas/minutas/2026-10-26_cabida-hematologia.md · Avance 28-10-2026 (Cabida UHI): Hematología clínica son 8 (Gajardo, Grafiña, Lizama, Luzo, Peña, Roa, Romero, Valladares [sic?]); Retamal no entró en el corte. La Dra. Cabrera [sic?] figura en Hematología clínica sin horas, solo como docente de la U. de Chile; según la unidad se habría jubilado hace unos 4 años. Sumarlo al correo a RR.HH. (sin RUT). Minuta: Minutas/minutas/2026-10-28_cabida-uhi.md",
    "responsable": "Matías Pinto · Loreto Pérez",
    "frente": "Cabida",
    "ambito": "Dotación"
   },
   {
    "id": "P273",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5430,7 +5458,7 @@ window.BITACORA = {
   },
   {
    "id": "P274",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5442,7 +5470,7 @@ window.BITACORA = {
   },
   {
    "id": "P275",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5466,7 +5494,7 @@ window.BITACORA = {
   },
   {
    "id": "P277",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Baja",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5478,7 +5506,7 @@ window.BITACORA = {
   },
   {
    "id": "P278",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Baja",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5490,7 +5518,7 @@ window.BITACORA = {
   },
   {
    "id": "P279",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Baja",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5502,7 +5530,7 @@ window.BITACORA = {
   },
   {
    "id": "P280",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Baja",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5526,7 +5554,7 @@ window.BITACORA = {
   },
   {
    "id": "P282",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5538,7 +5566,7 @@ window.BITACORA = {
   },
   {
    "id": "P283",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5550,7 +5578,7 @@ window.BITACORA = {
   },
   {
    "id": "P284",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5562,7 +5590,7 @@ window.BITACORA = {
   },
   {
    "id": "P285",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5586,7 +5614,7 @@ window.BITACORA = {
   },
   {
    "id": "P287",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5598,7 +5626,7 @@ window.BITACORA = {
   },
   {
    "id": "P288",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5610,7 +5638,7 @@ window.BITACORA = {
   },
   {
    "id": "P289",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5622,7 +5650,7 @@ window.BITACORA = {
   },
   {
    "id": "P290",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5634,7 +5662,7 @@ window.BITACORA = {
   },
   {
    "id": "P291",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5658,7 +5686,7 @@ window.BITACORA = {
   },
   {
    "id": "P293",
-   "estado": "Esperando terceros",
+   "estado": "Cerrado",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5682,7 +5710,7 @@ window.BITACORA = {
   },
   {
    "id": "P295",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5694,7 +5722,7 @@ window.BITACORA = {
   },
   {
    "id": "P296",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5706,7 +5734,7 @@ window.BITACORA = {
   },
   {
    "id": "P297",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5718,7 +5746,7 @@ window.BITACORA = {
   },
   {
    "id": "P298",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5742,7 +5770,7 @@ window.BITACORA = {
   },
   {
    "id": "P300",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5754,7 +5782,7 @@ window.BITACORA = {
   },
   {
    "id": "P301",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5766,7 +5794,7 @@ window.BITACORA = {
   },
   {
    "id": "P302",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5778,7 +5806,7 @@ window.BITACORA = {
   },
   {
    "id": "P303",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5790,7 +5818,7 @@ window.BITACORA = {
   },
   {
    "id": "P304",
-   "estado": "Abierto",
+   "estado": "Cerrado",
    "prioridad": "Media",
    "origen": "matii01",
    "creado": "2026-10-27",
@@ -5798,6 +5826,303 @@ window.BITACORA = {
    "detalle": "Conversación de trabajo del 26-10-2026 [00:44:29]–[00:47:23]: la pauta firmada del recinto H2121 (procedimientos de endoscopía) no incluye la camilla de traslado; la contraparte dice que está y que tiene «todos los verificables». Acuerdo: enviar las fotos al grupo y escribirle a Felipe [sic?], que está a cargo, no a Karen González [sic?] («no es el conducto»). Quien revisa no está en el grupo y pidió la invitación. Minuta: Minutas/minutas/2026-10-26_emmc-traslado-y-comodato.md",
    "responsable": "No consta (quien revisa la pauta del H2121)",
    "frente": "Verificación EMMC",
+   "ambito": "EMMC"
+  },
+  {
+   "id": "P305",
+   "estado": "En curso",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-10-28",
+   "titulo": "PM · organigrama con referentes por tema para el director y resolución de coordinadora técnica",
+   "detalle": "Reuniones PM y Planificación Cabida SDADT del 28-10-2026: el Dr. Zajjur [sic?] pidió los referentes de cada tema, sobre todo de lo que toca el Anexo I-D, y un reporte semanal. Reparto armado: ámbito clínico, con AS (Cati, Javiera Flores), capacitación (Javi Pacheco; Carlos Guerrero, Isabel Rojas, Matías), EMMC con mobiliario clínico y no clínico (Mei; Matías), cabida (Loreto; María Elena, Matías, Carolina), plan piloto (Mei con Marisol Salvatierra; Horacio [sic?], Loreto, Rodrigo), traslado (Feña, Coti) y gestión del cambio y comunicaciones (Javi); ámbito administrativo, logístico e infraestructura, con Rodrigo y Fernando Lacalle: servicios concesionados (Marisol, Javi), equipos propios y comodatos (Mariana Bravo, Rodrigo Hermosilla, Matías), logística en terreno (Carlos Gostelva [sic?]), TIC (Cintia Soto, Camilo Cornejo), RR.HH. y enrolamiento (Allison [sic?], Loreto). Falta leer las orientaciones técnicas MINSAL de PM y preparar la resolución de María Elena como coordinadora técnica de PM y Gestión del Cambio. Minutas: Minutas/minutas/2026-10-28_reuni-on-equipo-pm-miercoles-28.md y 2026-10-28_planificaci-on-cabida-sdadt.md",
+   "plazo": "2026-10-29",
+   "responsable": "María Elena Sepúlveda · Matías Pinto (edición)",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P306",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-10-28",
+   "titulo": "Gremios · reunión oficial del 29-10 con director y 5 subdirectores, y vacaciones de noviembre a febrero",
+   "detalle": "Reuniones del 28-10-2026: la reunión con gremios del 29-10 (15:00–16:30; se movió unas 5 veces) debe ser oficial, con el director y los 5 subdirectores. La presentación se prepara el 29-10 en la mañana: lámina de habilitación → PSP → marcha blanca → traslado → primer paciente; plan piloto (diapositivas de la Mei); traslado; señalética (directorios); tallaje y uniformes. Javiera tiene el análisis de asistencia: 25 citaciones y un gremio fue a 5. La gente pide fechas; se propuso que las jefaturas programen vacaciones de noviembre a febrero. Relacionado con P114 y P145. Minutas: Minutas/minutas/2026-10-28_reuni-on-equipo-pm-miercoles-28.md y 2026-10-28_planificaci-on-cabida-sdadt.md · Avance 29-10-2026 (reunión PM): se revisó la PPT para los gremios. AS: «estamos preparando la solicitud y toda la gestión documental, para que cuando la presentemos estemos listos para la visita». Se suma una reunión comunicacional semanal con los gremios, posiblemente los martes junto al reporte al director, aparte de la de manuales de los jueves; María Elena la ofrece en la reunión de esta tarde. Minuta: Minutas/minutas/2026-10-29_reuni-on-equipo-pm-jueves-29.md",
+   "plazo": "2026-10-29",
+   "responsable": "Javiera · María Elena Sepúlveda",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P307",
+   "estado": "En curso",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-10-28",
+   "titulo": "Honorarios PM · informe de pagos con fondos PM y corrección del acta de entrega",
+   "detalle": "Reuniones del 28-10-2026: el director insiste en el pago de Úrsula y pregunta cómo se paga a las personas de PM (honorarios y la figura de agente público). Hay que sacar hoy todos los honorarios y corregir en el acta de la Dra. Brignardello cuántas personas se pagan con fondos PM y el saldo al 24, considerando el desfase de un mes. Javiera tiene el informe en curso. Minutas: Minutas/minutas/2026-10-28_reuni-on-equipo-pm-miercoles-28.md y 2026-10-28_planificaci-on-cabida-sdadt.md",
+   "plazo": "2026-10-28",
+   "responsable": "María Elena Sepúlveda · Javiera",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P308",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-10-28",
+   "titulo": "Pabellón Vascular · definir el almacenamiento de catéteres (Pyxis) en el NHDS",
+   "detalle": "Reunión PM 28-10-2026 [00:29:20]–[00:31:23]: en la capacitación del ecógrafo intravascular (IVUS), una prestación nueva para Vascular, se vio el pabellón con los quirófanos armados y sin plástico, y el techo del angiógrafo grande casi cerrado. María Elena alertó que nadie ha previsto los Pyxis de Vascular ni dónde se almacenan los catéteres. Hay un mobiliario clínico para catéteres dentro del recinto, pero falta definir quién lo toma y cómo se integra con la logística de medicamentos e insumos. Relacionado con P068 y P095. Minuta: Minutas/minutas/2026-10-28_reuni-on-equipo-pm-miercoles-28.md",
+   "responsable": "Matías Pinto",
+   "ambito": "EMMC"
+  },
+  {
+   "id": "P309",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-10-28",
+   "titulo": "Cabida · SDA administrativa (~70 puestos adicionales) y Prequirúrgica, Admisión y Pre-alta (~200 personas)",
+   "detalle": "Planificación Cabida SDADT 28-10-2026 [00:58:53]–[01:09:31]: la cabida va en 79–91 % según la subdirección y el 4.º piso está casi listo. Faltan: (1) la SDA administrativa, que depende de si se compran unos 70 puestos adicionales (Fernando Lacalle dijo que sí, sin confirmación escrita); la conversación sobre criterios la tienen Fernando Lacalle y Andrés Villarroel, y PM da un paso al lado. (2) Prequirúrgica, Admisión (Patricia Lyon [sic?]) y Pre-alta (Margarita), unas 200 personas imposibles de sentar; depende de la definición del Dr. Ramírez sobre pre-alta y pre-hospitalización transitorias. Las residencias las ven el Dr. Ramírez y Lorena Encina. Relacionado con P121, P234 y P080. Minuta: Minutas/minutas/2026-10-28_planificaci-on-cabida-sdadt.md",
+   "responsable": "Loreto Pérez · Fernando Lacalle · Andrés Villarroel",
+   "ambito": "Dotación"
+  },
+  {
+   "id": "P310",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-10-28",
+   "titulo": "Gestión del cambio · apoyo para la Javi (PAPS, observaciones, ordinarios, reglamento interno)",
+   "detalle": "Planificación Cabida SDADT 28-10-2026 [00:07:46]–[00:09:15]: la Javi lleva sola gestión del cambio y comunicaciones, además de las observaciones de los PAPS, los ordinarios y la elaboración de documentos como el reglamento interno del hospital (con Víctor Leiva y otros). Pidió apoyo; Loreto puede ayudar a articular reuniones y María Elena buscará a una persona más. Minuta: Minutas/minutas/2026-10-28_planificaci-on-cabida-sdadt.md",
+   "responsable": "María Elena Sepúlveda",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P311",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-10-28",
+   "titulo": "Comité de Farmacia · aclarar por reglamento que ve insumos y medicamentos",
+   "detalle": "Planificación Cabida SDADT 28-10-2026 [01:00:37]–[01:02:53]: en el Comité de Farmacia del 28-10, la presentación fue de insumos, y el Dr. Palma [sic?] sostuvo que el comité es solo de medicamentos; el comité acordó sugerirle al director cómo abordarlo. María Elena indica que el reglamento (resolución ministerial) incluye insumos y medicamentos. Acción: hablar antes con el director y pasar el reglamento al Dr. Palma. Relacionado con el proyecto de perfusión XVIVO. Minuta: Minutas/minutas/2026-10-28_planificaci-on-cabida-sdadt.md",
+   "responsable": "María Elena Sepúlveda",
+   "ambito": "Otros"
+  },
+  {
+   "id": "P312",
+   "estado": "En curso",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-10-28",
+   "titulo": "Hospitalización domiciliaria · definir la solución para el NHDS",
+   "detalle": "Reunión PM 28-10-2026 [00:46:50]–[00:47:40] y Cabida SDADT [01:08:07]: las camas de hospitalización domiciliaria (HOSDOM [sic?]) son camas del hospital y su responsable es el director, pero no hay solución para su lugar en el NHDS (solo requiere el auto y la gente). Consultar al Dr. Ramírez y a Lorena Encina. Minutas: Minutas/minutas/2026-10-28_reuni-on-equipo-pm-miercoles-28.md y 2026-10-28_planificaci-on-cabida-sdadt.md · Avance 29-10-2026 (reunión PM): el Dr. Ramírez entregó la caracterización de la hospitalización domiciliaria; falta la valorización de los recursos para sumar 100 cupos a los 120 actuales, que pidió el SSMO para apoyar el traslado; la envía hoy Pablo Eno [sic?]. Rodrigo retomó la idea de Matías de ubicarla en el estacionamiento de rehabilitación (acceso independiente). Minuta: Minutas/minutas/2026-10-29_reuni-on-equipo-pm-jueves-29.md",
+   "responsable": "Dr. Ramírez · Lorena Encina",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P313",
+   "estado": "Abierto",
+   "prioridad": "Baja",
+   "origen": "matii01",
+   "creado": "2026-10-28",
+   "titulo": "Escultura y Healing Arts · reunión del 10-11 y visita de Dafne al espacio (sin Daniel Lumera)",
+   "detalle": "Planificación Cabida SDADT 28-10-2026 [00:41:01]–[00:48:44]: la visita de Daniel Lumera el 18-11 en la tarde no se hace porque aún no se entra al edificio (se pospone, quizás a mayo de 2027); María Elena avisará a Andrea Burón. La escultura que ofrece Dafne Anastasiu (Fundación Agapi; opciones «Ternura», «Árbol de la vida», «Esfera de luz», «Evolución» para el tragaluz del mesón de acceso) se separa de esa visita. Dafne vendría a ver el espacio el 29-10 cerca de las 16:45 [sic?]. Healing Arts: reunión el 10-11 a las 18:30, a la que María Elena asiste. Matías ofreció renders de las esculturas para verlas en el lugar desde el teléfono. Minuta: Minutas/minutas/2026-10-28_planificaci-on-cabida-sdadt.md",
+   "plazo": "2026-11-10",
+   "responsable": "María Elena Sepúlveda · Matías Pinto (renders)",
+   "ambito": "Otros"
+  },
+  {
+   "id": "P314",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-10-28",
+   "titulo": "Cabida Hematología clínica · definir ubicación (Poli de Medicina u otro) y puestos de sus enfermeras",
+   "detalle": "Cabida UHI 28-10-2026 [00:02:09]–[00:05:15]: Hematología clínica no va en la coordinación de AA P2, que es de trasplante de médula ósea. Su jefatura médica queda en el 4.º piso y aún se analiza si se instala con el Poli de Medicina u otro lugar. La Dra. Analía Cortés [sic?] informó que hay 2 consultas en Oncología para Hematología clínica. Criterio para sus enfermeras: actividad agendada con paciente → box; gestión de casos → puesto de trabajo; si no hay puestos, consultas vacías. Falta la reunión con Hematología clínica (Nico, Erika, Martínez [sic?]). Minuta: Minutas/minutas/2026-10-28_cabida-uhi.md",
+   "responsable": "María Elena Sepúlveda · Loreto Pérez",
+   "ambito": "Dotación"
+  },
+  {
+   "id": "P315",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-10-28",
+   "titulo": "Instructivos de uso · link de la carpeta y responsables por servicio (médico / no médico) para Capacitación",
+   "detalle": "Capacitaciones equipos médicos IU 28-10-2026 [00:00:35]–[00:07:05]: Capacitación necesita (1) el link de la carpeta de instructivos de uso y (2) por servicio, qué instructivos van a personal médico y cuáles a no médico, con el responsable a quién dirigirse. Matías envía el link «al tiro» y el listado por servicio. Pabellón va separado: pabellón propiamente tal (Dr. Rubio y las Danielas) y cada especialidad (Anestesia Dr. Lamarca [sic?], Cirugía Dr. Catán, Vascular Dr. Sala, Digestivo alto Paula Fluxá, Digestivo bajo Mónica Martínez, Cabeza y cuello Salvatierra [sic?], Urología Calderón, Traumatología Alfaro). Farmacia e Infectología, con Ivana. Las áreas administrativas no firman: solo tienen DEA, sin instructivo, y computadores. Los informes por servicio ya enviados a las jefaturas traen los instructivos dentro de cada equipo. Minuta: Minutas/minutas/2026-10-28_capacitaciones-equipos-m-edicos-iu.md",
+   "responsable": "Matías Pinto",
+   "ambito": "Capacitación"
+  },
+  {
+   "id": "P316",
+   "ambito": "EMMC",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Matías Pinto",
+   "contraparte": "Felipe Rojas (SSMO) → IF → SC",
+   "servicio": "",
+   "origen_tipo": "Correo",
+   "origen_ref": "Listado EMMC al 26-10-26 · A.S. Individualizado (series de la SC, vía F. Rojas 28-10-2026)",
+   "origen_fecha": "2026-10-28",
+   "compromiso": "",
+   "creado": "2026-10-28",
+   "actualizado": "2026-10-28",
+   "titulo": "Responder a F. Rojas las observaciones al listado de series de la SC y pedir lo que falta",
+   "detalle": "Lo que trae: 9.634 unidades (9.633 del PINS + el esterilizador de plasma H2412), 6.678 con N° de serie. Lo que hay que devolver: 2.912 sin serie (autoclaves STEELCO, motores de yeso, DEA, celdas y contenedores de Medicina Nuclear, entre otras), 44 con el correlativo en vez de serie (incluidos PET-CT y SPECT-CT), 2 series duplicadas, 1 TAC con la misma serie que el otro, 98 con caracteres raros (puntos, corchetes) y 49 celdas con varias series sin decir qué componente es cada una. No vienen los puntos 2 a 5 de la solicitud del 13-10: código de inventario, año, fecha de instalación, garantía y software. Borrador en el hilo de F. Rojas.",
+   "plazo": "2026-10-30"
+  },
+  {
+   "id": "P317",
+   "ambito": "Puesta en Marcha",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Matías Pinto (sesión Atlas)",
+   "contraparte": "—",
+   "servicio": "",
+   "origen_tipo": "Correo",
+   "origen_ref": "Listado EMMC al 26-10-26 · A.S. Individualizado (series de la SC, vía F. Rojas 28-10-2026)",
+   "origen_fecha": "2026-10-28",
+   "compromiso": "",
+   "creado": "2026-10-28",
+   "actualizado": "2026-10-28",
+   "titulo": "Atlas: mostrar el equipamiento por BIM real (EMMC_POR_BIM) en vez de repartir el total del código entre instancias",
+   "detalle": "Caso H3128 (15.1.6 Estación Trabajo Profesionales): el código tiene 2 instancias PMA (H0692 Comercial 11 y H3128); el Atlas reparte los 10 computadores 5 y 5, pero PINS y la SC ponen los 10 en H3128, que es lo que se vio en terreno (SONDA instalando 10). Son 1.928 combinaciones código+tipo con instancias donde el reparto real no es parejo. SHARED_DATA/emmc_por_bim.js (window.EMMC_POR_BIM) trae tipo, cantidad y series por BIM; traspaso dejado para la sesión del Atlas."
+  },
+  {
+   "id": "P318",
+   "ambito": "TI",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "responsable": "Matías Pinto",
+   "contraparte": "Cynthia Soto (Informática) · SONDA",
+   "servicio": "",
+   "origen_tipo": "Correo",
+   "origen_ref": "Listado EMMC al 26-10-26 · A.S. Individualizado (series de la SC, vía F. Rojas 28-10-2026)",
+   "origen_fecha": "2026-10-28",
+   "compromiso": "",
+   "creado": "2026-10-28",
+   "actualizado": "2026-10-28",
+   "titulo": "Entregar a Informática las series de los 2.120 equipos de Apoyo TI por recinto",
+   "detalle": "La SC informó la serie de los 1.650 computadores 60008, 282 de alto rendimiento, 126 notebooks y el resto de Apoyo TI, todos LENOVO salvo 7 DELL. Sirve para la instalación que está haciendo SONDA y para el inventario de Informática. Excel 0.MAESTRO/Computadores_Series_SC_2026-10-28.xlsx; borrador a C. Soto en el hilo «información de computadores»."
+  },
+  {
+   "id": "P319",
+   "ambito": "EMMC",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "responsable": "Meylin Canales",
+   "contraparte": "Matías Pinto",
+   "servicio": "",
+   "origen_tipo": "Correo",
+   "origen_ref": "Listado EMMC al 26-10-26 · A.S. Individualizado (series de la SC, vía F. Rojas 28-10-2026)",
+   "origen_fecha": "2026-10-28",
+   "compromiso": "",
+   "creado": "2026-10-28",
+   "actualizado": "2026-10-28",
+   "titulo": "Cuadrar las 73 unidades que cambiaron de BIM y las 7 diferencias de cantidad entre el listado de la SC y las actas",
+   "detalle": "Diferencias EQM (sin Apoyo TI ni INGER) entre el listado de la SC al 26-10 y las actas de existencia: 10 aceleradores de infusión que las actas ponen en los pabellones H0069/H0087/H0088 y el listado en H2504 y otros; camillas de traslado en H2096 (acta 24, listado 34) y H1865 (acta 12, listado 2); monitores 130010 que la SC cambió entre H1467 y cinco recintos. Hojas «BIM movidos» y «Actas vs unidades» del Excel de auditoría."
+  },
+  {
+   "id": "P320",
+   "ambito": "EMMC",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Matías Pinto · Mariana Bravo",
+   "contraparte": "F. Araya (Coordinador de Traslado) · SDADT",
+   "servicio": "",
+   "origen_tipo": "Otro",
+   "origen_ref": "Manual de Traslado HDS → HDS-INGER v1.0 · Res. Ex. N°3986 del 27-10-2026",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-28",
+   "actualizado": "2026-10-28",
+   "titulo": "Manual de Traslado: lo que le pide a Equipamiento antes del Día 1",
+   "detalle": "El manual (RE-3986) asigna a Matías «capacitaciones y gestión de equipos autorizados» y a Mariana Bravo «verificación de equipos concesionados y traslado de equipos autorizados». Puntos 5.2 que deben estar resueltos al cierre de la preparación: inventario general por servicio en el hospital actual; identificación, etiquetado y embalaje con trazabilidad de los equipos a trasladar; comodatos y arriendos vigentes y operativos en el nuevo hospital; nuevos equipos críticos probados (ventiladores, monitores, BIC, radiología, laboratorio); camiones climatizados contratados. KPI 12: equipos críticos validados al 100 % antes de operar cada unidad (SDADT). RACI del traslado de equipamiento crítico: ejecutan Subdirección Administrativa y SDADT; PM es consultada."
+  },
+  {
+   "id": "P321",
+   "ambito": "Puesta en Marcha",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "responsable": "Matías Pinto",
+   "contraparte": "Fernando Araya · Costanza Poch",
+   "servicio": "",
+   "origen_tipo": "Otro",
+   "origen_ref": "Manual de Traslado HDS → HDS-INGER v1.0 · Res. Ex. N°3986 del 27-10-2026",
+   "origen_fecha": "2026-10-27",
+   "compromiso": "",
+   "creado": "2026-10-28",
+   "actualizado": "2026-10-28",
+   "titulo": "Manual de Traslado: pedir el Anexo 4 (tablero Excel) y el Anexo 7 (salidas por ambulancia) y la versión Word",
+   "detalle": "El PDF de la RE-3986 termina en la página 46 de 49: faltan el cierre del Anexo 6 (criterios e indicadores del simulacro), el Anexo 7 (cronograma detallado de salidas por ambulancia, Días 4-6) y la hoja de aprobación. El Anexo 4 es una planilla Excel que no viene. Las fechas de la sección 1.5 están en blanco y el cronograma se numera por Día 1-10 desde la PSP."
+  },
+  {
+   "id": "P322",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-10-29",
+   "titulo": "PM · seguimiento semanal al director los martes (formato tipo Gantt, puesta al día los lunes)",
+   "detalle": "Reunión PM 29-10-2026 [00:00:18]–[00:02:30]: el director quiere un seguimiento semanal de PM, que se hará los martes. Cada lunes los referentes ponen al día a María Elena en todos los temas (traslado, red, etc.) con un formato tipo Gantt: tema, actividades, compromisos, responsables y estado. Parte del acta de traslado. El primer martes es el 03-11. Minuta: Minutas/minutas/2026-10-29_reuni-on-equipo-pm-jueves-29.md",
+   "plazo": "2026-11-03",
+   "responsable": "María Elena Sepúlveda · referentes PM",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P323",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-10-29",
+   "titulo": "Traslado · carta intersectorial (Carabineros, Bomberos, municipalidad, delegación presidencial) y reunión de coordinación",
+   "detalle": "Reunión PM 29-10-2026 [00:05:48]–[00:09:56]: hay que iniciar la comunicación intersectorial. Se redacta una carta que informe que el hospital está elaborando su plan de traslado y cite a una reunión de coordinación con el director (Carabineros, Bomberos, municipalidad, delegado presidencial, GORE [sic?]), para coordinar el cierre de perímetro y otros temas. La fecha de traslado se comunicará cuando exista. Debe ir con copia al SSMO, al MOP y a la CSSO para evitar gestiones en paralelo; el INGER también está involucrado. La UTO debe definir su derivación durante el período y comunicarlo a regiones. Redacta la Javi (comunicaciones). Minuta: Minutas/minutas/2026-10-29_reuni-on-equipo-pm-jueves-29.md",
+   "responsable": "Javiera (comunicaciones) · María Elena Sepúlveda",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P324",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-10-29",
+   "titulo": "Traslado · visita de terreno para ver rutas, accesos y ascensores (mapa de traslado)",
+   "detalle": "Reunión PM 29-10-2026 [00:04:56]–[00:05:39]: se pasa «del plan al programa y al mapa» de traslado. Se pidió una visita de terreno para recorrer las rutas posibles (flujos de acceso y ascensores). María José Mendizábal [sic?] pedirá la autorización y se le enviará por correo el plano con lo que se quiere recorrer. Ojalá la próxima semana. En la red, se ordenó no recibir derivaciones de otros servicios durante el período y las camas se mantienen disponibles; el SAMU coordinará con la urgencia. Minuta: Minutas/minutas/2026-10-29_reuni-on-equipo-pm-jueves-29.md",
+   "plazo": "2026-11-06",
+   "responsable": "Equipo de traslado (Feña, Coti) · María José Mendizábal [sic?]",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P325",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-10-29",
+   "titulo": "Revisión EMMC · coordinación de las visitas con Felipe Rojas y Anexo I-A actualizado para cruzar mobiliario no clínico",
+   "detalle": "Reunión PM 29-10-2026 [00:13:17]–[00:20:54]: el 28-10, en la visita de revisión de mobiliario no clínico, el equipo esperó 40–45 minutos y le dijeron que no estaba listo; se reprogramó para el 29-10. La convocatoria de Felipe Rojas llega a Equipos Médicos un día antes y a la CSSO el mismo día; Felipe no asiste a terreno (van Soledad [sic?] y Caro Rivera por mobiliario, Karen González y Manuel Navarro por equipos). Hace unas 3 semanas Felipe dijo por teléfono que «las relaciones con el hospital estaban rotas». María Elena hablará con Francisca Cid para ordenar la coordinación, y si vuelve a fallar hay que avisarle de inmediato. Para mobiliario no clínico falta el Anexo I-A actualizado (no está en el Drive; el I-D lo envió Paz Fuentes al director). La Mei envía hoy tres planillas (EM, MC, MNC) indicando lo que falta. Minuta: Minutas/minutas/2026-10-29_reuni-on-equipo-pm-jueves-29.md",
+   "responsable": "María Elena Sepúlveda · Mei [sic?]",
+   "ambito": "EMMC"
+  },
+  {
+   "id": "P326",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-10-29",
+   "titulo": "Ruta PM · sumar equipamiento TIC, integraciones, traslado de comodatos/equipos propios y mobiliario logístico",
+   "detalle": "Reunión PM 29-10-2026 [00:35:36]–[00:47:13]: Rodrigo propuso agregar a la ruta de PM 4 temas que son del hospital y no de la Concesionaria, y que se necesitan antes del traslado y, en parte, antes de la autorización: (1) implementación de equipamiento TIC (telefonía, más de 1.000 impresoras que toman más de un mes, módems); (2) integraciones de sistemas; (3) traslado de comodatos y equipamiento propio (~1.800 equipos; solicitable en la primera reunión del comité de explotación, es post-PSP); (4) mobiliario logístico. Acuerdo: la etapa de revisión EMMC pasa a decir «revisión y traslado»; Matías escribe los 4 temas en la PPT. Rodrigo planteó además una unidad de proyectos post-PSP (con Carolina Martínez Conte). Las remodelaciones en explotación van director → IF → CSSO, que presupuesta. Minuta: Minutas/minutas/2026-10-29_reuni-on-equipo-pm-jueves-29.md",
+   "plazo": "2026-10-29",
+   "responsable": "Matías Pinto · Rodrigo",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P327",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-10-29",
+   "titulo": "CEDE [sic?] · recintos transitorios sin equipamiento comprado ni fondos para computadores",
+   "detalle": "Reunión PM 29-10-2026 [00:11:21]–[00:13:00]: Cati trajo el caso que le envió la Dra. Cerda [sic?] y que le comentó Carla. Según Fernando Lacalle, el equipamiento para implementar los recintos transitorios del CEDE [sic?] estaría comprado, pero los correos muestran que no; además, Lacalle respondió que no hay fondos para los computadores que piden. Se nombra también a nutrición clínica. María Elena debe tomarlo como urgente con Irene [sic?] y Fernando Lacalle. Minuta: Minutas/minutas/2026-10-29_reuni-on-equipo-pm-jueves-29.md",
+   "responsable": "María Elena Sepúlveda",
    "ambito": "EMMC"
   }
  ],
@@ -5876,6 +6201,21 @@ window.BITACORA = {
   "María Elena Sepúlveda",
   "Rodrigo Espinoza",
   "Rodrigo Hermosilla",
+  "Margarita Aguilera",
+  "Naifer Jaramillo",
+  "Francisco Cano",
+  "Pablo Astorga",
+  "Ivana Milio",
+  "Carlos Constenla",
+  "Patricia Lyon",
+  "Tamara Cataldo",
+  "Mariana Bravo",
+  "Cynthia Soto",
+  "Carlos Guerrero",
+  "Martín Navarro",
+  "Andrés Villarroel",
+  "Fernando Lacalle",
+  "Marisol Salvatierra",
   "No consta"
  ],
  "huddle": {

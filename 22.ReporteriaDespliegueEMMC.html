@@ -322,6 +322,7 @@ details.rp-det{margin:0 0 18px}details.rp-det>summary{cursor:pointer;font-size:.
     <button class="rp-tab" data-p="plan" onclick="rpTab('plan')">📜 Plan de Instalación · cumplimiento</button>
     <button class="rp-tab" data-p="exi" onclick="rpTab('exi')">✅ Existencias · firmas y cumplimiento</button>
     <button class="rp-tab" data-p="mnc" onclick="rpTab('mnc')">🪑 Existencias MNC · mobiliario no clínico</button>
+    <button class="rp-tab" data-p="ser" onclick="rpTab('ser')">🔢 Series · identificación de la SC</button>
   </div>
 
   <!-- ═══ PESTAÑA PINS ═══ -->
@@ -570,6 +571,7 @@ details.rp-det{margin:0 0 18px}details.rp-det>summary{cursor:pointer;font-size:.
   <!-- ═══ PESTAÑA EXISTENCIAS (firma por BIM y cumplimiento equipo por equipo) ═══ -->
   <div class="rp-pane" id="pane-exi"><div class="rp-nota">Cargando…</div></div>
   <div class="rp-pane" id="pane-mnc"><div class="rp-nota">Cargando…</div></div>
+  <div class="rp-pane" id="pane-ser"><div class="rp-nota">Cargando…</div></div>
 
   <div class="footer" id="rp-footer"></div>
 </div>
@@ -902,6 +904,56 @@ function exiRender(){
     <div class="rp-nota" style="margin-top:12px">Fuentes: ${exiEsc(D.fuentes.anexo_ib)} · ${exiEsc(D.fuentes.actas)} · ${exiEsc(D.fuentes.revision)}. ⚠ SC = la Concesionaria registra otra firma en su planilla LINKS. El detalle completo (observaciones de las actas y página) está en el Excel Estado_firmas_EQM_por_BIM de Existencias_23_09_26.</div>`;
 }
 if (document.getElementById('pane-exi').classList.contains('on')) exiCargar();
+</script>
+<script>
+/* 🔢 Series · identificación — dato: SHARED_DATA/emmc_cuadratura.js (_DEV/pins/aplicar_series_as.py, desde el listado de series
+   que entregó la SC vía F. Rojas el 28-10-2026). Se carga al abrir la pestaña (≈350 KB). Solo muestra lo pendiente de cuadrar. */
+function serCargar(){
+  if (window.EMMC_CUADRATURA) return serRender();
+  if (window._serCargando) return; window._serCargando = true;
+  const e = document.createElement('script'); e.src = 'SHARED_DATA/emmc_cuadratura.js?v=' + Date.now();
+  e.onload = serRender;
+  e.onerror = () => document.getElementById('pane-ser').innerHTML = '<div class="rp-alerta">Falta SHARED_DATA/emmc_cuadratura.js: correr python3 _DEV/pins/aplicar_series_as.py</div>';
+  document.head.appendChild(e);
+}
+const _rpTabSer = rpTab; rpTab = function(t){ _rpTabSer(t); if (t === 'ser') serCargar(); };
+function serRender(){
+  const D = window.EMMC_CUADRATURA, P = document.getElementById('pane-ser'); if (!D) return;
+  const R = D.resumen, S = D.series, VP = D.vs_pins, VA = D.vs_anexo_ib, VX = D.vs_actas, VM = D.vs_pma, EM = D.emisores;
+  const n = v => Number(v || 0).toLocaleString('es-CL'), pct = (a, t) => t ? (a / t * 100).toFixed(1).replace('.', ',') + ' %' : '—';
+  const kpi = (l, v, sub, col) => `<div class="kpi-card"><div class="kpi-label">${l}</div><div class="kpi-val" style="color:${col || 'var(--inst)'}">${n(v)}</div><div class="kpi-sub">${sub || ''}</div></div>`;
+  const tabla = (cab, filas) => filas.length ? `<div class="card" style="padding:0;overflow-x:auto;margin-bottom:14px"><table class="tbl"><tr>${cab.map(c => `<th>${c}</th>`).join('')}</tr>${filas.map(f => `<tr>${f.map(c => `<td>${exiEsc(c)}</td>`).join('')}</tr>`).join('')}</table></div>` : '';
+  const det = (tit, cnt, html, abierto) => cnt ? `<details${abierto ? ' open' : ''} style="margin-bottom:10px"><summary style="cursor:pointer;font:700 .7rem Verdana;color:var(--inst);padding:8px 0">${tit} <span class="rp-corte">${n(cnt)}</span></summary>${html}</details>` : '';
+  const lim = (a, k) => a.slice(0, k || 300);
+  const sinSerie = Object.entries(S.por_familia).filter(([, v]) => v.sin).sort((a, b) => b[1].sin - a[1].sin);
+  const emis = EM.filter(e => e.emisor);
+  P.innerHTML = `
+    <div class="sec-title">Identificación individual del EMMC según la Sociedad Concesionaria <span class="rp-corte">corte SC ${exiEsc(D.corte)} · recibido ${exiEsc(D.recibido)}</span></div>
+    <div class="rp-nota">${exiEsc(D.solicitud)}. Llegó por ${exiEsc(D.via)}. La llave de todo es el correlativo PINS (tipología-ítem-unidad): el N° ítem cambió en ${n(R.item_cambiados)} unidades y el BIM en ${n(R.bim_movidos)}. Aquí sólo se muestra lo que no cuadra; el detalle completo está en 0.MAESTRO/Auditoria_Series_EMMC_${exiEsc(D.generado)}.xlsx.</div>
+    <div class="kpi-grid">${kpi('Unidades', R.unidades, n(R.en_pins) + ' en el PINS 31-07 · ' + n(R.nuevas) + ' nueva')}${kpi('Con N° de serie', R.con_serie, pct(R.con_serie, R.unidades), 'var(--green)')}${kpi('Sin serie', R.sin_serie, pct(R.sin_serie, R.unidades) + ' · ' + n(R.no_disponible) + ' «no disponible»', 'var(--yellow)')}${kpi('Serie = correlativo', R.serie_es_correlativo, 'no es un N° de serie', 'var(--red)')}${kpi('Duplicadas', R.duplicadas, 'misma serie en 2 unidades', R.duplicadas ? 'var(--red)' : 'var(--green)')}${kpi('Varias series en una celda', R.compuestas, 'torres, columnas: componentes')}${kpi('BIM distinto al PINS', R.bim_movidos, 'unidades que cambiaron de recinto')}${kpi('Emisores con serie', emis.filter(e => ['ok', 'rara', 'duplicada'].includes(e.est_sc)).length, 'de ' + emis.length + ' · ' + emis.filter(e => e.coincide === 'no').length + ' ≠ acta · PET-CT y SPECT-CT con correlativo', emis.some(e => e.coincide === 'no') ? 'var(--yellow)' : 'var(--green)')}</div>
+    ${det('Sin serie por familia', sinSerie.length, tabla(['Familia', 'Unidades', 'Con serie', 'Sin serie'], sinSerie.map(([f, v]) => [f, n(v.n), n(v.con), n(v.sin)])), true)}
+    ${det('Series que hay que devolver a la SC', S.duplicadas.length + S.correlativo.length + S.raras.length + S.no_disponible.length + S.sin_serie_tecnicas.length + S.item_cruzado.length,
+      tabla(['Caso', 'Correlativo', 'BIM', 'Equipo', 'Detalle'],
+        S.duplicadas.flatMap(d => d.unidades.map(u => ['Duplicada', u.pk, u.bim, u.nombre, d.serie]))
+        .concat(S.correlativo.map(d => ['Serie = correlativo', d.pk, d.bim, d.nombre, d.fam]))
+        .concat(S.raras.map(d => ['Caracteres raros', d.pk, d.bim, d.nombre, d.serie]))
+        .concat(S.no_disponible.map(d => ['No disponible', d.pk, d.bim, d.nombre, '']))
+        .concat(S.sin_serie_tecnicas.map(d => ['Sin serie en familia técnica', d.pk, d.bim, d.nombre, d.fam + ' · ' + d.marca]))
+        .concat(S.item_cruzado.map(d => ['N° ítem de otro edificio', d.pk, d.bim, d.nombre, d.item]))), true)}
+    ${det('Componentes con serie propia (celdas con varias series)', S.compuestas.length, tabla(['Correlativo', 'BIM', 'Equipo', 'Componentes', 'Series'], S.compuestas.map(d => [d.pk, d.bim, d.nombre, d.n_comp, d.comp.join(' | ')])))}
+    ${det('Unidades que cambiaron de BIM respecto del PINS 31-07', VP.bim_movidos.length, tabla(['Correlativo', 'Equipo', 'BIM PINS', 'BIM SC', 'Código PINS', 'Código SC'], VP.bim_movidos.map(m => [m.pk, m.nombre, m.bim_pins, m.bim, m.cod_pins, m.cod])))}
+    ${det('Códigos de recinto que la SC cambió (mismo BIM)', VP.cod_cambiados.length, tabla(['Código PINS 31-07', 'Código SC 26-10', 'Unidades'], VP.cod_cambiados.map(c => [c.de, c.a, n(c.n)])))}
+    ${det('Unidades nuevas (no estaban en el PINS)', VP.nuevas.length, tabla(['Correlativo', 'Equipo', 'BIM', 'Código', 'Serie'], VP.nuevas.map(x => [x.pk, x.nombre, x.bim, x.cod, x.serie])))}
+    ${det('Anexo Ib · ítems sin ninguna unidad en el listado', VA.items_sin_unidad.length, `<div class="rp-nota">${n(VA.unidades_sin_listado)} unidades del Anexo Ib (${n(VA.total_anexo)}) sin correlativo en el listado (${n(VA.total_listado)}): instrumental, ítems de INGER y otros.</div>` + tabla(['N° ítem', 'Equipo', 'Código recinto', 'Cantidad'], lim(VA.items_sin_unidad).map(d => [d.item, d.nombre, d.cod, n(d.cantidad)])))}
+    ${det('Anexo Ib · ítems con cantidad distinta', VA.cantidad_distinta.length, tabla(['N° ítem', 'Equipo', 'Código', 'Anexo Ib', 'Listado SC'], VA.cantidad_distinta.map(d => [d.item, d.nombre, d.cod, n(d.anexo), n(d.listado)])))}
+    ${det('Actas de existencia vs listado (EQM, sin Apoyo TI ni INGER)', VX.no_en_acta.length + VX.no_en_listado.length + VX.cantidad_distinta.length, tabla(['Caso', 'BIM', 'Equipo', 'En el acta', 'En el listado'],
+      VX.no_en_acta.map(d => ['Tipo en listado, no en acta', d.bim, d.nombre, 0, n(d.listado)]).concat(VX.no_en_listado.map(d => ['Tipo en acta, no en listado', d.bim, d.nombre, n(d.acta), 0])).concat(VX.cantidad_distinta.map(d => ['Cantidad distinta', d.bim, d.nombre, n(d.acta), n(d.listado)]))))}
+    ${det('Atlas · códigos con varias instancias donde el reparto real por BIM no es parejo', VM.instancias_desiguales.length, `<div class="rp-nota">${exiEsc(VM.ejemplo)} El Atlas reparte el total del código entre sus instancias PMA; SHARED_DATA/emmc_por_bim.js trae lo que hay en cada BIM.</div>` + tabla(['Código', 'Equipo', 'Total Atlas', 'Instancias', 'Unidades por BIM (SC)'], lim(VM.instancias_desiguales, 200).map(d => [d.cod, d.nombre, n(d.total_atlas), d.instancias, Object.entries(d.por_bim).map(([b, c]) => b + ': ' + c).join(', ')])) + (VM.instancias_desiguales.length > 200 ? `<div class="rp-nota">… y ${n(VM.instancias_desiguales.length - 200)} más en el Excel.</div>` : ''))}
+    ${det('BIM del listado que no están en el mapa PMA', VM.bim_fuera_pma.length, `<div class="rp-nota">${VM.bim_fuera_pma.join(' · ')}</div>`)}
+    ${det('Equipos emisores de radiación ionizante · serie de la SC vs acta', emis.length, tabla(['N°', 'Equipo', 'Marca · modelo', 'BIM', 'Cat.', 'Serie SC', 'Estado', 'Serie acta', 'Coincide'], emis.map(e => [e.n, e.nombre, (e.marca || '') + ' ' + (e.modelo || ''), e.bim, e.cat, e.serie_sc, e.est_sc, e.serie_acta, e.coincide])), true)}
+    <div class="rp-nota" style="margin-top:12px">Fuente: ${exiEsc(D.fuente)} (SC, vía SSMO). Generado ${exiEsc(D.generado)} con _DEV/pins/aplicar_series_as.py. Lo que la SC todavía no entrega: código de inventario, año de fabricación, fecha de instalación, garantía y versión de software (puntos 2 a 5 de la solicitud del 13-10).</div>`;
+}
+if (document.getElementById('pane-ser').classList.contains('on')) serCargar();
 </script>
 <script>
 /* 🪑 Existencias MNC — dato: SHARED_DATA/existencias_mnc_estado.js (actualizar_existencias.py → estado_mnc_bim.py).

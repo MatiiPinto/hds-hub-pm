@@ -464,7 +464,7 @@ function renderPab(){
   const R=PAUTA.requisitos||[], mesa=R.find(r=>r.n===206)||{};
   const br=R.filter(r=>r.estado==='Brecha'), pc=R.filter(r=>r.estado==='Por confirmar'||r.estado==='Redistribuir');
   document.getElementById('alerta-pb').innerHTML=`<div class="avi rojo">
-    <b>${cr.length} pendientes críticos abiertos en Pabellón</b>${tr?`, a <b>${dias>=0?dias+' días del traslado':(-dias)+' días después del traslado'}</b> (${tr.fecha.split('-').reverse().join('-')})`:''}.
+    <b>${cr.length} pendientes críticos abiertos en Pabellón</b>${tr?(tr.por_confirmar?`; el traslado se numera por días desde la PSP, con <b>fecha por confirmar</b> (Manual de Traslado RE-3986)`:`, a <b>${dias>=0?dias+' días del traslado':(-dias)+' días después del traslado'}</b> (${tr.fecha.split('-').reverse().join('-')})`):''}.
     ${mesa.total?`La pauta de cirugía mayor exige mesa quirúrgica propia en cada quirófano y el proyecto asigna <b>${mesa.asignados} mesas para ${mesa.total} quirófanos</b>: sin resolver eso, esos ${mesa.total-mesa.cubiertos} quirófanos no se autorizan.`:''}</div>`;
   const k=[['quirófanos',PAUTA.total_quirofanos||0],['con mesa quirúrgica',mesa.total?mesa.cubiertos+' / '+mesa.total:'—'],
            ['requisitos con brecha',br.length],['por confirmar',pc.length],
@@ -1102,7 +1102,7 @@ function renderHuddle(){
   document.getElementById('hud-top').innerHTML=`
     <div class="tt">🧭 Huddle de Puesta en Marcha · ${fmt(A?A.fecha:h)}
       <small>${A?'En curso desde las '+A.inicio+' · '+nrev+' revisados':'Último huddle: '+(ultimoHuddle()?fmt(ultimoHuddle()):'todavía ninguno')+' · lo «nuevo» y lo «resuelto» se cuentan desde el '+fmt(dsd)}
-      ${tr?' · traslado '+fmt(tr.fecha)+(dias>=0?' (en '+dias+' días)':' ('+(-dias)+' días atrás)'):''}</small></div>
+      ${tr?(tr.por_confirmar?' · traslado: Día 1 por confirmar, tras la PSP (Manual de Traslado RE-3986)':' · traslado '+fmt(tr.fecha)+(dias>=0?' (en '+dias+' días)':' ('+(-dias)+' días atrás)')):''}</small></div>
     <span id="sync" class="sync off" onclick="configSync()"></span>
     ${A?`<button class="ghost" onclick="vistaPrevia()">👁 Acta en curso</button><button class="warn" onclick="cerrarHuddle()">■ Cerrar huddle</button>`
        :`<button class="go" onclick="iniciarHuddle()">▶ Iniciar huddle</button>`}
