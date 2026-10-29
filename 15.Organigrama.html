@@ -334,6 +334,11 @@
   .oe-tools hr{border:none;border-top:1px solid #e2e8f0;margin:2px 4px;width:auto}
   .oe-tools .oe-col{flex-direction:column;align-items:center;padding:4px 0}
   .oe-t-lapiz .oe-lienzo .ow{cursor:crosshair} .oe-t-lapiz .ow:hover{box-shadow:0 0 0 3px #10b981}
+  .oe-pt{display:none;position:absolute;width:22px;height:22px;border-radius:50%;background:#10b981;border:3px solid #fff;box-shadow:0 1px 5px rgba(0,0,0,.35);cursor:crosshair;z-index:4;box-sizing:border-box}
+  .oe-pt:hover{background:#059669;transform:scale(1.25)}
+  .oe-pt-n{top:2px;left:calc(50% - 11px)} .oe-pt-s{bottom:2px;left:calc(50% - 11px)} .oe-pt-e{right:2px;top:calc(50% - 11px)} .oe-pt-o{left:2px;top:calc(50% - 11px)}
+  .oe-t-lapiz .ow:hover .oe-pt{display:block}
+  .oe-lienzo path.cola{stroke:#64748b;stroke-dasharray:2 4;stroke-linecap:round}
   .oe-t-bloque,.oe-t-bloque .ow{cursor:copy} .oe-t-pintar .ow{cursor:pointer} .oe-t-pintar .ow:hover{box-shadow:0 0 0 3px #2563eb}
   .oe-t-goma,.oe-t-goma .ow{cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='26' height='26'><circle cx='13' cy='13' r='10' fill='rgba(220,38,38,.18)' stroke='%23dc2626' stroke-width='2'/></svg>") 13 13,crosshair}
   .oe-t-goma .oe-hit:hover{stroke:rgba(220,38,38,.35)}
@@ -1444,7 +1449,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function ubicar(n, x, y, out){
     const [w, h] = TAM[n.z] || TAM.S, hijos = (n.h || []).filter(c => !c.lat), lats = (n.h || []).filter(c => c.lat);
-    n.x = x + n.W / 2 - w / 2; n.y = y; out.nodos.push(n);
+    n.x = x + n.W / 2 - w / 2; n.y = y; out.nodos.push(n); out.lineas.push(...colasDe(n, n));
     let lx = n.x + w + GX;
     lats.forEach(l => { ubicar(l, lx, y + (h - (TAM[l.z] || TAM.S)[1]) / 2, out); if(!l.sl) out.lineas.push({ d: `M${n.x + w},${y + h / 2} H${lx}`, lat: 1 }); lx += l.W + GX; });
     if(!hijos.length) return;
@@ -1486,10 +1491,10 @@ document.addEventListener('DOMContentLoaded', () => {
           L.push({ d: `M${x1},${y1} V${my} H${rx} V${cy} H${b.x}`, k: k.id, hx: rx, hy: cy }); }
         else { const x1 = a.x + w / 2, y1 = a.y + h, x2 = b.x + kw / 2, y2 = b.y, my = y2 > y1 + 20 ? Math.min(y1 + GY / 2, y2 - 10) : y1 + 16;
           L.push({ d: `M${x1},${y1} V${my} H${x2} V${y2}`, k: k.id, hx: x2, hy: Math.max(my, y2 - 16) }); }
-        rec(k); }); })(arbol);
+        rec(k); }); L.push(...colasDe(n, a)); })(arbol);
     return L;
   }
-  const svgLibre = () => lineasLibres().filter(l => l.d).map(l => `<path d="${l.d}" class="${l.lat ? 'lat' : ''}"/><path class="oe-hit" data-linea="${l.k}" d="${l.d}"><title>🧽 Goma o clic derecho: borrar la línea</title></path>`).join('')
+  const svgLibre = () => lineasLibres().filter(l => l.d).map(l => `<path d="${l.d}" class="${l.lat ? 'lat' : ''}${l.cola ? 'cola' : ''}"/><path class="oe-hit" data-linea="${l.k}" d="${l.d}"><title>🧽 Goma o clic derecho: borrar la línea</title></path>`).join('')
     + [].map(l => `<circle class="oe-asa${l.suelta ? ' suelta' : ''}" data-linea="${l.k}" cx="${l.hx}" cy="${l.hy}" r="11"><title>${l.suelta ? 'Sin línea: arrastra este punto hasta un bloque para volver a conectarlo' : 'Arrastra este punto hasta el nuevo superior; suéltalo en un espacio vacío para desconectar la línea'}</title></circle>`).join('')
     + '<path class="oe-temp" id="oeTemp" d=""/>';
   // al cerrar la edición: el orden de izquierda a derecha (y de arriba abajo en columnas) es el que quedó a mano
@@ -1497,12 +1502,13 @@ document.addEventListener('DOMContentLoaded', () => {
     (function ord(n){ const h = n.h || []; if(h.length > 1) h.sort((a, b) => ((a.lat ? 1 : 0) - (b.lat ? 1 : 0))
       || (Math.round(libre[a.id].x / 120) - Math.round(libre[b.id].x / 120)) || (libre[a.id].y - libre[b.id].y)); h.forEach(ord); })(arbol);
   }
-  const ptXY = (n, pt) => { const P = libre[n.id], [w, h] = tam(n);
+  const ancla = (P, n, pt) => { const [w, h] = TAM[n.z] || TAM.S;
     return pt === 'n' ? { x: P.x + w / 2, y: P.y } : pt === 's' ? { x: P.x + w / 2, y: P.y + h } : pt === 'e' ? { x: P.x + w, y: P.y + h / 2 } : { x: P.x, y: P.y + h / 2 }; };
-  // ✏️: el otro bloque más abajo → queda debajo (s) · más arriba → queda encima (n) · a la misma altura → asesoría al costado (e/o)
-  const dirPt = (n, b, p) => { const A = libre[n.id], [w, h] = tam(n), o = b && buscar(b.dataset.id);
-    if(o && o.n.id !== n.id){ const B = libre[o.n.id], bh = tam(o.n)[1]; return B.y >= A.y + h - 10 ? 's' : B.y + bh <= A.y + 10 ? 'n' : B.x > A.x ? 'e' : 'o'; }
-    return p.y > A.y + h ? 's' : p.y < A.y ? 'n' : p.x > A.x + w / 2 ? 'e' : 'o'; };
+  const ptXY = (n, pt) => ancla(libre[n.id], n, pt);
+  const colasDe = (n, P) => (n.lx || []).map((c, i) => { if(!c) return null; const a = ancla(P, n, c.pt), ex = a.x + c.dx, ey = a.y + c.dy;
+    return { d: c.pt === 'n' || c.pt === 's' ? `M${a.x},${a.y} V${ey} H${ex}` : `M${a.x},${a.y} H${ex} V${ey}`, k: n.id + '#' + i, cola: 1 }; }).filter(Boolean);
+  const quitarCola = k => { const [id, i] = k.split('#'), o = buscar(id); if(!o || !o.n.lx || !o.n.lx[+i]) return false; o.n.lx[+i] = null; return true; };
+  const limpiarColas = () => (function rec(n){ if(n.lx){ n.lx = n.lx.filter(Boolean); if(!n.lx.length) delete n.lx; } (n.h || []).forEach(rec); })(arbol);
   // 🧽: tramos de cada línea (las líneas son ortogonales: M x,y · H x · V y)
   const tramos = () => lineasLibres().filter(l => l.d).map(l => { const P = []; let c = null;
     l.d.replace(/([MHV])([-\d.]+)(?:,([-\d.]+))?/g, (_, k, a, b) => { c = k === 'M' ? { x: +a, y: +b } : k === 'H' ? { x: +a, y: c.y } : { x: c.x, y: +a }; P.push(c); });
@@ -1525,7 +1531,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return `<div class="ow c-${n.c || 'azul'} z${n.z}${sel === n.id ? ' sel' : ''}${multi.has(n.id) ? ' multi' : ''}${n.lat ? ' lat' : ''}" data-id="${n.id}" style="left:${P.x}px;top:${P.y}px;width:${w}px;height:${h}px">
       <div class="t">${esc(n.t)}</div>${n.s ? `<div class="s">${esc(n.s)}</div>` : ''}
       ${pp.length ? `<div class="pp">${pp.map((x, i) => `<span${i ? '' : ' class="lider" title="Lidera"'}>${esc(conSigla(x))}</span>`).join('')}</div>` : ''}
-      ${editar ? `<span class="oe-del" data-a="borrar" title="Eliminar este bloque">×</span>` : ''}
+      ${editar ? `${[['n', 'arriba: el otro queda ENCIMA'], ['s', 'abajo: el otro queda DEBAJO'], ['e', 'al lado: asesoría'], ['o', 'al lado: asesoría']].map(([d, t]) => `<span class="oe-pt oe-pt-${d}" data-pt="${d}" title="Línea desde ${t}"></span>`).join('')}<span class="oe-del" data-a="borrar" title="Eliminar este bloque">×</span>` : ''}
       ${n.q ? `<span class="q" title="${esc(n.q)}">por confirmar</span>` : ''}${(() => { const k = pendDe(n.t, n.p).n; return k ? `<span class="bp" title="Pendientes abiertos en la Bitácora (clic para verlos)">📌 ${k}</span>` : ''; })()}</div>`;
   }
   function pintar(){
@@ -1543,12 +1549,12 @@ document.addEventListener('DOMContentLoaded', () => {
       </div>
 
       <div class="oe-wrap${editar ? ' oe-t-' + herr + (espacio ? ' espacio' : '') : ''}"><div class="oe-lienzo${editar ? ' oe-libre' : ''}" style="width:${W}px;height:${H}px">
-        <svg width="${W}" height="${H}">${editar ? svgLibre() : out.lineas.map(l => `<path d="${l.d}" class="${l.lat ? 'lat' : ''}"/>`).join('')}</svg>
+        <svg width="${W}" height="${H}">${editar ? svgLibre() : out.lineas.map(l => `<path d="${l.d}" class="${l.lat ? 'lat' : ''}${l.cola ? 'cola' : ''}"/>`).join('')}</svg>
         ${out.nodos.map(widget).join('')}</div>${editar && n ? panel(n.n, n.p) : ''}
         ${editar ? `<div class="oe-tools">${HERR.map(([k, ic, nom, t]) => `<button data-h="${k}" class="${herr === k ? 'on' : ''}" title="${nom} (tecla ${t})">${ic}<small>${nom}</small></button>`).join('')}
           ${herr === 'pintar' ? `<div class="oe-col">${Object.keys(COLORES).map(c => `<button data-pc="${c}" class="c-${c}${colorP === c ? ' on' : ''}" title="${COLORES[c]}"></button>`).join('')}</div>` : ''}
           <hr><button data-a="deshacer" title="Deshacer (⌘Z)" ${hist.length ? '' : 'disabled'}>↶<small>Deshacer</small></button></div>
-        <details class="oe-ayf"><summary>❔ Cómo editar</summary><div><b>🖐 Mover (M)</b>: arrastra bloques (Alt = con su rama · ⌘ + clic = varios) · clic = editar · <b>×</b> o Supr = eliminar · arrastra el fondo para recorrer<br><b>✏️ Lápiz (L)</b>: desde un bloque, arrastra (o clic y clic) hasta otro: si está <b>más abajo</b> queda debajo, <b>más arriba</b> queda encima, <b>al lado</b> queda como asesoría. En un <b>espacio vacío</b> crea ahí un bloque nuevo ya conectado<br><b>🧽 Goma (G)</b>: mantén el clic y pasa sobre las líneas · también: clic derecho sobre una línea<br><b>➕ Bloque (B)</b>: clic en un espacio vacío = bloque suelto (luego únelo con el lápiz) · clic en un bloque = uno nuevo debajo<br><b>🎨 Color (P)</b>: elige el color y haz clic en los bloques<br><b>Esc</b> = vuelve a 🖐 sin salir de la edición · <b>barra espaciadora</b> sostenida = recorrer con cualquier herramienta · <b>rueda</b> = zoom · <b>✓ Listo</b> ordena todo</div></details>` : ''}
+        <details class="oe-ayf"><summary>❔ Cómo editar</summary><div><b>🖐 Mover (M)</b>: arrastra bloques (Alt = con su rama · ⌘ + clic = varios) · clic = editar · <b>×</b> o Supr = eliminar · arrastra el fondo para recorrer<br><b>✏️ Lápiz (L)</b>: solo dibuja líneas. Pasa sobre un bloque y toma uno de sus <b>4 puntos verdes</b>; arrastra (o clic y clic) y termina <b>sobre otro bloque</b>, <b>sobre una línea</b> (se suma a esa rama) o <b>al aire</b> (línea suelta, para unir después). Desde <b>arriba</b>: el otro queda encima · desde <b>abajo</b>: queda debajo · desde un <b>lado</b>: asesoría<br><b>🧽 Goma (G)</b>: mantén el clic y pasa sobre las líneas · también: clic derecho sobre una línea<br><b>➕ Bloque (B)</b>: clic en un espacio vacío = bloque suelto (luego únelo con el lápiz) · clic en un bloque = uno nuevo debajo<br><b>🎨 Color (P)</b>: elige el color y haz clic en los bloques<br><b>Esc</b> = vuelve a 🖐 sin salir de la edición · <b>barra espaciadora</b> sostenida = recorrer con cualquier herramienta · <b>rueda</b> = zoom · <b>✓ Listo</b> ordena todo</div></details>` : ''}
         <div class="oe-zf"><button data-a="mas" title="Acercar">＋</button><button data-a="menos" title="Alejar">−</button><button data-a="ajustar" title="Ver todo">⤢</button></div></div>
       ${!editar ? panelPend() : ''}`;
     const lz = cont.querySelector('.oe-lienzo'), wr = lz.parentElement;
@@ -1673,6 +1679,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: false });
     div.addEventListener('contextmenu', ev => {
       const h = ev.target.closest('.oe-hit'); if(!editar || !h) return; ev.preventDefault();
+      if(h.dataset.linea.includes('#')){ snap(); quitarCola(h.dataset.linea); limpiarColas(); guardar(); pintar(); return aviso('Línea suelta borrada'); }
       const q = buscar(h.dataset.linea); if(q && q.p && !q.n.sl){ snap(); q.n.sl = true; guardar(); pintar(); aviso(`Línea de «${q.n.t}» borrada`); }
     });
     let gz = 1;   // Safari no manda Ctrl+rueda al pellizcar: usa gesturestart/gesturechange
@@ -1715,6 +1722,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const L = Math.hypot(p.x - d.last.x, p.y - d.last.y), n = Math.max(1, Math.ceil(L * zoom / 4)), tol = 12 / zoom; let algo = false;
       for(let i = 1; i <= n; i++){ const q = { x: d.last.x + (p.x - d.last.x) * i / n, y: d.last.y + (p.y - d.last.y) * i / n };
         d.lineas = d.lineas.filter(l => { if(!l.P.some((a, j) => j && distTramo(q, l.P[j - 1], a) < tol)) return true;
+          if(l.k.includes('#')){ if(!d.borradas) snap(); if(quitarCola(l.k)){ d.borradas++; algo = true; } return false; }
           const o = buscar(l.k); if(o && o.p && !o.n.sl){ if(!d.borradas) snap(); o.n.sl = true; d.borradas++; algo = true; } return false; }); }
       d.last = p; if(algo) div.querySelector('.oe-lienzo svg').innerHTML = svgLibre();
     }
@@ -1726,31 +1734,38 @@ document.addEventListener('DOMContentLoaded', () => {
       libre[nn.id] = { x: Math.max(0, p.x - nw / 2), y: Math.max(0, p.y - nh / 2) }; sinChoque(nn.id);
       herr = 'mano'; multi.clear(); sel = nn.id; recienCreado = nn.id; guardar(); pintar();
     }
-    // une el bloque «srcId» (desde su punto «pt») con el bloque bajo el cursor, o crea uno nuevo en el espacio vacío
-    function unir(srcId, pt, b, ev){
-      const src = buscar(srcId), lat = pt === 'e' || pt === 'o'; if(!src) return pintar();
-      if(!b){
-          const p = local(ev), [nw, nh] = TAM.S; snap();
-          const nn = conIds({ t: 'Nuevo', c: src.n.c === 'navy' ? 'azul' : src.n.c, z: 'S', p: [] });
-          if(pt === 'n'){ if(src.p) src.p.h.splice(src.p.h.indexOf(src.n), 1, nn); else arbol = nn; nn.h = [src.n]; delete src.n.lat; delete src.n.sl; }   // nuevo superior
-          else { (src.n.h = src.n.h || []).push(nn); if(lat) nn.lat = true; }
-          libre[nn.id] = { x: Math.max(0, p.x - nw / 2), y: Math.max(0, p.y - nh / 2) }; sinChoque(nn.id);
-          multi.clear(); sel = nn.id; recienCreado = nn.id; guardar(); return pintar(); }
-        const otro = buscar(b.dataset.id), hijo = pt === 'n' ? src : otro, sup = pt === 'n' ? otro : src;
-        if(!hijo.p){ aviso(`«${hijo.n.t}» es el primer nivel: no puede quedar debajo de otro`); return pintar(); }
-        if(desciende(hijo.n, sup.n)){ aviso(`«${sup.n.t}» depende de «${hijo.n.t}»: no puede quedar encima de él`); return pintar(); }
-        snap();
-        if(hijo.p.id !== sup.n.id){ hijo.p.h.splice(hijo.p.h.indexOf(hijo.n), 1); (sup.n.h = sup.n.h || []).push(hijo.n); }
-        if(lat) hijo.n.lat = true; else delete hijo.n.lat; delete hijo.n.sl;
-        guardar(); aviso(lat ? `«${hijo.n.t}» queda al costado de «${sup.n.t}» (asesoría)` : `«${hijo.n.t}» ahora depende de «${sup.n.t}»`);
-        return pintar();
+    // deja a «hijo» bajo «sup» (lat = asesoría al costado); avisa si no se puede
+    function relacionar(hijo, sup, lat){
+      if(!hijo || !sup) return false;
+      if(!hijo.p){ aviso(`«${hijo.n.t}» es el primer nivel: no puede quedar debajo de otro`); return false; }
+      if(desciende(hijo.n, sup.n)){ aviso(`«${sup.n.t}» depende de «${hijo.n.t}»: no puede quedar encima de él`); return false; }
+      snap(); if(hijo.p.id !== sup.n.id){ hijo.p.h.splice(hijo.p.h.indexOf(hijo.n), 1); (sup.n.h = sup.n.h || []).push(hijo.n); }
+      if(lat) hijo.n.lat = true; else delete hijo.n.lat; delete hijo.n.sl;
+      aviso(lat ? `«${hijo.n.t}» queda al costado de «${sup.n.t}» (asesoría)` : `«${hijo.n.t}» ahora depende de «${sup.n.t}»`); return true;
+    }
+    // ✏️ desde el punto «pt» de srcId: arriba → el otro queda encima · abajo → debajo · lado → asesoría
+    const unir = (srcId, pt, otroId) => { const a = buscar(srcId), b = buscar(otroId); return pt === 'n' ? relacionar(a, b, false) : relacionar(b, a, pt === 'e' || pt === 'o'); };
+    // la línea más cercana al punto (12 px de pantalla), sin contar las del propio bloque
+    const lineaCerca = (p, id) => { const tol = 12 / zoom; let m = null, md = tol;
+      tramos().forEach(l => { if(l.k === id || l.k.startsWith(id + '#')) return; l.P.forEach((a, j) => { if(!j) return; const d = distTramo(p, l.P[j - 1], a); if(d < md){ md = d; m = l; } }); }); return m; };
+    // fin del trazo: sobre un bloque, sobre una línea (se suma a esa rama) o al aire (línea suelta)
+    function terminar(srcId, pt, ev){
+      const src = buscar(srcId); if(!src) return pintar();
+      const b = bajo(ev), p = local(ev);
+      if(b){ if(b.dataset.id !== srcId && unir(srcId, pt, b.dataset.id)) guardar(); return pintar(); }
+      const l = lineaCerca(p, srcId);
+      if(l && l.k.includes('#')){ const [yid, i] = l.k.split('#'), y = buscar(yid), c = y && y.n.lx[+i];   // otra línea suelta: se completa la unión
+        if(c && unir(yid, c.pt, srcId)){ y.n.lx[+i] = null; limpiarColas(); guardar(); } return pintar(); }
+      if(l){ const k = buscar(l.k); if(k && k.p && relacionar(src, buscar(k.p.id), !!k.n.lat)) guardar(); return pintar(); }   // una línea: queda en esa rama
+      const a = ptXY(src.n, pt); snap(); (src.n.lx = src.n.lx || []).push({ pt, dx: Math.round(p.x - a.x), dy: Math.round(p.y - a.y) });
+      guardar(); pintar(); aviso('Línea suelta: termínala después sobre un bloque, o bórrala con la 🧽');
     }
 
     div.addEventListener('pointerdown', ev => {
       if(ev.button > 0 || ev.target.closest('.oe-panel') || !ev.target.closest('.oe-wrap') || ev.target.closest('.oe-zf,.oe-xl,.oe-del,.oe-tools,.oe-ayf')) return;
       if(editar && trazo && !espacio){ ev.preventDefault(); const t = trazo; trazo = null; const b = bajo(ev), s0 = buscar(t.id);   // fin de la línea por clic
         div.querySelectorAll('.ow.sobre').forEach(x => x.classList.remove('sobre'));
-        if(!s0 || (b && b.dataset.id === t.id)) return pintar(); sinClic = true; setTimeout(() => sinClic = false, 0); return unir(t.id, dirPt(s0.n, b, local(ev)), b, ev); }
+        if(!s0 || (b && b.dataset.id === t.id)) return pintar(); sinClic = true; setTimeout(() => sinClic = false, 0); return terminar(t.id, t.pt, ev); }
       const w = ev.target.closest('.ow'), h = !editar ? '' : espacio ? 'pan' : herr;
       if(h === 'goma'){ ev.preventDefault(); drag = { tipo: 'goma', last: local(ev), lineas: tramos(), borradas: 0 }; borrarEn(drag, drag.last); try{ div.setPointerCapture(ev.pointerId); }catch(e){} return; }
       if(h === 'bloque'){ ev.preventDefault(); return crearBloque(w, ev); }
@@ -1759,7 +1774,9 @@ document.addEventListener('DOMContentLoaded', () => {
         drag = { tipo: 'pan', x0: ev.clientX, y0: ev.clientY, px: panX, py: panY, movio: false, pid: ev.pointerId }; return; }   // la captura recién al moverse: un clic sigue siendo clic
       const asa = ev.target.closest('.oe-asa');
       ev.preventDefault(); const p0 = local(ev);
-      if(h === 'lapiz'){ drag = { tipo: 'conectar', id: w.dataset.id, p0, movio: false }; }   // ✏️ dibujar una línea desde el bloque
+      if(h === 'lapiz'){ const s = buscar(w.dataset.id), pe = ev.target.closest('.oe-pt');   // ✏️ desde un punto verde (o el más cercano al clic)
+        const pt = pe ? pe.dataset.pt : ['n', 's', 'e', 'o'].map(k => [k, ptXY(s.n, k)]).sort((x, y) => Math.hypot(x[1].x - p0.x, x[1].y - p0.y) - Math.hypot(y[1].x - p0.x, y[1].y - p0.y))[0][0];
+        drag = { tipo: 'conectar', id: w.dataset.id, pt, p0, movio: false }; }
       else if(asa){ drag = { tipo: 'linea', id: asa.dataset.linea, p0 }; }
       else { const s = buscar(w.dataset.id), cmd = ev.metaKey || ev.ctrlKey;
         if(cmd){ if(multi.has(s.n.id)) multi.delete(s.n.id); else multi.add(s.n.id); if(sel && sel !== s.n.id){ multi.add(sel); } sel = null; }   // ⌘ + clic: sumar/quitar de la selección
@@ -1770,7 +1787,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     div.addEventListener('pointermove', ev => {
       if(trazo && !drag){   // la línea en curso sigue al cursor
-        const s0 = buscar(trazo.id); if(!s0) return; const p = local(ev), b = bajo(ev), a = ptXY(s0.n, dirPt(s0.n, b, p));
+        const s0 = buscar(trazo.id); if(!s0) return; const p = local(ev), b = bajo(ev), a = ptXY(s0.n, trazo.pt);
         const t = div.querySelector('#oeTemp'); if(t) t.setAttribute('d', `M${a.x},${a.y} L${p.x},${p.y}`);
         div.querySelectorAll('.ow.sobre').forEach(x => x.classList.remove('sobre')); if(b && b.dataset.id !== trazo.id) b.classList.add('sobre');
         return; }
@@ -1788,7 +1805,7 @@ document.addEventListener('DOMContentLoaded', () => {
         div.querySelector('.oe-lienzo svg').innerHTML = svgLibre();
       } else if(drag.tipo === 'conectar'){
         if(Math.hypot(dx, dy) * zoom > 6) drag.movio = true;
-        const s = buscar(drag.id), b = bajo(ev), a = ptXY(s.n, dirPt(s.n, b, p));
+        const s = buscar(drag.id), b = bajo(ev), a = ptXY(s.n, drag.pt);
         const t = div.querySelector('#oeTemp'); if(t) t.setAttribute('d', `M${a.x},${a.y} L${p.x},${p.y}`);
         div.querySelectorAll('.ow.sobre').forEach(x => x.classList.remove('sobre')); if(b && b.dataset.id !== drag.id) b.classList.add('sobre');
       } else {
@@ -1800,7 +1817,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     div.addEventListener('pointerup', ev => {
       if(!drag) return; const d = drag; drag = null;
-      if(d.tipo === 'goma'){ if(d.borradas){ guardar(); pintar(); aviso(d.borradas === 1 ? 'Línea borrada' : `${d.borradas} líneas borradas`); } return; }
+      if(d.tipo === 'goma'){ if(d.borradas){ limpiarColas(); guardar(); pintar(); aviso(d.borradas === 1 ? 'Línea borrada' : `${d.borradas} líneas borradas`); } return; }
       if(d.tipo === 'pan'){ const w = div.querySelector('.oe-wrap'); if(w) w.classList.remove('paneo'); if(d.movio){ sinClic = true; setTimeout(() => sinClic = false, 0); }
         else if(editar && (multi.size || sel)){ multi.clear(); sel = null; pintar(); } return; }
       div.querySelectorAll('.ow.sobre,.ow.mueve').forEach(x => x.classList.remove('sobre', 'mueve'));
@@ -1809,9 +1826,9 @@ document.addEventListener('DOMContentLoaded', () => {
         else { multi.clear(); sel = d.id; pintar(); } return; }
       if(d.tipo === 'conectar'){ const b = bajo(ev);
         if(!d.movio && (!b || b.dataset.id === d.id)){   // clic en un punto verde: la línea sigue al cursor hasta el próximo clic
-          trazo = { id: d.id }; aviso('Clic en el bloque de destino o en un espacio vacío · Esc cancela'); return; }
+          trazo = { id: d.id, pt: d.pt }; aviso('Clic sobre un bloque, sobre una línea o al aire · Esc cancela'); return; }
         if(b && b.dataset.id === d.id) return pintar();
-        return unir(d.id, dirPt(buscar(d.id).n, b, local(ev)), b, ev); }
+        return terminar(d.id, d.pt, ev); }
       const b2 = bajo(ev), s = buscar(d.id); if(!s || !s.p) return pintar();
       if(!d.movio) return pintar();   // un clic en el punto no hace nada
       const b = b2; if(!b){ if(!s.n.sl){ snap(); s.n.sl = true; guardar(); } return pintar(); }   // en vacío: se desconecta la línea
