@@ -2,6 +2,16 @@
 // PM: pizarra de Puesta en Marcha (foto IMG_0557) + organización acordada en la reunión del 27-10-2026. Lo que no consta con certeza va con «por confirmar».
 // Concesionado: conducto formal del contrato + 14 servicios de los PAPS aprobados (SHARED_DATA/paps_full.js).
 window.ORG_EXTRA = {
+  // Sigla de profesión/estamento antes del nombre (28-10-2026). Se aplica al mostrar a cada persona
+  // (también a las que se escriban en el editor) por inicial + apellido. Fuente: dotación del HDS
+  // revisada a mano; quien no está aquí se muestra sin sigla (completar cuando se confirme).
+  titulos: {
+    'Catherine Sepúlveda': 'EU', 'Meylin Canales': 'EU', 'Fernando Araya': 'EU', 'Lorena Encina': 'EU',
+    'María Elena Sepúlveda': 'QF', 'Matías Pinto': 'Ing.', 'Fernando Lacalle': 'Ing.',
+    'Javiera Pacheco': 'Ps.', 'Isabel Rojas': 'Ps.', 'Loreto Pérez': 'Ps.',
+    'Horacio Díaz': 'Dr.', 'Manuel Ramírez': 'Dr.', 'Jorge Zajjur Castro': 'Dr.',
+    'Allyson Davis': 'TM', 'Carolina Rivera': 'Arq.', 'Andrés Villarroel': 'Adm. Púb.'
+  },
   pm: {
     titulo: 'Puesta en Marcha · Nuevo HDS',
     sub: 'Organización acordada con el Director (reunión del equipo PM, 27-10-2026): cada rol con su persona · sobre la pizarra y el bosquejo en papel del 27-10',

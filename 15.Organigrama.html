@@ -278,7 +278,7 @@
 
   /* ── Editor de organigrama por widgets (vista Puesta en Marcha) ── */
   #oeHost{position:relative}
-  .oe-bar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+  .oe-bar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px;min-height:36px}   /* misma altura en vista y en edición: el lienzo no se corre */
   .oe-b{border:1px solid #cbd5e1;background:#fff;border-radius:9px;padding:6px 12px;font-size:12px;font-weight:700;color:#1F2A55;cursor:pointer}
   .oe-b.on{background:#1F2A55;color:#fff;border-color:#1F2A55} .oe-b:disabled{opacity:.4;cursor:default}
   .oe-sp{flex:1} .oe-z{font-size:11.5px;font-weight:700;color:#64748b;min-width:42px;text-align:center}
@@ -293,6 +293,7 @@
   .ow .t{font-weight:800;font-size:17px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .ow.zL .t{font-size:20px} .ow .s{font-size:13px;opacity:.85;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
   .ow .pp{margin-top:5px;display:flex;flex-wrap:wrap;gap:3px;justify-content:center;overflow:hidden;max-height:50px} .ow.zS .pp{max-height:24px} .ow.zL .pp{max-height:76px}
+  .ow .pp span.lider{font-weight:850;background:#fff;box-shadow:inset 0 0 0 1.5px rgba(31,42,85,.35)}   /* la primera persona lidera */
   .ow .pp span{background:rgba(255,255,255,.85);border-radius:9px;padding:1px 7px;font-size:12.5px;font-weight:600;color:#1F2A55;white-space:nowrap}
   .ow .q{position:absolute;top:4px;right:5px;width:9px;height:9px;border-radius:50%;background:#f59e0b;font-size:0;cursor:help}
   .ow.sel{box-shadow:0 0 0 3px #2563eb,0 6px 16px rgba(31,42,85,.18);z-index:2}
@@ -308,6 +309,46 @@
   .oe-col button.c-azul{background:#E3EEFB}.oe-col button.c-verde{background:#E3F4EA}.oe-col button.c-durazno{background:#FDEBDD}.oe-col button.c-lila{background:#ECE7FA}.oe-col button.c-navy{background:#1F2A55}
   .oe-col button.on{box-shadow:0 0 0 3px #2563eb}
   .oe-panel .oe-chk{display:flex;gap:6px;align-items:center;font-weight:600}
+  /* 28-10 · edición libre: bloques y líneas se mueven a mano; al cerrar la edición se ordena solo */
+  .oe-wrap{position:relative} .oe-lienzo svg{pointer-events:none}
+  /* 28-10 · como el Atlas: sin barras; arrastrar el fondo mueve, rueda/trackpad mueve, pellizco o Ctrl+rueda acerca */
+  .oe-wrap{overflow:hidden!important;cursor:grab;touch-action:none;height:calc(100vh - 210px);min-height:520px;overscroll-behavior:contain}
+  .oe-wrap.paneo{cursor:grabbing} .oe-wrap .ow{cursor:pointer} .oe-libre .ow{cursor:move}
+  .oe-libre .ow{cursor:move;user-select:none;-webkit-user-select:none;touch-action:none}
+  .oe-libre .ow.mueve{opacity:.85;box-shadow:0 10px 26px rgba(31,42,85,.28);z-index:3}
+  .ow.sobre{box-shadow:0 0 0 4px #10b981,0 6px 16px rgba(31,42,85,.18)!important}
+  .oe-asa{fill:#fff;stroke:#2563eb;stroke-width:3;cursor:grab;pointer-events:all}
+  .oe-asa:hover{fill:#2563eb} .oe-asa.suelta{stroke:#f59e0b;stroke-dasharray:3 2}
+  /* 28-10 · líneas seleccionables, dibujar líneas desde un bloque, borrar bloque, zoom a la vista */
+  .ow.multi{box-shadow:0 0 0 3px #2563eb,0 0 0 6px rgba(37,99,235,.25)!important}
+  .oe-hit{fill:none;stroke:transparent;stroke-width:22;pointer-events:stroke;cursor:pointer}
+  .oe-lienzo path.sel{stroke:#2563eb;stroke-width:4}
+  .oe-xl{cursor:pointer;pointer-events:all} .oe-xl circle{fill:#dc2626;stroke:#fff;stroke-width:2} .oe-xl text{fill:#fff;font:800 16px sans-serif;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+  .oe-con{display:none;position:absolute;left:50%;bottom:4px;transform:translateX(-50%);width:26px;height:26px;border-radius:50%;background:#10b981;color:#fff;font-weight:900;font-size:18px;line-height:26px;text-align:center;cursor:crosshair;box-shadow:0 1px 5px rgba(0,0,0,.3);z-index:4}
+  .oe-libre .ow:hover .oe-con,.oe-libre .ow.sel .oe-con{display:block}
+  /* barra de herramientas de edición (izquierda del lienzo) */
+  .oe-tools{position:absolute;left:12px;top:12px;z-index:20;display:flex;flex-direction:column;gap:4px;background:rgba(255,255,255,.97);border:1px solid #cbd5e1;border-radius:14px;padding:6px;box-shadow:0 4px 14px rgba(31,42,85,.16)}
+  .oe-tools>button{width:54px;height:50px;border:none;background:transparent;border-radius:10px;cursor:pointer;font-size:20px;line-height:1;color:#1F2A55;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+  .oe-tools>button small{font-size:9.5px;font-weight:800;letter-spacing:.2px}
+  .oe-tools>button:hover{background:#eff6ff} .oe-tools>button.on{background:#1F2A55;color:#fff} .oe-tools>button:disabled{opacity:.35;cursor:default}
+  .oe-tools hr{border:none;border-top:1px solid #e2e8f0;margin:2px 4px;width:auto}
+  .oe-tools .oe-col{flex-direction:column;align-items:center;padding:4px 0}
+  .oe-t-lapiz .oe-lienzo .ow{cursor:crosshair} .oe-t-lapiz .ow:hover{box-shadow:0 0 0 3px #10b981}
+  .oe-t-bloque,.oe-t-bloque .ow{cursor:copy} .oe-t-pintar .ow{cursor:pointer} .oe-t-pintar .ow:hover{box-shadow:0 0 0 3px #2563eb}
+  .oe-t-goma,.oe-t-goma .ow{cursor:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='26' height='26'><circle cx='13' cy='13' r='10' fill='rgba(220,38,38,.18)' stroke='%23dc2626' stroke-width='2'/></svg>") 13 13,crosshair}
+  .oe-t-goma .oe-hit:hover{stroke:rgba(220,38,38,.35)}
+  .oe-wrap.espacio,.oe-wrap.espacio .ow{cursor:grab!important}
+  .oe-del{display:none;position:absolute;left:5px;top:5px;width:26px;height:26px;border-radius:50%;background:#dc2626;color:#fff;font-weight:900;font-size:16px;line-height:26px;text-align:center;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,.3);z-index:4}
+  .oe-libre .ow.sel .oe-del{display:block}
+  .oe-zf{position:absolute;right:12px;bottom:12px;display:flex;flex-direction:column;gap:6px;z-index:20}
+  .oe-zf button{width:40px;height:40px;border-radius:10px;border:1px solid #cbd5e1;background:#fff;color:#1F2A55;font-size:20px;font-weight:800;cursor:pointer;box-shadow:0 2px 8px rgba(31,42,85,.15)}
+  .oe-zf button:hover{background:#eff6ff}
+  .oe-ayf{position:absolute;left:12px;bottom:12px;z-index:20;background:rgba(255,255,255,.96);border:1px solid #cbd5e1;border-radius:12px;box-shadow:0 2px 10px rgba(31,42,85,.15);font-size:12.5px;color:#1F2A55;max-width:520px}
+  .oe-ayf summary{cursor:pointer;padding:7px 12px;font-weight:800;list-style:none} .oe-ayf div{padding:0 12px 10px;line-height:1.55}
+  .oe-aviso{position:absolute;left:50%;top:10px;transform:translateX(-50%);background:#1F2A55;color:#fff;border-radius:10px;padding:8px 14px;font-size:13px;font-weight:700;z-index:25;pointer-events:none}
+  .oe-temp{fill:none;stroke:#2563eb;stroke-width:3;stroke-dasharray:6 5}
+  .oe-panel.oe-pop{position:absolute!important;right:auto!important;width:300px;max-height:540px;overflow:auto;z-index:30}
+  .oe-panel select{width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:8px;padding:6px 8px;font:inherit;font-weight:500;margin-top:3px}
   /* ?embed=1 · solo el organigrama de PM, para incrustarlo en la presentación */
   body.embed #hdr,body.embed #orgSwitch,body.embed #subnav,body.embed #main,body.embed #footer{display:none!important}
   body.embed{background:#fff;min-height:0} body.embed #altView{display:block!important;padding:8px 10px 0;margin:0}
@@ -1354,7 +1395,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const COLORES = { azul: 'Azul', verde: 'Verde', durazno: 'Durazno', lila: 'Lila', navy: 'Navy' };
   const KEY = 'org15_pm_editor_v3';   // v3 (27-10 tarde): organización acordada en la reunión PM (rol → persona); v2 y v1 quedan guardados aparte
   let uid = 0;
-  const conIds = n => { n.id = n.id || ('n' + (++uid)); (n.h || []).forEach(conIds); return n; };
+  // ids únicos: el contador salta los que ya vienen guardados (si no, un bloque nuevo repetía el id de otro y quedaban fusionados)
+  const conIds = n => { const visto = new Set();   // un id repetido (guardado con el error anterior) recibe uno nuevo
+    (function max(x){ if(visto.has(x.id)) delete x.id; visto.add(x.id); const k = /^n(\d+)$/.exec(x.id || ''); if(k) uid = Math.max(uid, +k[1]); (x.h || []).forEach(max); })(n);
+    (function dar(x){ x.id = x.id || ('n' + (++uid)); (x.h || []).forEach(dar); })(n); return n; };
   function desdeDato(){                     // dato original → árbol del editor (el «lado» pasa a hijo lateral)
     const r = JSON.parse(JSON.stringify(E.pm.arbol));
     if(r.lado){ r.h = [Object.assign({ lat: true, z: 'S' }, r.lado)].concat(r.h || []); delete r.lado; }
@@ -1362,10 +1406,21 @@ document.addEventListener('DOMContentLoaded', () => {
     tam(r, 0); return conIds(r);
   }
   let arbol, hist = [], sel = null, editar = false, zoom = 1, cont = null;
+  let panX = null, panY = 12;   // encuadre del lienzo (px de pantalla); null = centrar al pintar
+  let recienCreado = null;   // bloque recién agregado: su cuadro se abre con el nombre listo para escribir
+  let herr = 'mano', colorP = 'verde', espacio = false;   // herramienta activa de la barra · color del 🎨 · barra espaciadora sostenida = mover el lienzo
+  const HERR = [['mano', '🖐', 'Mover', 'M'], ['lapiz', '✏️', 'Lápiz', 'L'], ['goma', '🧽', 'Goma', 'G'], ['bloque', '➕', 'Bloque', 'B'], ['pintar', '🎨', 'Color', 'P']];
+  const multi = new Set();   // ⌘/Ctrl + clic: varios bloques seleccionados que se mueven juntos
+  let libre = null;   // mientras se edita: { id: {x, y} } posiciones movidas a mano (al cerrar la edición se ordena)
   try{ const g = JSON.parse(localStorage.getItem(KEY) || 'null'); arbol = g ? conIds(g) : desdeDato(); }catch(e){ arbol = desdeDato(); }
+  try{ if(!localStorage.getItem('org15_mig_2810')){   // 28-10: Matías pidió nombrar los dos bloques «Nuevo» del Ámbito clínico
+    const amb = (function f(n){ return n.t === 'Ámbito clínico' ? n : (n.h || []).map(f).find(Boolean); })(arbol);
+    const nuevos = amb ? (amb.h || []).filter(k => k.t === 'Nuevo') : [];
+    ['Comunicaciones', 'Gestión del cambio'].forEach((t, i) => { if(nuevos[i]) nuevos[i].t = t; });
+    if(nuevos.length){ localStorage.setItem(KEY, JSON.stringify(arbol)); } localStorage.setItem('org15_mig_2810', '1'); } }catch(e){}
   const guardar = () => { try{ localStorage.setItem(KEY, JSON.stringify(arbol)); }catch(e){} };
-  const snap = () => { hist.push(JSON.stringify(arbol)); if(hist.length > 60) hist.shift(); };
-  const deshacer = () => { if(!hist.length) return; arbol = JSON.parse(hist.pop()); guardar(); pintar(); };
+  const snap = () => { hist.push(JSON.stringify({ a: arbol, l: libre })); if(hist.length > 60) hist.shift(); };
+  const deshacer = () => { if(!hist.length) return; const o = JSON.parse(hist.pop()); arbol = o.a || o; if(o.a) libre = o.l; guardar(); pintar(); };
   function buscar(id, n = arbol, p = null){ if(n.id === id) return { n, p }; for(const h of n.h || []){ const r = buscar(id, h, n); if(r) return r; } return null; }
   const desciende = (a, b) => a.id === b.id || (a.h || []).some(h => desciende(h, b));
 
@@ -1391,33 +1446,94 @@ document.addEventListener('DOMContentLoaded', () => {
     const [w, h] = TAM[n.z] || TAM.S, hijos = (n.h || []).filter(c => !c.lat), lats = (n.h || []).filter(c => c.lat);
     n.x = x + n.W / 2 - w / 2; n.y = y; out.nodos.push(n);
     let lx = n.x + w + GX;
-    lats.forEach(l => { ubicar(l, lx, y + (h - (TAM[l.z] || TAM.S)[1]) / 2, out); out.lineas.push({ d: `M${n.x + w},${y + h / 2} H${lx}`, lat: 1 }); lx += l.W + GX; });
+    lats.forEach(l => { ubicar(l, lx, y + (h - (TAM[l.z] || TAM.S)[1]) / 2, out); if(!l.sl) out.lineas.push({ d: `M${n.x + w},${y + h / 2} H${lx}`, lat: 1 }); lx += l.W + GX; });
     if(!hijos.length) return;
     const pcx = n.x + w / 2, py = y + h, yh = y + h + GY;
     if(n.modo === 'col'){
       const tot = n.cols * (n.cw + 18) + (n.cols - 1) * GX; let cx0 = x + (n.W - tot) / 2;
       for(let c = 0; c < n.cols; c++){
         const grupo = hijos.slice(c * n.filas, (c + 1) * n.filas), bx = cx0 + c * (n.cw + 18 + GX);
-        out.lineas.push({ d: `M${pcx},${py} V${py + GY / 2} H${bx + 6} V${yh + (grupo.length - 1) * (n.ch + GS) + (TAM[grupo[grupo.length - 1].z] || TAM.S)[1] / 2}` });
-        grupo.forEach((k, i) => { const ky = yh + i * (n.ch + GS); ubicar(k, bx + 18, ky, out); out.lineas.push({ d: `M${bx + 6},${ky + (TAM[k.z] || TAM.S)[1] / 2} H${k.x}` }); });
+        const ult = grupo.map((k, i) => [k, i]).filter(([k]) => !k.sl).pop();   // los desconectados (sl) van sin línea
+        if(ult) out.lineas.push({ d: `M${pcx},${py} V${py + GY / 2} H${bx + 6} V${yh + ult[1] * (n.ch + GS) + (TAM[ult[0].z] || TAM.S)[1] / 2}` });
+        grupo.forEach((k, i) => { const ky = yh + i * (n.ch + GS); ubicar(k, bx + 18, ky, out); if(!k.sl) out.lineas.push({ d: `M${bx + 6},${ky + (TAM[k.z] || TAM.S)[1] / 2} H${k.x}` }); });
       }
     } else {
       const ancho = hijos.reduce((a, k) => a + k.W, 0) + GX * (hijos.length - 1); let cx = x + (n.W - ancho) / 2;
       hijos.forEach(k => { ubicar(k, cx, yh, out); const kcx = k.x + (TAM[k.z] || TAM.S)[0] / 2;
-        out.lineas.push({ d: `M${pcx},${py} V${py + GY / 2} H${kcx} V${yh}` }); cx += k.W + GX; });
+        if(!k.sl) out.lineas.push({ d: `M${pcx},${py} V${py + GY / 2} H${kcx} V${yh}` }); cx += k.W + GX; });
     }
+  }
+  // ── sigla de profesión antes del nombre (E.titulos, por inicial + apellido) ──
+  const YA_SIGLA = /^(EU|Dra?|Ps|Ing|QF|TM|Arq|Adm|Klgo|Nut|TS|TO|Fono|Mat|Sr|Sra|Abog)\.?\s/i;
+  const claveP = t => { const w = nr(t).replace(/\(.*?\)/g, ' ').replace(/^dra?\.\s*/, '').replace(/[^a-z\s]/g, ' ').trim().split(/\s+/).filter(x => x.length > 1 || x.length === 1);
+    return w.length >= 2 ? w[0][0] + ' ' + w[w.length - 1] : ''; };
+  const TIT = {}; Object.entries(E.titulos || {}).forEach(([k, v]) => { TIT[claveP(k)] = v; const w = nr(k).split(/\s+/); if(w.length > 2) TIT[w[0][0] + ' ' + w[1]] = v; });
+  const conSigla = t => { const x = String(t || '').trim(); if(!x || YA_SIGLA.test(x)) return x; const sg = TIT[claveP(x)]; return sg ? sg + ' ' + x : x; };
+  // ── edición libre ──
+  const tam = n => TAM[n.z] || TAM.S;
+  function autoPos(){ medir(arbol); const out = { nodos: [], lineas: [] }; ubicar(arbol, 20, 20, out); const P = {}; out.nodos.forEach(n => P[n.id] = { x: n.x, y: n.y }); return P; }
+  function asegurarLibre(){ const P = autoPos(); libre = libre || {}; Object.keys(P).forEach(id => { if(!libre[id]) libre[id] = P[id]; }); }
+  function rama(n){ const L = [n]; (n.h || []).forEach(k => L.push(...rama(k))); return L; }
+  function lineasLibres(){
+    const L = [];
+    (function rec(n){ const a = libre[n.id], [w, h] = tam(n);
+      (n.h || []).forEach(k => { const b = libre[k.id], [kw, kh] = tam(k);
+        if(k.sl){ L.push({ suelta: 1, k: k.id, hx: b.x + kw / 2, hy: b.y - 14 }); }
+        else if(k.lat){ const der = b.x >= a.x, x1 = der ? a.x + w : a.x, x2 = der ? b.x : b.x + kw, y1 = a.y + h / 2, y2 = b.y + kh / 2, mx = (x1 + x2) / 2;
+          L.push({ d: `M${x1},${y1} H${mx} V${y2} H${x2}`, lat: 1, k: k.id, hx: mx, hy: (y1 + y2) / 2 }); }
+        else if(n.modo === 'col'){   // como en el orden automático: baja, va al riel a la izquierda del bloque y entra por el costado
+          const x1 = a.x + w / 2, y1 = a.y + h, rx = b.x - 12, cy = b.y + kh / 2, my = Math.min(y1 + GY / 2, cy - 8);
+          L.push({ d: `M${x1},${y1} V${my} H${rx} V${cy} H${b.x}`, k: k.id, hx: rx, hy: cy }); }
+        else { const x1 = a.x + w / 2, y1 = a.y + h, x2 = b.x + kw / 2, y2 = b.y, my = y2 > y1 + 20 ? Math.min(y1 + GY / 2, y2 - 10) : y1 + 16;
+          L.push({ d: `M${x1},${y1} V${my} H${x2} V${y2}`, k: k.id, hx: x2, hy: Math.max(my, y2 - 16) }); }
+        rec(k); }); })(arbol);
+    return L;
+  }
+  const svgLibre = () => lineasLibres().filter(l => l.d).map(l => `<path d="${l.d}" class="${l.lat ? 'lat' : ''}"/><path class="oe-hit" data-linea="${l.k}" d="${l.d}"><title>🧽 Goma o clic derecho: borrar la línea</title></path>`).join('')
+    + [].map(l => `<circle class="oe-asa${l.suelta ? ' suelta' : ''}" data-linea="${l.k}" cx="${l.hx}" cy="${l.hy}" r="11"><title>${l.suelta ? 'Sin línea: arrastra este punto hasta un bloque para volver a conectarlo' : 'Arrastra este punto hasta el nuevo superior; suéltalo en un espacio vacío para desconectar la línea'}</title></circle>`).join('')
+    + '<path class="oe-temp" id="oeTemp" d=""/>';
+  // al cerrar la edición: el orden de izquierda a derecha (y de arriba abajo en columnas) es el que quedó a mano
+  function ordenarSegunLibre(){
+    (function ord(n){ const h = n.h || []; if(h.length > 1) h.sort((a, b) => ((a.lat ? 1 : 0) - (b.lat ? 1 : 0))
+      || (Math.round(libre[a.id].x / 120) - Math.round(libre[b.id].x / 120)) || (libre[a.id].y - libre[b.id].y)); h.forEach(ord); })(arbol);
+  }
+  const ptXY = (n, pt) => { const P = libre[n.id], [w, h] = tam(n);
+    return pt === 'n' ? { x: P.x + w / 2, y: P.y } : pt === 's' ? { x: P.x + w / 2, y: P.y + h } : pt === 'e' ? { x: P.x + w, y: P.y + h / 2 } : { x: P.x, y: P.y + h / 2 }; };
+  // ✏️: el otro bloque más abajo → queda debajo (s) · más arriba → queda encima (n) · a la misma altura → asesoría al costado (e/o)
+  const dirPt = (n, b, p) => { const A = libre[n.id], [w, h] = tam(n), o = b && buscar(b.dataset.id);
+    if(o && o.n.id !== n.id){ const B = libre[o.n.id], bh = tam(o.n)[1]; return B.y >= A.y + h - 10 ? 's' : B.y + bh <= A.y + 10 ? 'n' : B.x > A.x ? 'e' : 'o'; }
+    return p.y > A.y + h ? 's' : p.y < A.y ? 'n' : p.x > A.x + w / 2 ? 'e' : 'o'; };
+  // 🧽: tramos de cada línea (las líneas son ortogonales: M x,y · H x · V y)
+  const tramos = () => lineasLibres().filter(l => l.d).map(l => { const P = []; let c = null;
+    l.d.replace(/([MHV])([-\d.]+)(?:,([-\d.]+))?/g, (_, k, a, b) => { c = k === 'M' ? { x: +a, y: +b } : k === 'H' ? { x: +a, y: c.y } : { x: c.x, y: +a }; P.push(c); });
+    return { k: l.k, P }; });
+  const distTramo = (p, a, b) => Math.hypot(p.x - Math.max(Math.min(a.x, b.x), Math.min(Math.max(a.x, b.x), p.x)), p.y - Math.max(Math.min(a.y, b.y), Math.min(Math.max(a.y, b.y), p.y)));
+  // corre un bloque hasta un lugar libre (sin tapar a otro): hacia abajo y, si no hay, a la columna siguiente
+  function sinChoque(id){
+    const n = buscar(id); if(!n || !libre || !libre[id]) return; const [w, h] = tam(n.n), P0 = { ...libre[id] };
+    const choca = P => Object.keys(libre).some(k => { if(k === id) return false; const q = buscar(k); if(!q) return false; const Q = libre[k], [qw, qh] = tam(q.n);
+      return P.x < Q.x + qw + 10 && P.x + w + 10 > Q.x && P.y < Q.y + qh + 10 && P.y + h + 10 > Q.y; });
+    for(let c = 0; c < 12; c++) for(let f = 0; f < 16; f++){ const P = { x: P0.x + c * (w + GX), y: P0.y + f * (h / 2 + 6) }; if(!choca(P)){ libre[id] = P; return; } }
+  }
+  function cambiarSuperior(hijo, nuevo){
+    const a = buscar(hijo), d = buscar(nuevo); if(!a || !a.p || !d || desciende(a.n, d.n) || a.p.id === d.n.id) return false;
+    snap(); a.p.h.splice(a.p.h.indexOf(a.n), 1); (d.n.h = d.n.h || []).push(a.n); a.n.lat = false; guardar(); return true;
   }
   function widget(n){
     const [w, h] = TAM[n.z] || TAM.S, pp = n.p || [];
-    return `<div class="ow c-${n.c || 'azul'} z${n.z}${sel === n.id ? ' sel' : ''}${n.lat ? ' lat' : ''}" data-id="${n.id}" draggable="${editar}" style="left:${n.x}px;top:${n.y}px;width:${w}px;height:${h}px">
+    const P = editar && libre && libre[n.id] ? libre[n.id] : n;
+    return `<div class="ow c-${n.c || 'azul'} z${n.z}${sel === n.id ? ' sel' : ''}${multi.has(n.id) ? ' multi' : ''}${n.lat ? ' lat' : ''}" data-id="${n.id}" style="left:${P.x}px;top:${P.y}px;width:${w}px;height:${h}px">
       <div class="t">${esc(n.t)}</div>${n.s ? `<div class="s">${esc(n.s)}</div>` : ''}
-      ${pp.length ? `<div class="pp">${pp.map(x => `<span>${esc(x)}</span>`).join('')}</div>` : ''}
+      ${pp.length ? `<div class="pp">${pp.map((x, i) => `<span${i ? '' : ' class="lider" title="Lidera"'}>${esc(conSigla(x))}</span>`).join('')}</div>` : ''}
+      ${editar ? `<span class="oe-del" data-a="borrar" title="Eliminar este bloque">×</span>` : ''}
       ${n.q ? `<span class="q" title="${esc(n.q)}">por confirmar</span>` : ''}${(() => { const k = pendDe(n.t, n.p).n; return k ? `<span class="bp" title="Pendientes abiertos en la Bitácora (clic para verlos)">📌 ${k}</span>` : ''; })()}</div>`;
   }
   function pintar(){
     if(!cont) return;
+    const py = window.scrollY;   // no perder el lugar de trabajo
     medir(arbol); const out = { nodos: [], lineas: [] }; ubicar(arbol, 20, 20, out);
-    const W = arbol.W + 60, H = arbol.H + 60, n = sel && buscar(sel);
+    let W = arbol.W + 60, H = arbol.H + 60; const n = sel && buscar(sel);
+    if(editar){ asegurarLibre(); out.nodos.forEach(k => { const P = libre[k.id], [w, h] = tam(k); W = Math.max(W, P.x + w + 60); H = Math.max(H, P.y + h + 60); }); }
     cont.innerHTML = `<div class="oe-bar">
         <button class="oe-b ${editar ? 'on' : ''}" data-a="editar">${editar ? '✓ Listo' : '✏️ Editar'}</button>
         ${editar ? `<button class="oe-b" data-a="deshacer" ${hist.length ? '' : 'disabled'}>↶ Deshacer</button>
@@ -1425,14 +1541,42 @@ document.addEventListener('DOMContentLoaded', () => {
         <button class="oe-b" data-a="original">↺ Original</button>` : ''}
         <span class="oe-sp"></span><button class="oe-b" data-a="imagen" title="Descargar el organigrama como imagen PNG">🖼 Imagen</button><button class="oe-b" data-a="menos">−</button><span class="oe-z">${Math.round(zoom * 100)} %</span><button class="oe-b" data-a="mas">+</button><button class="oe-b" data-a="ajustar">Ajustar</button>
       </div>
-      ${editar ? `<div class="oe-ayuda">Clic en un widget para editarlo · arrástralo sobre otro para moverlo debajo de él · el orden se ajusta solo</div>` : ''}
-      <div class="oe-wrap"><div class="oe-lienzo" style="width:${W}px;height:${H}px;transform:scale(${zoom})">
-        <svg width="${W}" height="${H}">${out.lineas.map(l => `<path d="${l.d}" class="${l.lat ? 'lat' : ''}"/>`).join('')}</svg>
-        ${out.nodos.map(widget).join('')}</div></div>
-      ${editar && n ? panel(n.n, n.p) : ''}${!editar ? panelPend() : ''}`;
-    const lz = cont.querySelector('.oe-lienzo'); lz.parentElement.style.height = Math.min(H * zoom + 10, 900) + 'px';
-    lz.style.marginLeft = Math.max(0, (lz.parentElement.clientWidth - W * zoom) / 2) + 'px';   // centrado cuando sobra ancho
+
+      <div class="oe-wrap${editar ? ' oe-t-' + herr + (espacio ? ' espacio' : '') : ''}"><div class="oe-lienzo${editar ? ' oe-libre' : ''}" style="width:${W}px;height:${H}px">
+        <svg width="${W}" height="${H}">${editar ? svgLibre() : out.lineas.map(l => `<path d="${l.d}" class="${l.lat ? 'lat' : ''}"/>`).join('')}</svg>
+        ${out.nodos.map(widget).join('')}</div>${editar && n ? panel(n.n, n.p) : ''}
+        ${editar ? `<div class="oe-tools">${HERR.map(([k, ic, nom, t]) => `<button data-h="${k}" class="${herr === k ? 'on' : ''}" title="${nom} (tecla ${t})">${ic}<small>${nom}</small></button>`).join('')}
+          ${herr === 'pintar' ? `<div class="oe-col">${Object.keys(COLORES).map(c => `<button data-pc="${c}" class="c-${c}${colorP === c ? ' on' : ''}" title="${COLORES[c]}"></button>`).join('')}</div>` : ''}
+          <hr><button data-a="deshacer" title="Deshacer (⌘Z)" ${hist.length ? '' : 'disabled'}>↶<small>Deshacer</small></button></div>
+        <details class="oe-ayf"><summary>❔ Cómo editar</summary><div><b>🖐 Mover (M)</b>: arrastra bloques (Alt = con su rama · ⌘ + clic = varios) · clic = editar · <b>×</b> o Supr = eliminar · arrastra el fondo para recorrer<br><b>✏️ Lápiz (L)</b>: desde un bloque, arrastra (o clic y clic) hasta otro: si está <b>más abajo</b> queda debajo, <b>más arriba</b> queda encima, <b>al lado</b> queda como asesoría. En un <b>espacio vacío</b> crea ahí un bloque nuevo ya conectado<br><b>🧽 Goma (G)</b>: mantén el clic y pasa sobre las líneas · también: clic derecho sobre una línea<br><b>➕ Bloque (B)</b>: clic en un espacio vacío = bloque suelto (luego únelo con el lápiz) · clic en un bloque = uno nuevo debajo<br><b>🎨 Color (P)</b>: elige el color y haz clic en los bloques<br><b>Esc</b> = vuelve a 🖐 sin salir de la edición · <b>barra espaciadora</b> sostenida = recorrer con cualquier herramienta · <b>rueda</b> = zoom · <b>✓ Listo</b> ordena todo</div></details>` : ''}
+        <div class="oe-zf"><button data-a="mas" title="Acercar">＋</button><button data-a="menos" title="Alejar">−</button><button data-a="ajustar" title="Ver todo">⤢</button></div></div>
+      ${!editar ? panelPend() : ''}`;
+    const lz = cont.querySelector('.oe-lienzo'), wr = lz.parentElement;
+    if(panX === null){ panX = Math.max(10, (wr.clientWidth - W * zoom) / 2); panY = 12; }   // primera vez / Ajustar: centrado arriba
+    if(Math.abs(window.scrollY - py) > 2) window.scrollTo(0, py);
+    if(recienCreado && n && recienCreado === n.n.id){   // el bloque recién agregado queda a la vista
+      const P = libre[n.n.id], [w, h] = tam(n.n), bx = panX + P.x * zoom, by = panY + P.y * zoom;
+      if(bx < 10 || bx + w * zoom > wr.clientWidth - 330) panX += wr.clientWidth / 3 - bx;
+      if(by < 10 || by + h * zoom > wr.clientHeight - 10) panY += wr.clientHeight / 3 - by; }
+    encuadre();
+    const pop = wr.querySelector('.oe-pop');
+    if(pop && n && recienCreado === n.n.id){ recienCreado = null; const i = pop.querySelector('input[data-f="t"]'); if(i){ i.focus({ preventScroll: true }); i.select(); } }
   }
+  // aplica el desplazamiento y la escala, y deja el cuadro de edición pegado a su bloque
+  function encuadre(){
+    const lz = cont && cont.querySelector('.oe-lienzo'); if(!lz) return; const wr = lz.parentElement;
+    lz.style.transform = `translate(${panX}px,${panY}px) scale(${zoom})`;
+    const zz = cont.querySelector('.oe-z'); if(zz) zz.textContent = Math.round(zoom * 100) + ' %';
+    const pop = wr.querySelector('.oe-pop'), n = sel && buscar(sel); if(!pop || !n || !libre) return;
+    const P = libre[n.n.id], [w] = tam(n.n);
+    let x = panX + (P.x + w) * zoom + 14; if(x + 310 > wr.clientWidth) x = Math.max(4, panX + P.x * zoom - 314);
+    const alto = Math.min(pop.offsetHeight, wr.clientHeight - 8);
+    pop.style.left = x + 'px'; pop.style.top = Math.max(4, Math.min(panY + P.y * zoom, wr.clientHeight - alto - 4)) + 'px';
+    pop.style.maxHeight = (wr.clientHeight - 8) + 'px';
+  }
+  function aviso(t){ const wr = cont && cont.querySelector('.oe-wrap'); if(!wr) return; setTimeout(() => { const w2 = cont.querySelector('.oe-wrap'); if(!w2) return;
+    const d = document.createElement('div'); d.className = 'oe-aviso'; d.textContent = t; w2.appendChild(d); setTimeout(() => d.remove(), 2600); }, 30); }
+  function zoomEn(z2, cx, cy){ z2 = Math.max(.25, Math.min(2, z2)); panX = cx - (cx - panX) * z2 / zoom; panY = cy - (cy - panY) * z2 / zoom; zoom = z2; encuadre(); }
   function imagen(){
     medir(arbol); const out = { nodos: [], lineas: [] }; ubicar(arbol, 30, 90, out);
     const K = 2, W = arbol.W + 80, H = arbol.H + 140, cv = document.createElement('canvas'); cv.width = W * K; cv.height = H * K;
@@ -1447,9 +1591,10 @@ document.addEventListener('DOMContentLoaded', () => {
     out.nodos.forEach(n => {
       const [w, h] = TAM[n.z] || TAM.S, [bg, bd] = F[n.c] || F.azul, claro = n.c === 'navy';
       rr(n.x, n.y, w, h, 14); g.fillStyle = bg; g.fill(); g.strokeStyle = bd; g.lineWidth = 1; g.stroke();
-      const lineas = [], pp = (n.p || []).join(' · ');
+      const lineas = [], lider = (n.p || [])[0], pp = (n.p || []).slice(1).map(conSigla).join(' · ');
       lineas.push(['800 ' + (n.z === 'L' ? 20 : 17) + 'px Inter, Verdana, sans-serif', n.t, claro ? '#fff' : '#1F2A55']);
       if(n.s) lineas.push(['13px Inter, Verdana, sans-serif', n.s, claro ? '#cbd5e1' : '#475569']);
+      if(lider) lineas.push(['800 13px Inter, Verdana, sans-serif', conSigla(lider), claro ? '#fff' : '#1F2A55']);
       if(pp) lineas.push(['600 12.5px Inter, Verdana, sans-serif', pp, claro ? '#fff' : '#1F2A55']);
       let y = n.y + h / 2 - (lineas.length - 1) * 10 + 5; g.textAlign = 'center';
       lineas.forEach(([f, t, c]) => { g.font = f; g.fillStyle = c; g.fillText(corta(t, w - 16), n.x + w / 2, y); y += 20; });
@@ -1461,27 +1606,33 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   function panel(n, padre){
     const raiz = !padre;
-    return `<aside class="oe-panel" data-id="${n.id}">
-      <div class="oe-ph">Editar widget <button data-a="cerrar" title="Cerrar">×</button></div>
+    const prohib = new Set(rama(n).map(x => x.id)), todos = [];
+    (function rec(x){ if(!prohib.has(x.id)) todos.push(x); (x.h || []).forEach(rec); })(arbol);
+    return `<aside class="oe-panel oe-pop" data-id="${n.id}">
+      <div class="oe-ph">Editar bloque <button data-a="cerrar" title="Cerrar">×</button></div>
       <label>Nombre<input data-f="t" value="${esc(n.t)}"></label>
       <label>Detalle<input data-f="s" value="${esc(n.s || '')}" placeholder="opcional"></label>
       <label>Personas <small>(una por línea)</small><textarea data-f="p" rows="4">${esc((n.p || []).join('\n'))}</textarea></label>
       <div class="oe-l">Tamaño</div><div class="oe-seg">${['S', 'M', 'L'].map(z => `<button data-z="${z}" class="${n.z === z ? 'on' : ''}">${z}</button>`).join('')}</div>
       <div class="oe-l">Color</div><div class="oe-col">${Object.keys(COLORES).map(c => `<button data-c="${c}" class="c-${c}${(n.c || 'azul') === c ? ' on' : ''}" title="${COLORES[c]}"></button>`).join('')}</div>
       <label class="oe-chk"><input type="checkbox" data-f="lat" ${n.lat ? 'checked' : ''} ${raiz ? 'disabled' : ''}> Al costado del superior (asesoría)</label>
+      <label class="oe-chk"><input type="checkbox" data-f="sl" ${n.sl ? 'checked' : ''} ${raiz ? 'disabled' : ''}> Sin línea (desconectado del superior)</label>
       <label>Nota «por confirmar»<input data-f="q" value="${esc(n.q || '')}" placeholder="vacío = confirmado"></label>
+      ${raiz ? '' : `<label>Depende de<select data-f="sup">${todos.map(x => `<option value="${x.id}"${padre && padre.id === x.id ? ' selected' : ''}>${esc(x.t)}</option>`).join('')}</select></label>`}
       <div class="oe-acc">
         <button data-a="hijo">＋ Agregar debajo</button>
-        ${raiz ? '' : `<button data-a="hermano">＋ Agregar al lado</button><button data-a="izq">◀ Mover</button><button data-a="der">Mover ▶</button><button data-a="borrar" class="rojo">🗑 Quitar</button>`}
+        ${raiz ? '' : `<button data-a="hermano">＋ Agregar al lado</button><button data-a="borrar" class="rojo">🗑 Quitar</button>`}
       </div></aside>`;
   }
   function accion(a, el){
     const s = sel && buscar(sel);
-    if(a === 'editar'){ editar = !editar; if(!editar) sel = null; return pintar(); }
+    if(a === 'editar'){ editar = !editar; herr = 'mano'; multi.clear();
+      if(editar){ libre = null; asegurarLibre(); } else { if(libre){ ordenarSegunLibre(); guardar(); } libre = null; sel = null; }
+      return pintar(); }
     if(a === 'cerrar'){ sel = null; return pintar(); }
     if(a === 'cerrarPend'){ verPend = null; return pintar(); }
-    if(a === 'mas' || a === 'menos'){ zoom = Math.max(.4, Math.min(1.6, zoom + (a === 'mas' ? .1 : -.1))); return pintar(); }
-    if(a === 'ajustar'){ medir(arbol); zoom = EMBED ? Math.max(.3, Math.min(1, (cont.clientWidth - 20) / (arbol.W + 60), (innerHeight - 74) / (arbol.H + 60)))   // incrustado: cabe entero (ancho y alto)
+    if(a === 'mas' || a === 'menos'){ const wr = cont.querySelector('.oe-wrap'); return zoomEn(zoom + (a === 'mas' ? .1 : -.1), wr.clientWidth / 2, wr.clientHeight / 2); }
+    if(a === 'ajustar'){ medir(arbol); panX = null; zoom = EMBED ? Math.max(.3, Math.min(1, (cont.clientWidth - 20) / (arbol.W + 60), (innerHeight - 74) / (arbol.H + 60)))   // incrustado: cabe entero (ancho y alto)
       : Math.max(.75, Math.min(1, (cont.clientWidth - 20) / (arbol.W + 60))); return pintar(); }   // piso 75 %: legible al proyectar (lo que sobra se recorre)
     if(a === 'deshacer') return deshacer();
     if(a === 'imagen') return imagen();
@@ -1490,8 +1641,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const l = document.createElement('a'); l.href = URL.createObjectURL(b); l.download = 'organigrama_PM_NHDS.json'; l.click(); return; }
     if(!s) return;
     snap();
-    if(a === 'hijo'){ const nn = conIds({ t: 'Nuevo', c: s.n.c === 'navy' ? 'azul' : s.n.c, z: 'S', p: [] }); (s.n.h = s.n.h || []).push(nn); sel = nn.id; }
-    if(a === 'hermano' && s.p){ const nn = conIds({ t: 'Nuevo', c: s.n.c, z: s.n.z, p: [] }); s.p.h.splice(s.p.h.indexOf(s.n) + 1, 0, nn); sel = nn.id; }
+    if(a === 'hijo'){ const previos = (s.n.h || []).filter(k => !k.lat), nn = conIds({ t: 'Nuevo', c: s.n.c === 'navy' ? 'azul' : s.n.c, z: 'S', p: [] });
+      (s.n.h = s.n.h || []).push(nn); sel = nn.id; recienCreado = nn.id;
+      if(libre){ const P = libre[s.n.id];   // debajo del último hijo (o del bloque si no tiene), sin tapar a nadie
+        libre[nn.id] = previos.length ? (u => ({ x: libre[u.id].x, y: libre[u.id].y + tam(u)[1] + GS }))(previos.reduce((m, k) => libre[k.id].y > libre[m.id].y ? k : m))
+                                     : { x: P.x, y: P.y + tam(s.n)[1] + GY }; sinChoque(nn.id); } }
+    if(a === 'hermano' && s.p){ const nn = conIds({ t: 'Nuevo', c: s.n.c, z: s.n.z, p: [] }); s.p.h.splice(s.p.h.indexOf(s.n) + 1, 0, nn); sel = nn.id; recienCreado = nn.id;
+      if(libre){ const P = libre[s.n.id]; libre[nn.id] = { x: P.x + tam(s.n)[0] + GX, y: P.y }; sinChoque(nn.id); } }
     if((a === 'izq' || a === 'der') && s.p){ const L = s.p.h, i = L.indexOf(s.n), j = i + (a === 'izq' ? -1 : 1); if(j >= 0 && j < L.length){ [L[i], L[j]] = [L[j], L[i]]; } }
     if(a === 'borrar' && s.p){ const k = (s.n.h || []).length; if(k && !confirm(`«${s.n.t}» tiene ${k} widget(s) debajo. ¿Quitarlo junto con ellos? (se puede deshacer)`)){ hist.pop(); return; }
       s.p.h.splice(s.p.h.indexOf(s.n), 1); sel = null; }
@@ -1500,31 +1656,181 @@ document.addEventListener('DOMContentLoaded', () => {
   function montar(div){
     cont = div; pintar();
     div.addEventListener('click', ev => {
+      if(sinClic){ sinClic = false; return; }   // fue un arrastre del lienzo, no un clic
       const b = ev.target.closest('[data-a]'); if(b && b.tagName !== 'INPUT') return accion(b.dataset.a, b);
+      const hb = ev.target.closest('[data-h]'); if(hb) return elegir(hb.dataset.h);
+      const pc = ev.target.closest('[data-pc]'); if(pc){ colorP = pc.dataset.pc; return pintar(); }
       const z = ev.target.closest('[data-z]'), c = ev.target.closest('[data-c]');
       if((z || c) && sel){ const s = buscar(sel); snap(); if(z) s.n.z = z.dataset.z; if(c) s.n.c = c.dataset.c; guardar(); return pintar(); }
-      const w = ev.target.closest('.ow'); if(w && editar){ sel = w.dataset.id; pintar(); }
+      const w = ev.target.closest('.ow'); if(w && editar) return;   // en edición, la selección la hace el arrastre (clic sin mover)
       else if(w){ const s = buscar(w.dataset.id); verPend = s ? { t: s.n.t, p: s.n.p || [] } : null; pintar(); }
     });
+    div.addEventListener('wheel', ev => {
+      const wr = ev.target.closest('.oe-wrap'); if(!wr || ev.target.closest('.oe-panel')) return; ev.preventDefault();
+      // la rueda (y el pellizco) hacen ZOOM donde está el cursor; para moverse se arrastra el fondo
+      const r = wr.getBoundingClientRect(), dy = ev.deltaY * (ev.deltaMode === 1 ? 16 : ev.deltaMode === 2 ? 400 : 1);
+      zoomEn(zoom * Math.max(.88, Math.min(1.14, Math.exp(-dy * (ev.ctrlKey ? 0.01 : 0.0025)))), ev.clientX - r.left, ev.clientY - r.top);
+    }, { passive: false });
+    div.addEventListener('contextmenu', ev => {
+      const h = ev.target.closest('.oe-hit'); if(!editar || !h) return; ev.preventDefault();
+      const q = buscar(h.dataset.linea); if(q && q.p && !q.n.sl){ snap(); q.n.sl = true; guardar(); pintar(); aviso(`Línea de «${q.n.t}» borrada`); }
+    });
+    let gz = 1;   // Safari no manda Ctrl+rueda al pellizcar: usa gesturestart/gesturechange
+    div.addEventListener('gesturestart', ev => { if(!ev.target.closest('.oe-wrap')) return; ev.preventDefault(); gz = zoom; });
+    div.addEventListener('gesturechange', ev => { const wr = ev.target.closest('.oe-wrap'); if(!wr) return; ev.preventDefault(); const r = wr.getBoundingClientRect();
+      zoomEn(gz * ev.scale, (ev.clientX || r.left + r.width / 2) - r.left, (ev.clientY || r.top + r.height / 2) - r.top); });
+    div.addEventListener('gestureend', ev => { if(ev.target.closest('.oe-wrap')) ev.preventDefault(); });
+    let campoSnap = null;
+    div.addEventListener('input', ev => {
+      const f = ev.target.dataset.f; if(!['t', 's', 'p', 'q'].includes(f) || !sel) return; const s = buscar(sel); if(!s) return;
+      if(campoSnap !== ev.target){ snap(); campoSnap = ev.target; }
+      if(f === 'p') s.n.p = ev.target.value.split('\n').map(x => x.trim()).filter(Boolean); else s.n[f] = ev.target.value.trim();
+      const el = cont.querySelector(`.ow[data-id="${s.n.id}"]`); if(el){ const t = document.createElement('div'); t.innerHTML = widget(s.n).trim(); el.replaceWith(t.firstChild); }
+      guardar();
+    });
+    div.addEventListener('focusout', ev => { if(ev.target === campoSnap) campoSnap = null; });
+    div.addEventListener('keydown', ev => { if(ev.key === 'Enter' && ev.target.matches('.oe-pop input[data-f]')){ ev.preventDefault(); ev.target.blur(); } });
     div.addEventListener('change', ev => {
       if(ev.target.dataset.a === 'importar'){ const f = ev.target.files[0]; if(!f) return; f.text().then(t => { try{ snap(); arbol = conIds(JSON.parse(t)); guardar(); pintar(); }catch(e){ alert('El archivo no es un organigrama válido.'); } }); return; }
       const f = ev.target.dataset.f; if(!f || !sel) return; const s = buscar(sel); snap();
+      if(f === 'sup'){ hist.pop(); if(cambiarSuperior(s.n.id, ev.target.value)) pintar(); return; }
+      if(['t', 's', 'p', 'q'].includes(f)){ hist.pop(); return; }   // ya se aplicó al escribir (evento input)
       if(f === 'p') s.n.p = ev.target.value.split('\n').map(x => x.trim()).filter(Boolean);
       else if(f === 'lat') s.n.lat = ev.target.checked;
+      else if(f === 'sl'){ if(ev.target.checked) s.n.sl = true; else delete s.n.sl; }
       else s.n[f] = ev.target.value.trim();
       guardar(); pintar();
     });
-    // arrastrar un widget sobre otro = pasa a depender de él
-    let arr = null;
-    div.addEventListener('dragstart', ev => { const w = ev.target.closest('.ow'); if(!w || !editar) return; arr = w.dataset.id; ev.dataTransfer.effectAllowed = 'move'; w.classList.add('drag'); });
-    div.addEventListener('dragover', ev => { const w = ev.target.closest('.ow'); if(!arr || !w || w.dataset.id === arr) return; ev.preventDefault();
-      div.querySelectorAll('.ow.drop').forEach(x => x.classList.remove('drop')); w.classList.add('drop'); });
-    div.addEventListener('dragend', () => { arr = null; div.querySelectorAll('.drag,.drop').forEach(x => x.classList.remove('drag', 'drop')); });
-    div.addEventListener('drop', ev => { const w = ev.target.closest('.ow'); if(!arr || !w) return; ev.preventDefault();
-      const a = buscar(arr), d = buscar(w.dataset.id); if(!a || !a.p || desciende(a.n, d.n)) return;
-      snap(); a.p.h.splice(a.p.h.indexOf(a.n), 1); (d.n.h = d.n.h || []).push(a.n); a.n.lat = false; sel = a.n.id; guardar(); pintar(); });
+    // edición libre: arrastrar un BLOQUE lo mueve (con su rama; Alt = solo el bloque); arrastrar el PUNTO de una
+    // línea hasta otro bloque lo hace su nuevo superior. Clic sin mover = abrir el cuadro de edición junto al bloque.
+    let drag = null;
+    const local = ev => { const r = div.querySelector('.oe-lienzo').getBoundingClientRect(); return { x: (ev.clientX - r.left) / zoom, y: (ev.clientY - r.top) / zoom }; };
+    const bajo = ev => { const el = document.elementFromPoint(ev.clientX, ev.clientY); return el && el.closest('.ow'); };
+    let sinClic = false, trazo = null;   // trazo: línea en curso del ✏️ por clic-clic { id }
+    div.addEventListener('oe-cancelar', () => { trazo = null; });
+    div.addEventListener('oe-herr', ev => elegir(ev.detail));
+    function elegir(h){ herr = h; trazo = null; multi.clear(); pintar(); }
+    // 🧽 borra las líneas que pasan a menos de 12 px (de pantalla) del recorrido desde el último punto
+    function borrarEn(d, p){
+      const L = Math.hypot(p.x - d.last.x, p.y - d.last.y), n = Math.max(1, Math.ceil(L * zoom / 4)), tol = 12 / zoom; let algo = false;
+      for(let i = 1; i <= n; i++){ const q = { x: d.last.x + (p.x - d.last.x) * i / n, y: d.last.y + (p.y - d.last.y) * i / n };
+        d.lineas = d.lineas.filter(l => { if(!l.P.some((a, j) => j && distTramo(q, l.P[j - 1], a) < tol)) return true;
+          const o = buscar(l.k); if(o && o.p && !o.n.sl){ if(!d.borradas) snap(); o.n.sl = true; d.borradas++; algo = true; } return false; }); }
+      d.last = p; if(algo) div.querySelector('.oe-lienzo svg').innerHTML = svgLibre();
+    }
+    // ➕: en un bloque = uno nuevo debajo · en un espacio vacío = bloque suelto (sin línea) donde se hizo clic
+    function crearBloque(w, ev){
+      if(w){ sel = w.dataset.id; herr = 'mano'; return accion('hijo'); }
+      const p = local(ev), [nw, nh] = TAM.S; snap();
+      const nn = conIds({ t: 'Nuevo', c: 'azul', z: 'S', p: [] }); nn.sl = true; (arbol.h = arbol.h || []).push(nn);
+      libre[nn.id] = { x: Math.max(0, p.x - nw / 2), y: Math.max(0, p.y - nh / 2) }; sinChoque(nn.id);
+      herr = 'mano'; multi.clear(); sel = nn.id; recienCreado = nn.id; guardar(); pintar();
+    }
+    // une el bloque «srcId» (desde su punto «pt») con el bloque bajo el cursor, o crea uno nuevo en el espacio vacío
+    function unir(srcId, pt, b, ev){
+      const src = buscar(srcId), lat = pt === 'e' || pt === 'o'; if(!src) return pintar();
+      if(!b){
+          const p = local(ev), [nw, nh] = TAM.S; snap();
+          const nn = conIds({ t: 'Nuevo', c: src.n.c === 'navy' ? 'azul' : src.n.c, z: 'S', p: [] });
+          if(pt === 'n'){ if(src.p) src.p.h.splice(src.p.h.indexOf(src.n), 1, nn); else arbol = nn; nn.h = [src.n]; delete src.n.lat; delete src.n.sl; }   // nuevo superior
+          else { (src.n.h = src.n.h || []).push(nn); if(lat) nn.lat = true; }
+          libre[nn.id] = { x: Math.max(0, p.x - nw / 2), y: Math.max(0, p.y - nh / 2) }; sinChoque(nn.id);
+          multi.clear(); sel = nn.id; recienCreado = nn.id; guardar(); return pintar(); }
+        const otro = buscar(b.dataset.id), hijo = pt === 'n' ? src : otro, sup = pt === 'n' ? otro : src;
+        if(!hijo.p){ aviso(`«${hijo.n.t}» es el primer nivel: no puede quedar debajo de otro`); return pintar(); }
+        if(desciende(hijo.n, sup.n)){ aviso(`«${sup.n.t}» depende de «${hijo.n.t}»: no puede quedar encima de él`); return pintar(); }
+        snap();
+        if(hijo.p.id !== sup.n.id){ hijo.p.h.splice(hijo.p.h.indexOf(hijo.n), 1); (sup.n.h = sup.n.h || []).push(hijo.n); }
+        if(lat) hijo.n.lat = true; else delete hijo.n.lat; delete hijo.n.sl;
+        guardar(); aviso(lat ? `«${hijo.n.t}» queda al costado de «${sup.n.t}» (asesoría)` : `«${hijo.n.t}» ahora depende de «${sup.n.t}»`);
+        return pintar();
+    }
+
+    div.addEventListener('pointerdown', ev => {
+      if(ev.button > 0 || ev.target.closest('.oe-panel') || !ev.target.closest('.oe-wrap') || ev.target.closest('.oe-zf,.oe-xl,.oe-del,.oe-tools,.oe-ayf')) return;
+      if(editar && trazo && !espacio){ ev.preventDefault(); const t = trazo; trazo = null; const b = bajo(ev), s0 = buscar(t.id);   // fin de la línea por clic
+        div.querySelectorAll('.ow.sobre').forEach(x => x.classList.remove('sobre'));
+        if(!s0 || (b && b.dataset.id === t.id)) return pintar(); sinClic = true; setTimeout(() => sinClic = false, 0); return unir(t.id, dirPt(s0.n, b, local(ev)), b, ev); }
+      const w = ev.target.closest('.ow'), h = !editar ? '' : espacio ? 'pan' : herr;
+      if(h === 'goma'){ ev.preventDefault(); drag = { tipo: 'goma', last: local(ev), lineas: tramos(), borradas: 0 }; borrarEn(drag, drag.last); try{ div.setPointerCapture(ev.pointerId); }catch(e){} return; }
+      if(h === 'bloque'){ ev.preventDefault(); return crearBloque(w, ev); }
+      if(h === 'pintar' && w){ const s = buscar(w.dataset.id); if(s && s.n.c !== colorP){ snap(); s.n.c = colorP; guardar(); pintar(); } return; }
+      if(!(h === 'mano' || h === 'lapiz') || !(w || ev.target.closest('.oe-asa'))){   // mover el lienzo
+        drag = { tipo: 'pan', x0: ev.clientX, y0: ev.clientY, px: panX, py: panY, movio: false, pid: ev.pointerId }; return; }   // la captura recién al moverse: un clic sigue siendo clic
+      const asa = ev.target.closest('.oe-asa');
+      ev.preventDefault(); const p0 = local(ev);
+      if(h === 'lapiz'){ drag = { tipo: 'conectar', id: w.dataset.id, p0, movio: false }; }   // ✏️ dibujar una línea desde el bloque
+      else if(asa){ drag = { tipo: 'linea', id: asa.dataset.linea, p0 }; }
+      else { const s = buscar(w.dataset.id), cmd = ev.metaKey || ev.ctrlKey;
+        if(cmd){ if(multi.has(s.n.id)) multi.delete(s.n.id); else multi.add(s.n.id); if(sel && sel !== s.n.id){ multi.add(sel); } sel = null; }   // ⌘ + clic: sumar/quitar de la selección
+        else if(!multi.has(s.n.id)) multi.clear();
+        const ids = ev.altKey ? rama(s.n).map(x => x.id) : (multi.size > 1 && multi.has(s.n.id) ? [...multi] : [s.n.id]);
+        drag = { tipo: 'bloque', id: s.n.id, ids, p0, ini: ids.map(id => ({ ...libre[id] })), movio: false, cmd }; }
+      try{ div.setPointerCapture(ev.pointerId); }catch(e){}
+    });
+    div.addEventListener('pointermove', ev => {
+      if(trazo && !drag){   // la línea en curso sigue al cursor
+        const s0 = buscar(trazo.id); if(!s0) return; const p = local(ev), b = bajo(ev), a = ptXY(s0.n, dirPt(s0.n, b, p));
+        const t = div.querySelector('#oeTemp'); if(t) t.setAttribute('d', `M${a.x},${a.y} L${p.x},${p.y}`);
+        div.querySelectorAll('.ow.sobre').forEach(x => x.classList.remove('sobre')); if(b && b.dataset.id !== trazo.id) b.classList.add('sobre');
+        return; }
+      if(!drag) return;
+      if(drag.tipo === 'goma') return borrarEn(drag, local(ev));
+      if(drag.tipo === 'pan'){ const dx = ev.clientX - drag.x0, dy = ev.clientY - drag.y0; if(!drag.movio && Math.hypot(dx, dy) < 4) return;
+        if(!drag.movio){ drag.movio = true; const w = div.querySelector('.oe-wrap'); if(w) w.classList.add('paneo'); try{ div.setPointerCapture(drag.pid); }catch(e){} }
+        panX = drag.px + dx; panY = drag.py + dy; encuadre(); return; }
+      const p = local(ev), dx = p.x - drag.p0.x, dy = p.y - drag.p0.y;
+      if(drag.tipo === 'bloque'){
+        if(!drag.movio && Math.hypot(dx, dy) * zoom < 5) return;
+        if(!drag.movio){ drag.movio = true; snap(); }
+        drag.ids.forEach((id, i) => { libre[id] = { x: Math.max(0, drag.ini[i].x + dx), y: Math.max(0, drag.ini[i].y + dy) };
+          const el = div.querySelector(`.ow[data-id="${id}"]`); if(el){ el.style.left = libre[id].x + 'px'; el.style.top = libre[id].y + 'px'; el.classList.add('mueve'); } });
+        div.querySelector('.oe-lienzo svg').innerHTML = svgLibre();
+      } else if(drag.tipo === 'conectar'){
+        if(Math.hypot(dx, dy) * zoom > 6) drag.movio = true;
+        const s = buscar(drag.id), b = bajo(ev), a = ptXY(s.n, dirPt(s.n, b, p));
+        const t = div.querySelector('#oeTemp'); if(t) t.setAttribute('d', `M${a.x},${a.y} L${p.x},${p.y}`);
+        div.querySelectorAll('.ow.sobre').forEach(x => x.classList.remove('sobre')); if(b && b.dataset.id !== drag.id) b.classList.add('sobre');
+      } else {
+        if(Math.hypot(dx, dy) * zoom > 6) drag.movio = true;
+        const s = buscar(drag.id); if(!s || !s.p) return; const a = libre[s.p.id], [w, h] = tam(s.p);
+        const t = div.querySelector('#oeTemp'); if(t) t.setAttribute('d', `M${a.x + w / 2},${a.y + h} L${p.x},${p.y}`);
+        div.querySelectorAll('.ow.sobre').forEach(x => x.classList.remove('sobre')); const b = bajo(ev); if(b && b.dataset.id !== drag.id) b.classList.add('sobre');
+      }
+    });
+    div.addEventListener('pointerup', ev => {
+      if(!drag) return; const d = drag; drag = null;
+      if(d.tipo === 'goma'){ if(d.borradas){ guardar(); pintar(); aviso(d.borradas === 1 ? 'Línea borrada' : `${d.borradas} líneas borradas`); } return; }
+      if(d.tipo === 'pan'){ const w = div.querySelector('.oe-wrap'); if(w) w.classList.remove('paneo'); if(d.movio){ sinClic = true; setTimeout(() => sinClic = false, 0); }
+        else if(editar && (multi.size || sel)){ multi.clear(); sel = null; pintar(); } return; }
+      div.querySelectorAll('.ow.sobre,.ow.mueve').forEach(x => x.classList.remove('sobre', 'mueve'));
+      if(d.tipo === 'bloque'){ if(d.movio){ guardar(); pintar(); }
+        else if(d.cmd){ pintar(); }                                   // ⌘ + clic: solo cambia la selección
+        else { multi.clear(); sel = d.id; pintar(); } return; }
+      if(d.tipo === 'conectar'){ const b = bajo(ev);
+        if(!d.movio && (!b || b.dataset.id === d.id)){   // clic en un punto verde: la línea sigue al cursor hasta el próximo clic
+          trazo = { id: d.id }; aviso('Clic en el bloque de destino o en un espacio vacío · Esc cancela'); return; }
+        if(b && b.dataset.id === d.id) return pintar();
+        return unir(d.id, dirPt(buscar(d.id).n, b, local(ev)), b, ev); }
+      const b2 = bajo(ev), s = buscar(d.id); if(!s || !s.p) return pintar();
+      if(!d.movio) return pintar();   // un clic en el punto no hace nada
+      const b = b2; if(!b){ if(!s.n.sl){ snap(); s.n.sl = true; guardar(); } return pintar(); }   // en vacío: se desconecta la línea
+      if(b.dataset.id === s.p.id){ if(s.n.sl){ snap(); delete s.n.sl; guardar(); } return pintar(); }
+      if(cambiarSuperior(d.id, b.dataset.id)){ delete s.n.sl; guardar(); sel = d.id; } pintar();
+    });
     if(!window._oeKey && (window._oeKey = 1)) document.addEventListener('keydown', ev => { if(!editar || !cont.isConnected) return;
-      if((ev.metaKey || ev.ctrlKey) && ev.key === 'z' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)){ ev.preventDefault(); deshacer(); } });
+      if((ev.metaKey || ev.ctrlKey) && ev.key === 'z' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)){ ev.preventDefault(); deshacer(); }
+      if((ev.key === 'Delete' || ev.key === 'Backspace') && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)){
+        if(multi.size > 1){ ev.preventDefault(); if(!confirm(`¿Eliminar los ${multi.size} bloques seleccionados (con lo que tengan debajo)? Se puede deshacer.`)) return;
+          snap(); [...multi].forEach(id => { const q = buscar(id); if(q && q.p) q.p.h.splice(q.p.h.indexOf(q.n), 1); }); multi.clear(); sel = null; guardar(); pintar(); }
+        else if(sel){ ev.preventDefault(); accion('borrar'); } }
+      const escribe = /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+      if(ev.key === 'Escape'){ if(escribe) document.activeElement.blur(); sel = null; cont.dispatchEvent(new CustomEvent('oe-herr', { detail: 'mano' })); return; }   // nunca sale de la edición
+      if(escribe || ev.metaKey || ev.ctrlKey || ev.altKey) return;
+      if(ev.key === ' '){ ev.preventDefault(); if(!espacio){ espacio = true; const w = cont.querySelector('.oe-wrap'); if(w) w.classList.add('espacio'); } return; }
+      const t = HERR.find(x => x[3] === ev.key.toUpperCase()); if(t) cont.dispatchEvent(new CustomEvent('oe-herr', { detail: t[0] })); });
+    if(!window._oeKeyUp && (window._oeKeyUp = 1)) document.addEventListener('keyup', ev => { if(ev.key !== ' ' || !espacio) return; espacio = false;
+      const w = cont && cont.querySelector('.oe-wrap'); if(w) w.classList.remove('espacio'); });
   }
 
   function pm(){
@@ -1535,7 +1841,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="sec">Fases</div><div class="fases">${D.fases.map(f=>`<div class="card fase c-${f.c}"><span class="n">${f.n}</span><span class="t">${esc(f.t)}</span>${f.cuando?`<div class="w">${esc(f.cuando)}</div>`:'<div class="w">&nbsp;</div>'}<ul>${f.items.map(i=>`<li>${esc(i)}</li>`).join('')}</ul></div>`).join('')}</div>
       <div class="sec">Estructura</div><div id="oeHost"></div>
       <div class="sec">Frentes transversales</div>
-      <div class="grid">${D.transversales.map((t,i)=>{ const k=pendDe(t.t,personasTv(t)).n; return `<div class="card tv c-${t.c}" data-tv="${i}" title="Ver sus pendientes de la Bitácora"><div class="t">${esc(t.t)}${t.ok?`<span class="ok">${esc(t.ok)}</span>`:''}</div><div class="p">${esc(t.p)}</div>${k?`<span class="bp">📌 ${k}</span>`:''}</div>`; }).join('')}</div>
+      <div class="grid">${D.transversales.map((t,i)=>{ const k=pendDe(t.t,personasTv(t)).n; return `<div class="card tv c-${t.c}" data-tv="${i}" title="Ver sus pendientes de la Bitácora"><div class="t">${esc(t.t)}${t.ok?`<span class="ok">${esc(t.ok)}</span>`:''}</div><div class="p">${String(t.p).split(' · ').map((x, i) => i ? esc(conSigla(x)) : `<b>${esc(conSigla(x))}</b>`).join(' · ')}</div>${k?`<span class="bp">📌 ${k}</span>`:''}</div>`; }).join('')}</div>
       <div class="sec">Agenda del día</div><div class="agenda">${D.agenda.map(a=>`<span>${esc(a)}</span>`).join('')}</div>
       <div class="nota">${D.notas.map(esc).join('<br>')} Las etiquetas «por confirmar» marcan lo que no se lee con certeza en la pizarra. Los cambios del editor quedan guardados en este navegador; «Exportar» descarga el organigrama para compartirlo.</div></div>`;
   }
