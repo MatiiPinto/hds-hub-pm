@@ -12162,6 +12162,14 @@ function wplGo(i){
   goRoom(it.rid);
   if(!S.viewOnly) setTimeout(()=>{ try{ openModal(it.rid,it.idx); }catch(e){} },820);
 }
+// Cargo de puestos fuera de matriz (31-10-2026): la matriz no lo tiene; SHARED_DATA/puestos_cargo_sis.js lo trae por id de
+// puesto desde las nóminas SIS (_DEV/build_puestos_cargo_sis.py). Sólo llena lo vacío: nunca pisa un cargo escrito a mano.
+function _cargoSisAplica(){
+  const L=window.PUESTOS_CARGO_SIS||{}; let n=0;
+  for(const arr of Object.values(wsState.dots||{})){ if(!Array.isArray(arr)) continue;
+    arr.forEach(d=>{ const c=d.id&&L[d.id]; if(!c||String(d.cargo||'').trim()) return; d.cargo=c.cargo; if(!String(d.estamento||'').trim()) d.estamento=c.estamento||''; n++; }); }
+  return n;
+}
 function renderWorkpoints(){
   // 26-10-2026 «Puestos libres»: lo asignado ya está en el Avance; acá sólo lo que sirve para seguir ubicando:
   // cuántos puestos hay, cuántos con persona y DÓNDE quedan libres por tipo (clic → lista). Sin «Otros con cargo»
@@ -12183,7 +12191,7 @@ function renderWorkpoints(){
     +(nLib?'<div class="wp-sub">Libres por tipo · clic para ir a cada uno</div>'
       +Object.entries(lib).sort((a,b)=>(a[0]==='sincargo')-(b[0]==='sincargo')||b[1]-a[1]).map(([k,n])=>fila(LBL(k),n,"openWpList('"+k+"','libre')")).join(''):'<div class="wp-sub">✅ Sin puestos libres</div>')
     +(sinCargoP?fila('⚠ Con persona pero sin cargo (completar)',sinCargoP,"openWpList('sincargo','asig')",'#b91c1c'):'')
-    +(huerf?'<div class="wp-sub" title="Puestos guardados en recintos que ya no están dibujados: no se ven en el plano ni cuentan arriba">'+_avNum(huerf)+' puestos en recintos que ya no existen (no cuentan)</div>':'');
+    +(huerf?'<div class="wp-sub" title="Puestos guardados en recintos que ya no están dibujados: no se ven en el plano ni cuentan arriba. Se resuelven en la pestaña Revisión.">'+_avNum(huerf)+' puestos en recintos borrados · ver Revisión</div>':'');
 }
 // AA/AC desde el BIM del recinto: A#### = Atención Abierta, H#### = Atención Cerrada.
 function roomAAC(rid){
@@ -15522,6 +15530,14 @@ const REV_CHECKS={
     subText:p=>p.porColocar?p.sub:(p.L?('equipo '+p.L.id+' · '+p.L.servicio):(p.sug?('sugerido '+p.sug.id+' · '+p.sug.servicio+' (revísalo)'):'sin equipo: asígnalo en 📋 Revisión DEA'))
       +(p.d!==null&&p.d<3?(' · ⚠ otro DEA a '+p.d.toFixed(1).replace('.',',')+' m: borra el que sobre'):'')+' · '+p.fl.label,
     done:'Todos los DEA están colocados y confirmados.'},
+  huerf_rev:{label:'Puestos en recintos borrados (recuperar o quitar)',
+    find:_huerfPendientes, approve:true, noDialog:true, saveWs:true, allIf:()=>false,
+    groupOf:p=>p.dup?'Duplican un puesto vigente':(p.vivos?'Posición antigua en un recinto con puestos':'Recinto hoy sin puestos'),
+    okTitle:'Duplicados: los quita · Los demás: los recupera en el recinto que hoy ocupa ese lugar (la copia queda guardada)',
+    apply:p=>_huerfAplica(p), go:p=>{ if(S.floorId!==p.fl.id) goFloor(p.fl.id); didPan=false; goArea(p.area.id); didPan=false; goRoom(p.r.id); },
+    subText:p=>p.items.length+' puesto'+(p.items.length===1?'':'s')+' vacío'+(p.items.length===1?'':'s')+' · '
+      +(p.dup?('a menos de 30 cm de uno vigente · ✓ los quita'):(p.vivos?('el recinto ya tiene '+p.vivos+' · ✓ los suma · 🚫 si son los mismos puestos corridos'):'✓ los recupera aquí'))+' · '+p.fl.label,
+    done:'No quedan puestos en recintos borrados.'},
   dis_rev:{label:'Diseño: pendientes del Atlas (estacionamientos, Droguería, comercios)',
     find:()=>{ const h=nameState.disRev||{};
       return (window.ATLAS_PENDIENTES_DISENO||[]).filter(it=>!h[it.id]).map(it=>({it, fl:FLOORS.find(f=>f.id===it.piso)||FLOORS[0],
@@ -15536,6 +15552,30 @@ const REV_CHECKS={
     subText:p=>p.it.detalle+' · '+p.fl.label,
     done:'No quedan pendientes de diseño.'}
 };
+// Puestos cuyo recinto se borró o se redibujó (31-10-2026): no se ven ni cuentan. Se agrupan por el recinto que hoy ocupa
+// ese punto: a < 30 cm de un puesto vigente son duplicados; si no, se pueden recuperar. Con persona no se tocan solos.
+function _huerfPendientes(){
+  if(S.viewOnly) return [];
+  const G={}, fp=S.floorId;
+  try{ for(const [rid,arr] of Object.entries(wsState.dots||{})){
+    if(_findRoom(rid)||!Array.isArray(arr)) continue;
+    const fl=FLOORS.find(f=>rid.startsWith(f.id+'-')); if(!fl) continue;
+    S.floorId=fl.id;
+    arr.forEach(d=>{ const dest=_roomAtPoint(d.x,d.y), ctx=dest&&_findRoom(dest); if(!ctx||isDotAsignado(d)) return;
+      const vivos=wsState.dots[dest]||[], cm=_cmPorPx(fl.id), dup=vivos.some(v=>Math.hypot(v.x-d.x,v.y-d.y)*cm<30);
+      const k=rid+'|'+dest+'|'+(dup?'d':'m');
+      (G[k]=G[k]||{fl, area:ctx.area, r:{id:dest}, rid, dup, vivos:vivos.length, code:'hf|'+k, nombre:(dup?'Duplicados en ':'Recuperar en ')+(rName(dest)||dest), items:[]}).items.push(d); });
+  } } finally { S.floorId=fp; }
+  return Object.values(G).sort((a,b)=>(b.dup-a.dup)||(a.vivos-b.vivos));
+}
+function _huerfDest(fl,x,y){ const fp=S.floorId; S.floorId=fl.id; try{ return _roomAtPoint(x,y); } finally { S.floorId=fp; } }
+function _huerfAplica(p){
+  const arr=wsState.dots[p.rid]||[], ids=new Set(p.items.map(d=>d.id));
+  const salen=arr.filter(d=>ids.has(d.id)); wsState.dots[p.rid]=arr.filter(d=>!ids.has(d.id));
+  if(!wsState.dots[p.rid].length) delete wsState.dots[p.rid];
+  if(p.dup) (nameState.puestosQuitados=nameState.puestosQuitados||[]).push({rid:p.rid, ts:Date.now(), dots:salen});   // copia por si hay que volver atrás
+  else (wsState.dots[p.r.id]=wsState.dots[p.r.id]||[]).push(...salen);
+}
 // DEA en la pestaña Revisión (22-10-2026): los colocados sin confirmar (primero los que están a < 3 m
 // de otro, posibles repetidos) y una fila con los que faltan por colocar según el Anexo Ib. El detalle
 // completo (asociar equipo, ↺, 🗑) sigue en el panel 📋 Revisión DEA.
@@ -17930,6 +17970,7 @@ function init(){
   // publicada ya viene sincronizada desde el maestro y, si se mutara aquí, el delta del editor
   // del 🟡 cargaría recintos que nadie tocó (y al importarlo podría pisar el maestro).
   try{ setTimeout(()=>{ try{ if(dotDB&&dotDB.staff&&!S.viewOnly){ _sincronizaReemplazos(); renderSVG(); try{ renderBimPending(); }catch(e){} } }catch(e){} }, 2500); }catch(e){}
+  if(!S.viewOnly) try{ if(_cargoSisAplica()) sWs(); }catch(e){ console.warn('cargo de puestos desde el SIS',e); }
   if(!S.viewOnly) try{ const nl=_normalizaMarcasDotacion();
     if(nl) setTimeout(()=>{ if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🧹 '+nl+' asignaciones marcadas fuera de matriz ya estaban en la matriz: se quitó la marca'; setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },7000); } },1500);
   }catch(e){ console.warn('normalización de marcas de dotación',e); }
@@ -18923,6 +18964,30 @@ async function runSelfTest(){
       S.floorId='P2'; renderSVG(); const otro=im.style.display==='none' && !svg.querySelector('.esc-layer') && document.getElementById('btnJardines').classList.contains('dis');
       return dentro && seis && img && mks.length===6 && k1 && k2 && ficha && cierra && apaga && prende && otro;
     } finally { S.floorId=fPrev; S.level=lPrev; S.areaId=aPrev; S.roomId=rPrev; S.jardines=jPrev; S.zoom=zPrev; _escTipOff(); renderSVG(); }
+  });
+  T('Puestos: el cargo del SIS sólo llena vacíos y los huérfanos se recuperan o, si duplican, se quitan guardando copia', ()=>{
+    const snap=JSON.stringify(wsState.dots), L=window.PUESTOS_CARGO_SIS, nq=JSON.stringify(nameState.puestosQuitados||null);
+    try{
+      let rid=null, fl=null, b=null; FLOORS.some(f=>f.areas.some(a=>(a.rooms||[]).some(r=>{ const sh=boxState.rooms[r.id]||[]; if(sh.length && !(wsState.dots[r.id]||[]).length){ rid=r.id; fl=f; b=sh[0]; return true; } })));
+      if(!rid) return false;
+      const cx=b.x+b.w/2, cy=b.y+b.h/2, hr=fl.id+'-st-borrado';
+      window.PUESTOS_CARGO_SIS={t1:{cargo:'TENS',estamento:'TECNICOS'},t2:{cargo:'OTRO',estamento:'X'}};
+      wsState.dots['st_c']=[{id:'t1',nombre:'ZZQ UNO',x:1,y:1},{id:'t2',nombre:'ZZQ DOS',cargo:'ESCRITO',x:2,y:2}];
+      const n=_cargoSisAplica(), c=wsState.dots['st_c'];
+      const cargo=n===1 && c[0].cargo==='TENS' && c[0].estamento==='TECNICOS' && c[1].cargo==='ESCRITO';
+      delete wsState.dots['st_c'];
+      wsState.dots[hr]=[{id:'h1',x:cx,y:cy,tipo:'fijo',nombre:''}];
+      const P1=_revPend('huerf_rev').find(p=>p.rid===hr), rec=!!P1 && !P1.dup && P1.r.id===_huerfDest(fl,cx,cy);
+      if(!P1) return false;
+      const destino=P1.r.id; REV_CHECKS.huerf_rev.apply(P1);
+      const movido=!wsState.dots[hr] && (wsState.dots[destino]||[]).some(d=>d.id==='h1');
+      wsState.dots[hr]=[{id:'h2',x:cx+1,y:cy,tipo:'fijo',nombre:''}];
+      const P2=_revPend('huerf_rev').find(p=>p.rid===hr), dup=!!P2 && P2.dup; REV_CHECKS.huerf_rev.apply(P2);
+      const quitado=!wsState.dots[hr] && (nameState.puestosQuitados||[]).some(x=>x.dots.some(d=>d.id==='h2'));
+      wsState.dots[hr]=[{id:'h3',x:cx,y:cy,tipo:'fijo',nombre:'ZZQ PERSONA'}];
+      const conPersona=!_revPend('huerf_rev').some(p=>p.rid===hr);
+      return cargo && rec && movido && dup && quitado && conPersona;
+    } finally { wsState.dots=JSON.parse(snap); window.PUESTOS_CARGO_SIS=L; const q=JSON.parse(nq); if(q===null) delete nameState.puestosQuitados; else nameState.puestosQuitados=q; }
   });
   T('Exportar dotación: 3er nivel «Unidad» (p. ej. sólo Cuidados de Emergencia) que acota la cuenta y el archivo', ()=>{
     try{
