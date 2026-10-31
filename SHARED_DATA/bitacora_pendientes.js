@@ -6124,6 +6124,42 @@ window.BITACORA = {
    "detalle": "Reunión PM 29-10-2026 [00:11:21]–[00:13:00]: Cati trajo el caso que le envió la Dra. Cerda [sic?] y que le comentó Carla. Según Fernando Lacalle, el equipamiento para implementar los recintos transitorios del CEDE [sic?] estaría comprado, pero los correos muestran que no; además, Lacalle respondió que no hay fondos para los computadores que piden. Se nombra también a nutrición clínica. María Elena debe tomarlo como urgente con Irene [sic?] y Fernando Lacalle. Minuta: Minutas/minutas/2026-10-29_reuni-on-equipo-pm-jueves-29.md",
    "responsable": "María Elena Sepúlveda",
    "ambito": "EMMC"
+  },
+  {
+   "id": "P328",
+   "ambito": "Cartera de Servicios",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "responsable": "Matías Pinto",
+   "contraparte": "Javiera Flores (Eficiencia Hospitalaria) → Evelyn Villalón (referente de cartera, ORD 1163)",
+   "servicio": "",
+   "origen_tipo": "Sesión de trabajo",
+   "origen_ref": "Carpeta Drive «CARTERA DE SERVICIOS HDS 2026» · formato Anexo 1 SSMO (PROC-ACSE-8.1-0003)",
+   "origen_fecha": "2026-10-30",
+   "compromiso": "",
+   "creado": "2026-10-31",
+   "actualizado": "2026-10-31",
+   "titulo": "Cartera 2026 · revisar con Javiera el borrador v0 del Anexo 1 SSMO (hoja Preguntas SÍ/NO/OTRO) y generar la v1",
+   "detalle": "Borrador v0 (30-10): 2.791 líneas = maestro de red SSMO (HDS 1.737 filas) ∪ RE-3535 (2.525); 163 turquesa (solo maestro → NUEVA), 592 magenta (solo RE, no figura en maestro SSMO), 191 verde (equipos NHDS por PINS), 1.496 con producción REM 2025 por código MAI (OpenREM, datos abiertos DEIS). Pendientes de respuesta: 42 estamentos fuera de lista SSMO, 9 líneas candidatas a MACRORED/NACIONAL, 9 subprocesos fuera de lista; convenio de 227 compras de servicio. Archivo: 3.CARTERA DE SERVICIOS/Anexo 1 SSMO 2026/ (builder _DEV/cartera_re3535/13_anexo1_v0.py). Correo a Javiera enviado el 31-10. Después va a Cathy.",
+   "plazo": ""
+  },
+  {
+   "id": "P329",
+   "ambito": "Cartera de Servicios",
+   "prioridad": "Media",
+   "estado": "Abierto",
+   "responsable": "Javiera Flores",
+   "contraparte": "Matías Pinto",
+   "servicio": "",
+   "origen_tipo": "Hallazgo",
+   "origen_ref": "REM 2025 serie BS (hojas B y B17) del HDS vs Anexo 1 v0",
+   "origen_fecha": "2026-10-30",
+   "compromiso": "",
+   "creado": "2026-10-31",
+   "actualizado": "2026-10-31",
+   "titulo": "Cartera 2026 · decidir las 108 prestaciones con producción REM 2025 que no están en la cartera (candidatas a NUEVA)",
+   "detalle": "Hoja «REM sin cartera» del borrador v0: p. ej. filtración de glóbulos rojos/plaquetas en Medicina Transfusional (2.710 en 2025), tratamientos farmacológicos oncológicos grupo 29 (abiraterona 428, lenalidomida 324, VRD 203), citología no ginecológica (300); 6 caen por la regla neonatal/gineco/obstétrico/mamas (consulta por matrona 4.382).",
+   "plazo": ""
   }
  ],
  "criticos": [
