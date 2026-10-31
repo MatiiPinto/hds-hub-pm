@@ -250,7 +250,7 @@ code,.mono{font-family:var(--font-mono)}
 #capasBar .cp-g,#capasBar .cp-fin{display:inline-grid;grid-template-columns:repeat(2,var(--cpw));grid-template-rows:repeat(2,var(--cph));grid-auto-flow:column;gap:3px 4px;flex-shrink:0}
 #capasBar .cp-g{padding-right:8px;margin-right:6px;border-right:1px solid var(--border)}
 #capasBar .cp-g:last-of-type{border-right:0}
-#capasBar .cp-fin{margin-left:auto;padding-left:8px}
+#capasBar .cp-fin{margin-left:auto;padding-left:8px;grid-template-columns:repeat(3,var(--cpw))}   /* Ficha · Ruta | Editar · Agregar | Botones */
 #capasBar .cp-fin .tb-btn{border-radius:var(--r-md);color:var(--text)}
 #capasBar #btnEdit.active{background:var(--accent-600);border-color:var(--accent-600);color:#fff}
 @media (max-width:840px){#capasBar{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch}#capasBar .cp-fin{margin-left:0}}
@@ -8069,7 +8069,7 @@ const CAPAS_BARRA=[
 ];
 const DOCK_MAPA=[
   ['dkIr',    ['btnBuscaRec']],
-  ['dkCons',  ['btnFicha','btnAutSan','btnEquip','btnMob','btnScen','btnMoves','btnServPuestos']],
+  ['dkCons',  ['btnAutSan','btnEquip','btnMob','btnScen','btnMoves','btnServPuestos']],
   ['dkEdit2', ['btnUndo','btnDraw','btnMerge','btnUnmerge','btnRename','btnDel','btnDelDot','btnOrdenarDots']],
   ['dkAdd',   ['btnPuertas','puertaTipoSel','btnPuertaDel','btnPuertaDelAll','btnPuertasAuto','btnDupMueble','btnStruct']],
   ['dkExp',   ['btnExpServ','btnMapaServ','btnMurosServ','btnDotServ']]
@@ -8270,6 +8270,7 @@ function _dockMonta(){
     // 22-10-2026: los grupos salen de la grilla ⚙ (orden y ocultos de cada navegador; si no hay, CAPAS_BARRA)
     CAPAS_BARRA.forEach(x=>{ if(x!=='|') pon(bar2,x[0],x[1]); });
     const fin=document.createElement('div'); fin.className='cp-fin';
+    pon(fin,'btnFicha','Ficha');   // 31-10-2026: acceso rápido a la ficha del recinto (antes en 🧰 Consultar)
     pon(fin,'btnNav','Ruta'); pon(fin,'btnEdit','Editar'); pon(fin,'btnAgregar','Agregar'); pon(fin,'btnCapasCfg','Botones'); bar2.appendChild(fin);
     // a todo el ancho de la ventana, entre la cabecera y el plano (caben más interruptores por fila)
     const lay=document.getElementById('layout'); if(lay&&lay.parentNode) lay.parentNode.insertBefore(bar2, lay); else nav.parentNode.insertBefore(bar2, nav.nextSibling);
@@ -18839,8 +18840,9 @@ async function runSelfTest(){
   });
   T('Dock: la barra superior se vacía y los botones de edición viven en el gestor', ()=>{
     const dock=document.getElementById('dock'); if(!dock) return false;
-    const ids=['btnDraw','btnPuertas','btnDupMueble','btnStruct','btnMerge','btnDel','btnFicha','btnMob','btnExpServ','puertaTipoSel'];
-    const dentro=ids.every(id=>{ const e=document.getElementById(id); return e && dock.contains(e); });
+    const ids=['btnDraw','btnPuertas','btnDupMueble','btnStruct','btnMerge','btnDel','btnMob','btnExpServ','puertaTipoSel'];
+    const dentro=ids.every(id=>{ const e=document.getElementById(id); return e && dock.contains(e); })
+      && !!document.querySelector('#capasBar .cp-fin #btnFicha');   // la ficha va en el bloque fijo de la derecha
     // cajas · nombres · edición: en la barra de capas, bajo la de navegación
     const nav=document.getElementById('capasBar');
     const rapidos=!!nav && ['btnBoxVis','btnDotNames','btnJardines','btnEdit'].every(id=>{ const e=document.getElementById(id); return e && nav.contains(e) && !dock.contains(e); });
