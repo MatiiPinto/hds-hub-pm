@@ -1516,7 +1516,8 @@ document.addEventListener('DOMContentLoaded', () => {
     (function rec(n){ (n.h || []).forEach(k => { pares.push([n, k]); rec(k); }); })(arbol);
     const toca = (n, k) => k.ln && !k.sl && (sol.has(k.id) || sol.has(n.id));
     // 1) bloque a bloque casi en línea recta: el de abajo (o del costado) se corre hasta quedar justo frente al punto de su superior
-    pares.forEach(([n, k]) => { if(!toca(n, k) || !k.ln.a || (k.ln.v || []).length) return; const pa = ancla(libre[n.id], n, k.ln.a), pb = ancla(libre[k.id], k, k.ln.b);
+    const abajo = n => (n.h || []).filter(k => !k.sl && !k.lat && libre[k.id] && libre[k.id].y >= libre[n.id].y + tam(n)[1] + 10);   // dependientes bajo el bloque
+    pares.forEach(([n, k]) => { if(!toca(n, k) || !k.ln.a || (k.ln.v || []).length || abajo(n).length > 1) return; const pa = ancla(libre[n.id], n, k.ln.a), pb = ancla(libre[k.id], k, k.ln.b);
       if(V(k.ln.a) && V(k.ln.b) && Math.abs(pa.x - pb.x) > .5 && Math.abs(pa.x - pb.x) < TOL){ libre[k.id].x += pa.x - pb.x; mov.add(k.id); }
       if(!V(k.ln.a) && !V(k.ln.b) && Math.abs(pa.y - pb.y) > .5 && Math.abs(pa.y - pb.y) < TOL){ libre[k.id].y += pa.y - pb.y; mov.add(k.id); } });
     // traza la línea de k en ángulo recto (P0: otro punto de partida, para las que nacen sobre una línea)
@@ -1536,10 +1537,27 @@ document.addEventListener('DOMContentLoaded', () => {
         Q.push(b); vert = fin; }
       const v = (k.ln.a ? Q.slice(1, -1) : Q.slice(0, -1)).map(q => ({ x: q.x - S.x, y: q.y - S.y }));
       if(v.length !== (k.ln.v || []).length || v.some((q, i) => Math.abs(q.x - k.ln.v[i].x) > .5 || Math.abs(q.y - k.ln.v[i].y) > .5)){ k.ln.v = v; lin++; } };
-    // 2) las líneas que salen de un bloque
-    pares.forEach(([n, k]) => { if(toca(n, k) && k.ln.a) rutear(n, k); });
-    // 3) las que nacen sobre otra línea: el punto de unión vuelve a quedar SOBRE la línea de un hermano y se desliza por ella hasta quedar frente al bloque
-    pares.forEach(([n, k]) => { if(!toca(n, k) || k.ln.a || !(k.ln.v || []).length) return;
+    // 2) como árbol: del superior baja una línea a UNA barra horizontal común (a media altura, sobre el dependiente más alto)
+    //    y de la barra baja una línea a cada dependiente. Si varios están apilados en la misma columna, esa columna lleva
+    //    un tronco vertical por su costado (el del lado del superior; compartido con la columna vecina si el pasillo es angosto)
+    //    y una rama horizontal a cada uno.
+    const hechos = new Set(), mismo = (a, b) => Math.abs(a.x - b.x) < .5 && Math.abs(a.y - b.y) < .5;
+    (function rec(n){ (n.h || []).forEach(rec); const H = abajo(n); if(!H.length || !(sol.has(n.id) || H.some(k => sol.has(k.id)))) return;
+      const S = libre[n.id], [w, h] = tam(n), px = S.x + w / 2, py = S.y + h, caja = k => { const P = libre[k.id], [kw, kh] = tam(k); return { l: P.x, r: P.x + kw, t: P.y, cx: P.x + kw / 2, cy: P.y + kh / 2 }; };
+      const C = H.map(k => [k, caja(k)]), top = Math.min(...C.map(([, c]) => c.t)), yJ = py + (top - py) / 2;
+      const fijar = (k, ptB, V0) => { const V = V0.filter((q, i) => !mismo(q, i ? V0[i - 1] : { x: px, y: py })), v = V.map(q => ({ x: q.x - S.x, y: q.y - S.y })), ln = { a: 's', b: ptB, v };
+        if(JSON.stringify(ln) !== JSON.stringify(k.ln)){ k.ln = ln; lin++; } hechos.add(k.id); };
+      const cols = []; C.slice().sort((a, b) => a[1].l - b[1].l).forEach(([k, c]) => { const u = cols[cols.length - 1];   // columnas: bloques que se tapan en x
+        if(u && c.l < u.r - 5){ u.m.push([k, c]); u.r = Math.max(u.r, c.r); } else cols.push({ l: c.l, r: c.r, m: [[k, c]] }); });
+      cols.forEach((col, i) => {
+        if(col.m.length < 2) return col.m.forEach(([k, c]) => fijar(k, 'n', [{ x: px, y: yJ }, { x: c.cx, y: yJ }]));   // bajada desde la barra
+        const izq = (col.l + col.r) / 2 < px, vec = izq ? cols[i + 1] : cols[i - 1], pas = vec && vec.m.length > 1 ? (izq ? [col.r, vec.l] : [vec.r, col.l]) : null;
+        const tx = pas && pas[1] - pas[0] < 160 ? (pas[0] + pas[1]) / 2 : izq ? col.r + 20 : col.l - 20;
+        col.m.forEach(([k, c]) => fijar(k, izq ? 'e' : 'o', [{ x: px, y: yJ }, { x: tx, y: yJ }, { x: tx, y: c.cy }])); }); })(arbol);
+    // 3) las demás líneas que salen de un bloque
+    pares.forEach(([n, k]) => { if(toca(n, k) && k.ln.a && !hechos.has(k.id)) rutear(n, k); });
+    // 4) las que nacen sobre otra línea: el punto de unión vuelve a quedar SOBRE la línea de un hermano y se desliza por ella hasta quedar frente al bloque
+    pares.forEach(([n, k]) => { if(!toca(n, k) || k.ln.a || hechos.has(k.id) || !(k.ln.v || []).length) return;
       const S = libre[n.id], p0 = { x: S.x + k.ln.v[0].x, y: S.y + k.ln.v[0].y };
       const sig = k.ln.v.length > 1 ? { x: S.x + k.ln.v[1].x, y: S.y + k.ln.v[1].y } : ancla(libre[k.id], k, k.ln.b);
       const herm = new Set((n.h || []).filter(h => h !== k).map(h => h.id)); let best = null, bd = 1e9;
@@ -1602,7 +1620,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ${editar ? `<button class="oe-b" data-a="deshacer" ${hist.length ? '' : 'disabled'}>↶ Deshacer</button>
         <button class="oe-b" data-a="exportar">⬇ Exportar</button><label class="oe-b">⬆ Importar<input type="file" accept=".json" hidden data-a="importar"></label>
         <button class="oe-b" data-a="original">↺ Original</button>` : ''}
-        <span class="oe-sp"></span><button class="oe-b" data-a="imagen" title="Descargar el organigrama como imagen PNG">🖼 Imagen</button><button class="oe-b" data-a="menos">−</button><span class="oe-z">${Math.round(zoom * 100)} %</span><button class="oe-b" data-a="mas">+</button><button class="oe-b" data-a="ajustar">Ajustar</button>
+        <span class="oe-sp"></span><button class="oe-b" data-a="imagen" title="Descargar el organigrama como imagen PNG">🖼 Imagen</button><button class="oe-b" data-a="pdf" title="Descargar el organigrama en PDF (para enviar por correo)">📄 PDF</button><button class="oe-b" data-a="menos">−</button><span class="oe-z">${Math.round(zoom * 100)} %</span><button class="oe-b" data-a="mas">+</button><button class="oe-b" data-a="ajustar">Ajustar</button>
       </div>
 
       <div class="oe-wrap${editar ? ' oe-t-' + herr + (espacio ? ' espacio' : '') : ''}"><div class="oe-lienzo${editar ? ' oe-libre' : ''}" style="width:${W}px;height:${H}px">
@@ -1612,7 +1630,7 @@ document.addEventListener('DOMContentLoaded', () => {
           ${herr === 'pintar' ? `<div class="oe-col">${Object.keys(COLORES).map(c => `<button data-pc="${c}" class="c-${c}${colorP === c ? ' on' : ''}" title="${COLORES[c]}"></button>`).join('')}</div>` : ''}
           <hr><button data-a="alinear" title="Alinear bloques y líneas sin cambiar el orden (tecla A) · con ⌘ + clic en varios, solo esos">📐<small>Alinear</small></button>
           <button data-a="deshacer" title="Deshacer (⌘Z)" ${hist.length ? '' : 'disabled'}>↶<small>Deshacer</small></button></div>
-        <details class="oe-ayf"><summary>❔ Cómo editar</summary><div><b>🖐 Mover (M)</b>: arrastra bloques (Alt = con su rama · ⌘ + clic = varios) · clic = editar · <b>×</b> o Supr = eliminar · arrastra el fondo para recorrer<br><b>✏️ Lápiz (L)</b>: solo dibuja líneas. Pasa sobre un bloque y toma uno de sus <b>4 puntos verdes</b>; arrastra (o clic y clic) y termina <b>sobre otro bloque</b>, <b>sobre una línea</b> (se suma a esa rama) o <b>al aire</b> (línea suelta, para unir después). También puedes <b>empezar en una línea</b> (o en una línea suelta) y terminar sobre un bloque u otra línea. Desde <b>arriba</b>: el otro queda encima · desde <b>abajo</b>: queda debajo · desde un <b>lado</b>: asesoría<br><b>🧽 Goma (G)</b>: mantén el clic y pasa sobre las líneas · también: clic derecho sobre una línea<br><b>➕ Bloque (B)</b>: clic en un espacio vacío = bloque suelto (luego únelo con el lápiz) · clic en un bloque = uno nuevo debajo<br><b>🎨 Color (P)</b>: elige el color y haz clic en los bloques<br><b>📐 Alinear (A)</b>: empareja filas y columnas casi alineadas y deja las líneas en ángulo recto, sin cambiar el orden (con ⌘ + clic en varios, solo esos)<br><b>Esc</b> = vuelve a 🖐 sin salir de la edición · <b>barra espaciadora</b> sostenida = recorrer con cualquier herramienta · <b>rueda</b> = zoom · <b>✓ Listo</b> guarda todo tal como lo dejaste</div></details>` : ''}
+        <details class="oe-ayf"><summary>❔ Cómo editar</summary><div><b>🖐 Mover (M)</b>: arrastra bloques (Alt = con su rama · ⌘ + clic = varios) · clic = editar · <b>×</b> o Supr = eliminar · arrastra el fondo para recorrer<br><b>✏️ Lápiz (L)</b>: solo dibuja líneas. Pasa sobre un bloque y toma uno de sus <b>4 puntos verdes</b>; arrastra (o clic y clic) y termina <b>sobre otro bloque</b>, <b>sobre una línea</b> (se suma a esa rama) o <b>al aire</b> (línea suelta, para unir después). También puedes <b>empezar en una línea</b> (o en una línea suelta) y terminar sobre un bloque u otra línea. Desde <b>arriba</b>: el otro queda encima · desde <b>abajo</b>: queda debajo · desde un <b>lado</b>: asesoría<br><b>🧽 Goma (G)</b>: mantén el clic y pasa sobre las líneas · también: clic derecho sobre una línea<br><b>➕ Bloque (B)</b>: clic en un espacio vacío = bloque suelto (luego únelo con el lápiz) · clic en un bloque = uno nuevo debajo<br><b>🎨 Color (P)</b>: elige el color y haz clic en los bloques<br><b>📐 Alinear (A)</b>: empareja filas y columnas casi alineadas y ordena las líneas como árbol (barra común y una bajada a cada uno; tronco con ramas donde hay bloques apilados), sin cambiar el orden (con ⌘ + clic en varios, solo esos)<br><b>Esc</b> = vuelve a 🖐 sin salir de la edición · <b>barra espaciadora</b> sostenida = recorrer con cualquier herramienta · <b>rueda</b> = zoom · <b>✓ Listo</b> guarda todo tal como lo dejaste</div></details>` : ''}
         <div class="oe-zf"><button data-a="mas" title="Acercar">＋</button><button data-a="menos" title="Alejar">−</button><button data-a="ajustar" title="Ver todo">⤢</button></div></div>
       ${!editar ? panelPend() : ''}`;
     const lz = cont.querySelector('.oe-lienzo'), wr = lz.parentElement;
@@ -1641,7 +1659,19 @@ document.addEventListener('DOMContentLoaded', () => {
   function aviso(t){ const wr = cont && cont.querySelector('.oe-wrap'); if(!wr) return; setTimeout(() => { const w2 = cont.querySelector('.oe-wrap'); if(!w2) return;
     const d = document.createElement('div'); d.className = 'oe-aviso'; d.textContent = t; w2.appendChild(d); setTimeout(() => d.remove(), 2600); }, 30); }
   function zoomEn(z2, cx, cy){ z2 = Math.max(.25, Math.min(2, z2)); panX = cx - (cx - panX) * z2 / zoom; panY = cy - (cy - panY) * z2 / zoom; zoom = z2; encuadre(); }
-  function imagen(){
+  // PDF de una página con el organigrama (la misma imagen que 🖼, en JPEG), sin bibliotecas
+  function pdfDe(cv){
+    const j = atob(cv.toDataURL('image/jpeg', .92).split(',')[1]), pw = 842, ph = Math.round(pw * cv.height / cv.width), c = `q ${pw} 0 0 ${ph} 0 0 cm /Im0 Do Q`;
+    const O = ['<< /Type /Catalog /Pages 2 0 R >>', '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+      `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pw} ${ph}] /Resources << /XObject << /Im0 4 0 R >> >> /Contents 5 0 R >>`,
+      `<< /Type /XObject /Subtype /Image /Width ${cv.width} /Height ${cv.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode /Length ${j.length} >>\nstream\n${j}\nendstream`,
+      `<< /Length ${c.length} >>\nstream\n${c}\nendstream`];
+    let t = '%PDF-1.4\n'; const x = [];
+    O.forEach((o, i) => { x.push(t.length); t += `${i + 1} 0 obj\n${o}\nendobj\n`; });
+    const xr = t.length; t += `xref\n0 ${O.length + 1}\n0000000000 65535 f \n` + x.map(n => String(n).padStart(10, '0') + ' 00000 n \n').join('') + `trailer\n<< /Size ${O.length + 1} /Root 1 0 R >>\nstartxref\n${xr}\n%%EOF`;
+    const b = new Uint8Array(t.length); for(let i = 0; i < t.length; i++) b[i] = t.charCodeAt(i) & 255; return new Blob([b], { type: 'application/pdf' });
+  }
+  function imagen(pdf){
     medir(arbol); const out = { nodos: [], lineas: [] }; ubicar(arbol, 30, 90, out); let dx = 0, dy = 0, mx = 0, my = 0;
     if(libre){ asegurarLibre(); out.lineas = lineasLibres().filter(l => l.d); out.nodos.forEach(n => { n.x = libre[n.id].x; n.y = libre[n.id].y; }); dx = 10; dy = 70; }
     out.nodos.forEach(n => { const [w, h] = tam(n); mx = Math.max(mx, n.x + w); my = Math.max(my, n.y + h); });
@@ -1668,7 +1698,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if(n.q){ g.fillStyle = '#f59e0b'; g.beginPath(); g.arc(n.x + w - 10, n.y + 10, 4.5, 0, 7); g.fill(); }
     });
     g.setTransform(K, 0, 0, K, 0, 0); g.fillStyle = '#94a3b8'; g.font = '11px Inter, Verdana, sans-serif'; g.fillText('● por confirmar · Hospital del Salvador · Puesta en Marcha NHDS', 30, H - 20);
-    cv.toBlob(b => { const l = document.createElement('a'); l.href = URL.createObjectURL(b); l.download = 'Organigrama_PM_NHDS.png'; l.click(); });
+    const bajar = (b, nom) => { const l = document.createElement('a'); l.href = URL.createObjectURL(b); l.download = nom; l.click(); };
+    if(pdf) return bajar(pdfDe(cv), 'Organigrama_PM_NHDS.pdf');
+    cv.toBlob(b => bajar(b, 'Organigrama_PM_NHDS.png'));
   }
   function panel(n, padre){
     const raiz = !padre;
@@ -1705,6 +1737,7 @@ document.addEventListener('DOMContentLoaded', () => {
       : Math.max(.75, Math.min(1, (cont.clientWidth - 20) / (arbol.W + 60))); return pintar(); }   // piso 75 %: legible al proyectar (lo que sobra se recorre)
     if(a === 'deshacer') return deshacer();
     if(a === 'imagen') return imagen();
+    if(a === 'pdf') return imagen(true);
     if(a === 'alinear') return alinear();
     if(a === 'original'){ if(!confirm('¿Volver al organigrama original de la pizarra? Se pierden los cambios hechos aquí (puedes exportarlos antes).')) return; snap(); arbol = desdeDato(); sel = null; libre = null; try{ localStorage.removeItem(KEY + '_pos'); }catch(e){} guardar(); return pintar(); }
     if(a === 'exportar'){ const b = new Blob([JSON.stringify({ arbol: JSON.parse(JSON.stringify(arbol, function(k, v){ return 't' in this && ['x', 'y', 'W', 'H', 'modo', 'cols', 'filas', 'cw', 'ch'].includes(k) ? undefined : v; })), pos: libre }, null, 1)], { type: 'application/json' });
