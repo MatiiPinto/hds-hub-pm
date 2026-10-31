@@ -46,12 +46,12 @@ window.ORG_EXTRA = {
               { t: 'Sociedad Concesionaria', s: 'servicios concesionados: seguridad, aseo, alimentación, ropería, esterilización', c: 'durazno', z: 'M', p: ['Marisol Salvatierra'], q: 'Responsable de los servicios concesionados por confirmar' }
             ]}
           ]},
-          { t: 'Subdirecciones', s: 'resuelven; PM facilita y coordina', c: 'lila', h: [
-            { t: 'SDA · Administrativa', s: 'TIC y Logística (salen de PM)', c: 'lila', p: ['Fernando Lacalle'] },
+          { t: 'Subdirecciones', s: 'resuelven; PM facilita y coordina', c: 'lila', enFila: true, h: [
             { t: 'SDM · Médica', c: 'lila', p: ['Dr. Manuel Ramírez'] },
             { t: 'SDADT · Apoyo Dx y Terapéutico', c: 'lila', p: ['María Elena Sepúlveda'] },
             { t: 'SDGC · Gestión del Cuidado', c: 'lila', p: ['Lorena Encina'] },
-            { t: 'SDGP · Gestión de Personas', c: 'lila', p: ['Andrés Villarroel'] }
+            { t: 'SDGP · Gestión de Personas', c: 'lila', p: ['Andrés Villarroel'] },
+            { t: 'SDA · Administrativa', s: 'TIC y Logística (salen de PM)', c: 'lila', p: ['Fernando Lacalle'] }
           ]}
         ]},
         { t: 'INGER', s: 'Instituto Nacional de Geriatría', c: 'navy' }
