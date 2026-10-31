@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="es"><head>
+<script src="pm_config.js"></script>
+<script src="pm_gate.js"></script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Preguntas Frecuentes · Puesta en Marcha · Nuevo HDS</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231D2D5B'/><text x='50' y='72' font-size='58' font-family='Arial' font-weight='bold' fill='%2329ABE2' text-anchor='middle'>?</text></svg>">
+<style>
+/* ══ Preguntas Frecuentes · Puesta en Marcha Nuevo HDS ═════════════════════
+   Material de DIFUSIÓN: el contenido de las 86 preguntas es textual del
+   documento oficial "Preguntas frecuentes y respuestas sugeridas"; lo que se
+   agregó son las capas de juego (mochila, verdadero/falso, quiz) que sirven
+   para fijarlo. Plataforma autocontenida: sin CDN ni dependencias externas. */
+:root{
+  --navy:#1D2D5B; --navy2:#12224E; --cel:#29ABE2; --verde:#7AC143;
+  --ambar:#F5A623; --rojo:#E4572E; --violeta:#8B5CF6;
+  --bg:#F4F7FB; --card:#fff; --bd:#E3E9F2; --tx:#1B2740; --tx2:#66748F;
+  --sombra:0 1px 3px rgba(23,42,86,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:var(--bg);color:var(--tx);font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+img,svg{max-width:100%}
+
+/* ── Cabecera ── */
+header{background:linear-gradient(120deg,var(--navy2) 0%,var(--navy) 55%,#24407F 100%);
+  color:#fff;padding:14px 22px;position:sticky;top:0;z-index:40;box-shadow:0 2px 10px rgba(15,30,70,.22)}
+.hrow{display:flex;align-items:center;gap:14px;max-width:1120px;margin:0 auto;flex-wrap:wrap}
+.logo{width:46px;height:46px;border-radius:13px;background:rgba(41,171,226,.22);
+  display:grid;place-items:center;font-size:24px;border:1px solid rgba(41,171,226,.45);flex:none}
+.htitle h1{font-size:18px;font-weight:800;letter-spacing:-.2px}
+.htitle p{font-size:12px;opacity:.82;margin-top:1px}
+.hscore{margin-left:auto;display:flex;align-items:center;gap:9px;background:rgba(255,255,255,.10);
+  border:1px solid rgba(255,255,255,.20);border-radius:12px;padding:7px 13px;cursor:pointer}
+.hscore .n{font-size:19px;font-weight:800;color:var(--cel);line-height:1}
+.hscore .l{font-size:10px;text-transform:uppercase;letter-spacing:.7px;opacity:.8}
+
+/* ── Pestañas ── */
+nav.tabs{background:#fff;border-bottom:1px solid var(--bd);position:sticky;top:74px;z-index:35;
+  box-shadow:0 1px 2px rgba(23,42,86,.04)}
+.tabsin{max-width:1120px;margin:0 auto;display:flex;gap:2px;padding:0 14px;overflow-x:auto;scrollbar-width:none}
+.tabsin::-webkit-scrollbar{display:none}
+.tab{border:0;background:none;padding:13px 15px;font-size:13.5px;font-weight:700;color:var(--tx2);
+  cursor:pointer;white-space:nowrap;border-bottom:3px solid transparent;font-family:inherit;display:flex;gap:7px;align-items:center}
+.tab:hover{color:var(--navy)}
+.tab.on{color:var(--navy);border-bottom-color:var(--cel)}
+.tab .bdg{background:var(--bd);color:var(--tx2);font-size:10.5px;font-weight:800;border-radius:20px;padding:1px 7px}
+.tab.on .bdg{background:var(--cel);color:#fff}
+
+main{max-width:1120px;margin:0 auto;padding:20px 22px 70px}
+.pane{display:none;animation:fade .22s ease}
+.pane.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+
+/* ── Portada ── */
+.hero{background:linear-gradient(125deg,var(--navy2),var(--navy) 62%,#2B4A8F);color:#fff;
+  border-radius:20px;padding:34px 32px;position:relative;overflow:hidden;margin-bottom:18px}
+.hero::after{content:"";position:absolute;right:-70px;top:-70px;width:280px;height:280px;border-radius:50%;
+  background:radial-gradient(circle,rgba(41,171,226,.36),transparent 68%)}
+.hero::before{content:"";position:absolute;left:-40px;bottom:-90px;width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle,rgba(122,193,67,.20),transparent 70%)}
+.hero h2{font-size:29px;font-weight:800;line-height:1.18;max-width:660px;letter-spacing:-.5px;position:relative}
+.hero p{margin-top:11px;font-size:14.5px;opacity:.9;max-width:600px;position:relative}
+.hero .cta{margin-top:20px;display:flex;gap:9px;flex-wrap:wrap;position:relative}
+.bcta{background:var(--cel);color:#08243B;border:0;border-radius:11px;padding:11px 18px;font-size:13.5px;
+  font-weight:800;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:8px}
+.bcta:hover{filter:brightness(1.08)}
+.bcta.gh{background:rgba(255,255,255,.13);color:#fff;border:1px solid rgba(255,255,255,.3)}
+
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:11px;margin-bottom:20px}
+.kpi{background:var(--card);border:1px solid var(--bd);border-radius:15px;padding:16px 17px;box-shadow:var(--sombra)}
+.kpi .n{font-size:27px;font-weight:800;letter-spacing:-.7px;line-height:1}
+.kpi .l{font-size:12px;color:var(--tx2);margin-top:5px;line-height:1.35}
+
+.gcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(238px,1fr));gap:13px}
+.gcard{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:20px;cursor:pointer;
+  text-align:left;font-family:inherit;box-shadow:var(--sombra);transition:transform .16s,box-shadow .16s;position:relative;overflow:hidden}
+.gcard:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(23,42,86,.11)}
+.gcard .ic{font-size:29px;margin-bottom:9px;display:block}
+.gcard h3{font-size:16px;font-weight:800;margin-bottom:5px;color:var(--tx)}
+.gcard p{font-size:12.8px;color:var(--tx2);line-height:1.45}
+.gcard .bar{position:absolute;left:0;top:0;bottom:0;width:5px}
+
+.secttl{font-size:11.5px;font-weight:800;letter-spacing:.9px;text-transform:uppercase;
+  color:var(--tx2);margin:26px 2px 11px}
+
+/* ── Buscador y filtros ── */
+.search{position:relative;margin-bottom:12px}
+.search input{width:100%;padding:13px 15px 13px 43px;border:1px solid var(--bd);border-radius:13px;
+  font-size:15px;background:#fff;font-family:inherit;color:var(--tx)}
+.search input:focus{outline:none;border-color:var(--cel);box-shadow:0 0 0 3px rgba(41,171,226,.14)}
+.search .si{position:absolute;left:15px;top:50%;transform:translateY(-50%);opacity:.42;font-size:15px}
+.chips{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.chip{border:1px solid var(--bd);background:#fff;border-radius:22px;padding:7px 13px;font-size:12.5px;
+  font-weight:700;cursor:pointer;color:var(--tx2);font-family:inherit;display:inline-flex;gap:6px;align-items:center}
+.chip:hover{border-color:var(--cel)}
+.chip.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.chip .c{width:9px;height:9px;border-radius:3px;display:inline-block}
+
+/* ── Preguntas ── */
+.qgroup{margin-bottom:22px}
+.qgh{display:flex;align-items:center;gap:9px;margin:0 2px 9px}
+.qgh .ic{font-size:17px}
+.qgh h3{font-size:14.5px;font-weight:800}
+.qgh .cnt{font-size:11.5px;color:var(--tx2);font-weight:700;margin-left:auto}
+.qc{background:var(--card);border:1px solid var(--bd);border-radius:13px;margin-bottom:8px;overflow:hidden;box-shadow:var(--sombra)}
+.qc-h{display:flex;align-items:flex-start;gap:11px;padding:14px 16px;cursor:pointer;user-select:none}
+.qc-h:hover{background:#FAFCFF}
+.qc-h .t{font-size:14.5px;font-weight:700;flex:1;line-height:1.42}
+.qc-h .ch{color:var(--tx2);transition:transform .2s;flex:none;margin-top:2px;font-size:12px}
+.qc.open .qc-h .ch{transform:rotate(90deg)}
+.qc-b{display:none;padding:2px 16px 16px 42px;font-size:14px;color:#3A4A68;white-space:pre-line}
+.qc.open .qc-b{display:block}
+.qc .vd{width:22px;height:22px;border-radius:7px;flex:none;display:grid;place-items:center;font-size:12px;font-weight:800;color:#fff;margin-top:1px}
+.vd.si{background:var(--verde)} .vd.no{background:var(--rojo)} .vd.dep{background:var(--ambar)} .vd.inf{background:var(--cel)}
+.vacio{background:#fff;border:1px dashed var(--bd);border-radius:13px;padding:28px;text-align:center;color:var(--tx2)}
+
+/* ── Juegos ── */
+.gwrap{background:var(--card);border:1px solid var(--bd);border-radius:18px;padding:24px;box-shadow:var(--sombra)}
+.gtop{display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap}
+.gtop .pg{flex:1;min-width:120px;height:8px;background:var(--bd);border-radius:20px;overflow:hidden}
+.gtop .pg i{display:block;height:100%;background:linear-gradient(90deg,var(--cel),var(--verde));transition:width .3s}
+.gtop .st{font-size:12.5px;font-weight:800;color:var(--tx2);white-space:nowrap}
+.gq{font-size:19px;font-weight:800;line-height:1.35;margin:6px 0 4px;letter-spacing:-.2px}
+.gsub{font-size:13px;color:var(--tx2);margin-bottom:16px}
+.gitem{text-align:center;padding:22px 10px 8px}
+.gitem .em{font-size:62px;line-height:1;display:block;margin-bottom:10px}
+.gopts{display:flex;gap:9px;flex-wrap:wrap;margin-top:6px}
+.gopt{flex:1;min-width:110px;border:1.5px solid var(--bd);background:#fff;border-radius:13px;padding:14px 12px;
+  font-size:14.5px;font-weight:800;cursor:pointer;font-family:inherit;color:var(--tx);transition:.14s}
+.gopt:hover:not(:disabled){border-color:var(--cel);background:#F7FCFF}
+.gopt:disabled{cursor:default}
+.gopt.ok{background:#EAF8E2;border-color:var(--verde);color:#3D6B18}
+.gopt.bad{background:#FDEDE8;border-color:var(--rojo);color:#9C3418}
+.gopt.era{background:#FFF8E9;border-color:var(--ambar);color:#8A5A08}
+.feed{margin-top:15px;border-radius:13px;padding:14px 16px;font-size:13.5px;line-height:1.5;display:none}
+.feed.on{display:block;animation:fade .2s}
+.feed.ok{background:#EAF8E2;border-left:4px solid var(--verde);color:#33600F}
+.feed.bad{background:#FDEDE8;border-left:4px solid var(--rojo);color:#8E2F14}
+.feed b{display:block;margin-bottom:3px;font-size:13px;text-transform:uppercase;letter-spacing:.4px}
+.gnav{display:flex;gap:9px;margin-top:16px;flex-wrap:wrap}
+.btn{border:0;border-radius:11px;padding:11px 18px;font-size:13.5px;font-weight:800;cursor:pointer;
+  background:var(--navy);color:#fff;font-family:inherit}
+.btn:hover{filter:brightness(1.12)}
+.btn.gh{background:#fff;color:var(--navy);border:1px solid var(--bd)}
+.btn:disabled{opacity:.4;cursor:default;filter:none}
+
+/* Resultado final */
+.fin{text-align:center;padding:14px 6px}
+.fin .medal{font-size:66px;line-height:1}
+.fin h3{font-size:23px;font-weight:800;margin:8px 0 4px}
+.fin .sc{font-size:15px;color:var(--tx2);margin-bottom:6px}
+.fin .lvl{display:inline-block;font-size:12.5px;font-weight:800;padding:6px 15px;border-radius:22px;
+  background:var(--navy);color:#fff;margin:8px 0 14px;letter-spacing:.3px}
+.rev{text-align:left;margin-top:18px;border-top:1px solid var(--bd);padding-top:16px}
+.rev h4{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--tx2);margin-bottom:9px}
+.revi{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid #F1F5FA;font-size:13.3px;align-items:flex-start}
+.revi .m{flex:none;font-size:14px;margin-top:1px}
+
+/* ── Referentes ── */
+.refg{display:grid;grid-template-columns:repeat(auto-fit,minmax(252px,1fr));gap:12px}
+.refc{background:var(--card);border:1px solid var(--bd);border-radius:15px;padding:17px;box-shadow:var(--sombra);
+  border-top:4px solid var(--cel)}
+.refc .am{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;color:var(--tx2)}
+.refc .nm{font-size:15.5px;font-weight:800;margin-top:5px;line-height:1.35}
+.refc .pend{font-size:12.5px;color:var(--ambar);font-weight:700;margin-top:5px}
+.canal{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--bd);border-radius:13px;
+  padding:13px 16px;margin-bottom:9px;text-decoration:none;color:var(--tx);box-shadow:var(--sombra)}
+.canal:hover{border-color:var(--cel)}
+.canal .ic{font-size:21px;flex:none}
+.canal .tt{font-weight:800;font-size:14px}
+.canal .ds{font-size:12.3px;color:var(--tx2);word-break:break-all}
+.canal .tag{margin-left:auto;font-size:10.5px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;
+  padding:3px 9px;border-radius:20px;background:#EEF3FA;color:var(--tx2);flex:none}
+.aviso{background:#FFF8E9;border:1px solid #F6D98F;border-left:4px solid var(--ambar);border-radius:11px;
+  padding:13px 16px;font-size:13px;color:#7A5407;margin-bottom:14px}
+.aviso b{display:block;margin-bottom:2px}
+
+footer{background:var(--navy2);color:rgba(255,255,255,.62);padding:18px 22px;font-size:11.8px;text-align:center;line-height:1.6}
+footer b{color:rgba(255,255,255,.9)}
+@media(max-width:640px){
+  nav.tabs{top:70px}
+  .hero{padding:26px 22px;border-radius:16px}.hero h2{font-size:23px}
+  main{padding:16px 14px 50px}.gwrap{padding:18px}
+  .htitle h1{font-size:16px}.qc-b{padding-left:16px}
+}
+</style>
+</head><body>
+
+<header>
+  <div class="hrow">
+    <div class="logo">❓</div>
+    <div class="htitle">
+      <h1>Preguntas Frecuentes · Puesta en Marcha</h1>
+      <p>Nuevo Hospital del Salvador e Instituto Nacional de Geriatría</p>
+    </div>
+    <div class="hscore" onclick="irA('inicio')" title="Tu avance acumulado en los tres juegos">
+      <div><div class="n" id="hsN">0</div><div class="l">puntos</div></div>
+      <div style="font-size:26px" id="hsM">🌱</div>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs"><div class="tabsin" id="tabs"></div></nav>
+
+<main>
+  <!-- ═══ INICIO ═══ -->
+  <section class="pane on" id="p-inicio">
+    <div class="hero">
+      <h2>Nos cambiamos de hospital.<br>Estas son las respuestas.</h2>
+      <p>Las <b id="heroN">86</b> preguntas que más se repiten sobre el traslado, resueltas con la respuesta
+         oficial de la Unidad de Puesta en Marcha. Y para que no se te olviden, tres juegos.</p>
+      <div class="cta">
+        <button class="bcta" onclick="irA('mochila')">🎒 Jugar “¿Me lo llevo?”</button>
+        <button class="bcta gh" onclick="irA('preguntas')">Ver todas las preguntas</button>
+      </div>
+    </div>
+
+    <div class="kpis" id="kpis"></div>
+
+    <div class="secttl">Tres formas de aprendértelo</div>
+    <div class="gcards">
+      <button class="gcard" onclick="irA('mochila')">
+        <span class="bar" style="background:var(--verde)"></span>
+        <span class="ic">🎒</span><h3>¿Me lo llevo?</h3>
+        <p>La caja está armada y aparece el hervidor. ¿Va o no va al nuevo hospital? 19 objetos reales, tres respuestas posibles.</p>
+      </button>
+      <button class="gcard" onclick="irA('vf')">
+        <span class="bar" style="background:var(--ambar)"></span>
+        <span class="ic">⚡</span><h3>Verdadero o Falso</h3>
+        <p>Dieciséis afirmaciones que circulan por los pasillos. Algunas son ciertas. Otras no tanto.</p>
+      </button>
+      <button class="gcard" onclick="irA('quiz')">
+        <span class="bar" style="background:var(--violeta)"></span>
+        <span class="ic">🏆</span><h3>Quiz por ámbito</h3>
+        <p>Veinte preguntas de alternativas sobre kitchenettes, casino, casilleros, auditorios y estacionamientos.</p>
+      </button>
+    </div>
+
+    <div class="secttl">Lo esencial en una línea</div>
+    <div class="gcards" id="esencial"></div>
+  </section>
+
+  <!-- ═══ PREGUNTAS ═══ -->
+  <section class="pane" id="p-preguntas">
+    <div class="search">
+      <span class="si">🔍</span>
+      <input id="bus" type="text" placeholder="Buscar: hervidor, casillero, plantas, estacionamiento…"
+             oninput="pintaFAQ()" autocomplete="off">
+    </div>
+    <div class="chips" id="chipsFAQ"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+      <button class="btn gh" onclick="alAzar()">🎲 Una pregunta al azar</button>
+      <button class="btn gh" onclick="todo(true)">Abrir todas</button>
+      <button class="btn gh" onclick="todo(false)">Cerrar todas</button>
+    </div>
+    <div id="faqLista"></div>
+  </section>
+
+  <!-- ═══ JUEGOS ═══ -->
+  <section class="pane" id="p-mochila"><div class="gwrap" id="gMochila"></div></section>
+  <section class="pane" id="p-vf"><div class="gwrap" id="gVF"></div></section>
+  <section class="pane" id="p-quiz"><div class="gwrap" id="gQuiz"></div></section>
+
+  <!-- ═══ REFERENTES ═══ -->
+  <section class="pane" id="p-referentes">
+    <div class="aviso">
+      <b>¿Y si mi duda no está en la lista?</b>
+      Las jefaturas deben registrar la consulta y canalizarla al referente de Puesta en Marcha que
+      corresponda al ámbito, por correo institucional <b style="display:inline">…@hsalvador.cl</b>
+      o al <b style="display:inline">anexo 287065</b>.
+    </div>
+    <div class="secttl">Referente por ámbito</div>
+    <div class="refg" id="refs"></div>
+
+    <div class="secttl">Canales oficiales de información</div>
+    <p style="font-size:13px;color:var(--tx2);margin:-4px 2px 12px">
+      Los canales oficiales son la Dirección, los Subdirectores, la Unidad de Puesta en Marcha y Gestión
+      del Cambio, y los canales institucionales que el hospital defina.</p>
+    <div id="canales"></div>
+  </section>
+</main>
+
+<footer>
+  <b>Preguntas Frecuentes · Puesta en Marcha</b> — Nuevo Hospital del Salvador e Instituto Nacional de Geriatría<br>
+  Contenido textual del documento oficial “Preguntas frecuentes y respuestas sugeridas”, Unidad de Puesta en
+  Marcha y Gestión del Cambio. Las respuestas son sugeridas y pueden actualizarse: ante cualquier duda,
+  consultá al referente del ámbito.
+</footer>
+
+<script>
+/* ════════════════════════════════════════════════════════════════════════
+   DATOS
+   FAQ  → generado desde el .docx oficial (texto literal, no reescrito). Sección s10 agregada el 28-10-2026 a partir del Manual de Traslado v1.0 (Res. Ex. N°3986 del 27-10-2026).
+   Las capas de juego se derivan de esas mismas respuestas.
+   ════════════════════════════════════════════════════════════════════════ */
+const FAQ=[{"id": "s1", "n": "Información general y canales oficiales", "ic": "📣", "col": "#29ABE2", "q": [{"p": "¿Qué deben hacer las jefaturas si aparece una duda que no está incluida?", "r": "Registrar la consulta y canalizarla por correo …@hsalvador.cl a referente de Puesta en Marcha de acuerdo al ámbito de acción o a través del anexo: 287065.\nReferente por ámbito\nOrientación respecto a Plan de Traslado: Fernando Araya y Costanza Poch\nOrientación respecto Gestión del Cambio: Loreto Pérez y Javiera Pacheco.\nOrientación respecto a Autorización Sanitaria: Catherine Sepúlveda y Meylin Canales\nOrientación de Procesos Asociados a TI: Cynthia Soto.\nOrientación de Procesos Asociados Servicios Concesionados.\nOrientación de Procesos Logísticos y Operacionales: Rodrigo Hermosilla.\nOrientación de Procesos relacionados a Gestión Documental: Karina Alfaro \nOrientación respecto a Equipamiento Médico: Mariana Bravo y Matías Pinto."}, {"p": "¿Quiénes serán los canales oficiales de información?", "r": "La Dirección, Subdirectores y Unidad de Puesta en Marcha y Gestión del Cambio, y los canales institucionales que el hospital defina."}, {"p": "¿Cuáles son los canales oficiales de información?", "r": "Externo: \nPágina web del proyecto: https://sumate-inger-hds.cl\nInstagram: https://www.instagram.com/sumate_inger_hds\n\nInterno: \nWhatsApp Institucional HDS\nIntranet HDS"}]}, {"id": "s2", "n": "Pertenencias personales y objetos", "ic": "🎒", "col": "#7AC143", "q": [{"p": "¿Los funcionarios podrán llevar cosas personales al nuevo hospital?", "r": "Sí, elementos pequeños de uso cotidiano, siempre que no interfieran con seguridad, higiene, operación, limpieza, circulación ni imagen institucional."}, {"p": "¿Qué tipo de objetos personales podrían llevarse?", "r": "Artículos de escritorio, agenda, botella de agua, taza personal, neceser, fotografía discreta u otros elementos pequeños y funcionales para la jornada laboral."}, {"p": "¿Se podrán llevar objetos decorativos?", "r": "No. No se permitirá trasladar ni incorporar objetos decorativos, con el propósito de mantener los espacios despejados, facilitar las labores de limpieza y desinfección, evitar la acumulación de elementos y resguardar el orden, la seguridad y el estándar institucional del nuevo hospital."}, {"p": "¿Se podrán llevar plantas?", "r": "En espacios administrativos podrían permitirse plantas pequeñas. En áreas clínicas deberá evaluarse según criterios sanitarios, de limpieza e IAAS."}, {"p": "¿Se podrán instalar cuadros, repisas o elementos en muros?", "r": "No sin autorización. No se deben perforar muros, puertas, vidrios ni mobiliario institucional."}, {"p": "¿Se podrán pegar afiches o carteles en paredes y vidrios?", "r": "No. Solo las unidades expresamente autorizadas podrán instalar afiches o carteles, y únicamente en los espacios definidos para ello, utilizando material institucional previamente aprobado. No se permitirá adherir elementos directamente en paredes, vidrios u otras superficies no habilitadas."}, {"p": "¿Se podrán llevar muebles propios?", "r": "No. El mobiliario será definido institucionalmente. Incorporar muebles personales puede afectar circulación, seguridad, circulación de vectores, limpieza y estándar del nuevo hospital."}, {"p": "¿Se trasladará mobiliario antiguo?", "r": "No. No se trasladará mobiliario antiguo al nuevo hospital, salvo aquel que haya sido expresamente autorizado y considerado en la planificación institucional. Esta medida busca resguardar las condiciones de higiene, seguridad y conservación de los nuevos espacios, ya que el mobiliario usado puede acumular polvo, humedad y microorganismos, además de presentar una alta probabilidad de trasladar vectores o plagas, como chinches, cucarachas, ácaros u otros insectos. Asimismo, su incorporación podría afectar la circulación, la limpieza y el estándar institucional definido para el nuevo establecimiento."}, {"p": "¿Se podrán llevar hervidores personales?", "r": "Sí, de manera regulada. Se autorizará un hervidor nuevo por cada kitchenette, destinado al uso compartido de los funcionarios asociados a ese espacio. El hospital no proveerá este equipamiento, por lo que su adquisición deberá ser gestionada por los propios equipos. No se permitirá incorporar hervidores adicionales ni equipos usados, con el propósito de prevenir riesgos eléctricos, evitar sobrecargas y mantener un adecuado control del equipamiento instalado."}, {"p": "¿Se podrán llevar cafeteras personales?", "r": "No, salvo autorización expresa. El uso de equipos eléctricos debe estar regulado para prevenir riesgos y sobrecargas."}, {"p": "¿Se podrán llevar refrigeradores personales?", "r": "No. No se permitirá el traslado ni la instalación de refrigeradores personales, ya que las kitchenettes del nuevo hospital contemplan un equipo de refrigeración por recinto, destinado al uso compartido."}, {"p": "¿Se podrán llevar microondas personales?", "r": "No. No se permitirá el traslado ni la instalación de microondas personales. Solo podrán utilizarse los equipos institucionales autorizados y ubicados en los espacios habilitados. Además, el casino contará con microondas disponibles para que los funcionarios puedan calentar sus alimentos, evitando así la duplicidad de equipos, las sobrecargas eléctricas y los riesgos asociados a su instalación en espacios no autorizados."}, {"p": "¿Se podrán llevar ventiladores, calefactores o estufas?", "r": "No. No será necesario incorporar estos equipos, ya que el nuevo hospital contará con un sistema de climatización central."}, {"p": "¿Se podrán llevar radios, parlantes o equipos de música?", "r": "No. Para resguardar el bienestar, descanso y recuperación de nuestros pacientes, no se permitirá su uso en áreas clínicas, de atención ni en espacios compartidos. Estos equipos pueden generar ruidos molestos, dificultar la comunicación entre pacientes y funcionarios y afectar la concentración necesaria para brindar una atención segura y de calidad. Su utilización solo podrá autorizarse excepcionalmente para actividades institucionales o terapéuticas, en espacios y condiciones previamente definidos."}, {"p": "¿Qué pasará con objetos personales que no puedan trasladarse?", "r": "Cada funcionario deberá retirar, dentro del plazo que se informe, únicamente los objetos que sean de su propiedad personal. Las pertenencias que no estén autorizadas para ingresar al nuevo hospital deberán llevarse al domicilio particular de su propietario y no podrán quedar abandonadas ni incorporarse al traslado institucional.\nQueda estrictamente prohibido retirar mobiliario, equipos, insumos, documentos, libros, cuadros, adornos u otros bienes pertenecientes al hospital, aunque se encuentren deteriorados, en desuso, sin identificación visible o hayan sido utilizados habitualmente por una persona o unidad. Ante cualquier duda respecto de la propiedad de un objeto, este no deberá retirarse y se deberá consultar previamente a la jefatura o al encargado de activo fijo."}]}, {"id": "s3", "n": "Oficinas, estaciones de trabajo y mobiliario", "ic": "🪑", "col": "#F5A623", "q": [{"p": "¿Las oficinas podrán decorarse libremente?", "r": "No libremente. Se podrán personalizar de forma moderada, cuidando imagen institucional, orden, limpieza y seguridad."}, {"p": "¿Se podrán dejar cajas en oficinas?", "r": "Solo de manera transitoria en la fase de traslado y si no afectan circulación, seguridad ni limpieza. Las oficinas no deben transformarse en bodegas."}, {"p": "¿Se podrán guardar insumos clínicos en oficinas administrativas?", "r": "No, los insumos deben almacenarse en lugares autorizados."}, {"p": "¿Se podrán usar oficinas como comedor?", "r": "No es lo recomendado. Para alimentación existirán espacios definidos, como casino y kitchenettes, según corresponda."}, {"p": "¿Se podrán instalar extensiones eléctricas o alargadores?", "r": "No sin autorización. El uso de alargadores debe ser regulado por seguridad eléctrica y prevención de riesgos."}, {"p": "¿Se podrán mover escritorios o cambiar la distribución de una oficina?", "r": "No de forma autónoma. Cualquier modificación debe evaluarse y autorizarse institucionalmente."}, {"p": "¿Qué pasa si una unidad considera que le falta mobiliario?", "r": "Debe levantar la necesidad por su jefatura para evaluación por los canales establecidos."}, {"p": "¿Se podrán asignar puestos de trabajo sin coordinación institucional?", "r": "No. La asignación de espacios debe responder a planificación institucional y a los criterios definidos por cada subdirección."}, {"p": "¿Se podrán bloquear escritorios o puestos para uso exclusivo?", "r": "No. Los escritorios y puestos de trabajo deberán utilizarse de acuerdo con la asignación, disponibilidad y normas de funcionamiento definidas para cada área. En las nuevas instalaciones se promoverá el uso compartido y eficiente de los espacios, por lo que no se podrán reservar, bloquear ni personalizar informalmente puestos para uso exclusivo, salvo que exista una asignación institucional expresa asociada a las funciones del cargo o a una necesidad debidamente autorizada."}, {"p": "¿Qué debe hacer una jefatura si detecta mal uso del mobiliario?", "r": "Reforzar la norma, conversar con el equipo y canalizar la situación si requiere mantención, reposición o instrucción formal al referente institucional de ese servicio concesionado para recibir orientación."}]}, {"id": "s4", "n": "Kitchenettes", "ic": "☕", "col": "#E4572E", "q": [{"p": "¿Qué son las kitchenettes?", "r": "Son espacios de apoyo para funcionarios, destinados principalmente a colación breve, descanso y almacenamiento temporal de alimentos durante la jornada."}, {"p": "¿Quiénes podrán usar las kitchenettes?", "r": "Los funcionarios de las áreas asociadas a cada espacio, según la organización y funcionamiento que defina el hospital."}, {"p": "¿Las kitchenettes reemplazan al casino?", "r": "No. El casino será el espacio principal para el beneficio de alimentación. Las kitchenettes cumplen una función complementaria."}, {"p": "¿Se podrá almorzar en las kitchenettes?", "r": "Podrán usarse para colaciones o alimentación breve, pero no deben transformarse en comedores permanentes ni reemplazar el casino cuando corresponda."}, {"p": "¿Se podrá cocinar en las kitchenettes?", "r": "No. Las kitchenettes no están diseñadas ni habilitadas para preparar o cocinar alimentos. Solo podrán utilizarse para calentar o conservar alimentos mediante los frigobares disponibles en cada recinto."}, {"p": "¿Se podrán dejar alimentos de un día para otro?", "r": "No. Los alimentos deben retirarse diariamente para evitar malos olores, contaminación, acumulación y problemas de higiene."}, {"p": "¿Quién será responsable del orden de la kitchenette?", "r": "El aseo institucional tendrá un rol definido ya que es un servicio concesionado, pero el orden cotidiano es responsabilidad de todos los funcionarios que la utilizan."}, {"p": "¿Se podrán guardar utensilios personales?", "r": "Sí, de manera limitada. Las kitchenettes del Edificio de Atención Cerrada contarán con casilleros para guardar, durante cada turno, utensilios personales pequeños, identificados y de uso diario. Estos elementos deberán retirarse según la organización definida y no podrán generar acumulación, desorden ni dificultar la limpieza del espacio."}, {"p": "¿Se podrán dejar tazas, platos o cubiertos sucios?", "r": "No. Cada funcionario debe lavar, retirar o disponer adecuadamente sus utensilios después de usarlos."}, {"p": "¿Se podrán realizar celebraciones en las kitchenettes?", "r": "Solo actividades breves y acotadas, sin interferir con la atención, descanso de otros funcionarios ni funcionamiento del servicio."}, {"p": "¿Se podrá usar la kitchenette como sala de reuniones?", "r": "No. Para reuniones de trabajo deberán utilizarse salas habilitadas."}, {"p": "¿Se podrá usar la kitchenette para guardar cajas, insumos o materiales?", "r": "No. Las kitchenettes no deben utilizarse como bodegas."}, {"p": "¿Qué pasa si una kitchenette se usa de mala manera?", "r": "La jefatura debe reforzar las normas de uso y, si corresponde, informar la situación por los canales definidos."}, {"p": "¿Habrá normas de uso en las kitchenettes?", "r": "Sí. Se dispondrá de un Manual de Buenas Prácticas para orientar el uso adecuado de las kitchenettes. Este incluirá indicaciones como mantener el espacio limpio y ordenado, retirar diariamente los alimentos, respetar la organización y los turnos definidos, cuidar el equipamiento y evitar la acumulación de utensilios u objetos personales."}, {"p": "¿Cuál es la principal regla para usar las kitchenettes?", "r": "Usarlas con responsabilidad, recordando que son espacios compartidos y que su buen funcionamiento depende del cuidado de todos."}]}, {"id": "s5", "n": "Vestidores y casilleros", "ic": "🚿", "col": "#8B5CF6", "q": [{"p": "¿Habrá vestidores para funcionarios?", "r": "Sí. El nuevo hospital considera 4 vestidores con amplia capacidad y espacios para cambio de ropa y resguardo de pertenencias, según planificación institucional."}, {"p": "¿Todos los funcionarios tendrán casillero?", "r": "No. Los casilleros serán asignados prioritariamente al personal clínico que, por la naturaleza de sus funciones, requiera cambiarse de ropa o utilizar uniforme durante la jornada laboral. Su distribución se realizará conforme a la planificación institucional, la disponibilidad existente y las necesidades de cada servicio o unidad."}, {"p": "¿Los casilleros serán personales?", "r": "Sí, en principio serán de uso personal e intransferible cuando sean asignados individualmente."}, {"p": "¿Qué se podrá guardar en los casilleros?", "r": "Ropa de cambio, uniforme, elementos personales pequeños y artículos necesarios para la jornada laboral."}, {"p": "¿Se podrán guardar objetos de valor?", "r": "No se recomienda. Aunque los recintos contarán con medidas de seguridad, cada funcionario será responsable del cuidado de sus pertenencias personales. Por ello, se sugiere no guardar dinero, joyas, dispositivos electrónicos u otros objetos de valor en los casilleros."}, {"p": "¿Qué pasa si se pierde la llave del casillero?", "r": "El funcionario deberá informar de inmediato a su jefatura o al responsable institucional de la administración de los casilleros. A partir de este aviso, se activará el protocolo definido para asistir al funcionario, verificar la asignación del casillero y gestionar de manera segura su apertura."}, {"p": "¿Se podrá personalizar el casillero?", "r": "No. Los casilleros deberán mantenerse en su estado original para facilitar su limpieza, conservación y futura reasignación. Por esta razón, no se permitirá rayarlos, perforarlos, pintarlos ni adherir stickers, carteles u otros elementos, aunque sean removibles, ya que pueden dejar residuos o dañar las superficies."}, {"p": "¿Se podrán dejar cosas fuera del casillero?", "r": "No. Pasillos y áreas de vestidores deben mantenerse despejados por seguridad, limpieza y convivencia."}, {"p": "¿Habrá duchas en los vestidores?", "r": "Sí. Los vestidores consideran duchas para funcionarios según el diseño de las nuevas instalaciones."}, {"p": "¿Cómo se debe cuidar el uso de duchas y baños?", "r": "Con higiene y respeto: no dejar ropa, toallas, residuos ni artículos personales en espacios comunes."}, {"p": "¿Quién regulará el buen uso de los vestidores?", "r": "Las jefaturas reforzarán buenas prácticas y el hospital definirá mecanismos de administración y cuidado, de acuerdo al servicio concesionado de aseo."}, {"p": "¿Cuál es la principal regla para los vestidores?", "r": "Mantenerlos limpios, ordenados y seguros, cuidando que permanezcan disponibles para todos los funcionarios que los requieran. Asimismo, los casilleros deberán quedar disponibles para su apertura en las fechas establecidas en el calendario de aseo, con el fin de facilitar la limpieza, desinfección y adecuada mantención del recinto."}]}, {"id": "s6", "n": "Casino y beneficio de alimentación", "ic": "🍽", "col": "#14B8A6", "q": [{"p": "¿El nuevo hospital contará con casino?", "r": "Sí. El nuevo hospital contará con un casino institucional para funcionarios. Sus horarios, condiciones de acceso y normas de uso serán informados oportunamente mediante el Manual de Buenas Prácticas para el Casino y los canales oficiales del hospital."}, {"p": "¿Quiénes podrán usar el beneficio de alimentación?", "r": "Los funcionarios que cumplan con los criterios definidos institucionalmente para acceder al beneficio."}, {"p": "¿El beneficio de alimentación es personal?", "r": "Sí. El beneficio es personal e intransferible."}, {"p": "¿Se podrá retirar comida preparada desde el casino?", "r": "No. El beneficio debe utilizarse dentro del casino, conforme a las normas establecidas en el Manual de Buenas Prácticas para el Casino"}, {"p": "¿Se podrá llevar comida del casino a otro funcionario?", "r": "No. Cada funcionario debe utilizar personalmente su beneficio."}, {"p": "¿Se podrá ingresar al casino fuera del horario establecido?", "r": "No. El uso del casino deberá ajustarse a horarios y turnos definidos para asegurar cobertura y orden."}, {"p": "¿Habrá horarios para almorzar?", "r": "Sí. El funcionamiento considera horarios para organizar el flujo de funcionarios y evitar aglomeraciones."}, {"p": "¿Se podrá elegir libremente cualquier menú?", "r": "Se deberá respetar la minuta disponible y las alternativas definidas para cada jornada."}, {"p": "¿Habrá alternativas de alimentación?", "r": "Sí. Se consideran 3 alternativas de menú y una de ellas hipocalórica, ensaladas, postres y bebestibles, según planificación del servicio."}, {"p": "¿Qué pasa si un funcionario requiere dieta especial?", "r": "Las dietas especiales deberán gestionarse y validarse formalmente por los canales institucionales correspondientes."}, {"p": "¿Se podrán realizar reuniones de trabajo en el casino?", "r": "No es su finalidad principal. El casino está destinado a alimentación de funcionarios."}, {"p": "¿Cuál es el mensaje principal sobre el casino?", "r": "El beneficio de alimentación es un recurso institucional y debe utilizarse de forma responsable, respetuosa y conforme a las normas definidas."}]}, {"id": "s7", "n": "Auditorios, salas y capacitación", "ic": "🎤", "col": "#EC4899", "q": [{"p": "¿El nuevo hospital contará con auditorios y salas de capacitación?", "r": "Sí. Considera espacios destinados a auditorios, salas de capacitación y actividades institucionales."}, {"p": "¿Para qué se podrán usar los auditorios?", "r": "Para capacitaciones, jornadas institucionales, reuniones ampliadas, ceremonias, inducciones y otras actividades autorizadas."}, {"p": "¿Cualquier unidad podrá reservar un auditorio?", "r": "La reserva deberá realizarse según el procedimiento institucional que se defina. No será de uso espontáneo ni informal."}, {"p": "¿Se podrán realizar actividades externas en auditorios?", "r": "Si, deben contar con autorización institucional y se ajustan al propósito del hospital."}, {"p": "¿Se podrán usar auditorios para reuniones pequeñas?", "r": "Dependerá de disponibilidad y pertinencia. Para reuniones pequeñas se recomienda utilizar salas acordes al tamaño de la actividad."}, {"p": "¿Quién será responsable del cuidado del auditorio durante una actividad?", "r": "La unidad solicitante será responsable del buen uso, cuidado del equipamiento y entrega del espacio en condiciones adecuadas."}, {"p": "¿Se podrá consumir alimentos en auditorios?", "r": "Solo si está autorizado para una actividad específica. En general, se debe evitar para cuidar limpieza, mobiliario y equipamiento."}, {"p": "¿Se podrá modificar la distribución del auditorio?", "r": "Solo si el espacio lo permite y existe autorización. Al finalizar, deberá quedar en las condiciones establecidas."}, {"p": "¿Se podrán pegar afiches o instalar pendones?", "r": "Solo con autorización y sin dañar muros, pisos, vidrios ni equipamiento."}, {"p": "¿Qué pasa si se daña equipamiento de un auditorio?", "r": "Debe informarse de inmediato a la jefatura o unidad responsable, para activar el procedimiento correspondiente."}]}, {"id": "s8", "n": "Estacionamientos, bicicleteros y accesos", "ic": "🅿️", "col": "#2563EB", "q": [{"p": "¿El nuevo hospital contará con estacionamientos para funcionarios?", "r": "Sí. El proyecto considera 803 estacionamientos para funcionarios, cuyo uso deberá ajustarse al manual o procedimiento institucional correspondiente."}, {"p": "¿Todos los funcionarios tendrán estacionamiento?", "r": "No necesariamente. La disponibilidad es limitada y su uso será por orden de llegada."}, {"p": "¿Habrá estacionamientos para visitas y usuarios?", "r": "Sí. El proyecto considera estacionamientos para visitas y usuarios, diferenciados de los espacios destinados a funcionarios y servicios."}, {"p": "¿Habrá bicicleteros?", "r": "Sí. El proyecto considera 50 bicicleteros, cuyo uso deberá ajustarse a las normas de seguridad y convivencia que se informen, estos contaran con casilleros para resguardar pertenecías y estar disponibles para usuarios y funcionarios."}, {"p": "¿Se podrán estacionar bicicletas o scooters en oficinas, pasillos o áreas clínicas?", "r": "No. Deben utilizarse espacios habilitados para evitar obstrucción, riesgos de seguridad y problemas de circulación."}]}, {"id": "s9", "n": "Espacios comunes y convivencia", "ic": "🤝", "col": "#0EA5A4", "q": [{"p": "¿Se podrán dejar cajas o materiales en pasillos?", "r": "No. Los pasillos deben mantenerse despejados por seguridad, evacuación, circulación y limpieza."}, {"p": "¿Se podrán usar espacios comunes como bodegas?", "r": "No. Cada unidad debe utilizar únicamente los espacios de almacenamiento definidos institucionalmente."}, {"p": "¿Qué se espera en términos de convivencia funcionaria?", "r": "Respeto, colaboración, uso responsable de espacios compartidos, cumplimiento de turnos, cuidado del mobiliario y disposición al cambio."}, {"p": "¿Cuál es el principal llamado a los funcionarios?", "r": "Cuidar el nuevo hospital como un espacio común, usar responsablemente los beneficios, respetar normas de convivencia y participar activamente en una puesta en marcha colaborativa, segura y ordenada."}]}, {"id": "s10", "n": "Traslado · Manual aprobado (RE-3986)", "ic": "🚑", "col": "#1F3B63", "q": [{"p": "¿Está aprobado el Manual de Traslado?", "r": "Sí. La Resolución Exenta N°3986 del 27 de octubre de 2026, firmada por el Director Dr. Jorge Zajjur Castro, aprueba el Manual de Traslado del Hospital del Salvador a las nuevas instalaciones (versión 1.0, vigencia 5 años). Las jefaturas deben difundirlo entre sus equipos y usar sus registros de trazabilidad, comunicación y reporte."}, {"p": "¿Quién coordina el traslado?", "r": "El Director es el líder estratégico. El Coordinador General del Traslado es el EU Fernando Araya S. y la Coordinadora Adjunta del Centro de Comando Operativo (CCO) es la EU Costanza Poch T. El Equipo de Traslado reúne a las subdirecciones y a las jefaturas de Calidad, IAAS, Gestión de Camas, Prevención de Riesgos, Farmacia, Logística, Gestión del Cambio, Gestión de la Demanda, Archivo, Equipos Médicos, Informática, RR.HH. y Comunicaciones."}, {"p": "¿Cuándo es el traslado?", "r": "El cronograma se numera del Día 1 al Día 10 y no por fecha calendario, para que siga siendo válido si cambia la fecha. Se inicia después de la Puesta en Servicio Provisoria (PSP) y de una etapa de preparación de unas 4 semanas. Cada fase parte solo con una decisión GO/NO-GO formal."}, {"p": "¿En qué orden se trasladan las unidades?", "r": "Siete días hábiles, de menor a mayor criticidad: Día 1 áreas administrativas; Día 2 unidades de apoyo (Imágenes, Farmacia, Anatomía Patológica, Laboratorio, Endoscopia, UMT, Diálisis, Nutrición, Medicina Física); Día 3 atención ambulatoria; Día 4 pabellón quirúrgico; Días 4, 5 y 6 pacientes hospitalizados; Día 6 Unidad de Emergencia, que es la última en trasladarse."}, {"p": "¿Cómo se trasladan los pacientes hospitalizados?", "r": "En ambulancia, uno por móvil, entre las 09:00 y las 14:00, en tres días: Día 4 Medicina Quirúrgica (40 pacientes), Día 5 UHI y SIQ (30), Día 6 UCI y UTI (24). En total 94 pacientes, con una flota de 10 ambulancias (9 en operación y 1 de reserva), ciclo de 30 minutos y salidas cada 5 minutos."}, {"p": "¿Qué pasa con la Unidad de Emergencia del hospital antiguo?", "r": "Se mantiene operativa 48 a 72 horas después del cierre formal, con dotación reducida y una ambulancia, solo para manejo y derivación de pacientes, con señalética y personal de apoyo en el acceso antiguo. El cierre definitivo del punto transitorio lo evalúa el Comité de Traslado."}, {"p": "¿Qué es el CCO y qué son P1, P2, CC1 y CC2?", "r": "El CCO es el Centro de Comando Operativo único, en el hall central del HDS, que conduce, autoriza y hace seguimiento del traslado desde 7 días antes del Día 1. CC1 es el centro de comando del hospital de origen (hall de salida) y CC2 el del hospital de destino (hall de entrada). P1 es el punto de control de salida en la unidad de origen y P2 el punto de control de llegada en la unidad de destino."}, {"p": "¿Cuándo puede salir un paciente de su unidad?", "r": "Solo cuando se cumplen tres confirmaciones a la vez: la enfermera de piso confirma que el paciente está preparado, Gestión de Camas confirma la cama o unidad de destino y el CCO confirma el traslado autorizado y el transporte disponible. El paciente embarcado en la ambulancia es el punto de no retorno."}, {"p": "¿Qué detiene el traslado?", "r": "El protocolo STOP / PAUSA se activa ante falla de gases clínicos, falla eléctrica sin respaldo, ascensores críticos indisponibles, pérdida de comunicación entre origen y destino, ausencia de cama receptora, ambulancias insuficientes o condiciones asistenciales inseguras. El CCO ordena la pausa y solo el Coordinador General autoriza la reanudación."}, {"p": "¿Qué debe hacer cada unidad antes de trasladarse?", "r": "Adaptar y firmar su propio checklist: inventario de documentación y equipos autorizados, documentación embalada y rotulada, equipos desconectados y embalados con respaldo de datos, inventario de lo que NO se traslada (queda para el SSMO), conectividad probada en la sala de destino, y registro de salida en PC1 y de llegada en PC2. Las jefaturas de cada unidad y el CCO autorizan el traslado."}, {"p": "¿Qué se traslada del equipamiento actual?", "r": "Solo el equipamiento autorizado, identificado, etiquetado y embalado con trazabilidad de origen y destino. Los comodatos y arriendos deben estar vigentes y operativos en el nuevo hospital. Los equipos críticos nuevos (ventiladores, monitores, bombas de infusión, radiología, laboratorio) se prueban antes del traslado y cada unidad opera solo con sus equipos críticos validados al 100 %."}, {"p": "¿Habrá visitas el día del traslado?", "r": "Se solicitará la suspensión de visitas el día del traslado. La semana anterior cada paciente o su tutor recibe la constancia de información de traslado (Anexo 1), que se archiva en la ficha clínica. El paciente viaja con su ficha, documentos, medicamentos en bolsa rotulada y pertenencias."}, {"p": "¿Qué pasa si ocurre un incidente?", "r": "Se notifica al CCO y se registra en el Registro de Incidentes (Anexo 3). Hay cuatro niveles de escalamiento: incidente local → jefatura de la unidad; afecta una fase → CCO; amenaza la continuidad asistencial → Coordinador General; impacto en la red → Dirección y Servicio de Salud."}, {"p": "¿Cómo se evalúa el traslado?", "r": "Con 23 indicadores en siete dimensiones (seguridad del paciente, eficiencia, continuidad, recursos, personas, comunicación y cierre). Los errores de identificación, la pérdida de pacientes y los eventos graves evitables deben ser cero. Además se revisa cada unidad a las 24, 48, 72 y 120 horas y se hace un informe final con lecciones aprendidas."}]}];
+
+/* Veredicto de cada respuesta, para el semáforo del listado: se deduce de cómo
+   arranca la respuesta oficial ("No.", "Sí,", "Solo…"). */
+function veredicto(r){
+  var t=r.trim().toLowerCase();
+  if(/^no\b/.test(t)) return 'no';
+  if(/^s[íi]\b/.test(t)) return 'si';
+  if(/^(solo|s[óo]lo|depender[áa]|en espacios|podr[áa]n usarse|se deber[áa]|la reserva|cada|las dietas)/.test(t)) return 'dep';
+  return 'inf';
+}
+var VD={si:{s:'✓',t:'Sí'},no:{s:'✕',t:'No'},dep:{s:'!',t:'Depende'},inf:{s:'i',t:'Información'}};
+
+/* ── Juego 1 · ¿Me lo llevo? ─────────────────────────────────────────── */
+var MOCHILA=[
+ {n:'Tu taza personal',em:'☕',v:'si',w:'Sí. Es uno de los elementos pequeños de uso cotidiano expresamente mencionados, junto con la agenda, la botella de agua o el neceser.'},
+ {n:'Una agenda y artículos de escritorio',em:'📓',v:'si',w:'Sí. Elementos pequeños y funcionales para la jornada laboral están permitidos.'},
+ {n:'Una fotografía discreta',em:'🖼',v:'si',w:'Sí, una fotografía discreta está dentro de los objetos personales permitidos. Distinto es el objeto decorativo, que no se permite.'},
+ {n:'Un hervidor nuevo para la kitchenette',em:'🫖',v:'dep',w:'Sí, pero regulado: se autoriza UN hervidor nuevo por kitchenette, de uso compartido. El hospital no lo provee, lo gestiona cada equipo. No se permiten hervidores adicionales ni usados.'},
+ {n:'Una planta pequeña',em:'🪴',v:'dep',w:'Depende del espacio. En espacios administrativos podrían permitirse plantas pequeñas. En áreas clínicas debe evaluarse según criterios sanitarios, de limpieza e IAAS.'},
+ {n:'Adornos y objetos decorativos',em:'🎎',v:'no',w:'No. No se permite trasladar ni incorporar objetos decorativos: se busca mantener los espacios despejados y facilitar la limpieza y desinfección.'},
+ {n:'Tu cafetera personal',em:'☕',v:'no',w:'No, salvo autorización expresa. El uso de equipos eléctricos debe regularse para prevenir riesgos y sobrecargas.'},
+ {n:'Un refrigerador personal',em:'🧊',v:'no',w:'No. Las kitchenettes del nuevo hospital contemplan un equipo de refrigeración por recinto, destinado al uso compartido.'},
+ {n:'Un microondas personal',em:'🍲',v:'no',w:'No. Solo se usan los equipos institucionales autorizados. Además el casino contará con microondas para calentar alimentos.'},
+ {n:'Una estufa o un ventilador',em:'🔥',v:'no',w:'No. No será necesario: el nuevo hospital contará con sistema de climatización central.'},
+ {n:'Un parlante o una radio',em:'🔊',v:'no',w:'No. Para resguardar el descanso y la recuperación de los pacientes no se permite su uso en áreas clínicas, de atención ni en espacios compartidos. Solo excepcionalmente, para actividades institucionales o terapéuticas autorizadas.'},
+ {n:'Tu propio escritorio o silla',em:'🪑',v:'no',w:'No. El mobiliario será definido institucionalmente. Incorporar muebles personales puede afectar circulación, seguridad, circulación de vectores y limpieza.'},
+ {n:'El mueble antiguo que todavía sirve',em:'🗄',v:'no',w:'No se traslada mobiliario antiguo, salvo autorización expresa. El mobiliario usado acumula polvo y humedad y tiene alta probabilidad de trasladar vectores o plagas: chinches, cucarachas o ácaros.'},
+ {n:'Un cuadro para colgar en el muro',em:'🖌',v:'no',w:'No sin autorización. No se deben perforar muros, puertas, vidrios ni mobiliario institucional.'},
+ {n:'Afiches para pegar en la pared o el vidrio',em:'📄',v:'no',w:'No. Solo las unidades expresamente autorizadas pueden instalar afiches, en los espacios definidos y con material institucional aprobado. No se permite adherir elementos en paredes o vidrios.'},
+ {n:'Stickers para decorar tu casillero',em:'🏷',v:'no',w:'No. Los casilleros se mantienen en su estado original: no se pueden rayar, perforar, pintar ni adherir stickers, aunque sean removibles.'},
+ {n:'Insumos clínicos para guardar en tu oficina',em:'🩹',v:'no',w:'No. Los insumos deben almacenarse en los lugares autorizados, no en oficinas administrativas.'},
+ {n:'La bicicleta, hasta tu oficina',em:'🚲',v:'no',w:'No. Bicicletas y scooters van en los espacios habilitados: el proyecto considera 50 bicicleteros. Dejarlas en oficinas o pasillos obstruye la circulación.'},
+ {n:'Ese equipo del hospital viejo que nadie usa',em:'📦',v:'no',w:'No, y esto es categórico: queda estrictamente prohibido retirar mobiliario, equipos, insumos, documentos o libros del hospital, aunque estén deteriorados, en desuso o sin identificación. Ante la duda sobre quién es el dueño, no se retira y se consulta a la jefatura o a activo fijo.'}
+];
+
+/* ── Juego 2 · Verdadero o Falso ─────────────────────────────────────── */
+var VOF=[
+ {t:'Las kitchenettes vienen a reemplazar al casino.',v:false,w:'Falso. El casino es el espacio principal del beneficio de alimentación; la kitchenette cumple una función complementaria.'},
+ {t:'En la kitchenette se puede cocinar.',v:false,w:'Falso. No están diseñadas ni habilitadas para preparar alimentos. Solo para calentar o conservar mediante los frigobares de cada recinto.'},
+ {t:'Puedo dejar mi almuerzo en la kitchenette de un día para otro.',v:false,w:'Falso. Los alimentos se retiran diariamente para evitar malos olores, contaminación y problemas de higiene.'},
+ {t:'Todos los funcionarios tendrán casillero asignado.',v:false,w:'Falso. Se asignan prioritariamente al personal clínico que por sus funciones requiera cambiarse de ropa o usar uniforme, según disponibilidad.'},
+ {t:'El nuevo hospital tendrá 4 vestidores.',v:true,w:'Verdadero. Considera 4 vestidores con amplia capacidad, con espacios para cambio de ropa y resguardo de pertenencias.'},
+ {t:'Los vestidores tendrán duchas.',v:true,w:'Verdadero. Los vestidores consideran duchas para funcionarios según el diseño de las nuevas instalaciones.'},
+ {t:'Conviene guardar el celular o dinero en el casillero.',v:false,w:'Falso. No se recomienda: cada funcionario es responsable de sus pertenencias. Se sugiere no guardar dinero, joyas ni dispositivos electrónicos.'},
+ {t:'El beneficio de alimentación es personal e intransferible.',v:true,w:'Verdadero. Cada funcionario debe utilizar personalmente su beneficio.'},
+ {t:'Puedo llevarme comida del casino para un colega que quedó en el servicio.',v:false,w:'Falso. El beneficio se usa dentro del casino y cada funcionario lo utiliza personalmente.'},
+ {t:'Habrá una alternativa de menú hipocalórica.',v:true,w:'Verdadero. Se consideran 3 alternativas de menú, una de ellas hipocalórica, además de ensaladas, postres y bebestibles.'},
+ {t:'El proyecto considera 803 estacionamientos para funcionarios.',v:true,w:'Verdadero. Y su uso deberá ajustarse al manual o procedimiento institucional correspondiente.'},
+ {t:'Tener auto asegura un estacionamiento en el nuevo hospital.',v:false,w:'Falso. La disponibilidad es limitada y el uso será por orden de llegada.'},
+ {t:'Habrá 50 bicicleteros, con casilleros para resguardar pertenencias.',v:true,w:'Verdadero. Estarán disponibles para usuarios y funcionarios, con normas de seguridad y convivencia que se informarán.'},
+ {t:'Cualquier unidad puede ocupar un auditorio sin reservarlo.',v:false,w:'Falso. La reserva se hace según el procedimiento institucional que se defina. No es de uso espontáneo ni informal.'},
+ {t:'Si se daña un equipo del auditorio durante una actividad, responde la unidad solicitante.',v:true,w:'Verdadero. La unidad solicitante es responsable del buen uso y del cuidado del equipamiento, y debe informar de inmediato cualquier daño.'},
+ {t:'Puedo dejar cajas en el pasillo mientras dura el traslado.',v:false,w:'Falso. Los pasillos se mantienen despejados por seguridad, evacuación, circulación y limpieza. En oficinas se permite solo de manera transitoria.'}
+];
+
+/* ── Juego 3 · Quiz por ámbito ───────────────────────────────────────── */
+var QUIZ=[
+ {s:'Canales',q:'Aparece una duda que no está en el listado. ¿Qué corresponde hacer?',
+  o:['Resolverla en el equipo y seguir','Registrarla y canalizarla al referente del ámbito','Publicarla en redes sociales','Esperar la próxima reunión'],r:1,
+  w:'Se registra la consulta y se canaliza al referente de Puesta en Marcha del ámbito que corresponda, por correo institucional o al anexo 287065.'},
+ {s:'Canales',q:'¿Cuál de estos es un canal oficial EXTERNO del proyecto?',
+  o:['El grupo de WhatsApp del servicio','La intranet HDS','La página sumate-inger-hds.cl','El diario mural del casino'],r:2,
+  w:'Los canales externos son la página del proyecto y su Instagram. WhatsApp institucional e intranet son los canales internos.'},
+ {s:'Pertenencias',q:'¿Cuántos hervidores se autorizan por kitchenette?',
+  o:['Ninguno','Uno, nuevo y compartido','Uno por funcionario','Los que el equipo estime'],r:1,
+  w:'Se autoriza un hervidor nuevo por kitchenette, de uso compartido. Lo gestionan los propios equipos y no se permiten equipos usados ni adicionales.'},
+ {s:'Pertenencias',q:'La razón de fondo para no trasladar mobiliario antiguo es que…',
+  o:['Se ve viejo','Puede trasladar vectores y plagas','Pesa mucho','Ya no hay camiones'],r:1,
+  w:'El mobiliario usado acumula polvo, humedad y microorganismos, con alta probabilidad de trasladar vectores o plagas como chinches, cucarachas o ácaros.'},
+ {s:'Pertenencias',q:'Encontrás un objeto y no sabés si es tuyo o del hospital. ¿Qué hacés?',
+  o:['Te lo llevás, total nadie lo usa','No lo retirás y consultás a la jefatura o activo fijo','Lo dejás en el pasillo','Lo botás'],r:1,
+  w:'Ante cualquier duda respecto de la propiedad de un objeto, no debe retirarse y se debe consultar previamente a la jefatura o al encargado de activo fijo.'},
+ {s:'Pertenencias',q:'¿Por qué no se permiten parlantes ni radios en áreas clínicas?',
+  o:['Por el consumo eléctrico','Por el bienestar, descanso y recuperación de los pacientes','Porque no hay enchufes','Por derechos de autor'],r:1,
+  w:'Generan ruidos molestos, dificultan la comunicación entre pacientes y funcionarios y afectan la concentración necesaria para una atención segura.'},
+ {s:'Oficinas',q:'¿Se pueden usar alargadores y extensiones eléctricas en las oficinas?',
+  o:['Sí, libremente','No sin autorización','Solo de noche','Solo los rojos'],r:1,
+  w:'No sin autorización: el uso de alargadores debe ser regulado por seguridad eléctrica y prevención de riesgos.'},
+ {s:'Oficinas',q:'Una unidad quiere cambiar la distribución de su oficina. ¿Puede hacerlo por su cuenta?',
+  o:['Sí, si lo hacen entre todos','No: cualquier modificación se evalúa y autoriza institucionalmente','Sí, avisando después','Solo los fines de semana'],r:1,
+  w:'No de forma autónoma. Cualquier modificación debe evaluarse y autorizarse institucionalmente.'},
+ {s:'Oficinas',q:'¿Se puede reservar o bloquear un puesto de trabajo para uso exclusivo?',
+  o:['Sí, el que llega primero','No, salvo asignación institucional expresa','Sí, poniendo un cartel','Sí, si es tu escritorio de siempre'],r:1,
+  w:'Se promueve el uso compartido y eficiente de los espacios. No se pueden reservar, bloquear ni personalizar informalmente puestos, salvo asignación institucional expresa.'},
+ {s:'Kitchenettes',q:'¿Qué son, exactamente, las kitchenettes?',
+  o:['Comedores del personal','Espacios de apoyo para colación breve, descanso y almacenamiento temporal','Bodegas de insumos','Salas de reuniones'],r:1,
+  w:'Son espacios de apoyo para funcionarios, destinados principalmente a colación breve, descanso y almacenamiento temporal de alimentos durante la jornada.'},
+ {s:'Kitchenettes',q:'¿Se pueden guardar utensilios personales en la kitchenette?',
+  o:['No, nunca','Sí, de manera limitada: hay casilleros en el Edificio de Atención Cerrada','Sí, todos los que quepan','Solo tazas'],r:1,
+  w:'Las kitchenettes del Edificio de Atención Cerrada contarán con casilleros para guardar, durante cada turno, utensilios personales pequeños e identificados.'},
+ {s:'Kitchenettes',q:'¿De quién es la responsabilidad del orden cotidiano de la kitchenette?',
+  o:['Solo del aseo, que es servicio concesionado','De todos los funcionarios que la utilizan','De la jefatura','De nadie en particular'],r:1,
+  w:'El aseo institucional tiene un rol definido por ser servicio concesionado, pero el orden cotidiano es responsabilidad de todos quienes la utilizan.'},
+ {s:'Kitchenettes',q:'¿Se pueden hacer celebraciones en la kitchenette?',
+  o:['No, nunca','Solo actividades breves y acotadas, sin interferir','Sí, con música','Solo cumpleaños'],r:1,
+  w:'Solo actividades breves y acotadas, sin interferir con la atención, el descanso de otros funcionarios ni el funcionamiento del servicio.'},
+ {s:'Vestidores',q:'Se perdió la llave del casillero. ¿Cuál es el primer paso?',
+  o:['Forzarlo','Informar de inmediato a la jefatura o al responsable de los casilleros','Esperar a que aparezca','Pedir otro casillero'],r:1,
+  w:'Debe informarse de inmediato: a partir del aviso se activa el protocolo definido para verificar la asignación y gestionar de manera segura su apertura.'},
+ {s:'Vestidores',q:'¿Por qué los casilleros deben quedar disponibles en ciertas fechas?',
+  o:['Para redistribuirlos','Para la limpieza, desinfección y mantención según el calendario de aseo','Para revisar su contenido','Para pintarlos'],r:1,
+  w:'Deben quedar disponibles para su apertura en las fechas del calendario de aseo, para facilitar la limpieza, desinfección y adecuada mantención del recinto.'},
+ {s:'Casino',q:'¿Se puede retirar comida preparada desde el casino?',
+  o:['Sí, en envase propio','No: el beneficio se usa dentro del casino','Solo en turno de noche','Solo el postre'],r:1,
+  w:'No. El beneficio debe utilizarse dentro del casino, conforme a las normas del Manual de Buenas Prácticas para el Casino.'},
+ {s:'Casino',q:'Un funcionario requiere una dieta especial. ¿Cómo se resuelve?',
+  o:['Se conversa con el manipulador','Se gestiona y valida formalmente por los canales institucionales','Se lleva comida de la casa','No hay alternativa'],r:1,
+  w:'Las dietas especiales deben gestionarse y validarse formalmente por los canales institucionales correspondientes.'},
+ {s:'Auditorios',q:'¿Se pueden consumir alimentos en un auditorio?',
+  o:['Sí, siempre','Solo si está autorizado para una actividad específica','Nunca','Solo bebidas'],r:1,
+  w:'Solo si está autorizado para una actividad específica. En general se debe evitar, para cuidar limpieza, mobiliario y equipamiento.'},
+ {s:'Auditorios',q:'¿Se pueden realizar actividades externas en los auditorios?',
+  o:['No, jamás','Sí, con autorización institucional y si se ajustan al propósito del hospital','Solo si pagan','Solo actividades clínicas'],r:1,
+  w:'Sí: deben contar con autorización institucional y ajustarse al propósito del hospital.'},
+ {s:'Estacionamientos',q:'¿Dónde deben dejarse bicicletas y scooters?',
+  o:['En la oficina, si caben','En los espacios habilitados: el proyecto considera 50 bicicleteros','En el pasillo del servicio','Donde haya sombra'],r:1,
+  w:'En los espacios habilitados, para evitar obstrucción, riesgos de seguridad y problemas de circulación.'}
+];
+
+/* ── Referentes y canales (textual del documento) ─────────────────────── */
+var REFS=[
+ {a:'Plan de Traslado',                     n:'Fernando Araya y Costanza Poch', c:'#29ABE2'},
+ {a:'Gestión del Cambio',                   n:'Loreto Pérez y Javiera Pacheco', c:'#7AC143'},
+ {a:'Autorización Sanitaria',               n:'Catherine Sepúlveda y Meylin Canales', c:'#8B5CF6'},
+ {a:'Procesos asociados a TI',              n:'Cynthia Soto', c:'#F5A623'},
+ {a:'Procesos asociados a Servicios Concesionados', n:'', c:'#E4572E'},
+ {a:'Procesos logísticos y operacionales',  n:'Rodrigo Hermosilla', c:'#14B8A6'},
+ {a:'Gestión Documental',                   n:'Karina Alfaro', c:'#2563EB'},
+ {a:'Equipamiento Médico',                  n:'Mariana Bravo y Matías Pinto', c:'#0EA5A4'}
+];
+var CANALES=[
+ {ic:'🌐',t:'Página web del proyecto',d:'https://sumate-inger-hds.cl',g:'Externo',u:'https://sumate-inger-hds.cl'},
+ {ic:'📸',t:'Instagram del proyecto',d:'https://www.instagram.com/sumate_inger_hds',g:'Externo',u:'https://www.instagram.com/sumate_inger_hds'},
+ {ic:'💬',t:'WhatsApp Institucional HDS',d:'Canal interno de difusión del hospital',g:'Interno',u:''},
+ {ic:'🏛',t:'Intranet HDS',d:'Canal interno de difusión del hospital',g:'Interno',u:''},
+ {ic:'☎️',t:'Anexo de Puesta en Marcha',d:'Anexo 287065',g:'Interno',u:''}
+];
+
+/* Cifras que el propio documento entrega. */
+var KPIS=[
+ {n:'803', l:'estacionamientos para funcionarios', c:'#2563EB'},
+ {n:'50',  l:'bicicleteros, con casilleros', c:'#7AC143'},
+ {n:'4',   l:'vestidores con duchas', c:'#8B5CF6'},
+ {n:'3',   l:'alternativas de menú, una hipocalórica', c:'#14B8A6'},
+ {n:'8',   l:'ámbitos con referente asignado', c:'#F5A623'},
+ {n:'86',  l:'preguntas frecuentes resueltas', c:'#E4572E'}
+];
+var ESENCIAL=[
+ {ic:'🧳',t:'Chico, útil y de tu jornada',d:'Lo personal que viaja es lo pequeño: taza, agenda, botella, neceser, una foto discreta. Lo decorativo y los electrodomésticos, no.'},
+ {ic:'🚫',t:'Nada del hospital sale del hospital',d:'Está estrictamente prohibido retirar mobiliario, equipos, insumos o documentos, aunque estén en desuso. Ante la duda, se consulta.'},
+ {ic:'🤝',t:'Los espacios son compartidos',d:'Kitchenettes, casilleros, auditorios y escritorios funcionan bien si se dejan como uno los quisiera encontrar.'},
+ {ic:'📋',t:'Casi todo se puede, con autorización',d:'Perforar un muro, mover un escritorio, pegar un afiche o usar un alargador no están prohibidos porque sí: requieren evaluación previa.'}
+];
+
+/* ════════════════════════════════════════════════════════════════════════
+   ESTADO Y NAVEGACIÓN
+   ════════════════════════════════════════════════════════════════════════ */
+var LS='hds_faq_pm_v1';
+var E={mochila:{i:0,ok:0,ans:[]}, vf:{i:0,ok:0,ans:[]}, quiz:{i:0,ok:0,ans:[]}, leidas:{}};
+try{ var g=JSON.parse(localStorage.getItem(LS)||'null'); if(g) E=Object.assign(E,g); }catch(e){}
+function guarda(){ try{ localStorage.setItem(LS,JSON.stringify(E)); }catch(e){} }
+
+var PANES=[
+ {id:'inicio',    ic:'🏠', t:'Inicio'},
+ {id:'preguntas', ic:'❓', t:'Preguntas'},
+ {id:'mochila',   ic:'🎒', t:'¿Me lo llevo?'},
+ {id:'vf',        ic:'⚡', t:'Verdadero o Falso'},
+ {id:'quiz',      ic:'🏆', t:'Quiz'},
+ {id:'referentes',ic:'📞', t:'¿A quién pregunto?'}
+];
+function pintaTabs(){
+  document.getElementById('tabs').innerHTML=PANES.map(function(p){
+    var b='';
+    if(p.id==='mochila') b=E.mochila.ok+'/'+MOCHILA.length;
+    if(p.id==='vf')      b=E.vf.ok+'/'+VOF.length;
+    if(p.id==='quiz')    b=E.quiz.ok+'/'+QUIZ.length;
+    if(p.id==='preguntas') b=String(totalQ());
+    return '<button class="tab" id="tab-'+p.id+'" onclick="irA(\''+p.id+'\')">'+p.ic+' '+p.t+
+      (b?' <span class="bdg">'+b+'</span>':'')+'</button>';
+  }).join('');
+}
+function irA(id){
+  PANES.forEach(function(p){
+    document.getElementById('p-'+p.id).classList.toggle('on',p.id===id);
+    var t=document.getElementById('tab-'+p.id); if(t) t.classList.toggle('on',p.id===id);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='mochila') pintaMochila();
+  if(id==='vf')      pintaVF();
+  if(id==='quiz')    pintaQuiz();
+}
+function totalQ(){ return FAQ.reduce(function(a,s){return a+s.q.length;},0); }
+
+/* Puntaje global y nivel */
+function puntos(){ return E.mochila.ok+E.vf.ok+E.quiz.ok; }
+function maxPuntos(){ return MOCHILA.length+VOF.length+QUIZ.length; }
+function nivel(p){
+  var pc=p/maxPuntos();
+  if(pc>=.9) return {m:'🏅',n:'Embajador de la Puesta en Marcha'};
+  if(pc>=.7) return {m:'🌟',n:'Se nota que leíste'};
+  if(pc>=.45)return {m:'📘',n:'Vas bien encaminado'};
+  if(pc>0)   return {m:'🌿',n:'Recién empezando'};
+  return {m:'🌱',n:'Sin empezar'};
+}
+function refrescaScore(){
+  var p=puntos(), n=nivel(p);
+  document.getElementById('hsN').textContent=p;
+  document.getElementById('hsM').textContent=n.m;
+  document.querySelector('.hscore').title=n.n+' · '+p+' de '+maxPuntos()+' puntos';
+  pintaTabs();
+  PANES.forEach(function(q){
+    var t=document.getElementById('tab-'+q.id);
+    if(t) t.classList.toggle('on',document.getElementById('p-'+q.id).classList.contains('on'));
+  });
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   INICIO
+   ════════════════════════════════════════════════════════════════════════ */
+function pintaInicio(){
+  document.getElementById('heroN').textContent=totalQ();
+  document.getElementById('kpis').innerHTML=KPIS.map(function(k){
+    var n=(k.l.indexOf('preguntas')>=0)?String(totalQ()):k.n;
+    return '<div class="kpi"><div class="n" style="color:'+k.c+'">'+n+'</div><div class="l">'+k.l+'</div></div>';
+  }).join('');
+  document.getElementById('esencial').innerHTML=ESENCIAL.map(function(e){
+    return '<div class="gcard" style="cursor:default"><span class="ic">'+e.ic+'</span>'+
+      '<h3>'+e.t+'</h3><p>'+e.d+'</p></div>';
+  }).join('');
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   PREGUNTAS
+   ════════════════════════════════════════════════════════════════════════ */
+var filtroSec='todas';
+function pintaChips(){
+  document.getElementById('chipsFAQ').innerHTML=
+    '<button class="chip'+(filtroSec==='todas'?' on':'')+'" onclick="setSec(\'todas\')">Todas</button>'+
+    FAQ.map(function(s){
+      return '<button class="chip'+(filtroSec===s.id?' on':'')+'" onclick="setSec(\''+s.id+'\')">'+
+        '<span class="c" style="background:'+s.col+'"></span>'+s.ic+' '+s.n+'</button>';
+    }).join('');
+}
+function setSec(id){ filtroSec=id; pintaChips(); pintaFAQ(); }
+// busca sin acentos: "climatizacion" encuentra "climatización"
+function norm(s){ return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''); }
+function pintaFAQ(){
+  var t=norm(document.getElementById('bus').value.trim());
+  var pal=t?t.split(/\s+/):[];
+  var html='', n=0;
+  FAQ.forEach(function(s){
+    if(filtroSec!=='todas'&&filtroSec!==s.id) return;
+    var qs=s.q.filter(function(q){
+      if(!pal.length) return true;
+      var blob=norm(q.p+' '+q.r);
+      return pal.every(function(w){ return blob.indexOf(w)>=0; });
+    });
+    if(!qs.length) return;
+    n+=qs.length;
+    html+='<div class="qgroup"><div class="qgh"><span class="ic">'+s.ic+'</span>'+
+      '<h3 style="color:'+s.col+'">'+s.n+'</h3><span class="cnt">'+qs.length+' pregunta'+(qs.length===1?'':'s')+'</span></div>';
+    qs.forEach(function(q){
+      var v=veredicto(q.r), id=s.id+'_'+s.q.indexOf(q);
+      html+='<div class="qc" id="qc-'+id+'"><div class="qc-h" onclick="toggleQ(\''+id+'\')">'+
+        '<span class="vd '+v+'" title="'+VD[v].t+'">'+VD[v].s+'</span>'+
+        '<span class="t">'+esc(q.p)+'</span><span class="ch">▶</span></div>'+
+        '<div class="qc-b">'+esc(q.r)+'</div></div>';
+    });
+    html+='</div>';
+  });
+  document.getElementById('faqLista').innerHTML = n ? html :
+    '<div class="vacio">Sin resultados para “'+esc(document.getElementById('bus').value)+'”.<br>'+
+    'Probá con otra palabra: <b>hervidor</b>, <b>casillero</b>, <b>plantas</b>, <b>casino</b>…</div>';
+}
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function toggleQ(id){
+  var c=document.getElementById('qc-'+id);
+  c.classList.toggle('open');
+  if(c.classList.contains('open')){ E.leidas[id]=1; guarda(); }
+}
+function todo(abrir){
+  [].forEach.call(document.querySelectorAll('.qc'),function(c){ c.classList.toggle('open',abrir); });
+}
+function alAzar(){
+  document.getElementById('bus').value=''; filtroSec='todas'; pintaChips(); pintaFAQ();
+  var cs=document.querySelectorAll('.qc');
+  if(!cs.length) return;
+  todo(false);
+  var c=cs[Math.floor(Math.random()*cs.length)];
+  c.classList.add('open');
+  c.scrollIntoView({behavior:'smooth',block:'center'});
+  c.style.transition='box-shadow .3s'; c.style.boxShadow='0 0 0 3px rgba(41,171,226,.45)';
+  setTimeout(function(){ c.style.boxShadow=''; },1600);
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   JUEGO 1 · ¿ME LO LLEVO?
+   ════════════════════════════════════════════════════════════════════════ */
+var OPC_M=[{k:'si',t:'✓ Me lo llevo'},{k:'dep',t:'! Depende / regulado'},{k:'no',t:'✕ Se queda'}];
+function pintaMochila(){
+  var st=E.mochila, host=document.getElementById('gMochila');
+  if(st.i>=MOCHILA.length){ host.innerHTML=final('mochila',MOCHILA.length,st.ok,MOCHILA.map(function(x){return x.n;})); return; }
+  var it=MOCHILA[st.i], dado=st.ans[st.i];
+  host.innerHTML=
+    barra(st.i,MOCHILA.length,st.ok)+
+    '<div class="gitem"><span class="em">'+it.em+'</span>'+
+    '<div class="gq">'+esc(it.n)+'</div>'+
+    '<div class="gsub">¿Viaja al nuevo hospital?</div></div>'+
+    '<div class="gopts">'+OPC_M.map(function(o){
+      var cl='';
+      if(dado!==undefined){
+        if(o.k===it.v) cl=' ok';
+        else if(o.k===dado) cl=' bad';
+      }
+      return '<button class="gopt'+cl+'" '+(dado!==undefined?'disabled':'')+
+        ' onclick="respMochila(\''+o.k+'\')">'+o.t+'</button>';
+    }).join('')+'</div>'+
+    (dado!==undefined ? '<div class="feed on '+(dado===it.v?'ok':'bad')+'">'+
+      '<b>'+(dado===it.v?'Correcto':'La respuesta oficial dice otra cosa')+'</b>'+esc(it.w)+'</div>'+
+      '<div class="gnav"><button class="btn" onclick="sigMochila()">'+
+      (st.i===MOCHILA.length-1?'Ver resultado →':'Siguiente objeto →')+'</button></div>' : '');
+}
+function respMochila(k){
+  var st=E.mochila;
+  if(st.ans[st.i]!==undefined) return;
+  st.ans[st.i]=k;
+  if(k===MOCHILA[st.i].v) st.ok++;
+  guarda(); pintaMochila(); refrescaScore();
+}
+function sigMochila(){ E.mochila.i++; guarda(); pintaMochila(); refrescaScore(); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   JUEGO 2 · VERDADERO O FALSO
+   ════════════════════════════════════════════════════════════════════════ */
+function pintaVF(){
+  var st=E.vf, host=document.getElementById('gVF');
+  if(st.i>=VOF.length){ host.innerHTML=final('vf',VOF.length,st.ok,VOF.map(function(x){return x.t;})); return; }
+  var it=VOF[st.i], dado=st.ans[st.i];
+  host.innerHTML=
+    barra(st.i,VOF.length,st.ok)+
+    '<div style="padding:16px 0 4px"><div class="gsub">Afirmación '+(st.i+1)+' de '+VOF.length+'</div>'+
+    '<div class="gq">“'+esc(it.t)+'”</div></div>'+
+    '<div class="gopts">'+[[true,'✓ Verdadero'],[false,'✕ Falso']].map(function(o){
+      var cl='';
+      if(dado!==undefined){
+        if(o[0]===it.v) cl=' ok';
+        else if(o[0]===dado) cl=' bad';
+      }
+      return '<button class="gopt'+cl+'" '+(dado!==undefined?'disabled':'')+
+        ' onclick="respVF('+o[0]+')">'+o[1]+'</button>';
+    }).join('')+'</div>'+
+    (dado!==undefined ? '<div class="feed on '+(dado===it.v?'ok':'bad')+'">'+
+      '<b>'+(dado===it.v?'Bien':'No es así')+'</b>'+esc(it.w)+'</div>'+
+      '<div class="gnav"><button class="btn" onclick="sigVF()">'+
+      (st.i===VOF.length-1?'Ver resultado →':'Siguiente →')+'</button></div>' : '');
+}
+function respVF(v){
+  var st=E.vf;
+  if(st.ans[st.i]!==undefined) return;
+  st.ans[st.i]=v;
+  if(v===VOF[st.i].v) st.ok++;
+  guarda(); pintaVF(); refrescaScore();
+}
+function sigVF(){ E.vf.i++; guarda(); pintaVF(); refrescaScore(); }
+
+/* ════════════════════════════════════════════════════════════════════════
+   JUEGO 3 · QUIZ
+   ════════════════════════════════════════════════════════════════════════ */
+function pintaQuiz(){
+  var st=E.quiz, host=document.getElementById('gQuiz');
+  if(st.i>=QUIZ.length){ host.innerHTML=final('quiz',QUIZ.length,st.ok,QUIZ.map(function(x){return x.q;})); return; }
+  var it=QUIZ[st.i], dado=st.ans[st.i];
+  host.innerHTML=
+    barra(st.i,QUIZ.length,st.ok)+
+    '<div style="padding:14px 0 4px"><div class="gsub">'+esc(it.s)+' · pregunta '+(st.i+1)+' de '+QUIZ.length+'</div>'+
+    '<div class="gq">'+esc(it.q)+'</div></div>'+
+    '<div style="margin-top:8px">'+it.o.map(function(o,j){
+      var cl='';
+      if(dado!==undefined){
+        if(j===it.r) cl=' ok';
+        else if(j===dado) cl=' bad';
+      }
+      return '<button class="gopt'+cl+'" style="width:100%;text-align:left;margin-bottom:8px;font-weight:600" '+
+        (dado!==undefined?'disabled':'')+' onclick="respQuiz('+j+')">'+esc(o)+'</button>';
+    }).join('')+'</div>'+
+    (dado!==undefined ? '<div class="feed on '+(dado===it.r?'ok':'bad')+'">'+
+      '<b>'+(dado===it.r?'Correcto':'Respuesta correcta: '+esc(it.o[it.r]))+'</b>'+esc(it.w)+'</div>'+
+      '<div class="gnav"><button class="btn" onclick="sigQuiz()">'+
+      (st.i===QUIZ.length-1?'Ver resultado →':'Siguiente →')+'</button></div>' : '');
+}
+function respQuiz(j){
+  var st=E.quiz;
+  if(st.ans[st.i]!==undefined) return;
+  st.ans[st.i]=j;
+  if(j===QUIZ[st.i].r) st.ok++;
+  guarda(); pintaQuiz(); refrescaScore();
+}
+function sigQuiz(){ E.quiz.i++; guarda(); pintaQuiz(); refrescaScore(); }
+
+/* ── Piezas compartidas de los tres juegos ── */
+function barra(i,n,ok){
+  return '<div class="gtop"><span class="st">'+(i+1)+' / '+n+'</span>'+
+    '<span class="pg"><i style="width:'+Math.round(i/n*100)+'%"></i></span>'+
+    '<span class="st" style="color:var(--verde)">'+ok+' ✓</span></div>';
+}
+function final(cual,n,ok,titulos){
+  var st=E[cual], pc=ok/n;
+  var m = pc>=.9?'🏅' : pc>=.7?'🌟' : pc>=.5?'📘' : '🌿';
+  var msg= pc>=.9?'Impecable. Podés explicárselo a tu equipo.'
+         : pc>=.7?'Muy bien. Repasá las que fallaste y quedás listo.'
+         : pc>=.5?'Vas por buen camino: revisá las respuestas de abajo.'
+         : 'Date una vuelta por las preguntas y volvé a intentarlo.';
+  var det=titulos.map(function(t,i){
+    var bien = (cual==='mochila') ? st.ans[i]===MOCHILA[i].v
+             : (cual==='vf')      ? st.ans[i]===VOF[i].v
+             :                      st.ans[i]===QUIZ[i].r;
+    return '<div class="revi"><span class="m">'+(bien?'✅':'❌')+'</span><span>'+esc(t)+'</span></div>';
+  }).join('');
+  return '<div class="fin"><div class="medal">'+m+'</div>'+
+    '<h3>'+ok+' de '+n+'</h3><div class="sc">'+msg+'</div>'+
+    '<div class="lvl">'+nivel(puntos()).n+'</div>'+
+    '<div class="gnav" style="justify-content:center">'+
+      '<button class="btn" onclick="reinicia(\''+cual+'\')">↻ Jugar de nuevo</button>'+
+      '<button class="btn gh" onclick="irA(\'preguntas\')">Ir a las preguntas</button></div>'+
+    '<div class="rev"><h4>Tu detalle</h4>'+det+'</div></div>';
+}
+function reinicia(cual){
+  E[cual]={i:0,ok:0,ans:[]};
+  guarda();
+  if(cual==='mochila') pintaMochila(); else if(cual==='vf') pintaVF(); else pintaQuiz();
+  refrescaScore();
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   REFERENTES
+   ════════════════════════════════════════════════════════════════════════ */
+function pintaRefs(){
+  document.getElementById('refs').innerHTML=REFS.map(function(r){
+    return '<div class="refc" style="border-top-color:'+r.c+'">'+
+      '<div class="am">Orientación respecto a</div>'+
+      '<div class="nm" style="color:'+r.c+'">'+esc(r.a)+'</div>'+
+      (r.n ? '<div style="margin-top:8px;font-size:13.5px;font-weight:700">'+esc(r.n)+'</div>'
+           : '<div class="pend">Referente por confirmar</div>')+
+      '</div>';
+  }).join('');
+  document.getElementById('canales').innerHTML=CANALES.map(function(c){
+    var in0='<span class="ic">'+c.ic+'</span><div><div class="tt">'+esc(c.t)+'</div>'+
+      '<div class="ds">'+esc(c.d)+'</div></div><span class="tag">'+c.g+'</span>';
+    return c.u ? '<a class="canal" href="'+c.u+'" target="_blank" rel="noopener noreferrer">'+in0+'</a>'
+               : '<div class="canal">'+in0+'</div>';
+  }).join('');
+}
+
+/* ── Arranque ── */
+pintaTabs(); pintaInicio(); pintaChips(); pintaFAQ(); pintaRefs(); refrescaScore();
+document.getElementById('tab-inicio').classList.add('on');
+</script>
+<script src="hub-home.js"></script>
+</body></html>
