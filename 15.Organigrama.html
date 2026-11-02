@@ -292,9 +292,10 @@
   .ow.c-lila{background:#ECE7FA;border-color:#b8a8ea} .ow.c-navy{background:#1F2A55;color:#fff}
   .ow .t{font-weight:800;font-size:17px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .ow.zL .t{font-size:20px} .ow .s{font-size:13px;opacity:.85;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-  .ow .pp{margin-top:5px;display:flex;flex-wrap:wrap;gap:3px;justify-content:center;overflow:hidden;max-height:50px} .ow.zS .pp{max-height:24px} .ow.zL .pp{max-height:76px}
+  .ow .pp{margin-top:5px;display:flex;flex-direction:column;align-items:center;gap:3px;max-width:100%}   /* lista: quien lidera arriba y el resto debajo */
   .ow .pp span.lider{font-weight:850;background:#fff;box-shadow:inset 0 0 0 1.5px rgba(31,42,85,.35)}   /* la primera persona lidera */
-  .ow .pp span{background:rgba(255,255,255,.85);border-radius:9px;padding:1px 7px;font-size:12.5px;font-weight:600;color:#1F2A55;white-space:nowrap}
+  .ow .pp span{background:rgba(255,255,255,.85);border-radius:9px;padding:1px 7px;font-size:12.5px;line-height:15px;font-weight:600;color:#1F2A55;max-width:100%;box-sizing:border-box}
+  .ow .t,.ow .pp{flex-shrink:0} .ow.conpin{padding-bottom:24px}   /* el pin no tapa el último nombre */
   .ow .q{position:absolute;top:4px;right:5px;width:9px;height:9px;border-radius:50%;background:#f59e0b;font-size:0;cursor:help}
   .ow.sel{box-shadow:0 0 0 3px #2563eb,0 6px 16px rgba(31,42,85,.18);z-index:2}
   .ow[draggable="true"]{cursor:grab} .ow.drag{opacity:.4} .ow.drop{box-shadow:0 0 0 3px #10b981;transform:scale(1.04)}
@@ -1401,6 +1402,13 @@ document.addEventListener('DOMContentLoaded', () => {
      hijos con sub-hijos → en fila; 3 o más hojas → en columnas de hasta 4.
      Un nodo «lateral» (asesoría) va al costado de su padre con línea punteada. */
   const TAM = { S: [212, 92], M: [244, 126], L: [296, 162] };   // 27-10: más grandes, legibles al proyectar
+  // ancho y alto del bloque: el alto crece con la lista de personas (título, detalle y una fila por persona)
+  function med(n){ const [w, h0] = TAM[n.z] || TAM.S, tl = Math.min(2, Math.ceil(String(n.t || '').length / (n.z === 'L' ? 25 : n.z === 'M' ? 24 : 20))) || 1;
+    const largo = x => { try{ return conSigla(x).length; }catch(e){ return String(x).length + 4; } };   // con su sigla (al cargar aún no existe conSigla)
+    const nom = (n.p || []).reduce((t, x) => t + 5 + 15 * Math.ceil(largo(x) * 7 / (w - 40)), 0);       // un nombre largo ocupa dos líneas
+    return [w, Math.max(h0, Math.ceil(20 + tl * 20.4 + (n.s ? 18 : 0) + (nom ? 2 + nom : 0) + (tienePin(n) ? 18 : 0)))]; }
+  const PINES = new Map();   // ¿el bloque lleva pin? (reserva espacio aunque estén ocultos: el alto no cambia al ocultarlos)
+  function tienePin(n){ const k = n.t + '|' + (n.p || []).join(); if(!PINES.has(k)){ try{ PINES.set(k, pendDe(n.t, n.p).n > 0); }catch(e){ return false; } } return PINES.get(k); }
   const GX = 22, GY = 46, GS = 12;           // separación horizontal, entre niveles y dentro de columnas
   const COLORES = { azul: 'Azul', verde: 'Verde', durazno: 'Durazno', lila: 'Lila', navy: 'Navy' };
   const KEY = 'org15_pm_editor_v3';   // v3 (27-10 tarde): organización acordada en la reunión PM (rol → persona); v2 y v1 quedan guardados aparte
@@ -1438,7 +1446,7 @@ document.addEventListener('DOMContentLoaded', () => {
   try{ if(!localStorage.getItem('org15_mig_sd3110')){
     const ORD = ['SDM', 'SDADT', 'SDGC', 'SDGP', 'SDA'], sig = k => (/^(SDADT|SDGC|SDGP|SDM|SDA)\b/.exec(k.t) || [])[1];
     const sup = (function f(n){ return ORD.every(o => (n.h || []).filter(k => sig(k) === o).length === 1) ? n : (n.h || []).map(f).find(Boolean); })(arbol);
-    if(sup && localStorage.getItem(KEY)){ const B = ORD.map(o => sup.h.find(k => sig(k) === o)), TW = k => TAM[k.z] || TAM.S; let i = 0;
+    if(sup && localStorage.getItem(KEY)){ const B = ORD.map(o => sup.h.find(k => sig(k) === o)), TW = med; let i = 0;
       localStorage.setItem(KEY + '_antes_sd', JSON.stringify({ arbol, pos: libre }));
       sup.h = sup.h.map(k => ORD.includes(sig(k)) ? B[i++] : k); sup.enFila = true;
       if(libre && libre[sup.id] && B.every(k => libre[k.id])){
@@ -1451,6 +1459,16 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem(KEY + '_pos', JSON.stringify(libre)); }
       localStorage.setItem(KEY, JSON.stringify(arbol)); }
     localStorage.setItem('org15_mig_sd3110', '1'); } }catch(e){}
+  // 01-11: las coordinaciones técnicas son apéndices de su director (SSMO y Hospital): van al costado, fuera de la barra de sus dependientes.
+  // Una vez por navegador, sobre lo guardado: solo cambia su línea (los bloques no se mueven); lo que colgaba de ellas pasa al director. Copia previa en KEY_antes_ap
+  try{ if(!localStorage.getItem('org15_mig_ap0111')){ if(localStorage.getItem(KEY)){
+    const hallar = (rx, n = arbol, p = null) => rx.test(n.t) ? { n, p } : (n.h || []).map(k => hallar(rx, k, n)).find(Boolean), previo = JSON.stringify({ arbol, pos: libre }); let cambio = false;
+    [[/^Coordinaci[oó]n T[eé]cnica SSMO/i, /^SSMO\b/], [/^Coordinaci[oó]n T[eé]cnica de Puesta en Marcha/i, /^Hospital del Salvador/i]].forEach(([ra, rd]) => { const a = hallar(ra), d = hallar(rd);
+      if(!a || !d || !a.p || (function den(x){ return x === d.n || (x.h || []).some(den); })(a.n)) return;
+      if(a.p !== d.n){ a.p.h.splice(a.p.h.indexOf(a.n), 1); (d.n.h = d.n.h || []).push(a.n); }
+      (a.n.h || []).forEach(k => { delete k.ln; d.n.h.push(k); }); delete a.n.h; a.n.lat = true; delete a.n.sl; delete a.n.ln; cambio = true; });
+    if(cambio){ localStorage.setItem(KEY + '_antes_ap', previo); localStorage.setItem(KEY, JSON.stringify(arbol)); } }
+    localStorage.setItem('org15_mig_ap0111', '1'); } }catch(e){}
   const snap = () => { hist.push(JSON.stringify({ a: arbol, l: libre, s: SG })); if(hist.length > 60) hist.shift(); };
   const deshacer = () => { if(!hist.length) return; const o = JSON.parse(hist.pop()); arbol = o.a || o; if(o.a) libre = o.l; if(o.s) SG = o.s; guardar(); pintar(); pintarTv(); };
   function buscar(id, n = arbol, p = null){ if(n.id === id) return { n, p }; for(const h of n.h || []){ const r = buscar(id, h, n); if(r) return r; } return null; }
@@ -1458,7 +1476,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ── medir y ubicar ──
   function medir(n){
-    const [w, h] = TAM[n.z] || TAM.S, hijos = (n.h || []).filter(x => !x.lat), lats = (n.h || []).filter(x => x.lat);
+    const [w, h] = med(n), hijos = (n.h || []).filter(x => !x.lat), lats = (n.h || []).filter(x => x.lat);
     hijos.forEach(medir); lats.forEach(medir);
     const latW = lats.reduce((a, l) => a + GX + l.W, 0);
     n.modo = !n.enFila && hijos.length >= 3 && hijos.every(x => !(x.h || []).length) ? 'col' : 'fila';   // enFila: dependientes siempre de izquierda a derecha
@@ -1475,10 +1493,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
   function ubicar(n, x, y, out){
-    const [w, h] = TAM[n.z] || TAM.S, hijos = (n.h || []).filter(c => !c.lat), lats = (n.h || []).filter(c => c.lat);
+    const [w, h] = med(n), hijos = (n.h || []).filter(c => !c.lat), lats = (n.h || []).filter(c => c.lat);
     n.x = x + n.W / 2 - w / 2; n.y = y; out.nodos.push(n); out.lineas.push(...colasDe(n, n));
     let lx = n.x + w + GX;
-    lats.forEach(l => { ubicar(l, lx, y + (h - (TAM[l.z] || TAM.S)[1]) / 2, out); if(!l.sl) out.lineas.push({ d: `M${n.x + w},${y + h / 2} H${lx}`, lat: 1 }); lx += l.W + GX; });
+    lats.forEach(l => { ubicar(l, lx, y + (h - med(l)[1]) / 2, out); if(!l.sl) out.lineas.push({ d: `M${n.x + w},${y + h / 2} H${lx}`, lat: 1 }); lx += l.W + GX; });
     if(!hijos.length) return;
     const pcx = n.x + w / 2, py = y + h, yh = y + h + GY;
     if(n.modo === 'col'){
@@ -1486,12 +1504,12 @@ document.addEventListener('DOMContentLoaded', () => {
       for(let c = 0; c < n.cols; c++){
         const grupo = hijos.slice(c * n.filas, (c + 1) * n.filas), bx = cx0 + c * (n.cw + 18 + GX);
         const ult = grupo.map((k, i) => [k, i]).filter(([k]) => !k.sl).pop();   // los desconectados (sl) van sin línea
-        if(ult) out.lineas.push({ d: `M${pcx},${py} V${py + GY / 2} H${bx + 6} V${yh + ult[1] * (n.ch + GS) + (TAM[ult[0].z] || TAM.S)[1] / 2}` });
-        grupo.forEach((k, i) => { const ky = yh + i * (n.ch + GS); ubicar(k, bx + 18, ky, out); if(!k.sl) out.lineas.push({ d: `M${bx + 6},${ky + (TAM[k.z] || TAM.S)[1] / 2} H${k.x}` }); });
+        if(ult) out.lineas.push({ d: `M${pcx},${py} V${py + GY / 2} H${bx + 6} V${yh + ult[1] * (n.ch + GS) + med(ult[0])[1] / 2}` });
+        grupo.forEach((k, i) => { const ky = yh + i * (n.ch + GS); ubicar(k, bx + 18, ky, out); if(!k.sl) out.lineas.push({ d: `M${bx + 6},${ky + med(k)[1] / 2} H${k.x}` }); });
       }
     } else {
       const ancho = hijos.reduce((a, k) => a + k.W, 0) + GX * (hijos.length - 1); let cx = x + (n.W - ancho) / 2;
-      hijos.forEach(k => { ubicar(k, cx, yh, out); const kcx = k.x + (TAM[k.z] || TAM.S)[0] / 2;
+      hijos.forEach(k => { ubicar(k, cx, yh, out); const kcx = k.x + med(k)[0] / 2;
         if(!k.sl) out.lineas.push({ d: `M${pcx},${py} V${py + GY / 2} H${kcx} V${yh}` }); cx += k.W + GX; });
     }
   }
@@ -1510,7 +1528,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const pTv = t => String(t.p).split(' · ').map((x, i) => i ? esc(conSigla(x)) : `<b>${esc(conSigla(x))}</b>`).join(' · ');
   function pintarTv(){ document.querySelectorAll('.card.tv[data-tv] .p').forEach(el => { el.innerHTML = pTv(E.pm.transversales[+el.closest('[data-tv]').dataset.tv]); }); }
   // ── edición libre ──
-  const tam = n => TAM[n.z] || TAM.S;
+  const tam = n => med(n);
   function autoPos(){ medir(arbol); const out = { nodos: [], lineas: [] }; ubicar(arbol, 20, 20, out); const P = {}; out.nodos.forEach(n => P[n.id] = { x: n.x, y: n.y }); return P; }
   function asegurarLibre(){ const P = autoPos(); libre = libre || {}; Object.keys(P).forEach(id => { if(!libre[id]) libre[id] = P[id]; }); }
   function rama(n){ const L = [n]; (n.h || []).forEach(k => L.push(...rama(k))); return L; }
@@ -1537,21 +1555,39 @@ document.addEventListener('DOMContentLoaded', () => {
   // 📐 Alinear: emparejar lo que está CASI alineado, sin cambiar el orden. Bloques: misma fila (borde superior a ≤ 30 px)
   // y misma columna (centro a ≤ 30 px). Líneas: los tramos casi rectos quedan rectos y los diagonales en ángulo recto,
   // sin mover sus extremos. Con ⌘ + clic en varios bloques, solo esos.
-  function alinear(){
+  // baja lo que quedó tapado por el bloque de arriba en su misma columna. viejo = alto anterior: solo corrige lo que el crecimiento tapó y conserva el aire que había
+  function separar(viejo){ const L = Object.keys(libre).map(id => buscar(id)).filter(Boolean).map(q => q.n).sort((a, b) => libre[a.id].y - libre[b.id].y), O = {}, mov = []; L.forEach(n => { O[n.id] = { ...libre[n.id] }; });
+    L.forEach((b, i) => { const [bw] = tam(b), B = libre[b.id]; let y = B.y; L.slice(0, i).forEach(a => { const [aw, ah] = tam(a), A = libre[a.id]; if(A.x >= B.x + bw - 1 || A.x + aw <= B.x + 1) return;
+      const g = O[b.id].y - O[a.id].y - (viejo ? viejo(a) : ah); if(viejo){ if(g >= 0) y = Math.max(y, A.y + ah + Math.min(g, GY)); } else if(g < 0) y = Math.max(y, A.y + ah + GS); });
+      if(y > B.y + .5){ libre[b.id] = { x: B.x, y }; mov.push(b.id); } }); return mov; }
+  // una vez por navegador: los bloques ya guardados crecen con su lista; se baja lo que quedaría tapado y se retrazan solo las líneas de lo que cambió (copia previa en KEY_antes_lista)
+  function migrarLista(){ try{ if(localStorage.getItem('org15_mig_lista0211')) return;
+    if(localStorage.getItem(KEY) && libre){ const previo = JSON.stringify({ arbol, pos: libre, siglas: SG }); asegurarLibre(); const vi = n => (TAM[n.z] || TAM.S)[1], crecen = rama(arbol).filter(n => tam(n)[1] > vi(n)).map(n => n.id);
+      if(crecen.length){ localStorage.setItem(KEY + '_antes_lista', previo); const movidos = separar(vi); alinear({ ids: [...new Set([...crecen, ...movidos])], soloLineas: true }); } }
+    localStorage.setItem('org15_mig_lista0211', '1'); }catch(e){} }
+  function alinear(op = {}){
     asegurarLibre(); snap();
-    const TOL = 30, ids = (multi.size > 1 ? [...multi] : Object.keys(libre)).filter(id => buscar(id)), sol = new Set(ids), mov = new Set();
-    const agrupar = (val, fijar) => { let g = [];   // cada grupo va a su mediana: el desalineado se mueve hacia los demás
-      const cerrar = () => { if(g.length > 1){ const m = g[(g.length - 1) >> 1][1]; g.forEach(([id, v]) => { if(Math.abs(v - m) > .5){ fijar(id, m); mov.add(id); } }); } g = []; };
-      ids.map(id => [id, val(id)]).sort((a, b) => a[1] - b[1]).forEach(x => { if(g.length && x[1] - g[0][1] > TOL) cerrar(); g.push(x); }); cerrar(); };
+    const TOL = 30, ids = (op.ids || (multi.size > 1 ? [...multi] : Object.keys(libre))).filter(id => buscar(id)), sol = new Set(ids), mov = new Set();
+    const agrupar = (val, fijar, alto) => { let g = [];   // cada grupo va a su mediana: el desalineado se mueve hacia los demás
+      const cerrar = () => { if(g.length > 1){ const m = alto ? g[g.length - 1][1] : g[(g.length - 1) >> 1][1]; g.forEach(([id, v]) => { if(Math.abs(v - m) > .5){ fijar(id, m); mov.add(id); } }); } g = []; };
+      ids.filter(id => !buscar(id).n.lat).map(id => [id, val(id)]).sort((a, b) => a[1] - b[1]).forEach(x => { if(g.length && x[1] - g[0][1] > TOL) cerrar(); g.push(x); }); cerrar(); };
     const ancho = id => tam(buscar(id).n)[0];
-    agrupar(id => libre[id].y, (id, m) => { libre[id].y = m; });                                    // filas
-    agrupar(id => libre[id].x + ancho(id) / 2, (id, m) => { libre[id].x = m - ancho(id) / 2; });   // columnas
+    if(!op.soloLineas){
+      agrupar(id => libre[id].y, (id, m) => { libre[id].y = m; });                                    // filas
+      agrupar(id => libre[id].x + ancho(id) / 2, (id, m) => { libre[id].x = m - ancho(id) / 2; });   // columnas
+      if(multi.size < 2){ separar().forEach(id => mov.add(id)); agrupar(id => libre[id].y, (id, m) => { libre[id].y = m; }, true); separar().forEach(id => mov.add(id)); }   // sin tapar; las filas se emparejan hacia abajo
+    }
     let lin = 0; const V = pt => pt === 'n' || pt === 's', pares = [];
     (function rec(n){ (n.h || []).forEach(k => { pares.push([n, k]); rec(k); }); })(arbol);
     const toca = (n, k) => k.ln && !k.sl && (sol.has(k.id) || sol.has(n.id));
+    // 0) apéndices: línea de costado (sin trazado a mano) y a la altura de su superior, si está a un lado y ese lugar está libre
+    pares.forEach(([n, k]) => { if(!k.lat || k.sl || !(sol.has(k.id) || sol.has(n.id))) return; if(k.ln){ delete k.ln; lin++; }
+      if(op.soloLineas) return; const S = libre[n.id], P = libre[k.id], [w, h] = tam(n), [kw, kh] = tam(k), y = S.y + (h - kh) / 2; if(Math.abs(P.y - y) < .5 || !(P.x >= S.x + w || P.x + kw <= S.x)) return;
+      const tapa = Object.keys(libre).some(id => { const q = id !== k.id && buscar(id); if(!q) return false; const [qw, qh] = tam(q.n), Q = libre[id]; return P.x < Q.x + qw && P.x + kw > Q.x && y < Q.y + qh && y + kh > Q.y; });
+      if(!tapa){ P.y = y; mov.add(k.id); } });
     // 1) bloque a bloque casi en línea recta: el de abajo (o del costado) se corre hasta quedar justo frente al punto de su superior
     const abajo = n => (n.h || []).filter(k => !k.sl && !k.lat && libre[k.id] && libre[k.id].y >= libre[n.id].y + tam(n)[1] + 10);   // dependientes bajo el bloque
-    pares.forEach(([n, k]) => { if(!toca(n, k) || !k.ln.a || (k.ln.v || []).length || abajo(n).length > 1) return; const pa = ancla(libre[n.id], n, k.ln.a), pb = ancla(libre[k.id], k, k.ln.b);
+    if(!op.soloLineas) pares.forEach(([n, k]) => { if(!toca(n, k) || !k.ln.a || (k.ln.v || []).length || abajo(n).length > 1) return; const pa = ancla(libre[n.id], n, k.ln.a), pb = ancla(libre[k.id], k, k.ln.b);
       if(V(k.ln.a) && V(k.ln.b) && Math.abs(pa.x - pb.x) > .5 && Math.abs(pa.x - pb.x) < TOL){ libre[k.id].x += pa.x - pb.x; mov.add(k.id); }
       if(!V(k.ln.a) && !V(k.ln.b) && Math.abs(pa.y - pb.y) > .5 && Math.abs(pa.y - pb.y) < TOL){ libre[k.id].y += pa.y - pb.y; mov.add(k.id); } });
     // traza la línea de k en ángulo recto (P0: otro punto de partida, para las que nacen sobre una línea)
@@ -1602,6 +1638,7 @@ document.addEventListener('DOMContentLoaded', () => {
       rutear(n, k, q); });
     (function rec(n){ (n.lx || []).forEach(c => { if(!c || !sol.has(n.id)) return;   // líneas sueltas: rectas en su dirección principal
         const dx = Math.abs(c.dx) < Math.abs(c.dy) ? 0 : c.dx, dy = dx ? 0 : c.dy; if(dx !== c.dx || dy !== c.dy){ c.dx = dx; c.dy = dy; lin++; } }); (n.h || []).forEach(rec); })(arbol);
+    if(op.soloLineas){ hist.pop(); return guardar(); }
     if(!mov.size && !lin){ hist.pop(); return aviso('Ya estaba todo alineado'); }
     guardar(); pintar(); aviso(`📐 ${mov.size} bloque(s) y ${lin} línea(s) alineados · ↶ Deshacer si no te gusta`);
   }
@@ -1610,7 +1647,7 @@ document.addEventListener('DOMContentLoaded', () => {
     (function ord(n){ const h = n.h || []; if(h.length > 1) h.sort((a, b) => ((a.lat ? 1 : 0) - (b.lat ? 1 : 0))
       || (Math.round(libre[a.id].x / 120) - Math.round(libre[b.id].x / 120)) || (libre[a.id].y - libre[b.id].y)); h.forEach(ord); })(arbol);
   }
-  const ancla = (P, n, pt) => { const [w, h] = TAM[n.z] || TAM.S;
+  const ancla = (P, n, pt) => { const [w, h] = med(n);
     return pt === 'n' ? { x: P.x + w / 2, y: P.y } : pt === 's' ? { x: P.x + w / 2, y: P.y + h } : pt === 'e' ? { x: P.x + w, y: P.y + h / 2 } : { x: P.x, y: P.y + h / 2 }; };
   const ptXY = (n, pt) => ancla(libre[n.id], n, pt);
   const colasDe = (n, P) => (n.lx || []).map((c, i) => { if(!c) return null; const a = ancla(P, n, c.pt), ex = a.x + c.dx, ey = a.y + c.dy;
@@ -1658,9 +1695,9 @@ document.addEventListener('DOMContentLoaded', () => {
     snap(); a.p.h.splice(a.p.h.indexOf(a.n), 1); (d.n.h = d.n.h || []).push(a.n); a.n.lat = false; delete a.n.ln; guardar(); return true;
   }
   function widget(n){
-    const [w, h] = TAM[n.z] || TAM.S, pp = n.p || [];
+    const [w, h] = med(n), pp = n.p || [];
     const P = libre && libre[n.id] ? libre[n.id] : n;
-    return `<div class="ow c-${n.c || 'azul'} z${n.z}${sel === n.id ? ' sel' : ''}${multi.has(n.id) ? ' multi' : ''}${n.lat ? ' lat' : ''}" data-id="${n.id}" style="left:${P.x}px;top:${P.y}px;width:${w}px;height:${h}px">
+    return `<div class="ow c-${n.c || 'azul'} z${n.z}${tienePin(n) ? ' conpin' : ''}${sel === n.id ? ' sel' : ''}${multi.has(n.id) ? ' multi' : ''}${n.lat ? ' lat' : ''}" data-id="${n.id}" style="left:${P.x}px;top:${P.y}px;width:${w}px;height:${h}px">
       <div class="t">${esc(n.t)}</div>${n.s ? `<div class="s">${esc(n.s)}</div>` : ''}
       ${pp.length ? `<div class="pp">${pp.map((x, i) => `<span${i ? '' : ' class="lider" title="Lidera"'}>${esc(conSigla(x))}</span>`).join('')}</div>` : ''}
       ${editar ? `${[['n', 'arriba: el otro queda ENCIMA'], ['s', 'abajo: el otro queda DEBAJO'], ['e', 'al lado: asesoría'], ['o', 'al lado: asesoría']].map(([d, t]) => `<span class="oe-pt oe-pt-${d}" data-pt="${d}" title="Línea desde ${t}"></span>`).join('')}<span class="oe-del" data-a="borrar" title="Eliminar este bloque">×</span>` : ''}
@@ -1687,7 +1724,7 @@ document.addEventListener('DOMContentLoaded', () => {
           ${herr === 'pintar' ? `<div class="oe-col">${Object.keys(COLORES).map(c => `<button data-pc="${c}" class="c-${c}${colorP === c ? ' on' : ''}" title="${COLORES[c]}"></button>`).join('')}</div>` : ''}
           <hr><button data-a="alinear" title="Alinear bloques y líneas sin cambiar el orden (tecla A) · con ⌘ + clic en varios, solo esos">📐<small>Alinear</small></button>
           <button data-a="deshacer" title="Deshacer (⌘Z)" ${hist.length ? '' : 'disabled'}>↶<small>Deshacer</small></button></div>
-        <details class="oe-ayf"><summary>❔ Cómo editar</summary><div><b>🖐 Mover (M)</b>: arrastra bloques (Alt = con su rama) · clic = editar · <b>×</b> o Supr = eliminar · arrastra el fondo para recorrer · <b>arrastra una línea</b> para correrla (la barra común o el tronco se mueven enteros)<br><b>⌘ (con cualquier herramienta)</b>: clic = sumar o quitar bloques uno a uno · arrastrar en un espacio vacío = marco para seleccionar varios · después arrastra uno y se mueven juntos<br><b>✏️ Lápiz (L)</b>: solo dibuja líneas. Pasa sobre un bloque y toma uno de sus <b>4 puntos verdes</b>; arrastra (o clic y clic) y termina <b>sobre otro bloque</b>, <b>sobre una línea</b> (se suma a esa rama) o <b>al aire</b> (línea suelta, para unir después). También puedes <b>empezar en una línea</b> (o en una línea suelta) y terminar sobre un bloque u otra línea. Desde <b>arriba</b>: el otro queda encima · desde <b>abajo</b>: queda debajo · desde un <b>lado</b>: asesoría<br><b>🧽 Goma (G)</b>: mantén el clic y pasa sobre las líneas · también: clic derecho sobre una línea<br><b>➕ Bloque (B)</b>: clic en un espacio vacío = bloque suelto (luego únelo con el lápiz) · clic en un bloque = uno nuevo debajo<br><b>🎨 Color (P)</b>: elige el color y haz clic en los bloques<br><b>📐 Alinear (A)</b>: empareja filas y columnas casi alineadas y ordena las líneas como árbol (barra común y una bajada a cada uno; tronco con ramas donde hay bloques apilados), sin cambiar el orden (con ⌘ + clic en varios, solo esos)<br><b>Esc</b> = vuelve a 🖐 sin salir de la edición · <b>barra espaciadora</b> sostenida = recorrer con cualquier herramienta · <b>rueda</b> = zoom · <b>✓ Listo</b> guarda todo tal como lo dejaste</div></details>` : ''}
+        <details class="oe-ayf"><summary>❔ Cómo editar</summary><div><b>Apéndice</b> (coordinaciones técnicas, asesorías): depende de su superior pero va al costado, fuera de la barra de sus dependientes; se activa en el cuadro del bloque, sección Nivel<br><b>🖐 Mover (M)</b>: arrastra bloques (Alt = con su rama) · clic = editar · <b>×</b> o Supr = eliminar · arrastra el fondo para recorrer · <b>arrastra una línea</b> para correrla (la barra común o el tronco se mueven enteros)<br><b>⌘ (con cualquier herramienta)</b>: clic = sumar o quitar bloques uno a uno · arrastrar en un espacio vacío = marco para seleccionar varios · después arrastra uno y se mueven juntos<br><b>✏️ Lápiz (L)</b>: solo dibuja líneas. Pasa sobre un bloque y toma uno de sus <b>4 puntos verdes</b>; arrastra (o clic y clic) y termina <b>sobre otro bloque</b>, <b>sobre una línea</b> (se suma a esa rama) o <b>al aire</b> (línea suelta, para unir después). También puedes <b>empezar en una línea</b> (o en una línea suelta) y terminar sobre un bloque u otra línea. Desde <b>arriba</b>: el otro queda encima · desde <b>abajo</b>: queda debajo · desde un <b>lado</b>: asesoría<br><b>🧽 Goma (G)</b>: mantén el clic y pasa sobre las líneas · también: clic derecho sobre una línea<br><b>➕ Bloque (B)</b>: clic en un espacio vacío = bloque suelto (luego únelo con el lápiz) · clic en un bloque = uno nuevo debajo<br><b>🎨 Color (P)</b>: elige el color y haz clic en los bloques<br><b>📐 Alinear (A)</b>: empareja filas y columnas casi alineadas y ordena las líneas como árbol (barra común y una bajada a cada uno; tronco con ramas donde hay bloques apilados), sin cambiar el orden (con ⌘ + clic en varios, solo esos)<br><b>Esc</b> = vuelve a 🖐 sin salir de la edición · <b>barra espaciadora</b> sostenida = recorrer con cualquier herramienta · <b>rueda</b> = zoom · <b>✓ Listo</b> guarda todo tal como lo dejaste</div></details>` : ''}
         <div class="oe-zf"><button data-a="mas" title="Acercar">＋</button><button data-a="menos" title="Alejar">−</button><button data-a="ajustar" title="Ver todo">⤢</button></div></div>
       ${!editar ? panelPend() : ''}`;
     const lz = cont.querySelector('.oe-lienzo'), wr = lz.parentElement;
@@ -1742,15 +1779,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const rr = (x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
     const corta = (t, max) => { if(g.measureText(t).width <= max) return t; while(t.length > 1 && g.measureText(t + '…').width > max) t = t.slice(0, -1); return t + '…'; };
     out.nodos.forEach(n => {
-      const [w, h] = TAM[n.z] || TAM.S, [bg, bd] = F[n.c] || F.azul, claro = n.c === 'navy';
+      const [w, h] = med(n), [bg, bd] = F[n.c] || F.azul, claro = n.c === 'navy';
       rr(n.x, n.y, w, h, 14); g.fillStyle = bg; g.fill(); g.strokeStyle = bd; g.lineWidth = 1; g.stroke();
-      const lineas = [], lider = (n.p || [])[0], pp = (n.p || []).slice(1).map(conSigla).join(' · ');
+      const lineas = [], lider = (n.p || [])[0];
       lineas.push(['800 ' + (n.z === 'L' ? 20 : 17) + 'px Inter, Verdana, sans-serif', n.t, claro ? '#fff' : '#1F2A55']);
       if(n.s) lineas.push(['13px Inter, Verdana, sans-serif', n.s, claro ? '#cbd5e1' : '#475569']);
       if(lider) lineas.push(['800 13px Inter, Verdana, sans-serif', conSigla(lider), claro ? '#fff' : '#1F2A55']);
-      if(pp) lineas.push(['600 12.5px Inter, Verdana, sans-serif', pp, claro ? '#fff' : '#1F2A55']);
-      let y = n.y + h / 2 - (lineas.length - 1) * 10 + 5; g.textAlign = 'center';
-      lineas.forEach(([f, t, c]) => { g.font = f; g.fillStyle = c; g.fillText(corta(t, w - 16), n.x + w / 2, y); y += 20; });
+      (n.p || []).slice(1).forEach(x => lineas.push(['600 12.5px Inter, Verdana, sans-serif', conSigla(x), claro ? '#fff' : '#1F2A55']));
+      // título y nombres en hasta dos líneas (como en pantalla); el detalle en una
+      const filas = []; lineas.forEach(([f, t, c], i) => { g.font = f; const max = w - 20, tope = n.s && i === 1 ? 1 : 2, out = []; let act = '';
+        String(t).split(/\s+/).forEach(p => { const pr = act ? act + ' ' + p : p; if(act && out.length < tope - 1 && g.measureText(pr).width > max){ out.push(act); act = p; } else act = pr; }); out.push(act);
+        out.forEach(x => filas.push([f, corta(x, max), c])); });
+      let y = n.y + h / 2 - (filas.length - 1) * 10 + 5; g.textAlign = 'center';
+      filas.forEach(([f, t, c]) => { g.font = f; g.fillStyle = c; g.fillText(t, n.x + w / 2, y); y += 20; });
       g.textAlign = 'left';
       if(n.q){ g.fillStyle = '#f59e0b'; g.beginPath(); g.arc(n.x + w - 10, n.y + 10, 4.5, 0, 7); g.fill(); }
     });
@@ -1774,7 +1815,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="oe-l">Nivel ${(function d(x, k){ if(x.id === n.id) return k; for(const h of x.h || []){ const r = d(h, k + 1); if(r) return r; } return 0; })(arbol, 1)}<small> · ${raiz ? 'arriba de todo' : 'depende de «' + esc(padre.t) + '»'}</small></div>
       <label class="oe-chk"><input type="checkbox" data-f="raiz" ${raiz ? 'checked' : ''}> Primer nivel (arriba de todo)</label>
       ${raiz ? `<small style="display:block;margin:-2px 0 4px 22px">Desmárcalo para quitárselo: sube «${esc((n.h || []).slice().sort((a, b) => rama(b).length - rama(a).length).map(k => k.t)[0] || '—')}» y este queda sin línea, para unirlo con el ✏️.</small>` : ''}
-      <label class="oe-chk"><input type="checkbox" data-f="lat" ${n.lat ? 'checked' : ''} ${raiz ? 'disabled' : ''}> Al costado del superior (asesoría)</label>
+      <label class="oe-chk"><input type="checkbox" data-f="lat" ${n.lat ? 'checked' : ''} ${raiz ? 'disabled' : ''}> Apéndice del superior (al costado, línea punteada)</label>
       <label class="oe-chk"><input type="checkbox" data-f="sl" ${n.sl ? 'checked' : ''} ${raiz ? 'disabled' : ''}> Sin línea (desconectado del superior)</label>
       <label>Nota «por confirmar»<input data-f="q" value="${esc(n.q || '')}" placeholder="vacío = confirmado"></label>
       ${raiz ? '' : `<label>Depende de<select data-f="sup">${todos.map(x => `<option value="${x.id}"${padre && padre.id === x.id ? ' selected' : ''}>${esc(x.t)}</option>`).join('')}</select></label>`}
@@ -1816,7 +1857,7 @@ document.addEventListener('DOMContentLoaded', () => {
     guardar(); pintar();
   }
   function montar(div){
-    cont = div; document.body.classList.toggle('sinpines', sinPines); pintar();
+    cont = div; document.body.classList.toggle('sinpines', sinPines); migrarLista(); pintar();
     div.addEventListener('click', ev => {
       if(sinClic){ sinClic = false; return; }   // fue un arrastre del lienzo, no un clic
       const b = ev.target.closest('[data-a]'); if(b && b.tagName !== 'INPUT') return accion(b.dataset.a, b);
@@ -1848,6 +1889,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const f = ev.target.dataset.f; if(!['t', 's', 'p', 'q'].includes(f) || !sel) return; const s = buscar(sel); if(!s) return;
       if(campoSnap !== ev.target){ snap(); campoSnap = ev.target; }
       if(f === 'p'){ s.n.p = ev.target.value.split('\n').map(x => x.trim()).filter(Boolean); const g = cont.querySelector('.oe-sgs'); if(g) g.innerHTML = filasSg(s.n); } else s.n[f] = ev.target.value.trim();
+      if(libre) cont.querySelector('.oe-lienzo svg').innerHTML = svgLibre();
       const el = cont.querySelector(`.ow[data-id="${s.n.id}"]`); if(el){ const t = document.createElement('div'); t.innerHTML = widget(s.n).trim(); el.replaceWith(t.firstChild); }
       guardar();
     });
@@ -1860,7 +1902,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if(f === 'sup'){ hist.pop(); if(cambiarSuperior(s.n.id, ev.target.value)) pintar(); return; }
       if(['t', 's', 'p', 'q'].includes(f)){ hist.pop(); return; }   // ya se aplicó al escribir (evento input)
       if(f === 'p') s.n.p = ev.target.value.split('\n').map(x => x.trim()).filter(Boolean);
-      else if(f === 'lat') s.n.lat = ev.target.checked;
+      else if(f === 'lat'){ s.n.lat = ev.target.checked; delete s.n.ln; }
       else if(f === 'raiz' && !ev.target.checked && !s.p){   // deja el primer nivel: sube su rama más grande y este queda debajo de ella, sin línea
         const C = (s.n.h || []).slice().sort((a, b) => rama(b).length - rama(a).length)[0];
         if(!C){ hist.pop(); aviso('Es el único bloque: no hay otro que pueda quedar arriba'); return pintar(); }

@@ -31,20 +31,19 @@ window.ORG_EXTRA = {
               q: 'Cargo de origen por confirmar: jefa del departamento de Planificación y Proyectos, dependiente del Subdirector Administrativo del SSMO, encomendada como coordinadora técnica del Director' },
       h: [
         { t: 'Hospital del Salvador', s: 'Director', c: 'navy', z: 'M', p: ['Dr. Jorge Zajjur Castro'], h: [
-          { t: 'Coordinación Técnica de Puesta en Marcha', s: 'de director a director con la CT del SSMO', c: 'azul', z: 'M', p: ['María Elena Sepúlveda'], h: [
-            { t: 'Ámbito clínico', s: 'frentes clínicos', c: 'verde', h: [
-              { t: 'Autorización Sanitaria', s: 'SEREMI · ISP · cartera de prestaciones', c: 'verde', z: 'M', p: ['Catherine Sepúlveda (100 %)', 'Javiera Flores'] },
-              { t: 'Equipamiento médico (EMMC)', s: 'existencias · subsanaciones · traslado', c: 'verde', z: 'M', p: ['Matías Pinto', 'Meylin Canales'] },
-              { t: 'Plan Piloto (SCL)', s: 'enrolamiento y capacitación del piloto', c: 'verde', z: 'M', p: ['Javiera Pacheco', 'Horacio Díaz', 'Meylin Canales', 'Marisol Salvatierra'], q: 'Responsable único por definir (se trabaja en la presentación)' },
-              { t: 'Plan de Traslado y poblamiento', s: 'programa de traslado · despoblamiento', c: 'verde', z: 'M', p: ['Fernando Araya', 'Costanza Poch'] },
-              { t: 'Capacitación', s: 'general y específica', c: 'verde', z: 'M', p: ['C. Guerrero', 'Javi', 'Isabel Rojas', 'Matías Pinto'], q: 'Nombres de la pizarra: confirmar «Javi» y C. Guerrero' },
-              { t: 'Cabida', s: 'quién trabaja dónde en el NHDS', c: 'verde', z: 'M', p: ['Loreto Pérez', 'Matías Pinto'] }
-            ]},
-            { t: 'Ámbito administrativo y logístico', s: 'con la Subdirección Administrativa', c: 'durazno', z: 'M', p: ['Rodrigo Hermosilla', 'Fernando Lacalle', 'Marisol Salvatierra'], h: [
-              { t: 'Traslado de equipos propios y comodatos', s: 'con Mariana Bravo (SSMO)', c: 'durazno', z: 'M', p: ['Rodrigo Hermosilla', 'Matías Pinto'] },
-              { t: 'Logística en terreno', s: 'racks · bodegas · oficinas', c: 'durazno', z: 'M', p: ['Rodrigo Espinoza'] },
-              { t: 'Sociedad Concesionaria', s: 'servicios concesionados: seguridad, aseo, alimentación, ropería, esterilización', c: 'durazno', z: 'M', p: ['Marisol Salvatierra'], q: 'Responsable de los servicios concesionados por confirmar' }
-            ]}
+          { t: 'Coordinación Técnica de Puesta en Marcha', s: 'de director a director con la CT del SSMO', c: 'azul', z: 'M', p: ['María Elena Sepúlveda'], lat: true },
+          { t: 'Ámbito clínico', s: 'frentes clínicos', c: 'verde', h: [
+            { t: 'Autorización Sanitaria', s: 'SEREMI · ISP · cartera de prestaciones', c: 'verde', z: 'M', p: ['Catherine Sepúlveda (100 %)', 'Javiera Flores'] },
+            { t: 'Equipamiento médico (EMMC)', s: 'existencias · subsanaciones · traslado', c: 'verde', z: 'M', p: ['Matías Pinto', 'Meylin Canales'] },
+            { t: 'Plan Piloto (SCL)', s: 'enrolamiento y capacitación del piloto', c: 'verde', z: 'M', p: ['Javiera Pacheco', 'Horacio Díaz', 'Meylin Canales', 'Marisol Salvatierra'], q: 'Responsable único por definir (se trabaja en la presentación)' },
+            { t: 'Plan de Traslado y poblamiento', s: 'programa de traslado · despoblamiento', c: 'verde', z: 'M', p: ['Fernando Araya', 'Costanza Poch'] },
+            { t: 'Capacitación', s: 'general y específica', c: 'verde', z: 'M', p: ['C. Guerrero', 'Javi', 'Isabel Rojas', 'Matías Pinto'], q: 'Nombres de la pizarra: confirmar «Javi» y C. Guerrero' },
+            { t: 'Cabida', s: 'quién trabaja dónde en el NHDS', c: 'verde', z: 'M', p: ['Loreto Pérez', 'Matías Pinto'] }
+          ]},
+          { t: 'Ámbito administrativo y logístico', s: 'con la Subdirección Administrativa', c: 'durazno', z: 'M', p: ['Rodrigo Hermosilla', 'Fernando Lacalle', 'Marisol Salvatierra'], h: [
+            { t: 'Traslado de equipos propios y comodatos', s: 'con Mariana Bravo (SSMO)', c: 'durazno', z: 'M', p: ['Rodrigo Hermosilla', 'Matías Pinto'] },
+            { t: 'Logística en terreno', s: 'racks · bodegas · oficinas', c: 'durazno', z: 'M', p: ['Rodrigo Espinoza'] },
+            { t: 'Sociedad Concesionaria', s: 'servicios concesionados: seguridad, aseo, alimentación, ropería, esterilización', c: 'durazno', z: 'M', p: ['Marisol Salvatierra'], q: 'Responsable de los servicios concesionados por confirmar' }
           ]},
           { t: 'Subdirecciones', s: 'resuelven; PM facilita y coordina', c: 'lila', enFila: true, h: [
             { t: 'SDM · Médica', c: 'lila', p: ['Dr. Manuel Ramírez'] },
