@@ -179,6 +179,20 @@ body.locked main,body.locked header,body.locked footer{filter:blur(3px);pointer-
         <div class="pcard-foot"><span class="pcard-name">FarmaBox</span><span class="pcard-arrow">&#8594;</span></div>
       </a>
 
+      <a class="pcard" href="47.ProcesoQuirurgico.html" data-plat="47.ProcesoQuirurgico.html" title="Proceso Quirúrgico — el proceso del NHDS según el borrador PROC-QUIR-8.5-0003 de Eficiencia Hospitalaria: etapas, hitos de medición y pendientes">
+        <div class="pcard-icon" style="background:linear-gradient(135deg,#7c3aed 0%,#3b0764 100%)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#ede9fe" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="12" cy="18" r="2"/><path d="M7 6h10M6 8l5 8M18 8l-5 8"/></svg>
+        </div>
+        <div class="pcard-foot"><span class="pcard-name">Proceso Quirúrgico</span><span class="pcard-arrow">&#8594;</span></div>
+      </a>
+
+      <a class="pcard" href="36.FlujosEsterilizacion.html" data-plat="36.FlujosEsterilizacion.html" title="Flujos Esterilización ↔ Pabellones — recorrido de carros sucios, limpios y estériles entre Pabellones Centrales y la Central de Esterilización">
+        <div class="pcard-icon" style="background:linear-gradient(135deg,#0891b2 0%,#164e63 100%)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#cffafe" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h12"/><path d="M12 8l4 4-4 4"/><path d="M20 6v12"/></svg>
+        </div>
+        <div class="pcard-foot"><span class="pcard-name">Flujos Esterilización</span><span class="pcard-arrow">&#8594;</span></div>
+      </a>
+
       <a class="pcard" href="23.InformesResumen.html" data-plat="23.InformesResumen.html" title="Informes Resumen — catastros de equipamiento por tipología e informes EMMC/MNC/TI por servicio (AA y HDS)">
         <div class="pcard-icon" style="background:linear-gradient(135deg,#0369a1 0%,#0c4a6e 100%)">
           <svg viewBox="0 0 24 24" fill="none" stroke="#bae6fd" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
@@ -307,7 +321,8 @@ async function pmDoLogin(ev){
     pmUnlock();
   } else {
     err.style.display = 'block';
-    pmLog('login_fallido:' + u, 'index');
+    // si escribieron un RUT (u otro número) en el usuario, no queda en el registro
+    pmLog('login_fallido:' + (/\d{4,}/.test(u) ? '(número oculto)' : u), 'index');
   }
   return false;
 }

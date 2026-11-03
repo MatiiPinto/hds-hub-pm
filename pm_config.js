@@ -67,7 +67,10 @@ window.PM_CONFIG = {
   // archivo sigue siendo descargable por URL directa para quien conozca la ruta.
   RESTRINGIDAS: {
     // Protección Radiológica: solo la OPR y quienes la acompañan
-    '37.ProteccionRadiologica.html': ['mpinto', 'csepulveda', 'mcanales', 'adavis']
+    '37.ProteccionRadiologica.html': ['mpinto', 'csepulveda', 'mcanales', 'adavis'],
+    // Proceso Quirúrgico: borrador interno de Eficiencia Hospitalaria; el padrón
+    // incluye contrapartes externas (SSMO, AIF). Ivana Milio (Farmacia) lo revisa
+    '47.ProcesoQuirurgico.html': ['mpinto', 'imilio']
   },
   SESSION_HOURS: 12,
   USERS: {
