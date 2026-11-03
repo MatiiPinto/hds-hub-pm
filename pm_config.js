@@ -69,8 +69,8 @@ window.PM_CONFIG = {
     // Protección Radiológica: solo la OPR y quienes la acompañan
     '37.ProteccionRadiologica.html': ['mpinto', 'csepulveda', 'mcanales', 'adavis'],
     // Proceso Quirúrgico: borrador interno de Eficiencia Hospitalaria; el padrón
-    // incluye contrapartes externas (SSMO, AIF). Ivana Milio (Farmacia) lo revisa
-    '47.ProcesoQuirurgico.html': ['mpinto', 'imilio']
+    // incluye contrapartes externas (SSMO, AIF). Lo revisan Ivana Milio y Dan Hebel (Farmacia)
+    '47.ProcesoQuirurgico.html': ['mpinto', 'imilio', 'dhebel']
   },
   SESSION_HOURS: 12,
   USERS: {
@@ -128,6 +128,8 @@ window.PM_CONFIG = {
     'imilio':     '2353256ec97ec6cdec3a8725033da0aa4786b7524986372f8fc96a05e73a0721',
     // Alejandra Díaz Chacón · Química Farmacéutica, Área Pabellón
     'adiazch':    '3b56cc0059218c744b1033697b498288673073094636679b47b9b39329230672',
+    // Dan Hebel Silva · Químico Farmacéutico, Farmacia Área Hospitalizados (03-11-2026)
+    'dhebel':     '35accc520756671b3756d8f13b9aa47e47738d3916e23d4ffbe83378c796ff42',
     // María Elena Sepúlveda · Subdirectora SDADT y Coordinadora Técnica de Puesta en Marcha
     // (27-10-2026). Clave inicial: primeros 4 dígitos del RUT.
     'msepulveda': '10a0b7229c8dfee90e0e92c4a0f6b0c8e3641d70c3af00d431ce854196bf0b27'
