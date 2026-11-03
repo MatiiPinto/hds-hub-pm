@@ -150,8 +150,19 @@ code,.mono{font-family:var(--font-mono)}
 .sb-tab{flex:1;background:none;border:0;border-bottom:2px solid transparent;border-radius:0;margin-bottom:-1px;padding:10px 6px 8px;cursor:pointer;font-size:var(--fs-sm);font-weight:var(--fw-regular);color:var(--text-2);white-space:nowrap;transition:color .15s,border-color .15s}
 .sb-tab:hover{color:var(--text)}
 .sb-tab.on{color:var(--accent-600);font-weight:var(--fw-medium);border-bottom-color:var(--accent-600)}
-#floorList{flex:1;overflow-y:auto;padding:6px 8px 8px}
+#floorList{flex:1;overflow-y:auto;padding:10px 0;display:flex;flex-direction:column;align-items:center;gap:8px}
+/* En Pisos la barra es un riel delgado; Servicio y Tipologías la ensanchan porque traen listas */
+#sidebar.delgado{width:60px}
+#sidebar.delgado #dataStamp,#sidebar.delgado #sbTabPisos{display:none}
+#sidebar.delgado #sbTabs{order:2;flex-direction:column;align-items:center;gap:6px;padding:8px 0;border-bottom:0;border-top:1px solid var(--n-100)}
+#sidebar.delgado #sbTabs .sb-tab{flex:none;width:36px;height:36px;padding:0;margin:0;border:0;border-radius:50%;font-size:0}
+#sidebar.delgado #sbTabs .sb-tab:hover{background:var(--surface-sunken)}
+#sidebar.delgado #sbTabServ::before{content:'🏥';font-size:16px}
+#sidebar.delgado #sbTabTipos::before{content:'🏷';font-size:16px}
 #srvList{flex:1;overflow-y:auto;padding:10px 10px 8px}
+.fl-circ{width:36px;height:36px;flex:none;border-radius:50%;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:var(--fs-sm);font-weight:var(--fw-medium);cursor:pointer;padding:0}
+.fl-circ:hover{background:var(--surface-sunken)}
+.fl-circ.cur{background:var(--accent-50);border:2px solid var(--accent-600);font-weight:700}
 .srv-vacio{font-size:var(--fs-sm);color:var(--text-2);line-height:1.5;padding:10px 4px}
 .srv-cab{padding:2px 2px 8px;border-bottom:1px solid var(--border);margin-bottom:6px}
 .srv-cab .nm{font-size:13px;font-weight:800;color:var(--text);line-height:1.25}
@@ -170,31 +181,6 @@ code,.mono{font-family:var(--font-mono)}
 .srv-row.open .ar{transform:rotate(90deg)}
 .srv-rooms{margin:0 0 6px 14px}
 .srv-pie{font-size:10px;color:var(--text-2);margin-top:8px;font-style:italic}
-.fl-item{margin-bottom:2px}
-.fl-hdr{display:flex;align-items:flex-start;gap:4px;width:100%;background:none;border:0;border-radius:var(--r-md);padding:8px 8px;cursor:pointer;text-align:left;color:var(--text);transition:background .15s}
-.fl-hdr:hover{background:var(--surface-sunken)}
-.fl-item.cur>.fl-hdr{background:var(--accent-50);color:var(--accent-600)}
-.fl-toggle{font-size:8px;margin-top:5px;flex-shrink:0;line-height:1;transition:transform .18s;opacity:.5;width:10px}
-.fl-toggle.open{transform:rotate(90deg)}
-.fl-info{flex:1;min-width:0;display:grid;grid-template-columns:30px 1fr auto;align-items:baseline;column-gap:6px}
-.fl-name{font-size:var(--fs-md);font-weight:var(--fw-medium)}
-.fl-sub{font-size:var(--fs-sm);color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.fl-item.cur .fl-sub{color:var(--accent-600)}
-.fl-pct{font-size:var(--fs-xs);color:var(--text-2);font-variant-numeric:tabular-nums}
-.fl-bar{grid-column:1/-1;height:3px;background:var(--n-150);border-radius:2px;margin-top:6px;overflow:hidden}
-.fl-fill{height:100%;border-radius:2px;background:var(--accent-600);transition:width .3s}
-.fl-fill.done{background:var(--ok)}
-.tree-areas{padding:2px 0 4px 14px}
-.tree-area-wrap{margin-bottom:1px}
-.tree-area-hdr{display:flex;align-items:center;gap:6px;width:100%;padding:6px 8px;cursor:pointer;color:var(--text);font-size:var(--fs-sm);border:0;border-radius:6px;background:none;text-align:left;transition:background .15s}
-.tree-area-hdr:hover{background:var(--surface-sunken)}
-.tree-area-hdr.cur{background:var(--accent-50);color:var(--accent-600)}
-.tree-area-toggle{font-size:7px;flex-shrink:0;transition:transform .18s;opacity:.5}
-.tree-area-toggle.open{transform:rotate(90deg)}
-.tree-area-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.3}
-.tree-badge{font-size:var(--fs-xs);flex-shrink:0;color:var(--text-3);font-variant-numeric:tabular-nums}
-.tree-area-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
-.tree-area-ws{font-size:10px;line-height:1.2;font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--text-2)}
 .taw-asig{color:var(--ok);font-weight:var(--fw-medium)}.taw-disp{color:var(--warn);font-weight:var(--fw-medium)}.taw-zero{color:var(--text-3)}.taw-tot{color:var(--text-3)}
 .tree-rooms{padding-left:10px}
 .tree-room{display:block;width:100%;text-align:left;background:none;border:0;padding:4px 6px 4px 12px;font-size:var(--fs-xs);color:var(--text-2);cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;border-left:2px solid var(--n-150);transition:all .12s}
@@ -390,7 +376,7 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 #lblHint:hover{background:var(--n-800)}
 #ubicLegend{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:31;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-pill);padding:5px 14px;font-size:var(--fs-sm);color:var(--text);box-shadow:var(--shadow-2);white-space:nowrap}
 #ubicLegend b{margin-left:2px}
-#cpLegend{position:absolute;top:48px;left:50%;transform:translateX(-50%);z-index:31;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-pill);padding:5px 8px 5px 14px;font-size:var(--fs-sm);color:var(--text);box-shadow:var(--shadow-2);white-space:nowrap;display:flex;align-items:center;gap:8px}
+#cpLegend{position:absolute;top:48px;left:50%;transform:translateX(-50%);z-index:31;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-pill);padding:5px 8px 5px 14px;font-size:var(--fs-sm);color:var(--text);box-shadow:var(--shadow-2);white-space:nowrap;display:flex;flex-wrap:wrap;justify-content:center;width:max-content;max-width:calc(100% - 24px);align-items:center;gap:2px 8px}
 #cpLegend .cp-pt{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
 #cpLegend button{border:1px solid var(--border);background:var(--surface);border-radius:var(--r-pill);padding:2px 10px;font-size:var(--fs-xs);font-weight:700;cursor:pointer;color:var(--text)}
 .cp-mk{cursor:pointer}
@@ -658,6 +644,8 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 .av-tools{display:flex;align-items:center;gap:6px 10px;flex-wrap:wrap;padding:2px 4px 6px;font-size:var(--fs-xs);color:var(--text-3)}
 .av-tools a{color:var(--accent-600);font-weight:var(--fw-medium);text-decoration:none;white-space:nowrap}
 .av-tools a:hover{text-decoration:underline}
+.av-mk{flex:none;align-self:flex-start;border:1px solid var(--border);background:var(--surface);border-radius:var(--r-pill);font-size:10px;line-height:15px;padding:0 5px;cursor:pointer}
+.av-mk:hover{background:var(--surface-sunken)}
 .av-tools a.av-grupo{padding:2px 8px;border:1px solid var(--border);border-radius:var(--r-pill);color:var(--external)}
 .av-tools a.av-grupo:hover{background:var(--external-soft);text-decoration:none}
 .av-tools a.av-grupo.on{background:var(--external);border-color:var(--external);color:#fff}
@@ -1078,11 +1066,11 @@ function _cargarJS(L){
   </div>
 </div>
 <div id="layout">
-  <aside id="sidebar">
+  <aside id="sidebar" class="delgado">
     <div id="sbTabs">
       <button id="sbTabPisos" class="sb-tab on" onclick="sbShowTab('pisos')">Pisos</button>
       <button id="sbTabServ" class="sb-tab" onclick="sbShowTab('serv')" title="El servicio que estás mirando: cuántos recintos tiene de cada tipo y, al desplegar un tipo, cuáles son">Servicio</button>
-      <button id="sbTabTipos" class="sb-tab" onclick="sbShowTab('tipos')">Tipologías</button>
+      <button id="sbTabTipos" class="sb-tab" onclick="sbShowTab('tipos')" title="Tipologías">Tipologías</button>
     </div>
     <div id="floorList"></div>
     <div id="srvList" style="display:none"></div>
@@ -1162,6 +1150,7 @@ function _cargarJS(L){
       <button class="tb-btn" id="btnAudit" onclick="toggleAudit()" title="Colorear cada recinto según la completitud de sus datos: tipo, código, BIM y señalética">✅ Auditoría de datos</button>
       <button class="tb-btn" id="btnMetas" onclick="toggleMetas()" title="Metas oficiales de recintos (Resumen Ejecutivo HDS): asignados vs meta">🎯 Metas</button>
       <button class="tb-btn" id="btnAsigN" onclick="toggleAsigNum()" title="Mostrar en cada recinto cuántos funcionarios tiene asignados (solo el número, abajo a la derecha)">🧑 N° asignados</button>
+      <button class="tb-btn" id="btnOficinas" onclick="toggleOficinas()" title="Vista 2: encuadra el servicio y escribe dentro de cada oficina a sus funcionarios. Al apagarlo vuelve al encuadre anterior.">🏢 Oficinas</button>
       <button class="tb-btn" id="btnTiPrint" onclick="toggleTiPrint()" title="Mostrar en cada recinto (vista de servicio) las impresoras del HDS según el archivo Comodatos Jun-2026 cruzado con el PMA/BIM, abajo a la izquierda: 🖨 + 👤 láser monousuario · 👥 láser multiusuario · 📠 multifuncional · 🎨 multifuncional color. Clic abre la ficha.">🖨 Impresoras</button>
       <button class="tb-btn" id="btnLineas" onclick="toggleLineasPiso()" title="Líneas de piso de circulación general: el recorrido de color hacia cada destino (Oftalmología, Farmacia, Toma de muestras…), de los planos de señalización de recorridos (PE 21). Leyenda con filtro por destino. Sólo lectura.">🟩 Líneas de piso</button>
       <button class="tb-btn" id="btnPP" onclick="togglePP()" title="Puntos de datos y enchufes · planos PINS 2024-2025: cada punto de corrientes débiles (datos, comunicaciones, seguridad, llamado de enfermería) y cada enchufe (normal o circuito C), registrados sobre el Atlas. En vista de piso, un testigo por recinto. Sólo lectura.">📐 Puntos PINS</button>
@@ -1271,8 +1260,9 @@ function _cargarJS(L){
         <div id="capasSrc" style="display:none">
           <button class="dk-btn tog" id="dkUbicTotem" onclick="toggleUbic('totem')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van los TÓTEMS (círculo grande + icono)"><span class="ic">🎫</span><span class="lb">Tótems</span></button>
           <button class="dk-btn tog" id="dkUbicDea" onclick="toggleUbic('dea')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van los DEA"><span class="ic">💚</span><span class="lb">DEA</span></button>
+          <button class="dk-btn tog" id="dkUbicVend" onclick="toggleUbic('vend')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van las VENDOMÁTICAS (espacios de vending de los planos)"><span class="ic">🥤</span><span class="lb">Vendomática</span></button>
           <button class="dk-btn tog" id="dkUbicPrinter" onclick="toggleUbic('printer')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van las IMPRESORAS"><span class="ic">🖨</span><span class="lb">Impresoras</span></button>
-          <button class="dk-btn tog" id="dkUbicCarro" onclick="toggleCarros()" title="Carros de paro: desfibrilador (130007 / 130008) + carro de paro (110032) del EMMC de cada recinto. Azul = completo · rojo = desfibrilador sin su carro. Se ve en todas las vistas y se exporta a Excel."><span class="ic">🚨</span><span class="lb">Carros de paro</span></button>
+          <button class="dk-btn tog" id="dkUbicCarro" onclick="toggleCarros()" title="Carros de paro: desfibrilador (130007 / 130008) + carro de paro (110032) del EMMC de cada recinto. Azul = completo · rojo = desfibrilador sin su carro · pastilla MP = con marcapaso externo. Se ve en todas las vistas y se exporta a Excel."><span class="ic">🚨</span><span class="lb">Carros de paro</span></button>
           <button class="dk-btn tog" id="dkLabels" onclick="toggleRoomLabels()" title="Mostrar u ocultar el nombre y código de cada recinto sobre el plano"><span class="ic">🏷</span><span class="lb">Etiquetas de recintos</span></button>
         </div>
         <div class="dk-h">Apoyo TI</div>
@@ -1890,14 +1880,17 @@ const PLANO_LIVIANO=(function(){
 })();
 // ── Resolución del plano por niveles (20-10-2026) ─────────────────────────────
 // lite 4.096 px (~50 MB en memoria) · mid 8.192 px (~190 MB) · full ~16.000 px (~750 MB).
-// Base: equipo modesto o iPhone → lite; versión web (HUB) en computador → mid; Atlas maestro → full.
-// Al acercarse más de lo que la imagen alcanza a mostrar nítido, sube UN nivel (el modesto llega
-// a mid, nunca a full) y al alejarse vuelve a la base. ?plano=lite|mid|full lo fija.
+// Base: versión web (HUB), equipo modesto o iPhone → lite; Atlas maestro → full.
+// Al acercarse más de lo que la imagen alcanza a mostrar nítido, sube UN nivel (la web y el modesto
+// llegan a mid, nunca a full) y al alejarse vuelve a la base. ?plano=lite|mid|full lo fija.
+// 03-11-2026: la web partía en mid y subía a full (~750 MB) al acercarse; en computadores con poca
+// memoria gráfica el plano colapsaba. Piso completo en pantalla = lite alcanza (≤ 0,4 px/px).
 const _PLANO_FORZADO=(function(){ try{ const q=new URLSearchParams(location.search).get('plano'); return ['lite','mid','full'].includes(q)?q:null; }catch(e){ return null; } })();
 const _PLANO_DENS={lite:4096/16000, mid:8192/16000, full:1};
 let _planTier=null;
-function _planBase(){ if(_PLANO_FORZADO) return _PLANO_FORZADO; if(PLANO_LIVIANO) return 'lite'; return (typeof S!=='undefined'&&S.viewOnly)?'mid':'full'; }
-function _planTope(){ if(_PLANO_FORZADO) return _PLANO_FORZADO; return PLANO_LIVIANO?'mid':'full'; }
+function _planWeb(){ return PLANO_LIVIANO || (typeof S!=='undefined'&&S.viewOnly); }
+function _planBase(){ if(_PLANO_FORZADO) return _PLANO_FORZADO; return _planWeb()?'lite':'full'; }
+function _planTope(){ if(_PLANO_FORZADO) return _PLANO_FORZADO; return _planWeb()?'mid':'full'; }
 function _planObjetivo(){
   const base=_planBase(), tope=_planTope(), orden=['lite','mid','full'];
   if(_planTier===null) return base;          // primera carga: el zoom todavía no está encuadrado (vale 1)
@@ -2202,15 +2195,54 @@ function toggleAsigNum(){
   const b=document.getElementById('btnAsigN'); if(b)b.classList.toggle('active',S.showAsigN);
   renderSVG();
 }
+// 🏢 Oficinas (vista 2): escribe dentro de cada oficina a quienes trabajan ahí, en letra legible en
+// pantalla. Es el único zoom de la vista 2 y lo pide el botón: encuadra las oficinas con gente y, al
+// apagarlo, vuelve al encuadre anterior. Lo que no cabe en una caja queda con su N° de asignados.
+var _ofOn=false, _ofCam=null;
+function toggleOficinas(){
+  if(!_ofOn && S.level!==2){ if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🏢 Entra a un servicio (vista 2) para ver sus oficinas'; setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },3500); } return; }
+  _ofOn=!_ofOn;
+  const b=document.getElementById('btnOficinas'); if(b) b.classList.toggle('active',_ofOn);
+  if(_ofOn){
+    _ofCam={fl:S.floorId,zoom:S.zoom,ox:S.ox,oy:S.oy};
+    const a=curArea(), D=_perLista(), ids=new Set((D?D.gente:[]).map(g=>g.rid));
+    const sh=(a?a.rooms:[]).filter(r=>ids.has(r.id)).flatMap(r=>rShapes(r));
+    const destino=sh.length?sh:(a?aShapes(a):[]);
+    if(destino.length) zoomTo(bounds(destino),50,renderSVG); else renderSVG();
+  } else {
+    if(_ofCam && _ofCam.fl===S.floorId) animTo(_ofCam.zoom,_ofCam.ox,_ofCam.oy,700);
+    _ofCam=null; renderSVG();
+  }
+}
+function _oficinasLayer(){
+  svg.querySelector('.of-layer')?.remove();
+  const D=_perLista(); if(!D) return;
+  const porRec={};
+  D.gente.forEach(p=>{ if(p.aus) return; const L=(porRec[p.rid]=porRec[p.rid]||[]); if(!L.includes(p.nom)) L.push(p.nom); });
+  const fs=12/S.zoom, lh=fs*1.25, pad=fs*.4, g=el('g',{class:'of-layer','pointer-events':'none'});
+  D.area.rooms.forEach(r=>{
+    const L=porRec[r.id], sh=rShapes(r); if(!L||!sh.length) return;
+    const b=sh.reduce((a,q)=>q.w*q.h>a.w*a.h?q:a);
+    const cap=Math.floor((b.h-2*pad)/lh), chars=Math.floor((b.w-2*pad)/(fs*.56));
+    if(cap<2||chars<6) return;
+    const corta=s=>s.length<=chars?s:s.slice(0,chars-1)+'…';
+    const nombres=L.slice().sort((x,y)=>x.localeCompare(y,'es')).map(n=>corta(n.length<=chars?n:_dotShortName(n)));
+    const lineas=nombres.length<cap?nombres:nombres.slice(0,cap-2).concat('+'+(nombres.length-cap+2)+' más');
+    const c=el('g',{class:'of-card'});
+    c.appendChild(el('rect',{x:b.x,y:b.y,width:b.w,height:(lineas.length+1)*lh+2*pad,rx:fs*.3,fill:'#fff','fill-opacity':.93,stroke:'#0f4c81','stroke-width':1/S.zoom}));
+    const linea=(s,i,x)=>txt(b.x+pad,b.y+pad+lh*(i+.5),s,{...x,'font-size':fs,'text-anchor':'start','font-family':'Segoe UI,sans-serif'});
+    c.appendChild(linea(corta((rName(r.id)||'')+' · '+L.length),0,{fill:'#0f4c81','font-weight':800}));
+    lineas.forEach((s,i)=>c.appendChild(linea(s,i+1,{fill:'#1e2433'})));
+    g.appendChild(c);
+  });
+  svg.appendChild(g);
+}
 function toggleSenaletica(){
   S.showSen=!S.showSen;
   _lsPref('cabida_show_sen',S.showSen?'1':'0');
   const b=document.getElementById('btnSen'); if(b)b.classList.toggle('active',S.showSen);
   renderSVG();
 }
-// Sidebar tree expand state: which floor and area node are open.
-// Arranca colapsado (sin piso ni servicio abierto) al cargar la plataforma.
-let _sb = { floor: null, area: null };
 
 // ═══ PERSISTENCE ════════════════════════════════════════════════════════════
 // ── COMPRESIÓN DEL ESTADO (LZW → UTF-16) ────────────────────────────────────
@@ -4400,12 +4432,20 @@ function animTo(tz,tox,toy,dur=600,cb=null){
   }
   S.rafId=requestAnimationFrame(step);
 }
-function zoomTo(bnd,pad=80){
+function zoomTo(bnd,pad=80,cb=null){
   const vW=viewer.clientWidth,vH=viewer.clientHeight;
   const tz=Math.max(0.01, Math.min((vW-2*pad)/bnd.w,(vH-2*pad)/bnd.h,14));
   const cx=bnd.x+bnd.w/2,cy=bnd.y+bnd.h/2;
   // Duración aumentada a 900ms para transición más fluida entre vistas
-  animTo(tz,vW/2-cx*tz,vH/2-cy*tz,900);
+  animTo(tz,vW/2-cx*tz,vH/2-cy*tz,900,cb);
+}
+// Abrir sin marear al que presenta en pantalla: el encuadre no cambia. Sólo si el destino quedó fuera
+// de la pantalla (p. ej. desde el árbol lateral) se desliza hasta él, siempre con el mismo zoom.
+function _traerSinZoom(sh){
+  if(!sh.length) return;
+  const b=bounds(sh), vW=viewer.clientWidth, vH=viewer.clientHeight, cx=b.x+b.w/2, cy=b.y+b.h/2;
+  const sx=cx*S.zoom+S.ox, sy=cy*S.zoom+S.oy;
+  if(sx<0||sx>vW||sy<0||sy>vH) animTo(S.zoom,vW/2-cx*S.zoom,vH/2-cy*S.zoom,320);
 }
 
 // ═══ PAN — works from ANYWHERE: free space OR semi-transparent boxes ═══════
@@ -4472,7 +4512,7 @@ const _FRICTION=0.80;   // per-frame decay: higher = more glide
 const _MAX_V=0.08;      // log-zoom cap per burst — reducido 50% para respuesta más suave
 
 function _zTick(){
-  if(Math.abs(_zv)<1e-4){ _zRaf=null; if(S.level===1){ updateAreaLabelSizes(); _ubicRescale(); } return; }
+  if(Math.abs(_zv)<1e-4){ _zRaf=null; if(S.level===1){ updateAreaLabelSizes(); _ubicRescale(); } if(S.level===2 && _ofOn) _oficinasLayer(); return; }
   const nz=Math.min(Math.max(S.zoom*Math.exp(_zv),.03),22);
   S.ox=_zmx-(_zmx-S.ox)*nz/S.zoom;
   S.oy=_zmy-(_zmy-S.oy)*nz/S.zoom;
@@ -4516,25 +4556,33 @@ window.addEventListener('keydown',e=>{
 
 // ═══ NAVIGATION ═════════════════════════════════════════════════════════════
 function pushH(){ S.history.push({level:S.level,areaId:S.areaId,roomId:S.roomId,zoom:S.zoom,ox:S.ox,oy:S.oy}); }
-function goBack(){
+// Volver no toca el encuadre, igual que abrir. Sólo recupera el anterior si se había entrado con un
+// salto que encuadró solo (h.auto: buscador, reportes) o en teléfono. n = cuántas vistas retroceder.
+function goBack(n=1){
   if(!S.history.length)return;
-  const h=S.history.pop();
+  let h, auto=false;
+  for(let i=0;i<n && S.history.length;i++){ h=S.history.pop(); auto=auto||!!h.auto; }
   S.level=h.level; S.areaId=h.areaId; S.roomId=h.roomId;
   S.selIds.clear(); S.delDotMode=false; delHint.classList.remove('show'); viewer.classList.remove('del-mode');
-  animTo(h.zoom,h.ox,h.oy,700,()=>{renderSVG();updateUI();});
+  if(auto||_esTelefono()) animTo(h.zoom,h.ox,h.oy,700,()=>{renderSVG();updateUI();});
   renderSVG(); updateUI();
 }
-function goArea(id){
+// sinZoom: clic en el plano o en el árbol. Sin él (buscador, reportes, «ir a») se sigue encuadrando,
+// porque ahí se salta a un lugar que no estaba a la vista. En teléfono siempre se encuadra.
+function goArea(id,sinZoom){
   if(didPan)return;
   pushH(); S.areaId=id; S.level=2; S.selIds.clear();
-  const _asSh=aShapes(curFloor().areas.find(a=>a.id===id)); if(_asSh.length){zoomTo(bounds(_asSh));}else{const{zoom,ox,oy}=fitView();animTo(zoom,ox,oy,700);}
+  const _sz=sinZoom&&!_esTelefono(); if(!_sz) S.history[S.history.length-1].auto=true;
+  const _asSh=aShapes(curFloor().areas.find(a=>a.id===id)); if(_sz){ _traerSinZoom(_asSh); }else if(_asSh.length){zoomTo(bounds(_asSh));}else{const{zoom,ox,oy}=fitView();animTo(zoom,ox,oy,700);}
   renderSVG(); updateUI();
 }
-function goRoom(id){
+function goRoom(id,sinZoom){
   if(didPan)return;
   pushH(); S.roomId=id; S.level=3; S.selIds.clear(); S.delDotMode=false;
+  const _sz=sinZoom&&!_esTelefono(); if(!_sz) S.history[S.history.length-1].auto=true;
   const _rsSh=rShapes(curArea().rooms.find(r=>r.id===id));
   renderSVG(); updateUI();
+  if(_sz){ _traerSinZoom(_rsSh); return; }
   if(_rsSh.length){
     // con el listado ordenado, el encuadre incluye el recinto y su listado
     let bb=bounds(_rsSh); const rp=svg.querySelector('.roster-panel');
@@ -4559,7 +4607,11 @@ function goFloor(id){
   renderSVG(); updateUI(); renderSidebar();
   if(typeof renderRightPanel==='function') renderRightPanel();
 }
-function crumb0Click(){ if(S.level>1){ S.history=[]; goFloor(S.floorId); } }
+function crumb0Click(){
+  if(S.level<=1) return;
+  if(S.history[0] && S.history[0].level===1){ exitEdit(); goBack(S.history.length); }
+  else { S.history=[]; goFloor(S.floorId); }
+}
 
 // ═══ SVG HELPERS ════════════════════════════════════════════════════════════
 const NS='http://www.w3.org/2000/svg';
@@ -5140,6 +5192,7 @@ function renderSVG(){
   // Carros de paro: marcadores que laten en el recinto (todas las vistas)
   { const lg=document.getElementById('cpLegend');
     if(_cpOn){ try{ _cpLayer(); }catch(e){ console.warn('carros de paro',e); } } else if(lg) lg.style.display='none'; }
+  if(S.level===2 && _ofOn) try{ _oficinasLayer(); }catch(e){ console.warn('oficinas',e); }
   if(S.level===1) try{ _instLayer(fl); }catch(e){ console.warn('instituciones',e); }
   try{ renderEscSel(); }catch(e){}
   try{ _lineasPisoLayer(); }catch(e){ console.warn('líneas de piso',e); }
@@ -5185,7 +5238,7 @@ function renderL1(fl){
     //     para luego fusionar varios elementos juntos.
     const onCk=e=>{
       e.stopPropagation();
-      if(!S.editMode){ goArea(area.id); return; }
+      if(!S.editMode){ goArea(area.id,true); return; }
       if(S.drawMode||S.moveMode){ toggleSel(area.id); return; } // legacy multi-select en draw/move
       if(e.metaKey||e.ctrlKey){
         toggleSel(area.id);
@@ -5369,7 +5422,7 @@ function renderL2(){
       e.stopPropagation();
       if(S.equipMode){ S.equipRoomId=room.id; renderSVG(); openEquipPanel(room.id); return; }
       if(S.fichaMode){ openFichaRecinto(room.id); return; }
-      if(!S.editMode){ goRoom(room.id); return; }
+      if(!S.editMode){ goRoom(room.id,true); return; }
       if(S.drawMode||S.moveMode){ toggleSel(room.id); return; }
       if(e.metaKey||e.ctrlKey){
         toggleSel(room.id);
@@ -6372,7 +6425,8 @@ const PROP_DEF={
   desk: {lbl:'Puesto de trabajo nuevo', corto:'Puesto nuevo', ico:'🖥', col:'#d100b6', cm:{w:150,h:160}, rota:true},
   totem:{lbl:'Tótem / gestor de fila',  corto:'Tótem',        ico:'🎫', col:'#7c3aed', cm:{w:60,h:60},   rota:true},
   dea:  {lbl:'DEA · Clave Azul',        corto:'DEA',          ico:'💚', col:'#16a34a', cm:{w:60,h:60},   rota:false},
-  printer:{lbl:'Impresora',             corto:'Impresora',    ico:'🖨', col:'#ea580c', cm:{w:60,h:50},   rota:true}
+  printer:{lbl:'Impresora',             corto:'Impresora',    ico:'🖨', col:'#ea580c', cm:{w:60,h:50},   rota:true},
+  vend: {lbl:'Vendomática',             corto:'Vendomática',  ico:'🥤', col:'#0891b2', cm:{w:180,h:120}, rota:true}
 };
 // centímetros por píxel del plano de un piso (extensión DXF / tamaño de imagen);
 // sin calibración (P-2, P-3, P5) se asume 1,6 cm/px como el resto del edificio.
@@ -6504,6 +6558,11 @@ function _propSymbol(it){
     g.appendChild(el('rect',{x:-W/2+6*f,y:-H/2+5*f,width:W-12*f,height:14*f,rx:2*f,fill:D.col,'fill-opacity':.85}));        // escáner / tapa
     g.appendChild(el('rect',{x:-W/2+10*f,y:H/2-4*f,width:W-20*f,height:12*f,rx:2*f,fill:'#fff',stroke:D.col,'stroke-width':sw*.7}));   // bandeja con hoja
     g.appendChild(txt(0,2*f,'🖨',{'font-size':Math.max(12,22*f*1.6),'pointer-events':'none'}));
+  } else if(it.k==='vend'){
+    // el bloque del plano: dos máquinas contra el muro, 180 × 120 cm
+    const W=180*f, H=120*f;
+    g.appendChild(el('rect',{x:-W/2,y:-H/2,width:W,height:H,rx:6*f,fill:D.col,'fill-opacity':.18,stroke:D.col,'stroke-width':sw,'stroke-dasharray':`${8*f} ${5*f}`}));
+    g.appendChild(txt(0,2*f,'🥤',{'font-size':Math.max(12,30*f*1.6),'pointer-events':'none'}));
   } else {  // dea
     // 23-10-2026: se dibuja en unidades de PANTALLA (caja de 26 px) dentro de un grupo que _escRescale
     // reescala en cada zoom: ~26 px siempre, o su tamaño real (60 cm) si al acercarse es mayor. Antes el
@@ -6530,7 +6589,7 @@ function _propLayer(){
     if(ids && it.rid && !ids.has(it.rid)) return;
     const D=PROP_DEF[it.k]||PROP_DEF.desk;
     const pg=_propSymbol(it);
-    const ttl=el('title'); ttl.textContent=D.ico+' '+D.lbl+(it.rid?(' · '+(rName(it.rid)||'')):' · fuera de recinto')+(D.rota?' · clic derecho rota 90°':'')+' · arrastrar mueve · doble clic elimina'; pg.appendChild(ttl);
+    const ttl=el('title'); ttl.textContent=D.ico+' '+D.lbl+(it.nota?(' · '+it.nota):'')+(it.rid?(' · '+(rName(it.rid)||'')):' · fuera de recinto')+(D.rota?' · clic derecho rota 90°':'')+' · arrastrar mueve · doble clic elimina'; pg.appendChild(ttl);
     if(!S.viewOnly||S.editPM){
       pg.addEventListener('mousedown',e=>_startPropDrag(e,it.id));
       pg.addEventListener('contextmenu',e=>{ e.preventDefault(); e.stopPropagation(); propRotar(it.id); });
@@ -6635,7 +6694,7 @@ function fijarCupo(k){
 // esconde todas las cajas y dibuja cada elemento como un círculo de tamaño FIJO
 // en pantalla (no crece ni se achica con el zoom) con su icono, para ver de un
 // vistazo dónde van los tótems, los DEA o las impresoras del piso.
-function _UBIC(){ return ['totem','dea','printer']; }   // función y no const: renderSVG puede correr antes de esta línea
+function _UBIC(){ return ['totem','dea','printer','vend']; }   // función y no const: renderSVG puede correr antes de esta línea
 if(!S.ubic){ try{ S.ubic=new Set((localStorage.getItem('cabida_ubic')||'').split(',').filter(k=>_UBIC().includes(k))); }catch(e){ S.ubic=new Set(); } }
 function _ubicTipos(){ return _UBIC().filter(k=>S.ubic && S.ubic.has(k)); }
 function toggleUbic(k){
@@ -6657,7 +6716,7 @@ function _ubicLayer(tipos){
     mk.appendChild(el('circle',{cx:0,cy:0,r:16,fill:'#ffffff',opacity:.9}));
     mk.appendChild(el('circle',{class:'bola',cx:0,cy:0,r:13,fill:D.col,stroke:'#ffffff','stroke-width':2.5}));
     mk.appendChild(txt(0,1,D.ico,{'font-size':13.5,'pointer-events':'none'}));
-    const ttl=el('title'); ttl.textContent=D.ico+' '+D.lbl+(it.rid?(' · '+(rName(it.rid)||'')+' · '+(_findRoom(it.rid)?aName(_findRoom(it.rid).area.id):'')):' · fuera de recinto')+' · clic = ir al recinto';
+    const ttl=el('title'); ttl.textContent=D.ico+' '+D.lbl+(it.nota?(' · '+it.nota):'')+(it.rid?(' · '+(rName(it.rid)||'')+' · '+(_findRoom(it.rid)?aName(_findRoom(it.rid).area.id):'')):' · fuera de recinto')+' · clic = ir al recinto';
     mk.appendChild(ttl);
     mk.addEventListener('mousedown',e=>e.stopPropagation());
     mk.addEventListener('click',e=>{ e.stopPropagation(); _ubicIr(it); });
@@ -6700,6 +6759,13 @@ function _ubicIr(it){
 //   un carro de paro operativo) pero sí sale en la exportación.
 const CP_DEF=['130007','130008'], CP_CARRO='110032';
 const CP_COL={ok:'#2563eb', solo:'#dc2626'};
+// Monitores CON marcapaso externo por código EMMC (02-11-2026): lista de Matías del 22-10-2026,
+// 27 de 64 (25 TEC-5600 + 2 ZOLL M2). No sale del tipo: el EMMC inscribe los 25 TEC-5600 como
+// 130007 y sólo los ZOLL como 130008. Pendiente confirmar con Bluemedical por número de serie.
+const CP_MPE={'27.6.2':1,'27.6.3':1,'27.7.1':1,'27.7.9':1,'28.10.2':1,'28.10.3':1,'28.10.4':1,'30.2':1,'30.3':1,
+  '26.2.5':3,'26.4.5':1,'26.9.1':1, '31.3.1':1,'33.3.1':1,'34.3.1':1,'36.3.1':1, '38.4.1':1,'39.3.1':1,
+  '40.3.1':1,'41.3.1':2, '37.2.4.1':1,'37.1.3.1':1, '9.2.2':1,'9.2.10':1};
+const CP_MP_COL='#7c3aed';
 // var y no let: renderSVG/_dockSync pueden correr antes de esta línea (TDZ)
 var _cpOn=false; try{ _cpOn=localStorage.getItem('cabida_carros')==='1'; }catch(e){}
 function toggleCarros(){
@@ -6739,7 +6805,7 @@ function _cpClaves(){
   return _cpClavesMemo;
 }
 function _cpDeRecinto(rid){
-  const x={d:0,c:0,mod:{},porClave:{}};
+  const x={d:0,c:0,mp:0,mod:{},porClave:{}};
   const RE=window.RECINTO_EQUIP||{};
   rCodeParts(rid).forEach(code=>{
     const {N,k}=_repartoShare(rid, code);
@@ -6751,6 +6817,7 @@ function _cpDeRecinto(rid){
         if(t===CP_CARRO){ x.c+=q; pc.c+=q; }
         else { x.d+=q; pc.d+=q; x.mod[t+' '+(e.n||'')]=(x.mod[t+' '+(e.n||'')]||0)+q; }
       });
+      if(CP_MPE[kk]) x.mp+=_shareQty(N,k,CP_MPE[kk]);
     });
   });
   return x;
@@ -6803,9 +6870,15 @@ function _cpLayer(){
     mk.appendChild(el('circle',{cx:0,cy:0,r:12,fill:col,stroke:'#fff','stroke-width':2.5}));
     mk.appendChild(txt(0,1,'🚨',{'font-size':12,'pointer-events':'none'}));
     if(z.x.d>1) mk.appendChild(txt(13,-12,String(z.x.d),{'font-size':11,'font-weight':800,fill:col,'pointer-events':'none'}));
+    if(z.x.mp){ // pastilla MP = con marcapaso externo; sin pastilla = sin marcapaso. «MP 1/2»: uno de los dos
+      const lb=z.x.mp<z.x.d?('MP '+z.x.mp+'/'+z.x.d):'MP', w=lb.length>2?38:24;
+      mk.appendChild(el('rect',{class:'cp-mp',x:-w/2,y:14,width:w,height:13,rx:6.5,fill:CP_MP_COL,stroke:'#fff','stroke-width':1.5}));
+      mk.appendChild(txt(0,20.5,lb,{'font-size':9,'font-weight':800,fill:'#fff','pointer-events':'none'}));
+    }
     const t=el('title');
     t.textContent='🚨 '+(rName(z.r.id)||'(sin nombre)')+' · '+aName(z.area.id)+'\n'
       +Object.entries(z.x.mod).map(([m,q])=>q+' × '+m).join('\n')
+      +'\n'+z.x.mp+' con marcapaso externo · '+(z.x.d-z.x.mp)+' sin marcapaso'
       +'\n'+z.x.c+' × 110032 Carro de paro\n→ '+_cpEstadoTxt(z.x)+' · clic = ir al recinto';
     mk.appendChild(t);
     mk.addEventListener('mousedown',e=>e.stopPropagation());
@@ -6821,6 +6894,9 @@ function _cpLayer(){
       +'<span><i class="cp-pt" style="background:'+CP_COL.ok+'"></i>completos <b>'+ok+'</b></span>'
       +'<span><i class="cp-pt" style="background:'+CP_COL.solo+'"></i>sin carro <b>'+solo+'</b></span>'
       +'<span style="color:#64748b">hospital '+hOk+' / '+hSolo+'</span>'
+      +'<span><i class="cp-pt" style="background:'+CP_MP_COL+'"></i>con marcapaso <b>'+aqui.reduce((a,z)=>a+z.x.mp,0)+'</b></span>'
+      +'<span>sin marcapaso <b>'+aqui.reduce((a,z)=>a+z.x.d-z.x.mp,0)+'</b></span>'
+      +'<span style="color:#64748b">hospital '+todos.reduce((a,z)=>a+z.x.mp,0)+' / '+todos.reduce((a,z)=>a+z.x.d-z.x.mp,0)+'</span>'
       +'<button type="button" onclick="exportCarrosParo()" title="Todos los pisos, recinto por recinto">⬇ Excel</button>';
     lg.style.display='';
   }
@@ -6837,20 +6913,21 @@ function exportCarrosParo(){
   todos.sort((a,b)=>ORD[a.est]-ORD[b.est] || pisoIx(a.fl.id)-pisoIx(b.fl.id) || String(aName(a.area.id)).localeCompare(String(aName(b.area.id)),'es'));
   const rows=[['Carros de paro por recinto · Atlas HDS · '+hoy],
     ['Desfibrilador 130007 / 130008 + carro de paro 110032, según el EMMC de cada recinto dibujado (reparto por instancia, igual que la ficha).'],
-    ['Estado','Piso','Servicio','Recinto','Código','BIM','Desfibriladores','Modelo','Carros de paro 110032']];
+    ['Con marcapaso externo: lista por recinto del 22-10-2026, pendiente de confirmar con Bluemedical por número de serie.'],
+    ['Estado','Piso','Servicio','Recinto','Código','BIM','Desfibriladores','Con marcapaso','Sin marcapaso','Modelo','Carros de paro 110032']];
   todos.forEach(z=>rows.push([_cpEstadoTxt(z.x), z.fl.label, aName(z.area.id), rName(z.r.id)||'', rCode(z.r.id)||'',
-    ((rBim(z.r.id)||'').match(/[A-Za-z]\d{3,5}/g)||[]).join('\n'), z.x.d,
+    ((rBim(z.r.id)||'').match(/[A-Za-z]\d{3,5}/g)||[]).join('\n'), z.x.d, z.x.mp, z.x.d-z.x.mp,
     Object.entries(z.x.mod).map(([m,q])=>q+' × '+m).join('\n'), z.x.c]));
   const COLR={'Completo':'FFDBEAFE','Carro sin desfibrilador':'FFF1F5F9'};
   const estilo=(r,c,v)=>{ if(c!==0) return null; const f=COLR[v]||'FFFEE2E2';
     return {fill:{patternType:'solid',fgColor:{rgb:f}},font:{bold:true,color:{rgb:v==='Completo'?'FF1D4ED8':v==='Carro sin desfibrilador'?'FF475569':'FFB91C1C'}}}; };
   // resumen por piso
-  const res=[['Resumen por piso · '+hoy],[''],['Piso','Completos','Desfibrilador sin carro','Carro sin desfibrilador','Desfibriladores','Carros de paro']];
-  const T=[0,0,0,0,0];
+  const res=[['Resumen por piso · '+hoy],[''],['Piso','Completos','Desfibrilador sin carro','Carro sin desfibrilador','Desfibriladores','Con marcapaso','Sin marcapaso','Carros de paro']];
+  const T=[0,0,0,0,0,0,0];
   FLOORS.forEach(fl=>{
     const z=todos.filter(q=>q.fl.id===fl.id); if(!z.length) return;
     const f=[z.filter(q=>q.est==='ok').length, z.filter(q=>q.est==='solo').length, z.filter(q=>q.est==='carro').length,
-             z.reduce((a,q)=>a+q.x.d,0), z.reduce((a,q)=>a+q.x.c,0)];
+             z.reduce((a,q)=>a+q.x.d,0), z.reduce((a,q)=>a+q.x.mp,0), z.reduce((a,q)=>a+q.x.d-q.x.mp,0), z.reduce((a,q)=>a+q.x.c,0)];
     f.forEach((v,i)=>T[i]+=v); res.push([fl.label,...f]);
   });
   res.push(['Total',...T]);
@@ -6869,9 +6946,9 @@ function exportCarrosParo(){
       _repartoDueno(kk) ? ('dibujado en '+(_codeBoxes(_repartoDueno(kk))||[]).length+' caja(s), la PMA tiene '+codeInstances(_repartoDueno(kk))+' instancia(s)') : 'código sin caja en el plano']);
   });
   xlsxLibro([
-    {name:'Carros de paro', rows, hdr:2, freezeCols:1, estilo,
-     colW:[{wch:24},{wch:14},{wch:34},{wch:34},{wch:12},{wch:10},{wch:14},{wch:40},{wch:12}]},
-    {name:'Resumen por piso', rows:res, hdr:2, totalRow:true, colW:[{wch:18},{wch:12},{wch:22},{wch:22},{wch:15},{wch:15}]},
+    {name:'Carros de paro', rows, hdr:3, freezeCols:1, estilo,
+     colW:[{wch:24},{wch:14},{wch:34},{wch:34},{wch:12},{wch:10},{wch:14},{wch:14},{wch:14},{wch:40},{wch:12}]},
+    {name:'Resumen por piso', rows:res, hdr:2, totalRow:true, colW:[{wch:18},{wch:12},{wch:22},{wch:22},{wch:15},{wch:14},{wch:14},{wch:15}]},
     {name:'Sin recinto en el Atlas', rows:sin, hdr:2, colW:[{wch:20},{wch:14},{wch:12},{wch:22},{wch:52}]}
   ], 'Carros_de_paro_'+hoy+'.xlsx');
 }
@@ -7607,6 +7684,22 @@ function _autoImportarPlano(){
   _lsPref('cabida_prop_plano_firma', firma);
   return n;
 }
+// Vendomáticas de los planos (SHARED_DATA/vending_plano.js): se traen una vez por versión del archivo
+// y sólo las que faltan, para que lo movido o quitado a mano no vuelva.
+function _vendSembrar(){
+  if(_SELFTEST || S.viewOnly) return 0;
+  const VP=window.VENDING_PLANO; if(!VP||!VP.floors) return 0;
+  const firma=_firmaPlano(VP);
+  let hecho=null; try{ hecho=localStorage.getItem('cabida_vend_firma'); }catch(e){}
+  if(hecho===firma) return 0;
+  const ids=new Set(Object.values(propState).flat().map(x=>x.id)), fPrev=S.floorId; let n=0;
+  Object.entries(VP.floors).forEach(([p,L])=>{ S.floorId=p; L.forEach(x=>{ if(ids.has(x.id)) return;
+    (propState[p]=propState[p]||[]).push({...x, rid:_roomAtPoint(x.x,x.y)||null, ts:Date.now()}); n++; }); });
+  S.floorId=fPrev;
+  if(n){ sProp(); renderSVG(); }
+  _lsPref('cabida_vend_firma', firma);
+  return n;
+}
 function importarPropuestosPlano(sinConfirmar){
   if(S.viewOnly && !S.editPM) return;
   const PP=window.PROPUESTOS_PLANO;
@@ -7652,7 +7745,7 @@ function openPropReport(){
   const {filas,tot}=_propResumen();
   const esc=x=>String(x||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
   const sub=document.getElementById('pmSub'), body=document.getElementById('pmBody');
-  sub.textContent=filas.length?(filas.length+' elementos propuestos · '+tot.desk+' puestos · '+tot.totem+' tótems · '+tot.dea+' DEA · '+tot.printer+' impresoras'+(tot.sin?(' · '+tot.sin+' fuera de recinto'):'')):'Todavía no hay elementos propuestos.';
+  sub.textContent=filas.length?(filas.length+' elementos propuestos · '+tot.desk+' puestos · '+tot.totem+' tótems · '+tot.dea+' DEA · '+tot.printer+' impresoras'+(tot.vend?(' · '+tot.vend+' vendomáticas'):'')+(tot.sin?(' · '+tot.sin+' fuera de recinto'):'')):'Todavía no hay elementos propuestos.';
   let h='<div class="pm-kpi">'
     +'<div><b style="color:#d100b6">'+tot.desk+'</b><span>🖥 Puestos de trabajo nuevos</span></div>'
     +'<div><b style="color:#7c3aed">'+tot.totem+'</b><span>🎫 Tótems / gestores de fila</span></div>'
@@ -7814,8 +7907,8 @@ function exportDEA(){
 const CAPAS_BARRA=[
   ['btnBoxVis','Cajas'],['dkLabels','Etiquetas'],['btnSen','Señalética'],['btnPlanKind','Color'],'|',
   ['btnDotNames','Nombres'],['btnDotLista','En lista'],['btnAsigN','N° asig.'],['btnSoloReemp','Reemplazos'],'|',
-  ['btnVert','Ascensores'],['btnReloj','Relojes'],['btnCorreoN','Correo N.'],['btnEstac','Estacion.'],['btnPuertasVis','Puertas'],['btnJardines','Jardines'],['btnLaminas','Láminas'],'|',
-  ['dkUbicCarro','Carros paro'],['dkUbicDea','DEA'],['dkUbicTotem','Tótems'],['btnImpresoras','Impresoras'],['btnShowPC','PC'],'|',
+  ['btnVert','Ascensores'],['btnReloj','Relojes'],['btnCorreoN','Correo N.'],['btnEstac','Estacion.'],['btnPuertasVis','Puertas'],['btnJardines','Jardines'],['btnLaminas','Láminas'],['btnOficinas','Oficinas'],'|',
+  ['dkUbicCarro','Carros paro'],['dkUbicDea','DEA'],['dkUbicTotem','Tótems'],['dkUbicVend','Vendomática'],['btnImpresoras','Impresoras'],['btnShowPC','PC'],'|',
   ['btnShowTomas','Tomas'],['btnShowGases','Gases'],['btnCcdd','C. débiles'],['btnPP','PINS'],['btnLineas','Líneas piso']
 ];
 const DOCK_MAPA=[
@@ -7842,6 +7935,7 @@ const AGREGAR_MENU=[
   {g:'Equipos y puestos', it:[
     {ic:'💚', lb:'DEA', c:PROP_DEF.dea.col, p:'dea'}, {ic:'🖥', lb:'Puesto de trabajo nuevo', c:PROP_DEF.desk.col, p:'desk'},
     {ic:'🎫', lb:'Tótem / gestor de fila', c:PROP_DEF.totem.col, p:'totem'}, {ic:'🖨', lb:'Impresora', c:PROP_DEF.printer.col, p:'printer'},
+    {ic:'🥤', lb:'Vendomática', c:PROP_DEF.vend.col, p:'vend'},
     {ic:'🛏', lb:'Camilla o sillón numerado', c:'#0e7490', f:()=>{ if(!S.bedMode) toggleBedMode(); }},
     {ic:'🪑', lb:'Duplicar mueble del plano', c:'#a16207', f:()=>{ if(!S.stampMode) toggleStampMode(); }}]},
   {g:'Instalaciones', it:[
@@ -12347,10 +12441,32 @@ function renderPersonas(){
 let _avAbierto={};
 function _avPct(a,n){ return n? Math.round(a*100/n) : 0; }
 function _avColor(p){ return p>=90?'#16a34a' : p>=60?'#65a30d' : p>=30?'#f59e0b' : '#dc2626'; }
-function _avBarra(a,n,alto){
-  const p=_avPct(a,n);
-  return '<span style="display:inline-block;width:100%;height:'+(alto||6)+'px;border-radius:3px;background:#dde7f0;overflow:hidden;vertical-align:middle">'
-    +'<span style="display:block;height:100%;width:'+p+'%;background:'+_avColor(p)+'"></span></span>';
+function _avBarra(a,n,alto,m){   // m = marcados virtuales: siguen a lo real, en rayado
+  const p=_avPct(a,n), v=n?(m||0)*100/n:0, col=_avColor(_avPct(a+(m||0),n));
+  return '<span style="display:flex;width:100%;height:'+(alto||6)+'px;border-radius:3px;background:#dde7f0;overflow:hidden;vertical-align:middle">'
+    +'<span style="height:100%;width:'+p+'%;background:'+col+'"></span>'
+    +(v?'<span style="height:100%;width:'+v+'%;background:repeating-linear-gradient(135deg,'+col+' 0 3px,#fff 3px 6px)"></span>':'')+'</span>';
+}
+// Marcas de quien aún no tiene recinto (02-11-2026): cuentan para llegar al 100 %, pero no como ubicadas.
+// nameState.avMarcas[nombre normalizado] = {t, nota, ts}. Si la persona recibe puesto, manda el puesto.
+// La observación es texto libre: build_atlas_web_data.py no la publica en el 🟡.
+const AV_MARCA={hds:{ico:'🏛',lbl:'Se queda en HDS actual',col:'#b45309'}, obs:{ico:'📝',lbl:'Virtual con observación',col:'#6d28d9'}};
+function _avMarcaDe(s,asg){ const k=norm(s.nombre); return asg[k]?null:((nameState.avMarcas||{})[k]||null); }
+function _avMarcaSet(nom,t,nota){
+  const M=(nameState.avMarcas=nameState.avMarcas||{}), k=norm(nom);
+  if(t) M[k]={t,nota:nota||'',ts:Date.now()}; else delete M[k];
+}
+function avMarcar(nom,t){
+  if(S.viewOnly) return;
+  if(t){
+    const act=(nameState.avMarcas||{})[norm(nom)], D=AV_MARCA[t];
+    const nota=prompt(D.ico+' '+D.lbl+'\n'+nom+'\n\nObservación'+(t==='obs'?':':' (opcional):'), act?act.nota:'');
+    if(nota===null) return;
+    if(t==='obs' && !nota.trim()){ alert('Escribe la observación.'); return; }
+    if(/\b\d{1,2}\.?\d{3}\.?\d{3}-?[\dkK]\b/.test(nota)){ alert('La observación no puede llevar un RUT.'); return; }
+    _avMarcaSet(nom,t,nota.trim());
+  } else _avMarcaSet(nom,null);
+  sNames(); renderAvance();
 }
 // Solo el % global, para el rotulo de la pestaña: no arma el arbol entero.
 // Dotación que cuenta para el avance: los becados en formación quedan fuera
@@ -12359,16 +12475,16 @@ function _avStaff(){ return _dpStaffAll().filter(s=>!s.beca && !s.externo); }
 function _avBadge(){
   const b=document.getElementById('sbAvN'); if(!b||!dotDB||!dotDB.staff) return;
   const asg=_dpAsignados(), all=_avStaff();
-  let a=0; all.forEach(s=>{ if(asg[norm(s.nombre)]) a++; });
-  b.textContent=_avPct(a,all.length)+'%';
-  _hdrAvance(a,all.length);
+  let a=0, m=0; all.forEach(s=>{ if(asg[norm(s.nombre)]) a++; else if(_avMarcaDe(s,asg)) m++; });
+  b.textContent=_avPct(a+m,all.length)+'%';
+  _hdrAvance(a,all.length,m);
 }
 // Único % de avance a la vista (cabecera): dotación asignada a un recinto.
-function _hdrAvance(a,n){
-  const p=_avPct(a,n), f=x=>Number(x).toLocaleString('es-CL');
+function _hdrAvance(a,n,m=0){
+  const p=_avPct(a+m,n), f=x=>Number(x).toLocaleString('es-CL');
   const pe=document.getElementById('statPct'); if(pe) pe.textContent=p+'%';
   const be=document.getElementById('statBar'); if(be) be.style.width=Math.min(100,p)+'%';
-  const de=document.getElementById('statDet'); if(de) de.textContent=f(a)+' de '+f(n);
+  const de=document.getElementById('statDet'); if(de) de.textContent=f(a)+(m?(' + '+f(m)+' virtuales'):'')+' de '+f(n);
 }
 function avToggle(k){ _avAbierto[k]=!_avAbierto[k]; renderAvance(); }
 // Abre (o cierra) todas las subdirecciones y sus servicios de una vez; los
@@ -12381,10 +12497,10 @@ function avExpandir(on){
 }
 // Filas del avance para Excel: una por subdirección, servicio/departamento y unidad.
 function _avExportFilas(){
-  const {arbol,tN,tA}=_avArbol();
-  const rows=[['Nivel','Subdirección','Servicio / Departamento','Unidad','Personas','Asignadas a recinto','Faltan','% avance']];
-  const fila=(niv,sd,sv,u,x)=>rows.push([niv,sd,sv,u,x.n,x.a,x.n-x.a,_avPct(x.a,x.n)]);
-  rows.push(['Total','','','',tN,tA,tN-tA,_avPct(tA,tN)]);
+  const {arbol,tN,tA,tM}=_avArbol();
+  const rows=[['Nivel','Subdirección','Servicio / Departamento','Unidad','Personas','Asignadas a recinto','Faltan','% en recinto','Virtuales','% con virtuales']];
+  const fila=(niv,sd,sv,u,x)=>rows.push([niv,sd,sv,u,x.n,x.a,x.n-x.a-x.m,_avPct(x.a,x.n),x.m,_avPct(x.a+x.m,x.n)]);
+  rows.push(['Total','','','',tN,tA,tN-tA-tM,_avPct(tA,tN),tM,_avPct(tA+tM,tN)]);
   Object.entries(arbol).sort((x,y)=>y[1].n-x[1].n).forEach(([sd,A])=>{
     fila('Subdirección',sd,'','',A);
     Object.entries(A.hijos).sort((x,y)=>y[1].n-x[1].n).forEach(([sv,B])=>{
@@ -12398,7 +12514,7 @@ function exportAvance(){
   const rows=_avExportFilas(); if(rows.length<3){ alert('La matriz de dotación no está cargada.'); return; }
   const suf=_avFiltro?('_'+norm(_avGrupoNombre(_avFiltro)).replace(/[^a-z0-9]+/g,'_')):'';
   xlsxDownload(rows,'Avance','Avance_dotacion_asignada'+suf+'_'+new Date().toISOString().slice(0,10)+'.xlsx',
-    [{wch:13},{wch:38},{wch:44},{wch:40},{wch:10},{wch:12},{wch:9},{wch:10}]);
+    [{wch:13},{wch:38},{wch:44},{wch:40},{wch:10},{wch:12},{wch:9},{wch:11},{wch:10},{wch:13}]);
 }
 // Nombres de una unidad del árbol, con su estado de asignación. Cierra el
 // circuito: cualquier número del avance se puede abrir hasta ver quién es.
@@ -12408,14 +12524,19 @@ function _avPersonas(sd,sv,u,asg){
     String(s.subdireccion||'(sin subdirección)')===sd &&
     String(s.servicio||'(sin departamento)')===sv &&
     String(s.unidad||'(sin unidad)')===u &&
-    (!_avSoloFaltan || !asg[norm(s.nombre)]));          // modo faltantes: sólo quienes no tienen recinto
+    (!_avSoloFaltan || (!asg[norm(s.nombre)] && !_avMarcaDe(s,asg))));   // modo faltantes: sólo quienes siguen sin resolver
   if(!gente.length) return '<div style="padding:4px 4px 6px 40px;font-size:10px;color:#b45309">'+(_avSoloFaltan?'Nadie falta en esta unidad.':'Sin personas en la matriz para esta unidad.')+'</div>';
   gente.sort((a,b)=>String(a.nombre).localeCompare(String(b.nombre),'es'));
+  const puede=!S.viewOnly && ATLAS_EDIFICIO.id==='NHDS', attr=s=>esc(s).replace(/"/g,'&quot;');
+  const boton=(n,t,ico,tip)=>'<button type="button" class="av-mk" data-n="'+attr(n)+'" onclick="avMarcar(this.dataset.n,'+(t?"'"+t+"'":'null')+')" title="'+tip+'">'+ico+'</button>';
   return '<div style="padding:2px 4px 6px 40px">'+gente.map(g=>{
-    const ok=!!asg[norm(g.nombre)];
-    return '<div style="display:flex;gap:6px;font-size:10px;line-height:1.5;color:'+(ok?'#15803d':'#b45309')+'">'
-      +'<span>'+(ok?'✔':'○')+'</span>'
-      +'<span style="flex:1;min-width:0;overflow-wrap:anywhere">'+esc(g.nombre)+(g.cargo?(' <span style="color:#94a3b8">· '+esc(g.cargo)+'</span>'):'')+'</span></div>';
+    const ok=!!asg[norm(g.nombre)], M=ok?null:_avMarcaDe(g,asg), D=M&&AV_MARCA[M.t];
+    return '<div style="display:flex;gap:6px;font-size:10px;line-height:1.5;color:'+(ok?'#15803d':D?D.col:'#b45309')+'">'
+      +'<span>'+(ok?'✔':D?D.ico:'○')+'</span>'
+      +'<span style="flex:1;min-width:0;overflow-wrap:anywhere">'+esc(g.nombre)+(g.cargo?(' <span style="color:#94a3b8">· '+esc(g.cargo)+'</span>'):'')
+      +(D?('<div style="font-weight:600">'+D.lbl+(M.nota?(' · <span style="font-weight:400">'+esc(M.nota)+'</span>'):'')+'</div>'):'')+'</span>'
+      +(puede&&!ok?(D?boton(g.nombre,null,'✕','Quitar la marca')
+        :boton(g.nombre,'hds','🏛','Se queda en el HDS actual: cuenta como virtual')+boton(g.nombre,'obs','📝','Virtual con observación')):'')+'</div>';
   }).join('')+'</div>';
 }
 // Árbol sd → sv → u de la dotación (sin becados), con personas y asignadas por nodo.
@@ -12440,7 +12561,7 @@ function avSoloFaltan(){ _avSoloFaltan=!_avSoloFaltan; renderAvance(); }
 // Quiénes faltan por cubicar (respeta el grupo filtrado), listos para Excel.
 function _avFaltantes(){
   const asg=_dpAsignados();
-  return _avStaffFiltrado().filter(s=>!asg[norm(s.nombre)])
+  return _avStaffFiltrado().filter(s=>!asg[norm(s.nombre)] && !_avMarcaDe(s,asg))
     .sort((a,b)=>String(a.subdireccion||'').localeCompare(String(b.subdireccion||''),'es')
               || String(a.servicio||'').localeCompare(String(b.servicio||''),'es')
               || String(a.unidad||'').localeCompare(String(b.unidad||''),'es')
@@ -12457,6 +12578,13 @@ function exportFaltantes(){
   xlsxDownload(rows,'Faltan por cubicar','Faltan_por_cubicar'+suf+'_'+new Date().toISOString().slice(0,10)+'.xlsx',
     [{wch:38},{wch:44},{wch:40},{wch:40},{wch:30},{wch:22}]);
 }
+// Marcados virtuales (🏛 / 📝), listos para Excel.
+function exportMarcados(){
+  const asg=_dpAsignados(), rows=[['Subdirección','Servicio / Departamento','Unidad','Nombre','Cargo','Marca','Observación']];
+  _avStaffFiltrado().forEach(s=>{ const M=_avMarcaDe(s,asg); if(M) rows.push([s.subdireccion||'(sin subdirección)',s.servicio||'(sin departamento)',s.unidad||'(sin unidad)',s.nombre,s.cargo||'',AV_MARCA[M.t].lbl,M.nota||'']); });
+  if(rows.length<2){ alert('Todavía no hay personas marcadas.'); return; }
+  xlsxDownload(rows,'Marcados','Marcados_virtuales_'+new Date().toISOString().slice(0,10)+'.xlsx',[{wch:38},{wch:44},{wch:40},{wch:40},{wch:30},{wch:24},{wch:50}]);
+}
 function _avArbol(){
   const asg=_dpAsignados();
   // árbol sd → sv → u, contando personas y cuántas tienen recinto
@@ -12470,16 +12598,18 @@ function _avArbol(){
     // total del servicio pero no aparecía en ningún hijo, y al desplegar no salía
     // nadie. Ahora cae en una unidad explícita.
     const u =String(s.unidad||'(sin unidad)');
-    const A=arbol[sd]||(arbol[sd]={n:0,a:0,hijos:{}});
-    const B=A.hijos[sv]||(A.hijos[sv]={n:0,a:0,hijos:{}});
-    const C=B.hijos[u]||(B.hijos[u]={n:0,a:0});
+    const A=arbol[sd]||(arbol[sd]={n:0,a:0,m:0,hijos:{}});
+    const B=A.hijos[sv]||(A.hijos[sv]={n:0,a:0,m:0,hijos:{}});
+    const C=B.hijos[u]||(B.hijos[u]={n:0,a:0,m:0});
     const ok=!!asg[norm(s.nombre)];
     A.n++; B.n++; C.n++;
     if(ok){ A.a++; B.a++; C.a++; }
+    else if(_avMarcaDe(s,asg)){ A.m++; B.m++; C.m++; }
   });
   const tN=Object.values(arbol).reduce((x,v)=>x+v.n,0);
   const tA=Object.values(arbol).reduce((x,v)=>x+v.a,0);
-  return {asg,arbol,nBec,nExt,tN,tA};
+  const tM=Object.values(arbol).reduce((x,v)=>x+v.m,0);
+  return {asg,arbol,nBec,nExt,tN,tA,tM};
 }
 // ── ¿Cuántos somos? ── cifras oficiales confirmadas con la sesión de Matriz Dotación (14-10-2026).
 // Se calculan en vivo sobre la matriz (window.SHARED_DOTACION), así cambian solas con cada corte.
@@ -12545,17 +12675,19 @@ function renderAvance(){
   if(!dotDB||!dotDB.staff){ cont.innerHTML='<div style="padding:8px;color:#64748b">La matriz de dotación no está cargada.</div>'; return; }
   const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
   const corto=s=>String(s||'').replace(/^SUBDIRECCION\s+(DE\s+)?/i,'').replace(/^DEPARTAMENTO\s+/i,'Depto. ').replace(/^SERVICIO\s+(DE\s+)?/i,'');
-  const {asg,arbol,nBec,nExt,tN,tA}=_avArbol();
+  const {asg,arbol,nBec,nExt,tN,tA,tM}=_avArbol();
+  const nHds=_avStaffFiltrado().filter(s=>(_avMarcaDe(s,asg)||{}).t==='hds').length;
   // La categoría de RRHH sólo existe mientras haya personas sin clasificar.
   const PEND_RRHH='PENDIENTE DE CLASIFICAR POR RRHH';
   const nPend=(arbol[PEND_RRHH]||{}).n||0;
-  const badge=document.getElementById('sbAvN'); if(badge && !_avFiltro){ badge.textContent=_avPct(tA,tN)+'%'; _hdrAvance(tA,tN); }
+  const badge=document.getElementById('sbAvN'); if(badge && !_avFiltro){ badge.textContent=_avPct(tA+tM,tN)+'%'; _hdrAvance(tA,tN,tM); }
   const H=[];
   H.push('<div style="display:flex;align-items:center;gap:8px;padding:4px 4px 6px">'
     +'<b style="font-size:12px">'+(_avFiltro?('🖋️ '+esc(_avGrupoNombre(_avFiltro))+' · asignadas a recinto'):'Dotación asignada a recinto')+'</b>'
-    +'<b style="margin-left:auto;font-size:15px;color:'+_avColor(_avPct(tA,tN))+'">'+_avPct(tA,tN)+'%</b></div>'
-    +'<div style="padding:0 4px 6px">'+_avBarra(tA,tN,8)
-    +'<div style="font-size:10.5px;color:#64748b;margin-top:3px" title="Base del porcentaje: registros de la matriz con nombre, sin becados ni personal de otra institución. Un médico con dos cargos cuenta dos veces. No es «cuántos somos»: ver el recuadro de abajo.">'+_avNum(tA)+' de '+_avNum(tN)+' registros de la matriz · faltan '+_avNum(tN-tA)+'</div>'
+    +'<b style="margin-left:auto;font-size:15px;color:'+_avColor(_avPct(tA+tM,tN))+'">'+_avPct(tA+tM,tN)+'%</b></div>'
+    +'<div style="padding:0 4px 6px">'+_avBarra(tA,tN,8,tM)
+    +'<div style="font-size:10.5px;color:#64748b;margin-top:3px" title="Base del porcentaje: registros de la matriz con nombre, sin becados ni personal de otra institución. Un médico con dos cargos cuenta dos veces. No es «cuántos somos»: ver el recuadro de abajo.">'+_avNum(tA)+' de '+_avNum(tN)+' registros de la matriz · faltan '+_avNum(tN-tA-tM)+'</div>'
+    +(tM?'<div style="font-size:10.5px;color:#6d28d9;margin-top:2px" title="Marcados sin recinto: cuentan para el total, pero no son personas ubicadas en el NHDS">'+_avPct(tA,tN)+'% en recinto + '+_avNum(tM)+' virtuales · 🏛 '+_avNum(nHds)+' se quedan en HDS actual · 📝 '+_avNum(tM-nHds)+' con observación</div>':'')
     +((!_avFiltro&&nBec)?'<div style="font-size:10.5px;color:#94a3b8;margin-top:2px" title="Los becados en formación no pertenecen a una subdirección">🎓 '+nBec+' becados no considerados</div>':'')
     +((!_avFiltro&&nExt)?'<div style="font-size:10.5px;color:#94a3b8;margin-top:2px" title="Personal de otra institución (Universidad de Chile) que trabaja en el hospital: está en la matriz para ubicarlo, pero no es dotación del HDS">🏛 '+nExt+' de otra institución no considerados</div>':'')
     +(nPend?'<div style="font-size:10.5px;color:#b45309;margin-top:2px" title="Personal contratado que RRHH aún no clasifica por departamento ni subdirección. La categoría desaparece cuando llegue la clasificación.">📋 '+nPend+' sin clasificar por RRHH ('+(tN? (nPend*100/tN<1 ? (nPend*100/tN).toFixed(1) : _avPct(nPend,tN)) : 0)+'% de la dotación)</div>':'')
@@ -12569,8 +12701,9 @@ function renderAvance(){
     +'<a href="#" class="av-grupo'+(_avFiltro==='circulo_secretarias'?' on':'')+'" onclick="avFiltrar(\'circulo_secretarias\');return false" title="Avance sólo del Círculo de Secretarias: grupo transversal, repartido en varias subdirecciones">'
     +(_avFiltro==='circulo_secretarias'?'✕ Ver toda la dotación':'🖋️ Círculo de secretarias')+'</a>'
     +'<a href="#" class="av-falt'+(_avSoloFaltan?' on':'')+'" onclick="avSoloFaltan();return false" title="Ver sólo dónde falta gente por cubicar y quiénes son (el % restante)">'
-    +(_avSoloFaltan?'✕ Ver todo':'○ Sólo faltantes ('+(tN-tA)+')')+'</a>'
-    +'<a href="#" onclick="exportFaltantes();return false" title="Excel con nombre, cargo, subdirección, servicio y unidad de cada persona que aún no tiene recinto">⬇ Exportar faltantes</a></div>');
+    +(_avSoloFaltan?'✕ Ver todo':'○ Sólo faltantes ('+(tN-tA-tM)+')')+'</a>'
+    +'<a href="#" onclick="exportFaltantes();return false" title="Excel con nombre, cargo, subdirección, servicio y unidad de cada persona que aún no tiene recinto">⬇ Exportar faltantes</a>'
+    +(tM?'<a href="#" onclick="exportMarcados();return false" title="Excel con las personas marcadas como virtuales y su observación">⬇ Exportar marcados</a>':'')+'</div>');
   // Líneas guía del árbol (sutiles): cada fila hija se conecta con su padre (├ / └) y la línea del
   // abuelo sigue mientras queden hermanos abajo. sigue[L] = la guía del nivel L continúa bajo esta fila.
   const GX=[8.5,20.5];                       // centro del chevron de los niveles 0 y 1
@@ -12582,8 +12715,8 @@ function renderAvance(){
       if(esPadre) h+='<span class="av-g av-gh" style="left:'+GX[L]+'px;top:'+y+'px;width:'+(GX[L+1]!==undefined?(GX[L+1]-GX[L]-4):9)+'px"></span>';
     }
     return h; };
-  const fila=(nivel,nombre,a,n,clave,hayHijos,nHijos,sigue)=>{
-    const p=_avPct(a,n), ab=!!_avAbierto[clave];
+  const fila=(nivel,nombre,x,clave,hayHijos,nHijos,sigue)=>{
+    const {a,n,m}=x, p=_avPct(a+m,n), ab=!!_avAbierto[clave];
     const pad=[0,12,24][nivel];
     const abre=hayHijos||nivel===2;          // la hoja despliega los NOMBRES
     return '<div class="av-fila'+(abre?' av-abre':'')+(ab?' av-ab':'')+'" style="position:relative;padding:5px 4px 5px '+(4+pad)+'px;border-top:1px solid #eef2f7;'
@@ -12597,26 +12730,26 @@ function renderAvance(){
         +(nivel===0?'font-weight:700':nivel===1?'font-weight:600':'color:#475569')+'">'+esc(corto(nombre))
         +(nHijos&&!ab?' <span class="av-hijos">'+nHijos+' '+(nivel===0?'servicio':'unidad')+(nHijos>1?(nivel===0?'s':'es'):'')+'</span>':'')
         +(nivel===2&&!ab?' <span class="av-hijos">nombres</span>':'')+'</span>'
-      +(_avSoloFaltan?'<span style="color:#c0262d;font-size:10px;font-weight:600;white-space:nowrap">faltan '+(n-a)+'</span>'
-                     :'<span style="color:#64748b;font-size:10px;white-space:nowrap">'+a+'/'+n+'</span>')
+      +(_avSoloFaltan?'<span style="color:#c0262d;font-size:10px;font-weight:600;white-space:nowrap">faltan '+(n-a-m)+'</span>'
+                     :'<span style="color:#64748b;font-size:10px;white-space:nowrap" title="'+(m?(a+' en recinto + '+m+' virtuales'):'')+'">'+a+(m?('+'+m):'')+'/'+n+'</span>')
       +'<b style="width:32px;text-align:right;color:'+_avColor(p)+';font-size:10.5px">'+p+'%</b></div>'
-      +'<div style="margin:3px 0 0 15px">'+_avBarra(a,n,nivel===0?6:4)+'</div></div>';
+      +'<div style="margin:3px 0 0 15px">'+_avBarra(a,n,nivel===0?6:4,m)+'</div></div>';
   };
   // modo faltantes: sólo los nodos donde todavía falta alguien, ordenados por cuántos faltan
-  const vivo=x=>!_avSoloFaltan || x.n-x.a>0;
-  const orden=(x,y)=>_avSoloFaltan ? ((y[1].n-y[1].a)-(x[1].n-x[1].a)) : (y[1].n-x[1].n);
+  const vivo=x=>!_avSoloFaltan || x.n-x.a-x.m>0;
+  const orden=(x,y)=>_avSoloFaltan ? ((y[1].n-y[1].a-y[1].m)-(x[1].n-x[1].a-x[1].m)) : (y[1].n-x[1].n);
   Object.entries(arbol).filter(([,A])=>vivo(A)).sort(orden).forEach(([sd,A])=>{
     const kA='sd:'+sd, hijosA=Object.entries(A.hijos).filter(([,B])=>vivo(B));
-    H.push(fila(0,sd,A.a,A.n,kA,hijosA.length>0,hijosA.length));
+    H.push(fila(0,sd,A,kA,hijosA.length>0,hijosA.length));
     if(!_avAbierto[kA]) return;
     hijosA.sort(orden).forEach(([sv,B],iB)=>{
       const kB=kA+'|sv:'+sv, hijosB=Object.entries(B.hijos).filter(([,C])=>vivo(C));
       const masB=iB<hijosA.length-1;         // quedan servicios abajo: la guía del nivel 0 sigue
-      H.push(fila(1,sv,B.a,B.n,kB,hijosB.length>0,hijosB.length,[masB]));
+      H.push(fila(1,sv,B,kB,hijosB.length>0,hijosB.length,[masB]));
       if(!_avAbierto[kB]) return;
       hijosB.sort(orden).forEach(([u,C],iC)=>{
         const kC=kB+'|u:'+u, masC=iC<hijosB.length-1;
-        H.push(fila(2,u,C.a,C.n,kC,false,0,[masB,masC]));
+        H.push(fila(2,u,C,kC,false,0,[masB,masC]));
         if(_avAbierto[kC]) H.push('<div style="position:relative">'+guias(2,[masB,masC],false,0)+_avPersonas(sd,sv,u,asg)+'</div>');
       });
     });
@@ -14100,17 +14233,7 @@ function updateStats(){
 }
 
 // ═══ SIDEBAR TREE ═══════════════════════════════════════════════════════════
-function toggleFloor(flId){
-  if(_sb.floor===flId){_sb.floor=null; _sb.area=null;}
-  else{_sb.floor=flId; _sb.area=null;}
-  renderSidebar();
-}
-function toggleArea(aId){
-  _sb.area=(_sb.area===aId)?null:aId;
-  renderSidebar();
-}
 function sidebarGoArea(floorId,areaId){
-  _sb.floor=floorId; _sb.area=areaId;
   if(S.floorId!==floorId){
     S.floorId=floorId; S.level=1; S.areaId=null; S.roomId=null;
     S.history=[]; S.selIds.clear(); exitEdit();
@@ -14119,14 +14242,18 @@ function sidebarGoArea(floorId,areaId){
   }else if(S.level!==1){S.history=[]; S.level=1; S.areaId=null; S.roomId=null;}
   S.selIds.clear();
   pushH(); S.areaId=areaId; S.level=2;
-  const _sa=aShapes(curFloor().areas.find(a=>a.id===areaId)); if(_sa.length){zoomTo(bounds(_sa));}else{const{zoom,ox,oy}=fitView();animTo(zoom,ox,oy,280);}
+  const _sa=aShapes(curFloor().areas.find(a=>a.id===areaId)); if(!_esTelefono()){ _traerSinZoom(_sa); }else if(_sa.length){zoomTo(bounds(_sa));}else{const{zoom,ox,oy}=fitView();animTo(zoom,ox,oy,280);}
   renderSVG(); updateUI();
 }
 function sidebarGoRoom(floorId,areaId,roomId){
-  _sb.floor=floorId; _sb.area=areaId;
-
   const doNavigate=()=>{
     S.history=[]; S.selIds.clear(); S.level=1; S.areaId=null; S.roomId=null;
+    if(!_esTelefono()){
+      pushH(); S.areaId=areaId; S.level=2; pushH(); S.roomId=roomId; S.level=3; S.delDotMode=false;
+      _traerSinZoom(rShapes(curFloor().areas.find(a=>a.id===areaId)?.rooms.find(r=>r.id===roomId)));
+      renderSVG(); updateUI(); renderSidebar();
+      return;
+    }
     renderSVG(); updateUI(); renderSidebar();
     // Step 1: zoom to area first (give visual context)
     const areaShapes=aShapes(curFloor().areas.find(a=>a.id===areaId));
@@ -14181,6 +14308,7 @@ function sidebarGoRoom(floorId,areaId,roomId){
 let _sbTab='pisos';
 function sbShowTab(tab){
   _sbTab=tab;
+  document.getElementById('sidebar').classList.toggle('delgado',tab==='pisos');
   document.getElementById('sbTabPisos').classList.toggle('on',tab==='pisos');
   document.getElementById('sbTabTipos').classList.toggle('on',tab==='tipos');
   { const b=document.getElementById('sbTabServ'); if(b) b.classList.toggle('on',tab==='serv'); }
@@ -15934,113 +16062,15 @@ function renderSidebar(){
   try{ if(_sbTab==='tipos') renderTypeFilter(); }catch(e){}
   try{ if(_sbTab==='serv') renderSrvPanel(); }catch(e){}
   try{ renderBimPending(); }catch(e){}
+  // Pisos: sólo íconos circulares (02-11-2026). Los servicios se abren desde el plano y los recintos
+  // en la pestaña «Servicio». Clic en el piso actual vuelve a la vista 1.
   const list=document.getElementById('floorList'); list.innerHTML='';
   FLOORS.forEach(fl=>{
-    const isCurFloor=fl.id===S.floorId;
-    // Only count areas that have been drawn (have a box in boxState)
-    const activeAreas=fl.areas.filter(a=>(boxState.areas[a.id]||[]).length>0);
-    const isFlExp=_sb.floor===fl.id && activeAreas.length>0;
-
-    const flDots=Object.entries(wsState.dots||{}).filter(([k])=>k.startsWith(fl.id));
-    const total=flDots.reduce((a,[,d])=>a+d.length,0);
-    const asig=flDots.reduce((a,[,d])=>a+d.filter(x=>x.tipo==='dinamico'?(x.turnos&&x.turnos.length>0):(x.nombre&&x.nombre.trim())).length,0);
-    const pct=total?Math.round(asig/total*100):0;
-
-    const item=document.createElement('div');
-    item.className='fl-item'+(isCurFloor?' cur':'');
-
-    const hdr=document.createElement('button');
-    hdr.className='fl-hdr';
-    const tog=document.createElement('span');
-    tog.className='fl-toggle'+(isFlExp?' open':'');
-    tog.style.visibility=activeAreas.length?'visible':'hidden';
-    tog.textContent='▶';
-    tog.onclick=e=>{e.stopPropagation(); if(activeAreas.length)toggleFloor(fl.id);};
-    const info=document.createElement('div');
-    info.className='fl-info';
-    info.innerHTML=`<span class="fl-name">${fl.id}</span><span class="fl-sub">${fl.label}</span>`
-      ;   // sin % por piso: el único avance a la vista es el de la cabecera (30-09-2026)
-    hdr.append(tog,info);
-    hdr.onclick=()=>{ if(S.floorId===fl.id){ if(activeAreas.length)toggleFloor(fl.id); } else goFloor(fl.id); };
-    item.appendChild(hdr);
-
-    if(isFlExp && activeAreas.length){
-      const areasEl=document.createElement('div');
-      areasEl.className='tree-areas';
-      activeAreas.forEach(area=>{
-        const isAreaExp=false;              // el detalle de recintos vive en la pestaña «Servicio»
-        const isCurArea=S.areaId===area.id;
-        // Only show rooms that have been drawn
-        const activeRooms=area.rooms.filter(r=>(boxState.rooms[r.id]||[]).length>0);
-
-        const aWrap=document.createElement('div');
-        aWrap.className='tree-area-wrap';
-
-        const ws=areaWsStats(area);
-        const aHdr=document.createElement('button');
-        aHdr.className='tree-area-hdr'+(isCurArea?' cur':'');
-        const aTog=document.createElement('span');
-        aTog.className='tree-area-toggle'+(isAreaExp?' open':'');
-        aTog.style.display='none';
-        const aInfo=document.createElement('div');
-        aInfo.className='tree-area-info';
-        const aName_=document.createElement('span');
-        aName_.className='tree-area-name';
-        aName_.textContent=aName(area.id);
-        aInfo.appendChild(aName_);
-        // (puestos y recintos: pestaña «Servicio»)
-        aHdr.append(aTog,aInfo);
-        aHdr.title=ws.total?`${ws.asig} asignados · ${ws.disp} disponibles de ${ws.total} puestos`:aName(area.id);
-        aHdr.onclick=()=>sidebarGoArea(fl.id,area.id);
-        aWrap.appendChild(aHdr);
-
-        if(isAreaExp && activeRooms.length){
-          const roomsEl=document.createElement('div');
-          roomsEl.className='tree-rooms';
-          // Orden automático: primero por tipología (orden canónico de ROOM_TYPES)
-          // y, dentro de cada tipo, alfabético por nombre del recinto.
-          const TYPE_ORDER=Object.keys(ROOM_TYPES);
-          const typeRank=id=>{ const i=TYPE_ORDER.indexOf(rType(id)); return i<0?TYPE_ORDER.length:i; };
-          const sortedRooms=activeRooms.slice().sort((a,b)=>{
-            const d=typeRank(a.id)-typeRank(b.id);
-            if(d!==0) return d;
-            return rName(a.id).localeCompare(rName(b.id),'es',{numeric:true,sensitivity:'base'});
-          });
-          sortedRooms.forEach(room=>{
-            const isCurRoom=S.roomId===room.id;
-            const rDots=(wsState.dots[room.id]||[]).length;
-            const rc2=rColor(room.id);
-            const rt=rType(room.id);
-            const btn=document.createElement('button');
-            btn.className='tree-room'+(isCurRoom?' cur':'');
-            btn.title=rName(room.id);
-            btn.innerHTML=`<span class="rtype-badge" style="background:${rc2}"></span>${rName(room.id)}`+(rDots?` <span style="opacity:.6;font-size:9px">(${rDots})</span>`:'');
-            btn.onclick=()=>sidebarGoRoom(fl.id,area.id,room.id);
-            if(S.editMode && S.level===2){
-              const row=document.createElement('div');
-              row.className='tree-room-row';
-              row.appendChild(btn);
-              const del=document.createElement('button');
-              del.className='tree-room-del';
-              del.textContent='\u2715';
-              del.title='Eliminar recinto';
-              del.onclick=e=>{
-                e.stopPropagation();
-                quickDeleteRoom(room.id);   // sin confirmación
-              };
-              row.appendChild(del);
-              roomsEl.appendChild(row);
-            } else {
-              roomsEl.appendChild(btn);
-            }
-          });
-          aWrap.appendChild(roomsEl);
-        }
-        areasEl.appendChild(aWrap);
-      });
-      item.appendChild(areasEl);
-    }
-    list.appendChild(item);
+    const b=document.createElement('button');
+    b.className='fl-circ'+(fl.id===S.floorId?' cur':'');
+    b.textContent=fl.id; b.title=fl.label;
+    b.onclick=()=>{ if(fl.id!==S.floorId) goFloor(fl.id); else crumb0Click(); };
+    list.appendChild(b);
   });
 }
 function updateUI(){
@@ -16050,7 +16080,6 @@ function updateUI(){
   // En la vista de piso (nivel 1) se respeta el estado manual del árbol, de modo
   // que al abrir la plataforma todo queda colapsado y los servicios se expanden
   // únicamente cuando el usuario lo decide (toggle) o al drillear adentro.
-  if(S.level>=2){ _sb.floor=S.floorId; _sb.area=S.areaId; }
   const fl=curFloor();
   const c0=document.getElementById('crumb0');
   c0.textContent=fl?.label||''; c0.className='nav-crumb'+(S.level>1?' link':'');
@@ -16059,7 +16088,7 @@ function updateUI(){
   if(S.level>=2&&S.areaId){
     c1.textContent=aName(S.areaId);
     c1.className='nav-crumb'+(S.level>2?' link':'');
-    if(S.level>2)c1.onclick=()=>{while(S.history.length>1)S.history.pop();goBack();};
+    if(S.level>2)c1.onclick=()=>goBack(S.history.length-S.history.map(h=>h.level).lastIndexOf(2));
     c1.style.display=''; s1.style.display='';
   }else{c1.style.display='none'; s1.style.display='none';}
   const c2=document.getElementById('crumb2'),s2=document.getElementById('sep2');
@@ -17902,13 +17931,14 @@ function init(){
   try{ pautasRemotePull(); }catch(e){}   // hidratar asignaciones desde la hoja central
   // Escritorios nuevos (fucsia) de la siembra que todavía no están en este Atlas:
   // se importan UNA vez por versión de la siembra (petición 18-sep-2026).
-  setTimeout(()=>{ try{ _autoImportarPlano(); }catch(e){ console.warn('importación automática del plano',e); } },900);
+  setTimeout(()=>{ try{ _autoImportarPlano(); _vendSembrar(); }catch(e){ console.warn('importación automática del plano',e); } },900);
   // El fit inicial solo cuando el viewer YA tiene tamaño: si la pestaña abre
   // en background o el layout no terminó, clientWidth es 0 y el plano quedaría
   // microscópico. rAF reintenta (y en pestañas ocultas espera a ser visibles).
   const go=()=>{
     if(!(viewer.clientWidth>0 && viewer.clientHeight>0)){ requestAnimationFrame(go); return; }
     const{zoom,ox,oy}=fitView(); S.zoom=zoom;S.ox=ox;S.oy=oy; applyT(); renderSVG(); updateUI(); renderSidebar();
+    floorImg.onload=null;   // sólo el primer encuadre: si quedaba, cada cambio de resolución del plano (lite→mid) re-encuadraba el piso
   };
   floorImg.onload=go;
   if(floorImg.complete&&floorImg.naturalWidth>0)go();
@@ -18201,6 +18231,39 @@ async function runSelfTest(){
   T('Navegación L1→L2→L3', ()=>{ didPan=false; goFloor(fl.id); didPan=false; goArea('st_a'); didPan=false; goRoom('st_r1'); return S.level===3; });
   await sleep(60);
   T('Vista 3: dots renderizados', ()=>svg.querySelectorAll('.ws-dot').length===3);
+  T('Abrir desde el plano no cambia el encuadre', ()=>{
+    if(S.rafId){ cancelAnimationFrame(S.rafId); S.rafId=null; }
+    S.level=1; S.areaId=null; S.roomId=null; const z=S.zoom;
+    didPan=false; goArea('st_a',true); const v2=S.level===2 && S.zoom===z;
+    didPan=false; goRoom('st_r1',true);
+    return v2 && S.level===3 && S.zoom===z;
+  });
+  T('Salir tampoco cambia el encuadre; sólo un salto automático lo recupera', ()=>{
+    const z=S.zoom, ox=S.ox;
+    goBack(); const v2=S.level===2 && S.zoom===z;
+    goBack(); const v1=S.level===1 && S.zoom===z;
+    didPan=false; goArea('st_a',true); didPan=false; goRoom('st_r1',true); crumb0Click();
+    const miga=S.level===1 && !S.history.length && S.zoom===z;
+    didPan=false; goArea('st_a',true); didPan=false; goRoom('st_r1',true);
+    document.getElementById('crumb1').onclick(); const miga2=S.level===2 && S.history.length===1 && S.zoom===z;
+    S.level=1; S.areaId=null; S.roomId=null; S.history=[];
+    didPan=false; goArea('st_a'); const marca=S.history[S.history.length-1].auto===true;
+    if(S.rafId){ cancelAnimationFrame(S.rafId); S.rafId=null; }
+    goBack(); const recupera=!!S.rafId;
+    if(S.rafId){ cancelAnimationFrame(S.rafId); S.rafId=null; }
+    S.zoom=z; S.ox=ox; S.level=1; S.areaId=null; S.history=[];
+    didPan=false; goArea('st_a',true); didPan=false; goRoom('st_r1',true);
+    return v2 && v1 && miga && miga2 && marca && recupera;
+  });
+  T('Oficinas: tarjeta con la gente del recinto sólo en vista 2 y con el botón', ()=>{
+    const z=S.zoom, ds=wsState.dots.st_r1, prev=JSON.stringify(ds);
+    try{
+      ds[0].nombre='PRUEBA OFICINA'; S.level=2; S.zoom=1; _ofOn=true; renderSVG();
+      const c=svg.querySelector('.of-card'), con=!!c && /PRUEBA OFICINA/.test(c.textContent);
+      _ofOn=false; renderSVG(); const sin=!svg.querySelector('.of-layer');
+      return con && sin;
+    } finally { wsState.dots.st_r1=JSON.parse(prev); _ofOn=false; S.zoom=z; S.level=3; renderSVG(); }
+  });
   T('Estructuras: visibles en vista 2 y 3 sin capturar clics', ()=>{
     structuresState[fl.id]=[{id:'st_s1',kind:'stair',x:1500,y:900}];
     renderSVG();                                      // estamos en vista 3
@@ -18799,7 +18862,7 @@ async function runSelfTest(){
       const abiertos=Object.values(_avAbierto).filter(Boolean).length===nSd+nSv;
       const filas=document.querySelectorAll('#avBody .av-fila').length===nSd+nSv+nU;
       const rows=_avExportFilas();
-      const exp=rows.length===2+nSd+nSv+nU && rows[1][0]==='Total' && rows.slice(2).every(r=>r.length===8 && r[4]>=r[5] && r[6]===r[4]-r[5]);
+      const exp=rows.length===2+nSd+nSv+nU && rows[1][0]==='Total' && rows.slice(2).every(r=>r.length===10 && r[4]>=r[5] && r[6]===r[4]-r[5]-r[8]);
       avExpandir(false);
       const cerrado=document.querySelectorAll('#avBody .av-fila').length===nSd;
       return nSd>0 && abiertos && filas && exp && cerrado && /nombres/.test(t);   // las unidades ofrecen abrir sus nombres
@@ -19100,7 +19163,7 @@ async function runSelfTest(){
     const abPrev={..._avAbierto}, fPrev=_avFiltro, sPrev=_avSoloFaltan;
     try{
       _avFiltro=null; _avSoloFaltan=false; renderAvance();
-      const {tN,tA}=_avArbol(); const faltan=tN-tA;
+      const {tN,tA,tM}=_avArbol(); const faltan=tN-tA-tM;
       const rows=_avFaltantesFilas();
       const exp=rows.length===faltan+1 && rows.slice(1).every(r=>r.length===6 && r[3]);
       avSoloFaltan(); avExpandir(true); if(!_avSoloFaltan) return false;
@@ -19287,6 +19350,32 @@ async function runSelfTest(){
     return cambiadas.length===0;
   });
   // Carros de paro: desfibrilador (130007/130008) + carro 110032 en el mismo recinto
+  T('Avance: las marcas virtuales suman al 100 % sin contar como ubicadas, y un puesto real manda', ()=>{
+    const st=dotDB.staff, M0=nameState.avMarcas, aF=_avFiltro;
+    try{
+      _avFiltro=null;
+      dotDB.staff=['ZZ UNO','ZZ DOS','ZZ TRES'].map(nombre=>({nombre,subdireccion:'ZZ',servicio:'ZS',unidad:'ZU'}));
+      nameState.avMarcas={}; _avMarcaSet('ZZ UNO','hds',''); _avMarcaSet('ZZ DOS','obs','nota');
+      const r=_avArbol(), C=r.arbol.ZZ.hijos.ZS.hijos.ZU;
+      const cuenta=r.tN===3 && r.tA===0 && r.tM===2 && C.m===2 && _avFaltantes().length===1 && _avFaltantes()[0].nombre==='ZZ TRES';
+      const pct=_avExportFilas()[1].slice(4,10).join()==='3,0,1,0,2,67';
+      const manda=_avMarcaDe({nombre:'ZZ UNO'},{[norm('ZZ UNO')]:1})===null;
+      _avMarcaSet('ZZ UNO',null); const quita=!_avMarcaDe({nombre:'ZZ UNO'},{});
+      return cuenta && pct && manda && quita;
+    } finally { dotDB.staff=st; nameState.avMarcas=M0; if(M0===undefined) delete nameState.avMarcas; _avFiltro=aF; }
+  });
+  T('Plano web: parte liviano, sube a mid al acercarse y nunca a full; cambiar de resolución no re-encuadra', ()=>{
+    const v=S.viewOnly;
+    try{ S.viewOnly=true; const web=_planBase()==='lite' && _planTope()==='mid' || !!_PLANO_FORZADO;
+      S.viewOnly=false; const maestro=_planBase()==='full' || PLANO_LIVIANO || !!_PLANO_FORZADO;
+      return web && maestro && floorImg.onload===null;
+    } finally { S.viewOnly=v; }
+  });
+  T('Vendomáticas: 12 bloques + 81.2.2, dentro del plano y sin ids repetidos', ()=>{
+    const VP=window.VENDING_PLANO; if(!VP) return true;   // ni la web ni la 48 cargan la siembra
+    const L=Object.entries(VP.floors).flatMap(([p,a])=>a.map(x=>({...x,p})));
+    return L.length===13 && VP.total===13 && new Set(L.map(x=>x.id)).size===13 && L.every(x=>x.k==='vend' && x.x>0 && x.y>0 && x.x<FLOOR_DIMS[x.p].w && x.y<FLOOR_DIMS[x.p].h) && !!PROP_DEF.vend && _UBIC().includes('vend');
+  });
   T('Carros de paro: estados y cruce por recinto', ()=>{
     const e=_cpEstado;
     if(e({d:1,c:1})!=='ok' || e({d:1,c:0})!=='solo' || e({d:2,c:1})!=='solo' || e({d:0,c:1})!=='carro' || e({d:0,c:0})!==null) return false;
@@ -19299,6 +19388,12 @@ async function runSelfTest(){
     const sinExceso=Object.entries(porK).every(([k,v])=>v<=RE[k].reduce((a,x)=>a+(CP_DEF.includes(String(x.t))?Math.max(1,parseInt(x.c)||1):0),0));
     return sinExceso && L.reduce((a,z)=>a+z.x.d,0)<=tot && L.every(z=>z.est===_cpEstado(z.x));
   });
+  T('Carros de paro: lista de marcapaso 27 de 64, cada código con su monitor', ()=>{
+    const RE=window.RECINTO_EQUIP||{}, md=k=>(RE[k]||[]).reduce((a,x)=>a+(CP_DEF.includes(String(x.t))?Math.max(1,parseInt(x.c)||1):0),0);
+    const tot=Object.values(CP_MPE).reduce((a,v)=>a+v,0);
+    const L=_cpRecintos();
+    return tot===27 && Object.entries(CP_MPE).every(([k,v])=>v<=md(k)) && L.every(z=>z.x.mp<=z.x.d);
+  });
   T('Carros de paro: capa con pulso azul/rojo y leyenda', ()=>{
     const prev=_cpOn, fPrev=S.floorId, lPrev=S.level, aPrev=S.areaId;
     const z=_cpRecintos().find(q=>q.est!=='carro'); if(!z) return _sinDibujo();
@@ -19307,7 +19402,7 @@ async function runSelfTest(){
       const mks=[...svg.querySelectorAll('.cp-mk')];
       const esp=_cpRecintos().filter(q=>q.fl.id===z.fl.id && q.est!=='carro').length;
       const lg=document.getElementById('cpLegend');
-      const leyenda=lg.style.display!=='none' && /completos/.test(lg.innerHTML) && /Excel/.test(lg.innerHTML);
+      const leyenda=lg.style.display!=='none' && /completos/.test(lg.innerHTML) && /con marcapaso/.test(lg.innerHTML) && /Excel/.test(lg.innerHTML);
       const colOk=mks.every(m=>{ const c=m.querySelectorAll('circle')[2].getAttribute('fill'); return m.classList.contains('cp-ok')?c===CP_COL.ok:c===CP_COL.solo; });
       const pulso=mks.every(m=>m.querySelectorAll('animate').length===2);
       _cpOn=false; renderSVG();
@@ -19611,13 +19706,13 @@ async function runSelfTest(){
     const esperado = nw ? nw/IMG_W : 1;
     return typeof PLANO_LIVIANO==='boolean' && Math.abs(k0-esperado)<1e-9 && (PLANO_LIVIANO ? k0<0.5 : true);
   });
-  T('Barra izquierda: Pisos muestra solo los servicios; la pestaña Servicio da recintos por tipo y el detalle al desplegar', ()=>{
+  T('Barra izquierda: Pisos muestra sólo íconos circulares; la pestaña Servicio da recintos por tipo y el detalle al desplegar', ()=>{
     const nivel=S.level, a0=S.areaId, tab=_sbTab, abiertos=new Set(_srvAbiertos); _rpFix(true);
     try{
       nameState.types=nameState.types||{}; const t0=nameState.types['st_r1'];
-      S.floorId=fl.id; _sb.floor=fl.id; S.level=2; S.areaId='st_a'; sbShowTab('pisos'); renderSidebar();
+      S.floorId=fl.id; S.level=2; S.areaId='st_a'; sbShowTab('pisos'); renderSidebar();
       const L=document.getElementById('floorList');
-      const soloServ=!!L.querySelector('.tree-area-hdr') && !L.querySelector('.tree-room') && !L.querySelector('.tree-area-ws');
+      const soloServ=L.querySelectorAll('.fl-circ').length===FLOORS.length && L.querySelectorAll('.fl-circ.cur').length===1 && L.children.length===FLOORS.length;
       sbShowTab('serv'); const B=document.getElementById('srvList');
       const fila=B.querySelector('.srv-row'); const tiene=!!fila && /ST/.test(B.querySelector('.srv-cab .nm').textContent) && B.style.display!=='none' && L.style.display==='none';
       fila.click(); const det=!!B.querySelector('.srv-rooms .tree-room');
@@ -20511,6 +20606,51 @@ document.addEventListener('keydown',e=>{
 })();
 </script>
 <script src="hub-home.js">
+</script>
+<style>
+#sgAt{position:fixed;left:72px;bottom:16px;z-index:60;display:none;align-items:center;gap:6px;background:#fff;border:1.5px solid #f59e0b;color:#1e2433;border-radius:999px;padding:7px 14px;font:600 13px system-ui,sans-serif;cursor:pointer;box-shadow:0 4px 14px rgba(15,30,52,.18)}
+#sgAt:hover{background:#fffbeb}
+#sgAtOv{position:fixed;inset:0;background:rgba(15,30,52,.45);z-index:9600;display:none;align-items:center;justify-content:center}
+#sgAtBox{background:#fff;border-radius:14px;width:min(460px,94vw);box-shadow:0 24px 60px rgba(0,0,0,.3);font:14px system-ui,sans-serif;color:#1e2433}
+#sgAtBox header{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid #e5e7eb;font-weight:700}
+#sgAtBox header button{border:0;background:none;font-size:22px;cursor:pointer;color:#64748b}
+#sgAtBox .c{padding:14px 18px 18px}
+#sgAtBox label{display:block;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.4px;margin:0 0 5px}
+#sgAtBox input,#sgAtBox textarea{width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:8px;padding:9px 11px;font:14px system-ui,sans-serif;margin-bottom:12px}
+#sgAtCtx{font-size:12px;color:#475569;background:#f1f5f9;border-radius:8px;padding:7px 10px;margin-bottom:12px}
+#sgAtBox .pie{display:flex;align-items:center;gap:12px}
+#sgAtEnv{background:#f59e0b;border:0;color:#1e2433;border-radius:8px;padding:10px 18px;font-weight:800;cursor:pointer}
+@media (max-width:840px){#sgAt{left:12px;bottom:12px}}
+</style>
+<button id="sgAt" onclick="sgAtAbrir()" title="Comentarios, errores o ideas sobre el Atlas: llegan directo a Matías">💡 Sugerencias</button>
+<div id="sgAtOv" onclick="if(event.target===this)this.style.display='none'"><div id="sgAtBox">
+  <header>💡 Sugerencia sobre el Atlas<button onclick="document.getElementById('sgAtOv').style.display='none'">×</button></header>
+  <div class="c">
+    <div id="sgAtCtx"></div>
+    <label>Tu nombre</label><input id="sgAtNom" maxlength="60">
+    <label>Comentario</label><textarea id="sgAtTxt" rows="4" maxlength="1400" placeholder="¿Qué falta, qué está mal o qué mejorarías? Si es sobre un recinto, ábrelo antes y queda anotado."></textarea>
+    <div class="pie"><button id="sgAtEnv" onclick="sgAtEnviar()">Enviar</button><span id="sgAtMsg" style="font-size:13px;font-weight:600"></span></div>
+  </div>
+</div></div>
+<script>
+function _sgAtCtx(){ try{ const f=curFloor(); return [f?f.label:'', S.areaId?aName(S.areaId):'', (S.level===3&&S.roomId)?(rName(S.roomId)+(rCode(S.roomId)?' '+rCode(S.roomId):'')):''].filter(Boolean).join(' · '); }catch(e){ return ''; } }
+function sgAtAbrir(){
+  document.getElementById('sgAtMsg').textContent='';
+  const n=document.getElementById('sgAtNom'); if(!n.value){ try{ n.value=(pmSession()&&pmSession().u)||''; }catch(e){} }
+  document.getElementById('sgAtCtx').textContent='📍 '+(_sgAtCtx()||'Atlas');
+  document.getElementById('sgAtOv').style.display='flex';
+}
+function sgAtEnviar(){
+  const C=window.PM_CONFIG||{}, nom=document.getElementById('sgAtNom').value.trim(), tx=document.getElementById('sgAtTxt').value.trim(), m=document.getElementById('sgAtMsg');
+  if(!nom||tx.length<5){ m.style.color='#dc2626'; m.textContent='Falta tu nombre o el comentario.'; return; }
+  if(!C.LOG_URL){ m.style.color='#dc2626'; m.textContent='Sin conexión al registro.'; return; }
+  const b=document.getElementById('sgAtEnv'); b.disabled=true;
+  const body=new URLSearchParams({tipo:'sugerencia', nombre:nom, sugerencia:'[Atlas · '+(_sgAtCtx()||'general')+'] '+tx, origen:'atlas-pm'}).toString();
+  fetch(C.LOG_URL,{method:'POST',mode:'no-cors',keepalive:true,headers:{'Content-Type':'application/x-www-form-urlencoded'},body})
+    .catch(()=>{}).finally(()=>{ b.disabled=false; m.style.color='#16a34a'; m.textContent='¡Gracias! Quedó registrada.';
+      document.getElementById('sgAtTxt').value=''; setTimeout(()=>{ document.getElementById('sgAtOv').style.display='none'; },1500); });
+}
+window.addEventListener('load',()=>{ if(window.PM_CONFIG&&PM_CONFIG.LOG_URL) document.getElementById('sgAt').style.display='inline-flex'; });
 </script>
 </body>
 </html>

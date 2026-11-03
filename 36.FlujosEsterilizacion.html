@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<script src="pm_config.js"></script>
+<script src="pm_gate.js"></script>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flujos Esterilización ↔ Pabellones · HDS</title>
+<style>
+  :root{--navy:#0d1b34;--blue:#29aae2;--teal:#0e7c66;--amber:#f59e0b;--violet:#a78bfa;
+        --ink:#e8f1fb;--mut:#9fb4cf;--line:rgba(255,255,255,.10);}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;
+       background:linear-gradient(160deg,#0a1428,#0d1b34 55%,#0b1a30);color:var(--ink);min-height:100vh}
+  .wrap{max-width:1180px;margin:0 auto;padding:30px 22px 60px}
+  .h-tit{font-size:26px;font-weight:800}
+  .bar{height:4px;width:74px;background:linear-gradient(90deg,var(--teal),var(--blue));border-radius:3px;margin:10px 0 14px}
+  .h-sub{color:var(--mut);font-size:13px;margin-bottom:20px;line-height:1.55}
+  .tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+  .tab{padding:11px 20px;border-radius:12px;font-weight:800;font-size:14px;cursor:pointer;
+       border:1px solid var(--line);background:rgba(255,255,255,.05);color:var(--mut);transition:.15s}
+  .tab.on{background:linear-gradient(90deg,var(--teal),#0aa07f);color:#fff;border-color:transparent}
+  .panel{display:none}.panel.on{display:block}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
+  .kpi{background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+  .kpi .v{font-size:22px;font-weight:800;color:#3ddcb0}
+  .kpi .l{font-size:11px;color:var(--mut);margin-top:3px;line-height:1.35}
+  .box{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:16px}
+  .box h3{margin:0 0 4px;font-size:16px;font-weight:800}
+  .box .st{font-size:11.5px;color:var(--mut);margin-bottom:12px}
+  .lbl{font-size:10.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--blue);margin:14px 0 6px}
+  .esc{border-left:4px solid var(--blue)}
+  .esc.seremi{border-left-color:var(--amber)}
+  .esc.hds{border-left-color:var(--violet)}
+  .kv{display:grid;grid-template-columns:120px 1fr;gap:6px 12px;font-size:12.8px;line-height:1.5}
+  .kv b{color:var(--mut);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.4px;padding-top:2px}
+  .flow{list-style:none;margin:0;padding:0;counter-reset:f}
+  .flow li{counter-increment:f;position:relative;padding:9px 0 9px 40px;font-size:13px;line-height:1.5;
+           border-bottom:1px solid rgba(255,255,255,.05)}
+  .flow li:last-child{border-bottom:none}
+  .flow li::before{content:counter(f);position:absolute;left:0;top:8px;width:26px;height:26px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;
+    background:rgba(41,170,226,.2);color:#9fd8f5;border:1px solid rgba(41,170,226,.4)}
+  .flow.lim li::before{background:rgba(14,124,102,.25);color:#3ddcb0;border-color:rgba(61,220,176,.4)}
+  .alert{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);border-radius:12px;
+         padding:13px 16px;font-size:12.8px;line-height:1.55;color:#ffd79a}
+  .rule{background:rgba(41,170,226,.10);border:1px solid rgba(41,170,226,.35);border-radius:12px;
+        padding:13px 16px;font-size:12.8px;line-height:1.55}
+  table{width:100%;border-collapse:collapse;font-size:12.8px}
+  th{text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--blue);
+     padding:8px 10px;border-bottom:1px solid var(--line)}
+  td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.05);line-height:1.45}
+  tr:last-child td{border-bottom:none}
+  .cod{font-weight:800;color:#3ddcb0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px}
+  .lam{background:rgba(255,255,255,.045);border:1px solid var(--line);border-radius:14px;overflow:hidden;
+       cursor:zoom-in;transition:.15s}
+  .lam:hover{transform:translateY(-2px);border-color:rgba(41,170,226,.55)}
+  .lam img{width:100%;display:block;background:#fff}
+  .lam .cap{padding:11px 14px}
+  .lam .tg{font-size:9.5px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--blue)}
+  .lam .nm{font-size:13.5px;font-weight:700;margin:3px 0 4px;line-height:1.25}
+  .lam .ds{font-size:11.5px;color:var(--mut);line-height:1.45}
+  .who{display:flex;flex-wrap:wrap;gap:7px}
+  .who span{font-size:11.5px;padding:5px 10px;border-radius:8px;background:rgba(255,255,255,.06);border:1px solid var(--line)}
+  .who span.ct{background:rgba(167,139,250,.15);border-color:rgba(167,139,250,.35);color:#d3c4ff}
+  .lnk{display:inline-block;font-size:12px;font-weight:700;color:#3ddcb0;text-decoration:none;
+       border:1px solid rgba(61,220,176,.35);background:rgba(14,124,102,.16);border-radius:9px;padding:7px 12px;margin:4px 6px 0 0}
+  .lnk:hover{filter:brightness(1.2)}
+  .note{margin-top:26px;color:#7f96b4;font-size:11.5px;border-top:1px solid var(--line);padding-top:14px;line-height:1.6}
+  .ovl{position:fixed;inset:0;background:rgba(4,10,20,.9);display:none;align-items:center;justify-content:center;
+       z-index:99;padding:22px;cursor:zoom-out}
+  .ovl.on{display:flex}.ovl img{max-width:100%;max-height:92vh;border-radius:10px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="h-tit">🔄 Flujos Esterilización ↔ Pabellones Centrales</div>
+  <div class="bar"></div>
+  <div class="h-sub" id="sub"></div>
+
+  <div class="tabs">
+    <div class="tab on" data-p="res" onclick="tab(this)">📋 Resumen</div>
+    <div class="tab" data-p="esc" onclick="tab(this)">🔀 Escenarios</div>
+    <div class="tab" data-p="lam" onclick="tab(this)">🗺️ Planos y láminas</div>
+    <div class="tab" data-p="acu" onclick="tab(this)">✅ Acuerdos</div>
+  </div>
+
+  <div class="panel on" id="p-res">
+    <div class="kpis" id="kpis"></div>
+    <div class="box"><div class="lbl" style="margin-top:0">Flujo del carro de material sucio</div>
+      <ol class="flow" id="f-suc"></ol></div>
+    <div class="box"><div class="lbl" style="margin-top:0">Flujo del carro limpio / estéril</div>
+      <ol class="flow lim" id="f-lim"></ol></div>
+    <div class="box"><div class="lbl" style="margin-top:0">Regla operativa aclarada en la reunión</div>
+      <div class="rule" id="regla"></div></div>
+    <div class="box"><div class="lbl" style="margin-top:0">Zona de lavado de carros · recintos</div>
+      <table><thead><tr><th style="width:80px">Recinto</th><th>Nombre</th><th>Observación</th></tr></thead>
+      <tbody id="rec"></tbody></table></div>
+  </div>
+
+  <div class="panel" id="p-esc"><div id="escs"></div></div>
+  <div class="panel" id="p-lam"><div class="grid" id="lams"></div></div>
+
+  <div class="panel" id="p-acu">
+    <div class="box"><div class="lbl" style="margin-top:0">Alerta de la Coordinación Técnica</div>
+      <div class="alert" id="alerta"></div></div>
+    <div class="box"><div class="lbl" style="margin-top:0">Acuerdos de la reunión</div>
+      <table><thead><tr><th style="width:210px">Responsable</th><th>Acuerdo</th><th style="width:110px">Estado</th></tr></thead>
+      <tbody id="acu"></tbody></table></div>
+    <div class="box"><div class="lbl" style="margin-top:0">Asistentes</div><div class="who" id="who"></div></div>
+    <div class="box"><div class="lbl" style="margin-top:0">Documentos fuente</div>
+      <a class="lnk" id="l-acta" target="_blank">📄 Acta de reunión (.doc)</a>
+      <a class="lnk" id="l-pdf" target="_blank">🖼️ Presentación (.pdf)</a>
+      <a class="lnk" id="l-ppt" target="_blank">📊 Presentación (.pptx)</a>
+    </div>
+  </div>
+
+  <div class="note" id="note"></div>
+</div>
+<div class="ovl" id="ovl" onclick="this.classList.remove('on')"><img id="ovi" src="" alt=""></div>
+
+<script src="SHARED_DATA/flujos_esterilizacion.js"></script>
+<script>
+const F=window.FLUJOS_ESTERILIZACION;
+const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const RUTA=F.fuente.ruta;
+
+document.getElementById('sub').innerHTML=
+ 'Acta de reunión del <b>'+esc(F.fuente.reunion)+'</b> y presentación de la <b>'+esc(F.fuente.emisor)+
+ '</b> sobre el circuito de carros sucios, limpios y estériles entre <b>Pabellones Centrales (Piso 2)</b> y la '+
+ '<b>Central de Esterilización (Piso −1)</b> del Nuevo Hospital Del Salvador, a través del núcleo de ascensores <b>NH.03</b>.';
+
+const K=[['3','Escenarios de flujo en discusión'],
+         [String(F.laminas.length),'Láminas de plano georreferenciadas'],
+         [String(F.recintos_lavado.length),'Recintos de la zona de lavado'],
+         [String(F.acuerdos.length),'Acuerdos comprometidos'],
+         ['NH.03','Núcleo de ascensores involucrado']];
+document.getElementById('kpis').innerHTML=K.map(k=>
+ '<div class="kpi"><div class="v">'+esc(k[0])+'</div><div class="l">'+esc(k[1])+'</div></div>').join('');
+
+document.getElementById('f-suc').innerHTML=F.flujo_sucio.map(x=>'<li>'+esc(x)+'</li>').join('');
+document.getElementById('f-lim').innerHTML=F.flujo_limpio.map(x=>'<li>'+esc(x)+'</li>').join('');
+document.getElementById('regla').textContent=F.regla_clave;
+document.getElementById('alerta').textContent=F.alerta;
+document.getElementById('rec').innerHTML=F.recintos_lavado.map(r=>
+ '<tr><td class="cod">'+esc(r.cod)+'</td><td>'+esc(r.nombre)+'</td><td style="color:#9fb4cf">'+esc(r.obs||'—')+'</td></tr>').join('');
+document.getElementById('acu').innerHTML=F.acuerdos.map(a=>
+ '<tr><td><b>'+esc(a.responsable)+'</b></td><td>'+esc(a.acuerdo)+'</td>'+
+ '<td style="color:#ffd79a;font-weight:700;text-transform:uppercase;font-size:11px">'+esc(a.estado)+'</td></tr>').join('');
+document.getElementById('who').innerHTML=F.asistentes.map(a=>
+ '<span class="'+(a.org==='CT-SSMO'?'ct':'')+'">'+esc(a.nombre)+' · '+esc(a.org)+'</span>').join('');
+
+document.getElementById('escs').innerHTML=F.escenarios.map(e=>{
+  const lam=e.laminas.map(n=>{const l=F.laminas.find(x=>x.n===n);
+    return '<a class="lnk" href="#" onclick="zoom(\''+l.img+'\');return false">🗺️ '+esc(l.titulo)+'</a>';}).join('');
+  return '<div class="box esc '+e.id+'"><h3>'+esc(e.titulo)+'</h3><div class="st">'+esc(e.estado)+'</div>'+
+    '<div class="kv"><b>Bajada · sucio</b><div>'+esc(e.bajada)+'</div>'+
+    '<b>Subida · limpio</b><div>'+esc(e.subida)+'</div>'+
+    (e.motivo?'<b>Motivo</b><div>'+esc(e.motivo)+'</div>':'')+'</div>'+
+    (lam?'<div style="margin-top:10px">'+lam+'</div>':
+         '<div style="margin-top:10px;font-size:11.5px;color:#ffd79a">Sin lámina en la presentación V5 — propuesta aún en definición.</div>')+
+    '</div>';}).join('');
+
+document.getElementById('lams').innerHTML=F.laminas.map(l=>
+ '<div class="lam" onclick="zoom(\''+l.img+'\')"><img src="'+l.img+'" alt="'+esc(l.titulo)+'" loading="lazy">'+
+ '<div class="cap"><div class="tg">Lámina '+l.n+' · '+esc(l.grupo)+'</div>'+
+ '<div class="nm">'+esc(l.titulo)+'</div><div class="ds">'+esc(l.desc)+'</div></div></div>').join('');
+
+document.getElementById('l-acta').href=RUTA+F.fuente.acta;
+document.getElementById('l-ppt').href=RUTA+F.fuente.presentacion;
+document.getElementById('l-pdf').href=RUTA+'260731 - Presentacion Flujos Esterilizacion - Pabellones HDS V5.pdf';
+document.getElementById('note').innerHTML=
+ 'Fuente: <b>'+esc(F.fuente.acta)+'</b> y <b>'+esc(F.fuente.presentacion)+'</b>, preparados por '+
+ esc(F.fuente.preparado_por)+' · Coordinación Técnica SSMO. Copia de los originales en <b>'+esc(RUTA)+'</b>.<br>'+
+ 'Relacionado: <a class="lnk" href="8.Navegacion.html" style="margin-top:8px">🧭 Navegación · núcleos de ascensores</a>'+
+ '<a class="lnk" href="31.EsterilizacionLibroRojo.html">📕 Libro Rojo · Esterilización</a>';
+
+function zoom(src){document.getElementById('ovi').src=src;document.getElementById('ovl').classList.add('on');}
+function tab(el){document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');
+ document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+ document.getElementById('p-'+el.dataset.p).classList.add('on');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')document.getElementById('ovl').classList.remove('on');});
+</script>
+<script src="hub-home.js"></script>
+</body>
+</html>

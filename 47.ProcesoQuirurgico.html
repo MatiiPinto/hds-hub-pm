@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="es">
+<head>
+<script src="pm_config.js"></script>
+<script src="pm_gate.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Proceso Quirúrgico · NHDS</title>
+<link rel="icon" type="image/png" href="Logos%20HUB-HDS/favicon-nhds-amarillo-64.png">
+<style>
+:root{--navy:#1F3B63;--blue:#2E5A9E;--teal:#0E7C66;--amber:#B45309;--red:#9B1C1C;--violet:#6a359c;
+  --bg:#0e1726;--bg2:#152238;--card:#1b2b45;--line:rgba(255,255,255,.10);--txt:#e8eef7;--dim:#93a4bd;--chip:#22375a}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif}
+header{background:var(--navy);padding:14px 20px 0;border-bottom:3px solid var(--teal)}
+h1{margin:0;font-size:19px}
+.sub{color:#b9c8de;font-size:12.5px;margin:3px 0 12px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap}
+.tab{padding:8px 13px;border-radius:8px 8px 0 0;background:rgba(255,255,255,.06);cursor:pointer;font-size:13px;user-select:none;white-space:nowrap}
+.tab.on{background:var(--bg2);font-weight:600}
+main{padding:16px 20px 60px;background:var(--bg2);min-height:80vh}
+.panel{display:none}.panel.on{display:block}
+h2{font-size:16px;margin:18px 0 8px}h2:first-child{margin-top:0}
+h3{font-size:14px;margin:12px 0 6px;color:#cfe0f5}
+.kpis{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.k{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 16px;min-width:120px}
+.k .v{font-size:22px;font-weight:700}.k .l{font-size:11px;color:var(--dim)}
+.k.rojo .v{color:#ff9a9a}.k.verde .v{color:#7fd8bb}.k.ambar .v{color:#f0c07a}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.card.t{border-top:4px solid var(--teal)}.card.a{border-top:4px solid var(--amber)}.card.v{border-top:4px solid var(--violet)}.card.b{border-top:4px solid var(--blue)}.card.r{border-top:4px solid #e05252}
+.card h3{margin-top:0}
+.chip{display:inline-block;background:var(--chip);border-radius:20px;padding:2px 10px;font-size:11px;color:#cfe0f5;margin:1px 2px}
+.chip.crit{background:#7a1414;color:#ffd9d9;font-weight:700}.chip.ok{background:#12362c;color:#7fd8bb}.chip.amb{background:#3a3212;color:#e8d07a}.chip.vio{background:#3d2140;color:#e0a8ea}.chip.az{background:#12314f;color:#8fc4ff}
+table{width:100%;border-collapse:collapse;font-size:12.6px}
+th{background:var(--navy);text-align:left;padding:7px 9px;position:sticky;top:0}
+td{padding:6px 9px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:nth-child(even) td{background:rgba(255,255,255,.02)}
+.dim{color:var(--dim)}.small{font-size:12px}
+ul{margin:4px 0 8px;padding-left:20px}li{margin:2px 0}
+.avi{border-radius:10px;padding:11px 14px;margin-bottom:12px;font-size:13px;line-height:1.55;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+.avi.rojo{background:rgba(155,28,28,.16);border-color:rgba(255,120,120,.3)}
+.avi.verde{background:rgba(14,124,102,.14);border-color:rgba(127,216,187,.3)}
+.avi.ambar{background:rgba(180,83,9,.14);border-color:rgba(240,192,122,.3)}
+.hl{display:grid;grid-template-columns:60px 1fr;gap:8px;align-items:start;padding:8px 10px;border-bottom:1px solid var(--line)}
+.hl .t{font-variant-numeric:tabular-nums;color:#8fc4ff;font-size:12px}
+.flow{display:flex;gap:0;flex-wrap:wrap;margin:8px 0 14px}
+.flow .st{flex:1;min-width:190px;background:var(--card);border:1px solid var(--line);padding:10px 12px;position:relative;cursor:pointer}
+.flow .st:first-child{border-radius:10px 0 0 10px}.flow .st:last-child{border-radius:0 10px 10px 0}
+.flow .st b{display:block;font-size:14px}.flow .st span{font-size:11.5px;color:var(--dim)}
+.flow .st.on{background:#16304a;border-color:var(--teal)}
+.hitos{display:grid;grid-template-columns:repeat(6,1fr);gap:4px;margin:10px 0}
+.hito{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px;text-align:center;font-size:12px}
+.hito b{display:block;font-size:20px;color:#7fd8bb}
+.iv{display:grid;grid-template-columns:1fr 1fr 1fr 2fr;gap:8px;padding:6px 8px;border-bottom:1px solid var(--line);font-size:12.5px}
+.iv .eq{color:#e0a8ea}
+.pend{display:grid;grid-template-columns:22px 60px 1fr auto;gap:8px;align-items:start;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin-bottom:6px}
+.pend.crit{border-left:4px solid #e05252}
+.ck{width:20px;height:20px;border-radius:6px;border:2px solid #4f6a8f;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px}
+.ck.si{background:var(--teal);border-color:var(--teal);color:#fff}
+a{color:#8fc4ff}button{background:var(--blue);color:#fff;border:0;border-radius:8px;padding:7px 13px;font-size:13px;cursor:pointer}
+button.ghost{background:transparent;border:1px solid var(--line);color:var(--txt)}
+footer{padding:14px 20px;color:var(--dim);font-size:11.5px;background:var(--bg)}
+details.d{background:rgba(255,255,255,.02);border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
+details.d>summary{padding:9px 12px;cursor:pointer;font-weight:600;list-style:none}
+details.d>summary::-webkit-details-marker{display:none}
+details.d>div{padding:0 12px 10px}
+body.pub .solo-local{display:none!important}
+@media(max-width:760px){.hitos{grid-template-columns:repeat(3,1fr)}.iv{grid-template-columns:1fr 1fr}.hl{grid-template-columns:1fr}.pend{grid-template-columns:22px 1fr}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🩺 Proceso Quirúrgico · Nuevo Hospital Del Salvador</h1>
+  <div class="sub">El proceso según el borrador de Eficiencia Hospitalaria, lo que se ve en terreno, cómo medirlo al detalle y el trabajo con la U. Finis Terrae</div>
+  <div class="tabs">
+    <div class="tab on" data-p="res" onclick="tab(this)">🧭 Resumen</div>
+    <div class="tab" data-p="pro" onclick="tab(this)">📜 Proceso</div>
+    <div class="tab" data-p="reu" onclick="tab(this)">🎙 Reunión 06-10</div>
+    <div class="tab" data-p="med" onclick="tab(this)">⏱ Medición</div>
+    <div class="tab" data-p="fin" onclick="tab(this)">🎓 Finis Terrae</div>
+    <div class="tab" data-p="rec" onclick="tab(this)">🏥 Recurso</div>
+    <div class="tab" data-p="pen" onclick="tab(this)">✅ Pendientes <span class="dim" id="n-pen"></span></div>
+    <div class="tab" data-p="ant" onclick="tab(this)">📚 Antecedentes</div>
+  </div>
+</header>
+<main>
+  <div class="panel on" id="p-res"></div>
+  <div class="panel" id="p-pro"></div>
+  <div class="panel" id="p-reu"></div>
+  <div class="panel" id="p-med"></div>
+  <div class="panel" id="p-fin"></div>
+  <div class="panel" id="p-rec"></div>
+  <div class="panel" id="p-pen"></div>
+  <div class="panel" id="p-ant"></div>
+</main>
+<footer id="pie"></footer>
+<script src="SHARED_DATA/proceso_quirurgico.js"></script>
+<script src="hub-home.js"></script>
+<script>
+const PUBLIC_BUILD = true; /*__PUBLIC_FLAG__*/
+if(PUBLIC_BUILD) document.body.classList.add('pub');
+const D=window.PROCESO_QUIRURGICO||{};
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fmt=f=>f?String(f).split('-').reverse().join('-'):'';
+const li=a=>'<ul>'+(a||[]).map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>';
+const SEV={'Crítico':'crit','Mayor':'amb','Menor':'az'};
+function tab(el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));el.classList.add('on');
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('on'));
+  document.getElementById('p-'+el.dataset.p).classList.add('on');
+  try{localStorage.setItem('pq_tab',el.dataset.p);}catch(e){}
+}
+function ir(p){ tab(document.querySelector('.tab[data-p="'+p+'"]')); window.scrollTo(0,0); }
+
+// ── Resumen ──────────────────────────────────────────────────────────────────
+function rResumen(){
+  const R=D.reunion||{}, M=D.medicion||{}, P=D.pendientes||[], S=D.doc.subprocesos;
+  const crit=P.filter(x=>x.critico), reu=P.filter(x=>+x.id.slice(1)>=127);
+  const h1=(R.hallazgos||[]).find(h=>h.id==='H1');
+  document.getElementById('p-res').innerHTML=`
+  <div class="avi rojo"><b>Hallazgo que ordena todo (reunión 06-10):</b> ${esc(h1?h1.texto:'')}
+    Es exactamente la línea base que el proyecto de medición de pabellón y el paper de Renata Vargas (EMBC 2027) proponen cuantificar: primero medir el error del método manual, después medir el proceso con sensores.</div>
+  <div class="kpis">
+    <div class="k"><div class="v">26</div><div class="l">pabellones (24 quirófanos + 2 angiografía)</div></div>
+    <div class="k"><div class="v">22 · 48</div><div class="l">cupos preanestesia · recuperación</div></div>
+    <div class="k"><div class="v">4</div><div class="l">subprocesos del borrador PROC-QUIR</div></div>
+    <div class="k"><div class="v">6</div><div class="l">hitos de tiempo por cirugía</div></div>
+    <div class="k ambar"><div class="v">${(D.recurso.pauta.brechas||[]).length}</div><div class="l">requisitos de la pauta con brecha o por confirmar</div></div>
+    <div class="k rojo"><div class="v">${crit.length}</div><div class="l">pendientes críticos del frente</div></div>
+    <div class="k"><div class="v">${P.length}</div><div class="l">pendientes abiertos</div></div>
+  </div>
+  <h2>El proceso en una línea</h2>
+  <div class="flow">${S.map(s=>`<div class="st" onclick="ir('pro');abrir('${s.id}')"><b>${esc(s.nombre)}</b><span>${esc(s.desde)} → ${esc(s.hasta)}</span></div>`).join('')}</div>
+  <h2>Tres frentes de trabajo</h2>
+  <div class="grid">
+    <div class="card b"><h3>📜 El proceso escrito</h3><div class="small">${esc(D.doc.codigo)} · ${esc(D.doc.estado)}.</div>
+      <p class="small">Lo elabora Eficiencia Hospitalaria; lo validan 8 jefaturas. En la reunión del 06-10 se acordó revisar «toda la parte quirúrgica propiamente médica» con los jefes de equipo y presentarlo como propuesta el martes 13-10.</p>
+      <button class="ghost" onclick="ir('pro')">Ver el proceso</button></div>
+    <div class="card t"><h3>⏱ Medir el proceso al detalle</h3><p class="small">${esc(M.tesis)}</p>
+      <p class="small">Hoy los 6 tiempos se cierran a posteriori. Primero se mide el error del registro manual (2027), después el proceso con cámara de profundidad + señales de equipos (2028).</p>
+      <button class="ghost" onclick="ir('med')">Ver la medición</button></div>
+    <div class="card v"><h3>🎓 Reconocimiento de patrones con la Finis Terrae</h3><p class="small">${esc((D.finis||{}).patrones)}</p>
+      <p class="small">Dos papers para EMBC 2027 (cierre 24-01-2027): Renata Vargas (error del registro manual) y Darinka (cobertura de capacitación).</p>
+      <button class="ghost" onclick="ir('fin')">Ver el plan</button></div>
+  </div>
+  <h2>Lo que salió de la reunión del 06-10 <span class="dim small">· ${reu.length} pendientes nuevos</span></h2>
+  ${(R.decisiones||[]).slice(0,8).map(d=>`<div class="hl"><span class="t">${d.id}</span><span>${esc(d.texto)} <span class="dim">— ${esc(d.quien)}</span></span></div>`).join('')}
+  <p class="small"><button class="ghost" onclick="ir('reu')">Minuta completa</button> <button class="ghost" onclick="ir('pen')">Pendientes del frente</button></p>`;
+}
+// ── Proceso ──────────────────────────────────────────────────────────────────
+function abrir(id){ const d=document.getElementById('sp-'+id); if(d){ d.open=true; d.scrollIntoView({behavior:'smooth',block:'start'}); } }
+function rProceso(){
+  const C=D.doc;
+  document.getElementById('p-pro').innerHTML=`
+  <div class="avi"><b>${esc(C.codigo)}</b> · ${esc(C.titulo)}<br><span class="small">${esc(C.estado)}. Elabora: ${esc(C.elabora)}.<br>Validan: ${C.valida.map(esc).join(' · ')}. <a href="${esc(C.drive)}" target="_blank">Documento en el Drive</a></span></div>
+  <h2>Objetivo y principios</h2><p class="small">${esc(C.objetivo)}</p>${li(C.principios)}
+  <h2>Subprocesos</h2>
+  ${C.subprocesos.map(s=>`<details class="d" id="sp-${s.id}" open><summary>${esc(s.nombre)} <span class="dim small">· ${esc(s.desde)} → ${esc(s.hasta)}</span></summary><div>
+    ${s.entradas?'<h3>Entradas</h3>'+li(s.entradas):''}
+    <table><thead><tr><th style="width:36px">#</th><th>Etapa</th><th>Pasos</th><th>Responsables</th></tr></thead><tbody>
+    ${s.etapas.map(e=>`<tr><td>${e.n}</td><td><b>${esc(e.nombre)}</b></td><td>${li(e.pasos)}</td><td class="small">${esc(e.resp)}</td></tr>`).join('')}</tbody></table></div></details>`).join('')}
+  <h2>Quién hace qué</h2>
+  <table><thead><tr><th>Rol</th><th>Responsabilidad</th><th>Reporta a</th></tr></thead><tbody>
+  ${C.roles.map(r=>`<tr><td><b>${esc(r[0])}</b></td><td class="small">${esc(r[1])}</td><td class="small">${esc(r[2])}</td></tr>`).join('')}</tbody></table>
+  <div class="grid" style="margin-top:14px">
+    <div class="card a"><h3>Suspensiones</h3><p class="small">${esc(C.suspension.regla)}</p>${li(C.suspension.causales)}<div class="dim small">${esc(C.suspension.fuente)}</div></div>
+    <div class="card b"><h3>Indicadores que el borrador deja definidos o implícitos</h3>${li(C.indicadores_doc)}</div>
+    <div class="card"><h3>Documentos de referencia</h3>${li(C.referencias)}</div>
+  </div>`;
+}
+// ── Reunión ──────────────────────────────────────────────────────────────────
+function rReunion(){
+  const R=D.reunion||{}; if(!R.fecha){ document.getElementById('p-reu').innerHTML='<div class="avi">Sin reunión cargada.</div>'; return; }
+  document.getElementById('p-reu').innerHTML=`
+  <div class="avi"><b>${esc(R.titulo)}</b> · ${fmt(R.fecha)} · conduce ${esc(R.conduce)}<br><span class="small">${R.participantes.map(esc).join(' · ')}. Minuta: <code>${esc(R.minuta)}</code> (borrador, requiere revisión; transcripción automática con tramos ininteligibles).</span></div>
+  <p>${esc(R.resumen)}</p>
+  <h2>Hallazgos</h2>
+  ${R.hallazgos.map(h=>`<div class="hl"><span class="t">${h.id}<br>${esc(h.t)}</span><span><span class="chip ${SEV[h.sev]||''}">${esc(h.sev)}</span> ${esc(h.texto)} <a href="#" class="small" onclick="ir('${h.liga==='medicion'?'med':h.liga==='recurso'?'rec':'pro'}');return false">→ ${h.liga==='medicion'?'medición':h.liga==='recurso'?'recurso':'proceso'}</a></span></div>`).join('')}
+  <h2>Decisiones</h2>
+  ${R.decisiones.map(d=>`<div class="hl"><span class="t">${d.id}</span><span>${esc(d.texto)} <span class="dim">— ${esc(d.quien)}</span></span></div>`).join('')}
+  <h2>Compromisos</h2>
+  <table><thead><tr><th>#</th><th>Compromiso</th><th>Responsable</th><th>Plazo</th></tr></thead><tbody>
+  ${R.compromisos.map(c=>`<tr><td>${c.id}</td><td>${esc(c.texto)}</td><td class="small">${esc(c.resp)}</td><td>${c.plazo?fmt(c.plazo):'<span class="dim">sin plazo</span>'}</td></tr>`).join('')}</tbody></table>
+  <h2>Sin acuerdo</h2>${li(R.sin_acuerdo)}
+  <h2>Próxima reunión · ${fmt(R.proxima.fecha)}</h2>${li(R.proxima.temas)}
+  <p class="small">Pendientes en la Bitácora: ${R.pendientes.map(p=>`<span class="chip">${p}</span>`).join('')} <button class="ghost" onclick="ir('pen')">Ver</button></p>`;
+}
+// ── Medición ─────────────────────────────────────────────────────────────────
+function rMedicion(){
+  const M=D.medicion, H1=((D.reunion||{}).hallazgos||[]).find(h=>h.id==='H1');
+  document.getElementById('p-med').innerHTML=`
+  <div class="avi verde">${esc(M.tesis)}</div>
+  <h2>Los 6 hitos</h2>
+  <div class="hitos">${M.hitos.map(h=>`<div class="hito"><b>${h.n}</b>${esc(h.nombre)}<div class="dim" style="font-size:11px">${esc(h.trakcare)}</div></div>`).join('')}</div>
+  <table><thead><tr><th>Hito</th><th>Campo TrakCare (borrador PROC-QUIR 7.3.2)</th><th>Observabilidad por cámara</th><th>Señal alternativa</th></tr></thead><tbody>
+  ${M.hitos.map(h=>`<tr><td><b>${h.n} · ${esc(h.nombre)}</b></td><td>${esc(h.trakcare)}</td><td class="small">${esc(h.camara)}</td><td class="small">${esc(h.senal)}</td></tr>`).join('')}</tbody></table>
+  <h2>Los intervalos: lo que de verdad se mide</h2>
+  <div class="iv" style="font-weight:600;color:var(--dim)"><span>Intervalo</span><span>Cálculo</span><span>Equipo que interpela</span><span>Qué revela</span></div>
+  ${M.intervalos.map(i=>`<div class="iv"><span><b>${esc(i.nombre)}</b></span><span>${esc(i.calculo)}</span><span class="eq">${esc(i.equipo)}</span><span class="small">${esc(i.revela)}</span></div>`).join('')}
+  <div class="grid" style="margin-top:14px">
+    <div class="card r"><h3>La línea base: el registro manual</h3><p class="small">${esc(M.linea_base)}</p>
+      ${H1?`<div class="avi rojo small" style="margin:0"><b>Confirmado en terreno el 06-10 [${esc(H1.t)}]:</b> ${esc(H1.texto)}</div>`:''}</div>
+    <div class="card t"><h3>Arquitectura de fusión</h3>${li(M.fusion)}</div>
+    <div class="card a"><h3>Privacidad por diseño · Ley 21.719</h3>${li(M.privacidad)}</div>
+  </div>
+  <h2>Ruta</h2>
+  <div class="grid">${M.fases.map(f=>`<div class="card b"><h3>${esc(f.fase)}</h3><p class="small">${esc(f.que)}</p></div>`).join('')}</div>
+  <h2>Decisiones previas (del anteproyecto) y dónde están hoy</h2>
+  <table><thead><tr><th>Pregunta</th><th>Estado</th></tr></thead><tbody>${M.decisiones_previas.map(d=>`<tr><td><b>${esc(d.q)}</b></td><td class="small">${esc(d.r)}</td></tr>`).join('')}</tbody></table>
+  <div class="avi ambar" style="margin-top:14px"><b>Ventana de Equipos Médicos:</b> ${esc(M.ventana_equipos_medicos)}</div>`;
+}
+// ── Finis Terrae ─────────────────────────────────────────────────────────────
+function rFinis(){
+  const F=D.finis;
+  document.getElementById('p-fin').innerHTML=`
+  <div class="avi">${esc(F.marco)}</div>
+  <div class="grid">${F.papers.map(p=>`<div class="card v"><h3>${esc(p.alumna)}</h3><b>${esc(p.paper)}</b><p class="small"><i>${esc(p.pregunta)}</i></p>
+    <div class="small"><span class="chip vio">${esc(p.track)}</span></div>
+    <h3>Datos</h3><p class="small">${esc(p.datos)}</p><h3>Método</h3>${li(p.metodo)}<h3>Ética</h3><p class="small">${esc(p.etica)}</p><h3>Es</h3><p class="small">${esc(p.es)}</p></div>`).join('')}</div>
+  <h2>Calendario hasta el envío</h2>
+  <table><thead><tr><th>Cuándo</th><th>Hito</th><th>Quién</th></tr></thead><tbody>${F.calendario.map(c=>`<tr><td style="white-space:nowrap">${esc(c[0])}</td><td>${esc(c[1])}</td><td class="small">${esc(c[2])}</td></tr>`).join('')}</tbody></table>
+  <h2>Reglas</h2>${li(F.reglas)}
+  <div class="avi verde"><b>Reconocimiento de patrones:</b> ${esc(F.patrones)}</div>`;
+}
+// ── Recurso ──────────────────────────────────────────────────────────────────
+function rRecurso(){
+  const R=D.recurso, P=R.pauta;
+  const mod=m=>m===1?'Módulo 1':m===2?'Módulo 2':'Angiografía';
+  document.getElementById('p-rec').innerHTML=`
+  <div class="avi">${esc(R.resumen)}</div>
+  <div class="grid">
+    <div class="card b"><h3>Pabellones · numeración oficial REV 5</h3>
+      <table><thead><tr><th>N°</th><th>BIM</th><th>Recinto</th><th>Módulo</th></tr></thead><tbody>
+      ${R.pabellones.map(p=>`<tr><td><b>${p.numero}</b></td><td class="dim">${p.bim}</td><td class="small">${esc(p.nombre)}</td><td class="small">${mod(p.modulo)}</td></tr>`).join('')}</tbody></table></div>
+    <div>
+      <div class="card t"><h3>Cupos perioperatorios</h3><table><tbody>${R.cupos.map(c=>`<tr><td>${esc(c.sala)}</td><td class="dim">${c.bim}</td><td><b>${c.cupos}</b></td></tr>`).join('')}</tbody></table></div>
+      <div class="card a" style="margin-top:12px"><h3>Pauta de cirugía mayor · cotejo del ${fmt(P.generado)}</h3>
+        <div class="small">Cumple ${P.resumen.cumple} · brecha ${P.resumen.brecha} · redistribuir ${P.resumen.redistribuir} · por confirmar ${P.resumen.por_confirmar}</div>
+        <table style="margin-top:6px"><tbody>${P.brechas.map(b=>`<tr><td class="dim">${b.n}</td><td class="small">${esc(b.texto)}${b.faltantes.length?'<div class="dim">'+b.faltantes.map(esc).join(' · ')+'</div>':''}</td><td><span class="chip ${b.estado==='Brecha'?'crit':'amb'}">${esc(b.estado)}</span>${b.total?'<div class="dim small">'+b.cubiertos+' / '+b.total+'</div>':''}</td></tr>`).join('')}</tbody></table>
+        <div class="small" style="margin-top:6px">Detalle en <a href="14.Bitacora.html">14.Bitácora · 🏥 Pabellón</a>.</div></div>
+      <div class="card" style="margin-top:12px"><h3>Dispensadores de medicamentos (tabla de Farmacia 05-10)</h3><table><tbody>${R.dispensadores.map(d=>`<tr><td><b>${d.cantidad}</b></td><td class="small">${esc(d.equipo)}<div class="dim">${esc(d.donde)} · ${d.bim.join(', ')}</div></td></tr>`).join('')}</tbody></table></div>
+    </div>
+  </div>
+  <div class="grid" style="margin-top:12px">
+    <div class="card"><h3>Familias de equipamiento</h3>${li(R.familias)}</div>
+    <div class="card"><h3>Equipamiento específico de los equipos quirúrgicos</h3>${li(R.especifico)}</div>
+  </div>`;
+}
+// ── Pendientes ───────────────────────────────────────────────────────────────
+let CK={}; try{CK=JSON.parse(localStorage.getItem('pq_check')||'{}');}catch(e){}
+function marcar(id){ CK[id]=!CK[id]; localStorage.setItem('pq_check',JSON.stringify(CK)); rPend(); }
+function rPend(){
+  const P=(D.pendientes||[]).slice().sort((a,b)=>(b.critico-a.critico)||(+b.id.slice(1)-(+a.id.slice(1))));
+  document.getElementById('n-pen').textContent=P.length;
+  document.getElementById('p-pen').innerHTML=`
+  <div class="avi small">Los pendientes viven en la <a href="14.Bitacora.html">Bitácora (🧭 Huddle)</a>: ahí se resuelven, se anotan y se reasignan. Aquí el check es solo una marca personal de «ya lo revisé» en este navegador.</div>
+  ${P.map(x=>`<div class="pend${x.critico?' crit':''}"><div class="ck${CK[x.id]?' si':''}" onclick="marcar('${x.id}')">${CK[x.id]?'✓':''}</div><div class="dim small">${x.id}</div>
+    <div><b>${esc(x.titulo)}</b><div style="margin-top:4px">${x.critico?'<span class="chip crit">🚨 Crítico</span>':''}<span class="chip">${esc(x.estado)}</span><span class="chip">${esc(x.prioridad)}</span><span class="chip ${x.responsable&&!/no consta/i.test(x.responsable)?'ok':'crit'}">🙋 ${esc(x.responsable||'sin responsable')}</span>${x.plazo?`<span class="chip az">📅 ${fmt(x.plazo)}</span>`:''}</div></div>
+    <div><a class="small" href="14.Bitacora.html">Bitácora</a></div></div>`).join('')}`;
+}
+// ── Antecedentes ─────────────────────────────────────────────────────────────
+function rAnt(){
+  document.getElementById('p-ant').innerHTML=`
+  <table><thead><tr><th>Fecha</th><th>Qué</th><th>Dónde</th><th>Tipo</th></tr></thead><tbody>
+  ${D.antecedentes.map(a=>`<tr><td style="white-space:nowrap">${esc(a.fecha)}</td><td>${esc(a.que)}</td><td class="small dim">${esc(a.donde)}</td><td><span class="chip">${esc(a.tipo)}</span></td></tr>`).join('')}</tbody></table>
+  <h2>Plataformas relacionadas</h2>
+  <p class="small"><a href="40.FlujosHDS.html">40.FlujosHDS</a> (diagrama AS-IS con 33 hallazgos y propuesta TO-BE por carriles) · <a href="14.Bitacora.html">14.Bitácora</a> (🏥 Pabellón: pauta y pendientes) · <a href="6.AtlasHDS.html">6.Atlas</a> (recintos y numeración) · <a href="2.EquiBox.html">2.EquiBox</a> (equipamiento y PINS) · <a href="1.QuirurBox.html">1.QuirurBox</a> (instrumental).</p>`;
+}
+rResumen(); rProceso(); rReunion(); rMedicion(); rFinis(); rRecurso(); rPend(); rAnt();
+document.getElementById('pie').textContent='Dato: SHARED_DATA/proceso_quirurgico.js · '+(D.version||'')+' · generado '+(D.generado||'')+'. Fuentes: borrador PROC-QUIR-8.5-0003 (Eficiencia Hospitalaria), anteproyecto 02 de innovación, plan EMBC 2027, numeración REV 5, pauta de cirugía mayor, Bitácora.';
+(function(){ let p='res'; try{p=localStorage.getItem('pq_tab')||'res';}catch(e){} const t=document.querySelector('.tab[data-p="'+p+'"]'); if(t&&p!=='res') tab(t); })();
+</script>
+</body>
+</html>
