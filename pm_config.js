@@ -13,6 +13,10 @@
 // servidor: los archivos del repo siguen siendo descargables por URL directa.
 // Por eso acá NUNCA se publican datos sensibles (RUT, correos, etc.).
 // ════════════════════════════════════════════════════════════════════════════
+// Equipo de Puesta en Marcha (04-11-2026): ve las plataformas de gestión interna. Sin Gabriella
+// Brignardello (dejó la coordinación en oct-2026). Para sumar o quitar a alguien, editar sólo esta lista.
+var PM_EQUIPO = ['mpinto', 'msepulveda', 'lperez', 'mcanales', 'faraya', 'jpacheco', 'csepulveda',
+                 'rvargas', 'mrivera', 'cpoch', 'crivera'];
 window.PM_CONFIG = {
   LOG_URL: 'https://script.google.com/macros/s/AKfycbx-v6nDDB2YLNszxh3qg5eWJcxtKrBTlzKK1f91OQwV1NKAm6zKBQ6J_fBJvL9jrEA_/exec', /*__PM_LOG_URL__*/
   // Armador de Pautas (etapa 2): backend Apps Script propio (ver _setup/Code_pautas.gs)
@@ -70,7 +74,10 @@ window.PM_CONFIG = {
     '37.ProteccionRadiologica.html': ['mpinto', 'csepulveda', 'mcanales', 'adavis'],
     // Proceso Quirúrgico: borrador interno de Eficiencia Hospitalaria; el padrón
     // incluye contrapartes externas (SSMO, AIF). Lo revisan Ivana Milio y Dan Hebel (Farmacia)
-    '47.ProcesoQuirurgico.html': ['mpinto', 'imilio', 'dhebel']
+    '47.ProcesoQuirurgico.html': ['mpinto', 'imilio', 'dhebel'],
+    // Gestión interna de PM: no la ven contrapartes externas (SSMO, AIF) ni otras unidades
+    '14.Bitacora.html': PM_EQUIPO,
+    '52.PresentacionPM.html': PM_EQUIPO
   },
   SESSION_HOURS: 12,
   USERS: {
