@@ -1,7 +1,7 @@
 // SHARED_DATA/bitacora_pendientes.js — versión publicada en el HUB-PM (saneada por deploy_web_pm.py)
 window.BITACORA = {
  "version": "2026-10-05 · Bitácora y huddle de Puesta en Marcha",
- "generado": "2026-11-02",
+ "generado": "2026-11-08",
  "proposito": "Reunir en un solo lugar los pendientes que hoy viven dispersos en correos, ORD, cartas CS-IF, actas de mesas de trabajo y sesiones de trabajo.",
  "ambitos": [
   "Comunicaciones",
@@ -3424,7 +3424,7 @@ window.BITACORA = {
   {
    "id": "P151",
    "titulo": "Dotación · 28 personas sin clasificación que el Atlas no puede ubicar",
-   "detalle": "Al corte 19-10 quedan 28 registros que el Atlas no puede ubicar por falta de clasificación: 7 marcados PENDIENTE DE CLASIFICAR POR RRHH (informados el 23-09 con recinto pero sin departamento ni subdirección, y ninguno vigente en SIRH; 3 de ellos sin RUT: Marillán Huiquimil, Montalbán Rivereli y Silva Calquín), 10 de la Unidad de Diálisis cuyo departamento dice REVISAR, 9 de la Subdirección Médica cuya unidad dice REVISAR, 1 reemplazo sin subdirección (González Elgueta, ya corregida en la planilla) y 1 compra de servicio de Soporte Nutricional sin nombre. Consultado por correo a Rodrigo Quijada el 22-10-2026. Consolidado el 26-10 en el correo de P173, ya con la unidad sugerida por el maestro SIC para las 9 de la Subdirección Médica.",
+   "detalle": "Al corte 19-10 quedan 28 registros que el Atlas no puede ubicar por falta de clasificación: 7 marcados PENDIENTE DE CLASIFICAR POR RRHH (informados el 23-09 con recinto pero sin departamento ni subdirección, y ninguno vigente en SIRH; 3 de ellos sin RUT: Marillán Huiquimil, Montalbán Rivereli y Silva Calquín), 10 de la Unidad de Diálisis cuyo departamento dice REVISAR, 9 de la Subdirección Médica cuya unidad dice REVISAR, 1 reemplazo sin subdirección (González Elgueta, ya corregida en la planilla) y 1 compra de servicio de Soporte Nutricional sin nombre. Consultado por correo a Rodrigo Quijada el 22-10-2026. Consolidado el 26-10 en el correo de P173, ya con la unidad sugerida por el maestro SIC para las 9 de la Subdirección Médica. El 06-11-2026 Rodrigo Quijada respondió los 5 casos que quedaban: Jaramillo Saldías corresponde a la UCI (queda en la Unidad de Cuidados del Paciente Crítico, donde están las enfermeras de UCI); Orellana Ramírez, Valenzuela Sanfurgo y Marillán Huaiquivil (nombre corregido) no están vigentes y salen de la planilla; Carvajal Corvalán es compra de servicio de Socialmed en Urgencias de Farmacia, ya cuenta como cupo. González Elgueta tiene contrato hasta el 31-12-2026 en Cuidados Quirúrgicos. La Unidad de Urgencia avisó que Araneda Maureira no trabaja ahí hace tiempo, así que se revirtió su ubicación en la UEH: es la única de las 12 que sigue sin unidad. Matriz 3.853 → 3.849; TOTAL de dotación sin cambio.",
    "ambito": "Dotación",
    "prioridad": "Media",
    "estado": "Esperando terceros",
@@ -3436,8 +3436,8 @@ window.BITACORA = {
    "origen_fecha": "2026-10-22",
    "compromiso": "",
    "creado": "2026-10-22",
-   "actualizado": "2026-10-26",
-   "notas": ""
+   "actualizado": "2026-11-08",
+   "notas": " Falta: unidad real de Araneda Maureira, si Orellana sigue como reemplazo y si Carvajal sigue en Farmacia Urgencias."
   },
   {
    "id": "P152",
@@ -5915,7 +5915,7 @@ window.BITACORA = {
    "origen": "matii01",
    "creado": "2026-10-28",
    "titulo": "Hospitalización domiciliaria · definir la solución para el NHDS",
-   "detalle": "Reunión PM 28-10-2026 [00:46:50]–[00:47:40] y Cabida SDADT [01:08:07]: las camas de hospitalización domiciliaria (HOSDOM [sic?]) son camas del hospital y su responsable es el director, pero no hay solución para su lugar en el NHDS (solo requiere el auto y la gente). Consultar al Dr. Ramírez y a Lorena Encina. Minutas: Minutas/minutas/2026-10-28_reuni-on-equipo-pm-miercoles-28.md y 2026-10-28_planificaci-on-cabida-sdadt.md · Avance 29-10-2026 (reunión PM): el Dr. Ramírez entregó la caracterización de la hospitalización domiciliaria; falta la valorización de los recursos para sumar 100 cupos a los 120 actuales, que pidió el SSMO para apoyar el traslado; la envía hoy Pablo Eno [sic?]. Rodrigo retomó la idea de Matías de ubicarla en el estacionamiento de rehabilitación (acceso independiente). Minuta: Minutas/minutas/2026-10-29_reuni-on-equipo-pm-jueves-29.md",
+   "detalle": "Reunión PM 28-10-2026 [00:46:50]–[00:47:40] y Cabida SDADT [01:08:07]: las camas de hospitalización domiciliaria (HOSDOM [sic?]) son camas del hospital y su responsable es el director, pero no hay solución para su lugar en el NHDS (solo requiere el auto y la gente). Consultar al Dr. Ramírez y a Lorena Encina. Minutas: Minutas/minutas/2026-10-28_reuni-on-equipo-pm-miercoles-28.md y 2026-10-28_planificaci-on-cabida-sdadt.md · Avance 29-10-2026 (reunión PM): el Dr. Ramírez entregó la caracterización de la hospitalización domiciliaria; falta la valorización de los recursos para sumar 100 cupos a los 120 actuales, que pidió el SSMO para apoyar el traslado; la envía hoy Pablo Eno [sic?]. Rodrigo retomó la idea de Matías de ubicarla en el estacionamiento de rehabilitación (acceso independiente). Minuta: Minutas/minutas/2026-10-29_reuni-on-equipo-pm-jueves-29.md · Avance 03-11 (reunión PM [00:27:33]–[00:30:35]): según datos de Margarita, la hospitalización domiciliaria resuelve unos 40 pacientes mensuales del hospital, menos de 2 al día; además atendería pacientes de la APS. Para el despoblamiento «no nos sirve»: invertir ahí en más cupos no se justifica, y conviene más un convenio o tener a esos profesionales en el NHDS para la cama básica. María Elena: «los dom deberían ser nuestras camas básicas en domicilio». Lo lleva hoy al Dr. Zajjur [sic?]. Minuta: Minutas/minutas/2026-11-03_martes-03-nov-vargas-no-sigue.md",
    "responsable": "Dr. Ramírez · Lorena Encina",
    "ambito": "Puesta en Marcha"
   },
@@ -6058,12 +6058,12 @@ window.BITACORA = {
   },
   {
    "id": "P322",
-   "estado": "Abierto",
+   "estado": "En curso",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-29",
    "titulo": "PM · seguimiento semanal al director los martes (formato tipo Gantt, puesta al día los lunes)",
-   "detalle": "Reunión PM 29-10-2026 [00:00:18]–[00:02:30]: el director quiere un seguimiento semanal de PM, que se hará los martes. Cada lunes los referentes ponen al día a María Elena en todos los temas (traslado, red, etc.) con un formato tipo Gantt: tema, actividades, compromisos, responsables y estado. Parte del acta de traslado. El primer martes es el 03-11. Minuta: Minutas/minutas/2026-10-29_reuni-on-equipo-pm-jueves-29.md",
+   "detalle": "Reunión PM 29-10-2026 [00:00:18]–[00:02:30]: el director quiere un seguimiento semanal de PM, que se hará los martes. Cada lunes los referentes ponen al día a María Elena en todos los temas (traslado, red, etc.) con un formato tipo Gantt: tema, actividades, compromisos, responsables y estado. Parte del acta de traslado. El primer martes es el 03-11. Minuta: Minutas/minutas/2026-10-29_reuni-on-equipo-pm-jueves-29.md · Avance 03-11 (reunión PM): María Elena pidió a cada referente un plan de sus actividades y su avance uno a uno, porque espera que pidan información adicional. La presentación de PM es una sola: la mantiene Javiera, se actualiza los lunes con los datos de cada referente y no circula por correo; hay que alivianar el video. Hoy, de 9 a 10, María Elena pone al día al Dr. Zajjur [sic?]. Minuta: Minutas/minutas/2026-11-03_martes-03-nov-vargas-no-sigue.md",
    "plazo": "2026-11-03",
    "responsable": "María Elena Sepúlveda · referentes PM",
    "ambito": "Puesta en Marcha"
@@ -6116,12 +6116,12 @@ window.BITACORA = {
   },
   {
    "id": "P327",
-   "estado": "Abierto",
+   "estado": "En curso",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-29",
-   "titulo": "CEDE [sic?] · recintos transitorios sin equipamiento comprado ni fondos para computadores",
-   "detalle": "Reunión PM 29-10-2026 [00:11:21]–[00:13:00]: Cati trajo el caso que le envió la Dra. Cerda [sic?] y que le comentó Carla. Según Fernando Lacalle, el equipamiento para implementar los recintos transitorios del CEDE [sic?] estaría comprado, pero los correos muestran que no; además, Lacalle respondió que no hay fondos para los computadores que piden. Se nombra también a nutrición clínica. María Elena debe tomarlo como urgente con Irene [sic?] y Fernando Lacalle. Minuta: Minutas/minutas/2026-10-29_reuni-on-equipo-pm-jueves-29.md",
+   "titulo": "CEPE (central de preparados enterales) · recintos transitorios, control de lo que agrega la Concesionaria e implementación",
+   "detalle": "Reunión PM 29-10-2026 [00:11:21]–[00:13:00]: Cati trajo el caso que le envió la Dra. Cerda [sic?] y que le comentó Carla. Según Fernando Lacalle, el equipamiento para implementar los recintos transitorios del CEDE [sic?] estaría comprado, pero los correos muestran que no; además, Lacalle respondió que no hay fondos para los computadores que piden. Se nombra también a nutrición clínica. María Elena debe tomarlo como urgente con Irene [sic?] y Fernando Lacalle. Minuta: Minutas/minutas/2026-10-29_reuni-on-equipo-pm-jueves-29.md · Avance 03-11 (reunión PM [00:21:03]–[00:26:00]): el CEDE es la CEPE, la central de preparados de nutrición enteral. María Elena se reunió el 02-11 con la Dra. Sheila Cerda, la nutricionista Marcia, Manuel Ramírez y Fernando Lacalle. Flujo: el hospital compra, logística recibe, la CEPE rotula y lo envía a la Concesionaria para que lo agregue a la alimentación clínica (unas 500 raciones diarias). Riesgo: el hospital no controla si la Concesionaria agrega lo indicado; las nutricionistas de la CSSO no tendrían ese rol. Transitoriamente se usarían 2 salas de procedimiento de los pisos 3 y 4, con registro en papel. Decisión: la implementación la tiene que hacer Fernando Lacalle «sí o sí», tiene presupuesto. Se revisa con todos cuando vuelva Carla. Minuta: Minutas/minutas/2026-11-03_martes-03-nov-vargas-no-sigue.md",
    "responsable": "María Elena Sepúlveda",
    "ambito": "EMMC"
   },
@@ -6232,6 +6232,187 @@ window.BITACORA = {
    "contraparte": "Vanessa Duque · Auditoría Interna",
    "titulo": "Datos personales · el archivo plano circula con domicilio y remuneraciones",
    "detalle": "El archivo incluye por persona domicilio particular, comuna, estado civil, nacionalidad, fecha de nacimiento, Isapre, AFP, cargas familiares y remuneración, además del RUT. Para nuestro análisis esas columnas no se leyeron y no se incorporaron a ninguna plataforma: el cotejo sólo lee 20 de las 76 columnas y su salida son agregados. Se sugirió en el correo del 02-11 que, si el archivo vuelve a circular, se remita una versión recortada con sólo los campos de dotación. Mientras tanto el .xlsx queda en Descargas y no se versiona."
+  },
+  {
+   "id": "P334",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-03",
+   "titulo": "Revisión EMMC 02-11 · programación por edificio, una semana a la CSSO e informe claro de «parte y pieza»",
+   "detalle": "Reunión PM 03-11-2026 [00:05:46]–[00:16:45]: en la revisión del 02-11 se programaron 64 recintos, todos para quedar en firma 1 porque sus monitores no tienen brazaletes. Las mesas de paciente de los pisos 3 y 4 seguían con la pintura anticorrosiva dañada, aunque la CSSO había dicho que cambió la mitad. En la mañana cumplieron unos 50 de 60 [sic?]; en la tarde fue algo mejor. La programación llegó a las 16:30 del día anterior: 3 cuadrillas para 5 pisos (−1 al 4) en una tarde, y «a este ritmo no lo vamos a lograr». Se insistirá a Francisca para que programe por edificio/piso y se propone dar una semana a la CSSO para instalar antes de volver. María Elena pide que el informe explique qué falta y qué es «parte y pieza» (p. ej. la funda de colchón de repuesto, 1 cada 2 camas), porque el 84 % / 63 % se lee como que faltan equipos (lo hicieron notar la Dra. Herrera y el Dr. Castillo [sic?]). Contraparte técnica de la CSSO: Elisa Dávila. Relacionado con P325. Minuta: Minutas/minutas/2026-11-03_martes-03-nov-vargas-no-sigue.md",
+   "plazo": "2026-11-03",
+   "responsable": "Mei [sic?] · María Elena Sepúlveda",
+   "ambito": "EMMC"
+  },
+  {
+   "id": "P335",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-03",
+   "titulo": "Infraestructura · frigobares que no caben, estaciones de trabajo grandes en box y TV 55\" sin enchufe (listado y pronunciamiento)",
+   "detalle": "Reunión PM 03-11-2026 [00:12:23]–[00:14:22]: (1) los frigobares encienden y cumplen, pero no caben porque el enchufe queda abajo; en algunas residencias quedan en el pasillo y no se puede entrar. Se necesita un pronunciamiento de infraestructura para saber si se firma 1 o 2; el correo no ha tenido respuesta y hay que volver a insistir. (2) En los box, que son muy pequeños, pusieron estaciones de trabajo muy grandes que quedaron a medio armar porque no entran; deben cambiarse por un escritorio más pequeño. (3) Cerca del 90 % de los televisores de 55\" de las salas de espera no tienen enchufe donde van. María Elena pide todas estas observaciones en un listado. Minuta: Minutas/minutas/2026-11-03_martes-03-nov-vargas-no-sigue.md",
+   "responsable": "Mei [sic?] · equipo EMMC",
+   "ambito": "EMMC"
+  },
+  {
+   "id": "P336",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-03",
+   "titulo": "Equipamiento · mesa de trabajo con CSSO, Inspección Fiscal y SSMO, con agenda clara, para destrabar los casos",
+   "detalle": "Reunión PM 03-11-2026 [00:31:12]–[00:32:44]: se propuso una mesa de trabajo sobre el «enredo» del equipamiento con la Concesionaria, la Inspección Fiscal y Salud (SSMO), con una agenda clara para resolver punto a punto y no revisar caso a caso ni hacer catarsis. Ejemplos: la CSSO no recibe equipos porque faltan insumos descartables (electrobisturí), y hay accesorios de urología pedidos hace 10–15 años que ya no se comercializan. También el traslado de equipamiento: aún no hay respuesta sobre si se aprueba. No consta decisión ni responsable. Minuta: Minutas/minutas/2026-11-03_martes-03-nov-vargas-no-sigue.md",
+   "responsable": "No consta (propuesta a María Elena Sepúlveda)",
+   "ambito": "EMMC"
+  },
+  {
+   "id": "P337",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-03",
+   "titulo": "Autorización Sanitaria · jornada para todo el personal con reglamento interno, plan de emergencia y documentos AS",
+   "detalle": "Reunión PM 03-11-2026 [00:17:49]–[00:36:26]: Cati prepara una presentación de AS que pidió el Dr. Zajjur [sic?] para directivos, jefes de servicio y coordinadores, porque a la gente le faltan conceptos; Cati se reúne cada 15 días con el servicio para revisar su avance (hoy a las 12:00). La resolución del reglamento interno (ley de deberes y derechos, reemplaza el de 2015, revisado con Víctor Leiva y los referentes) debe leerla todo el personal. Para asegurar la lectura se acordó hacer una jornada de Autorización Sanitaria, como la jornada de concesiones, con todos los documentos relacionados: reglamento interno, plan de emergencia, claves, etc. Minuta: Minutas/minutas/2026-11-03_martes-03-nov-vargas-no-sigue.md",
+   "responsable": "Cati (Catherine Sepúlveda) · Javiera",
+   "ambito": "Autorización Sanitaria"
+  },
+  {
+   "id": "P338",
+   "estado": "En curso",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-03",
+   "titulo": "Gestión del cambio · ORD de uniforme, ropería y delantales/cambios de tipología + resolución del reglamento interno",
+   "detalle": "Reunión PM 03-11-2026 [00:32:44]–[00:33:43]: hoy, con Marisol, se terminan los ordinarios que quedaron pendientes ayer: uno por uniforme, otro por ropería y otro con la solicitud de los delantales y los cambios de tipología (los firma María Elena o se le explican a Jorge). También debe salir hoy la resolución del reglamento interno; el manual de organización, con los perfiles vinculados para navegar el documento, ya se envió. Relacionado con P310. Minuta: Minutas/minutas/2026-11-03_martes-03-nov-vargas-no-sigue.md",
+   "plazo": "2026-11-03",
+   "responsable": "Javiera · Marisol Salvatierra",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P339",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-03",
+   "titulo": "Plan piloto · revisión jueves 05-11 8:00 y preparación obligatoria lunes 09-11 en 3 tandas de 40",
+   "detalle": "Reunión PM 03-11-2026 [00:36:29]–[00:47:20]: preocupa cómo se entra al plan piloto si la PSP sale la próxima semana. Se hará un refresh de los 256 [sic?] nominados con los datos de avance («te lo tengo mañana»). Antes de comunicar nada, el plan piloto se revisa el jueves 05-11 a las 8:00. Tarea para todos: traer leídos los casos de uso, idealmente clasificados por servicio, y saber qué medirle a la CSSO en cada uno (p. ej. alimentación no programada en 45 minutos). Preparación el lunes 09-11 en 3 tandas (9–10, 10–11 y 11–12) de unas 40 personas, obligatoria: paso a paso, cronograma y ubicación de cada persona. Repositorio de casos en Drive y un WhatsApp para coordinar pruebas en paralelo (p. ej. abrir todas las llaves de un piso). Falta la parte de jefatura. Ver P141, P154 y P188. Minuta: Minutas/minutas/2026-11-03_martes-03-nov-vargas-no-sigue.md",
+   "plazo": "2026-11-09",
+   "responsable": "María Elena Sepúlveda · equipo PM",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P340",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-03",
+   "titulo": "Plan piloto · pruebas TI y logística (Cintia, Camilo Cornejo) y autotest de PC por pendrive",
+   "detalle": "Reunión PM 03-11-2026 [00:40:19]–[00:50:28]: Fernando Lacalle planteó diseñar pruebas de infraestructura y de servicio con algo de saturación. Ella no habría propuesto pruebas de equipamiento computacional [sic?]. Se propuso preguntar a Cintia y a Camilo Cornejo [sic?] cómo probar que los equipos estén integrados (Pyxis, entre otros), ya que para la PSP deben estarlo, y cómo probar la logística. Hay que tener claro hasta dónde llega la CSSO: el equipo informático (que prenda y funcione) es de la concesión, y el software es del hospital. Matías ofreció a Informática un autotest por pendrive de alrededor de un minuto por PC (periféricos, páginas y sistemas) y pedir a Mantención testers de enchufes. Fluidos y gases son competencia de la Inspección Fiscal. Minuta: Minutas/minutas/2026-11-03_martes-03-nov-vargas-no-sigue.md",
+   "responsable": "Matías Pinto",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P341",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-03",
+   "titulo": "Firma de documentos · ADP del Dr. Vargas no renovada: confirmar hasta cuándo firma y quién lo reemplaza",
+   "detalle": "Reunión PM 03-11-2026 [00:30:35]–[00:31:04] y [00:47:20]–[00:47:49]: María Elena informó que no se renovó la ADP del Dr. Vargas y que se nombró al Dr. Galve [sic?], que está en la PSP [sic?]. Según lo conversado, Vargas sigue hasta el lunes próximo, o hasta el 30-11 según el comunicado que circula (el 30 terminaba su ADP), y se toma los días administrativos. Hay que confirmarlo para la firma de documentos (ORD y resoluciones en curso). «Algo nos tendrá que remover… prefiero estar preparado». Minuta: Minutas/minutas/2026-11-03_martes-03-nov-vargas-no-sigue.md",
+   "responsable": "No consta",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P342",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-03",
+   "titulo": "Droguería NHDS · autorización ISP de instalación trabada: la exención de pago no se puede aplicar en SAFIS [sic?]",
+   "detalle": "Reunión de logística del 01-10-2026: la autorización del ISP para la droguería (fase de instalación) no avanza porque la plataforma SAFIS [sic?] no deja aplicar la exención de pago; se consultó por OIRS y la consulta se derivó a Informática. El 13-10 la autorización de la droguería seguía como «problema grave». Minuta levantada el 03-11 desde la transcripción: Minutas/minutas/2026-10-01_logistica-drogueria-kanban-stock.md · Confirmar si sigue vigente.",
+   "responsable": "Carlos [sic?] (Logística)",
+   "ambito": "Aut. Sanitaria"
+  },
+  {
+   "id": "P343",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-03",
+   "titulo": "Kanban del NHDS · confirmar si el INGER se suma al Kanban alternativo",
+   "detalle": "Reunión de logística del 01-10-2026: el Kanban alternativo espera que el INGER (Pamela Duarte [sic?]) confirme si se suma y que ambas instituciones lo acuerden; eso destraba la licitación de racks y cajas. El Kanban definitivo va por licitación y tardaría unos 5 meses más. Se esperaba cerrarlo la semana siguiente (inferido: ~09-10). Minuta levantada el 03-11: Minutas/minutas/2026-10-01_logistica-drogueria-kanban-stock.md · Confirmar si sigue vigente.",
+   "responsable": "Carlos [sic?] (Logística)",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P344",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-03",
+   "titulo": "Logística · bodegas periféricas (UCI, médica, quirúrgica, urgencia) cargadas en el sistema con stock y consumo",
+   "detalle": "Reunión de logística del 01-10-2026: compromiso de tener las bodegas periféricas de UCI, médica, quirúrgica y urgencia en el sistema, con stock y consumo, a fines de octubre. Ese día también se pidió con urgencia el stock de medicamentos oncológicos (faltó oxaliplatina) y las bodegas centrales estaban en contención del gasto. Minuta levantada el 03-11: Minutas/minutas/2026-10-01_logistica-drogueria-kanban-stock.md · Confirmar si se cumplió.",
+   "plazo": "2026-10-31",
+   "responsable": "Fernando · Carlos [sic?] (Logística)",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P345",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-03",
+   "titulo": "Estacionamientos de directivos · 11 reservados sin nombre; ubicar el documento que los fijó",
+   "detalle": "Coordinación PM del 01-10-2026: quedan 11 estacionamientos reservados para directivos sin asignar a nombre, y no está claro qué documento los formalizó. La PAPS aprobada habla de 12 demarcados más 37, no de 11. Minuta levantada el 03-11: Minutas/minutas/2026-10-01_coordinacion-pm-traslado-servicios-concesionados.md · Confirmar si sigue vigente.",
+   "responsable": "Por asignar",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P346",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-03",
+   "titulo": "Traslado · protocolo de cierre de instalaciones del hospital actual (entregas por jefatura)",
+   "detalle": "Coordinación PM del 01-10-2026: se pidió un protocolo de cierre de instalaciones con las entregas que hace cada jefatura; el plazo que se mencionó fue el 02-10. No hay registro posterior. Revisar si el Manual de Traslado RE-3986 ya lo cubre. Minuta levantada el 03-11: Minutas/minutas/2026-10-01_coordinacion-pm-traslado-servicios-concesionados.md · Confirmar si sigue vigente.",
+   "responsable": "Por asignar",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P347",
+   "estado": "Esperando terceros",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-03",
+   "titulo": "Alimentación concesionada · respuesta del MOP sobre los 3 tramos de pago",
+   "detalle": "Coordinación PM del 01-10-2026: falta la respuesta del MOP sobre los 3 tramos de pago del servicio de alimentación; el seguimiento quedó en Fernando [sic?] con Francisca Cid, y se esperaba para el 08-10. No hay registro posterior. Minuta levantada el 03-11: Minutas/minutas/2026-10-01_coordinacion-pm-traslado-servicios-concesionados.md · Confirmar si llegó.",
+   "plazo": "2026-10-08",
+   "responsable": "Fernando [sic?] · Francisca Cid",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P348",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-03",
+   "titulo": "Farmacia · listado de medicamentos críticos a trasladar, separando lo que va por medios propios",
+   "detalle": "Coordinación PM del 01-10-2026: Farmacia debe preparar el listado de medicamentos críticos para el traslado, indicando qué se mueve por medios propios. Sin plazo acordado. Relacionado: logística de medicamentos con dispensadores (P220). Minuta levantada el 03-11: Minutas/minutas/2026-10-01_coordinacion-pm-traslado-servicios-concesionados.md · Confirmar si sigue vigente.",
+   "responsable": "Farmacia",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P349",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-03",
+   "titulo": "Ecocardiógrafo «EPIC» [sic?] · reunión entre la Subdirección Administrativa y la Médica",
+   "detalle": "Coordinación PM del 01-10-2026, bloque de equipamiento: el ecocardiógrafo «EPIC» [sic?] quedó para una reunión entre la Subdirección Administrativa y la Subdirección Médica. Sin plazo acordado. Identificar el equipo (código y serie) y si está en el listado de traslado. Minuta levantada el 03-11: Minutas/minutas/2026-10-01_coordinacion-pm-traslado-servicios-concesionados.md · Confirmar si sigue vigente.",
+   "responsable": "Subdirección Administrativa · Subdirección Médica",
+   "ambito": "EMMC"
   }
  ],
  "criticos": [

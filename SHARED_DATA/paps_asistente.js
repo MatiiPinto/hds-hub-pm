@@ -88,13 +88,15 @@
     if(ints.indexOf('pm')>=0){ h += '<h5>Plan de Mantenimiento</h5><p>'+citas(f.plan_mantenimiento||'Este programa no tiene Plan de Mantenimiento aparte.',pid)+'</p>'; }
     if(ints.indexOf('hospital')>=0){ h += '<h5>Lo que el hospital debe saber</h5>'+lista(f.lo_que_el_hospital_debe_saber,pid,10); }
     if(ints.indexOf('cifras')>=0){ h += '<h5>Cifras destacadas</h5>'+(f.cifras_destacadas?'<ul>'+f.cifras_destacadas.map(function(c){return '<li>'+esc(c.dato)+': <b>'+esc(c.valor)+'</b> '+citas(c.cita||'',pid)+'</li>';}).join('')+'</ul>':''); }
-    if(todo){ h += '<h5>Para seguir</h5><div class="pa-chips">'+['qué incluye','dotación','horario','cómo se pide','contingencias','indicadores','anexos','qué debe saber el hospital','diferencias con INGER'].map(function(x){return '<span class="pa-chip" data-q="'+esc(x+' '+pid)+'">'+x+'</span>';}).join('')+'</div>'; }
+    if(todo){ h += '<h5>Para seguir</h5><div class="pa-chips">'+['tiempos de respuesta y ejecución','qué incluye','dotación','horario','cómo se pide','contingencias','indicadores','anexos','qué debe saber el hospital','diferencias con INGER'].map(function(x){return '<span class="pa-chip" data-q="'+esc(x+' '+pid)+'">'+x+'</span>';}).join('')+'</div>'; }
     h += '<div class="pa-src">Fuente: '+esc(f.nombre_oficial||f.short)+' · <span class="pa-link" data-open="'+(f.docs[e]||f.docs.HDS)+'">abrir el documento '+e+' →</span></div>';
     return h;
   }
   function fecha(d){ var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(d||''); return m?m[3]+'-'+m[2]+'-'+m[1]:(d||''); }
   function responder(q){
     var pids = programas(q), ints = intents(q), fq = faq(q), html = '';
+    // tiempos (respuesta · ejecución · corrección · reparación), zonificación, centinelas y ejemplos: módulo paps_tiempos.js
+    if(window.PAPS_TIEMPOS && window.PAPS_TIEMPOS.aplica(q)){ var ht = window.PAPS_TIEMPOS.responder(q, pids, est(), {esc:esc}); if(ht) return ht; }
     if(fq && !pids.length){ html = '<h4>'+esc(fq.q.charAt(0).toUpperCase()+fq.q.slice(1))+'</h4><p>'+esc(fq.a)+'</p>'; }
     else if(pids.length){ html = pids.map(function(p){ return tarjeta(p, ints, q); }).join('<hr style="border:none;border-top:1px dashed #e2e8f0;margin:10px 0">'); }
     else if(ints.length){
@@ -122,7 +124,7 @@
   /* ---- interfaz ---- */
   function render(){
     host.innerHTML = '<div class="pa-wrap"><div class="pa-hd"><div class="pa-av">✦</div><div><h3>Asistente PAPS</h3><p>Autoconsulta sobre los 14 programas concesionados · lee los documentos aprobados y cita el bloque</p></div></div>'
-      +'<div class="pa-body"><div class="pa-chips" id="paChips">'+['¿Qué incluye el aseo?','Dotación de vigilancia','Horario de cafetería','¿Cómo pido mantenimiento de un equipo médico?','Contingencias de residuos','Indicadores de alimentación','¿Quién aprueba los PAPS?','Diferencias INGER en ropería','Qué debe saber el hospital de SIIT'].map(function(x){return '<span class="pa-chip" data-q="'+esc(x)+'">'+esc(x)+'</span>';}).join('')+'</div>'
+      +'<div class="pa-body"><div class="pa-chips" id="paChips">'+['¿Cuál es la diferencia entre tiempo de respuesta y de ejecución?','¿Qué servicios están sujetos a tiempo?','Tiempos de aseo en UCI (ejemplo)','¿Qué incluye el aseo?','Dotación de vigilancia','¿Cómo pido mantenimiento de un equipo médico?','Contingencias de residuos','¿Quién aprueba los PAPS?','Diferencias INGER en ropería'].map(function(x){return '<span class="pa-chip" data-q="'+esc(x)+'">'+esc(x)+'</span>';}).join('')+'</div>'
       +'<div class="pa-log" id="paLog"></div><div class="pa-in"><input id="paIn" placeholder="Pregunta en tus palabras: «cada cuánto se desratiza», «cuántos guardias hay de noche»…" autocomplete="off"><button id="paGo">Preguntar</button></div></div></div>';
     host.querySelector('#paGo').onclick = enviar; host.querySelector('#paIn').onkeydown = function(e){ if(e.key==='Enter') enviar(); };
     bind(host);

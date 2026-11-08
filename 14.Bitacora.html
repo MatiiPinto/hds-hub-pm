@@ -179,6 +179,7 @@ body.pub .solo-local{display:none!important}
     <div class="tab" data-p="actas" onclick="tab(this)">📋 Actas de capacitación <span class="n" id="n-a"></span></div>
     <div class="tab" data-p="cron" onclick="tab(this)">🗓️ Cronograma traslado · TI · TD · EMMC · Logística <span class="n" id="n-cr"></span></div>
     <div class="tab" data-p="piloto" onclick="tab(this)">🧪 Plan piloto <span class="n" id="n-pp"></span></div>
+    <div class="tab" data-p="reub" onclick="tab(this)">🔁 Reubicaciones EMMC · SIC <span class="n" id="n-rb"></span></div>
     <div class="tab" data-p="cerr" onclick="tab(this)">✅ Cerrados <span class="n" id="n-c"></span></div>
   </div>
 </header>
@@ -283,6 +284,21 @@ body.pub .solo-local{display:none!important}
     <div id="lista-pp"></div>
   </div>
 
+  <!-- ══ REUBICACIONES EMMC (SIC de traslado) ══ -->
+  <div class="panel" id="p-reub">
+    <div class="kpis" id="kpis-rb"></div>
+    <div class="sec">📘 Cómo se tramita un traslado<small id="rb-fuente"></small></div>
+    <div id="rb-proc"></div>
+    <div class="sec">🔁 Reubicaciones<small> equipos que el proyecto dejó en un recinto y deben quedar en otro</small></div>
+    <div class="bar">
+      <input class="q" id="qrb" placeholder="Buscar equipo, serie, servicio o recinto…" oninput="renderReub()">
+      <select id="frb-est" onchange="renderReub()"><option value="">Estado: todos</option></select>
+      <button onclick="rbEditar('')">＋ Nueva reubicación</button>
+      <button class="ghost" onclick="rbExportar()">⤓ Excel (CSV)</button>
+    </div>
+    <div id="lista-rb"></div>
+  </div>
+
   <!-- ══ CERRADOS ══ -->
   <div class="panel" id="p-cerr"><div id="lista-c"></div></div>
 </main>
@@ -295,6 +311,7 @@ body.pub .solo-local{display:none!important}
 <script src="SHARED_DATA/actas_capacitacion.js"></script>
 <script src="SHARED_DATA/cronograma_traslado.js"></script>
 <script src="SHARED_DATA/plan_piloto.js"></script>
+<script src="SHARED_DATA/reubicaciones_emmc.js"></script>
 <script src="hub-home.js"></script>
 <script>
 // ════════════════════════════════════════════════════════════════════════════
@@ -376,7 +393,7 @@ function tab(el){
   document.getElementById('p-'+p).classList.add('on');
   // el formulario de edición vive en la pestaña de pendientes
   if(p!=='pend') document.getElementById('form').classList.remove('on');
-  if(p==='actas') renderActas(); else if(p==='cron') renderCron(); else if(p==='piloto') renderPiloto(); else render();
+  if(p==='actas') renderActas(); else if(p==='cron') renderCron(); else if(p==='piloto') renderPiloto(); else if(p==='reub') renderReub(); else render();
   try{ localStorage.setItem('hds_bitacora_tab',p); }catch(e){}
 }
 
@@ -1214,6 +1231,135 @@ function exportarPiloto(){
     nivel:c.nivel,observaciones:c.obs.map(o=>o.t).join(' | '),seguimiento:estPP(c.id),nota:(SP[c.id]||{}).nota||'',fecha:(SP[c.id]||{}).fecha||''}));
   const b=new Blob([JSON.stringify({generado:hoy(),fuente:PP.fuente,filas},null,1)],{type:'application/json'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='seguimiento_plan_piloto_'+hoy()+'.json'; a.click();
+}
+
+// ── Reubicaciones EMMC (SIC de traslado, 06-11-2026) ─────────────────────────
+// Equipos que el proyecto dejó en un recinto y deben quedar en otro. Según el PAPS AMEQM la distribución
+// del Anexo I b) se mantiene; para cambiarla el hospital notifica al IF, que instruye a la SC (P-OP-001 y
+// P-OP-002). Semilla: SHARED_DATA/reubicaciones_emmc.json · lo editado aquí y lo que llega desde el Atlas
+// (↪ Propuesta de reubicación → «A Bitácora») se guarda en este navegador (hds_reubic_v1) y gana por id.
+const RB=window.REUBICACIONES_EMMC||{items:[],estados:[],procedimiento:[]};
+const KEY_RB='hds_reubic_v1';
+let RL={}; try{ RL=JSON.parse(localStorage.getItem(KEY_RB)||'{}'); }catch(e){ RL={}; }
+const guardarRB=()=>{ try{ localStorage.setItem(KEY_RB,JSON.stringify(RL)); }catch(e){} };
+const RB_EST=RB.estados||[];
+const RB_CL={'Propuesta':'Sin-revisar','Validada por el servicio':'En-riesgo','Solicitada al IF':'En-riesgo','Autorizada por el IF':'Al-dia',
+  'Ejecutada por la SC':'Al-dia','Ubicación actualizada en el SIC':'Al-dia','No requiere IF (equipo móvil)':'No-aplica','Rechazada':'Atrasado'};
+function rbItems(){
+  try{ RL=JSON.parse(localStorage.getItem(KEY_RB)||'{}'); }catch(e){}   // el Atlas también escribe aquí
+  const m=new Map(RB.items.map(x=>[x.id,x]));
+  Object.entries(RL).forEach(([id,v])=>{ if(!v) return; if(v._borrado){ m.delete(id); return; } m.set(id,{...(m.get(id)||{}),...v,id}); });
+  return [...m.values()].sort((a,b)=>String(a.id).localeCompare(String(b.id),'es',{numeric:true}));
+}
+const rbLugar=o=>[o.recinto,o.codigo&&('cód. '+o.codigo),o.bim&&('BIM '+o.bim),o.servicio,[o.piso,o.edificio].filter(Boolean).join(' ')].filter(Boolean).join(' · ');
+const rbIF=x=>x.requiere_if===true?'Requiere autorización del IF':x.requiere_if===false?'No requiere IF (equipo móvil del mismo servicio)':'¿Requiere IF? por confirmar';
+(function(){ const el=document.getElementById('frb-est'); if(el) el.innerHTML='<option value="">Estado: todos</option>'+RB_EST.map(x=>`<option>${esc(x)}</option>`).join('');
+  const n=document.getElementById('n-rb'); if(n) n.textContent=rbItems().length; })();
+function renderReub(){
+  const L0=rbItems(), cuenta=e=>L0.filter(x=>x.estado===e).length;
+  document.getElementById('n-rb').textContent=L0.length;
+  document.getElementById('kpis-rb').innerHTML=[['reubicaciones',L0.length],['equipos',L0.reduce((a,x)=>a+(parseInt(x.cantidad)||1),0)],
+    ['por solicitar al IF',L0.filter(x=>['Propuesta','Validada por el servicio'].includes(x.estado)&&x.requiere_if!==false).length],
+    ['solicitadas',cuenta('Solicitada al IF')],['autorizadas',cuenta('Autorizada por el IF')],['ejecutadas',cuenta('Ejecutada por la SC')+cuenta('Ubicación actualizada en el SIC')]]
+    .map(([l,v])=>`<div class="k"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+  document.getElementById('rb-fuente').textContent=' '+(RB.fuente||'');
+  document.getElementById('rb-proc').innerHTML=(RB.procedimiento||[]).map(p=>`<div class="hit" style="padding-left:14px;align-items:flex-start">
+      <span class="chip">${esc(p.paso)}</span><span class="h"><div class="f" style="white-space:normal;line-height:1.45">${esc(p.texto)}</div>
+      <div class="f" style="margin-top:2px;opacity:.75">${esc(p.ref)}</div></span></div>`).join('')
+    +(RB.excepcion?`<div class="avi" style="margin-top:10px;background:rgba(40,110,80,.14);border:1px solid rgba(120,220,170,.3)"><b style="color:#9ff0c8">Excepción:</b> ${esc(RB.excepcion)}</div>`:'')
+    +(RB.advertencia?`<div class="avi rojo"><b>Ojo:</b> ${esc(RB.advertencia)}</div>`:'')
+    +(RB.formulario_sic?`<div class="f" style="margin:-4px 0 6px 2px">Formulario SIC (AMEQM): ${RB.formulario_sic.map(esc).join(' · ')}.</div>`:'');
+  const q=nrm(document.getElementById('qrb').value), fe=document.getElementById('frb-est').value;
+  const L=L0.filter(x=>(!fe||x.estado===fe)&&(!q||nrm([x.id,x.equipo,x.codigo,x.marca,x.modelo,(x.series||[]).join(' '),rbLugar(x.origen||{}),rbLugar(x.destino||{}),x.motivo,x.folio_sic].join(' ')).includes(q)));
+  document.getElementById('lista-rb').innerHTML=L.length?L.map(x=>{ const o=x.origen||{}, d=x.destino||{}, nt=(x.notas||[]).slice(-1)[0];
+    return `<div class="hit" style="padding-left:14px;align-items:flex-start">
+      <span class="chip">${esc(x.id)}</span>
+      <span class="h"><b>${esc(x.equipo)}</b>${(parseInt(x.cantidad)||1)>1?' <span class="f">× '+x.cantidad+'</span>':''}
+        <span class="f">· ${esc([x.codigo&&('EMMC '+x.codigo),x.marca,x.modelo].filter(Boolean).join(' · '))}</span>
+        ${(x.series||[]).length?`<div class="f" style="margin-top:2px">Serie${x.series.length>1?'s':''}: ${x.series.map(esc).join(', ')}</div>`:''}
+        <div class="f" style="margin-top:3px;white-space:normal">📍 <b>Desde</b> ${esc(rbLugar(o))}</div>
+        <div class="f" style="white-space:normal">➡️ <b>Hacia</b> ${esc(rbLugar(d))}</div>
+        ${x.motivo?`<div class="f" style="margin-top:3px;white-space:normal;line-height:1.4">Motivo: ${esc(x.motivo)}</div>`:''}
+        <div class="f" style="margin-top:3px;color:${x.requiere_if===false?'#7fd8bb':x.requiere_if===true?'#e8d07a':'#ff9a9a'}">⚖ ${esc(rbIF(x))}${x.folio_sic?' · Folio SIC '+esc(x.folio_sic):''}</div>
+        ${nt?`<div class="f" style="margin-top:3px;white-space:normal">📝 ${esc(nt.texto)} · ${fmt(nt.fecha)}</div>`:''}</span>
+      <span class="chip seg seg-${RB_CL[x.estado]||'Sin-revisar'}" onclick="rbCiclo('${x.id}')" title="Clic para avanzar el estado">${esc(x.estado||'Propuesta')}</span>
+      <span style="display:flex;gap:4px;flex-wrap:wrap">
+        <button class="ghost" style="padding:3px 9px;font-size:11px" onclick="rbEditar('${x.id}')">editar</button>
+        <button class="ghost" style="padding:3px 9px;font-size:11px" onclick="rbNota('${x.id}')">nota</button>
+        <button class="ghost" style="padding:3px 9px;font-size:11px" onclick="rbTextoSIC('${x.id}')" title="Texto listo para el formulario del SIC o el ordinario al IF">texto SIC</button>
+        <button class="ghost" style="padding:3px 9px;font-size:11px" onclick="rbAPendiente('${x.id}')">→ Pendiente</button></span></div>`; }).join('')
+    :'<div class="vacio">Nada que mostrar con esos filtros.</div>';
+  document.getElementById('pie').innerHTML='Reubicaciones EMMC: semilla '+esc(RB.version||'')+' — lo editado y lo que llega desde el Atlas se guarda en este navegador.';
+}
+function rbGuardar(id,cambio){ RL[id]={...(RL[id]||{}),...cambio,actualizado:hoy()}; guardarRB(); renderReub(); }
+function rbCiclo(id){ const x=rbItems().find(y=>y.id===id); if(!x) return; const i=RB_EST.indexOf(x.estado||'Propuesta');
+  const e=RB_EST[(i+1)%RB_EST.length]; rbGuardar(id,{estado:e,notas:[...(x.notas||[]),{fecha:hoy(),texto:'Estado → '+e}]}); }
+function rbNota(id){ const x=rbItems().find(y=>y.id===id); if(!x) return; const t=prompt('Nota (respuesta del IF, coordinación, fecha de ejecución…):','');
+  if(t&&t.trim()) rbGuardar(id,{notas:[...(x.notas||[]),{fecha:hoy(),texto:t.trim()}]}); }
+function rbTextoSIC(id){
+  const x=rbItems().find(y=>y.id===id); if(!x) return; const o=x.origen||{}, d=x.destino||{};
+  const tx=`Solicitud de reubicación de equipamiento médico (PAPS AMEQM · Actualización de Inventario)
+Equipo: ${x.equipo}${x.codigo?' (EMMC '+x.codigo+')':''}${x.marca?' · '+x.marca:''}${x.modelo?' '+x.modelo:''}${(parseInt(x.cantidad)||1)>1?' · '+x.cantidad+' unidades':''}
+${(x.series||[]).length?'Serie'+(x.series.length>1?'s':'')+': '+x.series.join(', ')+'\n':''}Recinto actual: ${rbLugar(o)}
+Recinto destino: ${rbLugar(d)}
+Motivo: ${x.motivo||''}
+Se solicita al Inspector Fiscal instruir a la Sociedad Concesionaria el traslado del equipo (P-OP-001 «Desinstalación, traslado y salida del EQMMC») y la actualización de su ubicación en el SIC (P-OP-002 «Actualización de Inventario»).`;
+  document.getElementById('mbox').innerHTML=`<h3>Texto para el SIC · ${esc(x.id)}</h3><pre id="rb-tx">${esc(tx)}</pre>
+    <div class="acts"><button onclick="navigator.clipboard&&navigator.clipboard.writeText(document.getElementById('rb-tx').textContent);this.textContent='✔ Copiado'">Copiar</button>
+    <button class="ghost" onclick="document.getElementById('modal').classList.remove('on')">Cerrar</button></div>`;
+  document.getElementById('modal').classList.add('on');
+}
+function rbEditar(id){
+  const x=id?rbItems().find(y=>y.id===id):{estado:'Propuesta',origen:{},destino:{},cantidad:1}; if(!x) return;
+  const o=x.origen||{}, d=x.destino||{}, IFV=x.requiere_if===true?'Sí':x.requiere_if===false?'No (equipo móvil del mismo servicio)':'Por confirmar';
+  document.getElementById('mbox').innerHTML=`<h3>${id?'Editar '+esc(id):'Nueva reubicación'}</h3><div id="rb-f">
+    <div class="grid2">${campo('Equipo','equipo',x.equipo)}${campo('Código EMMC','codigo',x.codigo)}
+      ${campo('Marca','marca',x.marca)}${campo('Modelo','modelo',x.modelo)}
+      ${campo('Series (separadas por coma)','series',(x.series||[]).join(', '))}${campo('Cantidad','cantidad',x.cantidad,'number')}</div>
+    <h4 style="margin:12px 0 4px">📍 Desde</h4><div class="grid2">${campo('Servicio','o_servicio',o.servicio)}${campo('Recinto','o_recinto',o.recinto)}
+      ${campo('Código PMA','o_codigo',o.codigo)}${campo('BIM','o_bim',o.bim)}${campo('Piso','o_piso',o.piso)}${campo('Edificio','o_edificio',o.edificio)}</div>
+    <h4 style="margin:12px 0 4px">➡️ Hacia</h4><div class="grid2">${campo('Servicio','d_servicio',d.servicio)}${campo('Recinto','d_recinto',d.recinto)}
+      ${campo('Código PMA','d_codigo',d.codigo)}${campo('BIM','d_bim',d.bim)}${campo('Piso','d_piso',d.piso)}${campo('Edificio','d_edificio',d.edificio)}</div>
+    ${campo('Motivo','motivo',x.motivo,'ta')}
+    <div class="grid2">${campo('¿Requiere autorización del IF?','requiere_if',IFV,['Sí','No (equipo móvil del mismo servicio)','Por confirmar'])}
+      ${campo('Estado','estado',x.estado,RB_EST)}${campo('Folio SIC / N° ORD','folio_sic',x.folio_sic)}${campo('Fecha de solicitud al IF','fecha_solicitud',x.fecha_solicitud,'date')}</div></div>
+    <div class="acts"><button onclick="rbSalvar('${id||''}')">Guardar</button>
+      ${id?`<button class="ghost" onclick="if(confirm('¿Quitar ${esc(id)} de la lista?')){rbGuardar('${id}',{_borrado:true});document.getElementById('modal').classList.remove('on')}">Quitar</button>`:''}
+      <button class="ghost" onclick="document.getElementById('modal').classList.remove('on')">Cancelar</button></div>`;
+  document.getElementById('modal').classList.add('on');
+}
+function rbSalvar(id){
+  const f=document.getElementById('rb-f'), g=n=>(f.querySelector(`[name="${n}"]`)||{}).value||'';
+  if(!g('equipo').trim()){ alert('Falta el equipo.'); return; }
+  const v={equipo:g('equipo').trim(),codigo:g('codigo').trim(),marca:g('marca').trim(),modelo:g('modelo').trim(),
+    series:g('series').split(',').map(s=>s.trim()).filter(Boolean),cantidad:parseInt(g('cantidad'))||1,
+    origen:{servicio:g('o_servicio'),recinto:g('o_recinto'),codigo:g('o_codigo'),bim:g('o_bim'),piso:g('o_piso'),edificio:g('o_edificio')},
+    destino:{servicio:g('d_servicio'),recinto:g('d_recinto'),codigo:g('d_codigo'),bim:g('d_bim'),piso:g('d_piso'),edificio:g('d_edificio')},
+    motivo:g('motivo').trim(),requiere_if:g('requiere_if')==='Sí'?true:/^No/.test(g('requiere_if'))?false:null,
+    estado:g('estado')||'Propuesta',folio_sic:g('folio_sic').trim(),fecha_solicitud:g('fecha_solicitud')};
+  if(!id){ const n=rbItems().reduce((m,y)=>/^R\d+$/.test(y.id)?Math.max(m,parseInt(y.id.slice(1))):m,0)+1;   // los del Atlas (R-…) no cuentan
+    id='R'+String(n).padStart(3,'0'); v.creado=hoy(); v.notas=[{fecha:hoy(),texto:'Reubicación creada.'}]; }
+  document.getElementById('modal').classList.remove('on'); rbGuardar(id,v);
+}
+function rbAPendiente(id){
+  const x=rbItems().find(y=>y.id===id); if(!x) return;
+  const t=prompt('Título del pendiente:','Reubicación '+x.id+' · '+x.equipo+' → '+((x.destino||{}).servicio||'')); if(!t||!t.trim()) return;
+  const n=D.reduce((m,y)=>Math.max(m,parseInt((y.id||'P0').slice(1))||0),0)+1;
+  D.push({id:'P'+String(n).padStart(3,'0'),titulo:t.trim(),detalle:'Desde '+rbLugar(x.origen||{})+' hacia '+rbLugar(x.destino||{})+'. Motivo: '+(x.motivo||'')+' '+rbIF(x)+'.',
+    ambito:'EMMC',estado:'Abierto',prioridad:'Media',origen_tipo:'Trabajo interno',origen_ref:'Reubicaciones EMMC '+x.id,origen_fecha:hoy(),creado:hoy(),
+    notas:[{fecha:hoy(),texto:'Creado desde la pestaña Reubicaciones EMMC.'}]});
+  guardar(); alert('Creado '+D[D.length-1].id+' en Pendientes.'); renderReub();
+}
+function rbExportar(){
+  const C=['ID','Equipo','Código EMMC','Marca','Modelo','Series','Cantidad','Servicio origen','Recinto origen','Código origen','BIM origen','Piso origen',
+    'Servicio destino','Recinto destino','Código destino','BIM destino','Piso destino','Motivo','¿Requiere IF?','Estado','Folio SIC / ORD','Fecha solicitud','Última nota'];
+  const q=s=>'"'+String(s==null?'':s).replace(/"/g,'""')+'"';
+  const filas=rbItems().map(x=>{ const o=x.origen||{}, d=x.destino||{};
+    return [x.id,x.equipo,x.codigo,x.marca,x.modelo,(x.series||[]).join(', '),x.cantidad,o.servicio,o.recinto,o.codigo,o.bim,o.piso,
+      d.servicio,d.recinto,d.codigo,d.bim,d.piso,x.motivo,x.requiere_if===true?'Sí':x.requiere_if===false?'No':'Por confirmar',x.estado,x.folio_sic,x.fecha_solicitud,
+      ((x.notas||[]).slice(-1)[0]||{}).texto]; });
+  const b=new Blob(['\ufeff'+[C,...filas].map(r=>r.map(q).join(';')).join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='Reubicaciones_EMMC_'+hoy()+'.csv'; a.click();
 }
 
 initFiltros(); render();
