@@ -607,6 +607,20 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 /* jardines (imagen entre el plano y las cajas) y esculturas (marcador + ficha flotante) */
 #jardinImg{position:absolute;pointer-events:none;user-select:none;image-rendering:auto}
 .laminaImg{position:absolute;left:0;top:0;transform-origin:0 0;pointer-events:none;user-select:none;max-width:none}
+#lamFichaBody .lf-opc{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px;font-size:var(--fs-xs);color:var(--text-2)}
+#lamFichaBody .lf-opc button{border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:4px 12px;cursor:pointer;font-size:var(--fs-xs)}
+#lamFichaBody .lf-opc button.on{background:#222944;color:#fff;border-color:#222944}
+#lamFichaBody .lf-res{font-size:var(--fs-sm);line-height:1.5;margin:0 0 6px}
+#lamFichaBody .lf-h{font-weight:var(--fw-bold);margin:14px 0 6px;color:#222944;font-size:var(--fs-sm);border-bottom:2px solid #00A1DF;padding-bottom:2px}
+#lamFichaBody p{font-size:var(--fs-sm);margin:4px 0;line-height:1.45}
+#lamFichaBody .lf-tab{width:100%;border-collapse:collapse;font-size:var(--fs-xs)}
+#lamFichaBody .lf-tab th{text-align:left;color:var(--text-2);font-weight:600;padding:3px 6px;border-bottom:1px solid var(--border)}
+#lamFichaBody .lf-tab td{padding:4px 6px;border-bottom:1px solid var(--border);vertical-align:top}
+#lamFichaBody .lf-tab td.lf-k{font-weight:700;white-space:nowrap}
+#lamFichaBody .lf-imgs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+#lamFichaBody .lf-imgs a{display:block;text-decoration:none;color:var(--text-2);font-size:var(--fs-xs)}
+#lamFichaBody .lf-imgs img{width:100%;border-radius:8px;border:1px solid var(--border);display:block;margin-bottom:3px}
+#lamFichaBody .lf-nota{color:var(--text-2);font-size:var(--fs-xs);margin-top:14px}
 .esc-mk{cursor:help;pointer-events:all}
 .esc-mk:hover circle.bola{stroke:#0f172a}
 #escTip{display:none;position:fixed;z-index:1300;width:330px;max-width:calc(100vw - 16px);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-3);padding:12px 14px;font-size:var(--fs-sm);color:var(--text);pointer-events:none;line-height:1.45}
@@ -1566,6 +1580,15 @@ function _cargarJS(L){
       <button class="ficha-x" onclick="closeBajaLista()" title="Cerrar">×</button>
     </div>
     <div class="ficha-body" id="bajaListBody"></div>
+  </div>
+</div>
+<div id="lamFichaModal" class="modal-fondo" onclick="if(event.target===this)cerrarFichaLamina()">
+  <div class="ficha-box" style="width:900px">
+    <div class="ficha-head">
+      <div><div class="ficha-title" id="lamFichaTit"></div><div class="ficha-sub" id="lamFichaSub"></div></div>
+      <button class="ficha-x" onclick="cerrarFichaLamina()" title="Cerrar">×</button>
+    </div>
+    <div class="ficha-body" id="lamFichaBody"></div>
   </div>
 </div>
 <div id="ppModal" class="modal-fondo" onclick="if(event.target===this)closeReportePP()">
@@ -4382,7 +4405,16 @@ function _jardinesSync(){
 // proyecto (por ahora la Droguería ISP del P-1, 2 láminas 1:75) registradas contra los muros del plano
 // (residuo mediano < 1 px). Cada una es una imagen transparente ENTRE el plano y las cajas, puesta con
 // su matriz imagen→plano (mtx), así que calza al píxel aunque traiga giro o escala propios.
-function _laminas(){ const L=window.LAMINAS_PROYECTO||{}; return L[S.floorId]||[]; }
+function _laminasTodas(){ const L=window.LAMINAS_PROYECTO||{}; return L[S.floorId]||[]; }
+// Láminas con «grupo» son opciones excluyentes del mismo lugar (CORE: con / sin espirales): se ve una,
+// la elegida en la ficha (cabida_lam_opc), o la primera del grupo.
+function _lamOpc(){ if(!S.lamOpc){ S.lamOpc={}; try{ S.lamOpc=JSON.parse(localStorage.getItem('cabida_lam_opc')||'{}')||{}; }catch(e){} } return S.lamOpc; }
+function _laminas(){
+  const T=_laminasTodas(), opc=_lamOpc();
+  return T.filter(l=>{ if(!l.grupo) return true; const G=T.filter(x=>x.grupo===l.grupo);
+    const elegida=G.some(x=>x.id===opc[l.grupo]) ? opc[l.grupo] : G[0].id; return l.id===elegida; });
+}
+function lamElegirOpcion(grupo, id){ _lamOpc()[grupo]=id; _lsPref('cabida_lam_opc', JSON.stringify(S.lamOpc)); if(S.laminas===false) S.laminas=true; _laminasSync(); renderSVG(); }
 function toggleLaminas(){
   S.laminas=(S.laminas===false);
   _lsPref('cabida_laminas', S.laminas?'1':'0');
@@ -4393,7 +4425,7 @@ function _laminasSync(){
   const L=_laminas(), on=L.length>0 && S.laminas!==false;
   { const b=document.getElementById('btnLaminas'); if(b){ b.classList.toggle('active',S.laminas!==false); b.classList.toggle('dis',!L.length);
       b.title=L.length?'Mostrar u ocultar las láminas de proyecto de este piso, calibradas contra el plano: '+L.map(l=>l.nombre+' ('+l.lamina+')').join(' · ')+'.'
-                      :'Láminas de proyecto: por ahora sólo hay de la Droguería (P-1)'; } }
+                      :'Láminas de proyecto: Droguería ISP y CORE de Laboratorio (P-1)'; } }
   const wrap=document.getElementById('imgWrap'), sv=document.getElementById('svgLayer'); if(!wrap||!sv) return;
   const ids=new Set(on?L.map(l=>'lam-'+l.id):[]);
   wrap.querySelectorAll('img.laminaImg').forEach(im=>{ if(!ids.has(im.id)) im.remove(); });
@@ -4405,6 +4437,50 @@ function _laminasSync(){
     im.style.width=l.w+'px'; im.style.height=l.h+'px'; im.style.transform='matrix('+l.mtx.join(',')+')';
   });
 }
+
+// Pastilla «🧪 ficha» sobre una lámina que trae ficha (CORE de Laboratorio): tamaño fijo en pantalla.
+function _laminasFichaLayer(){
+  if(S.laminas===false) return;
+  const vis=_laminas(), T=_laminasTodas();
+  vis.forEach(l=>{
+    const F=l.ficha || (l.grupo && (T.find(x=>x.grupo===l.grupo && x.ficha)||{}).ficha); if(!F) return;
+    const k=_cpK(), x=l.caja[0]+l.caja[2]/2, y=l.caja[1];
+    const g=el('g',{class:'lam-ficha',transform:`translate(${x},${y}) scale(${k})`,style:'cursor:pointer'});
+    const lb='🧪 '+(F.titulo||l.nombre).split(' · ')[0]+' · ficha', w=Math.max(120, lb.length*6.6+22);
+    g.appendChild(el('rect',{x:-w/2,y:-30,width:w,height:24,rx:12,fill:'#222944',stroke:'#00A1DF','stroke-width':2}));
+    g.appendChild(txt(0,-14,lb,{'font-size':12,'font-weight':700,fill:'#fff','pointer-events':'none'}));
+    const t=el('title'); t.textContent=(F.titulo||l.nombre)+' · '+(F.proveedor||'')+'\nVista: '+(l.opcion||l.nombre)+'\nClic = ficha del equipamiento y opciones de layout'; g.appendChild(t);
+    g.addEventListener('mousedown',e=>e.stopPropagation());
+    g.addEventListener('click',e=>{ e.stopPropagation(); didPan=false; abrirFichaLamina(l.grupo||l.id); });
+    svg.appendChild(g);
+  });
+}
+function abrirFichaLamina(grupo){
+  const T=_laminasTodas(), G=T.filter(x=>(x.grupo||x.id)===grupo); if(!G.length) return;
+  const F=(G.find(x=>x.ficha)||{}).ficha||{}, vis=_laminas().find(x=>(x.grupo||x.id)===grupo)||G[0];
+  const e=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  document.getElementById('lamFichaTit').textContent=F.titulo||vis.nombre;
+  document.getElementById('lamFichaSub').textContent=[F.proveedor, F.documento].filter(Boolean).join(' · ');
+  const tab=(cab,filas)=>'<table class="lf-tab"><thead><tr>'+cab.map(c=>'<th>'+e(c)+'</th>').join('')+'</tr></thead><tbody>'
+    +filas.map(f=>'<tr>'+f.map((c,i)=>'<td'+(i===0?' class="lf-k"':'')+'>'+e(c)+'</td>').join('')+'</tr>').join('')+'</tbody></table>';
+  let h='';
+  if(G.length>1) h+='<div class="lf-opc"><span>Layout en el plano:</span>'+G.map(l=>'<button class="'+(l.id===vis.id?'on':'')
+      +'" onclick="lamElegirOpcion(\''+e(grupo)+'\',\''+e(l.id)+'\');abrirFichaLamina(\''+e(grupo)+'\')">'+e(l.opcion||l.nombre)+'</button>').join('')+'</div>';
+  if(F.resumen) h+='<p class="lf-res">'+e(F.resumen)+'</p>';
+  if(F.recintos) h+='<div class="lf-h">Recintos</div>'+tab(['Recinto','Código','BIM'],F.recintos);
+  (F.etapas||[]).forEach(et=>{ h+='<div class="lf-h">'+e(et.etapa)+'</div>'+tab(['Módulo','Función','Capacidad'],et.modulos); });
+  if(F.transporte) h+='<div class="lf-h">Transporte</div><p>'+e(F.transporte)+'</p>';
+  if(F.otros&&F.otros.length) h+='<div class="lf-h">Otros equipos en el layout</div><p>'+F.otros.map(e).join(' · ')+'</p>';
+  if(F.software&&F.software.length) h+='<div class="lf-h">Software</div><p>'+F.software.map(e).join(' · ')+'</p>';
+  if(F.imagenes&&F.imagenes.length) h+='<div class="lf-h">Imágenes del proveedor</div><div class="lf-imgs">'+F.imagenes.map(([src,cap])=>
+      '<a href="'+e(src)+'" target="_blank" title="Abrir en grande"><img src="'+e(src)+'" alt="'+e(cap)+'" loading="lazy"><span>'+e(cap)+'</span></a>').join('')+'</div>';
+  const q=vis.calibracion||{};
+  h+='<p class="lf-nota">'+e(F.nota||'')+(q.pilares?(' Calibrado contra el plano con '+q.pilares+' pilares (residuo máx. '+q.residuo_max_px+' px ≈ '+Math.round(q.residuo_max_px*1.61)+' cm; giro '+q.giro_grados+'°).'):'')
+    +' Fuente: '+e(vis.fuente||'')+'</p>';
+  document.getElementById('lamFichaBody').innerHTML=h;
+  document.getElementById('lamFichaModal').classList.add('show');
+}
+function cerrarFichaLamina(){ document.getElementById('lamFichaModal').classList.remove('show'); }
 
 function fitView(){
   const vW=viewer.clientWidth,vH=viewer.clientHeight;
@@ -5193,6 +5269,7 @@ function renderSVG(){
   // Carros de paro: marcadores que laten en el recinto (todas las vistas)
   { const lg=document.getElementById('cpLegend');
     if(_cpOn){ try{ _cpLayer(); }catch(e){ console.warn('carros de paro',e); } } else if(lg) lg.style.display='none'; }
+  try{ _laminasFichaLayer(); }catch(e){ console.warn('ficha de lámina',e); }
   if(S.level===2 && _ofOn) try{ _oficinasLayer(); }catch(e){ console.warn('oficinas',e); }
   if(S.level===1) try{ _instLayer(fl); }catch(e){ console.warn('instituciones',e); }
   try{ renderEscSel(); }catch(e){}
@@ -19113,17 +19190,33 @@ async function runSelfTest(){
     const fPrev=S.floorId, lPrev=S.level, aPrev=S.areaId, rPrev=S.roomId, mPrev=S.laminas;
     try{
       const L=(window.LAMINAS_PROYECTO||{})['P-1']||[], D=FLOOR_DIMS['P-1'];
-      const datos=L.length===2 && L.every(l=>l.mtx && l.mtx.length===6 && l.calibracion && l.calibracion.residuo_med_px<1.5
+      const Ld=L.filter(l=>!l.grupo), datos=Ld.length===2 && Ld.every(l=>l.mtx && l.mtx.length===6 && l.calibracion && l.calibracion.residuo_med_px<1.5
         && l.caja[0]>=0 && l.caja[1]>=0 && l.caja[0]+l.caja[2]<=D.w && l.caja[1]+l.caja[3]<=D.h);
       S.floorId='P-1'; S.level=1; S.areaId=null; S.roomId=null; S.laminas=true; renderSVG();
       const ims=[...document.querySelectorAll('#imgWrap img.laminaImg')];
-      const orden=ims.length===2 && ims.every(im=>im.nextElementSibling && (im.nextElementSibling.id==='svgLayer'||im.nextElementSibling.classList.contains('laminaImg'))
+      const nVis=_laminas().length, orden=ims.length===nVis && ims.every(im=>im.nextElementSibling && (im.nextElementSibling.id==='svgLayer'||im.nextElementSibling.classList.contains('laminaImg'))
         && /^matrix\(/.test(im.style.transform));
       toggleLaminas(); const apaga=S.laminas===false && !document.querySelector('#imgWrap img.laminaImg');
-      toggleLaminas(); const prende=document.querySelectorAll('#imgWrap img.laminaImg').length===2;
+      toggleLaminas(); const prende=document.querySelectorAll('#imgWrap img.laminaImg').length===nVis;
       S.floorId='P2'; renderSVG(); const otro=!document.querySelector('#imgWrap img.laminaImg') && document.getElementById('btnLaminas').classList.contains('dis');
       return datos && orden && apaga && prende && otro;
     } finally { S.floorId=fPrev; S.level=lPrev; S.areaId=aPrev; S.roomId=rPrev; S.laminas=mPrev; renderSVG(); }
+  });
+  T('Láminas: el CORE de Laboratorio (Tecnigen) muestra una sola opción, cambia desde la ficha y trae su pastilla y ficha', ()=>{
+    const fPrev=S.floorId, lPrev=S.level, aPrev=S.areaId, rPrev=S.roomId, mPrev=S.laminas, oPrev=JSON.stringify(_lamOpc());
+    try{
+      const T0=((window.LAMINAS_PROYECTO||{})['P-1']||[]).filter(l=>l.grupo==='core-lab'); if(T0.length<2) return false;
+      const cal=T0.every(l=>l.calibracion && l.calibracion.residuo_max_px<8 && Math.abs(Math.abs(l.calibracion.giro_grados)-90)<1);
+      S.floorId='P-1'; S.level=1; S.areaId=null; S.roomId=null; S.laminas=true; S.lamOpc={}; renderSVG();
+      const una=_laminas().filter(l=>l.grupo==='core-lab').length===1 && !!document.getElementById('lam-'+T0[0].id) && !document.getElementById('lam-'+T0[1].id);
+      lamElegirOpcion('core-lab', T0[1].id);
+      const cambia=!!document.getElementById('lam-'+T0[1].id) && !document.getElementById('lam-'+T0[0].id);
+      const pastilla=!!svg.querySelector('g.lam-ficha');
+      abrirFichaLamina('core-lab'); const m=document.getElementById('lamFichaModal');
+      const ficha=m.classList.contains('show') && /Alinity/.test(m.textContent) && m.querySelectorAll('.lf-opc button').length===T0.length;
+      cerrarFichaLamina();
+      return cal && una && cambia && pastilla && ficha && !m.classList.contains('show');
+    } finally { S.lamOpc=JSON.parse(oPrev); try{ _lsSet('cabida_lam_opc',oPrev); }catch(e){} S.floorId=fPrev; S.level=lPrev; S.areaId=aPrev; S.roomId=rPrev; S.laminas=mPrev; renderSVG(); }
   });
   T('Respaldo a archivo: sólo desde el Atlas de trabajo (un preview en otro puerto no pisa el estado)', ()=>{
     return FBAK_PUERTOS.indexOf('8790')>=0 && FBAK_PUERTOS.length<=2
