@@ -609,6 +609,13 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 #lamFichaBody .lf-imgs a{display:block;text-decoration:none;color:var(--text-2);font-size:var(--fs-xs)}
 #lamFichaBody .lf-imgs img{width:100%;border-radius:8px;border:1px solid var(--border);display:block;margin-bottom:3px}
 #lamFichaBody .lf-nota{color:var(--text-2);font-size:var(--fs-xs);margin-top:14px}
+#mcBody .mc-op{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid var(--border);border-radius:10px;margin-bottom:8px;cursor:pointer}
+#mcBody .mc-op:hover{background:var(--surface-2,#f8fafc)}
+#mcBody .mc-op input{margin-top:3px}
+#mcBody .mc-op b{font-size:var(--fs-sm)}
+#mcBody .mc-op small{display:block;color:var(--text-2);font-size:var(--fs-xs);margin-top:2px;line-height:1.4}
+#mcBody .mc-res{font-size:var(--fs-xs);color:var(--text-2);margin:6px 0 12px}
+#mcBody .mc-btns{display:flex;gap:8px;justify-content:flex-end}
 .esc-mk{cursor:help;pointer-events:all}
 .esc-mk:hover circle.bola{stroke:#0f172a}
 #escTip{display:none;position:fixed;z-index:1300;width:330px;max-width:calc(100vw - 16px);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-3);padding:12px 14px;font-size:var(--fs-sm);color:var(--text);pointer-events:none;line-height:1.45}
@@ -1136,7 +1143,7 @@ window.addEventListener('DOMContentLoaded',()=>{
       <button class="tb-btn" id="btnMoves" onclick="openMovesList()" style="display:none" title="Ver el listado completo de traslados propuestos">↪ 0</button>
       <span class="tb-div"></span>
       <button class="tb-btn" id="btnExpServ" onclick="exportServicioHTML()" style="display:none" title="Exportar este servicio como HTML autónomo: imagen del plano recortada al contorno punteado, recintos clicables con su ficha (equipamiento, mobiliario, TI, MNC) y opción de ocultar las cajas. No incluye información de funcionarios.">📄 Exportar servicio</button>
-      <button class="tb-btn" id="btnMapaServ" onclick="exportMapaServicio()" style="display:none" title="Mapa de navegación de este servicio en página carta: plano a página completa, recintos numerados y leyenda con nombre, código y señalética. Se guarda el HTML y se abre el diálogo de impresión para Guardar como PDF. Sin funcionarios.">🗺 Mapa carta (PDF)</button>
+      <button class="tb-btn" id="btnMapaServ" onclick="mapaServAbrir()" style="display:none" title="Mapa de navegación de este servicio en página carta: plano a página completa, recintos numerados y leyenda con nombre, código y señalética. Se eligen las secciones a sumar (ficha de recintos, Autorización Sanitaria, dotación cubicada) o ninguna: sólo el plano. Se guarda el HTML y se abre el diálogo de impresión para Guardar como PDF.">🗺 Mapa carta (PDF)</button>
       <button class="tb-btn" id="btnDotServ" onclick="openDotServicio()" style="display:none" title="Dotación de ESTE servicio, como la exportación general de cubicación pero sólo del servicio: completa, cubicada (con puesto en el Atlas) o no cubicada (sin puesto). PDF carta para imprimir o Excel.">👥 Dotación del servicio</button>
       <button class="tb-btn" id="btnMurosServ" onclick="exportMurosServicio()" style="display:none" title="Medidas de muros del servicio en hoja carta, para instalar mobiliario: cada recinto con su contorno sobre el plano, cada muro numerado con su largo, y tabla por muro (orientación, largo, puertas y tramo libre). Portada con el plano del servicio numerado. Se abre el diálogo de impresión para Guardar como PDF.">📐 Muros carta (PDF)</button>
       <button class="tb-btn" id="btnOrdenarDots" onclick="ordenarDots()" style="display:none" title="Ordenar los puestos del recinto en una cuadrícula alineada, con espacio suficiente para que las tarjetas de nombre no se superpongan">⊞ Ordenar puestos</button>
@@ -1153,6 +1160,8 @@ window.addEventListener('DOMContentLoaded',()=>{
       <button class="tb-btn" id="btnServPuestos" onclick="openServPuestos()" style="display:none" title="Ver todos los puestos asignados del servicio: en cantidad o con el nombre de cada funcionario">👥 Puestos del servicio</button>
       <button class="tb-btn tog" id="btnBoxVis" onclick="cycleBoxVis()" title="Ver u ocultar las cajas dibujadas y su información (para ver el plano de fondo)">👁 Cajas</button>
       <button class="tb-btn tog" id="btnJardines" onclick="toggleJardines()" title="Mostrar u ocultar los jardines y las esculturas del piso 1 (lámina de Paisajismo PAI-PL-GEN-X-P-E-081, calibrada contra el plano). Pasa el mouse por una 🗿 para ver su ficha y fechas de traslado.">🌳 Jardines</button>
+      <button class="tb-btn tog" id="btnPlanJun" onclick="togglePlanJun()" title="Planos de circulación jun-2026: zonas de cambio (magenta, con su N°), recintos nuevos aún sin dibujar, accesos y núcleos verticales, calibrados contra el plano del Atlas (no cambia el plano de fondo).">🧭 Planos jun</button>
+      <button class="tb-btn tog" id="btnDwgObj" onclick="toggleDwgObj()" title="Objetos de los DWG de coordinación (may-2026): equipamiento clínico, mobiliario, mobiliario adosado, correo neumático y ascensores en su posición (punto de inserción Revit). Referencia: el catálogo EMMC/MNC manda. Se ve dentro de un servicio.">📦 Objetos DWG</button>
       <button class="tb-btn tog" id="btnLaminas" onclick="toggleLaminas()" title="Mostrar u ocultar las láminas de proyecto del piso (Droguería ISP en el P-1), calibradas contra el plano.">📄 Láminas</button>
       <button class="tb-btn" id="btnNav" onclick="toggleNavPanel()" title="🧭 Ruta animada de un recinto a otro sobre la red de circulación (ejes reales del plano) y los ascensores/escaleras, con restricciones: perfil (público, camilla, clínico, logística), zonas a evitar, sin escaleras, ascensores o servicios a evitar.">🧭 Ruta</button>
       <button class="tb-btn tog" id="btnVert" onclick="toggleVerticales()" title="Mostrar u ocultar los ascensores, escaleras y escaleras mecánicas (se ven en todas las vistas). Las líneas de circulación no se tocan.">🛗 Ascensores</button>
@@ -1583,6 +1592,15 @@ window.addEventListener('DOMContentLoaded',()=>{
     <div class="ficha-body" id="bajaListBody"></div>
   </div>
 </div>
+<div id="mcModal" class="modal-fondo" onclick="if(event.target===this)mapaServCerrar()">
+  <div class="ficha-box" style="width:520px">
+    <div class="ficha-head">
+      <div><div class="ficha-title">🗺 Exportar servicio · carta (PDF)</div><div class="ficha-sub" id="mcSub"></div></div>
+      <button class="ficha-x" onclick="mapaServCerrar()" title="Cerrar">×</button>
+    </div>
+    <div class="ficha-body" id="mcBody"></div>
+  </div>
+</div>
 <div id="lamFichaModal" class="modal-fondo" onclick="if(event.target===this)cerrarFichaLamina()">
   <div class="ficha-box" style="width:900px">
     <div class="ficha-head">
@@ -1756,6 +1774,8 @@ window.addEventListener('DOMContentLoaded',()=>{
 <script src="SHARED_DATA/planos_calibracion.js"></script>
 <script src="SHARED_DATA/pm_deltas_pendientes.js"></script>
 <script src="SHARED_DATA/dea_catalogo.js"></script>
+<script src="SHARED_DATA/planos_jun2026.js"></script>
+<script src="SHARED_DATA/dwg_objetos_may2026.js"></script>
 <script src="SHARED_DATA/recinto_mnc2.js"></script>
 <script src="SHARED_DATA/estar_residencias_atlas.js"></script>
 <script src="SHARED_DATA/fichas_tecnicas_mnc.js"></script>
@@ -1858,9 +1878,19 @@ function roomMatrizM2(roomId){
   if(!hit) return null;
   return {m2:tot, src:parts.length>1?'matriz (suma de códigos fusionados)':'matriz'};
 }
+// m² del plano de circulación jun-2026 (rótulo oficial; sólo códigos únicos en el plano de ese piso)
+function roomPlanoM2(roomId){
+  const PJ=window.PLANOS_JUN2026; if(!PJ||!PJ.pisos) return null;
+  const ctx=(typeof _findRoom==='function')?_findRoom(roomId):null, fid=ctx?ctx.floor.id:S.floorId;
+  const P=PJ.pisos[fid]; if(!P||!P.m2) return null;
+  const parts=(typeof rCodeParts==='function')?rCodeParts(roomId):[rCode(roomId)].filter(Boolean);
+  if(!parts.length || !parts.every(c=>P.m2[c])) return null;
+  return {m2:parts.reduce((a,c)=>a+P.m2[c],0), src:'plano de circulación '+(P.revision||'jun-2026')};
+}
 function roomM2Label(roomId){
   const mat=roomMatrizM2(roomId), dib=roomDrawnM2(roomId);
   if(mat) return mat.m2.toFixed(1).replace(/\.0$/,'')+' m²';
+  { const pl=roomPlanoM2(roomId); if(pl) return pl.m2.toFixed(2).replace('.',',')+' m² (plano)'; }
   if(dib) return '≈'+dib.toFixed(1).replace(/\.0$/,'')+' m² (dibujado)';
   return '';
 }
@@ -4544,6 +4574,95 @@ function abrirFichaLamina(grupo){
 }
 function cerrarFichaLamina(){ document.getElementById('lamFichaModal').classList.remove('show'); }
 
+// ═══ PLANOS JUN-2026 Y OBJETOS DWG (11-11-2026) ═══════════════════════════════
+// Datos sumados SIN cambiar el plano de fondo: metraje oficial por recinto, zonas de cambio, recintos nuevos,
+// accesos y núcleos (SHARED_DATA/planos_jun2026.js) y objetos de los DWG de coordinación may-2026
+// (SHARED_DATA/dwg_objetos_may2026.js), ambos calibrados contra el plano del Atlas (< 1 px).
+var _pjOn=false, _dwgOn=false;
+try{ _pjOn=localStorage.getItem('hdsact_planjun')==='1'; _dwgOn=localStorage.getItem('hdsact_dwgobj')==='1'; }catch(e){}
+function togglePlanJun(){ _pjOn=!_pjOn; _lsPref('hdsact_planjun',_pjOn?'1':'0'); renderSVG(); }
+function toggleDwgObj(){ _dwgOn=!_dwgOn; _lsPref('hdsact_dwgobj',_dwgOn?'1':'0'); renderSVG(); }
+function _pjPiso(fid){ return ((window.PLANOS_JUN2026||{}).pisos||{})[fid||S.floorId]||null; }
+function _pjCambioTxt(z){ return z.n&&z.n.length?('Cambio '+z.n.join(', ')):(z.oftalmo?'Cambios Oftalmología':'Zona de cambio'); }
+function _planJunLayer(){
+  { const b=document.getElementById('btnPlanJun'); if(b){ b.classList.toggle('active',_pjOn); } }
+  if(!_pjOn) return; const P=_pjPiso(); if(!P) return;
+  const k=_cpK(), g=el('g',{class:'pj-layer'});
+  (P.cambios||[]).forEach(z=>{ const [x,y,w,h]=z.caja;
+    g.appendChild(el('rect',{x,y,width:w,height:h,fill:'#c026d3','fill-opacity':.07,stroke:'#c026d3','stroke-width':3*k,'stroke-dasharray':(10*k)+' '+(6*k),'pointer-events':'none'}));
+    const t=txt(x+4*k,y-6*k,_pjCambioTxt(z),{'font-size':11*k,'font-weight':800,fill:'#a21caf','text-anchor':'start','pointer-events':'none'}); g.appendChild(t); });
+  (P.nuevos||[]).forEach(n=>{ if(!n.xy) return; const [x,y]=n.xy, m=el('g',{transform:`translate(${x},${y}) scale(${k})`});
+    m.appendChild(el('circle',{r:9,fill:'#c026d3',stroke:'#fff','stroke-width':2}));
+    m.appendChild(txt(0,4,'+',{'font-size':14,'font-weight':900,fill:'#fff','pointer-events':'none'}));
+    m.appendChild(txt(0,-14,n.n+(n.m2?(' · '+String(n.m2).replace('.',',')+' m²'):''),{'font-size':10.5,'font-weight':800,fill:'#86198f',stroke:'#fff','stroke-width':3,'paint-order':'stroke','pointer-events':'none'}));
+    const ti=el('title'); ti.textContent='Recinto nuevo del plano jun-2026 (aún sin dibujar en el Atlas)\n'+n.c+' · '+n.n+(n.m2?(' · '+n.m2+' m²'):'')+'\n'+(n.cambio&&n.cambio.length?('Cambio '+n.cambio.join(', ')):''); m.appendChild(ti);
+    g.appendChild(m); });
+  const etq=(L,col,ic)=>(L||[]).forEach(a=>{ if(!a.xy) return; const [x,y]=a.xy, m=el('g',{transform:`translate(${x},${y}) scale(${k})`,'pointer-events':'none'});
+    const s=ic+' '+a.t, w=s.length*6.4+12;
+    m.appendChild(el('rect',{x:-w/2,y:-10,width:w,height:18,rx:9,fill:col,opacity:.92}));
+    m.appendChild(txt(0,3,s,{'font-size':10.5,'font-weight':800,fill:'#fff'})); g.appendChild(m); });
+  etq(P.accesos,'#15803d','🚪'); etq(P.nucleos,'#334155','⇅');
+  svg.appendChild(g);
+}
+const DWG_COL={eq:'#dc2626',mnc:'#2563eb',moa:'#16a34a',cne:'#ea580c',ver:'#7c3aed'};
+function _dwgPuntos(fid){ return ((window.DWG_OBJETOS||{}).pisos||{})[fid||S.floorId]||null; }
+function _dwgEnCajas(fid, sh){
+  const P=_dwgPuntos(fid); if(!P) return [];
+  const out=[]; Object.entries(P.puntos||{}).forEach(([gk,L])=>L.forEach(p=>{ const x=p[1], y=p[2];
+    if(sh.some(q=>x>=q.x&&x<=q.x+q.w&&y>=q.y&&y<=q.y+q.h)) out.push({g:gk, fam:P.familias[p[0]], x, y, ed:p[3]}); }));
+  return out;
+}
+function _dwgObjLayer(){
+  { const b=document.getElementById('btnDwgObj'); if(b){ b.classList.toggle('active',_dwgOn); } }
+  if(!_dwgOn || S.level<2) { if(_dwgOn && S.level<2 && typeof tbInfo!=='undefined' && tbInfo && !tbInfo.textContent) tbInfo.textContent='📦 Objetos DWG: entra a un servicio para verlos.'; return; }
+  const a=curArea(); if(!a) return; const sh=aShapes(a); if(!sh.length) return;
+  const k=_cpK(), g=el('g',{class:'dwg-layer'}), G=window.DWG_OBJETOS||{};
+  _dwgEnCajas(S.floorId, sh).forEach(o=>{ const c=el('circle',{cx:o.x,cy:o.y,r:4.5*k,fill:DWG_COL[o.g]||'#000','fill-opacity':.75,stroke:'#fff','stroke-width':1.2*k});
+    const t=el('title'); t.textContent=o.fam+'\n'+((G.grupos||{})[o.g]||o.g)+' · DWG may-2026 ('+o.ed+')'; c.appendChild(t); g.appendChild(c); });
+  svg.appendChild(g);
+}
+// Ficha: superficie (matriz / plano / dibujo) y objetos del DWG dentro del recinto
+function _fichaPlanoHtml(roomId){
+  const e=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;'), f2=v=>v.toFixed(2).replace('.',',');
+  const mat=roomMatrizM2(roomId), pl=roomPlanoM2(roomId), dib=roomDrawnM2(roomId);
+  let h='<div class="fk-sec"><div class="fk-sec-t">📐 Superficie</div><div style="font-size:12px;line-height:1.7">';
+  h+=mat?('Matriz: <b>'+f2(mat.m2)+' m²</b><br>'):'';
+  h+=pl?('Plano de circulación jun-2026: <b>'+f2(pl.m2)+' m²</b><br>'):'';
+  h+=dib?('Dibujo del Atlas: ≈'+f2(dib)+' m²'):'';
+  if(mat&&pl&&Math.abs(mat.m2-pl.m2)>=1&&Math.abs(mat.m2-pl.m2)/mat.m2>=0.10)
+    h+='<div style="margin-top:4px;color:#b45309;font-size:11px">⚠ La matriz y el plano difieren '+Math.round((pl.m2-mat.m2)/mat.m2*100)+' %: revisar la matriz.</div>';
+  if(!mat&&!pl&&!dib) h+='<span style="color:#94a3b8">Sin superficie registrada.</span>';
+  h+='</div></div>';
+  const ctx=_findRoom(roomId), sh=boxState.rooms[roomId]||[];
+  const O=ctx?_dwgEnCajas(ctx.floor.id, sh):[];
+  if(O.length){
+    const G=(window.DWG_OBJETOS||{}).grupos||{}, by={};
+    O.forEach(o=>{ const t=(by[o.g]=by[o.g]||{}); t[o.fam]=(t[o.fam]||0)+1; });
+    h+='<div class="fk-sec"><div class="fk-sec-t">📦 En el DWG de coordinación (may-2026) <span class="cnt">'+O.length+'</span></div>'
+      +Object.entries(by).map(([gk,t])=>'<div style="font-size:11px;font-weight:700;color:'+(DWG_COL[gk]||'#334155')+';margin:6px 0 2px">'+e(G[gk]||gk)+'</div>'
+        +Object.entries(t).sort((a,b)=>b[1]-a[1]).map(([fm,n])=>'<div style="font-size:11.5px;display:flex;gap:6px"><b style="min-width:24px;text-align:right">'+n+'×</b><span>'+e(fm)+'</span></div>').join('')).join('')
+      +'<div style="font-size:10.5px;color:#94a3b8;margin-top:4px">Posición del modelo Revit de mayo; referencia frente al catálogo EMMC/MNC de arriba.</div></div>';
+  }
+  return h;
+}
+// Revisiones: recintos nuevos del plano y superficie matriz vs plano
+function _pjNuevosPend(){
+  const out=[]; Object.entries(((window.PLANOS_JUN2026||{}).pisos)||{}).forEach(([fid,P])=>(P.nuevos||[]).forEach(n=>{
+    if(nameState.recintosRev && nameState.recintosRev['pjnuevo|'+fid+'|'+n.c]) return;
+    const fl=FLOORS.find(f=>f.id===fid); if(fl && fl.areas.some(a=>(a.rooms||[]).some(r=>rShapes(r).length && rCodeParts(r.id).includes(n.c)))) return;   // ya dibujado
+    out.push(Object.assign({fid, code:'pjnuevo|'+fid+'|'+n.c}, n)); }));
+  return out;
+}
+function _pjM2Pend(){
+  const out=[]; FLOORS.forEach(fl=>fl.areas.forEach(a=>(a.rooms||[]).forEach(r=>{
+    if(!rShapes(r).length) return; const mat=roomMatrizM2(r.id), pl=roomPlanoM2(r.id); if(!mat||!pl) return;
+    const d=pl.m2-mat.m2; if(Math.abs(d)<1 || Math.abs(d)/mat.m2<0.10) return;
+    const k='pjm2|'+r.id; if(nameState.recintosRev && nameState.recintosRev[k]) return;
+    out.push({r, fl, area:a, mat:mat.m2, pl:pl.m2, code:k}); })));
+  return out.sort((x,y)=>Math.abs(y.pl-y.mat)/y.mat-Math.abs(x.pl-x.mat)/x.mat);
+}
+function _pjGo(fid,x,y){ if(S.floorId!==fid) goFloor(fid); setTimeout(()=>zoomTo({x:x-260,y:y-200,w:520,h:400},60),fid===S.floorId?0:500); }
+
 function fitView(){
   const vW=viewer.clientWidth,vH=viewer.clientHeight;
   // clamp: si el viewer mide 0 en este instante (panel colgado, ventana en
@@ -4580,11 +4699,31 @@ function zoomTo(bnd,pad=80,cb=null){
 }
 // Abrir sin marear al que presenta en pantalla: el encuadre no cambia. Sólo si el destino quedó fuera
 // de la pantalla (p. ej. desde el árbol lateral) se desliza hasta él, siempre con el mismo zoom.
-function _traerSinZoom(sh){
-  if(!sh.length) return;
+function _traerSinZoom(sh, cb){
+  if(!sh.length){ if(cb) cb(); return; }
   const b=bounds(sh), vW=viewer.clientWidth, vH=viewer.clientHeight, cx=b.x+b.w/2, cy=b.y+b.h/2;
   const sx=cx*S.zoom+S.ox, sy=cy*S.zoom+S.oy;
-  if(sx<0||sx>vW||sy<0||sy>vH) animTo(S.zoom,vW/2-cx*S.zoom,vH/2-cy*S.zoom,320);
+  if(sx<0||sx>vW||sy<0||sy>vH) animTo(S.zoom,vW/2-cx*S.zoom,vH/2-cy*S.zoom,320,cb);
+  else if(cb) cb();
+}
+// Pulso de cambio de vista (11-11-2026, pedido de Matías): al entrar a un servicio o recinto el plano
+// se acerca un 5 % y vuelve; al salir, se aleja un 5 % y vuelve. El encuadre final es el MISMO
+// (se mantiene «sin zoom» al presentar): sólo marca que se pasó de una vista a otra. ~0,4 s.
+const PULSO_VISTA=0.05;
+// destino del pulso: escala f alrededor del centro del destino en pantalla (ese punto no se mueve)
+function _pulsoDestino(dir, sh){
+  const vW=viewer.clientWidth, vH=viewer.clientHeight; if(!vW||!vH) return null;
+  let ax=vW/2, ay=vH/2;
+  if(sh && sh.length){ const b=bounds(sh); const sx=(b.x+b.w/2)*S.zoom+S.ox, sy=(b.y+b.h/2)*S.zoom+S.oy;
+    if(sx>=0&&sx<=vW&&sy>=0&&sy<=vH){ ax=sx; ay=sy; } }
+  const f=dir>0?1+PULSO_VISTA:1-PULSO_VISTA;
+  return {ax, ay, f, z0:S.zoom, ox0:S.ox, oy0:S.oy, z1:S.zoom*f, ox1:ax-(ax-S.ox)*f, oy1:ay-(ay-S.oy)*f};
+}
+function _pulsoVista(dir, sh){
+  if(typeof _SELFTEST!=='undefined' && _SELFTEST) return;
+  try{ if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; }catch(e){}
+  const p=_pulsoDestino(dir, sh); if(!p) return;
+  animTo(p.z1, p.ox1, p.oy1, 160, ()=>animTo(p.z0, p.ox0, p.oy0, 260));
 }
 
 // ═══ PAN — works from ANYWHERE: free space OR semi-transparent boxes ═══════
@@ -4704,6 +4843,7 @@ function goBack(n=1){
   S.level=h.level; S.areaId=h.areaId; S.roomId=h.roomId;
   S.selIds.clear(); S.delDotMode=false; delHint.classList.remove('show'); viewer.classList.remove('del-mode');
   if(auto||_esTelefono()) animTo(h.zoom,h.ox,h.oy,700,()=>{renderSVG();updateUI();});
+  else _pulsoVista(-1);
   renderSVG(); updateUI();
 }
 // sinZoom: clic en el plano o en el árbol. Sin él (buscador, reportes, «ir a») se sigue encuadrando,
@@ -4712,7 +4852,7 @@ function goArea(id,sinZoom){
   if(didPan)return;
   pushH(); S.areaId=id; S.level=2; S.selIds.clear();
   const _sz=sinZoom&&!_esTelefono(); if(!_sz) S.history[S.history.length-1].auto=true;
-  const _asSh=aShapes(curFloor().areas.find(a=>a.id===id)); if(_sz){ _traerSinZoom(_asSh); }else if(_asSh.length){zoomTo(bounds(_asSh));}else{const{zoom,ox,oy}=fitView();animTo(zoom,ox,oy,700);}
+  const _asSh=aShapes(curFloor().areas.find(a=>a.id===id)); if(_sz){ _traerSinZoom(_asSh, ()=>_pulsoVista(1,_asSh)); }else if(_asSh.length){zoomTo(bounds(_asSh));}else{const{zoom,ox,oy}=fitView();animTo(zoom,ox,oy,700);}
   renderSVG(); updateUI();
 }
 function goRoom(id,sinZoom){
@@ -4721,7 +4861,7 @@ function goRoom(id,sinZoom){
   const _sz=sinZoom&&!_esTelefono(); if(!_sz) S.history[S.history.length-1].auto=true;
   const _rsSh=rShapes(curArea().rooms.find(r=>r.id===id));
   renderSVG(); updateUI();
-  if(_sz){ _traerSinZoom(_rsSh); return; }
+  if(_sz){ _traerSinZoom(_rsSh, ()=>_pulsoVista(1,_rsSh)); return; }
   if(_rsSh.length){
     // con el listado ordenado, el encuadre incluye el recinto y su listado
     let bb=bounds(_rsSh); const rp=svg.querySelector('.roster-panel');
@@ -5332,6 +5472,8 @@ function renderSVG(){
   { const lg=document.getElementById('cpLegend');
     if(_cpOn){ try{ _cpLayer(); }catch(e){ console.warn('carros de paro',e); } } else if(lg) lg.style.display='none'; }
   try{ _laminasFichaLayer(); }catch(e){ console.warn('ficha de lámina',e); }
+  try{ _planJunLayer(); }catch(e){ console.warn('planos jun',e); }
+  try{ _dwgObjLayer(); }catch(e){ console.warn('objetos dwg',e); }
   if(S.level===2 && _ofOn) try{ _oficinasLayer(); }catch(e){ console.warn('oficinas',e); }
   if(S.level===1) try{ _instLayer(fl); }catch(e){ console.warn('instituciones',e); }
   try{ renderEscSel(); }catch(e){}
@@ -8072,7 +8214,7 @@ const CAPAS_BARRA=[
   ['btnDotNames','Nombres'],['btnDotLista','En lista'],['btnAsigN','N° asig.'],['btnSoloReemp','Reemplazos'],'|',
   ['btnVert','Ascensores'],['btnReloj','Relojes'],['btnCorreoN','Correo N.'],['btnEstac','Estacion.'],['btnPuertasVis','Puertas'],['btnJardines','Jardines'],['btnLaminas','Láminas'],['btnOficinas','Oficinas'],'|',
   ['dkUbicCarro','Carros paro'],['dkUbicDea','DEA'],['dkUbicTotem','Tótems'],['btnImpresoras','Impresoras'],['btnShowPC','PC'],'|',
-  ['btnShowTomas','Tomas'],['btnShowGases','Gases'],['btnCcdd','C. débiles'],['btnPP','PINS'],['btnLineas','Líneas piso']
+  ['btnShowTomas','Tomas'],['btnShowGases','Gases'],['btnCcdd','C. débiles'],['btnPP','PINS'],['btnLineas','Líneas piso'],['btnPlanJun','Planos jun'],['btnDwgObj','Objetos DWG']
 ];
 const DOCK_MAPA=[
   ['dkIr',    ['btnBuscaRec']],
@@ -12244,6 +12386,7 @@ function openFichaRecinto(roomId){
     `</div>`;
   document.getElementById('fkBody').innerHTML=
     senHtml+
+    _fichaPlanoHtml(roomId)+
     `<div class="fk-sec"><div class="fk-sec-t">⚙️ Equipamiento <span class="cnt">${eq.length}</span></div>${eqHtml}</div>`+
     `<div class="fk-sec"><div class="fk-sec-t">🛏️ Mobiliario Clínico <span class="cnt">${mobCli.length}</span></div>${mobCliHtml}</div>`+
     `<div class="fk-sec"><div class="fk-sec-t">🖥️ Informática <span class="cnt">${informatica.length}</span></div>${tiHtml}</div>`+
@@ -15516,6 +15659,22 @@ function _bimPlanoPendientes(){
   return out;
 }
 const REV_CHECKS={
+  pj_nuevos:{label:'Planos jun-2026: recintos nuevos sin dibujar',
+    find:_pjNuevosPend, flat:true, approve:true,
+    okTitle:'Ya está dibujado o no corresponde',
+    allLabel:n=>'✓ Marcar los '+n+' como revisados',
+    apply:p=>{ nameState.recintosRev=nameState.recintosRev||{}; nameState.recintosRev[p.code]=1; },
+    go:p=>{ if(p.xy) _pjGo(p.fid,p.xy[0],p.xy[1]); }, goDestino:p=>!!p.xy,
+    subText:p=>'➕ '+p.c+' · '+p.n+(p.m2?(' · '+String(p.m2).replace('.',',')+' m²'):'')+' · '+p.fid+(p.cambio&&p.cambio.length?(' · cambio '+p.cambio.join(', ')):'')+' · dibujar la caja con este código (el m² lo toma solo)',
+    done:'No quedan recintos nuevos del plano de junio por dibujar.'},
+  pj_m2:{label:'Superficie: matriz vs plano jun-2026 (≥ 10 %)',
+    find:_pjM2Pend, flat:true, approve:true,
+    okTitle:'Revisado (la matriz se corrige aparte)',
+    allLabel:n=>'✓ Marcar los '+n+' como revisados',
+    apply:p=>{ nameState.recintosRev=nameState.recintosRev||{}; nameState.recintosRev[p.code]=1; },
+    go:p=>{ if(S.floorId!==p.fl.id) goFloor(p.fl.id); didPan=false; goArea(p.area.id); didPan=false; goRoom(p.r.id); },
+    subText:p=>'📐 '+(rName(p.r.id)||'')+' · '+(rCode(p.r.id)||'')+' · '+p.fl.id+' · matriz '+p.mat.toFixed(2).replace('.',',')+' m² · plano '+p.pl.toFixed(2).replace('.',',')+' m² ('+(p.pl>p.mat?'+':'')+Math.round((p.pl-p.mat)/p.mat*100)+' %)',
+    done:'La superficie de la matriz cuadra con el plano de junio en todos los recintos comparables.'},
   senalnum:{label:'Señalética: N° del Atlas ≠ REV 5',
     find:_senalNumPendientes, approve:true, noDialog:true, flat:true,
     okTitle:'Escribir el N° oficial de la REV 5 (el 🚫 deja el del Atlas)',
@@ -16301,7 +16460,7 @@ function updateUI(){
     if(S.level<2&&S.puertaMode){ S.puertaMode=false; if(bpu)bpu.classList.remove('active'); const ph=document.getElementById('puertaHint'); if(ph)ph.classList.remove('show'); svg.style.cursor=''; }
     if(S.level!==3&&S.stampMode){ S.stampMode=false; if(bdm)bdm.classList.remove('active'); const sh=document.getElementById('stampHint'); if(sh)sh.classList.remove('show'); svg.style.cursor=''; }
     const bxs=document.getElementById('btnExpServ'); if(bxs) bxs.style.display=(S.level===2)?'':'none';
-    const bms=document.getElementById('btnMapaServ'); if(bms) bms.style.display=(S.level===2)?'':'none';
+    const bms=document.getElementById('btnMapaServ'); if(bms) bms.style.display=(S.level===1||S.level===2)?'':'none';
     const bmu=document.getElementById('btnMurosServ'); if(bmu) bmu.style.display=(S.level===2)?'':'none';
     const bds=document.getElementById('btnDotServ'); if(bds) bds.style.display=(S.level===2)?'':'none'; }
   // Area jump selector: show at level 1 so user can navigate to any area (even without drawn shape)
@@ -16938,12 +17097,18 @@ function exportServicioHTML(){
 // No incluye funcionarios.
 function _servRecorte(){
   const area=curArea(); if(!area) return null;
-  const aSh=aShapes(area); if(!aSh.length) return {area, error:'Este servicio no tiene contorno dibujado.'};
+  return _servRecorteDe(area, curFloor(), floorImg, _imgK(), 2600);
+}
+// Igual que _servRecorte pero para cualquier servicio de cualquier piso (exporte por piso o edificio):
+// img = imagen del plano de ese piso (puede ser la «mid»), k = px de la imagen por px del plano.
+function _servRecorteDe(area, fl, img, k, maxW){
+  const aSh=aShapes(area); if(!aSh.length) return {area, floor:fl, error:'Este servicio no tiene contorno dibujado.'};
+  const D=(fl&&FLOOR_DIMS[fl.id])||{w:IMG_W,h:IMG_H};
   const PAD=60, ab=bounds(aSh);
   const b={x:Math.max(0,ab.x-PAD), y:Math.max(0,ab.y-PAD)};
-  b.w=Math.min(IMG_W,ab.x+ab.w+PAD)-b.x; b.h=Math.min(IMG_H,ab.y+ab.h+PAD)-b.y;
+  b.w=Math.min(D.w,ab.x+ab.w+PAD)-b.x; b.h=Math.min(D.h,ab.y+ab.h+PAD)-b.y;
   let dataURL=null;
-  const maxW=2600, sc=Math.min(1, maxW/Math.max(b.w,b.h));
+  const sc=Math.min(1, (maxW||2600)/Math.max(b.w,b.h));
   try{
     const cv=document.createElement('canvas');
     cv.width=Math.round(b.w*sc); cv.height=Math.round(b.h*sc);
@@ -16951,7 +17116,7 @@ function _servRecorte(){
     cx.fillStyle='#ffffff'; cx.fillRect(0,0,cv.width,cv.height);
     cx.save(); cx.beginPath();
     aSh.forEach(s=>cx.rect((s.x-b.x)*sc,(s.y-b.y)*sc,s.w*sc,s.h*sc));
-    cx.clip(); { const k=_imgK(); cx.drawImage(floorImg, b.x*k,b.y*k,b.w*k,b.h*k, 0,0,cv.width,cv.height); } cx.restore();
+    cx.clip(); cx.drawImage(img, b.x*k,b.y*k,b.w*k,b.h*k, 0,0,cv.width,cv.height); cx.restore();
     dataURL=cv.toDataURL('image/jpeg',0.86);
   }catch(e){}
   const rel=q=>({x:q.x-b.x, y:q.y-b.y, w:q.w, h:q.h});
@@ -16965,25 +17130,17 @@ function _servRecorte(){
       d:unionPath(sh.map(rel)).replace(/-?\d+\.\d+/g,m=>(+m).toFixed(1))});
   });
   rooms.sort((a,c)=>String(a.code).localeCompare(String(c.code),'es',{numeric:true})||String(a.nm).localeCompare(String(c.nm),'es'));
-  return {area, aSh, b, dataURL, planAbs:new URL(floorImg.getAttribute('src'), location.href).href, guiaD, rooms,
+  return {area, floor:fl, aSh, b, dataURL, planAbs:new URL((img&&img.getAttribute&&img.getAttribute('src'))||floorImg.getAttribute('src'), location.href).href, guiaD, rooms,
           sinDibujo:(area.rooms||[]).length-rooms.length};
 }
-function _mapaServicioHTML(R){
+function _mapaSvgLey(R, sufijo){
   const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
-  const nomServ=aName(R.area.id), piso=(curFloor()||{}).label||S.floorId;
-  const fecha=new Date().toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
-  const N=R.rooms.length, apaisado=R.b.w>=R.b.h*0.95;
-  // el plano ocupa una hoja carta (0,5 in de margen): 10 × 7,5 in apaisado, 7,5 × 10 vertical
-  const paginaW=apaisado?10:7.5, paginaH=apaisado?7.5:10, cab=0.7, pie=0.35;
-  // leyenda: al costado en apaisado (2,9 in, dos columnas si son muchos), abajo en vertical
-  const lado=apaisado&&N<=30, abajo=!apaisado&&N<=16, aparte=!lado&&!abajo;   // dónde va la leyenda
-  const leyAncho=lado?2.9:0, mapaW=paginaW-leyAncho-(leyAncho?0.15:0);
-  const mapaH=abajo?Math.min(paginaH-cab-pie-1.7, mapaW*R.b.h/R.b.w):(paginaH-cab-pie);
+  const cpId='cp'+(sufijo||'');
   const ms=Math.max(30,Math.min(70,Math.min(R.b.w,R.b.h)/26));       // marcador en px del plano
   let svg='<svg viewBox="0 0 '+R.b.w+' '+R.b.h+'" preserveAspectRatio="xMidYMid meet">';
-  svg+='<defs><clipPath id="cp"><path d="'+R.guiaD+'"/></clipPath></defs>';
-  svg+=R.dataURL?('<image href="'+R.dataURL+'" x="0" y="0" width="'+R.b.w+'" height="'+R.b.h+'" clip-path="url(#cp)"/>')
-    :('<image href="'+R.planAbs+'" x="'+(-R.b.x)+'" y="'+(-R.b.y)+'" width="'+IMG_W+'" height="'+IMG_H+'" clip-path="url(#cp)"/>');
+  svg+='<defs><clipPath id="'+cpId+'"><path d="'+R.guiaD+'"/></clipPath></defs>';
+  svg+=R.dataURL?('<image href="'+R.dataURL+'" x="0" y="0" width="'+R.b.w+'" height="'+R.b.h+'" clip-path="url(#'+cpId+')"/>')
+    :('<image href="'+R.planAbs+'" x="'+(-R.b.x)+'" y="'+(-R.b.y)+'" width="'+IMG_W+'" height="'+IMG_H+'" clip-path="url(#'+cpId+')"/>');
   svg+='<path d="'+R.guiaD+'" fill="none" stroke="#e11d48" stroke-width="'+(ms*.12)+'" stroke-dasharray="'+(ms*.6)+' '+(ms*.3)+'" stroke-linejoin="round"/>';
   R.rooms.forEach(r=>{ svg+='<path d="'+r.d+'" fill-rule="evenodd" fill="'+r.col+'" fill-opacity=".16" stroke="'+r.col+'" stroke-width="'+(ms*.07)+'" stroke-linejoin="round"/>'; });
   R.rooms.forEach((r,i)=>{
@@ -16996,6 +17153,20 @@ function _mapaServicioHTML(R){
   const tipos={}; R.rooms.forEach(r=>{ (tipos[r.tipo]=tipos[r.tipo]||{n:0,col:r.col}).n++; });
   const ley=R.rooms.map((r,i)=>'<li><span class="n" style="border-color:'+r.col+'">'+(i+1)+'</span><span class="t"><b>'+esc(r.nm)+'</b>'
     +((r.code||r.bim)?' <span class="c">'+esc([r.code,r.bim?('BIM '+r.bim):''].filter(Boolean).join(' · '))+'</span>':'')+((r.sen||r.senN)?'<br><span class="s">🪧 '+esc([r.sen,r.senN?('N° '+r.senN):''].filter(Boolean).join(' · '))+'</span>':'')+'</span></li>').join('');
+  return {svg, ley, tipos};
+}
+function _mapaServicioHTML(R){
+  const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const nomServ=aName(R.area.id), piso=(R.floor||curFloor()||{}).label||S.floorId;
+  const fecha=new Date().toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const N=R.rooms.length, apaisado=R.b.w>=R.b.h*0.95;
+  // el plano ocupa una hoja carta (0,5 in de margen): 10 × 7,5 in apaisado, 7,5 × 10 vertical
+  const paginaW=apaisado?10:7.5, paginaH=apaisado?7.5:10, cab=0.7, pie=0.35;
+  // leyenda: al costado en apaisado (2,9 in, dos columnas si son muchos), abajo en vertical
+  const lado=apaisado&&N<=30, abajo=!apaisado&&N<=16, aparte=!lado&&!abajo;   // dónde va la leyenda
+  const leyAncho=lado?2.9:0, mapaW=paginaW-leyAncho-(leyAncho?0.15:0);
+  const mapaH=abajo?Math.min(paginaH-cab-pie-1.7, mapaW*R.b.h/R.b.w):(paginaH-cab-pie);
+  const {svg, ley, tipos}=_mapaSvgLey(R,'');
   return ['<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>Mapa '+esc(nomServ)+' · '+esc(piso)+' · Atlas HDS</title>',
 '<style>',
 '@page{size:letter '+(apaisado?'landscape':'portrait')+';margin:0.5in}',
@@ -17032,12 +17203,218 @@ function _mapaServicioHTML(R){
 '<footer><span>Contorno punteado = límite del servicio · los números van sobre cada recinto · BIM = código del recinto en el modelo de la Sociedad Concesionaria'+(R.sinDibujo?(' · '+R.sinDibujo+' recinto(s) aún sin dibujar no aparecen'):'')+'</span><span>Solo consulta · sin información de funcionarios</span></footer>',
 '</body></html>'].join('\n');
 }
-function exportMapaServicio(soloHtml){
+
+// ── Exportar servicio · carta con secciones a elección (10-11-2026) ──────────
+// El mapa carta es la base (plano + recintos numerados). Se le suman, si se marcan:
+// 📋 ficha de recintos (equipamiento, mobiliario, TI, MNC), 🩺 Autorización Sanitaria
+// (pauta y estado por recinto) y 👥 dotación cubicada (puestos con persona, SIN RUT).
+// Sin marcar nada sale sólo el plano con la lista de recintos. Mismo N° que el plano.
+const MC_OPC=[
+  {k:'ficha', t:'📋 Ficha de recintos', d:'Equipamiento médico, mobiliario clínico, informática y mobiliario no clínico de cada recinto (matriz EMMC/MNC).'},
+  {k:'as',    t:'🩺 Autorización Sanitaria', d:'Estado de la pauta de cada recinto (validada, sugerida, sin pauta, no corresponde) y las pautas asignadas.'},
+  {k:'dot',   t:'👥 Dotación cubicada', d:'Personas con puesto dibujado en cada recinto: nombre, estamento y cargo (sin RUT). Puestos sin persona se cuentan aparte.'}];
+function _mcOpc(){ let o={}; try{ o=JSON.parse(localStorage.getItem('hdsact_mapa_opc')||'{}')||{}; }catch(e){} return o; }
+let _mcAlc=null;
+function mapaServAbrir(){
+  const area=S.level===2?curArea():null, fl=curFloor();
+  const o=_mcOpc(), esc=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const nAA=_mcServicios({tipo:'edificio',ed:'AA'}).length, nHDS=_mcServicios({tipo:'edificio',ed:'HDS'}).length, nPiso=_mcServicios({tipo:'piso',fid:fl.id}).length;
+  const ALC=[];
+  if(area) ALC.push({k:'serv', t:'Este servicio', d:aName(area.id)+' · '+fl.label});
+  ALC.push({k:'piso', t:'Piso completo', d:fl.label+' · '+nPiso+' servicios'});
+  ALC.push({k:'AA', t:'Edificio Atención Abierta (AA)', d:'todos los pisos · '+nAA+' servicios'});
+  ALC.push({k:'HDS', t:'Edificio Atención Cerrada (HDS)', d:'todos los pisos · '+nHDS+' servicios (incluye servicios generales sin BIM)'});
+  if(!_mcAlc || !ALC.some(x=>x.k===_mcAlc)) _mcAlc=area?'serv':'piso';
+  document.getElementById('mcSub').textContent='Plano carta para imprimir o guardar como PDF';
+  const res=()=>{ const n=MC_OPC.filter(x=>document.getElementById('mc_'+x.k)&&document.getElementById('mc_'+x.k).checked).length;
+    const r=document.getElementById('mcRes'); if(r) r.textContent=(_mcAlc==='serv'?'':'Portada con índice, una lámina general por piso y cada servicio con su plano. ')
+      +(n?('Se suman '+n+' sección'+(n>1?'es':'')+' por servicio.'):'Sin secciones: sólo planos con la lista de recintos (nombre, código, BIM y señalética).'); };
+  document.getElementById('mcBody').innerHTML=
+    '<div style="font-size:var(--fs-xs);font-weight:700;margin-bottom:6px">Alcance</div>'
+    +ALC.map(x=>'<label class="mc-op"><input type="radio" name="mcAlc" value="'+x.k+'" '+(_mcAlc===x.k?'checked':'')+'><span><b>'+esc(x.t)+'</b><small>'+esc(x.d)+'</small></span></label>').join('')
+    +'<div style="font-size:var(--fs-xs);font-weight:700;margin:12px 0 6px">Secciones a sumar (una, varias o ninguna)</div>'
+    +MC_OPC.map(x=>'<label class="mc-op"><input type="checkbox" id="mc_'+x.k+'" '+(o[x.k]?'checked':'')+'><span><b>'+esc(x.t)+'</b><small>'+esc(x.d)+'</small></span></label>').join('')
+    +'<div class="mc-res" id="mcRes"></div>'
+    +'<div class="mc-btns"><button class="tb-btn" onclick="mapaServCerrar()">Cancelar</button><button class="tb-btn active" id="mcGo" onclick="mapaServExportar()">🖨 Exportar PDF</button></div>';
+  MC_OPC.forEach(x=>{ const c=document.getElementById('mc_'+x.k); if(c) c.addEventListener('change',res); });
+  document.querySelectorAll('#mcBody input[name=mcAlc]').forEach(r=>r.addEventListener('change',()=>{ _mcAlc=r.value; res(); }));
+  res(); document.getElementById('mcModal').classList.add('show');
+}
+function mapaServCerrar(){ document.getElementById('mcModal').classList.remove('show'); }
+function mapaServExportar(){
+  const o={}; MC_OPC.forEach(x=>{ const c=document.getElementById('mc_'+x.k); o[x.k]=!!(c&&c.checked); });
+  _lsPref('hdsact_mapa_opc', JSON.stringify(o));
+  if(_mcAlc==='serv'){ mapaServCerrar(); exportMapaServicio(false, o); return; }
+  const alc=_mcAlc==='piso'?{tipo:'piso',fid:S.floorId}:{tipo:'edificio',ed:_mcAlc};
+  const bt=document.getElementById('mcGo'); if(bt){ bt.disabled=true; bt.textContent='⏳ Armando…'; }
+  // la ventana se abre YA (gesto del usuario) para que el navegador no la bloquee; se llena al terminar
+  const w=window.open('', '_blank'); if(w){ w.document.write('<p style="font-family:sans-serif;padding:20px">Armando el documento… puede tardar unos segundos por piso.</p>'); }
+  exportMapaGlobal(alc, o, false).then(html=>{
+    mapaServCerrar();
+    if(w && html){ w.document.open(); w.document.write(html); w.document.close(); w.onload=()=>setTimeout(()=>{ try{ w.focus(); w.print(); }catch(e){} },600); }
+  }).catch(e=>{ alert('No se pudo armar el documento: '+e.message); if(w) w.close(); })
+    .finally(()=>{ if(bt){ bt.disabled=false; bt.textContent='🖨 Exportar PDF'; } });
+}
+// ── Exporte global: piso completo o edificio (12-11-2026, pedido de Meylin Canales) ────────────────
+// Edificio de un servicio = letra del BIM de sus recintos (A = Atención Abierta; H y otras = Atención
+// Cerrada). Sin BIM (comercios, casino, cocina…): el del servicio vecino más cercano del mismo piso.
+let _mcEdifMemo=null;
+function _edifServicio(fl, a){
+  if(!_mcEdifMemo){ _mcEdifMemo={};
+    FLOORS.forEach(f=>{ const sinLetra=[];
+      f.areas.forEach(x=>{ const c={}; (x.rooms||[]).forEach(r=>((rBim(r.id)||'').match(/[A-Za-z]\d{3,5}/g)||[]).forEach(b=>{ const L=b[0].toUpperCase(); c[L]=(c[L]||0)+1; }));
+        const top=Object.entries(c).sort((p,q)=>q[1]-p[1])[0];
+        if(top) _mcEdifMemo[x.id]=top[0]==='A'?'AA':'HDS'; else sinLetra.push(x); });
+      sinLetra.forEach(x=>{ const sh=aShapes(x); if(!sh.length){ _mcEdifMemo[x.id]='HDS'; return; }
+        const b=bounds(sh), cx=b.x+b.w/2, cy=b.y+b.h/2; let mej=null, md=1e18;
+        f.areas.forEach(y=>{ if(!_mcEdifMemo[y.id]||sinLetra.includes(y)) return; const s2=aShapes(y); if(!s2.length) return; const c2=bounds(s2);
+          const d=Math.hypot(c2.x+c2.w/2-cx, c2.y+c2.h/2-cy); if(d<md){ md=d; mej=y; } });
+        _mcEdifMemo[x.id]=mej?_mcEdifMemo[mej.id]:'HDS'; });
+    }); }
+  return _mcEdifMemo[a.id]||'HDS';
+}
+function _mcServicios(alc){
+  const out=[];
+  FLOORS.forEach(f=>{ if(alc.tipo==='piso' && f.id!==alc.fid) return;
+    f.areas.forEach(a=>{ if(!aShapes(a).length || !(a.rooms||[]).some(r=>rShapes(r).length)) return;
+      if(alc.tipo==='edificio' && _edifServicio(f,a)!==alc.ed) return; out.push({fl:f, a}); }); });
+  return out;
+}
+function _imgPiso(fid){
+  const cand=['CABIDA_DATA/mid/plan_'+fid+'.webp','CABIDA_DATA/mid/plan_'+fid+'_color.webp','CABIDA_DATA/plan_'+fid+'.webp','CABIDA_DATA/plan_'+fid+'_color.webp'];
+  return new Promise((ok,mal)=>{ const prueba=i=>{ if(i>=cand.length){ mal(new Error('sin plano para '+fid)); return; }
+    const im=new Image(); im.onload=()=>ok({img:im, k:im.naturalWidth/((FLOOR_DIMS[fid]||{w:IMG_W}).w)}); im.onerror=()=>prueba(i+1); im.src=cand[i]; }; prueba(0); });
+}
+const _MC_TONOS=['#2563eb','#0d9488','#7c3aed','#0891b2','#16a34a','#c2410c','#be123c','#4f46e5','#0f766e','#a16207'];
+async function exportMapaGlobal(alc, opc, soloHtml){
+  const esc=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const L=_mcServicios(alc); if(!L.length){ alert('No hay servicios dibujados en este alcance.'); return null; }
+  const fecha=new Date().toLocaleDateString('es-CL',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const titulo=alc.tipo==='piso'?('Piso completo · '+(FLOORS.find(f=>f.id===alc.fid)||{}).label):(alc.ed==='AA'?'Edificio Atención Abierta (AA)':'Edificio Atención Cerrada (HDS)');
+  const porPiso=[]; FLOORS.forEach(f=>{ const s=L.filter(x=>x.fl.id===f.id); if(s.length) porPiso.push({fl:f, serv:s}); });
+  let n=0, cssSec='', paginas=[];
+  for(const P of porPiso){
+    const {img,k}=await _imgPiso(P.fl.id);
+    // lámina general del piso: los servicios del alcance numerados sobre el plano
+    const sh=P.serv.flatMap(x=>aShapes(x.a)), bb=bounds(sh), D=FLOOR_DIMS[P.fl.id]||{w:IMG_W,h:IMG_H}, PAD=120;
+    const b={x:Math.max(0,bb.x-PAD), y:Math.max(0,bb.y-PAD)}; b.w=Math.min(D.w,bb.x+bb.w+PAD)-b.x; b.h=Math.min(D.h,bb.y+bb.h+PAD)-b.y;
+    let url=null; try{ const sc=Math.min(1,2400/Math.max(b.w,b.h)); const cv=document.createElement('canvas'); cv.width=Math.round(b.w*sc); cv.height=Math.round(b.h*sc);
+      const cx=cv.getContext('2d'); cx.fillStyle='#fff'; cx.fillRect(0,0,cv.width,cv.height); cx.globalAlpha=.55; cx.drawImage(img,b.x*k,b.y*k,b.w*k,b.h*k,0,0,cv.width,cv.height); url=cv.toDataURL('image/jpeg',0.8); }catch(e){}
+    const ms=Math.max(90,Math.min(320,Math.max(b.w,b.h)/28));   // número visible aunque el piso sea alto y angosto
+    let g='<svg viewBox="0 0 '+b.w.toFixed(0)+' '+b.h.toFixed(0)+'" preserveAspectRatio="xMidYMid meet">'+(url?'<image href="'+url+'" x="0" y="0" width="'+b.w.toFixed(0)+'" height="'+b.h.toFixed(0)+'"/>':'');
+    const items=P.serv.map((x,i)=>{ const num=n+i+1, col=_MC_TONOS[i%_MC_TONOS.length], s2=aShapes(x.a), c=bounds(s2);
+      g+='<path d="'+unionPath(s2.map(q=>({x:q.x-b.x,y:q.y-b.y,w:q.w,h:q.h})))+'" fill="'+col+'" fill-opacity=".14" stroke="'+col+'" stroke-width="'+(ms*.09)+'" stroke-linejoin="round"/>';
+      return {num, col, cx:c.x+c.w/2-b.x, cy:c.y+c.h/2-b.y, x}; });
+    items.forEach(it=>{ g+='<circle cx="'+it.cx.toFixed(0)+'" cy="'+it.cy.toFixed(0)+'" r="'+(ms/2)+'" fill="#fff" stroke="'+it.col+'" stroke-width="'+(ms*.12)+'"/><text x="'+it.cx.toFixed(0)+'" y="'+(it.cy+ms*.03).toFixed(0)+'" text-anchor="middle" dominant-baseline="middle" font-size="'+(ms*.5)+'" font-weight="800" fill="#0f172a">'+it.num+'</text>'; });
+    g+='</svg>';
+    paginas.push('<section class="pg"><header><div><h1>'+esc(P.fl.label)+' · vista general</h1><div class="sub">'+esc(titulo)+' · '+P.serv.length+' servicios</div></div></header>'
+      +'<div class="cuerpo"><div class="mapa">'+g+'</div><aside><h2>Servicios</h2><ol>'
+      +items.map(it=>'<li><span class="n" style="border-color:'+it.col+'">'+it.num+'</span><span class="t"><b>'+esc(aName(it.x.a.id))+'</b> <span class="c">'+(it.x.a.rooms||[]).filter(r=>rShapes(r).length).length+' recintos</span></span></li>').join('')
+      +'</ol></aside></div></section>');
+    // cada servicio
+    for(const it of items){
+      const R=_servRecorteDe(it.x.a, P.fl, img, k, 1800); if(!R||R.error||!R.rooms.length) continue;
+      const {svg, ley}=_mapaSvgLey(R, '_'+it.num), N=R.rooms.length, lado=N<=30;
+      paginas.push('<section class="pg"><header><div><h1><span class="nn">'+it.num+'</span>'+esc(aName(R.area.id))+'</h1><div class="sub">'+esc(P.fl.label)+' · '+N+' recintos · '+esc(titulo)+'</div></div></header>'
+        +'<div class="cuerpo'+(lado?'':' col')+'"><div class="mapa'+(lado?'':' ancho')+'">'+svg+'</div>'+(lado?('<aside><h2>Recintos</h2><ol>'+ley+'</ol></aside>'):'')+'</div></section>'
+        +(lado?'':('<section class="pg"><header><div><h1><span class="nn">'+it.num+'</span>'+esc(aName(R.area.id))+' · recintos</h1></div></header><ol class="cols">'+ley+'</ol></section>')));
+      const ex=opc?_mcSeccionesHTML(R,opc):'';
+      if(ex){ const i=ex.indexOf('</style>'); if(!cssSec && i>=0) cssSec=ex.slice(0,i+8); paginas.push('<div class="sec-de"><b>'+esc(aName(R.area.id))+'</b> · '+esc(P.fl.label)+'</div>'+(i>=0?ex.slice(i+8):ex)); }
+    }
+    n+=P.serv.length;
+  }
+  const indice=porPiso.map(P=>'<tr><td colspan="3" class="pp">'+esc(P.fl.label)+'</td></tr>'+P.serv.map(x=>'<tr><td></td><td>'+esc(aName(x.a.id))+'</td><td class="n">'+(x.a.rooms||[]).filter(r=>rShapes(r).length).length+'</td></tr>').join('')).join('');
+  const html=['<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>'+esc(titulo)+' · Atlas HDS</title><style>',
+'@page{size:letter landscape;margin:0.45in}',
+'*{margin:0;padding:0;box-sizing:border-box}',
+'html,body{background:#fff;color:#0f172a;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;-webkit-print-color-adjust:exact;print-color-adjust:exact}',
+'body{width:10.1in;margin:0 auto}',
+'.pg{break-before:page;height:7.55in;overflow:hidden;padding-top:2px}',
+'.portada{height:7.55in}',
+'header{display:flex;justify-content:space-between;border-bottom:2px solid #1d5fa0;padding-bottom:4px;margin-bottom:6px}',
+'h1{font-size:14pt;font-weight:800;color:#1d5fa0;display:flex;align-items:center;gap:8px}',
+'h1 .nn{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;border:2px solid #1d5fa0;border-radius:50%;font-size:10pt}',
+'.sub{font-size:8.5pt;color:#475569;margin-top:2px}',
+'.cuerpo{display:flex;gap:0.15in}',
+'.mapa{width:7.05in;height:6.75in;border:1px solid #cbd5e1;border-radius:6px;overflow:hidden;flex-shrink:0}',
+'.mapa.ancho{width:10.1in}',
+'.mapa svg{width:100%;height:100%;display:block}',
+'.mapa .bimtx{display:none}','body.conbim .mapa .bimtx{display:inline}',
+'aside{width:2.9in;height:6.75in;overflow:hidden}',
+'aside h2{font-size:8pt;font-weight:800;text-transform:uppercase;color:#1d5fa0;border-bottom:1px solid #dbe7f2;margin-bottom:4px}',
+'ol{list-style:none}','ol.cols{column-count:3;column-gap:0.2in}',
+'li{display:flex;gap:5px;font-size:7.6pt;line-height:1.25;padding:1.5px 0;break-inside:avoid}',
+'li .n{flex-shrink:0;min-width:15px;height:15px;border:1.5px solid #64748b;border-radius:50%;font-size:6.6pt;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 2px;margin-top:1px}',
+'li .c{color:#64748b;font-size:.9em}','li .s{color:#7c2d12;font-size:.9em}',
+'.sec-de{break-before:page;font-size:8pt;color:#475569;margin-bottom:-2px}','.sec-de + style + .xs, .sec-de + .xs{break-before:avoid}',
+'table.ix{width:100%;border-collapse:collapse;font-size:8.5pt;margin-top:10px}','table.ix td{padding:2px 6px;border-bottom:1px solid #e2e8f0}','table.ix td.pp{font-weight:800;color:#1d5fa0;padding-top:8px}','table.ix td.n{text-align:right;color:#64748b}',
+'#ctl{position:fixed;top:10px;right:10px;display:flex;gap:6px}#ctl button{background:#1d5fa0;color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer}',
+'@media print{#ctl{display:none}}',
+'</style>'+cssSec.replace(/^<style>/,'<style>').replace('.xs{break-before:page','.xs{break-before:avoid'),'</head><body>',
+'<div id="ctl"><button onclick="document.body.classList.toggle(\'conbim\');this.textContent=document.body.classList.contains(\'conbim\')?\'🏷 Ocultar BIM del plano\':\'🏷 BIM en el plano\'">🏷 BIM en el plano</button><button onclick="window.print()">🖨 Imprimir / Guardar PDF</button></div>',
+'<section class="portada"><header><div><h1>🗺 '+esc(titulo)+'</h1><div class="sub">'+porPiso.length+' piso(s) · '+L.length+' servicios · Atlas HDS · '+fecha+(opc&&MC_OPC.some(x=>opc[x.k])?(' · con '+MC_OPC.filter(x=>opc[x.k]).map(x=>x.t.replace(/^\S+\s/,'')).join(', ')):'')+'</div></div></header>',
+'<table class="ix">'+indice+'</table>',
+'<p class="sub" style="margin-top:10px">Edificio según el BIM de los recintos (A = Atención Abierta; H = Atención Cerrada). Servicios sin BIM (comercios, casino, cocina…) se asignan al edificio del servicio vecino. Contorno = límite del servicio; los números van sobre cada recinto. Sin RUT.</p></section>',
+paginas.join('\n'),
+'</body></html>'].join('\n');
+  if(soloHtml) return html;
+  const nom=('Mapa_'+titulo).replace(/[^A-Za-z0-9Ññ]+/g,'_').replace(/^_|_$/g,'')+'_'+new Date().toISOString().slice(0,10)+'.html';
+  try{ await guardarArchivo('Servicios', nom, html, 'text/html'); }catch(e){}
+  return html;
+}
+// puestos dibujados de un recinto: personas (sin RUT) y puestos vacíos
+function _mcDotRecinto(rid){
+  const P=[]; let libres=0;
+  ((wsState.dots||{})[rid]||[]).forEach(d=>{
+    const add=x=>{ if(x&&x.nombre&&String(x.nombre).trim()) P.push({nombre:String(x.nombre).trim(), estamento:x.estamento||'', cargo:x.cargo||'', turno:x.turno||''}); else libres++; };
+    if(d.tipo==='dinamico'){ const T=d.turnos||[]; if(!T.length) libres++; T.forEach(add); } else add(d);
+  });
+  return {P, libres};
+}
+function _mcSeccionesHTML(R, o){
+  const esc=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  const cab=(r,i)=>'<td class="nn">'+(i+1)+'</td><td><b>'+esc(r.nm)+'</b>'+(r.code?'<br><span class="cd">'+esc(r.code)+(r.bim?' · BIM '+esc(r.bim):'')+'</span>':'')+'</td>';
+  let h='';
+  if(o.ficha){
+    const lst=a=>a&&a.length?a.map(e=>'<span class="it"><b>'+(e.c||1)+'×</b> '+esc(e.n)+'</span>').join(''):'<span class="vac">—</span>';
+    h+='<section class="xs"><h2>📋 Ficha de recintos</h2><table class="xt"><thead><tr><th>N°</th><th>Recinto</th><th>Equipamiento médico</th><th>Mobiliario clínico</th><th>Informática</th><th>Mobiliario no clínico</th></tr></thead><tbody>'
+      +R.rooms.map((r,i)=>{ const f=_expFichaData(r.id); return '<tr>'+cab(r,i)+'<td>'+lst(f.eq)+'</td><td>'+lst(f.mob)+'</td><td>'+lst(f.ti)+'</td><td>'+lst(f.mnc)+(f.aviso?'<div class="av">⚠ '+esc(f.aviso)+'</div>':'')+'</td></tr>'; }).join('')
+      +'</tbody></table><p class="xn">Fuente: matriz de equipamiento (EMMC) y de mobiliario no clínico por código de recinto; cuando un código se reparte entre varios recintos se indica el total del código.</p></section>';
+  }
+  if(o.as){
+    const PL=window.PAUTA_LABELS||{}, TX={sin:'🔴 Sin pauta',sugerida:'🟠 Sugerida',validada:'🟢 Validada',no_corresponde:'⚪ No corresponde'};
+    const cnt={sin:0,sugerida:0,validada:0,no_corresponde:0};
+    const filas=R.rooms.map((r,i)=>{ const pe=pautaEstadoRoom(r.id); cnt[pe.estado]=(cnt[pe.estado]||0)+1;
+      const ps=pe.estado==='no_corresponde'?[]:(pe.p||[]);
+      return '<tr>'+cab(r,i)+'<td class="es">'+TX[pe.estado]+'</td><td>'+(ps.length?ps.map(id=>{ const m=PL[id]||{}; return '<span class="it"><b>'+esc(m.normaLabel||String(id).split('_')[0])+'</b> '+esc(m.name||id)+(m.seccion?' · '+esc(m.seccion):'')+'</span>'; }).join(''):'<span class="vac">—</span>')+'</td></tr>'; }).join('');
+    h+='<section class="xs"><h2>🩺 Autorización Sanitaria</h2><p class="xn">'+Object.entries(cnt).filter(([,n])=>n).map(([k,n])=>TX[k]+' '+n).join(' · ')+'</p>'
+      +'<table class="xt"><thead><tr><th>N°</th><th>Recinto</th><th>Estado</th><th>Pautas</th></tr></thead><tbody>'+filas+'</tbody></table>'
+      +'<p class="xn">Sugerida = propuesta de la matriz por tipo de recinto, por validar. El detalle de cada pauta está en la plataforma de Autorización Sanitaria.</p></section>';
+  }
+  if(o.dot){
+    let nP=0, nL=0;
+    const filas=R.rooms.map((r,i)=>{ const D=_mcDotRecinto(r.id); nP+=D.P.length; nL+=D.libres; if(!D.P.length && !D.libres) return '';
+      return '<tr>'+cab(r,i)+'<td>'+(D.P.length?D.P.map(p=>'<span class="it"><b>'+esc(p.nombre)+'</b>'+((p.estamento||p.cargo)?' · '+esc([p.estamento,p.cargo].filter(Boolean).join(' · ')):'')+(p.turno?' · '+esc(p.turno):'')+'</span>').join(''):'<span class="vac">—</span>')+'</td><td class="c">'+(D.libres||'')+'</td></tr>'; }).join('');
+    h+='<section class="xs"><h2>👥 Dotación cubicada</h2><p class="xn">'+nP+' persona(s) con puesto en el servicio · '+nL+' puesto(s) sin persona · sólo recintos con puestos dibujados.</p>'
+      +(filas?'<table class="xt"><thead><tr><th>N°</th><th>Recinto</th><th>Personas con puesto</th><th>Puestos sin persona</th></tr></thead><tbody>'+filas+'</tbody></table>':'<p class="xn">Este servicio no tiene puestos dibujados.</p>')
+      +'<p class="xn">Fuente: puestos de trabajo dibujados en el Atlas. No incluye RUT. Para la dotación completa o no cubicada por unidad, usa «👥 Dotación del servicio».</p></section>';
+  }
+  if(!h) return '';
+  const css='<style>.xs{break-before:page;padding-top:4px}.xs h2{font-size:13pt;font-weight:800;color:#1d5fa0;border-bottom:2px solid #1d5fa0;padding-bottom:3px;margin-bottom:6px}'
+    +'.xt{width:100%;border-collapse:collapse;font-size:7.4pt}.xt thead{display:table-header-group}.xt th{background:#1d5fa0;color:#fff;text-align:left;padding:3px 4px;font-weight:700}'
+    +'.xt td{border-bottom:.5pt solid #cbd5e1;padding:3px 4px;vertical-align:top}.xt tr{break-inside:avoid}.xt td.nn{font-weight:800;color:#1d5fa0;width:22px;text-align:center}'
+    +'.xt td.es{white-space:nowrap}.xt td.c{text-align:center;font-weight:700}.xt .cd{color:#64748b;font-size:.92em}.xt .it{display:block;line-height:1.3}.xt .vac{color:#94a3b8}'
+    +'.xt .av{color:#92400e;font-size:.9em;margin-top:2px}.xn{font-size:7.2pt;color:#64748b;margin:4px 0}</style>';
+  return css+h;
+}
+function exportMapaServicio(soloHtml, opc){
   const R=_servRecorte();
   if(!R){ alert('Entra a un servicio (vista 2) para exportar su mapa.'); return null; }
   if(R.error){ alert(R.error); return null; }
   if(!R.rooms.length){ alert('Este servicio no tiene recintos dibujados.'); return null; }
-  const html=_mapaServicioHTML(R);
+  let html=_mapaServicioHTML(R);
+  const extra=opc?_mcSeccionesHTML(R,opc):'';
+  if(extra) html=html.replace(/<\/body><\/html>\s*$/, extra+'</body></html>');
   if(soloHtml) return html;
   const nom='Mapa_'+String(aName(R.area.id)).replace(/[^A-Za-z0-9Ññ]+/g,'_').replace(/^_|_$/g,'')+'_'+new Date().toISOString().slice(0,10)+'.html';
   guardarArchivo('Servicios', nom, html, 'text/html');
@@ -19304,6 +19681,59 @@ async function runSelfTest(){
       cerrarFichaLamina();
       return cal && una && cambia && pastilla && ficha && !m.classList.contains('show');
     } finally { S.lamOpc=JSON.parse(oPrev); try{ localStorage.setItem('hdsact_lam_opc',oPrev); }catch(e){} S.floorId=fPrev; S.level=lPrev; S.areaId=aPrev; S.roomId=rPrev; S.laminas=mPrev; renderSVG(); }
+  });
+  T('Exportar servicio carta: sin secciones = sólo el plano; ficha, AS y dotación se suman a elección y sin RUT', ()=>{
+    const fPrev=S.floorId, lPrev=S.level, aPrev=S.areaId;
+    try{
+      let fl=null, ar=null; for(const f of FLOORS){ for(const a of f.areas){ if(aShapes(a).length && (a.rooms||[]).some(r=>rShapes(r).length) && (a.rooms||[]).some(r=>((wsState.dots||{})[r.id]||[]).length)){ fl=f; ar=a; break; } } if(ar) break; }
+      if(!ar) return false;
+      S.floorId=fl.id; S.level=2; S.areaId=ar.id;
+      const base=exportMapaServicio(true), nada=exportMapaServicio(true,{});
+      const todo=exportMapaServicio(true,{ficha:true,as:true,dot:true});
+      const soloAS=exportMapaServicio(true,{as:true});
+      const ok1=base===nada && !/class="xs"/.test(base);
+      const ok2=(todo.match(/<section class="xs">/g)||[]).length===3 && /Ficha de recintos/.test(todo) && /Autorización Sanitaria/.test(todo) && /Dotación cubicada/.test(todo);
+      const ok3=(soloAS.match(/<section class="xs">/g)||[]).length===1 && !/Dotación cubicada/.test(soloAS);
+      const sinRut=!/\b\d{1,2}\.?\d{3}\.?\d{3}-[\dkK]\b/.test(todo.replace(/<image[^>]*>/g,''));
+      mapaServAbrir(); const m=document.getElementById('mcModal'); const dlg=m.classList.contains('show') && m.querySelectorAll('input[type=checkbox]').length===3; mapaServCerrar();
+      return ok1 && ok2 && ok3 && sinRut && dlg;
+    } finally { S.floorId=fPrev; S.level=lPrev; S.areaId=aPrev; renderSVG(); }
+  });
+  T('Planos jun-2026: m² de respaldo (matriz > plano > dibujo), capas, ficha y revisiones', ()=>{
+    const PJ=window.PLANOS_JUN2026, DW=window.DWG_OBJETOS; if(!PJ||!DW) return false;
+    const fPrev=S.floorId, lPrev=S.level, aPrev=S.areaId, pj=_pjOn, dw=_dwgOn;
+    try{
+      // 1) m²: un recinto sin matriz y con código único en el plano toma el del plano
+      let caso=null; for(const fl of FLOORS){ const P=PJ.pisos[fl.id]; if(!P) continue; for(const a of fl.areas){ for(const r of (a.rooms||[])){ if(!rShapes(r).length||roomMatrizM2(r.id)) continue; const pl=roomPlanoM2(r.id); if(pl){ caso={r,pl}; break; } } if(caso) break; } if(caso) break; }
+      const m2ok=!!caso && /m² \(plano\)$/.test(roomM2Label(caso.r.id));
+      // 2) capas
+      S.floorId='P1'; S.level=1; S.areaId=null; _pjOn=true; renderSVG();
+      const capa=!!svg.querySelector('g.pj-layer') && svg.querySelectorAll('g.pj-layer rect').length>0;
+      const fl=FLOORS.find(f=>f.id==='P4'); const ar=fl.areas.find(a=>aShapes(a).length && _dwgEnCajas('P4',aShapes(a)).length>20);
+      S.floorId='P4'; S.level=2; S.areaId=ar.id; _dwgOn=true; renderSVG();
+      const dwg=svg.querySelectorAll('g.dwg-layer circle').length>20;
+      // 3) revisiones
+      const rev=_pjNuevosPend().length>0 && _pjNuevosPend().length<=30 && Array.isArray(_pjM2Pend()) && !!REV_CHECKS.pj_nuevos && !!REV_CHECKS.pj_m2;
+      // 4) ficha
+      const r=ar.rooms.find(x=>rShapes(x).length && _dwgEnCajas('P4',rShapes(x)).length);
+      const fh=r?_fichaPlanoHtml(r.id):''; const ficha=/Superficie/.test(fh) && /DWG de coordinación/.test(fh);
+      const calib=Object.values(PJ.pisos).filter(p=>p.calibracion&&p.calibracion.residuo_mid_px!=null).every(p=>p.calibracion.residuo_mid_px<2)
+        && Object.values(DW.pisos).every(p=>p.calibracion.residuo_mid_px<2);
+      return m2ok && capa && dwg && rev && ficha && calib;
+    } finally { _pjOn=pj; _dwgOn=dw; S.floorId=fPrev; S.level=lPrev; S.areaId=aPrev; renderSVG(); }
+  });
+  T('Pulso de cambio de vista: ±5 % alrededor del destino, sin mover ese punto, y apagado en el selftest', ()=>{
+    const pin=_pulsoDestino(1), pout=_pulsoDestino(-1); if(!pin) return 'omitir';
+    const fijo=p=>Math.abs((p.ax-p.ox1)/p.z1-(p.ax-p.ox0)/p.z0)<1e-6 && Math.abs((p.ay-p.oy1)/p.z1-(p.ay-p.oy0)/p.z0)<1e-6;
+    const z0=S.zoom; _pulsoVista(1); const quieto=S.zoom===z0;   // en el selftest no anima
+    return Math.abs(pin.z1/pin.z0-1.05)<1e-9 && Math.abs(pout.z1/pout.z0-0.95)<1e-9 && fijo(pin) && fijo(pout) && quieto;
+  });
+  T('Exporte global: piso y edificios AA/HDS reparten todos los servicios dibujados sin repetir', ()=>{
+    const aa=_mcServicios({tipo:'edificio',ed:'AA'}), hds=_mcServicios({tipo:'edificio',ed:'HDS'});
+    const tot=FLOORS.reduce((s,f)=>s+_mcServicios({tipo:'piso',fid:f.id}).length,0);
+    const ids=new Set(aa.concat(hds).map(x=>x.a.id));
+    const sv=_mapaSvgLey({b:{w:10,h:10,x:0,y:0},guiaD:'',dataURL:null,planAbs:'',rooms:[]},'_7').svg;
+    return aa.length>0 && hds.length>0 && aa.length+hds.length===tot && ids.size===tot && /clipPath id="cp_7"/.test(sv) && /url\(#cp_7\)/.test(sv);
   });
   T('Respaldo a archivo: sólo desde el Atlas de trabajo (un preview en otro puerto no pisa el estado)', ()=>{
     return FBAK_PUERTOS.indexOf('8790')>=0 && FBAK_PUERTOS.length<=2
