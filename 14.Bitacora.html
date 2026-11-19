@@ -67,6 +67,20 @@ button.danger{background:var(--red)}
 .prog{width:110px;height:7px;background:#101c30;border-radius:6px;overflow:hidden;flex:none}
 .prog i{display:block;height:100%;background:var(--teal)}
 .prog.lo i{background:var(--red)}.prog.mid i{background:var(--amber)}
+.prog.big{width:min(340px,38vw);height:12px;border-radius:7px}
+details.ta{background:var(--card);border:1px solid var(--line);border-radius:10px;margin-bottom:9px}
+details.ta>summary{display:flex;align-items:center;gap:10px;padding:11px 14px;cursor:pointer;list-style:none;flex-wrap:wrap}
+details.ta>summary::-webkit-details-marker{display:none}
+details.ta .nom{flex:1;min-width:200px;font-weight:600}
+details.ta .pc{font-weight:700;min-width:44px;text-align:right}
+details.ta .dl{font-size:11px;color:var(--dim);min-width:92px}
+details.ta .dl.up{color:#7fd6b9}
+.ta-b{padding:4px 14px 12px}
+.ta-p{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-top:1px dashed var(--line);flex-wrap:wrap}
+.ta-p .pn{flex:1;min-width:220px;font-size:13px}
+.ta-p .nt{display:block;color:var(--dim);font-size:12px;margin-top:2px}
+.ta-nov{margin-top:8px;font-size:12.5px;line-height:1.5}
+.ta-nov li{margin:3px 0}
 .pc{font-size:12px;color:var(--dim);min-width:38px;text-align:right}
 .hit{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 14px 8px 26px;border-top:1px solid var(--line);font-size:12.8px}
 .hit .h{flex:1;min-width:190px}
@@ -178,6 +192,7 @@ body.pub .solo-local{display:none!important}
     <div class="tab" data-p="pab" onclick="tab(this)">🏥 Pabellón <span class="n" id="n-pb"></span></div>
     <div class="tab" data-p="actas" onclick="tab(this)">📋 Actas de capacitación <span class="n" id="n-a"></span></div>
     <div class="tab" data-p="cron" onclick="tab(this)">🗓️ Cronograma traslado · TI · TD · EMMC · Logística <span class="n" id="n-cr"></span></div>
+    <div class="tab" data-p="ti" onclick="tab(this)">💻 TI · 8 ámbitos <span class="n" id="n-ti"></span></div>
     <div class="tab" data-p="piloto" onclick="tab(this)">🧪 Plan piloto <span class="n" id="n-pp"></span></div>
     <div class="tab" data-p="reub" onclick="tab(this)">🔁 Reubicaciones EMMC · SIC <span class="n" id="n-rb"></span></div>
     <div class="tab" data-p="cerr" onclick="tab(this)">✅ Cerrados <span class="n" id="n-c"></span></div>
@@ -262,6 +277,15 @@ body.pub .solo-local{display:none!important}
     <div id="lista-cr"></div>
   </div>
 
+  <!-- ══ TI · 8 ÁMBITOS ══ -->
+  <div class="panel" id="p-ti">
+    <div class="kpis" id="kpis-ti"></div>
+    <div id="aviso-ti"></div>
+    <div id="lista-ti"></div>
+    <div id="otros-ti"></div>
+    <div id="falta-ti"></div>
+  </div>
+
   <!-- ══ PLAN PILOTO ══ -->
   <div class="panel" id="p-piloto">
     <div class="kpis" id="kpis-pp"></div>
@@ -312,6 +336,7 @@ body.pub .solo-local{display:none!important}
 <script src="SHARED_DATA/cronograma_traslado.js"></script>
 <script src="SHARED_DATA/plan_piloto.js"></script>
 <script src="SHARED_DATA/reubicaciones_emmc.js"></script>
+<script src="SHARED_DATA/ti_ambitos.js"></script>
 <script src="hub-home.js"></script>
 <script>
 // ════════════════════════════════════════════════════════════════════════════
@@ -393,7 +418,7 @@ function tab(el){
   document.getElementById('p-'+p).classList.add('on');
   // el formulario de edición vive en la pestaña de pendientes
   if(p!=='pend') document.getElementById('form').classList.remove('on');
-  if(p==='actas') renderActas(); else if(p==='cron') renderCron(); else if(p==='piloto') renderPiloto(); else if(p==='reub') renderReub(); else render();
+  if(p==='actas') renderActas(); else if(p==='cron') renderCron(); else if(p==='piloto') renderPiloto(); else if(p==='ti') renderTI(); else if(p==='reub') renderReub(); else render();
   try{ localStorage.setItem('hds_bitacora_tab',p); }catch(e){}
 }
 
@@ -1360,6 +1385,46 @@ function rbExportar(){
       ((x.notas||[]).slice(-1)[0]||{}).texto]; });
   const b=new Blob(['\ufeff'+[C,...filas].map(r=>r.map(q).join(';')).join('\n')],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download='Reubicaciones_EMMC_'+hoy()+'.csv'; a.click();
+}
+
+// ── TI · 8 ámbitos ──────────────────────────────────────────────────────────
+const TIA=(window.TI_AMBITOS||{ambitos:[],totales:{}});
+(function(){ const n=document.getElementById('n-ti'); if(n) n.textContent=(TIA.ambitos||[]).length; })();
+function barTI(pct,big){ const cl=pct<25?'lo':(pct<70?'mid':''); return `<span class="prog ${big?'big ':''}${cl}"><i style="width:${Math.max(0,Math.min(100,pct))}%"></i></span>`; }
+function dfTI(a,b){ if(b==null) return '<span class="dl">sin dato 10-09</span>'; const d=a-b;
+  return `<span class="dl${d>0?' up':''}">${d>0?'▲ +'+d:(d<0?'▼ '+d:'= sin cambio')}${d?' pts':''} vs 10-09</span>`; }
+const fdTI=f=>f?f.split('-').reverse().join('-'):'';
+function renderTI(){
+  const T=TIA.totales||{}, A=TIA.ambitos||[];
+  const k=[['avance TI',(T.avance||0)+' %'],['proyectos',T.proyectos||0],['terminados',T.terminados||0],
+           ['requisito para PSP',T.requisito_psp||0],['dependen de CSSO',T.dependen_csso||0],['bajo 25 %',T.bajo_25||0]];
+  document.getElementById('kpis-ti').innerHTML=k.map(([l,v])=>`<div class="k"><div class="v">${v}</div><div class="l">${l}</div></div>`).join('');
+  const peor=[...A].sort((a,b)=>a.avance-b.avance).slice(0,3).map(a=>`${a.nombre} (${a.avance} %)`).join(', ');
+  document.getElementById('aviso-ti').innerHTML=`<div class="avi rojo">
+    <b>Corte ${fdTI(TIA.corte)}</b> · ${esc(TIA.fuente||'')}. Comparado con el Informe Detallado del ${fdTI(TIA.corte_anterior)}.
+    Los ámbitos más atrasados son <b>${esc(peor)}</b>. ${esc(TIA.metodo||'')}
+    ${TIA.revision_correo?`<br>Revisión del correo: ${esc(TIA.revision_correo)}.`:''}</div>`;
+  document.getElementById('lista-ti').innerHTML=A.map(a=>{
+    const psp=a.proyectos.filter(p=>p.requisito==='PSP').length, cs=a.proyectos.filter(p=>p.depende_de.includes('CSSO')).length;
+    const pr=a.proyectos.map(p=>`<div class="ta-p">${barTI(p.avance)}<span class="pc" style="min-width:40px;font-weight:700">${p.avance}%</span>
+        <span class="pn">${esc(p.nombre)} <span class="chip">${esc(p.origen)}</span>
+          ${p.requisito?`<span class="chip pri-Alta">requisito ${esc(p.requisito)}</span>`:''}
+          ${p.depende_de.map(d=>`<span class="chip">depende de ${esc(d)}</span>`).join(' ')}
+          ${p.fecha_probable?`<span class="chip">término probable ${esc(p.fecha_probable)}</span>`:''}
+          <span class="nt">${esc(p.nota||'Sin nota en el cronograma.')}</span></span>${dfTI(p.avance,p.avance_ant)}</div>`).join('');
+    const fu=(a.fuera_del_corte||[]).length?`<div class="ta-nov">No vienen en el corte del ${fdTI(TIA.corte)} (estaban el ${fdTI(TIA.corte_anterior)}): ${a.fuera_del_corte.map(f=>`${esc(f.nombre)} ${f.avance_ant==null?'':f.avance_ant+' %'}`).join(' · ')}</div>`:'';
+    const nv=(a.novedades||[]).length?`<div class="ta-nov"><b>Novedades del correo</b><ul>${a.novedades.map(n=>`<li><b>${esc(fdTI(n.fecha))}</b> ${esc(n.texto)}${n.fuente?` <span class="nt" style="display:inline">· ${esc(n.fuente)}</span>`:''}</li>`).join('')}</ul></div>`:'';
+    const bl=a.bloqueo?`<div class="ta-nov"><b>Bloqueo principal:</b> ${esc(a.bloqueo)}</div>`:'';
+    return `<details class="ta"><summary><span style="font-size:18px">${a.icono}</span><span class="nom">${esc(a.nombre)}</span>
+      ${psp?`<span class="chip pri-Alta">${psp} requisito PSP</span>`:''}${cs?`<span class="chip">${cs} con CSSO</span>`:''}
+      <span class="f">${a.proyectos.length} proy.</span>${barTI(a.avance,true)}<span class="pc">${a.avance}%</span>${dfTI(a.avance,a.avance_ant)}</summary>
+      <div class="ta-b">${bl}${pr}${fu}${nv}</div></details>`; }).join('');
+  const O=TIA.otros_temas||[];
+  document.getElementById('otros-ti').innerHTML=O.length?`<details class="ta"><summary><span style="font-size:18px">🧩</span><span class="nom">Otros temas de TI fuera de los 8 ámbitos</span><span class="f">${O.length}</span></summary>
+    <div class="ta-b"><ul class="ta-nov">${O.map(o=>`<li><b>${esc(o.tema)}</b> ${esc(o.texto)}${o.fuente?` <span class="nt" style="display:inline">· ${esc(o.fuente)}</span>`:''}</li>`).join('')}</ul></div></details>`:'';
+  const F=TIA.faltante||[];
+  document.getElementById('falta-ti').innerHTML=F.length?`<details class="ta" open><summary><span style="font-size:18px">📥</span><span class="nom">Información que falta y de qué correo bajarla</span><span class="f">${F.length}</span></summary>
+    <div class="ta-b"><ul class="ta-nov">${F.map(f=>`<li><b>${esc(f.que)}</b> ${esc(f.donde||'')}${f.estado?` <span class="chip">${esc(f.estado)}</span>`:''}</li>`).join('')}</ul></div></details>`:'';
 }
 
 initFiltros(); render();

@@ -1,7 +1,7 @@
 // SHARED_DATA/bitacora_pendientes.js — versión publicada en el HUB-PM (saneada por deploy_web_pm.py)
 window.BITACORA = {
  "version": "2026-10-05 · Bitácora y huddle de Puesta en Marcha",
- "generado": "2026-11-08",
+ "generado": "2026-11-18",
  "proposito": "Reunir en un solo lugar los pendientes que hoy viven dispersos en correos, ORD, cartas CS-IF, actas de mesas de trabajo y sesiones de trabajo.",
  "ambitos": [
   "Comunicaciones",
@@ -92,8 +92,8 @@ window.BITACORA = {
   },
   {
    "id": "P003",
-   "titulo": "Angiografía 80007: el resumen dice 2 equipos y el Despliegue 1",
-   "detalle": "Discrepancia declarada en el informe de Pabellón. Hay que confirmar cuál es la cifra correcta antes de la recepción.",
+   "titulo": "Ecotomógrafo Doppler de Angiografía 80007: el resumen dice 2 equipos y el Despliegue 1",
+   "detalle": "Discrepancia declarada en el informe de Pabellón. Hay que confirmar cuál es la cifra correcta antes de la recepción. Aclaración 17-11-2026: el 80007 es el Ecotomógrafo Doppler Color de Angiografía (GE LOGIQ Fortis), no el angiógrafo. Los angiógrafos son el 80023 (Vascular, C.4.30.3) y el 80001 (Hemodinamia, C.4.30.2), ambos Siemens Artis Zee; sus observaciones van en P391.",
    "ambito": "EMMC",
    "origen_tipo": "Resumen de equipamiento",
    "origen_ref": "",
@@ -1337,7 +1337,7 @@ window.BITACORA = {
    "estado": "Esperando terceros",
    "compromiso": "Seguir en gestionti.hsalvador.cl los hitos que afectan al equipamiento (RIS-PACS, red, computadores de estaciones clínicas) antes de la Puesta en Servicio Provisoria (24-09) y del traslado (15-10).",
    "creado": "2026-09-18",
-   "actualizado": "2026-09-28",
+   "actualizado": "2026-11-10",
    "notas": [
     {
      "fecha": "2026-09-18",
@@ -1346,6 +1346,10 @@ window.BITACORA = {
     {
      "fecha": "2026-09-28",
      "texto": "28-09: borrador de respuesta a R. Hermosilla (cc Informática, SSMO TI, SDADT) para visto bueno: pide, para los hitos que afectan equipamiento y operación clínica (RIS-PACS, red/core/firewall, computadores y estaciones, impresoras, control de asistencia, central telefónica, tótems), adelantarlos antes del 15-10 o informar la contingencia, a más tardar el 02-10."
+    },
+    {
+     "fecha": "2026-11-10",
+     "texto": "10-11: corte de GESTIONTI del 10-11 (correo de R. Hermosilla de las 12:42, hilo 1a1c61fb1a14ff7a). 38 subproyectos, 37 activos y 1 cancelado; 167 hitos, 51 completados; 882 actividades, 341 completadas. Avance promedio 39,8 % (10-09: 29,8 %; el correo lo informa como 40 %). Los hitos que terminan después del 15-10 sin completar pasan de 25 a 29 y las actividades vencidas de 112 a 457. TIC e Integraciones no se mueven respecto del PPT del 02-11. RED MINSAL SD-WAN figura cancelado («en 10 meses aproximadamente se implementaría la red SD-WAN»). Hermosilla pidió que cada departamento actualice GESTIONTI para el 11-11 y sacar 4 proyectos: Red Minsal SD-WAN, Definición del modelo de operaciones, Plan Piloto y Kanban transitorio. Precisión: el «core» que el detalle de este pendiente cuenta entre los de TI es el CORE de Laboratorio, no el núcleo de la red; en el cronograma pasó al área EMMC (por área: EMMC 4, TI 14, TD 10, Logística 10). Cargado en las pestañas 🗓️ Cronograma y 💻 TI de la 14; fuentes en _FUENTES/Cronograma_traslado_2026-11-10/."
     }
    ],
    "responsable": "Matías Pinto"
@@ -1625,7 +1629,7 @@ window.BITACORA = {
    "estado": "En curso",
    "compromiso": "Revisar la planilla e incorporar los monitores ECG de las camas MQ (Mariana Bravo con Juan Carvajal y Cristian Fernández) antes de la reunión de revisión final del 2026-09-23 a las 14:00.",
    "creado": "2026-09-18",
-   "actualizado": "2026-10-15",
+   "actualizado": "2026-11-10",
    "notas": [
     {
      "fecha": "2026-09-18",
@@ -1634,6 +1638,14 @@ window.BITACORA = {
     {
      "fecha": "2026-10-15",
      "texto": "Nuevo corte «Traslados y Comodatos EMMC HDS 15OCT26» (guardado en 3.REVISION_SUBDIRECCIONES/2026-10-15 y cargado en EquiBox): reemplaza al del 16-09. Los monitores para camas básicas y medias ya están: 60 Mindray uMEC12 + 6 VS-600, presentados al SSMO el 16-09. Comodatos: 223 → 237 (+18, −4): entra la línea de laboratorio Abbott Alinity/GLP (bioquímica, inmunología, serología, transporte de muestras, módulos), Snibe Maglumi X3, ELISA, planta de agua, vitrina y freezer, y Diabetología (Ley Ricarte Soto, Accu-Chek, HbA1c, plataforma de descarga de glucómetros); salen los Abbott Architect y Minividas. 43 comodatos pasan de «pendiente de presentación» a «presentados en 2026 a SSMO»."
+    },
+    {
+     "fecha": "2026-11-10",
+     "texto": "10-11: llegó el corte «06NOV26» (V. 5NOV26, correo de R. Hermosilla del 06-11, hilo 1a1b26de75d00ba5). Formato nuevo: 2 hojas en vez de 6, con columnas Estado, Justificación y Categoría. Traslados propios: 684 equipos en 257 filas (40 aprobados en 2018, 7 autorizados por el SSMO a 2025, 637 presentados a 2026); por justificación, brecha de producción 434, inexistente en el NHDS 166, autorización sanitaria 72, brecha tecnológica 12. Comodatos: 1.224 equipos en 253 filas (1.035 autorizados por el SSMO a 2025, 189 presentados a 2026); ninguno por autorización sanitaria. Total 510 filas y 1.908 equipos; el corte del 15-10 tenía 521 registros y 1.936 unidades, y la comparación registro a registro no está hecha. Hermosilla pidió a Catherine Sepúlveda revisar la columna de justificación por la clasificación «para autorización sanitaria». El libro quedó archivado en 3.REVISION_SUBDIRECCIONES/_ENTRANTES/2026-11-06 V.5NOV26 (R. Hermosilla); todavía no está cargado en 🔴 EquiBox porque el builder no lee este formato (ver P361)."
+    },
+    {
+     "fecha": "2026-11-10",
+     "texto": "10-11 (tarde): comparación registro a registro del 15-10 contra el 06-11 (Excel en Desktop/ClaudeCode/ReunionTrasladosComodatos/Comparacion_15OCT26_vs_06NOV26.xlsx). Traslados: 284 → 257 registros (728 → 684 equipos); se mantienen 256, salen 28 (46 equipos) y entra 1 (Refrigerador HAIER HYC-390 x2 en I.1.45.7.2). Entre los que salen hay 17 ventiladores (UHI 3, UEH 9, UPC 5) y 12 de los 13 equipos que tenían alerta de aprobación 2018. Comodatos: 237 → 253 registros (1.208 → 1.224 equipos); no sale ninguno y entran 16 de Laboratorio Clínico, Biología Molecular. Cambios menores: 36 nombres normalizados, 4 marcas corregidas y 2 cambios de servicio; sin cambios de cantidad, subdirección ni recinto. El libro no explica por qué salen los equipos: por confirmar con la Jefatura de Equipos Médicos."
     }
    ],
    "responsable": "Matías Pinto"
@@ -1764,7 +1776,7 @@ window.BITACORA = {
   {
    "id": "P077",
    "titulo": "Microscopio 40042: exigir el puente estéreo face-to-face (coobservación a 180°)",
-   "detalle": "El 2026-09-14 Matías envió a SSMO y a la Inspección Fiscal un informe técnico sobre el ZEISS Tivato 700 (MEGALABS). Cumple el coobservador lateral, pero no la observación simultánea a 180° exigida por las EETT: el tubo lateral girado deja el eje visual del 2.º cirujano desplazado 10-20 cm, con desacople visuomotor, paralaje y carga ergonómica. Pidió un ORD para que la SC complemente sin costo con el Puente estéreo 50 (20COFFWO) y el tubo face-to-face (20COFFTI/20COFFFO), una prueba funcional en pabellón antes de la recepción definitiva y que la CTAR registre el criterio. No consta respuesta.",
+   "detalle": "El 2026-09-14 Matías envió a SSMO y a la Inspección Fiscal un informe técnico sobre el ZEISS Tivato 700 (MEGALABS). Cumple el coobservador lateral, pero no la observación simultánea a 180° exigida por las EETT: el tubo lateral girado deja el eje visual del 2.º cirujano desplazado 10-20 cm, con desacople visuomotor, paralaje y carga ergonómica. Pidió un ORD para que la SC complemente sin costo con el Puente estéreo 50 (20COFFWO) y el tubo face-to-face (20COFFTI/20COFFFO), una prueba funcional en pabellón antes de la recepción definitiva y que la CTAR registre el criterio. No consta respuesta. · Avance 05-11 (reunión Capacitaciones EMMC con la CSSO [00:39:04]–[00:41:00]): Matías reiteró ante la CSSO que el Tivato queda fuera de eje a 180° (error clásico del cabezal configurado). Además, los 2 microscopios Leica de Otorrino traen la coobservación a 180° en eje, pero Otorrino opera a 90°: lo lógico es intercambiarlos con los de Cirugía Plástica / Cabeza y cuello. La capacitación del Leica de Otorrino es la próxima semana y se espera que los otorrinos hagan la observación. Minuta: Minutas/minutas/2026-11-05_avance-capacitaci-onn-emmc.md",
    "ambito": "EMMC",
    "origen_tipo": "Correo",
    "origen_ref": "Hilo Gmail 1a09f7e18f82594d · «[40042] Microscopio Quirúrgico ZEISS Tivato 700 - Coobservación face-to-face a 180° no incluida (EETT)»",
@@ -1787,7 +1799,7 @@ window.BITACORA = {
   {
    "id": "P078",
    "titulo": "ORD IF-HSG 1053/26: el HDS debe aportar documentos para el almacenamiento transitorio de fuentes radiactivas (Medicina Nuclear)",
-   "detalle": "La Inspección Fiscal emitió el ORD IF-HSG N.° 1053/26 con la carta CS-IF-9697 sobre la autorización de almacenamiento transitorio de fuentes radiactivas para calibrar el PET/CT y el SPECT/CT, que la SC debe tramitar ante la autoridad sanitaria. El 2026-09-16 Felipe Rojas (SSMO) se lo remitió a Rodrigo Hermosilla y pidió apoyo del HDS con los documentos del titular: Encargado de PR, autorizaciones de desempeño, procedimientos de PR, plan de emergencia y gestión de desechos radiactivos. Adjuntos: informe del Laboratorio Caliente y memoria de cálculo de Medicina Nuclear. Ese mismo día Matías lo reenvió a Allyson Davis (OPR).",
+   "detalle": "La Inspección Fiscal emitió el ORD IF-HSG N.° 1053/26 con la carta CS-IF-9697 sobre la autorización de almacenamiento transitorio de fuentes radiactivas para calibrar el PET/CT y el SPECT/CT, que la SC debe tramitar ante la autoridad sanitaria. El 2026-09-16 Felipe Rojas (SSMO) se lo remitió a Rodrigo Hermosilla y pidió apoyo del HDS con los documentos del titular: Encargado de PR, autorizaciones de desempeño, procedimientos de PR, plan de emergencia y gestión de desechos radiactivos. Adjuntos: informe del Laboratorio Caliente y memoria de cálculo de Medicina Nuclear. Ese mismo día Matías lo reenvió a Allyson Davis (OPR). · Avance 05-11 (reunión Capacitaciones EMMC con la CSSO [00:25:10]–[00:26:47]): en Medicina Nuclear, un equipo sigue pendiente de la fuente para la última calibración. El proveedor debe mandar a fabricar y traer la fuente, y aduanas le exige el permiso transitorio. Una respuesta de la SEREMI diría que el trámite es todo del proveedor y que el hospital no tiene que hacer nada. La CSSO pide la respuesta formal del hospital a su carta para seguir con la calibración. Minuta: Minutas/minutas/2026-11-05_avance-capacitaci-onn-emmc.md",
    "ambito": "Aut. Sanitaria",
    "origen_tipo": "Correo",
    "origen_ref": "Hilo Gmail 1a0abd7cca857cb7 · «Fwd: ORD. IF-HSG N° 1053/26 // Gestiones Autorización Sanitaria - Desechos Radioactivos Transitorio (9697)»",
@@ -2792,7 +2804,7 @@ window.BITACORA = {
   {
    "id": "P120",
    "titulo": "Tallaje de uniformes (07-10 al 16-11): difusión a jefaturas y monitoreo de asistencia",
-   "detalle": "Tallaje en el primer piso del edificio A [sic?], con carnet, para contratas y titulares. Enviar a cada jefatura para que organice a su gente y monitorear la asistencia con reporte de la Sociedad Concesionaria. Aclarar a quién aplica: el correo masivo llega también a honorarios y servicios externos. · Avance 29-10-2026 (reunión PM): el personal de pabellón no puede salir a tallarse. Se hará en el mismo pabellón, dos viernes de 8:00 a 9:00, con un kit de una prenda por talla (delantal, kimono, etc.) y los QR en línea; no se paran pabellones (hoy hay 2,7 cirugías por pabellón al día). Ruta: Francisca Cid → Paz Fuentes → Carla (proveedora); coordinar con José Manuel y Daniela Núñez. Lo lleva la Javi. Plazo del tallaje: 16-11. Minuta: Minutas/minutas/2026-10-29_reuni-on-equipo-pm-jueves-29.md",
+   "detalle": "Reunión PM 09-11-2026 [00:23:03]–[00:24:05]: no todos fueron al tallaje y la idea era reiterar el mensaje esa semana, antes del cierre del 16-11. Hay un error de cruce: personas notificadas al revés y otras que aparecen enrolladas sin haber ido (caso Farmacia). Se le pediría a Alison Leres [sic?] que lo revisara, con prioridad para los del plan piloto. ⏰ PLAZO VENCIDO el 16-11: confirmar si se cerró o si se extendió. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-09_lunes-negro.md",
    "ambito": "Dotación",
    "origen_tipo": "Reunión",
    "origen_ref": "Minuta 05-10-2026 · Equipo de Puesta en Marcha (audios «Avenida Salvador 364 6» y «Hospital del Salvador 2»)",
@@ -3245,12 +3257,12 @@ window.BITACORA = {
   },
   {
    "id": "P140",
-   "estado": "Abierto",
+   "estado": "En curso",
    "prioridad": "Alta",
    "origen": "matii01",
    "creado": "2026-10-14",
    "titulo": "Hemodinamia · informe sobre el «equipo de radiofrecuencia»: se compró electroterapia, no ablación cardíaca",
-   "detalle": "Reunión de productividad 14-10-2026 [01:07:45]–[01:08:42]: en los pabellones de hemodinamia hay 2 equipos de electroterapia por radiofrecuencia (medicina física), no de ablación cardíaca. La ablación hepática y la de safena siguen en comodato y no se compraron; la única crioablación es la de oftalmología. Matías se comprometió a hacer un informe para el doctor [sic?]. Minuta: Minutas/minutas/2026-10-14_productividad.md",
+   "detalle": "Reunión de productividad 14-10-2026 [01:07:45]–[01:08:42]: en los pabellones de hemodinamia hay 2 equipos de electroterapia por radiofrecuencia (medicina física), no de ablación cardíaca. La ablación hepática y la de safena siguen en comodato y no se compraron; la única crioablación es la de oftalmología. Matías se comprometió a hacer un informe para el doctor [sic?]. Minuta: Minutas/minutas/2026-10-14_productividad.md · Avance 05-11 (reunión Capacitaciones EMMC con la CSSO [00:40:58]–[00:44:16]): tras la capacitación del polígrafo de electrofisiología (Boston Scientific) y del ecógrafo intravascular, el proveedor confirmó que falta el equipo de ablación para hacer la terapia: con lo comprado solo se hace el diagnóstico. El equipo de radiofrecuencia que llegó es de terapia física y debiera ir a Medicina Física. El Dr. Ramírez (subdirector médico) dijo que lo elevaría al Servicio, pero con los cambios no se sabe en qué está. Alternativa: pedir la consola de ablación en comodato junto a los insumos, lo que tiene un costo. Pasa algo parecido con el HPLC de Laboratorio. Minuta: Minutas/minutas/2026-11-05_avance-capacitaci-onn-emmc.md",
    "responsable": "Matías Pinto",
    "ambito": "EMMC",
    "notas": [
@@ -3281,9 +3293,13 @@ window.BITACORA = {
     {
      "fecha": "2026-10-15",
      "texto": "El corte de comodatos del 15-10 confirma que los glucómetros de Diabetología van en comodato (plataforma de descarga de glucómetros i-SENS, analizador Accu-Chek): el caso del glucómetro del plan piloto no es equipo de la concesión."
+    },
+    {
+     "fecha": "2026-11-10",
+     "texto": "10-11: en GESTIONTI «Plan Piloto» está en 0 % y sin responsable, y R. Hermosilla pidió sacarlo del sistema (correo del 10-11). La inducción de la Inspección Fiscal es el 11-11 a las 15:00 (ver P339)."
     }
    ],
-   "actualizado": "2026-10-15"
+   "actualizado": "2026-11-10"
   },
   {
    "id": "P142",
@@ -3365,7 +3381,7 @@ window.BITACORA = {
    "compromiso": "",
    "creado": "2026-10-19",
    "actualizado": "2026-10-20",
-   "notas": ""
+   "notas": []
   },
   {
    "id": "P148",
@@ -3383,7 +3399,7 @@ window.BITACORA = {
    "compromiso": "",
    "creado": "2026-10-19",
    "actualizado": "2026-10-19",
-   "notas": ""
+   "notas": []
   },
   {
    "id": "P149",
@@ -3401,7 +3417,7 @@ window.BITACORA = {
    "compromiso": "",
    "creado": "2026-10-19",
    "actualizado": "2026-10-22",
-   "notas": ""
+   "notas": []
   },
   {
    "id": "P150",
@@ -3419,15 +3435,15 @@ window.BITACORA = {
    "compromiso": "",
    "creado": "2026-10-21",
    "actualizado": "2026-10-27",
-   "notas": ""
+   "notas": []
   },
   {
    "id": "P151",
    "titulo": "Dotación · 28 personas sin clasificación que el Atlas no puede ubicar",
-   "detalle": "Al corte 19-10 quedan 28 registros que el Atlas no puede ubicar por falta de clasificación: 7 marcados PENDIENTE DE CLASIFICAR POR RRHH (informados el 23-09 con recinto pero sin departamento ni subdirección, y ninguno vigente en SIRH; 3 de ellos sin RUT: Marillán Huiquimil, Montalbán Rivereli y Silva Calquín), 10 de la Unidad de Diálisis cuyo departamento dice REVISAR, 9 de la Subdirección Médica cuya unidad dice REVISAR, 1 reemplazo sin subdirección (González Elgueta, ya corregida en la planilla) y 1 compra de servicio de Soporte Nutricional sin nombre. Consultado por correo a Rodrigo Quijada el 22-10-2026. Consolidado el 26-10 en el correo de P173, ya con la unidad sugerida por el maestro SIC para las 9 de la Subdirección Médica. El 06-11-2026 Rodrigo Quijada respondió los 5 casos que quedaban: Jaramillo Saldías corresponde a la UCI (queda en la Unidad de Cuidados del Paciente Crítico, donde están las enfermeras de UCI); Orellana Ramírez, Valenzuela Sanfurgo y Marillán Huaiquivil (nombre corregido) no están vigentes y salen de la planilla; Carvajal Corvalán es compra de servicio de Socialmed en Urgencias de Farmacia, ya cuenta como cupo. González Elgueta tiene contrato hasta el 31-12-2026 en Cuidados Quirúrgicos. La Unidad de Urgencia avisó que Araneda Maureira no trabaja ahí hace tiempo, así que se revirtió su ubicación en la UEH: es la única de las 12 que sigue sin unidad. Matriz 3.853 → 3.849; TOTAL de dotación sin cambio.",
+   "detalle": "Al corte 19-10 quedan 28 registros que el Atlas no puede ubicar por falta de clasificación: 7 marcados PENDIENTE DE CLASIFICAR POR RRHH (informados el 23-09 con recinto pero sin departamento ni subdirección, y ninguno vigente en SIRH; 3 de ellos sin RUT: Marillán Huiquimil, Montalbán Rivereli y Silva Calquín), 10 de la Unidad de Diálisis cuyo departamento dice REVISAR, 9 de la Subdirección Médica cuya unidad dice REVISAR, 1 reemplazo sin subdirección (González Elgueta, ya corregida en la planilla) y 1 compra de servicio de Soporte Nutricional sin nombre. Consultado por correo a Rodrigo Quijada el 22-10-2026. Consolidado el 26-10 en el correo de P173, ya con la unidad sugerida por el maestro SIC para las 9 de la Subdirección Médica. El 06-11-2026 Rodrigo Quijada respondió los 5 casos que quedaban: Jaramillo Saldías corresponde a la UCI (queda en la Unidad de Cuidados del Paciente Crítico, donde están las enfermeras de UCI); Orellana Ramírez, Valenzuela Sanfurgo y Marillán Huaiquivil (nombre corregido) no están vigentes y salen de la planilla; Carvajal Corvalán es compra de servicio de Socialmed en Urgencias de Farmacia, ya cuenta como cupo. González Elgueta tiene contrato hasta el 31-12-2026 en Cuidados Quirúrgicos. La Unidad de Urgencia avisó que Araneda Maureira no trabaja ahí hace tiempo, así que se revirtió su ubicación en la UEH: es la única de las 12 que sigue sin unidad. Matriz 3.853 → 3.849; TOTAL de dotación sin cambio. El 09-11-2026 Rodrigo respondió las tres consultas que quedaban: Orellana Ramírez sigue como reemplazo en Pabellón (vuelve a la matriz en la Unidad de Cuidados en Pabellón), Araneda Maureira no está vigente y Carvajal Corvalán renunció a fines de septiembre. Las 12 personas quedan clasificadas. Por Chat aclaró además dos salidas que marcaba el Atlas: Valenzuela Sanfuego no trabaja desde 2024 y Mendoza Giannina es médica externa a honorarios en Diálisis, no dotación.",
    "ambito": "Dotación",
    "prioridad": "Media",
-   "estado": "Esperando terceros",
+   "estado": "Cerrado",
    "responsable": "Matías",
    "contraparte": "Rodrigo Quijada · Unidad de Dotación",
    "servicio": "",
@@ -3436,8 +3452,13 @@ window.BITACORA = {
    "origen_fecha": "2026-10-22",
    "compromiso": "",
    "creado": "2026-10-22",
-   "actualizado": "2026-11-08",
-   "notas": " Falta: unidad real de Araneda Maureira, si Orellana sigue como reemplazo y si Carvajal sigue en Farmacia Urgencias."
+   "actualizado": "2026-11-09",
+   "notas": [
+    {
+     "fecha": "2026-11-09",
+     "texto": "Cerrado con las respuestas de Dotación del 06-11 y 09-11."
+    }
+   ]
   },
   {
    "id": "P152",
@@ -3455,7 +3476,7 @@ window.BITACORA = {
    "compromiso": "",
    "creado": "2026-10-22",
    "actualizado": "2026-10-22",
-   "notas": ""
+   "notas": []
   },
   {
    "id": "P153",
@@ -3473,7 +3494,7 @@ window.BITACORA = {
    "compromiso": "",
    "creado": "2026-10-22",
    "actualizado": "2026-10-22",
-   "notas": ""
+   "notas": []
   },
   {
    "id": "P154",
@@ -3603,11 +3624,15 @@ window.BITACORA = {
    "origen_fecha": "2026-10-19",
    "compromiso": "",
    "creado": "2026-10-22",
-   "actualizado": "2026-10-22",
+   "actualizado": "2026-11-10",
    "notas": [
     {
      "fecha": "2026-10-22",
      "texto": "Incorporado desde la entrega de Puesta en Marcha de Gabriella Brignardello."
+    },
+    {
+     "fecha": "2026-11-10",
+     "texto": "10-11: en GESTIONTI, «CORE» (el CORE de Laboratorio) va en 86 % (PPT del 02-11: 63 %), con término 11-01-2027 y sin responsable asignado; próximos pasos «Recepción, Capacitación y Puesta en Marcha (plazo máximo 120 días corridos)» e «Inicio de Convenio». El PPT directivo anota «fecha estimada de término modo no integrado en DIC.26» y «modo integrado en MZO.27». Revisión EMMC NHDS va en 90 % (02-11: 50 %), con término 30-11 y próximo paso «Subsanación de Observaciones»."
     }
    ]
   },
@@ -3937,7 +3962,7 @@ window.BITACORA = {
    "origen_ref": "Diff del corte «Traslados y Comodatos EMMC HDS» 16-09-2026 → 15-10-2026 (SHARED_DATA/traslados_comodatos_2026.json)",
    "origen_fecha": "2026-10-22",
    "creado": "2026-10-22",
-   "actualizado": "2026-10-22",
+   "actualizado": "2026-11-12",
    "id": "P170",
    "contraparte": "Felipe Rojas y Francisca Cid (CT SSMO) · Mariana Bravo (UEM) · Rodrigo Hermosilla (PM)",
    "titulo": "268 registros de traslado y comodato esperan pronunciamiento del SSMO; el HDS pidió respuesta para el 23-10 y la mesa de cierre es el 26-10",
@@ -3951,6 +3976,22 @@ window.BITACORA = {
     {
      "fecha": "2026-10-22",
      "texto": "Corregido el mismo día: la primera redacción decía «no informados al SSMO», tomando la etiqueta del corte del 16-09. En el corte del 15-10 ese grupo son los PRESENTADOS sin respuesta, con fecha de presentación por registro (134 el 15-10, 73 el 16-09, 61 comodatos en 2026)."
+    },
+    {
+     "fecha": "2026-11-10",
+     "texto": "10-11: el libro del 06-11 ya no trae el estado «rechazados o en revisión» (35 registros el 15-10). Figuran como «Presentado a 2026» 637 equipos de traslado propio y 189 de comodato. En GESTIONTI, Traslado de Equipos Médicos va en 55 % y su próximo paso es «Validación por parte del SSMO»; el hito «Validación de listado final» va en 50 % con término 13-11. Las cifras de este pendiente siguen siendo las del corte del 15-10 hasta cargar el libro nuevo (ver P361)."
+    },
+    {
+     "fecha": "2026-11-10",
+     "texto": "10-11 (tarde): con el corte 06-11 cargado, de los 35 registros que el 15-10 estaban «rechazados o en revisión» (30 traslados y 5 comodatos), 33 figuran ahora como «Presentado a 2026» y 2 traslados salen del libro (Ecocardiógrafo Philips EPIQ 7 y Endoscopio de Otorrino y Oftalmología). Presentados sin pronunciamiento del SSMO al 06-11: 224 registros de traslado (637 equipos) y 82 de comodato (189 equipos), 306 en total. Validados por el SSMO: 6 traslados (7 equipos; el 15-10 eran 7 registros y 1 salió del libro) y 171 comodatos (1.035 equipos), los mismos del 15-10."
+    },
+    {
+     "fecha": "2026-11-11",
+     "texto": "11-11: cargado el libro V.11NOV26 de R. Hermosilla (3.REVISION_SUBDIRECCIONES/2026-11-11). Mismas 257 líneas propias (684 u.) y 253 comodatos (1.224 u.); solo cambia la categoría del monitor de profundidad anestésica de la UTI (Mobiliario Menor → Equipo Mayor). Rodrigo le pide a Mariana revisar totalizadores, faltantes de Oftalmología y pendientes de UMT y devolver la versión definitiva. Seguimiento 82/345 enlazados, sin cambio. Cruce con la cartera regenerado al 11-11 con la hoja «Comodatos por contrato»."
+    },
+    {
+     "fecha": "2026-11-12",
+     "texto": "12-11: R. Hermosilla envió el 11-11 a las 16:50 las «planillas definitivas» V.11NOV26 (mismo nombre que la versión de la mañana, contenido distinto) y pidió agregar la cartera principal e idealmente la brecha de producción 2014–2026. La definitiva quedó como corte 2026-11-11; la de la mañana pasó a _ENTRANTES. Totales iguales a los del correo: traslado 684 u. (256 líneas; justificación 72 AS · 165 inexistente · 435 brecha producción · 12 brecha tecnológica; categoría 63 mayor · 321 menor · 130 mobiliario menor · 170 dispositivo menor) y comodato 1.224 u. (253 líneas; 124 mayor · 1.100 menor; 1.035 autorizados y 189 presentados). Cambios: nombres de equipos normalizados, Farmacia unificada, «Aditamento» pasa a «Dispositivo Menor», conector estéril pasa a brecha de producción. Seguimiento 81/345 enlazados. Entregable: copia de las planillas con la cartera principal en la columna PRESTACIONES y columnas de cartera, producción 2014, 2026 y brecha (fórmula), más la situación del contrato en comodatos; borrador de respuesta a Rodrigo sin enviar. Falta la producción por código."
     }
    ],
    "plazo": "2026-10-26"
@@ -4863,7 +4904,14 @@ window.BITACORA = {
    "detalle": "Reunión PM 27-10-2026 [00:35:11]–[00:49:06]: hay unos 800 equipos de traslado solicitados (sin comodatos), 18 autorizados por la comisión de 2018 y unos 20 con visto bueno del SSMO. El SSMO demora la respuesta y no se ha presentado ningún comodato a la CSSO (cada uno requiere análisis eléctrico, de agua, etc.; el proveedor toma 21 días). Acuerdos: (1) insistir a Francisca por la respuesta; (2) jueves 29-10, reunión sobre equipos médicos con Francisca, Mariana Bravo y Fernando Lacalle; (3) reuniones uno a uno con cada jefe de servicio (plano, cabida, equipos, funcionamiento, AS), partiendo por la SDADT, con Matías. Faltan en el listado la justificación por cartera y producción y un seguimiento de cada equipo por etapa de validación (propuesta de Matías). Relacionado con P170. Minuta: Minutas/minutas/2026-10-27_reuni-on-equipo-pm-27-10.md · Avance 28-10-2026: el 27-10, a pedido del Dr. Zajjur, se envió a Francisca un correo más formal pidiendo la reunión suspendida el lunes, fijada para el 29-10 a las 10:00. Cifras: unos 1.200 «como dato» [sic?] y 700 pendientes de autorización, unos 1.900 en total; hay que prepararse para que no más del 10 % salga aprobado. Los comodatos se pidieron cerca de 2019 y ninguno quedó con la misma marca ni modelo. El director pide estar en copia de toda comunicación con Francisca. Referentes: Mariana Bravo, Rodrigo Hermosilla y Matías. Minuta: Minutas/minutas/2026-10-28_reuni-on-equipo-pm-miercoles-28.md · Avance 29-10-2026: a la hora de la reunión PM, Francisca Cid no había confirmado la reunión de las 10:00 (unas 10 llamadas y 3 correos sin respuesta); María Elena le escribe. Rodrigo habla de unos 1.800 equipos por trasladar con urgencia y pide tratarlo como proyecto. Minuta: Minutas/minutas/2026-10-29_reuni-on-equipo-pm-jueves-29.md",
    "plazo": "2026-10-29",
    "responsable": "María Elena Sepúlveda · Rodrigo · Matías Pinto",
-   "ambito": "EMMC"
+   "ambito": "EMMC",
+   "notas": [
+    {
+     "fecha": "2026-11-10",
+     "texto": "10-11: en GESTIONTI, Traslado de Equipos Médicos va en 55 % (PPT del 02-11: 53 %), con término planificado 21-09 ya vencido y responsable Mariana Bravo. Hitos que siguen: validación del listado final hasta el 13-11, envío del estado de autorización a los jefes de servicio del 16 al 20-11, cotización del traslado del 23 al 27-11, coordinación del EMMC a trasladar del 27-11 al 04-12 e instalación en el NHDS del 07 al 18-12. La Actualización de Inventario de Equipos Médicos sigue en 90 %: falta el catastro oficial de Finanzas. Desde el 12-11 el avance se revisa cada jueves de 10:00 a 11:00 (ver P360)."
+    }
+   ],
+   "actualizado": "2026-11-10"
   },
   {
    "id": "P225",
@@ -5847,7 +5895,7 @@ window.BITACORA = {
    "origen": "matii01",
    "creado": "2026-10-28",
    "titulo": "Gremios · reunión oficial del 29-10 con director y 5 subdirectores, y vacaciones de noviembre a febrero",
-   "detalle": "Reuniones del 28-10-2026: la reunión con gremios del 29-10 (15:00–16:30; se movió unas 5 veces) debe ser oficial, con el director y los 5 subdirectores. La presentación se prepara el 29-10 en la mañana: lámina de habilitación → PSP → marcha blanca → traslado → primer paciente; plan piloto (diapositivas de la Mei); traslado; señalética (directorios); tallaje y uniformes. Javiera tiene el análisis de asistencia: 25 citaciones y un gremio fue a 5. La gente pide fechas; se propuso que las jefaturas programen vacaciones de noviembre a febrero. Relacionado con P114 y P145. Minutas: Minutas/minutas/2026-10-28_reuni-on-equipo-pm-miercoles-28.md y 2026-10-28_planificaci-on-cabida-sdadt.md · Avance 29-10-2026 (reunión PM): se revisó la PPT para los gremios. AS: «estamos preparando la solicitud y toda la gestión documental, para que cuando la presentemos estemos listos para la visita». Se suma una reunión comunicacional semanal con los gremios, posiblemente los martes junto al reporte al director, aparte de la de manuales de los jueves; María Elena la ofrece en la reunión de esta tarde. Minuta: Minutas/minutas/2026-10-29_reuni-on-equipo-pm-jueves-29.md",
+   "detalle": "Reunión PM 09-11-2026 [00:19:09]–[00:19:33]: que se programen las vacaciones, que se tomen, y lo que no alcance pasa al año siguiente («una muy buena noticia para alivianar»). Se pidió un comunicado de vacaciones; no consta quién lo emite ni cuándo. Gremios y capitulares siguen «en alerta»: la reunión del viernes 06-11 fue «muy dura» [00:15:16]–[00:15:34]. El plazo original (29-10) ya está vencido. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-09_lunes-negro.md",
    "plazo": "2026-10-29",
    "responsable": "Javiera · María Elena Sepúlveda",
    "ambito": "Puesta en Marcha"
@@ -6171,7 +6219,7 @@ window.BITACORA = {
    "compromiso": "",
    "creado": "2026-11-02",
    "actualizado": "2026-11-02",
-   "notas": "",
+   "notas": [],
    "id": "P330",
    "prioridad": "Alta",
    "estado": "Abierto",
@@ -6189,7 +6237,7 @@ window.BITACORA = {
    "compromiso": "",
    "creado": "2026-11-02",
    "actualizado": "2026-11-02",
-   "notas": "",
+   "notas": [],
    "id": "P331",
    "prioridad": "Media",
    "estado": "Abierto",
@@ -6207,7 +6255,7 @@ window.BITACORA = {
    "compromiso": "",
    "creado": "2026-11-02",
    "actualizado": "2026-11-02",
-   "notas": "",
+   "notas": [],
    "id": "P332",
    "prioridad": "Media",
    "estado": "Abierto",
@@ -6225,7 +6273,7 @@ window.BITACORA = {
    "compromiso": "",
    "creado": "2026-11-02",
    "actualizado": "2026-11-02",
-   "notas": "",
+   "notas": [],
    "id": "P333",
    "prioridad": "Alta",
    "estado": "Abierto",
@@ -6240,7 +6288,7 @@ window.BITACORA = {
    "origen": "matii01",
    "creado": "2026-11-03",
    "titulo": "Revisión EMMC 02-11 · programación por edificio, una semana a la CSSO e informe claro de «parte y pieza»",
-   "detalle": "Reunión PM 03-11-2026 [00:05:46]–[00:16:45]: en la revisión del 02-11 se programaron 64 recintos, todos para quedar en firma 1 porque sus monitores no tienen brazaletes. Las mesas de paciente de los pisos 3 y 4 seguían con la pintura anticorrosiva dañada, aunque la CSSO había dicho que cambió la mitad. En la mañana cumplieron unos 50 de 60 [sic?]; en la tarde fue algo mejor. La programación llegó a las 16:30 del día anterior: 3 cuadrillas para 5 pisos (−1 al 4) en una tarde, y «a este ritmo no lo vamos a lograr». Se insistirá a Francisca para que programe por edificio/piso y se propone dar una semana a la CSSO para instalar antes de volver. María Elena pide que el informe explique qué falta y qué es «parte y pieza» (p. ej. la funda de colchón de repuesto, 1 cada 2 camas), porque el 84 % / 63 % se lee como que faltan equipos (lo hicieron notar la Dra. Herrera y el Dr. Castillo [sic?]). Contraparte técnica de la CSSO: Elisa Dávila. Relacionado con P325. Minuta: Minutas/minutas/2026-11-03_martes-03-nov-vargas-no-sigue.md",
+   "detalle": "Reunión PM 03-11-2026 [00:05:46]–[00:16:45]: en la revisión del 02-11 se programaron 64 recintos, todos para quedar en firma 1 porque sus monitores no tienen brazaletes. Las mesas de paciente de los pisos 3 y 4 seguían con la pintura anticorrosiva dañada, aunque la CSSO había dicho que cambió la mitad. En la mañana cumplieron unos 50 de 60 [sic?]; en la tarde fue algo mejor. La programación llegó a las 16:30 del día anterior: 3 cuadrillas para 5 pisos (−1 al 4) en una tarde, y «a este ritmo no lo vamos a lograr». Se insistirá a Francisca para que programe por edificio/piso y se propone dar una semana a la CSSO para instalar antes de volver. María Elena pide que el informe explique qué falta y qué es «parte y pieza» (p. ej. la funda de colchón de repuesto, 1 cada 2 camas), porque el 84 % / 63 % se lee como que faltan equipos (lo hicieron notar la Dra. Herrera y el Dr. Castillo [sic?]). Contraparte técnica de la CSSO: Elisa Dávila. Relacionado con P325. Minuta: Minutas/minutas/2026-11-03_martes-03-nov-vargas-no-sigue.md · Avance 05-11 (reunión PM [00:02:49]–[00:04:00]): María Elena insiste en que la figura de firma 1 / firma 2 / subsanación confunde, que no la logra explicar y que el contrato no la contempla. El informe debe usar lenguaje simple: si el equipo está o no está, y qué parte le falta. Minuta: Minutas/minutas/2026-11-05_jueves-05-pm.md",
    "plazo": "2026-11-03",
    "responsable": "Mei [sic?] · María Elena Sepúlveda",
    "ambito": "EMMC"
@@ -6297,10 +6345,17 @@ window.BITACORA = {
    "origen": "matii01",
    "creado": "2026-11-03",
    "titulo": "Plan piloto · revisión jueves 05-11 8:00 y preparación obligatoria lunes 09-11 en 3 tandas de 40",
-   "detalle": "Reunión PM 03-11-2026 [00:36:29]–[00:47:20]: preocupa cómo se entra al plan piloto si la PSP sale la próxima semana. Se hará un refresh de los 256 [sic?] nominados con los datos de avance («te lo tengo mañana»). Antes de comunicar nada, el plan piloto se revisa el jueves 05-11 a las 8:00. Tarea para todos: traer leídos los casos de uso, idealmente clasificados por servicio, y saber qué medirle a la CSSO en cada uno (p. ej. alimentación no programada en 45 minutos). Preparación el lunes 09-11 en 3 tandas (9–10, 10–11 y 11–12) de unas 40 personas, obligatoria: paso a paso, cronograma y ubicación de cada persona. Repositorio de casos en Drive y un WhatsApp para coordinar pruebas en paralelo (p. ej. abrir todas las llaves de un piso). Falta la parte de jefatura. Ver P141, P154 y P188. Minuta: Minutas/minutas/2026-11-03_martes-03-nov-vargas-no-sigue.md",
+   "detalle": "Reunión PM 09-11-2026: el piloto se revisó ese día de 10:00 a 11:00 [00:41:12]–[00:41:31], y la conducción lo dejó para la semana siguiente [00:18:56]. No están confirmados los auditorios para la preparación en dos jornadas [00:25:32]–[00:25:38]. Se mencionó que la PSP se firmó el viernes 06-11 [00:18:33] (inferido). ⏰ El plazo del 09-11 venció: actualizar a la fecha nueva del piloto. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-09_lunes-negro.md",
    "plazo": "2026-11-09",
    "responsable": "María Elena Sepúlveda · equipo PM",
-   "ambito": "Puesta en Marcha"
+   "ambito": "Puesta en Marcha",
+   "notas": [
+    {
+     "fecha": "2026-11-10",
+     "texto": "10-11: la Inspección Fiscal imparte la «Introducción al plan piloto» el miércoles 11-11 de 15:00 a 17:00; la citación la envió Javiera Pacheco el 10-11 y Matías la aceptó (hilo 1a1c6f1e4b2dbd94). En GESTIONTI los subproyectos «Plan Piloto» y «Definición del Modelo de Operaciones» están en 0 % y sin responsable, y R. Hermosilla pidió el 10-11 sacarlos del sistema."
+    }
+   ],
+   "actualizado": "2026-11-10"
   },
   {
    "id": "P340",
@@ -6320,7 +6375,7 @@ window.BITACORA = {
    "origen": "matii01",
    "creado": "2026-11-03",
    "titulo": "Firma de documentos · ADP del Dr. Vargas no renovada: confirmar hasta cuándo firma y quién lo reemplaza",
-   "detalle": "Reunión PM 03-11-2026 [00:30:35]–[00:31:04] y [00:47:20]–[00:47:49]: María Elena informó que no se renovó la ADP del Dr. Vargas y que se nombró al Dr. Galve [sic?], que está en la PSP [sic?]. Según lo conversado, Vargas sigue hasta el lunes próximo, o hasta el 30-11 según el comunicado que circula (el 30 terminaba su ADP), y se toma los días administrativos. Hay que confirmarlo para la firma de documentos (ORD y resoluciones en curso). «Algo nos tendrá que remover… prefiero estar preparado». Minuta: Minutas/minutas/2026-11-03_martes-03-nov-vargas-no-sigue.md",
+   "detalle": "Reunión PM 03-11-2026 [00:30:35]–[00:31:04] y [00:47:20]–[00:47:49]: María Elena informó que no se renovó la ADP del Dr. Vargas y que se nombró al Dr. Galve [sic?], que está en la PSP [sic?]. Según lo conversado, Vargas sigue hasta el lunes próximo, o hasta el 30-11 según el comunicado que circula (el 30 terminaba su ADP), y se toma los días administrativos. Hay que confirmarlo para la firma de documentos (ORD y resoluciones en curso). «Algo nos tendrá que remover… prefiero estar preparado». Minuta: Minutas/minutas/2026-11-03_martes-03-nov-vargas-no-sigue.md · Avance 05-11 (reunión Capacitaciones EMMC [01:02:29]–[01:02:50]): se comentó que el director de servicio ya no es el Dr. Vargas y que asumió la subrogancia el Dr. Gálvez [sic?], que era el director del INGER (no «Galve»). Falta confirmación oficial: fecha y quién firma los documentos del HDS. Minuta: Minutas/minutas/2026-11-05_avance-capacitaci-onn-emmc.md",
    "responsable": "No consta",
    "ambito": "Puesta en Marcha"
   },
@@ -6333,7 +6388,14 @@ window.BITACORA = {
    "titulo": "Droguería NHDS · autorización ISP de instalación trabada: la exención de pago no se puede aplicar en SAFIS [sic?]",
    "detalle": "Reunión de logística del 01-10-2026: la autorización del ISP para la droguería (fase de instalación) no avanza porque la plataforma SAFIS [sic?] no deja aplicar la exención de pago; se consultó por OIRS y la consulta se derivó a Informática. El 13-10 la autorización de la droguería seguía como «problema grave». Minuta levantada el 03-11 desde la transcripción: Minutas/minutas/2026-10-01_logistica-drogueria-kanban-stock.md · Confirmar si sigue vigente.",
    "responsable": "Carlos [sic?] (Logística)",
-   "ambito": "Aut. Sanitaria"
+   "ambito": "Aut. Sanitaria",
+   "notas": [
+    {
+     "fecha": "2026-11-10",
+     "texto": "10-11: en GESTIONTI la «Autorización sanitaria de la Droguería» va en 28 % y sin fecha de término."
+    }
+   ],
+   "actualizado": "2026-11-10"
   },
   {
    "id": "P343",
@@ -6344,7 +6406,14 @@ window.BITACORA = {
    "titulo": "Kanban del NHDS · confirmar si el INGER se suma al Kanban alternativo",
    "detalle": "Reunión de logística del 01-10-2026: el Kanban alternativo espera que el INGER (Pamela Duarte [sic?]) confirme si se suma y que ambas instituciones lo acuerden; eso destraba la licitación de racks y cajas. El Kanban definitivo va por licitación y tardaría unos 5 meses más. Se esperaba cerrarlo la semana siguiente (inferido: ~09-10). Minuta levantada el 03-11: Minutas/minutas/2026-10-01_logistica-drogueria-kanban-stock.md · Confirmar si sigue vigente.",
    "responsable": "Carlos [sic?] (Logística)",
-   "ambito": "Puesta en Marcha"
+   "ambito": "Puesta en Marcha",
+   "notas": [
+    {
+     "fecha": "2026-11-10",
+     "texto": "10-11: en GESTIONTI el «Kanban alternativo (fase 1)» va en 11,1 % con término 15-10 ya vencido, y es uno de los 4 proyectos que R. Hermosilla pidió sacar del sistema (lo llama «Contratación de sistema Kanban transitorio»). El Kanban definitivo va en 10,7 % con término 14-02-2027."
+    }
+   ],
+   "actualizado": "2026-11-10"
   },
   {
    "id": "P344",
@@ -6356,7 +6425,14 @@ window.BITACORA = {
    "detalle": "Reunión de logística del 01-10-2026: compromiso de tener las bodegas periféricas de UCI, médica, quirúrgica y urgencia en el sistema, con stock y consumo, a fines de octubre. Ese día también se pidió con urgencia el stock de medicamentos oncológicos (faltó oxaliplatina) y las bodegas centrales estaban en contención del gasto. Minuta levantada el 03-11: Minutas/minutas/2026-10-01_logistica-drogueria-kanban-stock.md · Confirmar si se cumplió.",
    "plazo": "2026-10-31",
    "responsable": "Fernando · Carlos [sic?] (Logística)",
-   "ambito": "Puesta en Marcha"
+   "ambito": "Puesta en Marcha",
+   "notas": [
+    {
+     "fecha": "2026-11-10",
+     "texto": "10-11: en GESTIONTI el «Inventario de bodegas principales y periféricas» va en 70 %, con término 26-10 ya vencido y responsable Carlos Constenla."
+    }
+   ],
+   "actualizado": "2026-11-10"
   },
   {
    "id": "P345",
@@ -6413,6 +6489,639 @@ window.BITACORA = {
    "detalle": "Coordinación PM del 01-10-2026, bloque de equipamiento: el ecocardiógrafo «EPIC» [sic?] quedó para una reunión entre la Subdirección Administrativa y la Subdirección Médica. Sin plazo acordado. Identificar el equipo (código y serie) y si está en el listado de traslado. Minuta levantada el 03-11: Minutas/minutas/2026-10-01_coordinacion-pm-traslado-servicios-concesionados.md · Confirmar si sigue vigente.",
    "responsable": "Subdirección Administrativa · Subdirección Médica",
    "ambito": "EMMC"
+  },
+  {
+   "id": "P350",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-05",
+   "titulo": "Insumos de los equipos nuevos · estado por equipo de las licitaciones (SDA) y riesgo de equipos «regalados» por proveedores no adjudicados",
+   "detalle": "Reunión PM 05-11-2026 [00:09:05]–[00:12:45]: Matías propuso pedir a la SDA (abastecimiento) que presente, o al menos envíe, cómo van las licitaciones de los insumos que necesitan los equipos nuevos que compró la Concesionaria: son unos 150 equipos cuyos insumos debe comprar el hospital. Alertó además que los proveedores que no postularon a las licitaciones de la CSSO hoy ofrecen equipos caros a los médicos «prácticamente regalados» (el caso más claro es Alcon en Oftalmología); si el equipo adjudicado no se usa, el hospital igual lo paga a la Concesionaria. María Elena: «vamos a saber por equipo». Minuta: Minutas/minutas/2026-11-05_jueves-05-pm.md",
+   "responsable": "Rodrigo [sic?] · Matías Pinto",
+   "ambito": "EMMC"
+  },
+  {
+   "id": "P351",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-05",
+   "titulo": "Control único de equipos del hospital (edificio, comodato y propios) e ingreso de los no concesionados al SIC",
+   "detalle": "Reunión PM 05-11-2026 [00:11:33]–[00:15:02]: María Elena fijó el criterio: todos los equipos son del hospital. Unos vienen con el edificio y la Concesionaria solo los administra; otros llegan en comodato y los mantiene la empresa dueña; otros son propios y hay que trasladarlos. No se habla de «equipos de la concesionaria». Se necesita un control general único, «la bitácora del equipo», sin importar quién responda por cada uno (consejo de Mauricio Márquez [sic?]). El hospital debe entregar la información a la CSSO para que ingrese al SIC los equipos que no son de la concesión, de modo que, ante un requerimiento, se derive a quien corresponde. Abastecimiento (SDA) sigue comprando, así que tiene que haber un panel de control único. Relacionado con el CMMS del hospital. Minuta: Minutas/minutas/2026-11-05_jueves-05-pm.md",
+   "responsable": "Rodrigo [sic?] · Matías Pinto",
+   "ambito": "EMMC"
+  },
+  {
+   "id": "P352",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-05",
+   "titulo": "PM · decálogo de la Puesta en Marcha («vamos a trabajar en un hospital concesionado»)",
+   "detalle": "Reunión PM 05-11-2026 [00:15:42]–[00:20:00]: María Elena hará un decálogo de la PM para que los cerca de mil funcionarios entiendan lo mismo. Punto 1: vamos a trabajar en un hospital concesionado, que no es lo mismo que hoy. Punto 2: los equipos siguen siendo del hospital, con todo lo que eso implica (pérdida, robo, cuidado). Pide información «clara y sencilla», no confusa. Rol de PM: meter a los jefes de servicio desde el día 1, primero con el piloto y el día 2 con los 7 servicios. Las reuniones importantes duran 2 horas, no 1. Minuta: Minutas/minutas/2026-11-05_jueves-05-pm.md",
+   "responsable": "María Elena Sepúlveda",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P353",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-05",
+   "titulo": "Infraestructura · diálisis en la UTI sin toma de agua ni desagüe (las UCI sí tienen), necesaria para la autorización",
+   "detalle": "Reunión PM 05-11-2026 [00:06:11]–[00:08:19]: según contó Feña [sic?], todos dicen que la UCI y la UTI tienen toma de agua y desagüe para diálisis. En terreno, la UCI tiene la toma, la salida y el sifón de desagüe con su conexión, pero la UTI no. La infraestructura no la recepciona el hospital: la Inspección Fiscal, con su asesoría, hace las pruebas de funcionamiento y la certifica. Aun así, la observación debe levantarse porque es necesaria para la autorización; «si no la contemplaban, hay que hacerla». Se sugirió dejar la evidencia vía SIC y en los casos de uso de infraestructura (sugerencia de Fernando Lacalle). Minuta: Minutas/minutas/2026-11-05_jueves-05-pm.md",
+   "responsable": "No consta",
+   "ambito": "Autorización Sanitaria"
+  },
+  {
+   "id": "P354",
+   "estado": "En curso",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-05",
+   "titulo": "Cabida · Gestión del Cuidado (atención cerrada) y reparto de las residencias de la UPC por estamento",
+   "detalle": "Reunión PM 05-11-2026 [00:21:37]–[00:25:46]: con Loreto se acordó avanzar la atención cerrada de Gestión del Cuidado con Soledad Carvajal [sic?] usando el listado de los que aún no tienen ubicación. En atención cerrada no hay consultas ni puestos de trabajo: el personal queda en la estación de enfermería, así que permite mostrar un avance considerable. Los médicos que faltan hay que revisarlos con el Nico o la Dra. Martínez [sic?], porque RR.HH. los tiene con etiquetas distintas. Residencias: hoy los kinesiólogos de la UPC tienen residencia. La UCI tiene 6 y la UTI otras 6, que habría que repartir por estamento (kine, médicos, TENS, enfermería). Los grupos de residencias del −1 están separados entre sí; la de Laboratorio e Imagenología es para su propia gente. Minuta: Minutas/minutas/2026-11-05_jueves-05-pm.md",
+   "responsable": "Loreto Pérez · Matías Pinto",
+   "ambito": "Cabida"
+  },
+  {
+   "id": "P355",
+   "estado": "En curso",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-05",
+   "titulo": "Capacitaciones EMMC · 66 por ejecutar (12 coordinadas, 53 pendientes); Oftalmología pasa al 13-11 y al 20-11",
+   "detalle": "Reunión Estado general EMMC – Capacitaciones 05-11-2026 [00:04:36]–[00:09:36]: según Matías, al HDS le faltan 66 capacitaciones EMMC por ejecutar (sin instrumental): 12 coordinadas y 53 pendientes. De instructivos de uso falta 1, que la CSSO hará en formato propio y compartirá por la nube de las actas. Las 2 capacitaciones de Oftalmología del viernes 06-11 no se hacen, porque hay congreso de oftalmología y el personal de pabellón está con licencia. Pasan al viernes 13-11 y al viernes 20-11, de 8:00 a 9:00 en pabellón. Alerta: Alcon y J&J presionan por entrar y el jefe de Oftalmología dice que los adjudicados no tienen representación en Chile, por lo que hay riesgo de que no se usen. El grueso pendiente es de Esterilización e Imagenología. Para Imagenología, Matías propuso miércoles, jueves y viernes, un equipo por día, en jornada para todos los turnos de tecnólogos; todo está calibrado salvo el resonador (falta levantar el campo). Algunas capacitaciones casi confirmadas se cancelaron por motivos menores. Minuta: Minutas/minutas/2026-11-05_avance-capacitaci-onn-emmc.md",
+   "responsable": "Matías Pinto · CSSO",
+   "ambito": "Capacitación"
+  },
+  {
+   "id": "P356",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-05",
+   "titulo": "Esterilización · capacitación de equipos y del software de trazabilidad GEMCO antes de que todo esté instalado",
+   "detalle": "Reunión Estado general EMMC – Capacitaciones 05-11-2026 [00:08:41]–[00:24:42]: Esterilización no quiere capacitarse hasta que los equipos estén instalados y funcionando, porque la del lavador ultrasónico fracasó: el equipo no estaba conectado y daba error todo el rato. Según la CSSO, los autoclaves ya tienen la inscripción de caldera, hicieron ciclos con el personal de GEMCO y hay agua osmótica de buena calidad; las lavadoras terminan la próxima semana. Para el software de trazabilidad se propuso una parte teórica antes (presentación, conexión remota o entorno de simulación, como en el RIS-PACS) y una práctica después, procesando una caja. El plan del proveedor exige una sala con proyector para hasta 10 personas y material virtual para simular cajas e instrumentos; no se le puede exigir más que eso. El laboratorio de computación del SIC ya no está; alternativa: salas con computadores del 4.º piso. Camilo [sic?] (CSSO) consultará a GEMCO alternativas, incluso instalar la trazabilidad solo con los autoclaves para una prueba. Minuta: Minutas/minutas/2026-11-05_avance-capacitaci-onn-emmc.md",
+   "responsable": "Camilo [sic?] (CSSO) · Matías Pinto",
+   "ambito": "Capacitación"
+  },
+  {
+   "id": "P357",
+   "estado": "En curso",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-05",
+   "titulo": "Pyxis · capacitación en 2 niveles (listado de GdC el 06-11, virtuales desde el 11-11) y definición de perfiles y del administrador del sistema",
+   "detalle": "Reunión Estado general EMMC – Capacitaciones 05-11-2026 [00:26:45]–[00:38:58] y [00:44:16]–[00:48:05]: Ivana (Farmacia) pide con urgencia la capacitación de los Pyxis. Se propuso partir en mayo con un equipo en un entorno virtual y no se concretó. La reunión de integración del 04-11 se desvió a capacitación y generó confusión, con llamados insistentes del proveedor. Hay 2 niveles: coordinación (enfermera jefa, QF), con 2 sesiones virtuales; y técnico (carga, retiro, reposición), con práctica en grupos de hasta 7 y siempre con un QF o una enfermera supervisora. Mañana 06-11 la Subdirección de Gestión del Cuidado envía el listado de su personal que usará los Pyxis; las virtuales quedarían listas el martes y partirían el miércoles 11-11, y Grifols puede estar una semana con sesiones continuas. Varios Pyxis ya están en red (los de pabellón); faltan usuarios y nombres, pero se puede capacitar con usuarios y elementos de prueba. La sala llegó a 35 °C porque la climatización está en prueba. Pendiente de Grifols: enviar los perfiles y sus funciones. Sin definir si el administrador del sistema (alta y baja de usuarios y perfiles) es del hospital o de la CSSO; la CSSO dice que no le corresponde. Matías propone, si queda en el hospital, un perfil por subdirección (QF y enfermería supervisora). Kardex y blíster [sic?] son más simples (unas 5 personas); preocupa el Kardex de Infectología. Los Pyxis del 4.º piso del INGER quedarían sin conexión si el INGER pasa sus camas al 3.º. Ver P068 y P095. Minuta: Minutas/minutas/2026-11-05_avance-capacitaci-onn-emmc.md",
+   "plazo": "2026-11-11",
+   "responsable": "Matías Pinto · Grifols · Subdirección de Gestión del Cuidado",
+   "ambito": "Capacitación"
+  },
+  {
+   "id": "P358",
+   "estado": "Esperando terceros",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-05",
+   "titulo": "Equipos que hoy son descartables (apuradores de suero, fonendos, ambús) · categoría sin mantención ni reposición",
+   "detalle": "Reunión Estado general EMMC – Capacitaciones 05-11-2026 [00:49:01]–[00:56:00]: Matías advirtió que varios equipos de la concesión hoy el hospital los compra como insumo descartable: apuradores de suero, que se botan cuando se ensucian o se rompe la perilla; unos 250 fonendos, únicos por paciente en áreas con riesgo de contaminación cruzada; y ambús, desechables y únicos por paciente desde la pandemia, que Esterilización no acepta. Si se botan, vendrán SIC de reposición e investigaciones innecesarias. Según la CSSO, modificar el Anexo I-D [sic?] es complejo y los PAPS obligan a mantención preventiva de todo el Anexo I-D (salvo TIC, TI e instrumental), y el PAPS del próximo año ya está presentado. Mientras tanto, dejarlos guardados en bodega evita el conflicto. Acuerdo: la CSSO envía una propuesta de equipos para una categoría sin mantención ni reposición y el hospital la analiza (como se hizo con los cambios de instructivos de uso). Minuta: Minutas/minutas/2026-11-05_avance-capacitaci-onn-emmc.md",
+   "responsable": "CSSO (propuesta) · Matías Pinto (análisis)",
+   "ambito": "EMMC"
+  },
+  {
+   "id": "P359",
+   "estado": "En curso",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-05",
+   "titulo": "Equipos en un recinto distinto al de uso · bitácora de SIC de reubicación lista para el día 0",
+   "detalle": "Reunión Estado general EMMC – Capacitaciones 05-11-2026 [00:56:07]–[01:01:55]: por la distribución, varios equipos quedaron en un recinto que no es donde se usan. El motor maxilofacial está asignado a Odontología pero se usa en pabellón; el TEC está en la bodega de Psiquiatría y se usa en pabellón; el sistema de suspensión antigravedad de Medicina Física no cabe (el cielo quedó deformado y llega a la mitad de su altura). Además, piezas plásticas de equipos guardados desde 2022 se quebraron en la capacitación. La CSSO explicó que cada cambio es una movilización del activo vía SIC y debe quedar en su inventario; los cambios sistemáticos se pueden tratar antes (p. ej. el INGER pide pasar sus camas del piso 4 al 3, lo que revisa la IF). Las solicitudes de cambio se canalizan por la jefatura de cada servicio. Matías lleva una bitácora con el destino final de cada equipo para enviar todos los SIC el día 0 de explotación. El fabricante no recomienda grabar data matrix en los motores Stryker y Maxi. Minuta: Minutas/minutas/2026-11-05_avance-capacitaci-onn-emmc.md",
+   "responsable": "Matías Pinto",
+   "ambito": "EMMC"
+  },
+  {
+   "id": "P360",
+   "titulo": "Proyectos de traslado · seguimiento semanal en dos bloques los jueves desde el 12-11 (EMMC y Logística 10:00, TIC e Integraciones 11:00)",
+   "detalle": "R. Hermosilla (SDADT) citó el 10-11 a dos reuniones semanales de avance de los proyectos de traslado, los jueves desde el 12-11-2026: «AVANCE PROYECTOS TRASLADO EMMC Y LOGISTICA» de 10:00 a 11:00 y «AVANCES PROYECTOS TRASLADO TIC E INTEGRACIONES» de 11:00 a 12:00. Matías aceptó ambas el 10-11 y rechazó la sesión del jueves 26-11 por estar fuera de la oficina. Para la primera sesión, Hermosilla pidió que cada departamento deje GESTIONTI actualizado al 11-11 (ver P058). La serie anterior de María Elena Sepúlveda, «TRASLADO DE TI - TD - EMMC - LOGISTICA - OPERACIONES» (jueves de 10:00 a 12:00, hilo 1a1c68c6290e44f0), fue actualizada el mismo 10-11: la declara de carácter obligatorio y ahora termina el 18-11, por lo que su última sesión es la del 12-11, en el mismo horario que los dos bloques nuevos, que parecen tomar el relevo.",
+   "ambito": "Puesta en Marcha",
+   "origen_tipo": "Correo",
+   "origen_ref": "Hilos Gmail 1a1c62a2f6774227 y 1a1c62816e8710f6 · invitaciones «AVANCE PROYECTOS TRASLADO EMMC Y LOGISTICA (SDADT)» y «AVANCES PROYECTOS TRASLADO TIC E INTEGRACIONES (SDADT)» (R. Hermosilla, 10-11-2026)",
+   "origen_fecha": "2026-11-10",
+   "contraparte": "Rodrigo Hermosilla (SDADT) · María Elena Sepúlveda",
+   "servicio": null,
+   "prioridad": "Media",
+   "estado": "En curso",
+   "compromiso": "Asistir a los dos bloques de los jueves. Llevar al de las 10:00 el estado del EMMC y de los traslados y comodatos (P224, P071, P170).",
+   "creado": "2026-11-10",
+   "actualizado": "2026-11-10",
+   "notas": [
+    {
+     "fecha": "2026-11-10",
+     "texto": "10-11: registrado desde la revisión de los correos de R. Hermosilla. Matías aceptó las dos series a las 15:49 y antes había rechazado la sesión del 26-11."
+    }
+   ],
+   "responsable": "Matías Pinto"
+  },
+  {
+   "id": "P361",
+   "titulo": "Traslados y comodatos · adaptar el builder al formato del libro 06NOV26 para cargarlo en EquiBox",
+   "detalle": "El libro «Traslados y Comodatos EMMC HDS 06NOV26» (V. 5NOV26) cambió de formato: 2 hojas en vez de 6, con el estado, la justificación, la categoría y la subdirección como columnas. _DEV/build_traslados_comodatos_2026.py decide el tipo y el estado por el nombre de la hoja y la subdirección por títulos de bloque, así que no lo lee. Hay que adaptarlo (tipo y estado desde columnas, los tres estados nuevos, justificación y categoría, subdirección como columna), pasar el libro de _ENTRANTES a una carpeta con fecha y correr después build_traslados_seguimiento.py, porque los enlaces del seguimiento son posicionales. Hasta entonces 🔴 EquiBox muestra el corte del 15-10.",
+   "ambito": "EMMC",
+   "origen_tipo": "Correo",
+   "origen_ref": "Hilo Gmail 1a1b26de75d00ba5 · «LISTADOS DE EMMC A TRASLADAR PROPIO Y COMODATOS V.5NOV26» (R. Hermosilla, 06-11-2026)",
+   "origen_fecha": "2026-11-06",
+   "contraparte": "Rodrigo Hermosilla (SDADT)",
+   "servicio": null,
+   "prioridad": "Media",
+   "estado": "Cerrado",
+   "compromiso": "Adaptar el builder y cargar el corte del 06-11 cuando Matías lo confirme; después, comparar registro a registro con el corte del 15-10.",
+   "creado": "2026-11-10",
+   "actualizado": "2026-11-10",
+   "notas": [
+    {
+     "fecha": "2026-11-10",
+     "texto": "10-11: libro archivado en 3.REVISION_SUBDIRECCIONES/_ENTRANTES/2026-11-06 V.5NOV26 (R. Hermosilla), sha256 5e822c26f6d11585. No se cargó: queda a la espera del visto bueno de Matías para adaptar el builder."
+    },
+    {
+     "fecha": "2026-11-10",
+     "texto": "10-11 (tarde): cargado. El libro quedó como corte en 3.REVISION_SUBDIRECCIONES/2026-11-06/ y EquiBox ya lo muestra: 257 registros de traslado (684 equipos) y 253 de comodato (1.224 equipos). El generador (_DEV/build_traslados_comodatos_2026.py) lee los tres formatos de libro y da resultado idéntico al anterior con los cortes 15-09, 16-09 y 15-10. Campos nuevos por equipo: estado del libro, justificación, categoría y grupo de contrato (40 comodatos traen una marca de grupo sin ID de contrato). El libro ya no trae año de adquisición ni factibilidad. Seguimiento regenerado: 82 de 345 equipos enlazados al corte. El builder de protección radiológica quedó tolerante al libro sin año; su dataset no se regeneró. La comparación con el 15-10 está en P071. Queda a decisión de Matías: los PDF de informe y resumen por subdirección solo existen para el corte 16-09."
+    }
+   ],
+   "responsable": "Matías Pinto",
+   "cerrado": "2026-11-10"
+  },
+  {
+   "id": "P362",
+   "titulo": "SIC · homologación de códigos HIS–SIC: 7 de 12 catálogos listos; faltan servicio, sala y cama de hospitalización, consistencia y condiciones alimentarias",
+   "detalle": "La Subunidad SIDRA e Integraciones del SSMO envió la primera parte de los códigos de homologación pedidos en la mesa de integración HIS–SIC (libro «Homologación HSG - información SIC - 111126»). Listos: tipo de paciente (5), sexo (4), establecimiento de referencia (HDS 112100 e INGER 112106), estado del episodio (5), régimen alimentario (35 HDS y 39 INGER), alertas alimentarias (22) y estado de la orden (6). Pendientes: SERVHOSP, SALAHOSP y CAMAHOSP, que corresponden a la estructura de servicios, salas y camas del NHDS, más consistencia y condiciones alimentarias. Archivado con un consolidado ordenado en 15.SIC/Homologación HIS-SIC/. Matías va en copia.",
+   "ambito": "TI",
+   "origen_tipo": "Correo",
+   "origen_ref": "Hilo Gmail 1a1cb47556ff0294 · «[HSG] Homologación de códigos HIS - SIC» (Subunidad SIDRA e Integraciones SSMO, 11-11-2026)",
+   "origen_fecha": "2026-11-11",
+   "contraparte": "Subunidad SIDRA e Integraciones (SSMO)",
+   "servicio": null,
+   "prioridad": "Media",
+   "estado": "Esperando terceros",
+   "compromiso": "Seguir la segunda parte. Si la piden al HDS, los códigos de servicio, sala y cama pueden salir de la Cabida y la Matriz de recintos del NHDS.",
+   "creado": "2026-11-11",
+   "actualizado": "2026-11-11",
+   "notas": [
+    {
+     "fecha": "2026-11-11",
+     "texto": "11-11: original y consolidado ordenado en 15.SIC/Homologación HIS-SIC/ (LEEME con el procedimiento para la próxima entrega). Sumado a las novedades TI del ámbito Integraciones clínicas TrakCare."
+    }
+   ],
+   "responsable": null,
+   "cerrado": null
+  },
+  {
+   "id": "P363",
+   "titulo": "CORE Laboratorio · recepción conjunta del equipamiento de Tecnigen (211-I226): instalación hasta el 24-11 y nadie designado para firmar las guías",
+   "detalle": "El contrato 1057489-211-I226 se aprobó el 03-11-2026 y fija 21 días corridos para instalar, hasta el 24-11. Tecnigen informó 1 Alinity ci, 1 Alinity cii, 1 Alinity i, 2 Maglumi X3, 2 ChemWell 2910 y 2 plantas de agua (VLAB 200 y VLAB 70), todo a instalar en el NHDS; la sala de osmosis no está habilitada y las plantas quedan provisorias. La Jefatura de Laboratorio pide que Equipos Médicos sea garante de la recepción y la Jefatura de Equipos Médicos respondió que la recepción es conjunta según las bases y que no la han convocado. Cruce con el libro de traslados: los 6 módulos Alinity cuadran con los 3 sistemas; el libro omite la VLAB 70; la línea GLP (5 líneas), 3 vitrinas de 600 L y 2 freezers de 300 L del libro no están en la lista de Tecnigen; el preanalítico Pathfinder del contrato 533-LR25 no debería trasladarse si lo reemplaza la GLP. Es un comodato nuevo, no un traslado. Ficha de trabajo con pauta de recepción en 12.NORMATIVA Y CONTRACTUAL/LICITACION NUEVO HDS/CORE - LABORATORIO/.",
+   "ambito": "EMMC",
+   "origen_tipo": "Correo",
+   "origen_ref": "Hilo Gmail 1a1caa99813c15a5 · «Ingreso personal Tecnigen» (Jefatura de Laboratorio Clínico, 11-11-2026)",
+   "origen_fecha": "2026-11-11",
+   "contraparte": "Jefatura de Laboratorio Clínico · Tecnigen",
+   "servicio": "LABORATORIO CLINICO",
+   "prioridad": "Alta",
+   "estado": "Abierto",
+   "compromiso": "Designar quién firma las guías, fijar la fecha de recepción conjunta antes del 24-11 y confirmar con Tecnigen la línea GLP, la VLAB 70, las vitrinas y los freezers.",
+   "creado": "2026-11-11",
+   "actualizado": "2026-11-11",
+   "notas": [
+    {
+     "fecha": "2026-11-11",
+     "texto": "11-11: ficha de trabajo «Recepción CORE Tecnigen 211-I226» (resumen, cruce de equipos, pauta de recepción de 12 ítems). Borrador de respuesta de Matías a la Jefatura de Laboratorio en el hilo, sin enviar. Las 13 líneas del 211-I226 quedan marcadas como «comodato nuevo» en la hoja «Comodatos por contrato» del cruce con la cartera."
+    }
+   ],
+   "responsable": null,
+   "cerrado": null
+  },
+  {
+   "id": "P364",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "AS · mesa clínica de camas intermedias de la UHI (sin central de monitoreo no se presentan como intermedias)",
+   "detalle": "Reunión PM 09-11-2026 «Lunes negro» [00:00:06]–[00:02:41]: las camas intermedias de la UHI no se pueden presentar a la AS sin central de monitoreo («no tenemos el equipo»); hoy funcionan como cama media. Se acordó una mesa con la Dra. Molina [sic?], el Dr. Castillo [sic?], Lorena [sic?], Juan [sic?], Cristian Fernández y Cati para definirlo «como se debe hacer». Sin plazo acordado. Minuta levantada con atraso el 17-11: Minutas/minutas/2026-11-09_lunes-negro.md",
+   "responsable": "María Elena Sepúlveda (inferido) · Cati",
+   "ambito": "Aut. Sanitaria"
+  },
+  {
+   "id": "P365",
+   "estado": "En curso",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Central de monitoreo · aclarar con la IF quién la provee (el contrato no la asigna a la CSSO)",
+   "detalle": "Reunión PM 09-11-2026 [00:04:40]–[00:05:04]: se dijo que el contrato no le asigna la central de monitoreo a la Concesionaria («el hospital»), pero que la IF (Paz Fuentes) habría asegurado que existe. Quedó sin zanjar, y bloqueaba las camas intermedias de la UHI para la AS (P364). AVANCE 18-11-2026 (reunión con María Elena [00:03:46]–[00:04:11]): Cati informó que habló el 17-11 con la SEREMI y que esta le dijo presentar las camas sin central de monitoreo ni cámaras de vigilancia, porque la pauta solo lo «sugiere». Falta tener esa indicación por escrito (correo o acta de la SEREMI) y confirmar si aplica también a las camas intermedias de la UHI. Si se confirma, deja de bloquear la AS; queda pendiente decidir quién provee la central para la operación. Minutas: 2026-11-09_lunes-negro.md y 2026-11-18_off-the-record.md",
+   "responsable": "No consta",
+   "ambito": "Aut. Sanitaria"
+  },
+  {
+   "id": "P366",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Farmacia ambulatoria NHDS · reorientar recintos para farmacia en mesa IF–CSSO–hospital",
+   "detalle": "Reunión PM 09-11-2026 [00:05:22]–[00:08:24]: hoy la farmacia de Infectología atiende a Infectología, Dermatología y Urgencia. En el NHDS la farmacia es pequeña para unos 8.600 pacientes [sic?] y en una reunión con el ISP se dijo que «no está lista». Hay que reordenar recintos y cambiar su uso, conversándolo con Paz Fuentes (IF), con la CSSO (Llebrán / Gibrán [sic?]) y, por el hospital, con Francisca C. [sic?] y Valeria [sic?]. Relacionado: P348. Sin plazo acordado. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-09_lunes-negro.md",
+   "responsable": "María Elena Sepúlveda (inferido)",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P367",
+   "estado": "Abierto",
+   "prioridad": "Baja",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Visita «Charlado» [sic?] martes 10-11 14:00 · confirmar si se realizó",
+   "detalle": "Reunión PM 09-11-2026 [00:13:29]–[00:13:53]: la visita estaba en el calendario a la espera de autorización y se respondió «lo confirmo inmediatamente». ⏰ PLAZO VENCIDO: era el 10-11, una semana antes de levantar esta minuta (17-11). Confirmar si se hizo y cerrarlo; si no se hizo, reprogramarla. Minuta: Minutas/minutas/2026-11-09_lunes-negro.md",
+   "plazo": "2026-11-10",
+   "responsable": "No consta",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P368",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Capacitación EMMC · estado por servicio (qué le falta a cada uno), en el estilo de los casos de uso",
+   "detalle": "Reunión PM 09-11-2026 [00:21:22]–[00:22:25]: Matías informó que esa semana partía Pyxis (dos niveles: encargados y técnicos, según la nómina de Gestión del Cuidado; probablemente una semana completa de sesiones) y que quedaban unas 50 capacitaciones por programar, que avanzan por paquetes (Esterilización). Se le pidió el estado por servicio y respondió: «Sí, lo puedo hacer sin ningún problema». Sin plazo acordado. Insumo para la reunión «Estado general EMMC · Capacitaciones» del 19-11 a las 15:00. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-09_lunes-negro.md",
+   "responsable": "Matías Pinto",
+   "frente": "Capacitaciones EMMC",
+   "ambito": "EMMC"
+  },
+  {
+   "id": "P369",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "TDR de Javiera Flores · adendum para que apoye a Cati en Autorización Sanitaria",
+   "detalle": "Reunión PM 09-11-2026 [00:24:40]–[00:25:19]: Javiera Flores se paga por producto y lo que entrega está asociado a las temáticas de su TDR. Si va a apoyar a Cati en AS, hay que agregarle esa tarea a los términos, sin cambiar los que tiene. Queda por revisar si apoya todo el proceso de AS o sigue en Eficiencia Hospitalaria. Sin plazo acordado. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-09_lunes-negro.md",
+   "responsable": "No consta",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P370",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Planos actualizados · pedirlos directamente (sugerencia del Dr. Gálvez [sic?])",
+   "detalle": "Reunión PM 09-11-2026 [00:20:27]–[00:20:48]: se le pidió a Rodrigo que buscara los planos en el Drive, pero el Dr. Gálvez [sic?] sugirió pedirlos directamente; se respondió «ya, se le pido». No consta a quién se piden ni quién lo hace. Sin plazo acordado. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-09_lunes-negro.md",
+   "responsable": "No consta",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P371",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "AS · revisar si los equipos del listado de Rodrigo son exigibles por AS y completar «justificación» (ORD 2033 [sic?])",
+   "detalle": "Reunión PM 09-11-2026 [00:28:21]–[00:29:05]: se pidió revisar el listado de equipos que envió Rodrigo [sic?]: si los que hoy dicen «autorización sanitaria» son realmente exigibles por AS, y agregar el fundamento en el campo «justificación». Se mencionó el ordinario 2033 [sic?] y un ajuste que permitiría «no agrandar tanto». Responsable no explícito (inferido: Cati). Relacionado: P157. Sin plazo acordado. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-09_lunes-negro.md",
+   "responsable": "No consta (inferido: Cati)",
+   "ambito": "Aut. Sanitaria"
+  },
+  {
+   "id": "P372",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Visitas al NHDS · recorrido previo del piso 8 al 5 (Torre A), grupos de clínicos partiendo por la UCI y letreros no definitivos tapados",
+   "detalle": "Reunión PM 09-11-2026 [00:09:43]–[00:12:10], [00:26:01]–[00:26:26] y [00:37:14]–[00:37:56]: antes de llevar a nadie se hace un recorrido de reconocimiento del piso 8 al 5 («lo voy a pedir hoy día»). Las visitas de clínicos se organizan por grupos, porque las 250 personas no van de una, y parten por la UCI. Hay que tapar los letreros que no son definitivos (sala «Mamografía»). ⏰ PLAZO VENCIDO: el recorrido se iba a pedir el mismo 09-11; confirmar si se hizo. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-09_lunes-negro.md",
+   "plazo": "2026-11-09",
+   "responsable": "María Elena Sepúlveda",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P373",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Control de acceso · las unidades clínicas críticas no tienen acceso restringido",
+   "detalle": "Reunión PM 09-11-2026 [00:38:04]–[00:38:30]: «cada unidad clínica crítica tiene que tener acceso restringido»; hoy solo lo tienen las bodegas de insumos, que tienen sensor, y las puertas están abiertas. Se preguntó y no hubo respuesta. También se vio que el control del casino es muy básico (un generador de ticket) [00:38:31]–[00:39:31]. Definir con la CSSO el acceso de cada unidad crítica. Relacionado: P198 (enrolamiento SIC). Sin plazo acordado. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-09_lunes-negro.md",
+   "responsable": "No consta",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P374",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Orientación en el NHDS · animación de rutas desde el plano, banco de preguntas, mapa interior en Google y carritos o voluntariado para adultos mayores",
+   "detalle": "Reunión PM 09-11-2026 [00:35:37]–[00:43:38]: preocupa cómo se van a mover funcionarios y pacientes. Ideas: un banco de preguntas frecuentes («¿cómo llego de A a B?»), una animación desde el plano como la del traslado («usted está aquí», al estilo de un mall), puntos de referencia urbanos, cargar el plano interior en Google como en un aeropuerto, beacons, y carritos eléctricos o voluntariado para adultos mayores en la avenida hospitalaria. Los puntos críticos son los ascensores y las vías de acceso. Responsable de la animación y del mapa: inferido Matías. Complementa P164 (señalética). Sin plazo acordado. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-09_lunes-negro.md",
+   "responsable": "Matías Pinto (inferido)",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P375",
+   "estado": "Abierto",
+   "prioridad": "Baja",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Reunión con Fernando [sic?], el servicio y la universidad para mostrar la situación real",
+   "detalle": "Reunión PM 09-11-2026 [00:14:53]–[00:15:07]: «te voy a pedir una reunión con Fernando, con la gente del servicio y los de la universitaria [sic?]», y si es necesario con el secretario [sic?], «para que se vea la situación real en que estamos». Interlocutores y responsable poco claros en la transcripción. Sin plazo acordado. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-09_lunes-negro.md",
+   "responsable": "No consta",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P376",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "AS tras la PSP · separar los permisos SEREMI de la Concesionaria de las autorizaciones que tramita el hospital",
+   "detalle": "Consejo Técnico 12-11-2026 [00:03:16]–[00:04:17]: desde la PSP, la autorización sanitaria es responsabilidad exclusiva del hospital. La Concesionaria tiene solo sus permisos SEREMI (alimentación y casino, REAS [sic?] y otro, transcrito «cartera» [sic?]); «hasta ahí llega la responsabilidad de la sociedad concesionaria». Se pidió «acelerar el tranco». Acción inferida: dejar escrito qué permisos tiene la CSSO y cuáles tramita el hospital. Relacionado: P061 (antecedentes SEREMI). Sin plazo acordado. Minuta levantada con atraso el 17-11: Minutas/minutas/2026-11-12_ct-psp.md",
+   "responsable": "No consta",
+   "ambito": "Aut. Sanitaria"
+  },
+  {
+   "id": "P377",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Climatización · riesgo de sobrecarga térmica al ocupar el NHDS (experiencia del Geriátrico: salas a 27 °C)",
+   "detalle": "Consejo Técnico 12-11-2026 [00:04:17]–[00:06:22]: en el Geriátrico la temperatura de las salas subió de 24 a 27 °C [sic?], de 1 a 2,5 grados cada año. Según el expositor, la climatización de un edificio de este tamaño tarda de 6 meses a un año en estabilizarse, y la entrada de unas 3.000 personas en 2 a 3 semanas puede superar su capacidad. Hay que medirlo en el comisionamiento y exigirlo a la CSSO por la IF. Relacionado: la propuesta de comisionamiento separada del piloto (Fernando Lacalle · Marisol Salvatierra) y los ORD SSMO 1838/1877 sobre climatización. Sin plazo acordado. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-12_ct-psp.md",
+   "responsable": "No consta",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P378",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Concesionaria · sistema de alimentación operativo (compromiso al 15-11)",
+   "detalle": "Consejo Técnico 12-11-2026 [00:09:03]–[00:09:44]: el sistema de alimentación es un compromiso de la Sociedad Concesionaria «al 15 de este mes». Hoy la información no está disponible antes de las 10:00 [sic?], y la SEREMI lo evaluará. ⏰ PLAZO VENCIDO el 15-11, dos días antes de levantar esta minuta (17-11): confirmar con la IF si se cumplió. Relacionado: P155 (observaciones PAPS de Alimentación). Minuta: Minutas/minutas/2026-11-12_ct-psp.md",
+   "plazo": "2026-11-15",
+   "responsable": "Sociedad Concesionaria",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P379",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "AS · responder rápido las indicaciones del ISP y la SEREMI (cortina, psicotrópicos en la farmacia de atención abierta)",
+   "detalle": "Consejo Técnico 12-11-2026 [00:14:08]–[00:15:46]: el ISP pidió una cortina [sic?] y protección para los psicotrópicos en la farmacia de atención abierta; la SEREMI hizo «otra serie de indicaciones menores». Se advirtió que «si no estamos preparados para hacer esas presentaciones rápidamente, lo vamos a retrasar». También se dijo que la farmacia «nos quedó chica» y que hay unidades por reacomodar. Relacionado: la propuesta de farmacia ambulatoria de la minuta del 09-11. Sin plazo acordado. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-12_ct-psp.md",
+   "responsable": "No consta",
+   "ambito": "Aut. Sanitaria"
+  },
+  {
+   "id": "P380",
+   "estado": "Abierto",
+   "prioridad": "Baja",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Consejo Técnico 12-11 · respuesta comprometida «a la brevedad» por el expositor (resultado de una visita anterior)",
+   "detalle": "Consejo Técnico 12-11-2026 [00:16:12]–[00:16:58]: el expositor había comprometido, en una de las visitas de la primera o segunda semana, entregar un resultado (transcrito «de ocupamiento» [sic?]) y decir cuál era el problema. No tuvo el listado a tiempo y se comprometió «como servicio, con el equipo que nos acompaña» a responder «a la brevedad». Tema y responsable poco claros en la transcripción: confirmarlos. Sin plazo acordado. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-12_ct-psp.md",
+   "responsable": "Expositor del Consejo Técnico (servicio) [sic?]",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P381",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Plan piloto · coordinador del SIC por piso, canal de claves y revisión táctica diaria (lección del INGER)",
+   "detalle": "Lanzamiento del plan piloto 12-11-2026 [00:34:21]–[00:39:23]: el INGER recomendó tener un coordinador por piso que recorra a los participantes, un WhatsApp para resolver claves («es una cuestión de clave», el principal cuello de botella) y una revisión táctica al final de cada día para corregir de un día para otro. La reunión estratégica es semanal (viernes en la tarde, según la IF). El protocolo interno del HDS no quedó definido. Es una recomendación, no un compromiso asumido: responsable No consta. Relacionado: P339. Minuta levantada con atraso el 17-11: Minutas/minutas/2026-11-12_plan-piloto-psp.md",
+   "responsable": "No consta",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P382",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Plan piloto · verificar en el SIC el inventario de mobiliario y equipamiento médico cargado por recinto",
+   "detalle": "Lanzamiento del plan piloto 12-11-2026 [00:36:39]–[00:37:07]: el INGER recomendó verificar que el inventario, «tanto el mueble como el equipamiento médico», esté correctamente cargado en el SIC por recinto, y que cada funcionario vea todos los recintos de su piso y pueda pedirles los servicios. Responsable no asignado en la reunión (propuesto: Unidad de Equipos Médicos). Insumo: el catastro EMMC por BIM. Relacionado: P317 y P319 (BIM). Sin plazo acordado. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-12_plan-piloto-psp.md",
+   "responsable": "No consta (propuesto: Matías Pinto)",
+   "ambito": "EMMC"
+  },
+  {
+   "id": "P383",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Plan piloto · computadores habilitados para emitir SIC en cada sector",
+   "detalle": "Lanzamiento del plan piloto 12-11-2026 [00:43:52]–[00:44:24]: se preguntó si todos los computadores estarán habilitados para emitir SIC, porque en el INGER se centralizó una zona y eso dificultó el trabajo. La IF respondió: «lo hemos solicitado que sí». Hay que confirmarlo antes del inicio. Relacionado: P340 (pruebas TI). Sin plazo acordado. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-12_plan-piloto-psp.md",
+   "responsable": "Inspección Fiscal → Sociedad Concesionaria",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P384",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Plan piloto · rótulos BIM retirados de las puertas: pedir a la CSSO los planos con BIM por piso",
+   "detalle": "Lanzamiento del plan piloto 12-11-2026 [00:28:28]–[00:28:51] y [00:45:09]–[00:45:49]: en el INGER las solicitudes del SIC se hacían por BIM, pero los rótulos BIM se habían retirado de las puertas; la Concesionaria entregó planos con BIM y «eso fue maravilloso». Hay que verificar si en el NHDS los rótulos están y, si no, pedir los planos con BIM por piso antes del piloto. No consta quién lo pide. Sin plazo acordado. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-12_plan-piloto-psp.md",
+   "responsable": "No consta",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P385",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Plan piloto · arranque del 13-11: talleres 1 a 3, grupos de las semanas 1 a 3, feedback los miércoles y pautas propias del HDS",
+   "detalle": "Reunión PM 12-11-2026 «Ya tenemos la PSP» [00:01:38]–[00:03:10]: prioridad 1 es el plan piloto. La inducción y el primer taller eran el viernes 13-11, con materiales a cargo de Javi [sic?]. El correo a unos 80 participantes salía el 12-11 y el almuerzo del casino se ajustaría a las 12:00. Hay que armar los grupos de las semanas 1 a 3, con reunión de feedback los miércoles, y revisar las pautas propias del HDS, que aún no se revisaban. ⏰ PLAZO VENCIDO: el taller era el 13-11 y el correo el 12-11; confirmar si se hicieron. Conviene fusionarlo con P339 al aplicar. Minuta levantada con atraso el 17-11: Minutas/minutas/2026-11-12_ya-tenemos-la-psp.md",
+   "plazo": "2026-11-13",
+   "responsable": "María Elena Sepúlveda · equipo PM",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P386",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Equipo PM · decidir si se instala en el NHDS (biblioteca) para coordinar desde el edificio nuevo",
+   "detalle": "Reunión PM 12-11-2026 [00:03:12]–[00:16:02]: la conducción plantea que el equipo PM («unos 20») se instale en la biblioteca del NHDS, que ya tiene WiFi, para coordinar desde allá («¿y vamos a ponerlo en marcha dónde? ¿Aquí?»). Hubo dudas: no verse lejos del hospital actual, falta de equipos y que la biblioteca hoy solo sirve para capacitaciones pequeñas. No se decidió: «piénsenlo», «hay que ser claro en los mensajes». Sin plazo acordado. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-12_ya-tenemos-la-psp.md",
+   "responsable": "María Elena Sepúlveda · equipo PM",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P387",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Organización post-traslado · inspección sanitaria / Subdirección de Servicios Concesionados con staff, dependiente de PM hasta un mes post-traslado",
+   "detalle": "Reunión del sábado 14-11-2026 [00:10:12]–[00:55:56]: propuesta de trabajo, no aprobada. (1) Desde la PSP hasta un mes después del traslado o del primer paciente, la inspección sanitaria depende de la coordinación técnica de PM, para una sola conducción frente a la IF. (2) Después queda como Subdirección de Servicios Concesionados en el organigrama del director, con staff de contrato y documentación, control de gestión y SIG, y enlace clínico; analistas de servicios concesionados (hard y soft facilities), equipamiento médico y TIC, y clínico; y asesoría legal por horas. Cargos con nombre flexible («analista»). Base: la figura equivalente del INGER. Hay un organigrama en elaboración (responsable no identificado en la transcripción). Validar con María Elena y el director. Relacionado: P305. Sin plazo acordado. Minuta levantada con atraso el 17-11: Minutas/minutas/2026-11-14_reu-sabado.md",
+   "responsable": "No consta",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P388",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Inspección sanitaria · definir el canal y el flujo de información con la IF, los roles y la rutina diaria (probarlo en el piloto)",
+   "detalle": "Reunión del sábado 14-11-2026 [00:07:31]–[00:09:47] y [00:13:58]–[00:15:26]: «no hay un flujo de información y comunicación claro» entre el hospital, la Concesionaria y la IF. En capacitación, la CSSO no responde y la IF habría dejado de responder. Propuesta: una mesa interna que defina qué hace cada rol, la rutina diaria de la inspección sanitaria (ver el cumplimiento, recibir la información y escalarla) y de dónde y cómo llega la información. Probarlo durante el piloto y mostrar resultados al menos cada semana. Sin plazo acordado. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-14_reu-sabado.md",
+   "responsable": "No consta",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P389",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Contrato de concesión · la función de pagos no tiene responsable definido en el hospital",
+   "detalle": "Reunión del sábado 14-11-2026 [00:15:26]–[00:16:11]: «hay una función que casi nadie se acuerda, que es la de los pagos». Hasta ahora la ha visto Fernando Lacalle, y la Subdirección Administrativa no tiene definido quién la asume. Hay que asignar el responsable de los pagos del contrato antes de la operación. Sin plazo acordado. Minuta (con atraso, 17-11): Minutas/minutas/2026-11-14_reu-sabado.md",
+   "responsable": "No consta",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P390",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Pabellón de angiografía · carta de Cirugía Vascular al director por los déficits (respuesta a 7–10 días; si no, SEREMI y MINSAL)",
+   "detalle": "Reunión con Cirugía Vascular 17-11-2026 [00:14:26]–[00:16:01]: la jefatura de Vascular redacta y firma «personalmente», junto al equipo, una carta al director del hospital. La carta detalla los déficits del pabellón de angiografía del NHDS (mesa que no soporta una reanimación ni permite procedimientos de extremidad superior, faldones de protección radiológica que no anclan, lámpara limitada, software de neuro, columna de cirugía en la esquina, topes de peso y altura). Dice que no se puede empezar a trabajar hasta que estén resueltos y pide respuesta en 7 a 10 días; si no la hay, se escala a la SEREMI y al MINSAL. La firma era el mismo 17-11, después de la reunión clínica. Plazo de la respuesta: ~2026-11-27. Minuta: Minutas/minutas/2026-11-17_angio-desastre-martes-17.md",
+   "plazo": "2026-11-27",
+   "responsable": "Jefatura de Cirugía Vascular",
+   "ambito": "EMMC"
+  },
+  {
+   "id": "P391",
+   "estado": "En curso",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Pabellón de angiografía · informe técnico actualizado para el Servicio (mesa, faldones, lámpara, software, columnas, topes) y no recepción mientras no se corrija",
+   "detalle": "Reunión con Cirugía Vascular 17-11-2026: el Servicio pidió reenviar el informe con más información. Equipo: angiógrafo Siemens Artis Zee código 80023, Sala Angiógrafo General y Vascular Periférico C.4.30.3 (no el 80007, que es el ecógrafo Doppler; Hemodinamia C.4.30.2 tiene el 80001 con la misma configuración). Observaciones del equipo: la mesa no soporta una reanimación, no permite procedimientos de extremidad superior y no deja anclar los faldones de protección radiológica; la lámpara tiene altura limitada; trae el software de neuro sin los paquetes vascular y cardio (que sí estaban en la oferta); la columna de cirugía quedó en la esquina; faltan los topes de peso y altura. Posición: no recepción mientras no se corrija. AVANCE 17-11: (1) borrador del informe técnico de 9 páginas en Informes_Servicios/SERVICIOS/BORRADOR_Informe_Angiografia_Vascular_2026-11-17.pdf, con recuadros ámbar pendientes (lámpara, columna y cables, tope de estatura, licencias instaladas, observaciones de Ramírez y Duarte); (2) borrador de ORD a la Inspección Fiscal en ORD_BORRADORES/ORD_2026-11-17_observaciones-angiografo-80023-vascular_2251.docx, que pide cambio de mesa, licencias, ficha técnica y revisión de Hemodinamia. Falta confirmar el firmante y el cargo de la IF. Relacionado: P390 (carta de Vascular) y P308. Minuta: Minutas/minutas/2026-11-17_angio-desastre-martes-17.md",
+   "responsable": "Matías Pinto",
+   "ambito": "EMMC"
+  },
+  {
+   "id": "P392",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Angiógrafo · pedir al capacitador la lista de software de vascular y cardio disponibles",
+   "detalle": "Reunión con Cirugía Vascular 17-11-2026 [00:02:44]–[00:02:51]: el capacitador del angiógrafo dijo que podía nombrar los software de vascular; Matías: «se lo voy a pedir». El equipo instalado trae el de neuro. La lista sirve para el informe técnico y para pedir la configuración por el conducto. Sin plazo acordado. Minuta: Minutas/minutas/2026-11-17_angio-desastre-martes-17.md",
+   "responsable": "Matías Pinto",
+   "ambito": "EMMC"
+  },
+  {
+   "id": "P393",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-17",
+   "titulo": "Plan piloto día 1 · ticket del SIC cerrado como resuelto sin que la Concesionaria acudiera (Atención Abierta)",
+   "detalle": "Reunión con María Elena 17-11-2026 [00:03:25]–[00:03:47]: en el día 1 del piloto, en Atención Abierta (piso 1, con Lore, Nati de Atención al Usuario y Marisol), Matías generó casos ficticios (ratones; un paciente que se arranca, para Seguridad). Uno de los tickets volvió marcado como resuelto sin que nadie acudiera («claramente no vinieron»), en los mesones Azul y Turquesa [sic?]. Hay que registrarlo con número de ticket, hora y evidencia, y llevarlo a la reunión semanal de los viernes con la IF como no conformidad. Relacionado: P339. Sin plazo acordado. Minuta: Minutas/minutas/2026-11-17_reu-ma-elena.md",
+   "responsable": "Matías Pinto",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P394",
+   "estado": "En curso",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-18",
+   "titulo": "Fichas técnico-clínicas por unidad (SCL) · plano como bloque 1, ~5 formatos, producción 2024 y 2026 y visto bueno de las pautas AS",
+   "detalle": "Reunión con María Elena 18-11-2026 [00:00:00]–[00:07:23] y [00:25:00]–[00:25:30]: la ficha por unidad (pedido del 17-11, 42 fichas SDM/SDADT en borrador) debe partir por el plano de la unidad y seguir con los equipos que trae el edificio, la pauta AS, la cartera, la producción, los traslados y los comodatos. Avance: equipos 100 %, pautas AS ~90 % (falta el visto bueno de Cati), cartera 93 % (faltan Medicina Nuclear, Procuramiento y Hospital de Día), producción solo 2025 (faltan 2024 y 2026, a pedir a Estadística), traslados 100 %, comodatos 100 %. Matías ofrece ~5 formatos para que María Elena elija. Para la IF importa más la oportunidad que la precisión. Hay un borrador de respuesta a María Elena del 18-11. Sin plazo acordado. Minuta: Minutas/minutas/2026-11-18_off-the-record.md",
+   "responsable": "Matías Pinto",
+   "ambito": "EMMC"
+  },
+  {
+   "id": "P395",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-18",
+   "titulo": "Línea de tiempo · HDS actual, NHDS (piloto, marcha blanca), autorización sanitaria e INGER — piloto listo al 10–12-12, hito del 15-12",
+   "detalle": "Reunión con María Elena 18-11-2026 [00:04:36]–[00:14:23]: hay que pasar la pizarra a una línea de tiempo con tres procesos simultáneos. (1) HDS actual: despoblar, trasladar y poblar (Fernando Araya [sic?] con los subdirectores médico, SDADT y Gestión del Cuidado). (2) NHDS: plan piloto, luego marcha blanca o simulacro clínico-logístico con los jefes de servicio. (3) Autorización sanitaria ante la SEREMI y el ISP; el traslado de pacientes (~7 días) va después de la AS. Se suma una línea del INGER, que se traslada la última semana de diciembre y ya pidió su visita a la SEREMI. Se dijo que la PSP se entregó el miércoles 11-11 [sic?: en otros registros figura el 10-11]. El plan piloto debe estar listo al 10–12-12, porque el 15-12 es clave. Responsable inferido: María Elena con Matías. Minuta: Minutas/minutas/2026-11-18_off-the-record.md",
+   "plazo": "2026-12-10",
+   "responsable": "María Elena Sepúlveda · Matías Pinto (inferido)",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P396",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "matii01",
+   "creado": "2026-11-18",
+   "titulo": "Autorización sanitaria · cambiar al director técnico ante la SEREMI y el ISP (hoy Fernando)",
+   "detalle": "Reunión con María Elena 18-11-2026 [00:10:34]–[00:10:42]: para la AS «es súper importante cambiar el director técnico, que hoy día es Fernando». No consta a quién se designa ni quién lo tramita (inferido: Cati, con la Dirección). Sin plazo acordado. Minuta: Minutas/minutas/2026-11-18_off-the-record.md",
+   "responsable": "No consta",
+   "ambito": "Aut. Sanitaria"
+  },
+  {
+   "id": "P397",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-18",
+   "titulo": "Traslado de equipos · las solicitudes van directo a la Inspección Fiscal, con copia al Servicio de Salud (custodia de los equipos que quedan)",
+   "detalle": "Reunión con María Elena 18-11-2026 [00:07:58]–[00:08:57]: Felipe Rojas confirmó que, tras la PSP, el HDS pide el traslado de equipos directamente a la IF, con copia de la solicitud al Servicio de Salud, porque este custodia y da de baja los equipos que quedan en el hospital actual. La copia es informativa, no de autorización. Ajustar la plantilla de solicitud y el flujo de traslados. Felipe Rojas confirmó también que todos los pabellones llevan computador, aunque algunos falta instalarlos. Relacionado: P170. Sin plazo acordado. Minuta: Minutas/minutas/2026-11-18_off-the-record.md",
+   "responsable": "Matías Pinto",
+   "ambito": "EMMC"
+  },
+  {
+   "id": "P398",
+   "estado": "Abierto",
+   "prioridad": "Media",
+   "origen": "matii01",
+   "creado": "2026-11-18",
+   "titulo": "PM · comunicar la resolución: María Elena es coordinadora técnica e inspectora sanitaria hasta el traslado",
+   "detalle": "Reunión con María Elena 18-11-2026 [00:15:57]–[00:18:40]: hasta el traslado, María Elena Sepúlveda es la coordinadora técnica e inspectora sanitaria y la relación con la IF pasa por ella. Ya sacó la resolución y lo comunica el 19-11. Arma su equipo por líneas: plan piloto, capacitación, equipamiento médico (Matías), autorización sanitaria (Cati, Javiera Flores), simulación clínica, traslado, gestión del cambio (Javiera Pacheco), gestión administrativa, secretaría y coordinación de servicios concesionados (Rodrigo Hermosilla). Relacionado: P305 y la organización post-traslado de la reunión del 14-11. Minuta: Minutas/minutas/2026-11-18_off-the-record.md",
+   "plazo": "2026-11-19",
+   "responsable": "María Elena Sepúlveda",
+   "ambito": "Puesta en Marcha"
+  },
+  {
+   "id": "P399",
+   "estado": "Esperando terceros",
+   "prioridad": "Alta",
+   "origen": "Instrucción de Matías",
+   "creado": "2026-11-19",
+   "actualizado": "2026-11-19",
+   "titulo": "Gemco · estado de instalación por equipo y capacitaciones EMMC pendientes (Esterilización, Odontología, Laboratorio)",
+   "detalle": "Informe de instalación de Gemco recibido por Matías el 19-11-2026, cruzado con la hoja 4 del Seguimiento EMMC.\nCAPACITACIÓN HECHA (antes de que los equipos quedaran operativos; evaluar una sesión práctica de refuerzo al terminar la instalación): [140013] Flight A6 y [140014] Sillón A12, 10-11 (instalados, no todos conectados, sin suministros habilitados por el Hospital, piezas de mano Borden por cambiar a Midwest, corte eléctrico en un A12 sin inspeccionar porque la sala estaba cerrada); [70005] Secadoras AD400, 26-10 (falta conectar los ductos de extracción); [70008] Lavadoras ultrasónicas US100, 26-10 (conectadas; faltan manómetros, filtros y reguladores de aire, ajustar desagües; sin pruebas de encendido).\nSIN CAPACITACIÓN Y SIN FECHA (2.Por Coordinar): [70014] Autoclave VS6 y [70001] VS12 (conectados con agua y aire, prueba hidrostática hecha en los 5; faltan manómetros en 2, cambiar un vidrio roto con repuesto en stock, configurar y verificar); [70009] Termodesinfectadora DS1000 (conectada y con desagües; humedad y oxidación interna, no se ha encendido, falta la extracción superior); [70004] Plasma PL130 (posicionado; falta la conexión eléctrica y revisar las puertas por el espacio); [30001] Lavachatas BP100 (posicionadas; confirmar llaves de corte de agua y desagües, sin pruebas); [70012] Reprocesador EW1 (posicionado; depende del Hospital: duplicar cañerías de agua y doble extracción); [80021] TAC dental VistaVox S Ceph (armado; sin conexión eléctrica ni computador, faltan ductos de fibra óptica y del disparador; largo tiempo sin uso, evaluar el cabezal).\nSIN CAPACITACIÓN EN EL PROGRAMA: [70002] Autoclave de laboratorio Laboklav 80 MV (solo instructivo de uso, entregado). Fuera de servicio: alarma y olor a quemado en la prueba hidrostática; retirado al servicio técnico a la espera de diagnóstico.\nCONSULTA A LA SC: fechas Gemco para la semana del 23-11, pedidas el 10-11 y reiteradas el 17-11, sin respuesta. Con este estado, la semana del 23-11 no es viable para la mayoría. Propuesta: capacitar por equipo a medida que Gemco confirme que está operativo (primero VS6/VS12). El [80021] no tiene consulta activa. Relacionado: P400 y P088.",
+   "responsable": "Matías Pinto",
+   "ambito": "EMMC",
+   "contraparte": "Gemco / Sociedad Concesionaria",
+   "servicio": "Central de Esterilización; Odontología; Laboratorio Clínico; servicios con lavachatas",
+   "notas": []
+  },
+  {
+   "id": "P400",
+   "estado": "Abierto",
+   "prioridad": "Alta",
+   "origen": "Instrucción de Matías",
+   "creado": "2026-11-19",
+   "actualizado": "2026-11-19",
+   "titulo": "Obras y suministros que frenan la puesta en marcha de equipos Gemco (EW1, sillones dentales, TAC dental, lavachatas, extracción)",
+   "detalle": "Del informe de instalación de Gemco del 19-11-2026. Según Gemco, le corresponde al Hospital: (1) [70012] Reprocesador de endoscopios EW1: duplicar las cañerías de suministro de agua y habilitar doble extracción por equipo; (2) [140013]/[140014] Sillones dentales: habilitar los suministros para las pruebas. Por definir responsable (Hospital, SC u obra): (3) [80021] TAC dental: ductos para la fibra óptica y para el cable del disparador externo, y conexión eléctrica; (4) [30001] Lavachatas BP100: llaves de corte de agua en los recintos y ajustes de desagüe; (5) [70009] DS1000 y [70005] AD400: conexión al sistema de extracción; [70004] PL130: conexión eléctrica. (6) Acceso: un sillón A12 con corte eléctrico no se pudo inspeccionar porque la sala estaba cerrada. Sin estas obras no se pueden probar los equipos ni capacitar. Relacionado: P399.",
+   "responsable": "Matías Pinto",
+   "ambito": "Obra",
+   "contraparte": "Gemco / Sociedad Concesionaria / Inspección Fiscal",
+   "servicio": "Central de Esterilización; Odontología",
+   "notas": []
   }
  ],
  "criticos": [
@@ -6440,7 +7149,12 @@ window.BITACORA = {
   "P282",
   "P283",
   "P284",
-  "P285"
+  "P285",
+  "P365",
+  "P377",
+  "P388",
+  "P390",
+  "P391"
  ],
  "frentes": {
   "pabellon": [

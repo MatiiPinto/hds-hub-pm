@@ -283,7 +283,7 @@ var ST5 = [
   {k:"por_coordinar",lbl:"En Coordinación"},{k:"reprogramada",lbl:"Reprogramada"},{k:"no_aplica",lbl:"No aplica"}
 ];
 var ST_CAP = [
-  {k:"coordinada",lbl:"Coordinada"},{k:"pendiente",lbl:"CSSO"},{k:"reprogramada",lbl:"Reprogramada"},
+  {k:"coordinada",lbl:"Coordinada"},{k:"pendiente",lbl:"Por Coordinar"},{k:"reprogramada",lbl:"Reprogramada"},
   {k:"ejecutada",lbl:"Ejecutada"},{k:"en_progreso",lbl:"Ejecución parcial"},{k:"inst_uso",lbl:"Inst de Uso"}
 ];
 var ST_QX = [
@@ -405,6 +405,8 @@ function doneArea(area,c){
   return (c[DONE[area]]||0) + (area==="capacitaciones" ? (c.en_progreso||0)*0.5 : 0);
 }
 function fmtN(x){ return (Math.round(x*10)/10).toString().replace(".",","); }
+// % con 2 decimales para las tarjetas por área (así 300/301 no se ve como 100 %)
+function pctTxt(area,c){ return c.total>0?(doneArea(area,c)/c.total*100).toFixed(2).replace(".",","):"0,00"; }
 function pctArea(area,c){
   return c.total>0?Math.round(doneArea(area,c)/c.total*100):0;
 }
@@ -452,7 +454,7 @@ function renderDash(){
       var cw=cajasCounts(), esp=function(r){return valOf(r,"tipo_cap")==="Especial";};
       var ce={total:0,programado:0,sin_info:0}; ce[DONE.instrumental]=0;
       D.instrumental.forEach(function(r){ if(!esp(r)) return; var e=estadoOf("instrumental",r); ce[e]=(ce[e]||0)+1; ce.total++; });
-      h+='<div class="kpi"><h3>'+a[1]+' · por tipología de caja</h3><div class="big">'+pctArea("instrumental",c)+'%</div>'+
+      h+='<div class="kpi"><h3>'+a[1]+' · por tipología de caja</h3><div class="big">'+pctTxt("instrumental",c)+'%</div>'+
          '<div class="sub">'+(c[DONE.instrumental]||0)+' de '+c.total+' tipologías'+(c.programado?' · '+c.programado+' coordinadas':'')+
          ' · '+fmtN(cw[DONE.instrumental]||0)+'/'+fmtN(cw.total)+' cajas</div>'+barArea("instrumental",c)+
          (ce.total?'<div class="sub" style="margin-top:6px">★ Especiales: '+(ce[DONE.instrumental]||0)+' de '+ce.total+' tipologías'+
@@ -462,7 +464,7 @@ function renderDash(){
     var subx=(c[DONE[a[0]]]||0)+' '+DONE_WORD[a[0]]+
        (a[0]==="capacitaciones"&&c.en_progreso?(' + '+c.en_progreso+' parcial'+(c.en_progreso>1?'es':'')+' (×0,5)'):'')+
        ' de '+c.total;
-    h+='<div class="kpi"><h3>'+a[1]+'</h3><div class="big">'+pctArea(a[0],c)+'%</div>'+
+    h+='<div class="kpi"><h3>'+a[1]+'</h3><div class="big">'+pctTxt(a[0],c)+'%</div>'+
        '<div class="sub">'+subx+'</div>'+barArea(a[0],c)+'</div>';
   });
   // los GLOBALES (tarjetas azules) van primero; después el detalle por área
@@ -480,28 +482,19 @@ function renderDash(){
 }
 // Banner «nos faltan»: equipos (tipologías) del Programa de Capacitación aún no ejecutados, en los grandes
 // recintos y en total. Mismo estado que el avance (Excel + ajustes locales); parcial = todavía falta.
-var FALTAN_GRUPOS=[
-  {l:"Pabellones",       re:/PABELLON/, ins:true},
-  {l:"UPC · UCI y UTI",  re:/UNIDAD DE CUIDADOS (INTENSIVOS|INTERMEDIOS)/},
-  {l:"Med. Física y Rehab.", re:/MEDICINA FISICA Y REHABILITACION/},
-  {l:"Esterilización",   re:/ESTERILIZACION/, ins:true}
-];
+// Banner de avance: hecho vs total en las tres áreas (capacitaciones ejecutadas, instructivos entregados y cajas de instrumental).
 function renderFaltan(){
   var el=document.getElementById("faltan"); if(!el) return;
-  var pend=D.capacitaciones.filter(function(r){ return estadoOf("capacitaciones",r)!==DONE.capacitaciones; });
-  var norm=function(t){ return String(t||"").toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g,""); };
-  var insPend=(D.instrumental||[]).filter(function(r){ return estadoOf("instrumental",r)!==DONE.instrumental; }).length;
-  var h='<div class="ft"><b>⏳ Equipos que nos faltan por capacitar</b>Programa de Capacitación · grandes recintos</div>';
-  FALTAN_GRUPOS.forEach(function(g){
-    var n=pend.filter(function(r){ return g.re.test(norm(valOf(r,"detalle_servicios"))); }).length;
-    if(!g.ins){ h+='<div class="fn"><div class="n">'+n+'</div><div class="l">'+g.l+'</div></div>'; return; }
-    // Pabellones y Esterilización: mitad EMMC (tipologías del programa) y mitad Instrumental (tipologías de caja sin ejecutar)
-    h+='<div class="fn sp" title="Arriba: tipologías EMMC pendientes · Abajo: tipologías de instrumental pendientes (aplica a Pabellones y Esterilización)">'+
-       '<div class="h"><b>'+n+'</b><span>EMMC</span></div><div class="h"><b>'+insPend+'</b><span>Inst Qx</span></div><div class="l">'+g.l+'</div></div>';
-  });
-  h+='<div class="fn g"><div class="n">'+pend.length+'</div><div class="l">Total · de '+D.capacitaciones.length+'</div></div>';
-  if(typeof estamStats==="function"){ var es=estamStats(); h+='<div class="fn" title="Tipologías pendientes con al menos un estamento marcado"><div class="n">'+es.def+'<span style="font-size:13px;font-weight:600"> / '+es.pend+'</span></div><div class="l">👥 con estamentos</div></div>'; }
-  el.innerHTML=h;
+  var cc=counts("capacitaciones"), ci=counts("instructivos"), cw=cajasCounts();
+  var tile=function(done,total,lbl,nota){
+    return '<div class="fn"><div class="n">'+fmtN(done)+'<span style="font-size:13px;font-weight:600"> / '+fmtN(total)+'</span></div>'+
+           '<div class="l">'+lbl+'</div>'+(nota?'<div class="l" style="text-transform:none;opacity:.8">'+nota+'</div>':'')+'</div>';
+  };
+  var par=cc.en_progreso||0;
+  el.innerHTML='<div class="ft"><b>📊 Avance del Programa</b>Ejecutado o entregado vs total</div>'+
+    tile(cc[DONE.capacitaciones]||0,cc.total,"Capacitaciones ejecutadas",par?'+ '+par+' parcial'+(par>1?'es':''):'')+
+    tile(ci[DONE.instructivos]||0,ci.total,"Instructivos entregados","")+
+    tile(cw[DONE.instrumental]||0,cw.total,"Cajas de instrumental","");
 }
 function renderLegend(){
   document.getElementById("legend").innerHTML=
@@ -959,7 +952,7 @@ function pintaLista(){
 (function(){
 var FER={"2026-09-17":1,"2026-09-18":1};
 var ORD={coordinada:0,reprogramada:1,pendiente:2,en_progreso:3,ejecutada:4,inst_uso:5};
-var LBL={coordinada:"Coordinada",pendiente:"CSSO",reprogramada:"Reprogramada",
+var LBL={coordinada:"Coordinada",pendiente:"Por Coordinar",reprogramada:"Reprogramada",
          ejecutada:"Ejecutada",en_progreso:"Ejecución parcial",inst_uso:"Inst de Uso"};
 var mask=document.getElementById("gMask"), body=document.getElementById("gBody"),
     sub=document.getElementById("gSub"), foot=document.getElementById("gFoot");

@@ -1306,7 +1306,7 @@ function _cargarJS(L){
       <button class="tb-btn" id="btnScen" onclick="toggleScenario()" title="Alternar entre el Despliegue 0 (catálogo oficial, sin traslados) y la Propuesta de reubicación (con los traslados aplicados)">📦 Despliegue 0</button>
       <button class="tb-btn" id="btnMoves" onclick="openMovesList()" style="display:none" title="Ver el listado completo de traslados propuestos">↪ 0</button>
       <span class="tb-div"></span>
-      <button class="tb-btn" id="btnExpServ" onclick="exportServicioHTML()" style="display:none" title="Exportar este servicio como HTML autónomo: imagen del plano recortada al contorno punteado, recintos clicables con su ficha (equipamiento, mobiliario, TI, MNC) y opción de ocultar las cajas. No incluye información de funcionarios.">📄 Exportar servicio</button>
+      <button class="tb-btn" id="btnExpServ" onclick="exportServicioHTML()" style="display:none" title="Exportar este servicio como HTML autónomo: imagen del plano recortada al contorno punteado, recintos clicables con su ficha completa (superficie, letrero, camas, dotación cubicada con nombre y sin RUT, Autorización Sanitaria, equipamiento, mobiliario, TI, MNC y objetos del DWG), capas de puestos y camas, y resumen del servicio con la dotación no asignada. Uso interno HDS.">📄 Exportar servicio</button>
       <button class="tb-btn" id="btnMapaServ" onclick="mapaServAbrir()" style="display:none" title="Mapa de navegación de este servicio en página carta: plano a página completa, recintos numerados y leyenda con nombre, código y señalética. Se eligen las secciones a sumar (ficha de recintos, Autorización Sanitaria, dotación cubicada) o ninguna: sólo el plano. Se guarda el HTML y se abre el diálogo de impresión para Guardar como PDF.">🗺 Mapa carta (PDF)</button>
       <button class="tb-btn" id="btnDotServ" onclick="openDotServicio()" style="display:none" title="Dotación de ESTE servicio, como la exportación general de cubicación pero sólo del servicio: completa, cubicada (con puesto en el Atlas) o no cubicada (sin puesto). PDF carta para imprimir o Excel.">👥 Dotación del servicio</button>
       <button class="tb-btn" id="btnMurosServ" onclick="exportMurosServicio()" style="display:none" title="Medidas de muros del servicio en hoja carta, para instalar mobiliario: cada recinto con su contorno sobre el plano, cada muro numerado con su largo, y tabla por muro (orientación, largo, puertas y tramo libre). Portada con el plano del servicio numerado. Se abre el diálogo de impresión para Guardar como PDF.">📐 Muros carta (PDF)</button>
@@ -17082,12 +17082,68 @@ function _expFichaData(rid){
   const strip=a=>a.map(e=>({n:String(e.n||''),f:String(e.f||''),c:e.c||1}));
   return {eq:strip(eq),mob:strip(mob),ti:strip(ti),mnc:strip(mnc),aviso};
 }
+// Zoom y arrastre del HTML exportado de un servicio (igual que en el Atlas: rueda/pellizco al cursor, arrastrar para mover;
+// un clic sin arrastre sigue abriendo la ficha). Va como un bloque del <script> exportado.
+const _EXP_ZOOM_JS=String.raw`
+const VB={x:0,y:0,w:D.w,h:D.h}; let ARR=null, MOV=false; const PT=new Map(); let PINCH=null;
+function zSvg(){ return document.querySelector("#lienzo svg"); }
+function zAlto(){ const L=document.getElementById("lienzo"); L.style.height=Math.round(Math.max(420, Math.min(innerHeight-150, L.clientWidth*D.h/D.w)))+"px"; }
+function vbSet(){ const s=zSvg(); if(s){ s.setAttribute("viewBox",VB.x+" "+VB.y+" "+VB.w+" "+VB.h); const q=Math.pow(VB.w/D.w,.8);
+  s.querySelectorAll(".mk").forEach(c=>{ c.setAttribute("r",c.dataset.r*q); c.setAttribute("stroke-width",c.dataset.r*q*.27); });
+  s.querySelectorAll("#lyCa text").forEach(t=>{ const c=t.previousElementSibling; if(!t.dataset.f) t.dataset.f=t.getAttribute("font-size"); t.setAttribute("font-size",t.dataset.f*q); t.setAttribute("y",+c.getAttribute("cy")-c.dataset.r*q*1.5); }); } const z=document.getElementById("zPct"); if(z) z.textContent=Math.round(D.w/VB.w*100)+"%"; }
+function zEsc(){ const r=zSvg().getBoundingClientRect(); const k=Math.min(r.width/VB.w, r.height/VB.h); return {r,k,ox:(r.width-VB.w*k)/2,oy:(r.height-VB.h*k)/2}; }
+function zPunto(cx,cy){ const e=zEsc(); return {x:VB.x+(cx-e.r.left-e.ox)/e.k, y:VB.y+(cy-e.r.top-e.oy)/e.k}; }
+function zEn(px,py,f){ const nw=Math.min(D.w*1.2, Math.max(D.w/40, VB.w*f)), g=nw/VB.w; VB.x=px-(px-VB.x)*g; VB.y=py-(py-VB.y)*g; VB.w=nw; VB.h*=g; vbSet(); }
+function zBtn(f){ zEn(VB.x+VB.w/2, VB.y+VB.h/2, f); }
+function zReset(){ VB.x=0; VB.y=0; VB.w=D.w; VB.h=D.h; vbSet(); }
+(function(){ const L=document.getElementById("lienzo");
+ L.addEventListener("wheel",e=>{ e.preventDefault(); const p=zPunto(e.clientX,e.clientY); zEn(p.x,p.y,Math.exp(e.deltaY*(e.ctrlKey?0.01:0.0015))); },{passive:false});
+ L.addEventListener("pointerdown",e=>{ if(e.button>0) return; PT.set(e.pointerId,{x:e.clientX,y:e.clientY}); MOV=false;
+  if(PT.size===2){ const [a,b]=[...PT.values()]; PINCH={d:Math.hypot(a.x-b.x,a.y-b.y)}; ARR=null; } else { ARR={x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY}; } });
+ addEventListener("pointermove",e=>{ if(!PT.has(e.pointerId)) return; PT.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(PINCH&&PT.size===2){ const [a,b]=[...PT.values()], d=Math.hypot(a.x-b.x,a.y-b.y); if(d>0&&PINCH.d>0){ const p=zPunto((a.x+b.x)/2,(a.y+b.y)/2); zEn(p.x,p.y,PINCH.d/d); } PINCH.d=d; MOV=true; return; }
+  if(!ARR) return; if(Math.hypot(e.clientX-ARR.x0,e.clientY-ARR.y0)>4){ MOV=true; zSvg().classList.add("arr"); }
+  if(MOV){ const k=zEsc().k; VB.x-=(e.clientX-ARR.x)/k; VB.y-=(e.clientY-ARR.y)/k; vbSet(); } ARR.x=e.clientX; ARR.y=e.clientY; });
+ const fin=e=>{ PT.delete(e.pointerId); if(PT.size<2) PINCH=null; if(!PT.size){ ARR=null; const s=zSvg(); if(s) s.classList.remove("arr"); } };
+ addEventListener("pointerup",fin); addEventListener("pointercancel",fin);
+ L.addEventListener("click",e=>{ if(MOV){ e.stopPropagation(); e.preventDefault(); MOV=false; } },true);
+ L.addEventListener("dblclick",e=>{ const p=zPunto(e.clientX,e.clientY); zEn(p.x,p.y,1/2); });
+ addEventListener("resize",()=>{ zAlto(); vbSet(); });
+})();
+`;
+
+// ── Exportar servicio HTML · ficha completa (18-11-2026) ─────────────────────────────────────────
+// Todo lo que el Atlas muestra de un recinto, sin herramientas de edición: superficie, letrero, camas,
+// dotación cubicada (nombre, estamento, cargo; SIN RUT), Autorización Sanitaria, objetos del DWG y la
+// posición de puestos y camas (para las capas del plano). Más un resumen del servicio con la dotación
+// no asignada. Coordenadas relativas al recorte (b).
+function _expExtra(rid, b, fl){
+  const r2=v=>+(+v).toFixed(1), mat=roomMatrizM2(rid), pl=(typeof roomPlanoM2==='function')?roomPlanoM2(rid):null, dib=roomDrawnM2(rid);
+  const pe=pautaEstadoRoom(rid), PL=window.PAUTA_LABELS||{};
+  const D=_mcDotRecinto(rid);
+  const puestos=[]; ((wsState.dots||{})[rid]||[]).forEach(d=>{ if(d.x==null) return;
+    const noms=d.tipo==='dinamico'?(d.turnos||[]).map(t=>t.nombre).filter(Boolean):(d.nombre?[d.nombre]:[]);
+    puestos.push({x:r2(d.x-b.x), y:r2(d.y-b.y), n:noms.join(' · '), din:d.tipo==='dinamico'}); });
+  const camas=((wsState.beds||{})[rid]||[]).map(c=>({x:r2(c.x-b.x), y:r2(c.y-b.y), n:String(c.num||'')}));
+  const dwg={}; try{ const sh=boxState.rooms[rid]||[]; (fl?_dwgEnCajas(fl, sh):[]).forEach(o=>{ const g=((window.DWG_OBJETOS||{}).grupos||{})[o.g]||o.g; (dwg[g]=dwg[g]||{})[o.fam]=((dwg[g]||{})[o.fam]||0)+1; }); }catch(e){}
+  return {m2:{mat:mat?r2(mat.m2):null, pl:pl?r2(pl.m2):null, dib:dib?r2(dib):null},
+    as:{e:pe.estado, p:(pe.estado==='no_corresponde'?[]:(pe.p||[])).map(id=>{ const m=PL[id]||{}; return [m.normaLabel||String(id).split('_')[0], m.name||id, m.seccion||'']; })},
+    dot:{P:D.P.map(p=>[p.nombre,p.estamento,p.cargo,p.turno||'']), libres:D.libres}, puestos, camas, dwg, aforo:(nameState.capacity||{})[rid]||null};
+}
+function _expResumen(area, rooms){
+  let na=null; try{ const D=_mcNoAsig(area); na={total:D.total, aqui:D.aqui, otro:D.otro, unidades:D.unidades, P:D.P.map(p=>[p.mot,p.nombre,p.estamento,p.cargo,p.unidad,p.nota])}; }catch(e){}
+  const as={}; rooms.forEach(r=>{ const e=r.x&&r.x.as?r.x.as.e:'sin'; as[e]=(as[e]||0)+1; });
+  return {recintos:rooms.length, camas:rooms.reduce((a,r)=>a+((r.x&&r.x.camas)||[]).length,0),
+    personas:rooms.reduce((a,r)=>a+((r.x&&r.x.dot.P)||[]).length,0), libres:rooms.reduce((a,r)=>a+((r.x&&r.x.dot.libres)||0),0),
+    m2:+rooms.reduce((a,r)=>a+((r.x&&(r.x.m2.mat||r.x.m2.pl||r.x.m2.dib))||0),0).toFixed(1), as, na, motivos:MC_MOTIVO};
+}
+
 function exportServicioHTML(){
   const area=curArea();
   if(!area){ alert('Entra a un servicio (vista 2) para exportarlo.'); return; }
   const aSh=aShapes(area);
   if(!aSh.length){ alert('Este servicio no tiene contorno dibujado.'); return; }
-  const PAD=60, ab=bounds(aSh);
+  const PAD=60, ab=bounds(aSh), fl=S.floorId;
   const b={x:Math.max(0,ab.x-PAD), y:Math.max(0,ab.y-PAD)};
   b.w=Math.min(IMG_W,ab.x+ab.w+PAD)-b.x; b.h=Math.min(IMG_H,ab.y+ab.h+PAD)-b.y;
   // ── recorte del plano visible (con fallback si el canvas queda "tainted") ──
@@ -17120,7 +17176,8 @@ function exportServicioHTML(){
       sh:sh.map(s=>({x:+(s.x-b.x).toFixed(1), y:+(s.y-b.y).toFixed(1), w:+s.w.toFixed(1), h:+s.h.toFixed(1)})),
       // Recintos de varios bloques: contorno único fusionado (sin líneas internas)
       d:unionPath(sh.map(s=>({x:s.x-b.x, y:s.y-b.y, w:s.w, h:s.h}))).replace(/-?\d+\.\d+/g,m=>(+m).toFixed(1)),
-      f:_expFichaData(r.id)
+      f:_expFichaData(r.id),
+      x:_expExtra(r.id, b, fl)
     });
   });
   if(!rooms.length){ alert('Este servicio no tiene recintos dibujados.'); return; }
@@ -17133,7 +17190,7 @@ function exportServicioHTML(){
   const nomServ=aName(area.id), piso=(curFloor()||{}).label||S.floorId;
   const tipos={};
   rooms.forEach(r=>{ (tipos[r.tipo]=tipos[r.tipo]||{n:0,col:r.col}).n++; });
-  const DATA={serv:nomServ, piso, fecha, w:b.w, h:b.h,
+  const DATA={serv:nomServ, piso, fecha, w:b.w, h:b.h, res:_expResumen(area, rooms),
     img:dataURL?{d:dataURL}:{u:planAbs, full:{w:IMG_W,h:IMG_H}, off:{x:b.x,y:b.y}},
     guiaD, rooms, sinDibujo,
     tipos:Object.entries(tipos).sort((a,c)=>c[1].n-a[1].n).map(([k,v])=>({t:k,n:v.n,col:v.col}))};
@@ -17149,14 +17206,25 @@ function exportServicioHTML(){
 'header h1{font-size:17px;font-weight:800;letter-spacing:.4px}',
 'header .sub{font-size:11px;opacity:.85;margin-top:2px}',
 'header .sp{flex:1}',
-'#tgl{background:#fff;color:#1d5fa0;border:none;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:800;cursor:pointer}',
+'#tgl,.hb{background:#fff;color:#1d5fa0;border:none;border-radius:8px;padding:8px 12px;font-size:12px;font-weight:800;cursor:pointer}',
+'.hb.on{background:#fde68a}',
+'.kv{font-size:11.5px;color:#334155;line-height:1.6}','.kv b{color:#0f172a}',
+'.tag{display:inline-block;font-size:10px;font-weight:700;border-radius:6px;padding:1px 6px;margin-left:4px}',
+'.res-g{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0}','.res-g div{background:#eef4fa;border-radius:8px;padding:6px 8px;font-size:10.5px;color:#48687e}','.res-g b{display:block;font-size:17px;color:#0f172a}',
+'.pu{cursor:help}','.ca text{font-weight:800}',
 '.leyenda{display:flex;gap:10px;flex-wrap:wrap;background:#eef4fa;padding:7px 20px;font-size:10.5px;color:#334155;border-bottom:1px solid #cbd5e1}',
 '.leyenda .it{display:flex;align-items:center;gap:5px;font-weight:600}',
 '.leyenda .sw{width:10px;height:10px;border-radius:3px;display:inline-block}',
 '.wrap{display:flex;gap:14px;padding:14px 20px;align-items:flex-start}',
-'.mapa{flex:1;min-width:0;background:#fff;border:1px solid #a9c3d6;border-radius:12px;overflow:hidden;box-shadow:0 6px 24px rgba(15,30,52,.15)}',
-'.lienzo{position:relative;width:100%}',
-'.lienzo svg{display:block;width:100%;height:auto;background:#fff}',
+'.mapa{flex:1;min-width:0;background:#fff;border:1px solid #a9c3d6;border-radius:12px;overflow:hidden;box-shadow:0 6px 24px rgba(15,30,52,.15);position:relative}',
+'.lienzo{position:relative;width:100%;height:420px}',
+'.lienzo svg{display:block;width:100%;height:100%;background:#fff;touch-action:none;cursor:grab}',
+'.lienzo svg.arr{cursor:grabbing}',
+'.zctl{position:absolute;right:10px;bottom:10px;display:flex;gap:4px;align-items:center;background:rgba(255,255,255,.94);border:1px solid #a9c3d6;border-radius:10px;padding:4px;box-shadow:0 2px 10px rgba(15,30,52,.15)}',
+'.zctl button{width:30px;height:30px;border:none;border-radius:7px;background:#1d5fa0;color:#fff;font-size:16px;font-weight:800;cursor:pointer}',
+'.zctl span{min-width:44px;text-align:center;font-size:11px;font-weight:800;color:#1d5fa0}',
+'.rosa svg{width:100%;height:100%;display:block}',
+'.zhint{position:absolute;left:10px;bottom:10px;font-size:10.5px;color:#64748b;background:rgba(255,255,255,.9);border-radius:6px;padding:3px 7px}',
 '.rbx{cursor:pointer}',
 '.rbx rect{transition:fill-opacity .12s}',
 '.rbx:hover rect{fill-opacity:.42}',
@@ -17181,18 +17249,18 @@ function exportServicioHTML(){
 '</style></head><body>',
 '<header><div><h1>🏥 '+esc(nomServ)+'</h1>',
 '<div class="sub">'+esc(piso)+' · '+rooms.length+' recintos · Atlas HDS · exportado '+fecha+'</div></div>',
-'<div class="sp"></div><button id="tgl" onclick="tgl()">👁 Ocultar cajas</button></header>',
+'<div class="sp"></div><button class="hb" id="bPu" onclick="capa(\'pu\')">👥 Puestos</button><button class="hb" id="bCa" onclick="capa(\'ca\')">🛏 Camas</button><button class="hb" onclick="pick(-1)">📊 Resumen</button><button id="tgl" onclick="tgl()">👁 Ocultar cajas</button></header>',
 '<div class="leyenda" id="ley"></div>',
-'<div class="wrap"><div class="mapa"><div class="lienzo" id="lienzo"></div></div>',
-'<aside id="ficha"><div class="vacio">Clic en un recinto del plano para revisar su ficha.<br><br>El botón de arriba oculta o muestra las cajas para ver el plano limpio.</div></aside></div>',
-'<footer>Documento generado por Atlas HDS · solo consulta · no incluye información de funcionarios'+(sinDibujo?(' · '+sinDibujo+' recinto(s) del servicio aún sin dibujar no se incluyen'):'')+'</footer>',
+'<div class="wrap"><div class="mapa"><div class="lienzo" id="lienzo"></div>'+_rosaVientosHTML(0.9).replace('top:0.06in;right:0.06in','top:10px;right:10px')+'<div class="zhint">Rueda o pellizco: zoom · arrastrar: mover</div><div class="zctl"><button onclick="zBtn(1/1.4)" title="Acercar">+</button><span id="zPct">100%</span><button onclick="zBtn(1.4)" title="Alejar">−</button><button onclick="zReset()" title="Ver todo el servicio">⟲</button></div></div>',
+'<aside id="ficha"></aside></div>',
+'<footer>Documento generado por Atlas HDS · solo consulta · uso interno HDS: incluye nombres de funcionarios con puesto, sin RUT'+(sinDibujo?(' · '+sinDibujo+' recinto(s) del servicio aún sin dibujar no se incluyen'):'')+'</footer>',
 '<script>',
 'const D='+J+';',
-'let SEL=-1, CAJAS=true;',
+'let SEL=-1, CAJAS=true, CAPA={pu:false,ca:false};',
 'const _ex=s=>String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;");',
 'function build(){',
 ' const L=document.getElementById("lienzo");',
-' let s=\'<svg viewBox="0 0 \'+D.w+\' \'+D.h+\'">\';',
+' let s=\'<svg viewBox="0 0 \'+D.w+\' \'+D.h+\'" preserveAspectRatio="xMidYMid meet">\';',
 ' s+=\'<defs><clipPath id="cpServ"><path d="\'+D.guiaD+\'"/></clipPath></defs>\';',
 ' if(D.img.d) s+=\'<image href="\'+D.img.d+\'" x="0" y="0" width="\'+D.w+\'" height="\'+D.h+\'" clip-path="url(#cpServ)"/>\';',
 ' else s+=\'<image href="\'+D.img.u+\'" x="\'+(-D.img.off.x)+\'" y="\'+(-D.img.off.y)+\'" width="\'+D.img.full.w+\'" height="\'+D.img.full.h+\'" clip-path="url(#cpServ)"/>\';',
@@ -17216,10 +17284,15 @@ function exportServicioHTML(){
 '  if(r.code) s+=\'<text x="\'+cx+\'" y="\'+(cy+(l2?fs*1.55:fs*.95))+\'" text-anchor="middle" font-size="\'+(fs*.62)+\'" fill="#334155" stroke-width="\'+(fs*.18)+\'">\'+_ex(r.code)+\'</text>\';',
 '  s+="</g>";',
 ' });',
-' s+="</g></svg>";',
-' L.innerHTML=s;',
+' s+="</g>";',
+' const kk=Math.max(D.w,D.h)/180;',
+' s+=\'<g id="lyPu" style="display:none">\'; D.rooms.forEach(r=>(r.x.puestos||[]).forEach(p=>{ s+=\'<circle class="pu mk" data-r="\'+kk*.55+\'" cx="\'+p.x+\'" cy="\'+p.y+\'" r="\'+kk*.55+\'" fill="\'+(p.n?"#2563eb":"#cbd5e1")+\'" stroke="#fff" stroke-width="\'+kk*.15+\'"><title>\'+(p.n?_ex(p.n):"Puesto sin persona")+(p.din?" (turnos)":"")+\'</title></circle>\'; })); s+="</g>";',
+' s+=\'<g id="lyCa" class="ca" style="display:none">\'; D.rooms.forEach(r=>(r.x.camas||[]).forEach(c=>{ s+=\'<circle class="mk" data-r="\'+kk*.6+\'" cx="\'+c.x+\'" cy="\'+c.y+\'" r="\'+kk*.6+\'" fill="#e11d48" stroke="#fff" stroke-width="\'+kk*.15+\'"/><text x="\'+c.x+\'" y="\'+(c.y-kk*.9)+\'" text-anchor="middle" font-size="\'+kk*.75+\'" fill="#9f1239" stroke-width="\'+kk*.2+\'">\'+_ex(c.n)+\'</text>\'; })); s+="</g>";',
+' s+="</svg>";',
+' L.innerHTML=s; zAlto(); vbSet();',
 ' document.getElementById("ley").innerHTML=D.tipos.map(t=>\'<span class="it"><span class="sw" style="background:\'+t.col+\'"></span>\'+_ex(t.t)+\' · \'+t.n+\'</span>\').join("");',
 '}',
+'function capa(k){ CAPA[k]=!CAPA[k]; document.getElementById(k==="pu"?"lyPu":"lyCa").style.display=CAPA[k]?"":"none"; document.getElementById(k==="pu"?"bPu":"bCa").classList.toggle("on",CAPA[k]); }',
 'function tgl(){ CAJAS=!CAJAS;',
 ' document.getElementById("ov").style.display=CAJAS?"":"none";',
 ' document.getElementById("tgl").textContent=CAJAS?"👁 Ocultar cajas":"🙈 Mostrar cajas"; }',
@@ -17228,23 +17301,42 @@ function exportServicioHTML(){
 ' h+=arr.length?arr.map(e=>\'<div class="fila"><span class="q">\'+e.c+\'×</span><span>\'+_ex(e.n)+\'</span><span class="fam">\'+_ex(e.f)+\'</span></div>\').join(""):\'<div class="nada">Sin registro en la matriz.</div>\';',
 ' return h+"</div>";',
 '}',
+'const AS_TX={sin:"🔴 Sin pauta",sugerida:"🟠 Sugerida · por validar",validada:"🟢 Validada",no_corresponde:"⚪ No corresponde"};',
+'const f2=v=>(+v).toFixed(2).replace(".",",");',
+'function secH(tit,n,h){ return \'<div class="sec"><div class="t"><span>\'+tit+\'</span>\'+(n!=null?\'<span class="n">\'+n+\'</span>\':"")+\'</div>\'+h+"</div>"; }',
+'function resumen(){ const R=D.res; let h=\'<h2>\'+_ex(D.serv)+\'</h2><div class="meta">\'+_ex(D.piso)+\' · resumen del servicio · clic en un recinto para su ficha</div>\';',
+' h+=\'<div class="res-g"><div><b>\'+R.recintos+\'</b>recintos</div><div><b>\'+String(R.m2).replace(".",",")+\'</b>m² aprox.</div><div><b>\'+R.camas+\'</b>camas</div><div><b>\'+R.personas+\'</b>personas con puesto\'+(R.libres?(" · "+R.libres+" libres"):"")+\'</div></div>\';',
+' h+=secH("🩺 Autorización Sanitaria",null,\'<div class="kv">\'+Object.entries(R.as).map(([k,n])=>AS_TX[k]+" <b>"+n+"</b>").join("<br>")+"</div>");',
+' if(R.na&&R.na.unidades.length){ const g={}; R.na.P.forEach(p=>(g[p[0]]=g[p[0]]||[]).push(p));',
+'  h+=secH("⚠️ Dotación no asignada",R.na.P.length,\'<div class="kv">RRHH informa <b>\'+R.na.total+\'</b> · con puesto aquí <b>\'+R.na.aqui+\'</b>\'+(R.na.otro?(" · en otro servicio <b>"+R.na.otro+"</b>"):"")+\'<br><span style="color:#94a3b8">Unidades: \'+_ex(R.na.unidades.join(" · "))+\'</span></div>\'',
+'   +Object.keys(R.motivos).filter(m=>g[m]).map(m=>\'<div style="font-size:11px;font-weight:800;color:#1d5fa0;margin-top:6px">\'+R.motivos[m].ico+" "+R.motivos[m].lbl+" · "+g[m].length+"</div>"+g[m].map(p=>\'<div class="fila"><span>\'+_ex(p[1])+\'</span><span class="fam">\'+_ex([p[2],p[3]].filter(Boolean).join(" · "))+"</span></div>").join("")).join("")); }',
+' document.getElementById("ficha").innerHTML=h; }',
 'function pick(i){',
 ' SEL=i;',
 ' document.querySelectorAll(".rbx").forEach(g=>g.classList.toggle("sel",+g.dataset.i===i));',
-' const r=D.rooms[i], f=r.f;',
+' if(i<0){ resumen(); return; }',
+' const r=D.rooms[i], f=r.f, x=r.x;',
 ' let h=\'<h2>\'+_ex(r.nm)+\'</h2><div class="meta">\';',
 ' if(r.code) h+="Código <b>"+_ex(r.code)+"</b> · ";',
 ' if(r.bim) h+="BIM <b>"+_ex(r.bim)+"</b><br>";',
-' h+=_ex(r.tipo)+(r.m2?(" · 📐 "+_ex(r.m2)):"");',
-' if(r.sen||r.senN) h+="<br>🪧 "+_ex([r.sen,r.senN].filter(Boolean).join(" · "));',
+' h+=_ex(r.tipo)+(x.aforo?(" · aforo "+x.aforo):"");',
+' if(r.sen||r.senN) h+="<br>🪧 Letrero: <b>"+_ex([r.sen,r.senN?("N° "+r.senN):""].filter(Boolean).join(" · "))+"</b>";',
 ' h+="</div>";',
+' const m=x.m2; h+=secH("📐 Superficie",null,\'<div class="kv">\'+(m.mat!=null?("Matriz <b>"+f2(m.mat)+" m²</b><br>"):"")+(m.pl!=null?("Plano de circulación jun-2026 <b>"+f2(m.pl)+" m²</b><br>"):"")+(m.dib!=null?("Dibujo ≈ "+f2(m.dib)+" m²"):"")+((m.mat&&m.pl&&Math.abs(m.mat-m.pl)>=1&&Math.abs(m.mat-m.pl)/m.mat>=.1)?\'<br><span style="color:#b45309">⚠ matriz y plano difieren \'+Math.round((m.pl-m.mat)/m.mat*100)+" %</span>":"")+"</div>");',
+' if(x.camas.length) h+=secH("🛏 Camas",x.camas.length,\'<div class="kv">\'+x.camas.map(c=>_ex(c.n)).join(" · ")+"</div>");',
+' h+=secH("👥 Dotación cubicada",x.dot.P.length,(x.dot.P.length?x.dot.P.map(p=>\'<div class="fila"><span>\'+_ex(p[0])+\'</span><span class="fam">\'+_ex([p[1],p[2],p[3]].filter(Boolean).join(" · "))+"</span></div>").join(""):\'<div class="nada">Sin personas con puesto en este recinto.</div>\')+(x.dot.libres?(\'<div class="nada">\'+x.dot.libres+" puesto(s) sin persona.</div>"):""));',
+' h+=secH("🩺 Autorización Sanitaria",null,\'<div class="kv">\'+(AS_TX[x.as.e]||"")+"</div>"+x.as.p.map(p=>\'<div class="fila"><span><b>\'+_ex(p[0])+"</b> "+_ex(p[1])+(p[2]?(" · "+_ex(p[2])):"")+"</span></div>").join(""));',
 ' if(f.aviso) h+=\'<div class="aviso">⚠ \'+_ex(f.aviso)+\'</div>\';',
 ' h+=sec("⚙️ Equipamiento",f.eq)+sec("🛏️ Mobiliario Clínico",f.mob)+sec("🖥️ Informática",f.ti)+sec("🪑 Mobiliario No Clínico",f.mnc);',
+' const dg=Object.entries(x.dwg||{}); if(dg.length) h+=secH("📦 En el DWG de coordinación (may-2026)",dg.reduce((a,[g,t])=>a+Object.values(t).reduce((s,n)=>s+n,0),0),dg.map(([g,t])=>\'<div style="font-size:10.5px;font-weight:800;color:#64748b;margin-top:4px">\'+_ex(g)+"</div>"+Object.entries(t).sort((a,b)=>b[1]-a[1]).map(([fm,n])=>\'<div class="fila"><span class="q">\'+n+\'×</span><span>\'+_ex(fm)+"</span></div>").join("")).join(""));',
 ' document.getElementById("ficha").innerHTML=h;',
 '}',
-'build();',
+_EXP_ZOOM_JS,
+'build(); resumen();',
 '<\/script></body></html>'].join('\n');
-  const nomArch='Servicio_'+String(nomServ).replace(/[^A-Za-z0-9Ññ]+/g,'_').replace(/^_|_$/g,'')+'_'+new Date().toISOString().slice(0,10)+'.html';
+  const nomArch='Servicio_'+String(nomServ).replace(/[^A-Za-z0-9Ññ]+/g,'_').replace(/^_|_$/g,'')+'_'+String(S.floorId).replace(/[^A-Za-z0-9-]/g,'')+'_'+new Date().toISOString().slice(0,10)+'.html';
+  if(/\b\d{1,2}\.?\d{3}\.?\d{3}-[\dkK]\b/.test(html.replace(/data:image\/[^"']+/g,''))){ alert('⛔ El HTML tendría algo con forma de RUT: no se guarda.'); return null; }
+  if(window.__expServNoGuardar) return html;
   guardarArchivo('Servicios', nomArch, html, 'text/html').then(()=>{
     if(taintErr && typeof tbInfo!=='undefined' && tbInfo){
       tbInfo.textContent='⚠ El plano no pudo incrustarse (navegador via file://): el HTML lo referencia desde la carpeta del Atlas.';
@@ -17325,6 +17417,35 @@ function _mapaSvgLey(R, sufijo, msPx){
 // elige la combinación que deja el plano más grande con la letra más grande. Al abrir el documento,
 // fitLey() parte unos puntos más arriba y achica la letra sólo lo necesario para que todo quepa.
 // Los números sobre el plano miden siempre ~0,26 in (≈ 6,6 mm) en el papel.
+// ── Rosa de los vientos en las hojas impresas (17-11-2026, pedido de Meylin Canales: «que se ubiquen») ─────
+// Norte geográfico respecto del «arriba» del plano del Atlas: símbolo «orientación» de los planos ARQ-PL-GEN
+// Circulaciones (jun-2026, P-1 a P4, mismo en todos): el eje de la flecha está girado 15,2° en sentido horario.
+// El plano del Atlas tiene la misma orientación que esos PDF (registro sin giro, escala uniforme).
+const NORTE_PLANO_DEG=15.2;
+// Esquina del recuadro del plano que menos tapa el servicio (área de sus cajas bajo la rosa); empate → arriba a la derecha.
+function _rosaEsquina(R, Ly, t){
+  const M=0.06, sc=Ly.scale, ox=(Ly.mapW-R.b.w*sc)/2, oy=(Ly.mapH-R.b.h*sc)/2;
+  let sh=[]; try{ sh=aShapes(R.area).map(q=>({x:q.x-R.b.x, y:q.y-R.b.y, w:q.w, h:q.h})); }catch(e){}
+  const E=[['top:'+M+'in;right:'+M+'in', Ly.mapW-M-t, M], ['top:'+M+'in;left:'+M+'in', M, M],
+           ['bottom:'+M+'in;right:'+M+'in', Ly.mapW-M-t, Ly.mapH-M-t], ['bottom:'+M+'in;left:'+M+'in', M, Ly.mapH-M-t]];
+  let mej=E[0], md=Infinity;
+  E.forEach(([pos,xi,yi])=>{ const x0=(xi-ox)/sc, y0=(yi-oy)/sc, x1=x0+t/sc, y1=y0+t/sc;
+    const a=sh.reduce((s,q)=>s+Math.max(0,Math.min(x1,q.x+q.w)-Math.max(x0,q.x))*Math.max(0,Math.min(y1,q.y+q.h)-Math.max(y0,q.y)),0);
+    if(a<md-1e-6){ md=a; mej=[pos]; } });
+  return mej[0];
+}
+function _rosaVientosHTML(tamIn, pos){
+  const D=NORTE_PLANO_DEG, P=(a,r)=>[(Math.sin((a+D)*Math.PI/180)*r).toFixed(1), (-Math.cos((a+D)*Math.PI/180)*r).toFixed(1)];
+  let g='<svg viewBox="-50 -50 100 100"><circle r="48" fill="#fff" fill-opacity=".93" stroke="#1d5fa0" stroke-width="1.6"/><circle r="33" fill="none" stroke="#cbd5e1" stroke-width=".8"/>';
+  g+='<g transform="rotate('+D+')">';
+  [45,135,225,315].forEach(a=>{ g+='<g transform="rotate('+a+')"><polygon points="0,-20 3.5,-3.5 0,0" fill="#94a3b8"/><polygon points="0,-20 -3.5,-3.5 0,0" fill="#cbd5e1"/></g>'; });
+  [[0,'#b91c1c','#ef4444'],[90,'#1e3a8a','#3b82f6'],[180,'#1e3a8a','#3b82f6'],[270,'#1e3a8a','#3b82f6']].forEach(([a,c1,c2])=>{
+    g+='<g transform="rotate('+a+')"><polygon points="0,-31 6,-6 0,0" fill="'+c1+'"/><polygon points="0,-31 -6,-6 0,0" fill="'+c2+'"/></g>'; });
+  g+='<circle r="2.6" fill="#0f172a"/></g>';
+  [[0,'N'],[90,'E'],[180,'S'],[270,'O']].forEach(([a,t])=>{ const [x,y]=P(a,41);
+    g+='<text x="'+x+'" y="'+y+'" text-anchor="middle" dominant-baseline="central" font-size="'+(t==='N'?14:12)+'" font-weight="900" font-family="Segoe UI,system-ui,sans-serif" fill="'+(t==='N'?'#b91c1c':'#1e3a8a')+'">'+t+'</text>'; });
+  return '<div class="rosa" title="Norte geográfico según los planos de arquitectura" style="position:absolute;'+(pos||'top:0.06in;right:0.06in')+';width:'+tamIn+'in;height:'+tamIn+'in;pointer-events:none;z-index:2">'+g+'</svg></div>';
+}
 const MC_PAG={land:{w:10.5,h:8.0}, port:{w:8.0,h:10.5}, cab:0.52, pie:0.2, marca:0.26};
 var MC_PESO_LETRA=2.5;   // cuánto pesa la letra frente al tamaño del plano al elegir la hoja (más alto = letra más grande)
 function _mcLayout(R, W, H){
@@ -17349,12 +17470,13 @@ function _mcLayout(R, W, H){
 function _mcCuerpo(R, suf, W, H){
   const Ly=_mcLayout(R,W,H), {svg,ley,tipos}=_mapaSvgLey(R,suf,MC_PAG.marca/Ly.scale), lado=Ly.pos==='lado';
   return {Ly, tipos, html:'<div class="mc-cuerpo" style="display:flex;gap:0.15in;'+(lado?'':'flex-direction:column;')+'">'
-    +'<div class="mapa" style="width:'+Ly.mapW.toFixed(2)+'in;height:'+Ly.mapH.toFixed(2)+'in">'+svg+'</div>'
+    +'<div class="mapa" style="width:'+Ly.mapW.toFixed(2)+'in;height:'+Ly.mapH.toFixed(2)+'in">'+svg+(t=>_rosaVientosHTML(t,_rosaEsquina(R,Ly,t)))(Math.max(0.6,Math.min(0.85,Math.min(Ly.mapW,Ly.mapH)*0.16)))+'</div>'
     +'<aside class="leyfit" data-fs="'+Ly.fs0+'" style="width:'+Ly.legW.toFixed(2)+'in;height:'+Ly.legH.toFixed(2)+'in"><h2>Recintos</h2>'
     +'<ol style="column-count:'+Ly.cols+'">'+ley+'</ol></aside></div>'};
 }
 const MC_CSS_HOJA=[
-'.mapa{border:1px solid #cbd5e1;border-radius:6px;overflow:hidden;background:#fff;flex-shrink:0}',
+'.mapa{border:1px solid #cbd5e1;border-radius:6px;overflow:hidden;background:#fff;flex-shrink:0;position:relative}',
+'.rosa svg{width:100%;height:100%;display:block}',
 '.mapa svg{width:100%;height:100%;display:block}','.mapa text{font-family:"Segoe UI",system-ui,sans-serif}',
 '.mapa .bimtx{display:none}','body.conbim .mapa .bimtx{display:inline}',
 'aside.leyfit{overflow:hidden;flex-shrink:0}',
@@ -17503,17 +17625,21 @@ async function exportMapaGlobal(alc, opc, soloHtml){
     // lámina general del piso: los servicios del alcance numerados sobre el plano
     const sh=P.serv.flatMap(x=>aShapes(x.a)), bb=bounds(sh), D=FLOOR_DIMS[P.fl.id]||{w:IMG_W,h:IMG_H}, PAD=120;
     const b={x:Math.max(0,bb.x-PAD), y:Math.max(0,bb.y-PAD)}; b.w=Math.min(D.w,bb.x+bb.w+PAD)-b.x; b.h=Math.min(D.h,bb.y+bb.h+PAD)-b.y;
-    let url=null; try{ const sc=Math.min(1,2400/Math.max(b.w,b.h)); const cv=document.createElement('canvas'); cv.width=Math.round(b.w*sc); cv.height=Math.round(b.h*sc);
+    let url=null; try{ const sc=Math.min(1,3200/Math.max(b.w,b.h)); const cv=document.createElement('canvas'); cv.width=Math.round(b.w*sc); cv.height=Math.round(b.h*sc);
       const cx=cv.getContext('2d'); cx.fillStyle='#fff'; cx.fillRect(0,0,cv.width,cv.height); cx.globalAlpha=.55; cx.drawImage(img,b.x*k,b.y*k,b.w*k,b.h*k,0,0,cv.width,cv.height); url=cv.toDataURL('image/jpeg',0.8); }catch(e){}
-    const ms=Math.max(90,Math.min(320,Math.max(b.w,b.h)/28));   // número visible aunque el piso sea alto y angosto
+    // portada del piso (17-11-2026): plano grande con el NÚMERO y el NOMBRE de cada servicio, tamaño fijo en el papel
+    const OVW=MC_PAG.land.w-2.6-0.15, OVH=MC_PAG.land.h-MC_PAG.cab-0.1, escIn=Math.min(OVW/b.w, OVH/b.h);
+    const ms=0.30/escIn, fsN=0.115/escIn;
+    const partir=t=>{ const w=String(t).split(/\s+/), L=[]; let cur=''; w.forEach(p=>{ if((cur+' '+p).trim().length>16 && cur){ L.push(cur); cur=p; } else cur=(cur+' '+p).trim(); }); if(cur) L.push(cur); return L.slice(0,3); };
     let g='<svg viewBox="0 0 '+b.w.toFixed(0)+' '+b.h.toFixed(0)+'" preserveAspectRatio="xMidYMid meet">'+(url?'<image href="'+url+'" x="0" y="0" width="'+b.w.toFixed(0)+'" height="'+b.h.toFixed(0)+'"/>':'');
     const items=P.serv.map((x,i)=>{ const num=n+i+1, col=_MC_TONOS[i%_MC_TONOS.length], s2=aShapes(x.a), c=bounds(s2);
       g+='<path d="'+unionPath(s2.map(q=>({x:q.x-b.x,y:q.y-b.y,w:q.w,h:q.h})))+'" fill="'+col+'" fill-opacity=".14" stroke="'+col+'" stroke-width="'+(ms*.09)+'" stroke-linejoin="round"/>';
       return {num, col, cx:c.x+c.w/2-b.x, cy:c.y+c.h/2-b.y, x}; });
-    items.forEach(it=>{ g+='<circle cx="'+it.cx.toFixed(0)+'" cy="'+it.cy.toFixed(0)+'" r="'+(ms/2)+'" fill="#fff" stroke="'+it.col+'" stroke-width="'+(ms*.12)+'"/><text x="'+it.cx.toFixed(0)+'" y="'+(it.cy+ms*.03).toFixed(0)+'" text-anchor="middle" dominant-baseline="middle" font-size="'+(ms*.5)+'" font-weight="800" fill="#0f172a">'+it.num+'</text>'; });
+    items.forEach(it=>{ g+='<circle cx="'+it.cx.toFixed(0)+'" cy="'+it.cy.toFixed(0)+'" r="'+(ms/2)+'" fill="#fff" stroke="'+it.col+'" stroke-width="'+(ms*.12)+'"/><text x="'+it.cx.toFixed(0)+'" y="'+(it.cy+ms*.03).toFixed(0)+'" text-anchor="middle" dominant-baseline="middle" font-size="'+(ms*.5)+'" font-weight="800" fill="#0f172a">'+it.num+'</text>';
+      partir(aName(it.x.a.id)).forEach((ln,j)=>{ g+='<text x="'+it.cx.toFixed(0)+'" y="'+(it.cy+ms*.5+fsN*(1.05+j*1.1)).toFixed(0)+'" text-anchor="middle" font-size="'+fsN.toFixed(0)+'" font-weight="800" fill="'+it.col+'" stroke="#fff" stroke-width="'+(fsN*.28).toFixed(0)+'" paint-order="stroke fill" stroke-linejoin="round">'+esc(ln)+'</text>'; }); });
     g+='</svg>';
     paginas.push('<section class="pg"><header><div><h1>'+esc(P.fl.label)+' · vista general</h1><div class="sub">'+esc(titulo)+' · '+P.serv.length+' servicios</div></div></header>'
-      +'<div class="cuerpo"><div class="mapa">'+g+'</div><aside><h2>Servicios</h2><ol>'
+      +'<div class="cuerpo"><div class="mapa" style="width:'+OVW.toFixed(2)+'in;height:'+OVH.toFixed(2)+'in">'+g+_rosaVientosHTML(0.85)+'</div><aside style="width:2.6in;height:'+OVH.toFixed(2)+'in"><h2>Servicios</h2><ol>'
       +items.map(it=>'<li><span class="n" style="border-color:'+it.col+'">'+it.num+'</span><span class="t"><b>'+esc(aName(it.x.a.id))+'</b> <span class="c">'+(it.x.a.rooms||[]).filter(r=>rShapes(r).length).length+' recintos</span>'
         +(NA&&naServ[it.x.a.id]&&naServ[it.x.a.id].unidades.length?('<br><span class="s">⚠ RRHH '+naServ[it.x.a.id].total+' · sin asignar '+naServ[it.x.a.id].P.length+'</span>'):'')+'</span></li>').join('')
       +'</ol></aside></div></section>');
@@ -17543,7 +17669,7 @@ async function exportMapaGlobal(alc, opc, soloHtml){
 'h1 .nn{display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:26px;border:2px solid #1d5fa0;border-radius:50%;font-size:10pt}',
 '.sub{font-size:8.5pt;color:#475569;margin-top:2px}',
 '.cuerpo{display:flex;gap:0.15in}',
-'.mapa{width:7.35in;height:7.4in;border:1px solid #cbd5e1;border-radius:6px;overflow:hidden;flex-shrink:0}',
+'.mapa{width:7.35in;height:7.4in;border:1px solid #cbd5e1;border-radius:6px;overflow:hidden;flex-shrink:0;position:relative}',
 '.mapa svg{width:100%;height:100%;display:block}',
 '.mapa .bimtx{display:none}','body.conbim .mapa .bimtx{display:inline}',
 'aside{width:3.0in;height:7.4in;overflow:hidden}',
@@ -19994,6 +20120,22 @@ async function runSelfTest(){
       const h=_mcNoAsigHTML(D,v=>String(v)); if(/\b\d{1,2}\.?\d{3}\.?\d{3}-[\dkK]\b/.test(h)) ok=false; });
     return algun && ok && MC_OPC.some(o=>o.k==='noasig');
   });
+  T('Exportar servicio HTML: ficha completa (m², AS, dotación sin RUT, camas, puestos, DWG), resumen del servicio y zoom', ()=>{
+    const L=_mcServicios({tipo:'edificio',ed:'HDS'}); const x=L.find(z=>(z.a.rooms||[]).some(r=>((wsState.dots||{})[r.id]||[]).length)); if(!x) return 'omitir';
+    const fPrev=S.floorId, aPrev=S.areaId, lvPrev=S.level; let h=null;
+    try{ S.floorId=x.fl.id; S.areaId=x.a.id; S.level=2; window.__expServNoGuardar=true; h=exportServicioHTML(); }
+    finally{ window.__expServNoGuardar=false; S.floorId=fPrev; S.areaId=aPrev; S.level=lvPrev; }
+    if(!h) return false;
+    const j=JSON.parse(h.match(/const D=(\{[\s\S]*?\});\n/)[1]);
+    const r0=j.rooms.find(r=>r.x.dot.P.length);
+    return !!r0 && j.res && j.res.recintos===j.rooms.length && 'mat' in r0.x.m2 && r0.x.as.e && Array.isArray(r0.x.puestos) && Array.isArray(r0.x.camas)
+      && /function resumen\(/.test(h) && /lyPu/.test(h) && /function zEn\(/.test(h) && /zctl/.test(h) && /sin RUT/.test(h) && !/\b\d{1,2}\.?\d{3}\.?\d{3}-[\dkK]\b/.test(h.replace(/data:image\/[^"']+/g,''));
+  });
+  T('Rosa de los vientos: norte de los planos (15,2° horario) en la hoja carta del servicio', ()=>{
+    const r=_rosaVientosHTML(0.8); const R={b:{x:0,y:0,w:100,h:60},guiaD:'M0 0H100V60H0Z',dataURL:null,planAbs:'',rooms:[{nm:'X',code:'1.1',bim:'',tipo:'T',col:'#000',cx:50,cy:30,d:'M0 0H10V10H0Z'}],area:{id:'x'}};
+    const c=_mcCuerpo(R,'_r',7,5).html;
+    return /rotate\(15\.2\)/.test(r) && />N<\/text>/.test(r) && />O<\/text>/.test(r) && /class="rosa"/.test(c);
+  });
   T('Respaldo a archivo: sólo desde el Atlas de trabajo (un preview en otro puerto no pisa el estado)', ()=>{
     return FBAK_PUERTOS.indexOf('8790')>=0 && FBAK_PUERTOS.length<=2
       && (location.port==='8790'||location.port===''||FBAK_APLICA===false);
@@ -20358,7 +20500,7 @@ async function runSelfTest(){
       const R=_servRecorte(); const html=exportMapaServicio(true);
       if(!R||!html) return false;
       const n=R.rooms.length;
-      const marcas=(html.match(/<circle /g)||[]).length, items=(html.match(/<li>/g)||[]).length;
+      const marcas=(html.replace(/<div class="rosa"[\s\S]*?<\/svg><\/div>/g,'').match(/<circle /g)||[]).length, items=(html.match(/<li>/g)||[]).length;   // la rosa de los vientos no cuenta
       const carta=/@page\{size:letter (landscape|portrait)/.test(html);
       const orient=/data-orient="(landscape|portrait)"/.test(html) && (html.match(/class="leyfit"/g)||[]).length===1 && /function fitLey/.test(html) && /margin:0\.25in/.test(html);
       const ult=new RegExp('>'+n+'</text>').test(html) && html.indexOf('<span class="n"')>0;

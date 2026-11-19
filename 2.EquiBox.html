@@ -407,7 +407,8 @@ table.excel-tbl tr:nth-child(even) td{background:#f8fafc}
   </div>
   <div class="header-stats">
     <div class="hstat"><div class="hstat-n" id="statVisible">524</div><div class="hstat-l">Tipologías</div></div>
-    <div class="hstat"><div class="hstat-n" id="statUnidades">…</div><div class="hstat-l">Unidades</div></div>
+    <div class="hstat"><div class="hstat-n" id="statMedico">…</div><div class="hstat-l">Equipos médicos y mobiliario</div></div>
+    <div class="hstat"><div class="hstat-n" id="statInformatico">…</div><div class="hstat-l">Equipo informático</div></div>
     <div class="hstat"><div class="hstat-n">5</div><div class="hstat-l">Categorías</div></div>
     <button onclick="openExcel()" style="margin-left:8px;padding:7px 13px;background:rgba(74,173,214,.18);border:1px solid rgba(74,173,214,.35);border-radius:8px;color:#e8f4fd;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">📋 Vista Excel</button>
     <a href="equibox_directorio.html" style="margin-left:8px;padding:7px 13px;background:rgba(74,173,214,.18);border:1px solid rgba(74,173,214,.35);border-radius:8px;color:var(--cyan);font-size:11px;font-weight:700;text-decoration:none;display:flex;align-items:center;gap:6px;transition:all .15s" onmouseover="this.style.background='rgba(74,173,214,.3)'" onmouseout="this.style.background='rgba(74,173,214,.18)'">
@@ -1499,7 +1500,7 @@ function tcFiltrados(tipo, ignorar){
     if(ignorar !== 'est' && TC.est && r.estado !== TC.est) return false;
     if(ignorar !== 'svc' && TC.svc && r.servicio !== TC.svc) return false;
     if(ignorar !== 'fam' && TC.fam && r.familia !== TC.fam) return false;
-    if(q){ var blob = tcNrm([r.equipo, r.marca, r.modelo, r.servicio, r.servicio_origen, r.familia, r.recinto_cod, r.observacion, r.alerta, r.proveedor, r.contrato].join(' '));
+    if(q){ var blob = tcNrm([r.equipo, r.marca, r.modelo, r.servicio, r.servicio_origen, r.familia, r.recinto_cod, r.observacion, r.alerta, r.proveedor, r.contrato, r.justificacion, r.categoria, r.estado_origen].join(' '));
       if(!q.split(/\s+/).every(function(w){ return blob.indexOf(w) >= 0; })) return false; }
     return true;
   });
@@ -1514,7 +1515,8 @@ function renderTrasComTab(tipo){
   var uni = function(a){ return a.reduce(function(s, r){ return s + (+r.cant || 0); }, 0); };
   document.getElementById('resultsInfo').textContent = L.length + ' registros · ' + uni(L) + ' unidades · ' + nombre.toLowerCase() + ' EMMC (corte ' + D.corte + ')';
   var todos = D.registros.filter(function(r){ return r.tipo === tipo; });
-  var servs = Array.from(new Set(tcFiltrados(tipo, 'svc').map(function(r){ return r.servicio; }))).sort();
+  var conJust = todos.some(function(r){ return r.justificacion; });   // cortes desde el 06-11-2026: justificación y categoría por equipo
+  var servs =Array.from(new Set(tcFiltrados(tipo, 'svc').map(function(r){ return r.servicio; }))).sort();
   var fams = Array.from(new Set(tcFiltrados(tipo, 'fam').map(function(r){ return r.familia; }))).sort();
   var sdBtn = function(v, l){ return '<button onclick="tcSet(\'sd\',\'' + v + '\')" style="border:1.5px solid ' + (TC.sd === v ? color : '#cbd5e1') + ';background:' + (TC.sd === v ? color : '#fff') + ';color:' + (TC.sd === v ? '#fff' : '#334155') + ';border-radius:16px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer">' + l + '</button>'; };
   var html = '<div class="rev-sec" style="border-color:' + color + '33">'
@@ -1563,13 +1565,14 @@ function renderTrasComTab(tipo){
       html += '<div style="font-size:11px;font-weight:800;color:' + color + ';text-transform:uppercase;letter-spacing:.5px;margin:12px 0 4px">' + tcEsc(f) + ' · ' + porFam[f].length + '</div>'
         + '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr style="background:#f1f5f9;color:#475569;text-align:left">'
         + '<th style="padding:5px 7px">Estado</th><th style="padding:5px 7px">Equipo</th><th style="padding:5px 7px">Marca · modelo</th><th style="padding:5px 7px;text-align:center">Cant.</th>'
-        + '<th style="padding:5px 7px">Recinto</th><th style="padding:5px 7px">' + (esT ? 'Factibilidad · observación' : 'Estado SSMO · contrato') + '</th><th style="padding:5px 7px">Instalación</th></tr></thead><tbody>'
+        + '<th style="padding:5px 7px">Recinto</th><th style="padding:5px 7px">' + (conJust ? (esT ? 'Justificación · categoría · observación' : 'Justificación · categoría · contrato') : (esT ? 'Factibilidad · observación' : 'Estado SSMO · contrato')) + '</th><th style="padding:5px 7px">Instalación</th></tr></thead><tbody>'
         + porFam[f].sort(function(a, b){ return a.estado - b.estado || a.equipo.localeCompare(b.equipo); }).map(function(r){
             var E = D.estados[r.estado];
             var req = Object.keys(r.req || {}).map(function(k){ return '<span title="' + tcEsc(TC_REQ[k][1] + ': ' + r.req[k].join(' · ')) + '" style="cursor:help">' + TC_REQ[k][0] + '</span>'; }).join(' ');
             var dim = r.dim && (r.dim.alto || r.dim.peso) ? '<div style="font-size:10.5px;color:#94a3b8">' + [r.dim.alto, r.dim.ancho, r.dim.fondo].filter(function(x){ return x; }).join('×') + ' ' + r.dim_unidad + (r.dim.peso ? ' · ' + r.dim.peso + ' kg' : '') + '</div>' : '';
-            var nota = esT ? [r.factibilidad && r.estado !== 1 ? 'Factibilidad: ' + r.factibilidad : '', r.observacion].filter(Boolean).join(' · ')
-                           : [r.factibilidad, r.contrato && r.contrato !== 'REVISAR' ? 'Contrato ' + r.contrato : (r.contrato === 'REVISAR' ? 'Contrato por revisar' : ''), r.proveedor, r.observacion].filter(Boolean).join(' · ');
+            var jc = [r.justificacion, r.categoria].filter(Boolean).join(' · ');
+            var nota = esT ? [jc, r.factibilidad && r.estado !== 1 ? 'Factibilidad: ' + r.factibilidad : '', r.observacion].filter(Boolean).join(' · ')
+                           : [jc, r.factibilidad, r.contrato && r.contrato !== 'REVISAR' ? 'Contrato ' + r.contrato : (r.contrato === 'REVISAR' ? 'Contrato por revisar' : (r.contrato_grupo ? 'Contrato sin ID · grupo ' + r.contrato_grupo : '')), r.proveedor, r.observacion].filter(Boolean).join(' · ');
             return '<tr style="border-bottom:1px solid #e2e8f0"><td style="padding:5px 7px;white-space:nowrap"><span style="background:' + E.color + ';color:#fff;border-radius:10px;padding:1px 8px;font-size:10.5px;font-weight:700">' + r.estado + ' · ' + tcEsc(E.label) + '</span></td>'
               + '<td style="padding:5px 7px"><b>' + tcEsc(r.equipo) + '</b>' + (r.subservicio ? '<div style="font-size:10.5px;color:#64748b">' + tcEsc(r.subservicio) + '</div>' : '')
               + (r.equibox ? ' <button onclick="openModal(&quot;' + tcEsc(r.equibox.id) + '&quot;)" title="Ver la tipología en EquiBox" style="border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;border-radius:8px;padding:0 6px;font-size:10.5px;cursor:pointer">📦 ' + tcEsc(r.equibox.nombre) + '</button>' : '')
@@ -1599,12 +1602,13 @@ function tcExcel(tipo){
       'Servicio (planilla)': r.servicio_origen, 'Familia': r.familia, 'Equipo': r.equipo, 'Marca': r.marca, 'Modelo': r.modelo,
       'Cantidad': r.cant, 'Código recinto': r.recinto_cod, 'Factibilidad': r.factibilidad, 'Observación': r.observacion,
       'Alerta 2018': r.alerta, 'Contrato': r.contrato, 'Proveedor': r.proveedor, 'Año adquisición': r.anio,
+      'Estado en el libro': r.estado_origen || '', 'Justificación': r.justificacion || '', 'Categoría': r.categoria || '', 'Grupo de contrato': r.contrato_grupo || '',
       'Instalación': Object.keys(r.req || {}).map(function(k){ return TC_REQ[k][1]; }).join(', '),
       'Tipología EquiBox': r.equibox ? r.equibox.nombre : '' }; });
     var ws = X.utils.json_to_sheet(filas);
     var rg = X.utils.decode_range(ws['!ref']);
     for(var c = rg.s.c; c <= rg.e.c; c++){ var a = ws[X.utils.encode_cell({ r: 0, c: c })]; if(a) a.s = { font: { bold: true, color: { rgb: 'FFFFFF' } }, fill: { fgColor: { rgb: tipo === 'traslado' ? '7C3AED' : 'DB2777' } } }; }
-    ws['!cols'] = [8, 26, 26, 30, 24, 34, 18, 18, 8, 14, 22, 36, 18, 18, 22, 10, 30, 30].map(function(w){ return { wch: w }; });
+    ws['!cols'] = [8, 26, 26, 30, 24, 34, 18, 18, 8, 14, 22, 36, 18, 18, 22, 10, 24, 22, 18, 12, 30, 30].map(function(w){ return { wch: w }; });
     ws['!autofilter'] = { ref: ws['!ref'] };
     var wb = X.utils.book_new(); X.utils.book_append_sheet(wb, ws, tipo === 'traslado' ? 'Traslados' : 'Comodatos');
     X.writeFile(wb, (tipo === 'traslado' ? 'Traslados' : 'Comodatos') + '_EMMC_' + (TC.sd || 'SDM-SDADT') + '_' + D.corte + '.xlsx');
@@ -2657,7 +2661,11 @@ renderGrid();
 updateRevBadge();
 applyPublicMode();
 applyUrlFilter();
-{ const su=document.getElementById('statUnidades'); if(su) su.textContent=BOXES.reduce((a,b)=>a+(b.qty||0),0).toLocaleString('es-CL'); }
+// unidades separadas: equipo informático (computadores, notebooks y software) y el resto (equipos médicos, dispositivos menores y mobiliario clínico)
+{ const TI = ['Equipo Informático', 'Software'], por = {}; BOXES.forEach(b => { por[b.category] = (por[b.category] || 0) + (b.qty || 0); });
+  const n = x => x.toLocaleString('es-CL'), suma = c => c.reduce((a, k) => a + (por[k] || 0), 0), med = Object.keys(por).filter(k => !TI.includes(k)), tot = suma(Object.keys(por));
+  const pon = (id, cats) => { const el = document.getElementById(id); if(!el) return; el.textContent = n(suma(cats)); el.parentElement.title = cats.map(k => `${k}: ${n(por[k] || 0)}`).join(' · ') + ` · Total de unidades: ${n(tot)}`; };
+  pon('statMedico', med); pon('statInformatico', TI); }
 window.addEventListener('storage', function(e){
   if(e.key===SVC_MAP_KEY||e.key===DIR_ASSIGN_KEY){
     _loadDirCfg();
