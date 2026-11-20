@@ -365,6 +365,9 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 #ubicLegend{position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:31;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-pill);padding:5px 14px;font-size:var(--fs-sm);color:var(--text);box-shadow:var(--shadow-2);white-space:nowrap}
 #ubicLegend b{margin-left:2px}
 #cpLegend{position:absolute;top:48px;left:50%;transform:translateX(-50%);z-index:31;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-pill);padding:5px 8px 5px 14px;font-size:var(--fs-sm);color:var(--text);box-shadow:var(--shadow-2);white-space:nowrap;display:flex;flex-wrap:wrap;justify-content:center;width:max-content;max-width:calc(100% - 24px);align-items:center;gap:2px 8px}
+#dmLegend{position:absolute;top:84px;left:50%;transform:translateX(-50%);z-index:31;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-pill);padding:5px 8px 5px 14px;font-size:var(--fs-sm);color:var(--text);box-shadow:var(--shadow-2);white-space:nowrap;display:flex;flex-wrap:wrap;justify-content:center;width:max-content;max-width:calc(100% - 24px);align-items:center;gap:2px 8px}
+#dmLegend .cp-pt{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+#dmLegend button{border:1px solid var(--border);background:var(--surface);border-radius:var(--r-pill);padding:2px 10px;font-size:var(--fs-xs);font-weight:700;cursor:pointer;color:var(--text)}
 #cpLegend .cp-pt{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
 #cpLegend button{border:1px solid var(--border);background:var(--surface);border-radius:var(--r-pill);padding:2px 10px;font-size:var(--fs-xs);font-weight:700;cursor:pointer;color:var(--text)}
 .cp-mk{cursor:pointer}
@@ -1245,6 +1248,7 @@ window.addEventListener('DOMContentLoaded',()=>{
       <div class="float-hint" id="propHint"></div>
       <div id="ubicLegend" style="display:none"></div>
       <div id="cpLegend" style="display:none"></div>
+      <div id="dmLegend" style="display:none"></div>
       <button id="lblHint" style="display:none" onclick="toggleRoomLabels()" title="Los nombres y códigos de los recintos están ocultos. Clic para mostrarlos (también desde 🧰 → 🏷 Etiquetas de recintos).">🏷 Nombres de recinto ocultos · <b>mostrar</b></button>
       <div id="planLoading"><span class="pl-spin"></span> Cargando plano…</div>
       <div id="metasPanel" style="display:none">
@@ -1287,6 +1291,7 @@ window.addEventListener('DOMContentLoaded',()=>{
           <button class="dk-btn tog" id="dkUbicVend" onclick="toggleUbic('vend')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van las VENDOMÁTICAS (espacios de vending de los planos)"><span class="ic">🥤</span><span class="lb">Vendomática</span></button>
           <button class="dk-btn tog" id="dkUbicPrinter" onclick="toggleUbic('printer')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van las IMPRESORAS"><span class="ic">🖨</span><span class="lb">Impresoras</span></button>
           <button class="dk-btn tog" id="dkUbicCarro" onclick="toggleCarros()" title="Carros de paro: desfibrilador (130007 / 130008) + carro de paro (110032) del EMMC de cada recinto. Azul = completo · rojo = desfibrilador sin su carro · pastilla MP = con marcapaso externo. Se ve en todas las vistas y se exporta a Excel."><span class="ic">🚨</span><span class="lb">Carros de paro</span></button>
+          <button class="dk-btn tog" id="dkUbicMed" onclick="toggleMedStation()" title="MedStation (BD Pyxis) de la tabla de Farmacia: cada equipo en su recinto, con su número de columnas (1 · 2 · 3) y los armarios de estupefacientes. Se ve en todas las vistas; clic en un equipo = ir al recinto."><span class="ic">💊</span><span class="lb">MedStation</span></button>
           <button class="dk-btn tog" id="dkLabels" onclick="toggleRoomLabels()" title="Mostrar u ocultar el nombre y código de cada recinto sobre el plano"><span class="ic">🏷</span><span class="lb">Etiquetas de recintos</span></button>
         </div>
         <div class="dk-h">Apoyo TI</div>
@@ -1776,6 +1781,7 @@ window.addEventListener('DOMContentLoaded',()=>{
 <script src="SHARED_DATA/dea_catalogo.js"></script>
 <script src="SHARED_DATA/planos_jun2026.js"></script>
 <script src="SHARED_DATA/dwg_objetos_may2026.js"></script>
+<script src="SHARED_DATA/dispensadores_medicamentos.js"></script>
 <script src="SHARED_DATA/recinto_mnc2.js"></script>
 <script src="SHARED_DATA/estar_residencias_atlas.js"></script>
 <script src="SHARED_DATA/fichas_tecnicas_mnc.js"></script>
@@ -5471,6 +5477,9 @@ function renderSVG(){
   // Carros de paro: marcadores que laten en el recinto (todas las vistas)
   { const lg=document.getElementById('cpLegend');
     if(_cpOn){ try{ _cpLayer(); }catch(e){ console.warn('carros de paro',e); } } else if(lg) lg.style.display='none'; }
+  // MedStation y armarios de estupefacientes (tabla de Farmacia): todas las vistas
+  { const lg=document.getElementById('dmLegend');
+    if(_dmOn){ try{ _dmLayer(); }catch(e){ console.warn('medstation',e); } } else if(lg) lg.style.display='none'; }
   try{ _laminasFichaLayer(); }catch(e){ console.warn('ficha de lámina',e); }
   try{ _planJunLayer(); }catch(e){ console.warn('planos jun',e); }
   try{ _dwgObjLayer(); }catch(e){ console.warn('objetos dwg',e); }
@@ -7207,10 +7216,110 @@ function _cpLayer(){
   }
 }
 function _cpRescale(){
-  const ms=svg.querySelectorAll('.cp-mk'); if(!ms.length) return;
+  const ms=svg.querySelectorAll('.cp-mk,.dm-mk'); if(!ms.length) return;
   const k=_cpK();
   ms.forEach(m=>{ const t=m.getAttribute('transform')||''; m.setAttribute('transform', t.replace(/scale\([^)]*\)/,'scale('+k+')')); });
 }
+// ═══ 💊 MEDSTATION Y ARMARIOS DE ESTUPEFACIENTES (tabla de Farmacia 05-10-2026) ═════════════
+// Capa de sólo lectura, como carros de paro: SHARED_DATA/dispensadores_medicamentos.js (_DEV/dispensadores/
+// build_dispensadores.py) amarra cada equipo a un BIM; aquí se dibuja UNA marca por equipo dentro de su recinto,
+// con el número de columnas (1 · 2 · 3; la Supply Station cuenta como 3) y el armario de estupefacientes aparte.
+// Los Kardex no van en esta capa (son de Farmacia, no de las unidades). La tabla de Farmacia manda sobre PINS.
+var _dmOn=false; try{ _dmOn=localStorage.getItem('hdsact_medstation')==='1'; }catch(e){}
+function toggleMedStation(){ _dmOn=!_dmOn; _lsPref('hdsact_medstation', _dmOn?'1':'0'); renderSVG(); try{ _dockSync(); }catch(e){} }
+const DM_CL={c1:{col:'#0d9488',lbl:'1 columna'}, c2:{col:'#7c3aed',lbl:'2 columnas'}, c3:{col:'#ea580c',lbl:'3 columnas'}, est:{col:'#be123c',lbl:'Armario estupefacientes'}};
+function _dmD(){ return window.DISPENSADORES_MEDICAMENTOS||{tipos:[],por_bim:{},filas:[],resumen:{}}; }
+function _dmClase(e){
+  if(e.tipo==='estupefacientes') return 'est';
+  if(e.tipo==='medstation'||e.tipo==='supply') return 'c'+Math.min(3,Math.max(1,+e.columnas||1));
+  return null;
+}
+// BIM → primer recinto dibujado que lo trae (un BIM puede repetirse en cajas hijas: se dibuja una vez)
+let _dmIdxMemo=null;
+function _dmIdx(){
+  const sig=Object.keys(boxState.rooms||{}).length;
+  if(_dmIdxMemo && _dmIdxMemo.sig===sig) return _dmIdxMemo.m;
+  const m={};
+  FLOORS.forEach(fl=>fl.areas.forEach(a=>(a.rooms||[]).forEach(r=>{ if(!rShapes(r).length) return;
+    String(rBim(r.id)||'').split(/[\/,;\s]+/).filter(Boolean).forEach(b=>{ b=b.toUpperCase(); if(!m[b]) m[b]={fl, area:a, r}; }); })));
+  _dmIdxMemo={sig, m}; return m;
+}
+// [{fl,area,r,u:[{cl,e}]}] — u = una entrada por EQUIPO (cantidad 3 → 3 unidades)
+function _dmRecintos(){
+  const D=_dmD(), I=_dmIdx(), por={}, sin=[];
+  Object.entries(D.por_bim||{}).forEach(([b,L])=>L.forEach(e=>{ const cl=_dmClase(e); if(!cl) return;
+    const z=I[b.toUpperCase()]; if(!z){ sin.push({bim:b, e, cl}); return; }
+    const o=(por[z.r.id]=por[z.r.id]||{fl:z.fl, area:z.area, r:z.r, bim:b, u:[]});
+    for(let i=0;i<(+e.cantidad||1);i++) o.u.push({cl, e}); }));
+  const ord={c3:0,c2:1,c1:2,est:3}; Object.values(por).forEach(o=>o.u.sort((x,y)=>ord[x.cl]-ord[y.cl]));
+  return {lista:Object.values(por), sin};
+}
+function _dmCuenta(L){ const c={c1:0,c2:0,c3:0,est:0}; L.forEach(o=>(o.u||[o]).forEach(x=>c[x.cl]++)); return c; }
+function _dmTxtEquipo(e){
+  return (e.tipo==='estupefacientes'?'🔒 ':'💊 ')+e.equipo+(e.columnas?(' · '+e.columnas+' col'):'')+(e.area?(' · '+e.area):'')
+    +(e.sala?(' · abastece '+e.sala):'')+(e.cupos?(' ('+e.cupos+' cupos)'):'')+(e.obs?(' · '+e.obs):'');
+}
+function _dmLayer(){
+  const R=_dmRecintos(), fl=curFloor();
+  let aqui=R.lista.filter(z=>fl && z.fl.id===fl.id);
+  if(S.level>1 && S.areaId) aqui=aqui.filter(z=>z.area.id===S.areaId);
+  const g=el('g',{class:'dm-layer'}), k=_cpK();
+  aqui.forEach(z=>{
+    const c=_cpCentro(z.r.id); if(!c) return;
+    const n=z.u.length, cols=Math.min(n, Math.ceil(Math.sqrt(n*1.6))), filas=Math.ceil(n/cols), PX=26, PY=34;
+    z.u.forEach((x,i)=>{
+      const fx=(i%cols)-(cols-1)/2, fy=Math.floor(i/cols)-(filas-1)/2, col=DM_CL[x.cl].col;
+      const mk=el('g',{class:'dm-mk dm-'+x.cl, transform:`translate(${c.x+fx*PX*k},${c.y+fy*PY*k}) scale(${k})`});
+      mk.appendChild(el('rect',{x:-11,y:-14,width:22,height:28,rx:4,fill:'#fff',stroke:col,'stroke-width':2.6}));
+      if(x.cl==='est'){ mk.appendChild(el('rect',{x:-8,y:-11,width:16,height:22,rx:2,fill:col})); mk.appendChild(txt(0,1,'🔒',{'font-size':11,'pointer-events':'none'})); }
+      else { const nc=+x.cl.slice(1), w=(16-(nc-1)*2)/nc;
+        for(let j=0;j<nc;j++) mk.appendChild(el('rect',{x:-8+j*(w+2),y:-11,width:w,height:22,rx:1.5,fill:col}));
+        mk.appendChild(txt(0,1,String(nc),{'font-size':11,'font-weight':900,fill:'#fff','pointer-events':'none'})); }
+      const t=el('title'); t.textContent=_dmTxtEquipo(x.e)+'\n'+(rName(z.r.id)||'(sin nombre)')+' · BIM '+z.bim+' · '+aName(z.area.id)
+        +'\nEquipo '+(i+1)+' de '+n+' en este recinto · tabla de Farmacia 05-10-2026 · clic = ir al recinto'; mk.appendChild(t);
+      mk.addEventListener('mousedown',e=>e.stopPropagation());
+      mk.addEventListener('click',e=>{ e.stopPropagation(); didPan=false; goRoom(z.r.id); });
+      g.appendChild(mk);
+    });
+  });
+  svg.appendChild(g);
+  const lg=document.getElementById('dmLegend');
+  if(lg){
+    const a=_dmCuenta(aqui), h=_dmCuenta(R.lista), hs=_dmCuenta(R.sin), it=(cl,v)=>'<span><i class="cp-pt" style="background:'+DM_CL[cl].col+'"></i>'+DM_CL[cl].lbl+' <b>'+v[cl]+'</b></span>';
+    lg.innerHTML='<span>💊 <b>'+(fl?fl.label:'')+(S.level>1&&S.areaId?(' · '+esc(aName(S.areaId))):'')+'</b></span>'+it('c1',a)+it('c2',a)+it('c3',a)+it('est',a)
+      +'<span style="color:#64748b">hospital '+h.c1+' · '+h.c2+' · '+h.c3+' · 🔒 '+h.est+(R.sin.length?(' · sin recinto en el plano '+(hs.c1+hs.c2+hs.c3+hs.est)):'')+'</span>'
+      +'<button type="button" onclick="dmReporte()" title="Todos los pisos, recinto por recinto">📋 Lista</button>';
+    lg.style.display='';
+  }
+}
+// Ficha del recinto: qué dispensadores tiene y a qué sala abastecen
+function _dmHtml(rid){
+  const D=_dmD(), L=[]; String(rBim(rid)||'').split(/[\/,;\s]+/).filter(Boolean).forEach(b=>(D.por_bim[b.toUpperCase()]||[]).forEach(e=>{ if(_dmClase(e)) L.push(e); }));
+  if(!L.length) return '';
+  const n=L.reduce((a,e)=>a+(+e.cantidad||1),0);
+  return '<div class="fk-sec"><div class="fk-sec-t">💊 MedStation · tabla de Farmacia <span class="cnt">'+n+'</span></div>'
+    +L.map(e=>{ const cl=_dmClase(e); return '<div style="display:flex;gap:8px;align-items:flex-start;font-size:12px;padding:3px 0"><span style="flex-shrink:0;min-width:26px;text-align:center;border-radius:5px;color:#fff;font-weight:800;background:'+DM_CL[cl].col+'">'+(+e.cantidad||1)+'×</span><span><b>'+esc(e.equipo)+'</b>'+(e.columnas?(' · '+e.columnas+' columna'+(e.columnas>1?'s':'')):'')
+      +(e.area?('<br><span style="color:#64748b">'+esc(e.area)+(e.sala?(' · abastece '+esc(e.sala)):'')+(e.cupos?(' · '+e.cupos+' cupos'):'')+'</span>'):'')+(e.obs?('<br><span style="color:#7c2d12">'+esc(e.obs)+'</span>'):'')+'</span></div>'; }).join('')
+    +'<div class="fk-inst-fte">Tabla de dispensadores de Farmacia (05-10-2026). Farmacia define dónde va cada equipo; manda sobre PINS.</div></div>';
+}
+// Lista completa (todos los pisos) en una ventana, con clic para ir al recinto
+function dmReporte(){
+  const R=_dmRecintos(), h=_dmCuenta(R.lista), pisoIx=id=>FLOORS.findIndex(f=>f.id===id);
+  const L=R.lista.slice().sort((a,b)=>pisoIx(a.fl.id)-pisoIx(b.fl.id)||aName(a.area.id).localeCompare(aName(b.area.id),'es'));
+  const filas=L.map(z=>{ const c=_dmCuenta([z]); return '<tr onclick="goRoom(\''+z.r.id+'\');dmReporteCerrar()" style="cursor:pointer"><td>'+esc(z.fl.label)+'</td><td>'+esc(aName(z.area.id))+'</td><td><b>'+esc(rName(z.r.id)||'')+'</b><br><span style="color:#64748b">BIM '+esc(z.bim)+'</span></td>'
+    +['c1','c2','c3','est'].map(k=>'<td style="text-align:center;font-weight:800;color:'+DM_CL[k].col+'">'+(c[k]||'')+'</td>').join('')+'</tr>'; }).join('');
+  const sin=R.sin.map(x=>'<li>BIM <b>'+esc(x.bim)+'</b> · '+(+x.e.cantidad||1)+' × '+esc(x.e.equipo)+(x.e.columnas?(' '+x.e.columnas+' col'):'')+' · '+esc(x.e.area||'')+'</li>').join('');
+  let m=document.getElementById('dmModal');
+  if(!m){ m=document.createElement('div'); m.id='dmModal'; m.className='modal-fondo'; m.onclick=e=>{ if(e.target===m) dmReporteCerrar(); }; document.body.appendChild(m); }
+  m.innerHTML='<div class="modal" style="max-width:780px;max-height:86vh;overflow:auto;padding:18px 22px;background:var(--surface);border-radius:14px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center;gap:10px"><div style="font-size:17px;font-weight:800">💊 MedStation del hospital</div><button class="tb-btn" onclick="dmReporteCerrar()">✕</button></div>'
+    +'<div style="font-size:12.5px;color:#475569;margin:4px 0 10px">Tabla de Farmacia 05-10-2026 · en el plano: 1 col <b>'+h.c1+'</b> · 2 col <b>'+h.c2+'</b> · 3 col <b>'+h.c3+'</b> · armarios de estupefacientes <b>'+h.est+'</b> · clic en una fila = ir al recinto</div>'
+    +'<table style="width:100%;border-collapse:collapse;font-size:12.5px"><thead><tr style="text-align:left;border-bottom:2px solid #1d5fa0"><th>Piso</th><th>Servicio</th><th>Recinto</th>'+['c1','c2','c3','est'].map(k=>'<th style="text-align:center;color:'+DM_CL[k].col+'">'+DM_CL[k].lbl.replace('Armario estupefacientes','🔒 Estup.')+'</th>').join('')+'</tr></thead><tbody>'+filas+'</tbody></table>'
+    +(sin?('<div style="margin-top:12px;font-size:12.5px"><b>Sin recinto dibujado en el Atlas</b> (se resuelve poniéndole el BIM al recinto):<ul style="margin:4px 0 0 18px">'+sin+'</ul></div>'):'')
+    +'</div>';
+  m.classList.add('show');
+}
+function dmReporteCerrar(){ const m=document.getElementById('dmModal'); if(m) m.classList.remove('show'); }
 function exportCarrosParo(){
   const hoy=new Date().toISOString().slice(0,10);
   const todos=_cpRecintos();
@@ -8213,7 +8322,7 @@ const CAPAS_BARRA=[
   ['btnBoxVis','Cajas'],['dkLabels','Etiquetas'],['btnSen','Señalética'],['btnPlanKind','Color'],'|',
   ['btnDotNames','Nombres'],['btnDotLista','En lista'],['btnAsigN','N° asig.'],['btnSoloReemp','Reemplazos'],'|',
   ['btnVert','Ascensores'],['btnReloj','Relojes'],['btnCorreoN','Correo N.'],['btnEstac','Estacion.'],['btnPuertasVis','Puertas'],['btnJardines','Jardines'],['btnLaminas','Láminas'],['btnOficinas','Oficinas'],'|',
-  ['dkUbicCarro','Carros paro'],['dkUbicDea','DEA'],['dkUbicTotem','Tótems'],['btnImpresoras','Impresoras'],['btnShowPC','PC'],'|',
+  ['dkUbicCarro','Carros paro'],['dkUbicMed','MedStation'],['dkUbicDea','DEA'],['dkUbicTotem','Tótems'],['btnImpresoras','Impresoras'],['btnShowPC','PC'],'|',
   ['btnShowTomas','Tomas'],['btnShowGases','Gases'],['btnCcdd','C. débiles'],['btnPP','PINS'],['btnLineas','Líneas piso'],['btnPlanJun','Planos jun'],['btnDwgObj','Objetos DWG']
 ];
 const DOCK_MAPA=[
@@ -8473,6 +8582,7 @@ function _dockSync(){
   ['desk','totem','dea','printer'].forEach(k=>on('dk'+k.charAt(0).toUpperCase()+k.slice(1),S.propMode===k));
   _UBIC().forEach(k=>on('dkUbic'+k.charAt(0).toUpperCase()+k.slice(1), S.ubic&&S.ubic.has(k)));
   on('dkUbicCarro', _cpOn);
+  on('dkUbicMed', _dmOn);
   on('dkTiReport', S.showTI);
   const ro=S.viewOnly&&!S.editPM;
   dis('dkDesk',ro||S.level<2); dis('dkTotem',ro||S.level<2); dis('dkDea',ro||S.level<2); dis('dkPrinter',ro||S.level<2); dis('dkPropDel',ro||!_propEnCtx().length);
@@ -12388,6 +12498,7 @@ function openFichaRecinto(roomId){
     senHtml+
     _fichaPlanoHtml(roomId)+
     `<div class="fk-sec"><div class="fk-sec-t">⚙️ Equipamiento <span class="cnt">${eq.length}</span></div>${eqHtml}</div>`+
+    _dmHtml(roomId)+
     `<div class="fk-sec"><div class="fk-sec-t">🛏️ Mobiliario Clínico <span class="cnt">${mobCli.length}</span></div>${mobCliHtml}</div>`+
     `<div class="fk-sec"><div class="fk-sec-t">🖥️ Informática <span class="cnt">${informatica.length}</span></div>${tiHtml}</div>`+
     `<div class="fk-sec"><div class="fk-sec-t">🪑 Mobiliario No Clínico <span class="cnt">${mobNc.length}</span></div>${mobNcHtml}</div>`+
@@ -19971,6 +20082,19 @@ async function runSelfTest(){
     const r=_rosaVientosHTML(0.8); const R={b:{x:0,y:0,w:100,h:60},guiaD:'M0 0H100V60H0Z',dataURL:null,planAbs:'',rooms:[{nm:'X',code:'1.1',bim:'',tipo:'T',col:'#000',cx:50,cy:30,d:'M0 0H10V10H0Z'}],area:{id:'x'}};
     const c=_mcCuerpo(R,'_r',7,5).html;
     return /rotate\(15\.2\)/.test(r) && />N<\/text>/.test(r) && />O<\/text>/.test(r) && /class="rosa"/.test(c);
+  });
+  T('MedStation: tabla de Farmacia 6 · 34 · 4 + 2 armarios; una marca por equipo, ficha y lista', ()=>{
+    const D=_dmD(); if(!D.por_bim||!Object.keys(D.por_bim).length) return false;
+    const tot={c1:0,c2:0,c3:0,est:0}; Object.values(D.por_bim).forEach(L=>L.forEach(e=>{ const c=_dmClase(e); if(c) tot[c]+=(+e.cantidad||1); }));
+    if(!(tot.c1===6&&tot.c2===34&&tot.c3===4&&tot.est===2)) return false;
+    const R=_dmRecintos(); if(!R.lista.length) return _sinDibujo();
+    const h=_dmCuenta(R.lista), s=_dmCuenta(R.sin);
+    if(h.c1+s.c1!==6||h.c2+s.c2!==34||h.c3+s.c3!==4||h.est+s.est!==2) return false;
+    const z=R.lista[0], prev=_dmOn, fP=S.floorId, lP=S.level, aP=S.areaId; let n=0;
+    try{ _dmOn=true; S.floorId=z.fl.id; S.level=1; S.areaId=null; renderSVG(); n=svg.querySelectorAll('.dm-mk').length; }
+    finally{ _dmOn=prev; S.floorId=fP; S.level=lP; S.areaId=aP; renderSVG(); }
+    const fp=R.lista.filter(x=>x.fl.id===z.fl.id).reduce((a,x)=>a+x.u.length,0);
+    return n===fp && /MedStation/.test(_dmHtml(z.r.id)) && !svg.querySelector('.dm-mk');
   });
   T('Respaldo a archivo: sólo desde el Atlas de trabajo (un preview en otro puerto no pisa el estado)', ()=>{
     return FBAK_PUERTOS.indexOf('8790')>=0 && FBAK_PUERTOS.length<=2
