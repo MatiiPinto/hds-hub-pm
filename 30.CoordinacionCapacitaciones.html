@@ -482,10 +482,10 @@ function renderDash(){
 }
 // Banner «nos faltan»: equipos (tipologías) del Programa de Capacitación aún no ejecutados, en los grandes
 // recintos y en total. Mismo estado que el avance (Excel + ajustes locales); parcial = todavía falta.
-// Banner de avance: hecho vs total en las tres áreas (capacitaciones ejecutadas, instructivos entregados y cajas de instrumental).
+// Banner de avance: hecho vs total en las tres áreas (capacitaciones ejecutadas, instructivos entregados y tipologías de caja de instrumental).
 function renderFaltan(){
   var el=document.getElementById("faltan"); if(!el) return;
-  var cc=counts("capacitaciones"), ci=counts("instructivos"), cw=cajasCounts();
+  var cc=counts("capacitaciones"), ci=counts("instructivos"), cq=counts("instrumental");
   var tile=function(done,total,lbl,nota){
     return '<div class="fn"><div class="n">'+fmtN(done)+'<span style="font-size:13px;font-weight:600"> / '+fmtN(total)+'</span></div>'+
            '<div class="l">'+lbl+'</div>'+(nota?'<div class="l" style="text-transform:none;opacity:.8">'+nota+'</div>':'')+'</div>';
@@ -494,7 +494,7 @@ function renderFaltan(){
   el.innerHTML='<div class="ft"><b>📊 Avance del Programa</b>Ejecutado o entregado vs total</div>'+
     tile(cc[DONE.capacitaciones]||0,cc.total,"Capacitaciones ejecutadas",par?'+ '+par+' parcial'+(par>1?'es':''):'')+
     tile(ci[DONE.instructivos]||0,ci.total,"Instructivos entregados","")+
-    tile(cw[DONE.instrumental]||0,cw.total,"Cajas de instrumental","");
+    tile(cq[DONE.instrumental]||0,cq.total,"Tipologías de instrumental","");
 }
 function renderLegend(){
   document.getElementById("legend").innerHTML=
