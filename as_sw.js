@@ -1,7 +1,7 @@
 // as_sw.js · GENERADO por _DEV/as_app/build_as_app.py · no editar
-// Controla SOLO 50.AutorizacionSanitaria.html (scope de registro). Versión 039fe3de.
-const V = 'asapp-039fe3de';
-const PRE = ['50.AutorizacionSanitaria.html', 'data/as_app/datos.c7e72bf5.js', 'as_app.webmanifest', 'assets/as_app/icono.svg'];
+// Controla SOLO 50.AutorizacionSanitaria.html (scope de registro). Versión 0f966570.
+const V = 'asapp-0f966570';
+const PRE = ['50.AutorizacionSanitaria.html', 'data/as_app/datos.4a8e6502.js', 'as_app.webmanifest', 'assets/as_app/icono.svg'];
 self.addEventListener('install', e => e.waitUntil(caches.open(V).then(c => c.addAll(PRE)).then(() => self.skipWaiting())));
 self.addEventListener('activate', e => e.waitUntil(caches.keys()
   .then(ks => Promise.all(ks.filter(k => k.startsWith('asapp-') && k !== V).map(k => caches.delete(k))))

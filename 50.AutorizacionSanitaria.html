@@ -65,6 +65,7 @@ details.pl>div{padding:0 14px 14px}
 .btn.full{width:100%}.btn:disabled{opacity:.45}
 .fijo{position:fixed;left:0;right:0;bottom:0;z-index:15;padding:10px 12px calc(10px + var(--safe-b));background:linear-gradient(transparent,var(--bg) 30%)}
 .fijo .btn{width:100%;max-width:560px;margin:0 auto;display:flex}
+.fijo.dos{display:flex;gap:8px;justify-content:center}.fijo.dos .btn{flex:1;max-width:280px;margin:0;padding:0 10px}
 /* barra inferior (referentes) */
 #nav{position:fixed;left:0;right:0;bottom:0;z-index:16;background:#fff;border-top:1px solid var(--line);display:flex;padding-bottom:var(--safe-b)}
 #nav button{flex:1;min-height:58px;border:0;background:none;font-size:12px;color:var(--mute);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
@@ -145,14 +146,14 @@ details.tgs{width:100%}details.tgs>summary{list-style:none;cursor:pointer;displa
 <div id="toast" hidden></div>
 <input type="file" id="fFoto" accept="image/*" capture="environment" hidden>
 <input type="file" id="fDoc" accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.jpg,.jpeg,.png,.webp,image/*,application/pdf" hidden>
-<script src="data/as_app/datos.c7e72bf5.js"></script>
+<script src="data/as_app/datos.4a8e6502.js"></script>
 <script>
 'use strict';
 /* ═══ Autorización Sanitaria NHDS · app única (SPEC-AS-unaApp.md) ═══════════════════════════════════════════════
    Datos: window.ASD (paquete liviano) · window.ASR (propuesta Catymey, solo referentes, se carga al abrir Asignar).
    Backend: Apps Script v4 (token por código al correo). Mismas claves que la 39: rec|recinto|ámbito · svc|servicio|ámbito.
    Modo demostración: ?demo=1 (backend simulado en este navegador; código 123456). */
-const URLC='https://script.google.com/macros/s/AKfycbzOkdj1TkaZG7BS6NdVDx8hUKLShOqxZTI37YpCPeGRRZPGLqlqECwnhf8MhYeLNxWW-w/exec', REF_SRC='data/as_app/ref.ba6d51cf.js', VER='039fe3de';
+const URLC='https://script.google.com/macros/s/AKfycbzOkdj1TkaZG7BS6NdVDx8hUKLShOqxZTI37YpCPeGRRZPGLqlqECwnhf8MhYeLNxWW-w/exec', REF_SRC='data/as_app/ref.c27eddd7.js', VER='0f966570';
 const DEMO=/[?&]demo=1/.test(location.search);
 const D=window.ASD, Q=new URLSearchParams(location.search);
 const $=id=>document.getElementById(id);
@@ -167,10 +168,10 @@ const AMB=D.amb, SVC={}, REC={}, RECS={}, PTO={};
 D.servicios.forEach(s=>SVC[s.n]=s);
 D.recintos.forEach(r=>{REC[r[0]]=r;(RECS[r[3]]=RECS[r[3]]||[]).push(r[0]);});
 D.puntos.forEach(p=>PTO[p.id]=p);
-const NORMA_CORTA={atencion_cerrada:'Atención cerrada',cirugia_menor:'Cirugía menor',dialisis:'Diálisis',laboratorio:'Laboratorio',
+const NORMA_CORTA={atencion_cerrada:'Anexo 1 DS 58',cirugia_menor:'Anexo 2 DS 58',dialisis:'Diálisis',laboratorio:'Laboratorio',
   imagenologia:'Radiaciones',medicina_nuclear:'Medicina nuclear',quimioterapia:'Quimioterapia',farmacia:'Farmacia',
   hospitalizacion_psiquiatrica:'Hosp. psiquiátrica',al:'Alimentación',re:'REAS',cp:'Calderas y autoclaves',dr:'Droguería',cz:'Central de mezclas'};
-const NIVELES={HOSPITAL:'Hospital (todo el establecimiento)','EDIFICIO AA':'Edificio de Atención Abierta'};
+const NIVELES={HOSPITAL:'Hospital (todo el establecimiento)','EDIFICIO AA':'Edificio de Atención Ambulatoria'};
 function svcCanon(n){
   const k=nrm(n), a=(D.alias||{})[String(n||'').toUpperCase()]||(D.alias||{})[k];
   if(a&&SVC[a])return a;
@@ -214,9 +215,13 @@ function pautasSvc(svc){
 }
 const respondidos=d=>Object.keys(d||{}).filter(k=>/^r\d+$/.test(k)&&d[k]).length;
 function avanceDe(clave){const e=EST[clave];return e&&e.avance?Number(e.avance):0;}
-function avanceSvc(svc){
+function clavesSvc(svc){
   const ks=pautasSvc(svc).map(a=>'svc|'+svc+'|'+a);
   [...(RECS[svc]||[]),...D.puntos.filter(p=>p.svc===svc).map(p=>p.id)].forEach(rid=>pautasRec(rid).forEach(a=>ks.push('rec|'+rid+'|'+a)));
+  return ks;
+}
+function avanceSvc(svc){
+  const ks=clavesSvc(svc);
   if(!ks.length)return {n:0,p:0,listas:0};
   const sum=ks.reduce((t,k)=>t+avanceDe(k),0);
   return {n:ks.length,p:Math.round(sum/ks.length),listas:ks.filter(k=>avanceDe(k)>=100).length};
@@ -338,11 +343,11 @@ function ayuda(){
 }
 
 /* ── rutas ───────────────────────────────────────────────────────────── */
-let RUTA='#/';
+let RUTA='#/', PREV='#/';
 function ir(h){if(location.hash===h)render();else location.hash=h;}
 addEventListener('hashchange',render);
 function render(){
-  RUTA=location.hash||'#/'; cerrarHoja();
+  const h=location.hash||'#/'; if(h!==RUTA)PREV=RUTA; RUTA=h; cerrarHoja();
   document.body.classList.toggle('con-nav',!!(SES&&esRef()));
   $('bMenu').hidden=!SES;
   if(!SES)return vLogin();
@@ -354,6 +359,7 @@ function render(){
   if(v==='p')return vPauta(arg);
   if(v==='asignar')return vAsignar(arg);
   if(v==='revision')return vRevision();
+  if(v==='vb')return vVistoBueno(arg);
   if(v==='normas')return vNormas(arg);
   if(v==='expediente')return vExpediente();
   return vInicio();
@@ -362,7 +368,7 @@ function pintaNav(v){
   const n=$('nav'); if(!esRef()){n.hidden=true;return;}
   n.hidden=false;
   const it=[['','🏥','Servicios'],['asignar','🧩','Asignar'],['revision','📊','Avance'],['normas','📚','Normas']];
-  n.innerHTML=it.map(([k,i,t])=>`<button class="${(v||'')===k||((v==='s'||v==='r'||v==='p')&&k==='')?'on':''}" onclick="ir('#/${k}')"><i>${i}</i>${t}</button>`).join('');
+  n.innerHTML=it.map(([k,i,t])=>`<button class="${(v||'')===k||((v==='s'||v==='r'||v==='p')&&k==='')||(v==='vb'&&k==='revision')?'on':''}" onclick="ir('#/${k}')"><i>${i}</i>${t}</button>`).join('');
 }
 
 /* ── login por código al correo ──────────────────────────────────────── */
@@ -406,7 +412,7 @@ async function validarCodigo(){
     SES={token:r.token,correo:r.correo,nombre:r.nombre,nivel:r.nivel,servicios:r.servicios||[],expira:r.expira};
     LS.set(P+'ses',SES); setSync('pend'); await bajarEstados(); vaciarCola();
     const s=Q.get('s'), rr=Q.get('r');
-    ir(rr?'#/r/'+encodeURIComponent(rr):s?'#/s/'+encodeURIComponent(svcCanon(s)):'#/');
+    ir(rr?'#/r/'+encodeURIComponent(rr):s?'#/s/'+encodeURIComponent(svcCanon(s)):RUTA);
   }catch(e){$('msg').textContent='Sin señal con el servidor. Intenta de nuevo.';$('bEntrar').disabled=false;}
 }
 
@@ -420,7 +426,7 @@ function vInicio(){
       <span class="tx"><b>${esc(NIVELES[x.n]||x.n)}</b><span class="sub">${x.a.n?x.a.n+(x.a.n===1?' pauta · ':' pautas · ')+x.a.listas+(x.a.listas===1?' completa':' completas'):'Sin pautas asignadas'}${x.s&&x.s.cong?' · en pausa':''}</span></span>${x.a.n?ring(x.a.p):''}</button>`;
   $('app').innerHTML=`<input class="buscar" placeholder="Buscar servicio…" oninput="filtra(this.value,'.item')">
     ${!mios.length?'<div class="vacio">Tu correo no tiene servicios asignados. Avisa a las referentes de Autorización Sanitaria.</div>':''}
-    ${esRef()?`<h3>Una vez para todo el hospital</h3>${['HOSPITAL','EDIFICIO AA'].map(n=>item({n,a:avanceSvc(n)})).join('')}<h3>Servicios</h3>`:''}
+    ${esRef()?`${vbTarjeta()}<h3>Una vez para todo el hospital</h3>${['HOSPITAL','EDIFICIO AA'].map(n=>item({n,a:avanceSvc(n)})).join('')}<h3>Servicios</h3>`:''}
     ${lista.map(item).join('')}`;
 }
 function filtra(q,sel){q=nrm(q);document.querySelectorAll(sel).forEach(e=>{e.hidden=q&&!(e.dataset.q||'').includes(q);});}
@@ -651,7 +657,7 @@ function informeHtml(d){
 let REFOK=false;
 function cargarRef(){return new Promise(ok=>{if(REFOK||window.ASR)return ok(REFOK=true);const s=document.createElement('script');s.src=REF_SRC;
   s.onload=()=>ok(REFOK=true);s.onerror=()=>{toast('No se pudo cargar el detalle de la asignación');ok(false);};document.body.appendChild(s);});}
-const R0={res:{},fs:[],fu:{},conf:{},reglas:[],svc:{},niv:{},pto:{},na:[],brechas:[]};
+const R0={res:{},fs:[],fu:{},conf:{},reglas:[],rr:{},svc:{},niv:{},pto:{},na:[],brechas:[]};
 /* por qué esta pauta está aquí: {f: fundamento, q: quién la presenta, c: confianza} o null si se agregó a mano */
 function porque(clave){
   const R=window.ASR||R0, [t,id,a]=clave.split('|');
@@ -773,7 +779,7 @@ function asgHospital(){
   const bloque=(tipo,id,nombre)=>{const ks=(tipo==='svc'?pautasSvc(id):pautasRec(id)).map(a=>tipo+'|'+id+'|'+a);
     return `<div class="asg"><div class="cab"><b>${esc(nombre)}</b><button class="mini btn sec" style="min-height:36px" aria-label="Agregar pauta" onclick="pickPauta('${tipo}','${esc(id)}')">＋</button></div>
       <div class="pa">${ks.map(tag).join('')||'<span class="sub">Sin pautas</span>'}</div></div>`;};
-  return `<p class="sub">Lo que se coteja una sola vez: los requisitos generales del hospital, el edificio de atención abierta y los puntos con norma propia.</p>
+  return `<p class="sub">Lo que se coteja una sola vez: los requisitos generales del hospital, el edificio de Atención Ambulatoria y los puntos con norma propia.</p>
     ${bloque('svc','HOSPITAL',NIVELES.HOSPITAL)}${bloque('svc','EDIFICIO AA',NIVELES['EDIFICIO AA'])}
     <h3>Puntos específicos</h3>${D.puntos.map(p=>bloque('rec',p.id,p.n)).join('')}`;
 }
@@ -782,12 +788,118 @@ function asgCriterios(){
   return `<div class="card"><b>${r.con_pauta_propuesta||0} recintos</b> con pauta de ${r.recintos||0} · <b>${r.unidades_con_pauta||0} servicios</b> con pautas de unidad
       <p class="sub" style="margin:6px 0 0">Las ${r.ambitos||0} pautas de las 14 normas tienen destino: ${r.ambitos_asignados||0} asignadas y ${r.ambitos_no_aplica||0} que no aplican al hospital. Versión ${esc(R.gen||'')}.</p></div>
     <details class="pl" open><summary>Reglas por tipo de recinto (${R.reglas.length})</summary><div>
-      ${R.reglas.map(v=>`<p style="margin:8px 0"><b>${esc(v[0])}</b> · ${v[1]} ${v[1]===1?'recinto':'recintos'}<br><span class="sub">${esc(v[2])}</span></p>`).join('')}</div></details>
+      ${R.reglas.map((v,i)=>{const d=vb('regla',v[0]);return `<button class="item" onclick="hojaRegla(${i})"><span class="tx"><b>${esc(v[1])}</b>
+        <span class="sub">${v[2]} ${v[2]===1?'recinto':'recintos'} · ${esc(v[3])}</span></span>${d?vbPill(d,v[2]):''}</button>`;}).join('')}</div></details>
     <details class="pl"><summary>No aplican al hospital (${R.na.length})</summary><div>
       ${R.na.map(([a,m])=>`<p style="margin:8px 0"><b>${esc(nomAmb(a))}</b> · ${esc(normaAmb(a))}<br><span class="sub">${esc(m)}</span></p>`).join('')}</div></details>
     <details class="pl"><summary>Pendientes de norma o de decisión (${R.brechas.length})</summary><div>
       ${R.brechas.map(([t,d])=>`<p style="margin:8px 0"><b>${esc(t)}</b><br><span class="sub">${esc(d)}</span></p>`).join('')}</div></details>
     <p class="sub">Criterio: cada pauta va al recinto que la materializa; las listas de la unidad, los anexos y los decretos se cotejan una vez en el servicio. Los baños, esperas, bodegas y oficinas no llevan pauta propia: respaldan los requisitos generales.</p>`;
+}
+
+/* ── visto bueno (referentes) ─────────────────────────────────────────────
+   La referente confirma, un servicio a la vez, que las pautas asignadas son las que corresponden. Si algo no calza
+   deja una observación con sus palabras. Se guarda en el backend como val|svc|<SERVICIO> (val|regla|<regla> para una
+   regla): datos = {v:'ok'|'obs', por, ts, n, nota}. n = cuántas pautas había: si cambian después, la app lo avisa.
+   shortcut: «cambió» compara solo la cantidad; agregar una y quitar otra no se nota. */
+const VB_SERVICIO='__VALIDACION__', VB_REGLAS='__REGLAS__';
+const fecha=ts=>{const d=new Date(ts);return isNaN(d)?'':d.toLocaleDateString('es-CL');};
+const quien=d=>String(d&&d.por||'').split('@')[0];
+const unidadesVB=()=>['HOSPITAL','EDIFICIO AA',...D.servicios.map(s=>s.n).filter(n=>clavesSvc(n).length).sort((a,b)=>a.localeCompare(b,'es'))];
+// sin n = validación de las pruebas de 2026 sobre la siembra anterior: no cuenta
+function vb(tipo,id){const e=EST['val|'+tipo+'|'+id], d=e&&e.datos;return d&&(d.v==='ok'||d.v==='obs')&&d.n!=null?d:null;}
+function vbGuardar(tipo,id,v,n,nota){
+  const d=v?{v,por:SES.nombre,ts:new Date().toISOString(),n,...(nota?{nota}:{})}:{};
+  encolar('val|'+tipo+'|'+id,tipo==='svc'?VB_SERVICIO:VB_REGLAS,'',id,d,v==='ok'?100:0);
+}
+function vbPill(d,n){
+  if(!d)return '<span class="pill">Pendiente</span>';
+  if(d.v==='obs')return '<span class="pill warn">✎ Con observación</span>';
+  return d.n!==n?'<span class="pill warn">⚠ Cambió</span>':'<span class="pill ok">✓ Visto bueno</span>';
+}
+function vbEstadoHtml(d,n,que){
+  if(!d)return '';
+  if(d.v==='obs')return `<div class="card" style="background:var(--warn-bg);border-color:#f5d37a"><b>✎ Observación de ${esc(quien(d))} · ${fecha(d.ts)}</b><p style="margin:6px 0 0;white-space:pre-wrap">${esc(d.nota||'')}</p></div>`;
+  return `<div class="card" style="background:var(--ok-bg);border-color:#bfe0c9"><b>✓ Visto bueno de ${esc(quien(d))} · ${fecha(d.ts)}</b>
+    ${d.n!==n?`<p style="margin:6px 0 0"><span class="pill warn">⚠ Cambió</span> ${que} cambiaron después del visto bueno (eran ${d.n}, ahora son ${n}). Conviene mirarlo de nuevo.</p>`:''}</div>`;
+}
+function vbResumen(us){
+  us=us||unidadesVB(); const ds=us.map(u=>vb('svc',u));
+  return {n:us.length,ok:ds.filter(d=>d&&d.v==='ok').length,obs:ds.filter(d=>d&&d.v==='obs').length,sig:us[ds.findIndex(d=>!d)]};
+}
+function vbTarjeta(){
+  const r=vbResumen();
+  return `<button class="item" style="border-color:var(--acc)" onclick="ir('#/vb')"><span class="tx"><b>✅ Visto bueno de las pautas</b>
+    <span class="sub">${r.ok+r.obs} de ${r.n} revisados${r.obs?' · '+r.obs+' con observación':''}</span></span><span class="pill ${r.sig?'':'ok'}">${r.sig?'Revisar':'✓ Listo'}</span></button>`;
+}
+const vbLista=()=>PREV==='#/vb'?history.back():ir('#/vb');     // vuelve a la lista sin dejar el servicio en el «atrás»
+async function vVistoBueno(arg){
+  if(!esRef())return sinAcceso();
+  $('app').innerHTML='<div class="esq"></div><div class="esq"></div>'; await cargarRef();
+  if(arg)return vVistoBuenoSvc(SVC[svcCanon(arg)]?svcCanon(arg):arg);
+  const us=unidadesVB(), r=vbResumen(us);
+  titulo('Visto bueno',(r.ok+r.obs)+' de '+r.n+' servicios revisados');
+  $('app').innerHTML=`<div class="card"><b>Revisa un servicio a la vez, a tu ritmo.</b>
+      <p class="sub" style="margin:6px 0 10px">Si las pautas están bien, da el visto bueno. Si algo no calza, deja una observación con tus palabras y lo corregimos. Todo se guarda solo y puedes seguir otro día.</p>
+      <div class="barra"><i style="width:${r.n?(r.ok+r.obs)*100/r.n:0}%"></i></div></div>
+    ${r.sig?`<button class="btn acc full" style="margin-bottom:12px" onclick="ir('#/vb/${encodeURIComponent(r.sig)}')">Seguir con ${esc(NIVELES[r.sig]||r.sig)}</button>`
+      :'<div class="card" style="background:var(--ok-bg);border-color:#bfe0c9"><b>✓ Todos los servicios están revisados.</b></div>'}
+    ${us.map(u=>{const d=vb('svc',u),n=clavesSvc(u).length;return `<button class="item" onclick="ir('#/vb/${encodeURIComponent(u)}')"><span class="tx"><b>${esc(NIVELES[u]||u)}</b>
+      <span class="sub">${n} ${n===1?'pauta':'pautas'}${d?' · '+fecha(d.ts):''}</span></span>${vbPill(d,n)}</button>`;}).join('')}`;
+}
+function vVistoBuenoSvc(svc){
+  const n=clavesSvc(svc).length, d=vb('svc',svc);
+  if(!n){titulo('Sin pautas');$('app').innerHTML='<div class="vacio">Este servicio no tiene pautas asignadas.</div>';return;}
+  titulo(NIVELES[svc]||svc,n+(n===1?' pauta asignada':' pautas asignadas'));
+  const rev=k=>(porque(k)||{}).c==='revisar';
+  // toca una pauta para leer sus requisitos (📚 Normas) y vuelve con ‹
+  const lee=(a,k,pre)=>`<button class="tg vig ${rev(k)?'rev':''}" style="width:100%;padding:8px 10px;margin-bottom:6px" onclick="ir('#/normas/${encodeURIComponent(a)}')">${rev(k)?'⚠ ':pre||''}${esc(nomAmb(a))}</button>`;
+  const gN={}; pautasSvc(svc).forEach(a=>{const m=normaAmb(a);(gN[m]=gN[m]||[]).push(a);});
+  const unidad=Object.entries(gN).map(([m,as])=>{const k=a=>'svc|'+svc+'|'+a;
+    return as.length>4
+      ?`<details class="pl"><summary>${as.some(a=>rev(k(a)))?'⚠ ':''}${esc(m)} · ${as.length} pautas</summary><div>${as.map(a=>lee(a,k(a))).join('')}</div></details>`
+      :as.map(a=>`<button class="item" onclick="ir('#/normas/${encodeURIComponent(a)}')"><span class="tx"><b>${rev(k(a))?'⚠ ':''}${esc(nomAmb(a))}</b><span class="sub">${esc(m)} · ${reqsAmb(a).length} requisitos</span></span></button>`).join('');}).join('');
+  // recintos (y puntos) agrupados por las pautas que llevan
+  const gR={};
+  [...(RECS[svc]||[]),...D.puntos.filter(p=>p.svc===svc).map(p=>p.id)].forEach(rid=>{const ps=pautasRec(rid);if(!ps.length)return;
+    const k=ps.slice().sort().join('|');(gR[k]=gR[k]||{ps,rids:[]}).rids.push(rid);});
+  const lista=rids=>rids.map(rid=>`<p style="margin:6px 0">${esc(nomRec(rid))}${REC[rid]?` <span class="sub">${esc(REC[rid][1])}</span>`:''}</p>`).join('');
+  const recintos=Object.values(gR).sort((a,b)=>b.rids.length-a.rids.length).map(g=>`<details class="pl"><summary>
+      <span style="flex:1;padding:8px 0">${g.rids.some(rid=>g.ps.some(a=>rev('rec|'+rid+'|'+a)))?'⚠ ':''}${g.ps.map(a=>esc(nomAmb(a))).join(' + ')}<span class="sub" style="display:block;font-weight:400">${g.rids.length===1?esc(nomRec(g.rids[0])):g.rids.length+' recintos'}</span></span></summary>
+      <div>${g.ps.map(a=>lee(a,'rec|'+g.rids[0]+'|'+a,'📖 Leer: ')).join('')}${lista(g.rids)}</div></details>`).join('');
+  const sin=(RECS[svc]||[]).filter(rid=>!pautasRec(rid).length);
+  $('app').innerHTML=`${vbEstadoHtml(d,n,'Las pautas')}
+    <p class="sub">Toca una pauta para leer sus requisitos.${clavesSvc(svc).some(rev)?' Las marcadas con ⚠ conviene mirarlas primero.':''}</p>
+    ${unidad?`<h3>${NIVELES[svc]?'Se cotejan una sola vez':'Se cotejan una vez en el servicio'}</h3>${unidad}`:''}
+    ${recintos?`<h3>${NIVELES[svc]?'Puntos específicos':'Se cotejan en cada recinto'}</h3>${recintos}`:''}
+    ${sin.length?`<details class="pl"><summary>Sin pauta propia · ${sin.length} recintos</summary><div><p class="sub">Oficinas, baños, bodegas, esperas y estares: respaldan los requisitos generales.</p>${lista(sin)}</div></details>`:''}
+    <button class="btn sec full" style="margin-top:6px" onclick="ir('#/asignar/${SVC[svc]?encodeURIComponent(svc):'hospital'}')">＋ Agregar o quitar pautas</button>
+    <div class="fijo dos">${d&&d.v==='ok'&&d.n===n
+      ?`<button class="btn sec" onclick="vbQuitar('svc','${esc(svc)}')">Quitar visto bueno</button><button class="btn acc" onclick="vbLista()">Volver a la lista</button>`
+      :`<button class="btn sec" onclick="vbObservar('svc','${esc(svc)}',${n})">✎ Observación</button><button class="btn ok" onclick="vbDar('svc','${esc(svc)}',${n})">✓ Visto bueno</button>`}</div>`;
+}
+function vbDar(tipo,id,n){vbGuardar(tipo,id,'ok',n);cerrarHoja();toast('✓ Visto bueno registrado');tipo==='svc'?vbLista():render();}
+function vbQuitar(tipo,id){vbGuardar(tipo,id,'');cerrarHoja();toast('Visto bueno quitado');render();}
+function vbObservar(tipo,id,n){
+  const d=vb(tipo,id);
+  hoja(`<h2>Dejar una observación</h2><p class="sub">Escribe con tus palabras qué no calza. No necesitas corregirlo: lo vemos nosotros y te avisamos.</p>
+    <textarea id="vbNota" class="obs" style="min-height:120px" placeholder="Ejemplo: el box 12 no hace procedimientos, es solo consulta.">${esc(d&&d.v==='obs'?d.nota||'':'')}</textarea>
+    <button class="btn full" style="margin-top:10px" onclick="vbGuardarNota('${tipo}','${esc(id)}',${n})">Guardar observación</button>`);
+  $('vbNota').focus();
+}
+function vbGuardarNota(tipo,id,n){
+  const t=$('vbNota').value.trim(); if(!t){toast('Escribe la observación antes de guardar.');return;}
+  vbGuardar(tipo,id,'obs',n,t);cerrarHoja();toast('Observación guardada');tipo==='svc'?vbLista():render();
+}
+/* visto bueno de una regla (🧩 Asignar › Criterios): los mismos botones, para quien prefiera revisar por tipo de recinto */
+function hojaRegla(i){
+  const R=window.ASR||R0, [id,nombre,n,fund]=R.reglas[i], d=vb('regla',id), porSvc={};
+  Object.entries(R.rr||{}).forEach(([rid,j])=>{if(j===i&&REC[rid])porSvc[REC[rid][3]]=(porSvc[REC[rid][3]]||0)+1;});
+  hoja(`<h2>${esc(nombre)}</h2><p class="sub">${n} ${n===1?'recinto':'recintos'} · ${esc(fund)}</p>${vbEstadoHtml(d,n,'Los recintos')}
+    <details class="pl"><summary>Dónde se aplica</summary><div>${Object.entries(porSvc).sort((a,b)=>b[1]-a[1]).map(([s,c])=>`<p style="margin:6px 0">${esc(s)} <span class="sub">${c}</span></p>`).join('')}</div></details>
+    ${d&&d.v==='ok'?`<button class="btn sec full" onclick="vbQuitar('regla','${esc(id)}')">Quitar visto bueno</button>`
+      :`<button class="btn ok full" onclick="vbDar('regla','${esc(id)}',${n})">✓ Visto bueno a esta regla</button>
+        <button class="btn sec full" style="margin-top:8px" onclick="vbObservar('regla','${esc(id)}',${n})">✎ Dejar una observación</button>`}`);
 }
 
 /* ── avance por servicio (referentes) ─────────────────────────────────── */
@@ -796,7 +908,7 @@ function vRevision(){
   const xs=[...D.servicios.map(s=>s.n),'HOSPITAL','EDIFICIO AA'].map(n=>({n,a:avanceSvc(n)})).filter(x=>x.a.n).sort((a,b)=>a.a.p-b.a.p);
   const tot=xs.reduce((t,x)=>t+x.a.n,0),listas=xs.reduce((t,x)=>t+x.a.listas,0);
   titulo('Avance',listas+' de '+tot+' pautas completas');
-  $('app').innerHTML=`<p class="sub">De menor a mayor avance. Toca un servicio para ver sus recintos.</p>
+  $('app').innerHTML=`${vbTarjeta()}<p class="sub">De menor a mayor avance. Toca un servicio para ver sus recintos.</p>
     ${xs.map(x=>`<button class="item" onclick="ir('#/s/${encodeURIComponent(x.n)}')"><span class="tx"><b>${esc(NIVELES[x.n]||x.n)}</b>
       <span class="sub">${x.a.listas} de ${x.a.n} pautas completas${SVC[x.n]&&SVC[x.n].resp.length?' · '+esc(SVC[x.n].resp[0]):''}</span></span>${ring(x.a.p)}</button>`).join('')}`;
 }
