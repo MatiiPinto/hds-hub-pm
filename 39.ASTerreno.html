@@ -377,6 +377,12 @@ svg.ubic-mode > :not(.ubic-layer){display:none !important}
 #ubicLegend b{margin-left:2px}
 #cpLegend{position:absolute;top:48px;left:50%;transform:translateX(-50%);z-index:31;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-pill);padding:5px 8px 5px 14px;font-size:var(--fs-sm);color:var(--text);box-shadow:var(--shadow-2);white-space:nowrap;display:flex;flex-wrap:wrap;justify-content:center;width:max-content;max-width:calc(100% - 24px);align-items:center;gap:2px 8px}
 #dmLegend{position:absolute;top:84px;left:50%;transform:translateX(-50%);z-index:31;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-pill);padding:5px 8px 5px 14px;font-size:var(--fs-sm);color:var(--text);box-shadow:var(--shadow-2);white-space:nowrap;display:flex;flex-wrap:wrap;justify-content:center;width:max-content;max-width:calc(100% - 24px);align-items:center;gap:2px 8px}
+#estLegend{position:absolute;top:120px;left:50%;transform:translateX(-50%);z-index:31;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-pill);padding:5px 8px 5px 14px;font-size:var(--fs-sm);color:var(--text);box-shadow:var(--shadow-2);white-space:normal;max-width:calc(100% - 40px);display:flex;flex-wrap:wrap;justify-content:center;width:max-content;max-width:calc(100% - 24px);align-items:center;gap:2px 8px}
+#estLegend .ef{border:1.5px solid var(--border);background:var(--surface);border-radius:var(--r-pill);padding:2px 9px;font-size:var(--fs-xs);font-weight:700;cursor:pointer;color:var(--text);display:inline-flex;align-items:center;gap:4px}
+#estLegend .ef.off{opacity:.4;text-decoration:line-through}
+#estLegend .ef i{display:inline-block;width:10px;height:10px;border-radius:3px}
+#estLegend .ea{border:1.5px dashed var(--border);background:var(--surface);border-radius:var(--r-pill);padding:2px 9px;font-size:var(--fs-xs);font-weight:700;cursor:pointer;color:var(--text)}
+#estLegend .ea.on{background:#fde68a;border-style:solid}
 #dmLegend .cp-pt{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
 #dmLegend button{border:1px solid var(--border);background:var(--surface);border-radius:var(--r-pill);padding:2px 10px;font-size:var(--fs-xs);font-weight:700;cursor:pointer;color:var(--text)}
 #cpLegend .cp-pt{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
@@ -813,6 +819,15 @@ body.view-only #dkPmCentral,body.view-only #dkPmDelta,body.view-only #backupBadg
 #lpLegend{position:absolute;left:12px;bottom:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--shadow-2);padding:8px 10px;font-size:11px;line-height:1.6;z-index:9;display:none;max-width:300px}
 #lpLegend .lp-sw{display:inline-block;width:18px;height:4px;border-radius:2px;vertical-align:middle;margin-right:5px}
 #ccddLegend[style*="block"]+#ppLegend{bottom:auto;top:12px}
+/* Leyendas en la barra de vistas (a continuación de «Vista General»): una fila, desplazable si no caben */
+#navBar{height:auto;min-height:var(--navbar-h);flex-wrap:wrap;row-gap:4px;padding-top:4px;padding-bottom:4px}
+#navLegends{flex:1 1 320px;min-width:0;display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;margin-left:4px}
+#navLegends>div{position:static!important;transform:none!important;inset:auto!important;box-shadow:none!important;max-width:100%!important;flex-shrink:1;white-space:nowrap!important;flex-wrap:wrap!important;align-items:center;gap:6px;padding:3px 10px!important;border-radius:var(--r-pill)!important;font-size:var(--fs-xs)!important;line-height:1.3!important;background:var(--surface-2,#f1f5f9)!important;border:1px solid var(--border)!important;z-index:auto!important}
+#navLegends #ccddLegend[style*="block"],#navLegends #ppLegend[style*="block"],#navLegends #lpLegend[style*="block"]{display:flex!important}
+#navLegends br{display:none}
+#navLegends #ccddLegend b,#navLegends .pp-tit,#navLegends #lpLegend label,#navLegends #ppLegend>div{display:inline-flex!important;align-items:center;gap:3px;margin:0 0 0 2px!important}
+#navLegends #ccddLegend>div,#navLegends #ppLegend>div[style*="color"],#navLegends #lpLegend>div{display:none!important}
+#navLegends #lpLegend>span{display:inline!important}
 .fk-pp-det summary{cursor:pointer;font-size:11.5px;color:var(--text-2);margin:2px 0}
 .fk-pp-lista{font-size:11px;color:var(--text-1);line-height:1.5;margin:2px 0 4px;word-break:break-word}
 .fk-pp-comp{font-weight:600}
@@ -1293,6 +1308,16 @@ function _cargarJS(L){
       <span class="nav-crumb" id="crumb2" style="display:none"></span>
       <span class="level-badge" id="lvlBadge">Vista General</span>
       <div id="escSel" class="esc-sel" style="display:none"></div>
+      <!-- leyendas de las capas: en la barra de vistas, no sobre el plano (23-11-2026) -->
+      <div id="navLegends">
+        <div id="ccddLegend"></div>
+        <div id="ppLegend"></div>
+        <div id="lpLegend"></div>
+        <div id="ubicLegend" style="display:none"></div>
+        <div id="cpLegend" style="display:none"></div>
+        <div id="dmLegend" style="display:none"></div>
+        <div id="estLegend" style="display:none"></div>
+      </div>
     </div>
     <div id="editBar">
       <button class="tb-btn" id="btnBuscaRec" onclick="openRoomSearch()" title="Buscar recinto por nombre, código, BIM o señalética y saltar a él (Ctrl+K)">🔎 Recinto</button>
@@ -1348,7 +1373,7 @@ function _cargarJS(L){
       <button class="tb-btn" id="btnCcdd" onclick="toggleCcdd()" title="Mostrar sobre el plano los puntos de corrientes débiles (CE y CCDD) leídos de los planos CDE rev. 20-03-2020: llamada enfermera, seguridad y control de accesos, CCTV, megafonía, gestión de turnos, telefonía, WiFi/celular. Pasa el mouse por un punto para ver qué es. Las clases «por confirmar» se muestran con su letra del plano.">📡 Corrientes débiles</button>
       <button class="tb-btn" id="btnSoloReemp" onclick="toggleSoloReemp()" title="Filtro del plano: resaltar SOLO los puestos con reemplazo vigente (titular ausente según RRHH o informado en terreno). En vista 3 los demás puestos se atenúan; en vista 2 cada recinto muestra 🔁 y cuántos reemplazos tiene.">🔁 Sólo reemplazos</button>
       <button class="tb-btn" id="btnShowPC" onclick="toggleShowPC()" title="Mostrar en cada recinto (vista de servicio) los computadores del catálogo EMMC repartidos por caja dibujada: 💻 + cantidad (bajo y alto rendimiento, notebooks). Clic abre la ficha. Reporte y Excel en el gestor: Apoyo TI → Reporte de computadores.">💻 Computadores</button>
-      <button class="tb-btn tog" id="btnEstac" onclick="toggleEstac()" title="Mostrar u ocultar los estacionamientos (plazas importadas de 8.Navegacion, a tamaño real, del color de su categoría: 🅿 público · ♿ discapacitados · 🚑 ambulancias · ★ directivos · 👥 funcionarios). Se ven en todas las vistas.">🅿 Estacionamientos</button>
+      <button class="tb-btn tog" id="btnEstac" onclick="toggleEstac()" title="Mostrar u ocultar los estacionamientos (plazas a tamaño real). Al encenderlos aparece el subfiltro por institución: HDS · ★ Directivos HDS · INGER · ★ Directivos INGER · Visitas, con sus cupos de las PAPS; en ✏️ Editar (P-2) se asignan plazas con un rectángulo. Se ven en todas las vistas.">🅿 Estacionamientos</button>
       <button class="tb-btn" id="btnImpresoras" onclick="toggleImpresoras()" title="Impresoras: en el piso (vista 1) muestra dónde van las propuestas; dentro de un servicio (vista 2) pone en cada recinto el testigo 🖨 con las del archivo Comodatos Jun-2026 por tipo. Una sola capa para ambas.">🖨 Impresoras</button>
       <button class="tb-btn" id="btnPuertasVis" onclick="togglePuertasVis()" title="Mostrar u ocultar las puertas de los recintos (flecha de salida sobre el muro, vistas 2 y 3). Mientras se colocan puertas se ven siempre.">🚪 Puertas</button>
       <button class="tb-btn" id="btnShowTomas" onclick="toggleShowTomas()" title="Mostrar en cada recinto (vista de servicio) las tomas de corriente de la memoria eléctrica PE 01: 🔌 + total de tomas (triple = 3, doble = 2, simple = 1), sumando grado médico, computación (UPS) y fuerza. El detalle por red va en el tooltip y en la ficha.">🔌 Tomas</button>
@@ -1402,17 +1427,11 @@ function _cargarJS(L){
       <div class="float-hint" id="delHint">Modo eliminar — clic en dot para eliminar · ESC para salir</div>
       <div class="float-hint" id="puertaHint">🚪 Puertas — elige el tipo en la barra (90 · 120 · 200) y haz clic en el borde del recinto · atajos: Alt+clic=120, Shift+clic=200 · ⌘+clic sobre una puerta rota el tipo · arrastrar mueve · doble clic elimina · ⚡ Auto completa el área y ↩ lo deshace · ✕ borra 1 a 1 · 🗑 borra todas las del servicio · ESC sale</div>
       <div class="float-hint" id="vertHint"></div>
-      <div id="ccddLegend"></div>
-      <div id="ppLegend"></div>
-      <div id="lpLegend"></div>
       <div id="structEdit"></div>
       <div id="navPanel"></div>
       <div class="float-hint" id="stampHint">🪑 Duplicar mueble — arrastra un rectángulo sobre el mueble a copiar (como una captura de pantalla); al soltar, la copia queda junto al original · muévela arrastrándola · doble clic la elimina · ESC para salir</div>
       <div class="float-hint" id="bedHint">🛏 Modo puestos — en vista 2, clic DENTRO de un recinto: camillas/sillones en Recuperación, Habitación o Clínica; cupos (⭕) en Recuperación, Pre-Anestesia, Box Urgencia, Reanimador y Sala de Procedimiento; puestos de toma (🧪) solo en Laboratorio · ESC para salir</div>
       <div class="float-hint" id="propHint"></div>
-      <div id="ubicLegend" style="display:none"></div>
-      <div id="cpLegend" style="display:none"></div>
-      <div id="dmLegend" style="display:none"></div>
       <button id="lblHint" style="display:none" onclick="toggleRoomLabels()" title="Los nombres y códigos de los recintos están ocultos. Clic para mostrarlos (también desde 🧰 → 🏷 Etiquetas de recintos).">🏷 Nombres de recinto ocultos · <b>mostrar</b></button>
       <div id="planLoading"><span class="pl-spin"></span> Cargando plano…</div>
       <div id="metasPanel" style="display:none">
@@ -1455,7 +1474,7 @@ function _cargarJS(L){
           <button class="dk-btn tog" id="dkUbicVend" onclick="toggleUbic('vend')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van las VENDOMÁTICAS (espacios de vending de los planos)"><span class="ic">🥤</span><span class="lb">Vendomática</span></button>
           <button class="dk-btn tog" id="dkUbicPrinter" onclick="toggleUbic('printer')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van las IMPRESORAS"><span class="ic">🖨</span><span class="lb">Impresoras</span></button>
           <button class="dk-btn tog" id="dkUbicCarro" onclick="toggleCarros()" title="Carros de paro: desfibrilador (130007 / 130008) + carro de paro (110032) del EMMC de cada recinto. Azul = completo · rojo = desfibrilador sin su carro · pastilla MP = con marcapaso externo. Se ve en todas las vistas y se exporta a Excel."><span class="ic">🚨</span><span class="lb">Carros de paro</span></button>
-          <button class="dk-btn tog" id="dkUbicMed" onclick="toggleMedStation()" title="MedStation (BD Pyxis) de la tabla de Farmacia: cada equipo en su recinto, con su número de columnas (1 · 2 · 3) y los armarios de estupefacientes. Se ve en todas las vistas; clic en un equipo = ir al recinto."><span class="ic">💊</span><span class="lb">MedStation</span></button>
+          <button class="dk-btn tog" id="dkUbicMed" onclick="toggleMedStation()" title="MedStation (BD Pyxis) de la tabla de Farmacia: cada equipo en su recinto, con su número de columnas (1 · 2 · 3) y los armarios de estupefacientes. Se ve en todas las vistas. En vista 2 y 3: arrastrar = mover (reubicación), clic derecho = rotar 90°, doble clic = volver a la posición de la tabla."><span class="ic">💊</span><span class="lb">MedStation</span></button>
           <button class="dk-btn tog" id="dkLabels" onclick="toggleRoomLabels()" title="Mostrar u ocultar el nombre y código de cada recinto sobre el plano"><span class="ic">🏷</span><span class="lb">Etiquetas de recintos</span></button>
         </div>
         <div class="dk-h">Apoyo TI</div>
@@ -5649,6 +5668,7 @@ function renderSVG(){
   // interactiva solo en vista 1 (en 2 y 3 no captura clics, para no tapar
   // recintos ni puestos).
   paintStructures();
+  try{ _estLegendRender(); _estAsigLayer(); }catch(e){ console.warn('filtro estacionamientos',e); }
   { if(S.showCcdd===undefined){ let v=null; try{ v=localStorage.getItem('cabida_show_ccdd'); }catch(e){} S.showCcdd=(v==='1'); const b=document.getElementById('btnCcdd'); if(b) b.classList.toggle('active',!!S.showCcdd); }
     try{ _ccddLayer(); }catch(e){}
     try{ if(S.showPP===undefined){ let v=null; try{ v=localStorage.getItem('cabida_show_pp'); }catch(e){} S.showPP=(v==='1'); const b=document.getElementById('btnPP'); if(b) b.classList.toggle('active',!!S.showPP); } _ppLayer(); }catch(e){ console.warn('capa puntos PINS',e); } }
@@ -7414,10 +7434,37 @@ function _dmRecintos(){
   Object.entries(D.por_bim||{}).forEach(([b,L])=>L.forEach(e=>{ const cl=_dmClase(e); if(!cl) return;
     const z=I[b.toUpperCase()]; if(!z){ sin.push({bim:b, e, cl}); return; }
     const o=(por[z.r.id]=por[z.r.id]||{fl:z.fl, area:z.area, r:z.r, bim:b, u:[]});
-    for(let i=0;i<(+e.cantidad||1);i++) o.u.push({cl, e}); }));
+    for(let i=0;i<(+e.cantidad||1);i++) o.u.push({cl, e, key:b.toUpperCase()+'|'+e.fila+'|'+e.tipo+'|'+i}); }));
   const ord={c3:0,c2:1,c1:2,est:3}; Object.values(por).forEach(o=>o.u.sort((x,y)=>ord[x.cl]-ord[y.cl]));
   return {lista:Object.values(por), sin};
 }
+// Posición y giro puestos a mano (reubicaciones): nameState.dmPos[clave] = {x,y,r,ts}; sin clave = posición automática
+function _dmPos(){ return (nameState.dmPos=nameState.dmPos||{}); }
+function _dmMovidos(L){ let mov=0, otro=0; L.forEach(z=>z.u.forEach(x=>{ const p=_dmPos()[x.key]; if(!p) return; mov++; const r=_roomAtPoint(p.x,p.y); if(r!==z.r.id) otro++; })); return {mov, otro}; }
+let _dmDrag=null;
+function _dmDragStart(e, key, x0, y0){
+  if(e.button!==0 || S.level<2 || S.viewOnly) return;
+  e.preventDefault(); e.stopPropagation();
+  _dmDrag={key, sx:e.clientX, sy:e.clientY, ox:x0, oy:y0, moved:false};
+  window.addEventListener('mousemove',_dmDragMove); window.addEventListener('mouseup',_dmDragUp);
+}
+function _dmDragMove(e){
+  if(!_dmDrag) return;
+  if(!_dmDrag.moved && Math.hypot(e.clientX-_dmDrag.sx,e.clientY-_dmDrag.sy)<4) return;
+  _dmDrag.moved=true;
+  const P=_dmPos(), p=P[_dmDrag.key]||{};
+  P[_dmDrag.key]={...p, x:Math.round(_dmDrag.ox+(e.clientX-_dmDrag.sx)/S.zoom), y:Math.round(_dmDrag.oy+(e.clientY-_dmDrag.sy)/S.zoom), ts:Date.now()};
+  renderSVGThrottled();
+}
+function _dmDragUp(){
+  window.removeEventListener('mousemove',_dmDragMove); window.removeEventListener('mouseup',_dmDragUp);
+  if(_dmDrag && _dmDrag.moved){ sNames(); renderSVG(); const p=_dmPos()[_dmDrag.key], r=p?_roomAtPoint(p.x,p.y):null;
+    if(typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='💊 MedStation movido'+(r?(' a '+(rName(r)||'')):' (fuera de un recinto)')+' · doble clic lo devuelve a la tabla de Farmacia'; setTimeout(()=>{ if(tbInfo) tbInfo.textContent=''; },4000); } }
+  _dmDragMovido=!!(_dmDrag&&_dmDrag.moved); _dmDrag=null;
+}
+let _dmDragMovido=false;
+function _dmRotar(key, x0, y0){ if(S.level<2 || S.viewOnly) return; const P=_dmPos(), p=P[key]||{x:Math.round(x0), y:Math.round(y0)}; P[key]={...p, r:((p.r||0)+90)%360, ts:Date.now()}; sNames(); renderSVG(); }
+function _dmVolver(key){ if(S.level<2 || S.viewOnly) return; if(_dmPos()[key]){ delete _dmPos()[key]; sNames(); renderSVG(); } }
 function _dmCuenta(L){ const c={c1:0,c2:0,c3:0,est:0}; L.forEach(o=>(o.u||[o]).forEach(x=>c[x.cl]++)); return c; }
 function _dmTxtEquipo(e){
   return (e.tipo==='estupefacientes'?'🔒 ':'💊 ')+e.equipo+(e.columnas?(' · '+e.columnas+' col'):'')+(e.area?(' · '+e.area):'')
@@ -7433,16 +7480,23 @@ function _dmLayer(){
     const n=z.u.length, cols=Math.min(n, Math.ceil(Math.sqrt(n*1.6))), filas=Math.ceil(n/cols), PX=26, PY=34;
     z.u.forEach((x,i)=>{
       const fx=(i%cols)-(cols-1)/2, fy=Math.floor(i/cols)-(filas-1)/2, col=DM_CL[x.cl].col;
-      const mk=el('g',{class:'dm-mk dm-'+x.cl, transform:`translate(${c.x+fx*PX*k},${c.y+fy*PY*k}) scale(${k})`});
+      const pm=_dmPos()[x.key], px=pm&&pm.x!=null?pm.x:c.x+fx*PX*k, py=pm&&pm.y!=null?pm.y:c.y+fy*PY*k, rot=(pm&&pm.r)||0;
+      const rd=pm&&pm.x!=null?_roomAtPoint(px,py):z.r.id, otro=rd!==z.r.id, edit=S.level>=2 && !S.viewOnly;
+      const mk=el('g',{class:'dm-mk dm-'+x.cl, transform:`translate(${px},${py}) scale(${k}) rotate(${rot})`, style:edit?'cursor:grab':''});
+      if(otro) mk.appendChild(el('rect',{x:-15,y:-18,width:30,height:36,rx:6,fill:'none',stroke:col,'stroke-width':1.6,'stroke-dasharray':'4 2.5'}));
       mk.appendChild(el('rect',{x:-11,y:-14,width:22,height:28,rx:4,fill:'#fff',stroke:col,'stroke-width':2.6}));
       if(x.cl==='est'){ mk.appendChild(el('rect',{x:-8,y:-11,width:16,height:22,rx:2,fill:col})); mk.appendChild(txt(0,1,'🔒',{'font-size':11,'pointer-events':'none'})); }
       else { const nc=+x.cl.slice(1), w=(16-(nc-1)*2)/nc;
         for(let j=0;j<nc;j++) mk.appendChild(el('rect',{x:-8+j*(w+2),y:-11,width:w,height:22,rx:1.5,fill:col}));
         mk.appendChild(txt(0,1,String(nc),{'font-size':11,'font-weight':900,fill:'#fff','pointer-events':'none'})); }
       const t=el('title'); t.textContent=_dmTxtEquipo(x.e)+'\n'+(rName(z.r.id)||'(sin nombre)')+' · BIM '+z.bim+' · '+aName(z.area.id)
-        +'\nEquipo '+(i+1)+' de '+n+' en este recinto · tabla de Farmacia 05-10-2026 · clic = ir al recinto'; mk.appendChild(t);
-      mk.addEventListener('mousedown',e=>e.stopPropagation());
-      mk.addEventListener('click',e=>{ e.stopPropagation(); didPan=false; goRoom(z.r.id); });
+        +(otro?('\n↪ REUBICADO (propuesta) en '+(rd?((rName(rd)||'(sin nombre)')+(rBim(rd)?(' · BIM '+rBim(rd)):'')):'un punto fuera de los recintos')):(pm?'\n📍 posición ajustada a mano':''))
+        +'\nEquipo '+(i+1)+' de '+n+' en este recinto · tabla de Farmacia 05-10-2026'
+        +(edit?'\nArrastrar = mover · clic derecho = rotar 90° · doble clic = volver a la posición de la tabla':' · clic = ir al recinto'); mk.appendChild(t);
+      mk.addEventListener('mousedown',e=>{ if(edit) _dmDragStart(e, x.key, px, py); else e.stopPropagation(); });
+      mk.addEventListener('contextmenu',e=>{ e.preventDefault(); e.stopPropagation(); _dmRotar(x.key, px, py); });
+      mk.addEventListener('dblclick',e=>{ e.stopPropagation(); _dmVolver(x.key); });
+      mk.addEventListener('click',e=>{ e.stopPropagation(); didPan=false; if(_dmDragMovido){ _dmDragMovido=false; return; } if(!edit) goRoom(z.r.id); });
       g.appendChild(mk);
     });
   });
@@ -7452,6 +7506,7 @@ function _dmLayer(){
     const a=_dmCuenta(aqui), h=_dmCuenta(R.lista), hs=_dmCuenta(R.sin), it=(cl,v)=>'<span><i class="cp-pt" style="background:'+DM_CL[cl].col+'"></i>'+DM_CL[cl].lbl+' <b>'+v[cl]+'</b></span>';
     lg.innerHTML='<span>💊 <b>'+(fl?fl.label:'')+(S.level>1&&S.areaId?(' · '+esc(aName(S.areaId))):'')+'</b></span>'+it('c1',a)+it('c2',a)+it('c3',a)+it('est',a)
       +'<span style="color:#64748b">hospital '+h.c1+' · '+h.c2+' · '+h.c3+' · 🔒 '+h.est+(R.sin.length?(' · sin recinto en el plano '+(hs.c1+hs.c2+hs.c3+hs.est)):'')+'</span>'
+      +((M=>M.mov?('<span title="Movidos a mano; los reubicados quedaron en otro recinto (borde punteado)">📍 movidos <b>'+M.mov+'</b>'+(M.otro?(' · ↪ reubicados <b>'+M.otro+'</b>'):'')+'</span>'):'')(_dmMovidos(R.lista)))
       +'<button type="button" onclick="dmReporte()" title="Todos los pisos, recinto por recinto">📋 Lista</button>';
     lg.style.display='';
   }
@@ -7470,7 +7525,8 @@ function _dmHtml(rid){
 function dmReporte(){
   const R=_dmRecintos(), h=_dmCuenta(R.lista), pisoIx=id=>FLOORS.findIndex(f=>f.id===id);
   const L=R.lista.slice().sort((a,b)=>pisoIx(a.fl.id)-pisoIx(b.fl.id)||aName(a.area.id).localeCompare(aName(b.area.id),'es'));
-  const filas=L.map(z=>{ const c=_dmCuenta([z]); return '<tr onclick="goRoom(\''+z.r.id+'\');dmReporteCerrar()" style="cursor:pointer"><td>'+esc(z.fl.label)+'</td><td>'+esc(aName(z.area.id))+'</td><td><b>'+esc(rName(z.r.id)||'')+'</b><br><span style="color:#64748b">BIM '+esc(z.bim)+'</span></td>'
+  const reub=z=>z.u.map(x=>{ const p=_dmPos()[x.key]; if(!p||p.x==null) return ''; const r=_roomAtPoint(p.x,p.y); return r===z.r.id?'':('<br><span style="color:#b45309">↪ 1 × '+esc(DM_CL[x.cl].lbl)+' a '+esc(r?((rName(r)||'')+(rBim(r)?(' · BIM '+rBim(r)):'')):'fuera de recinto')+'</span>'); }).join('');
+  const filas=L.map(z=>{ const c=_dmCuenta([z]); return '<tr onclick="goRoom(\''+z.r.id+'\');dmReporteCerrar()" style="cursor:pointer"><td>'+esc(z.fl.label)+'</td><td>'+esc(aName(z.area.id))+'</td><td><b>'+esc(rName(z.r.id)||'')+'</b><br><span style="color:#64748b">BIM '+esc(z.bim)+'</span>'+reub(z)+'</td>'
     +['c1','c2','c3','est'].map(k=>'<td style="text-align:center;font-weight:800;color:'+DM_CL[k].col+'">'+(c[k]||'')+'</td>').join('')+'</tr>'; }).join('');
   const sin=R.sin.map(x=>'<li>BIM <b>'+esc(x.bim)+'</b> · '+(+x.e.cantidad||1)+' × '+esc(x.e.equipo)+(x.e.columnas?(' '+x.e.columnas+' col'):'')+' · '+esc(x.e.area||'')+'</li>').join('');
   let m=document.getElementById('dmModal');
@@ -9549,7 +9605,7 @@ function deleteStruct(id){
 function paintStructures(){
   if(S.vertAjuste && typeof _vertAjusteHint==='function') _vertAjusteHint();
   const items = structsOf(S.floorId).filter(it=>{ const t=STRUCT_TYPES[it.kind]; if(!t || t.kind!=='point') return true;
-    return t.grupo==='reloj' ? S.relojes!==false : (t.grupo==='cn' ? S.correoN!==false : (t.grupo==='est' ? S.estac!==false : S.verticales!==false)); });
+    return t.grupo==='reloj' ? S.relojes!==false : (t.grupo==='cn' ? S.correoN!==false : (t.grupo==='est' ? (S.estac!==false && _estVisible(it)) : S.verticales!==false)); });
   if(!items.length && !_structLine) return;
   const relojEditable = S.editMode && items.some(it=>_esMarca(it.kind));
   const g = el('g', {class:'structures-layer',
@@ -9603,7 +9659,7 @@ function renderStructMarker(it, tdef){
     t.textContent = it.etq || tdef.short; g.appendChild(t);
   } else if(tdef.grupo==='est'){
     // plaza a tamaño real: caja translúcida del color de la categoría con su icono
-    const c=_estCat(it), tc=it.estTipo?(EST_TIPO_COL[_estCatId(it)]||'#c026d3'):((S.estZona&&EO_ZONA[it.zona])?EO_ZONA[it.zona][1]:c.col);
+    const c=_estCat(it), tc=it.estTipo?(EST_TIPO_COL[_estCatId(it)]||'#c026d3'):(S.estInstCol!==false?EST_GRP[_estGrupo(it)].col:((S.estZona&&EO_ZONA[it.zona])?EO_ZONA[it.zona][1]:c.col));
     g.appendChild(el('rect',{class:'struct-est'+(it.estTipo?' struct-est-tipo':''),x:-bw/2,y:-bh/2,width:bw,height:bh,rx:Math.min(10,Math.min(bw,bh)*0.08),fill:tc,'fill-opacity':it.estTipo?0.6:0.42,stroke:tc,'stroke-width':Math.max(2,baseStrokeW*(it.estTipo?1.6:0.8))}));
     if(it.estTipo){ const tt=el('text',{x:0,y:-bh/2+Math.min(bw,bh)*0.2,'text-anchor':'middle','dominant-baseline':'central','font-size':Math.min(bw,bh)*0.2,'font-weight':900,fill:'#fff','pointer-events':'none','font-family':'system-ui,-apple-system,sans-serif'}); tt.textContent='TIPO'; g.appendChild(tt); }
     const t=el('text',{x:0,y:0,'text-anchor':'middle','dominant-baseline':'central','font-size':Math.min(bw,bh)*0.55,'font-weight':900,fill:'#fff',stroke:tc,'stroke-width':Math.max(1.5,Math.min(bw,bh)*0.03),'paint-order':'stroke fill','pointer-events':'none','font-family':'system-ui,-apple-system,sans-serif'});
@@ -9968,6 +10024,72 @@ function toggleEstac(){
   const b=document.getElementById('btnEstac'); if(b) b.classList.toggle('active',S.estac!==false);
   renderSVG();
 }
+// ── Subfiltro de estacionamientos: HDS · INGER · Directivos (23-11-2026) ─────────────────────
+// PAPS Estacionamiento aprobadas (HDS ORD IF-HSG 0960 · INGER 0961): S3 = 673 plazas de funcionarios HDS;
+// S2 = 307 de funcionarios y directivos (HDS 130 = 12 directivos identificados + 118; INGER 177 = 11 directivos
+// + 166, sectores A–J) y 494 de visitas. Las PAPS NO dicen qué plaza del S2 es de cada institución: se asigna
+// aquí (it.inst = 'hds'|'inger'; directivo = cat 'dir') con el rectángulo de asignación en ✏️ Editar.
+const EST_GRP={hds:{n:'HDS',col:'#1d5fa0'}, dir_hds:{n:'★ Directivos HDS',col:'#7c3aed'}, inger:{n:'INGER',col:'#0d9488'}, dir_inger:{n:'★ Directivos INGER',col:'#db2777'},
+  visita:{n:'Visitas',col:'#f26722'}, sinasig:{n:'Funcionarios S2 sin asignar',col:'#94a3b8'}, otro:{n:'🚑 Emergencia',col:'#ef4444'}};
+const EST_CUPO={'P-3':{hds:673}, 'P-2':{hds:118, dir_hds:12, inger:166, dir_inger:11, visita:494}};
+function _estGrupo(it, fid){
+  if(it.cat==='amb') return 'otro';
+  if(it.inst==='hds') return it.cat==='dir'?'dir_hds':'hds';
+  if(it.inst==='inger') return it.cat==='dir'?'dir_inger':'inger';
+  const p=fid||_estPisoDe(it);
+  if(p==='P-3') return 'hds';                         // S3: todas de funcionarios HDS (PAPS 0960)
+  if(it.zona==='visita') return 'visita';
+  return 'sinasig';
+}
+function _estPisoDe(it){ for(const [p,arr] of Object.entries(structuresState)) if((arr||[]).includes(it)) return p; return S.floorId; }
+function _estFil(){ if(!S.estFil){ let v=null; try{ v=JSON.parse(localStorage.getItem('cabida_est_fil')||'null'); }catch(e){} S.estFil=new Set(Array.isArray(v)?v:Object.keys(EST_GRP)); } return S.estFil; }
+if(S.estInstCol===undefined){ let v=null; try{ v=localStorage.getItem('cabida_est_instcol'); }catch(e){} S.estInstCol=(v!=='0'); }
+function _estVisible(it){ return it.kind!=='est' || _estFil().has(_estGrupo(it, S.floorId)); }
+function estFiltro(k){ const F=_estFil(); if(F.has(k)) F.delete(k); else F.add(k); _lsPref('cabida_est_fil', JSON.stringify([...F])); renderSVG(); }
+function estFiltroSolo(k){ S.estFil=new Set([k]); _lsPref('cabida_est_fil', JSON.stringify([k])); renderSVG(); }
+function estFiltroTodo(){ S.estFil=new Set(Object.keys(EST_GRP)); _lsPref('cabida_est_fil', JSON.stringify([...S.estFil])); renderSVG(); }
+function estInstCol(){ S.estInstCol=!(S.estInstCol!==false); _lsPref('cabida_est_instcol', S.estInstCol?'1':'0'); renderSVG(); }
+function estAsigModo(k){ S.estAsig=(S.estAsig===k)?null:k; renderSVG();
+  if(S.estAsig && typeof tbInfo!=='undefined'&&tbInfo){ tbInfo.textContent='🅿 Asignar '+(k==='limpiar'?'(quitar asignación)':EST_GRP[k].n)+': clic en una plaza o arrastra un rectángulo · Esc termina'; } }
+function _estCuenta(fid){ const c={}; Object.keys(EST_GRP).forEach(k=>c[k]=0);
+  (fid?[[fid,structsOf(fid)]]:Object.entries(structuresState)).forEach(([p,arr])=>(arr||[]).forEach(it=>{ if(it.kind==='est') c[_estGrupo(it,p)]++; })); return c; }
+function _estLegendRender(){
+  const lg=document.getElementById('estLegend'); if(!lg) return;
+  const hay=S.estac!==false && structsOf(S.floorId).some(x=>x.kind==='est');
+  if(!hay){ lg.style.display='none'; if(S.estAsig) S.estAsig=null; return; }
+  const F=_estFil(), c=_estCuenta(S.floorId), cup=EST_CUPO[S.floorId]||{}, ed=S.editMode && !S.viewOnly;
+  const chip=k=>c[k]||cup[k]!=null?('<button class="ef'+(F.has(k)?'':' off')+'" onclick="estFiltro(\''+k+'\')" ondblclick="estFiltroSolo(\''+k+'\')" title="Clic: mostrar u ocultar · doble clic: ver sólo este grupo"><i style="background:'+EST_GRP[k].col+'"></i>'+EST_GRP[k].n+' <b>'+c[k]+'</b>'+(cup[k]!=null?('<span style="color:#64748b">/'+cup[k]+'</span>'):'')+'</button>'):'';
+  let h='<span>🅿 <b>'+esc((curFloor()||{}).label||S.floorId)+'</b></span>'+Object.keys(EST_GRP).map(chip).join('')
+    +'<button class="ef" onclick="estFiltroTodo()" title="Mostrar todos los grupos">Todos</button>'
+    +'<button class="ef" onclick="estInstCol()" title="Colorear las plazas por institución o por su categoría original">🎨 '+(S.estInstCol!==false?'por institución':'por categoría')+'</button>';
+  if(ed && S.floorId==='P-2') h+='<span style="color:#64748b">Asignar:</span>'+['hds','dir_hds','inger','dir_inger','limpiar'].map(k=>'<button class="ea'+(S.estAsig===k?' on':'')+'" onclick="estAsigModo(\''+k+'\')">'+(k==='limpiar'?'✕ quitar':EST_GRP[k].n)+'</button>').join('');
+  lg.innerHTML=h; lg.style.display='';
+}
+function _estAsignar(L){
+  const k=S.estAsig; let n=0;
+  L.forEach(it=>{ if(it.kind!=='est' || it.cat==='amb') return;
+    if(k==='limpiar'){ delete it.inst; if(it.cat==='dir') it.cat='pub'; }
+    else { it.inst=k.indexOf('inger')>=0?'inger':'hds';
+      if(k.startsWith('dir_')){ if(it.cat==='pub'||it.cat==='func') it.cat='dir'; } else if(it.cat==='dir') it.cat='pub'; }
+    n++; });
+  if(n){ sStruct(); renderSVG(); if(typeof tbInfo!=='undefined'&&tbInfo) tbInfo.textContent='🅿 '+n+' plaza(s) → '+(k==='limpiar'?'sin asignar':EST_GRP[k].n)+' · Esc termina'; }
+}
+function _estAsigLayer(){
+  if(!S.estAsig || !S.editMode || S.viewOnly || S.estac===false) return;
+  const cap=el('rect',{x:0,y:0,width:IMG_W,height:IMG_H,fill:'transparent',style:'cursor:crosshair'}), sel=el('rect',{fill:'#fde68a','fill-opacity':.25,stroke:'#b45309','stroke-width':3,'stroke-dasharray':'10 6',display:'none','pointer-events':'none'});
+  let p0=null;
+  cap.addEventListener('mousedown',e=>{ if(e.button!==0) return; e.preventDefault(); e.stopPropagation(); p0=s2i(e.clientX,e.clientY);
+    const mv=ev=>{ const p=s2i(ev.clientX,ev.clientY); sel.setAttribute('display',''); sel.setAttribute('x',Math.min(p.x,p0.x)); sel.setAttribute('y',Math.min(p.y,p0.y)); sel.setAttribute('width',Math.abs(p.x-p0.x)); sel.setAttribute('height',Math.abs(p.y-p0.y)); };
+    const up=ev=>{ window.removeEventListener('mousemove',mv); window.removeEventListener('mouseup',up);
+      const p=s2i(ev.clientX,ev.clientY), x0=Math.min(p.x,p0.x), x1=Math.max(p.x,p0.x), y0=Math.min(p.y,p0.y), y1=Math.max(p.y,p0.y), clic=(x1-x0)<8&&(y1-y0)<8;
+      const L=structsOf(S.floorId).filter(it=>it.kind==='est' && _estVisible(it) && (clic
+        ? (Math.abs(it.x-p.x)<=(it.w||60)/2 && Math.abs(it.y-p.y)<=(it.h||60)/2)
+        : (it.x>=x0 && it.x<=x1 && it.y>=y0 && it.y<=y1)));
+      _estAsignar(L); };
+    window.addEventListener('mousemove',mv); window.addEventListener('mouseup',up); });
+  svg.appendChild(cap); svg.appendChild(sel);
+}
+window.addEventListener('keydown',e=>{ if(e.key==='Escape' && S.estAsig){ S.estAsig=null; renderSVG(); if(typeof tbInfo!=='undefined'&&tbInfo) tbInfo.textContent=''; } });
 // ── Estacionamientos desde 8.Navegacion (SHARED_DATA/nav_verticales.js, kind 'est') ──
 // Reemplaza las plazas de TODOS los pisos con las de la siembra; lo demás no se toca.
 function importarEstacionamientosNav(sinConfirmar){
@@ -20258,7 +20380,26 @@ async function runSelfTest(){
     try{ _dmOn=true; S.floorId=z.fl.id; S.level=1; S.areaId=null; renderSVG(); n=svg.querySelectorAll('.dm-mk').length; }
     finally{ _dmOn=prev; S.floorId=fP; S.level=lP; S.areaId=aP; renderSVG(); }
     const fp=R.lista.filter(x=>x.fl.id===z.fl.id).reduce((a,x)=>a+x.u.length,0);
-    return n===fp && /MedStation/.test(_dmHtml(z.r.id)) && !svg.querySelector('.dm-mk');
+    if(!(n===fp && /MedStation/.test(_dmHtml(z.r.id)) && !svg.querySelector('.dm-mk'))) return false;
+    // reubicación: mover a otro recinto, rotar y volver (sin dejar rastro en nameState)
+    const P=_dmPos(), key=z.u[0].key, otroR=R.lista.find(y=>y.r.id!==z.r.id && y.fl.id===z.fl.id), c2=otroR&&_cpCentro(otroR.r.id); if(!c2) return true;
+    const prevP=P[key], ok=[];
+    try{ P[key]={x:Math.round(c2.x),y:Math.round(c2.y)}; ok.push(_dmMovidos(R.lista).otro>=1);
+      S.level=2; _dmRotar(key,c2.x,c2.y); ok.push(P[key].r===90); _dmVolver(key); ok.push(!P[key]); }
+    finally{ if(prevP) P[key]=prevP; else delete P[key]; S.level=lP; renderSVG(); }
+    return ok.every(Boolean);
+  });
+  T('Estacionamientos: subfiltro HDS / INGER / directivos, asignación con rectángulo y cupos de las PAPS', ()=>{
+    const p2=structsOf('P-2').filter(x=>x.kind==='est'), p3=structsOf('P-3').filter(x=>x.kind==='est'); if(!p2.length||!p3.length) return 'omitir';
+    if(!p3.every(x=>x.cat==='amb'||_estGrupo(x,'P-3')==='hds')) return false;
+    if(!p2.some(x=>_estGrupo(x,'P-2')==='visita')) return false;
+    const it=p2.find(x=>x.zona==='func' && x.cat==='pub'), prev={inst:it.inst, cat:it.cat}, fPrev=new Set(_estFil()), aPrev=S.estAsig;
+    let ok=true;
+    try{ S.estAsig='dir_inger'; _estAsignar([it]); ok=ok && _estGrupo(it,'P-2')==='dir_inger' && it.cat==='dir';
+      S.estAsig='hds'; _estAsignar([it]); ok=ok && _estGrupo(it,'P-2')==='hds' && it.cat==='pub';
+      S.estFil=new Set(['inger']); ok=ok && !_estVisible(it) && EST_CUPO['P-2'].dir_hds===12 && EST_CUPO['P-2'].dir_inger===11; }
+    finally{ if(prev.inst) it.inst=prev.inst; else delete it.inst; it.cat=prev.cat; S.estFil=fPrev; S.estAsig=aPrev; }
+    return ok;
   });
   T('Respaldo a archivo: sólo desde el Atlas de trabajo (un preview en otro puerto no pisa el estado)', ()=>{
     return FBAK_PUERTOS.indexOf('8790')>=0 && FBAK_PUERTOS.length<=2

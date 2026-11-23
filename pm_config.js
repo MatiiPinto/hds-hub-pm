@@ -60,10 +60,21 @@ window.PM_CONFIG = {
   // valer, sin que nadie tenga que acordarse de quitar nada. Sin fecha acá =
   // acceso permanente. Para cortar antes: poner una fecha pasada, o borrar
   // al usuario de USERS.
+  // También acepta fecha y HORA de Chile: 'aaaa-mm-ddThh:mm' (23-11-2026).
   VENCEN: {
-    // (vacío = nadie con fecha de corte; Carolina Rivera pasó a acceso
-    //  permanente el 08-09-2026, antes vencía el 20-ago)
+    // (Carolina Rivera pasó a acceso permanente el 08-09-2026, antes vencía el 20-ago)
+    // invitado · prueba de la Guía NHDS con el supervisor de guardias: tope duro del acceso
+    'invitado': '2026-11-24T23:59'
   },
+  // ── ACCESOS DE PRUEBA ─────────────────────────────────────────────────────
+  // SOLO: usuario → únicas plataformas que puede abrir (al entrar va directo a la primera).
+  SOLO: { 'invitado': ['55.GuiaSC.html'] },
+  // SESION_MIN: duración de la sesión en minutos para ese usuario (el resto, SESSION_HOURS).
+  SESION_MIN: { 'invitado': 60 },
+  // UNA_VEZ: el acceso dura esos minutos desde el PRIMER ingreso en ese equipo; volver a
+  // entrar no suma tiempo. ⚠ Se recuerda en el navegador: otro equipo o una ventana
+  // privada parte de nuevo, pero nunca pasa del tope de VENCEN.
+  UNA_VEZ: { 'invitado': 60 },
   // ── PLATAFORMAS RESTRINGIDAS ──────────────────────────────────────────────
   // archivo → usuarios que pueden abrirlo. Lo que NO figure acá lo ve todo el
   // padrón. pm_gate.js lo verifica al abrir y el index oculta la tarjeta.
@@ -139,7 +150,10 @@ window.PM_CONFIG = {
     'dhebel':     '35accc520756671b3756d8f13b9aa47e47738d3916e23d4ffbe83378c796ff42',
     // María Elena Sepúlveda · Subdirectora SDADT y Coordinadora Técnica de Puesta en Marcha
     // (27-10-2026). Clave inicial: primeros 4 dígitos del RUT.
-    'msepulveda': '10a0b7229c8dfee90e0e92c4a0f6b0c8e3641d70c3af00d431ce854196bf0b27'
+    'msepulveda': '10a0b7229c8dfee90e0e92c4a0f6b0c8e3641d70c3af00d431ce854196bf0b27',
+    // invitado · acceso de prueba para el supervisor de guardias (23-11-2026): solo la
+    // 55 · Guía NHDS, 1 hora desde el primer ingreso, tope el 24-11-2026 23:59
+    'invitado':   '693a6f3579dadef5a9a3ef3545145cb2688c0f8ed23888e4d5004aa11e0115c7'
   }
 };
 
@@ -150,6 +164,8 @@ function pmVigente(u){
   try{
     var hasta = (window.PM_CONFIG.VENCEN || {})[u];
     if (!hasta) return true;                       // sin fecha = permanente
+    if (String(hasta).indexOf('T') > 0)            // con hora de Chile (verano: UTC-3)
+      return Date.now() < Date.parse(hasta + ':00-03:00');
     var hoy = new Date().toLocaleDateString('en-CA', { timeZone: 'America/Santiago' });
     return hoy <= hasta;
   }catch(e){ return true; }
@@ -167,10 +183,23 @@ function pmSession(){
   return null;
 }
 function pmSetSession(u){
-  localStorage.setItem('pm_session', JSON.stringify({
-    u: u, exp: Date.now() + window.PM_CONFIG.SESSION_HOURS * 3600 * 1000
-  }));
+  var cfg = window.PM_CONFIG, ahora = Date.now();
+  var exp = ahora + cfg.SESSION_HOURS * 3600 * 1000;
+  var m = (cfg.SESION_MIN || {})[u]; if (m) exp = ahora + m * 60000;
+  var uv = (cfg.UNA_VEZ || {})[u];
+  if (uv){ var k = 'pm_uso_' + u, ini = +(localStorage.getItem(k) || 0);
+    if (!ini){ ini = ahora; localStorage.setItem(k, String(ini)); }
+    exp = Math.min(exp, ini + uv * 60000); }
+  localStorage.setItem('pm_session', JSON.stringify({ u: u, exp: exp }));
 }
+// Acceso de una sola vez ya consumido en este equipo (UNA_VEZ)
+function pmUsoAgotado(u){
+  var uv = ((window.PM_CONFIG || {}).UNA_VEZ || {})[u]; if (!uv) return false;
+  var ini = +(localStorage.getItem('pm_uso_' + u) || 0);
+  return !!ini && Date.now() > ini + uv * 60000;
+}
+// Plataforma a la que va un usuario con acceso SOLO a algunas (o null)
+function pmSoloDestino(u){ var L = ((window.PM_CONFIG || {}).SOLO || {})[u]; return (L && L.length) ? L : null; }
 function pmLogout(){
   var s = pmSession();
   if (s) pmLog('logout', 'index');

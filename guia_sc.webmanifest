@@ -1,0 +1,12 @@
+{
+  "name": "Guía NHDS · Aseo y Seguridad",
+  "short_name": "Guía NHDS",
+  "start_url": "55.GuiaSC.html",
+  "display": "standalone",
+  "background_color": "#222944",
+  "theme_color": "#222944",
+  "icons": [
+    {"src": "CABIDA_DATA/logos/guia_sc_192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "CABIDA_DATA/logos/guia_sc_512.png", "sizes": "512x512", "type": "image/png"}
+  ]
+}

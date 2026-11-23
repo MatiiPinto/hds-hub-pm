@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<script src="pm_config.js"></script>
+<script src="pm_gate.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#222944">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Guía NHDS">
+<link rel="manifest" href="guia_sc.webmanifest">
+<link rel="apple-touch-icon" href="CABIDA_DATA/logos/guia_sc_192.png">
+<title>Guía NHDS · Aseo y Seguridad</title>
+<!-- 55 · Guía NHDS para personal de la Sociedad Concesionaria (aseo y seguridad). Spec: _DOCS/SPEC_55_GuiaSC.md
+     Sólo recintos, camas y circulación: sin personas, equipamiento ni instalaciones. Datos: _DEV/build_guia_sc.py -->
+<style>
+:root{--navy:#222944;--cel:#00A1DF;--bg:#f1f5f9;--card:#fff;--txt:#0f172a;--mut:#64748b;--brd:#e2e8f0;--sel:#f59e0b;--ruta:#e11d48;--safe-b:env(safe-area-inset-bottom,0px)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;overflow:hidden;touch-action:manipulation}
+button{font:inherit;cursor:pointer}
+#app{display:flex;flex-direction:column;height:100%}
+header{background:var(--navy);color:#fff;padding:10px 12px 8px;display:flex;flex-direction:column;gap:8px;flex-shrink:0;z-index:5}
+.fila{display:flex;align-items:center;gap:8px}
+.tit{font-weight:800;font-size:17px;letter-spacing:.2px;flex:1}
+.tit small{display:block;font-weight:500;font-size:11px;opacity:.75}
+#perfilBtn{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:700;white-space:nowrap}
+#q{flex:1;border:none;border-radius:12px;padding:12px 14px;font-size:16px;outline:none;min-width:0}
+#qx{background:transparent;border:none;color:#fff;font-size:22px;padding:0 4px;display:none}
+#pisos{display:flex;gap:6px;overflow-x:auto;padding:8px 10px;background:#fff;border-bottom:1px solid var(--brd);flex-shrink:0;scrollbar-width:none}
+#pisos::-webkit-scrollbar{display:none}
+.piso{border:1.5px solid var(--brd);background:#fff;border-radius:999px;padding:7px 13px;font-size:14px;font-weight:700;color:var(--navy);white-space:nowrap}
+.piso.on{background:var(--navy);color:#fff;border-color:var(--navy)}
+.piso .pt{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ruta);margin-left:5px;vertical-align:2px}
+#vp{position:relative;flex:1;overflow:hidden;background:#e8edf3;touch-action:none}
+#lienzo{position:absolute;left:0;top:0;transform-origin:0 0;will-change:transform}
+#lienzo img{display:block;user-select:none;-webkit-user-drag:none;pointer-events:none}
+#lienzo svg{position:absolute;left:0;top:0;overflow:visible}
+.zbtns{position:absolute;right:10px;top:10px;display:flex;flex-direction:column;gap:6px}
+.zbtns button{width:42px;height:42px;border-radius:12px;border:1px solid var(--brd);background:#fff;font-size:20px;font-weight:700;color:var(--navy);box-shadow:0 2px 8px rgba(0,0,0,.12)}
+#aviso{position:absolute;left:10px;bottom:10px;right:64px;font-size:10.5px;color:var(--mut);background:rgba(255,255,255,.85);border-radius:8px;padding:4px 8px}
+#hoja{background:var(--card);border-top-left-radius:18px;border-top-right-radius:18px;box-shadow:0 -6px 24px rgba(15,23,42,.15);max-height:44%;transition:max-height .2s;overflow-y:auto;flex-shrink:0;padding:6px 14px calc(12px + var(--safe-b));z-index:6}
+#hoja:empty{display:none}
+.asa{width:56px;height:5px;border-radius:3px;background:#cbd5e1;margin:2px auto 8px;position:relative}
+.asa::after{content:'';position:absolute;inset:-14px -40px}
+#hoja.min{max-height:92px;overflow:hidden}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{border:1.5px solid var(--brd);background:#fff;border-radius:999px;padding:8px 12px;font-size:14px;white-space:nowrap;color:var(--txt)}
+.chip.on{border-color:var(--cel);background:#e0f4fc}
+.lst{list-style:none;margin-top:4px}
+.lst li{padding:11px 4px;border-bottom:1px solid var(--brd);display:flex;gap:10px;align-items:center}
+.lst li:active{background:#f8fafc}
+.lst .ic{font-size:20px;width:26px;text-align:center;flex-shrink:0}
+.lst .tx{flex:1;min-width:0}
+.lst .tx b{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lst .tx span{font-size:12.5px;color:var(--mut)}
+.lst .pp{font-size:12px;font-weight:800;color:var(--navy);background:#eef2f7;border-radius:8px;padding:3px 7px;white-space:nowrap}
+.ficha h2{font-size:19px;line-height:1.2;margin:2px 0 4px}
+.ficha .meta{font-size:13.5px;color:var(--mut);line-height:1.55}
+.ficha .meta b{color:var(--txt)}
+.acc{display:flex;gap:8px;margin-top:12px}
+.acc button{flex:1;border:none;border-radius:12px;padding:13px 10px;font-size:15px;font-weight:800}
+.prim{background:var(--navy);color:#fff}
+.sec{background:#eef2f7;color:var(--navy)}
+.pasos{list-style:none;margin-top:8px;counter-reset:p}
+.pasos li{padding:10px 0 10px 34px;border-bottom:1px solid var(--brd);position:relative;font-size:14.5px;line-height:1.35}
+.pasos li::before{counter-increment:p;content:counter(p);position:absolute;left:0;top:9px;width:24px;height:24px;border-radius:50%;background:var(--navy);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center}
+.pasos li.v::before{background:var(--cel)}
+.pasos li button{margin-left:6px;border:none;background:#eef2f7;color:var(--navy);border-radius:8px;padding:3px 8px;font-size:12px;font-weight:700}
+.res{font-size:14px;margin:4px 0 2px}
+.res b{font-size:18px}
+.vacio{font-size:14px;color:var(--mut);padding:10px 2px}
+.err{font-size:14px;color:#b91c1c;padding:8px 2px}
+#bienv{position:fixed;inset:0;background:var(--navy);color:#fff;display:flex;flex-direction:column;justify-content:center;padding:28px;gap:14px;z-index:20}
+#bienv h1{font-size:26px}
+#bienv p{font-size:15px;opacity:.85;line-height:1.45}
+#bienv button{border:none;border-radius:16px;padding:18px;font-size:19px;font-weight:800;background:#fff;color:var(--navy);display:flex;align-items:center;gap:12px}
+#bienv button span{font-size:28px}
+#bienv small{font-size:11.5px;opacity:.6;line-height:1.4}
+.lbl-area{font-weight:800;fill:#334155;paint-order:stroke;stroke:#fff;stroke-linejoin:round;pointer-events:none}
+@media (min-width:900px){ #app{flex-direction:row;flex-wrap:wrap} header{width:100%} #pisos{width:100%} #vp{flex:1;height:calc(100% - 150px)} #hoja{width:390px;max-height:none;height:calc(100% - 150px);border-radius:0;box-shadow:none;border-left:1px solid var(--brd)} }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="fila"><div class="tit">Guía NHDS<small>Nuevo Hospital del Salvador · recintos y cómo llegar</small></div><button id="perfilBtn" onclick="elegirPerfil()"></button></div>
+    <div class="fila"><input id="q" type="search" placeholder="Buscar recinto, servicio, código, BIM o cama" autocomplete="off" enterkeyhint="search"><button id="qx" onclick="limpiar()">×</button></div>
+  </header>
+  <div id="pisos"></div>
+  <div id="vp"><div id="lienzo"><img id="img" alt=""><svg id="svg" xmlns="http://www.w3.org/2000/svg"></svg></div>
+    <div class="zbtns"><button onclick="zoomBtn(1.6)" aria-label="Acercar">+</button><button onclick="zoomBtn(1/1.6)" aria-label="Alejar">−</button><button onclick="encuadrar()" aria-label="Ver todo">⤢</button></div>
+    <div id="aviso"></div></div>
+  <div id="hoja"></div>
+</div>
+<div id="bienv" style="display:none"></div>
+<script src="SHARED_DATA/guia_sc.js"></script>
+<script src="SHARED_DATA/circulacion_red.js"></script>
+<script>
+'use strict';
+const G=window.GUIA_SC||{pisos:[]}, M_PX=0.0161;
+const PERFILES={
+  aseo:{ico:'🧹',lbl:'Aseo',ruta:'logistica',
+    chips:[['Aseo',r=>r.t==='Aseo'||/\baseo\b/i.test(r.n)],['Trabajo sucio',r=>/trabajo sucio/i.test(r.n)],['Lavachatas',r=>/lavachata/i.test(r.n)],
+           ['Ropa sucia',r=>/ropa sucia|ropería sucia|roperia sucia/i.test(r.n)],['Ropa limpia',r=>/ropa limpia|roper[ií]a/i.test(r.n)&&!/sucia/i.test(r.n)],
+           ['Residuos',r=>/residuo|reas\b|basura|desecho/i.test(r.n)],['Bodegas',r=>r.t==='Bodega'||/bodega/i.test(r.n)],['Baños',r=>r.t==='Baño'||/\bba[ñn]o/i.test(r.n)]]},
+  seguridad:{ico:'🛡',lbl:'Seguridad',ruta:'clinico',
+    chips:[['Accesos',r=>/acceso|hall/i.test(r.n)],['Porterías',r=>/porter[ií]a|guardia|vigilancia|seguridad|control/i.test(r.n)],
+           ['Escaleras',r=>/escalera/i.test(r.n)],['Esperas',r=>r.t==='Área de Espera'||/espera/i.test(r.n)],
+           ['Estacionamientos',r=>/estacionamiento/i.test(r.n)],['Jefaturas',r=>/jef[ea]|supervis/i.test(r.n)]]}};
+const RUTA_PERFILES={
+  clinico:  {vel:1.3, pen:{},             vert:['asc-G','asc-S','asc-P','asc-Pplus'], esc:true},
+  // aseo (con carro): prefiere ascensores de servicio y montacamas; usa los de público si no queda otra; sin escaleras
+  logistica:{vel:1.0, pen:{general:1.5},  vert:['asc-G','asc-S','asc-P','asc-Pplus'], esc:false, extra:{'asc-G':120}}};
+const ASC_LBL={'asc-G':'Ascensor de público','asc-S':'Ascensor de servicio','asc-P':'Montacamas','asc-Pplus':'Montacamas mayor'};
+const NAV_ORDEN=['P-3','P-2','P-1','P1','P2','P3','P4','P5'];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const norm=s=>String(s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase();
+const lsGet=k=>{ try{ return localStorage.getItem(k); }catch(e){ return null; } }, lsSet=(k,v)=>{ try{ localStorage.setItem(k,v); }catch(e){} };
+let S={perfil:lsGet('guia_sc_perfil')||'', piso:null, sel:null, origen:null, ruta:null, chip:null, z:1, ox:0, oy:0};
+// ── índices ──────────────────────────────────────────────────────────────────
+const PISO={}, REC={}, AREA={}, BUSCA=[];
+G.pisos.forEach(p=>{ PISO[p.id]=p; p.areas.forEach(a=>{ AREA[a.id]=Object.assign(a,{fid:p.id}); });
+  p.rec.forEach(r=>{ r.fid=p.id; REC[r.id]=r; const an=(AREA[r.a]||{}).n||'';
+    BUSCA.push({k:norm([r.n,r.c,r.b,r.s,r.sn,an].join(' ')), tipo:'rec', r});
+    (r.cam||[]).forEach(c=>BUSCA.push({k:norm('cama '+c.n), tipo:'cama', r, cama:c})); });
+  p.areas.forEach(a=>BUSCA.push({k:norm(a.n), tipo:'area', a})); });
+const nomPiso=fid=>(PISO[fid]||{}).n||fid;
+function buscar(q){ const t=norm(q).trim(); if(t.length<2) return [];
+  const pal=t.split(/\s+/), exacto=[], resto=[];
+  BUSCA.forEach(e=>{ if(!pal.every(p=>e.k.includes(p))) return; const r=e.r||{};
+    ((r.b&&norm(r.b).split(' / ').includes(t))||(r.c&&norm(r.c)===t)||(e.cama&&norm(e.cama.n)===t.replace(/^cama\s+/,''))?exacto:resto).push(e); });
+  const ord=e=>e.tipo==='area'?0:(e.r&&e.r.fid===S.piso?1:2);
+  return exacto.concat(resto.sort((a,b)=>ord(a)-ord(b))).slice(0,40); }
+// ── plano ────────────────────────────────────────────────────────────────────
+const vp=$('vp'), lienzo=$('lienzo'), img=$('img'), svg=$('svg');
+function aplicar(){ lienzo.style.transform='translate('+S.ox+'px,'+S.oy+'px) scale('+S.z+')'; reescalar(); }
+function encuadrar(rect){ const p=PISO[S.piso]; if(!p) return; const W=vp.clientWidth, H=vp.clientHeight;
+  const b=rect||{x:0,y:0,w:p.w,h:p.h}, pad=rect?60:12;
+  S.z=Math.min((W-2*pad)/b.w,(H-2*pad)/b.h); if(rect) S.z=Math.min(S.z, 0.5);
+  S.ox=W/2-(b.x+b.w/2)*S.z; S.oy=H/2-(b.y+b.h/2)*S.z; aplicar(); }
+function zoomEn(f,cx,cy){ const z=Math.max(0.02,Math.min(1.2,S.z*f)); f=z/S.z; S.ox=cx-(cx-S.ox)*f; S.oy=cy-(cy-S.oy)*f; S.z=z; aplicar(); }
+function zoomBtn(f){ zoomEn(f,vp.clientWidth/2,vp.clientHeight/2); }
+{ const pts=new Map(); let base=null;
+  vp.addEventListener('pointerdown',e=>{ vp.setPointerCapture(e.pointerId); pts.set(e.pointerId,{x:e.clientX,y:e.clientY}); base=null; });
+  vp.addEventListener('pointermove',e=>{ if(!pts.has(e.pointerId)) return; const prev=pts.get(e.pointerId); pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pts.size===1){ S.ox+=e.clientX-prev.x; S.oy+=e.clientY-prev.y; aplicar(); }
+    else if(pts.size===2){ const [a,b]=[...pts.values()], d=Math.hypot(a.x-b.x,a.y-b.y), r=vp.getBoundingClientRect(), cx=(a.x+b.x)/2-r.left, cy=(a.y+b.y)/2-r.top;
+      if(base) zoomEn(d/base,cx,cy); base=d; } });
+  const fin=e=>{ pts.delete(e.pointerId); base=null; };
+  vp.addEventListener('pointerup',fin); vp.addEventListener('pointercancel',fin);
+  vp.addEventListener('wheel',e=>{ e.preventDefault(); const r=vp.getBoundingClientRect(); zoomEn(e.deltaY<0?1.15:1/1.15,e.clientX-r.left,e.clientY-r.top); },{passive:false}); }
+function el(t,a){ const n=document.createElementNS('http://www.w3.org/2000/svg',t); for(const k in a) n.setAttribute(k,a[k]); return n; }
+function irPiso(fid, sinEncuadre){ const p=PISO[fid]; if(!p) return; S.piso=fid; lsSet('guia_sc_piso',fid);
+  img.src=p.img; img.style.width=p.w+'px'; img.style.height=p.h+'px'; svg.setAttribute('width',p.w); svg.setAttribute('height',p.h); svg.setAttribute('viewBox','0 0 '+p.w+' '+p.h);
+  pintarPisos(); dibujar(); if(!sinEncuadre) encuadrar(); }
+function pintarPisos(){ const enRuta=new Set(S.ruta?S.ruta.segs.map(s=>s.fid):[]);
+  $('pisos').innerHTML=G.pisos.filter(p=>p.rec.length).map(p=>'<button class="piso'+(p.id===S.piso?' on':'')+'" onclick="irPiso(\''+p.id+'\')">'+esc(p.n.replace('Subterráneo','Sub.'))+(enRuta.has(p.id)?'<span class="pt"></span>':'')+'</button>').join(''); }
+function rectsDe(r){ return r.r.map(q=>({x:q[0],y:q[1],w:q[2],h:q[3]})); }
+function bbox(L){ const x0=Math.min(...L.map(q=>q.x)), y0=Math.min(...L.map(q=>q.y)); return {x:x0,y:y0,w:Math.max(...L.map(q=>q.x+q.w))-x0,h:Math.max(...L.map(q=>q.y+q.h))-y0}; }
+function dibujar(){ svg.innerHTML=''; const p=PISO[S.piso]; if(!p) return;
+  const g=el('g',{});
+  p.areas.forEach(a=>{ a.r.forEach(q=>g.appendChild(el('rect',{x:q[0],y:q[1],width:q[2],height:q[3],fill:'#0ea5e9','fill-opacity':.05,stroke:'none'}))); });
+  // nombres de servicio (tamaño fijo en pantalla: se reescalan al hacer zoom)
+  p.areas.forEach(a=>{ const b=bbox(a.r.map(q=>({x:q[0],y:q[1],w:q[2],h:q[3]}))); const t=el('text',{x:b.x+b.w/2,y:b.y+b.h/2,'text-anchor':'middle','class':'lbl-area','data-fs':13}); t.textContent=a.n; g.appendChild(t); });
+  // resaltado por accesos rápidos
+  if(S.chip){ const fn=PERFILES[S.perfil].chips.find(c=>c[0]===S.chip)[1];
+    p.rec.filter(fn).forEach(r=>{ rectsDe(r).forEach(q=>g.appendChild(el('rect',{x:q.x,y:q.y,width:q.w,height:q.h,fill:'#00A1DF','fill-opacity':.28,stroke:'#0284c7','stroke-width':6}))); }); }
+  // ruta
+  if(S.ruta){ S.ruta.segs.filter(s=>s.fid===S.piso&&s.pts).forEach(s=>{ g.appendChild(el('polyline',{points:s.pts.map(q=>q.join(',')).join(' '),fill:'none',stroke:'#e11d48','stroke-width':22,'stroke-linecap':'round','stroke-linejoin':'round','stroke-opacity':.85})); });
+    S.ruta.segs.filter(s=>s.tipo==='vertical'&&s.fidDe===S.piso&&s.xy).forEach(s=>{ const m=el('g',{'class':'mk','data-x':s.xy[0],'data-y':s.xy[1]}); m.appendChild(el('circle',{r:16,fill:'#00A1DF',stroke:'#fff','stroke-width':3})); const t=el('text',{y:6,'text-anchor':'middle','font-size':16,fill:'#fff','font-weight':800}); t.textContent='⇅'; m.appendChild(t); g.appendChild(m); }); }
+  // origen y seleccionado
+  const pin=(r,col,txt)=>{ if(!r||r.fid!==S.piso) return; rectsDe(r).forEach(q=>g.appendChild(el('rect',{x:q.x,y:q.y,width:q.w,height:q.h,fill:col,'fill-opacity':.35,stroke:col,'stroke-width':8})));
+    const m=el('g',{'class':'mk','data-x':r.x,'data-y':r.y}); m.appendChild(el('circle',{r:15,fill:col,stroke:'#fff','stroke-width':3})); const t=el('text',{y:5,'text-anchor':'middle','font-size':14,fill:'#fff','font-weight':800}); t.textContent=txt; m.appendChild(t); g.appendChild(m); };
+  pin(S.origen,'#16a34a','A'); pin(S.sel,'#f59e0b','B');
+  if(S.sel && S.sel.fid===S.piso && S.selCama){ const m=el('g',{'class':'mk','data-x':S.selCama.x,'data-y':S.selCama.y}); m.appendChild(el('circle',{r:11,fill:'#e11d48',stroke:'#fff','stroke-width':3})); g.appendChild(m); }
+  svg.appendChild(g); reescalar(); }
+function reescalar(){ const k=1/S.z;
+  svg.querySelectorAll('.lbl-area').forEach(t=>{ const fs=+t.getAttribute('data-fs')*k; t.setAttribute('font-size',fs); t.setAttribute('stroke-width',fs*.3); t.style.display=S.z<0.03?'none':''; });
+  svg.querySelectorAll('.mk').forEach(m=>m.setAttribute('transform','translate('+m.getAttribute('data-x')+','+m.getAttribute('data-y')+') scale('+k+')')); }
+// ── ruta (mismo motor que la «ruta animada» del Atlas) ────────────────────────
+let _G=null;
+function grafo(){ if(_G) return _G; const R=window.CIRC_RED; if(!R||!R.pisos) return null;
+  const PASO=0.5/M_PX, RAD=0.6/M_PX, nodes={}, adj={}, verts={}, grid={}; let nId=0;
+  const gk=(f,x,y)=>f+'|'+Math.floor(x/RAD)+','+Math.floor(y/RAD);
+  const cluster=(f,x,y)=>{ const cx=Math.floor(x/RAD), cy=Math.floor(y/RAD); let best=null,bd=RAD;
+    for(let i=-1;i<=1;i++) for(let j=-1;j<=1;j++) (grid[f+'|'+(cx+i)+','+(cy+j)]||[]).forEach(k=>{ const n=nodes[k], d=Math.hypot(n.x-x,n.y-y); if(d<bd){bd=d;best=k;} });
+    if(best) return best; const k=f+'#'+(nId++); nodes[k]={k,x,y,fid:f}; adj[k]=[]; (grid[gk(f,x,y)]=grid[gk(f,x,y)]||[]).push(k); return k; };
+  const cercano=(f,x,y,rad)=>{ let best=null,bd=rad; const c=Math.ceil(rad/RAD), cx=Math.floor(x/RAD), cy=Math.floor(y/RAD);
+    for(let i=-c;i<=c;i++) for(let j=-c;j<=c;j++) (grid[f+'|'+(cx+i)+','+(cy+j)]||[]).forEach(k=>{ const n=nodes[k], d=Math.hypot(n.x-x,n.y-y); if(d<bd){bd=d;best=k;} }); return best?{k:best,d:bd}:null; };
+  const arista=(a,b,e)=>{ if(a===b) return; adj[a].push(Object.assign({to:b},e)); adj[b].push(Object.assign({to:a},e,{pts:e.pts?e.pts.slice().reverse():undefined})); };
+  const remuestrea=pts=>{ const o=[pts[0]]; for(let i=0;i<pts.length-1;i++){ const a=pts[i],b=pts[i+1], n=Math.max(1,Math.round(Math.hypot(b[0]-a[0],b[1]-a[1])/PASO)); for(let j=1;j<=n;j++) o.push([a[0]+(b[0]-a[0])*j/n,a[1]+(b[1]-a[1])*j/n]); } return o; };
+  Object.entries(R.pisos).forEach(([f,P])=>{
+    (P.tramos||[]).forEach(t=>{ if(!t.pts||t.pts.length<2) return; let pk=null, pp=null;
+      remuestrea(t.pts).forEach(pt=>{ const k=cluster(f,pt[0],pt[1]); if(pk&&k!==pk) arista(pk,k,{tipo:'tramo',zona:t.zona||'general',m:Math.hypot(pt[0]-pp[0],pt[1]-pp[1])*M_PX,pts:[pp,pt],fid:f}); if(k!==pk){ pk=k; pp=pt; } }); });
+    (P.accesos||[]).forEach(ac=>{ const h=ac.hasta||ac.desde, d=ac.desde||h, nc=cercano(f,h[0],h[1],4/M_PX); if(!nc) return;
+      const vk='V|'+f+'|'+ac.vertical; if(!nodes[vk]){ nodes[vk]={k:vk,x:d[0],y:d[1],fid:f}; adj[vk]=[]; }
+      const n=nodes[nc.k]; arista(nc.k,vk,{tipo:'acceso',zona:'general',m:(ac.largo_m||0)+nc.d*M_PX,pts:[[n.x,n.y],h,d],fid:f,kind:ac.kind,etq:ac.etq||''});
+      const fam=String(ac.kind||'').startsWith('asc-')?'asc':ac.kind; let ck=fam==='asc'&&ac.etq?'A:'+ac.etq:null;
+      if(!ck){ for(const k of Object.keys(verts)){ if(!k.startsWith(fam+':@')) continue; const v0=verts[k][0]; if(Math.hypot(v0.x-d[0],v0.y-d[1])<4/M_PX){ ck=k; break; } } if(!ck) ck=fam+':@'+Math.round(d[0])+','+Math.round(d[1]); }
+      (verts[ck]=verts[ck]||[]).push({fid:f,node:vk,kind:ac.kind,etq:ac.etq||'',x:d[0],y:d[1]}); }); });
+  Object.values(verts).forEach(arr=>{ const pp={}; arr.forEach(v=>{ pp[v.fid]=pp[v.fid]||v; }); const fs=Object.keys(pp).sort((a,b)=>NAV_ORDEN.indexOf(a)-NAV_ORDEN.indexOf(b));
+    for(let i=0;i<fs.length-1;i++){ const a=pp[fs[i]], b=pp[fs[i+1]]; arista(a.node,b.node,{tipo:'vertical',kind:a.kind,etq:a.etq,dn:Math.abs(NAV_ORDEN.indexOf(fs[i+1])-NAV_ORDEN.indexOf(fs[i])),de:fs[i],a:fs[i+1],xyDe:[a.x,a.y],xyA:[b.x,b.y]}); } });
+  _G={nodes,adj,cercano}; return _G; }
+function costo(e,P){ if(e.tipo==='vertical'){ const asc=String(e.kind||'').startsWith('asc-'); if(asc) return P.vert.includes(e.kind)?45+8*e.dn+((P.extra||{})[e.kind]||0):Infinity; return P.esc?(e.kind==='escalator'?18:25)*e.dn:Infinity; }
+  if(e.tipo==='acceso'){ if(String(e.kind||'').startsWith('asc-')&&!P.vert.includes(e.kind)) return Infinity; if((e.kind==='stair'||e.kind==='escalator')&&!P.esc) return Infinity; }
+  return (e.m||0)/P.vel*((P.pen||{})[e.zona]||1); }
+function dijkstra(src,dst,P){ const Gr=grafo(), dist={[src]:0}, prev={}, heap=[[0,src]], done=new Set();
+  const push=(c,k)=>{ heap.push([c,k]); let i=heap.length-1; while(i>0){ const p=(i-1)>>1; if(heap[p][0]<=heap[i][0]) break; [heap[p],heap[i]]=[heap[i],heap[p]]; i=p; } };
+  const pop=()=>{ const top=heap[0], last=heap.pop(); if(heap.length){ heap[0]=last; let i=0; for(;;){ const l=2*i+1,r=l+1; let m=i; if(l<heap.length&&heap[l][0]<heap[m][0]) m=l; if(r<heap.length&&heap[r][0]<heap[m][0]) m=r; if(m===i) break; [heap[m],heap[i]]=[heap[i],heap[m]]; i=m; } } return top; };
+  while(heap.length){ const [c,k]=pop(); if(done.has(k)) continue; done.add(k); if(k===dst) break;
+    (Gr.adj[k]||[]).forEach(e=>{ const w=costo(e,P); if(!isFinite(w)) return; const nc=c+w; if(nc<(dist[e.to]??Infinity)){ dist[e.to]=nc; prev[e.to]={from:k,e}; push(nc,e.to); } }); }
+  if(dist[dst]===undefined) return null; const edges=[]; for(let k=dst;prev[k];k=prev[k].from) edges.unshift(prev[k].e); return {t:dist[dst],edges}; }
+function calcRuta(o,d,punto){ const Gr=grafo(); if(!Gr) return {err:'No está cargada la red de circulación.'};
+  const R=window.CIRC_RED; if(!R.pisos[o.fid]||!R.pisos[d.fid]) return {err:'Todavía no hay red de circulación en '+nomPiso(!R.pisos[o.fid]?o.fid:d.fid)+'. Usa el plano para orientarte.'};
+  const P=RUTA_PERFILES[PERFILES[S.perfil].ruta], dx=punto?punto.x:d.x, dy=punto?punto.y:d.y;
+  const no=Gr.cercano(o.fid,o.x,o.y,60/M_PX), nd=Gr.cercano(d.fid,dx,dy,60/M_PX); if(!no||!nd) return {err:'No hay circulación cerca del origen o del destino.'};
+  const r=dijkstra(no.k,nd.k,P); if(!r) return {err:'No se encontró una ruta para tu perfil (puede requerir un ascensor o escalera que tu perfil no usa).'};
+  const nO=Gr.nodes[no.k], nD=Gr.nodes[nd.k], segs=[{fid:o.fid,pts:[[o.x,o.y],[nO.x,nO.y]],tipo:'tramo'}], pasos=[];
+  let mPiso=no.d*M_PX, fAct=o.fid, mTot=mPiso;
+  pasos.push({txt:'Sal de <b>'+esc(o.n)+'</b> hacia el pasillo.',fid:fAct});
+  let ultV=null;
+  r.edges.forEach(e=>{ if(e.tipo==='vertical'){ const dest=fAct===e.de?e.a:e.de, desdeXY=fAct===e.de?e.xyDe:e.xyA;
+      // sigue en el mismo ascensor o escalera (sin caminar entre medio): se alarga el paso anterior
+      if(ultV && mPiso<1 && ultV.kind===e.kind && ultV.etq===e.etq){ const p=pasos[pasos.length-1]; p.txt=p.txt.replace(/a <b>[^<]*<\/b>\.$/,'a <b>'+esc(nomPiso(dest))+'</b>.'); p.fid=dest;
+        const sg=segs[segs.length-1]; sg.fid=dest; fAct=dest; mPiso=0; return; }
+      ultV=e;
+      pasos.push({txt:'Camina unos <b>'+Math.round(mPiso)+' m</b> por '+esc(nomPiso(fAct))+'.',fid:fAct}); mPiso=0;
+      const nomb=String(e.kind||'').startsWith('asc-')?((ASC_LBL[e.kind]||'Ascensor')+(e.etq?' <b>'+esc(e.etq)+'</b>':'')):(e.kind==='escalator'?'Escalera mecánica':'Escalera');
+      pasos.push({txt:'Toma el '+nomb+' y '+(NAV_ORDEN.indexOf(dest)>NAV_ORDEN.indexOf(fAct)?'sube':'baja')+' a <b>'+esc(nomPiso(dest))+'</b>.',fid:dest,v:true});
+      segs.push({fid:dest,tipo:'vertical',fidDe:fAct,xy:desdeXY}); fAct=dest; }
+    else { if((e.m||0)>1) ultV=null; const u=segs[segs.length-1]; if(u&&u.tipo==='tramo'&&u.fid===e.fid&&u.pts) u.pts=u.pts.concat(e.pts.slice(1)); else segs.push({fid:e.fid,pts:e.pts.slice(),tipo:'tramo'}); mPiso+=e.m||0; mTot+=e.m||0; } });
+  segs.push({fid:d.fid,pts:[[nD.x,nD.y],[dx,dy]],tipo:'tramo'}); mPiso+=nd.d*M_PX; mTot+=nd.d*M_PX;
+  pasos.push({txt:'Camina unos <b>'+Math.round(mPiso)+' m</b> hasta <b>'+esc(d.n)+(punto&&punto.n?(' · cama '+esc(punto.n)):'')+'</b>.',fid:fAct});
+  const seg=r.edges.reduce((a,e)=>a+(e.tipo==='vertical'?45+8*e.dn:0),0)+mTot/P.vel;
+  return {segs,pasos,m:Math.round(mTot),min:Math.max(1,Math.round(seg/60))}; }
+// ── hoja inferior ────────────────────────────────────────────────────────────
+function hoja(h){ const H=$('hoja'); H.classList.remove('min'); H.innerHTML=h?('<div class="asa" onclick="$(\'hoja\').classList.toggle(\'min\')" title="Minimizar / ampliar"></div>'+h):''; }
+function inicio(){ S.chip=null; const P=PERFILES[S.perfil];
+  hoja('<div class="chips">'+P.chips.map(c=>'<button class="chip" onclick="chip(\''+c[0]+'\')">'+esc(c[0])+'</button>').join('')+'</div>'
+    +(S.origen?('<div class="vacio">📍 Estás en <b>'+esc(S.origen.n)+'</b> · '+esc(nomPiso(S.origen.fid))+' <button class="chip" style="padding:4px 10px" onclick="S.origen=null;dibujar();inicio()">cambiar</button></div>')
+      :'<div class="vacio">Busca un recinto arriba o toca un acceso rápido. Para «cómo llegar», primero marca dónde estás.</div>')); dibujar(); }
+function chip(nom){ S.chip=nom; const fn=PERFILES[S.perfil].chips.find(c=>c[0]===nom)[1];
+  const ref=S.origen||{fid:S.piso,x:(PISO[S.piso].w/2),y:(PISO[S.piso].h/2)};
+  const L=G.pisos.flatMap(p=>p.rec.filter(fn)).sort((a,b)=>(a.fid===ref.fid?0:1)-(b.fid===ref.fid?0:1)||Math.abs(NAV_ORDEN.indexOf(a.fid)-NAV_ORDEN.indexOf(ref.fid))-Math.abs(NAV_ORDEN.indexOf(b.fid)-NAV_ORDEN.indexOf(ref.fid))||Math.hypot(a.x-ref.x,a.y-ref.y)-Math.hypot(b.x-ref.x,b.y-ref.y)).slice(0,30);
+  hoja('<div class="chips">'+PERFILES[S.perfil].chips.map(c=>'<button class="chip'+(c[0]===nom?' on':'')+'" onclick="chip(\''+c[0]+'\')">'+esc(c[0])+'</button>').join('')+'</div>'
+    +(L.length?('<ul class="lst">'+L.map(r=>'<li onclick="ver(\''+r.id+'\')"><span class="ic">'+PERFILES[S.perfil].ico+'</span><span class="tx"><b>'+esc(r.n)+'</b><span>'+esc((AREA[r.a]||{}).n||'')+(r.c?' · '+esc(r.c):'')+'</span></span><span class="pp">'+esc(nomPiso(r.fid).replace('Subterráneo','Sub.'))+'</span></li>').join('')+'</ul>'):'<div class="vacio">No hay recintos de este tipo dibujados.</div>'));
+  dibujar(); }
+function ver(rid, cama){ const r=REC[rid]; if(!r) return; S.sel=r; S.selCama=cama||null; S.ruta=null; if(r.fid!==S.piso) irPiso(r.fid,true); else pintarPisos();
+  dibujar(); encuadrar(bbox(rectsDe(r)));
+  const a=AREA[r.a]||{}, cm=(r.cam||[]).map(c=>c.n);
+  hoja('<div class="ficha"><h2>'+esc(r.n)+(cama?' · cama '+esc(cama.n):'')+'</h2><div class="meta">'+(a.n?'<b>'+esc(a.n)+'</b> · ':'')+esc(nomPiso(r.fid))
+    +(r.c?'<br>Código <b>'+esc(r.c)+'</b>':'')+(r.b?' · BIM <b>'+esc(r.b)+'</b>':'')+(r.t?'<br>'+esc(r.t):'')
+    +((r.s||r.sn)?'<br>🪧 Letrero: <b>'+esc([r.s,r.sn?('N° '+r.sn):''].filter(Boolean).join(' · '))+'</b>':'')
+    +(cm.length?'<br>🛏 '+cm.length+' cama'+(cm.length>1?'s':'')+': '+esc(cm.slice(0,12).join(', '))+(cm.length>12?'…':''):'')+'</div>'
+    +'<div class="acc">'+(S.origen&&S.origen.id!==r.id?'<button class="prim" onclick="comoLlegar()">🧭 Cómo llegar</button>':'<button class="prim" onclick="pedirOrigen()">🧭 Cómo llegar</button>')
+    +'<button class="sec" onclick="fijarOrigen(\''+r.id+'\')">📍 Estoy aquí</button></div></div>'); }
+function fijarOrigen(rid){ S.origen=REC[rid]; lsSet('guia_sc_origen',rid); S.ruta=null; dibujar(); if(S.sel&&S.sel.id!==rid) ver(S.sel.id,S.selCama); else inicio(); }
+let _pidiendo=false;
+function pedirOrigen(){ _pidiendo=true; $('q').value=''; $('q').placeholder='¿Dónde estás? Busca el recinto más cercano'; $('q').focus();
+  hoja('<div class="vacio">Escribe arriba el recinto donde estás (o escanea el código QR del pasillo).</div><div class="acc"><button class="sec" onclick="_pidiendo=false;$(\'q\').placeholder=\'Buscar recinto, servicio, código, BIM o cama\';ver(S.sel.id,S.selCama)">Cancelar</button></div>'); }
+function comoLlegar(){ const o=S.origen, d=S.sel; if(!o||!d) return; const R=calcRuta(o,d,S.selCama);
+  if(R.err){ hoja('<div class="ficha"><h2>'+esc(d.n)+'</h2></div><div class="err">'+esc(R.err)+'</div><div class="acc"><button class="sec" onclick="ver(\''+d.id+'\')">Volver</button></div>'); return; }
+  S.ruta=R; irPiso(o.fid,true); dibujar(); const segsP=R.segs.filter(s=>s.fid===o.fid&&s.pts); if(segsP.length){ const pts=segsP.flatMap(s=>s.pts); const xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]); encuadrar({x:Math.min(...xs),y:Math.min(...ys),w:Math.max(...xs)-Math.min(...xs)+1,h:Math.max(...ys)-Math.min(...ys)+1}); }
+  hoja('<div class="res">De <b>'+esc(o.n)+'</b> a <b>'+esc(d.n)+'</b><br>≈ <b>'+R.m+' m</b> · unos <b>'+R.min+' min</b> · perfil '+PERFILES[S.perfil].ico+' '+esc(PERFILES[S.perfil].lbl)+'</div>'
+    +'<ol class="pasos">'+R.pasos.map(p=>'<li class="'+(p.v?'v':'')+'">'+p.txt+(p.v?' <button onclick="verTramo(\''+p.fid+'\')">ver '+esc(nomPiso(p.fid).replace('Subterráneo','Sub.'))+'</button>':'')+'</li>').join('')+'</ol>'
+    +'<div class="acc"><button class="sec" onclick="S.ruta=null;ver(\''+d.id+'\')">Cerrar ruta</button></div>'); }
+function verTramo(fid){ irPiso(fid,true); const s=S.ruta.segs.filter(x=>x.fid===fid&&x.pts); if(!s.length){ encuadrar(); return; } const pts=s.flatMap(x=>x.pts), xs=pts.map(p=>p[0]), ys=pts.map(p=>p[1]); encuadrar({x:Math.min(...xs),y:Math.min(...ys),w:Math.max(...xs)-Math.min(...xs)+1,h:Math.max(...ys)-Math.min(...ys)+1}); }
+// ── búsqueda ─────────────────────────────────────────────────────────────────
+$('q').addEventListener('input',()=>{ const v=$('q').value; $('qx').style.display=v?'block':'none'; const L=buscar(v);
+  if(v.trim().length<2){ if(!_pidiendo) inicio(); return; }
+  hoja(L.length?('<ul class="lst">'+L.map((e,i)=>{ if(e.tipo==='area') return '<li onclick="verArea(\''+e.a.id+'\')"><span class="ic">🏥</span><span class="tx"><b>'+esc(e.a.n)+'</b><span>Servicio</span></span><span class="pp">'+esc(nomPiso(e.a.fid).replace('Subterráneo','Sub.'))+'</span></li>';
+    const r=e.r; return '<li onclick="elegir('+i+')"><span class="ic">'+(e.tipo==='cama'?'🛏':'📍')+'</span><span class="tx"><b>'+(e.tipo==='cama'?'Cama '+esc(e.cama.n)+' · ':'')+esc(r.n)+'</b><span>'+esc((AREA[r.a]||{}).n||'')+(r.c?' · '+esc(r.c):'')+(r.b?' · BIM '+esc(r.b):'')+'</span></span><span class="pp">'+esc(nomPiso(r.fid).replace('Subterráneo','Sub.'))+'</span></li>'; }).join('')+'</ul>')
+    :'<div class="vacio">Sin resultados para «'+esc(v)+'».</div>');
+  window._res=L; });
+function elegir(i){ const e=window._res[i]; $('q').blur();
+  if(_pidiendo){ _pidiendo=false; $('q').value=''; $('qx').style.display='none'; $('q').placeholder='Buscar recinto, servicio, código, BIM o cama'; fijarOrigen(e.r.id); if(S.sel) comoLlegar(); return; }
+  ver(e.r.id, e.cama||null); }
+function verArea(aid){ const a=AREA[aid]; $('q').blur(); if(a.fid!==S.piso) irPiso(a.fid,true); S.sel=null; S.ruta=null; dibujar(); encuadrar(bbox(a.r.map(q=>({x:q[0],y:q[1],w:q[2],h:q[3]}))));
+  const L=PISO[a.fid].rec.filter(r=>r.a===aid).sort((x,y)=>String(x.n).localeCompare(String(y.n),'es'));
+  hoja('<div class="ficha"><h2>'+esc(a.n)+'</h2><div class="meta">'+esc(nomPiso(a.fid))+' · '+L.length+' recintos</div></div><ul class="lst">'+L.map(r=>'<li onclick="ver(\''+r.id+'\')"><span class="ic">📍</span><span class="tx"><b>'+esc(r.n)+'</b><span>'+esc(r.c||'')+(r.b?' · BIM '+esc(r.b):'')+'</span></span></li>').join('')+'</ul>'); }
+function limpiar(){ $('q').value=''; $('qx').style.display='none'; _pidiendo=false; S.sel=null; S.ruta=null; inicio(); }
+// ── perfil y arranque ────────────────────────────────────────────────────────
+function elegirPerfil(){ const b=$('bienv'); b.style.display='flex';
+  b.innerHTML='<h1>Guía NHDS</h1><p>Encuentra cualquier recinto del Nuevo Hospital del Salvador y cómo llegar desde donde estás.</p>'
+    +Object.entries(PERFILES).map(([k,p])=>'<button onclick="setPerfil(\''+k+'\')"><span>'+p.ico+'</span>'+esc(p.lbl)+'</button>').join('')
+    +'<small>'+esc(G.aviso||'')+' Versión de datos: '+esc(G.version||'')+'.</small>'; }
+function setPerfil(k){ S.perfil=k; lsSet('guia_sc_perfil',k); $('bienv').style.display='none'; $('perfilBtn').textContent=PERFILES[k].ico+' '+PERFILES[k].lbl; if(S.ruta) comoLlegar(); else inicio(); }
+function porCodigo(v){ const t=norm(v); return Object.values(REC).find(r=>(r.b&&norm(r.b).split(' / ').includes(t))||norm(r.c)===t||r.id===v)||null; }
+(function arrancar(){
+  $('aviso').textContent=G.aviso||''; setTimeout(()=>{ $('aviso').style.display='none'; },7000);
+  const u=new URLSearchParams(location.search);
+  if(u.get('perfil')&&PERFILES[u.get('perfil')]){ S.perfil=u.get('perfil'); lsSet('guia_sc_perfil',S.perfil); }
+  const og=u.get('desde')?porCodigo(u.get('desde')):REC[lsGet('guia_sc_origen')||''];
+  if(og){ S.origen=og; lsSet('guia_sc_origen',og.id); }
+  const p0=(og&&og.fid)||lsGet('guia_sc_piso')||'P1'; irPiso(PISO[p0]?p0:'P1');
+  if(!S.perfil||!PERFILES[S.perfil]){ elegirPerfil(); } else { $('perfilBtn').textContent=PERFILES[S.perfil].ico+' '+PERFILES[S.perfil].lbl; inicio(); }
+  const ir=u.get('ir')?porCodigo(u.get('ir')):null; if(ir&&S.perfil) ver(ir.id);
+  window.addEventListener('resize',()=>{ if(!S.sel) encuadrar(); });
+})();
+</script>
+</body>
+</html>

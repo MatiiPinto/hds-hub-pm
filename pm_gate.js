@@ -12,6 +12,11 @@
     location.replace('index.html?next=' + encodeURIComponent(here + location.search));
     return;
   }
+  // ¿Usuario de prueba que sólo puede abrir algunas plataformas? (SOLO)
+  var solo = (typeof pmSoloDestino === 'function') ? pmSoloDestino(s.u) : null;
+  if (solo && solo.indexOf(here) === -1){ location.replace(solo[0]); return; }
+  // La sesión caduca con la página abierta: se revisa cada 20 s y se vuelve al ingreso
+  setInterval(function(){ try{ if (!pmSession()) location.replace('index.html'); }catch(e){} }, 20000);
   // ¿Plataforma restringida a ciertos usuarios?
   var permitidos = ((window.PM_CONFIG && window.PM_CONFIG.RESTRINGIDAS) || {})[here];
   if (permitidos && permitidos.indexOf(s.u) === -1){

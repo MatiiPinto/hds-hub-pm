@@ -283,6 +283,7 @@ body.locked main,body.locked header,body.locked footer{filter:blur(3px);pointer-
 // ── Puerta de acceso del index ───────────────────────────────────────────────
 function pmUnlock(){
   var s = pmSession();
+  { var solo = s && pmSoloDestino(s.u); if (solo){ location.replace(solo[0]); return; } }
   document.body.classList.remove('locked');
   document.getElementById('login-ov').style.display = 'none';
   document.getElementById('pm-user-chip').textContent = '👤 ' + (s ? s.u : '');
@@ -310,13 +311,21 @@ async function pmDoLogin(ev){
   // Se dice con todas las letras, para que no parezca un problema de clave.
   if (window.PM_CONFIG.USERS[u] && window.PM_CONFIG.USERS[u] === hash && !pmVigente(u)){
     err.textContent = 'Tu acceso era temporal y venció el '
-      + ((window.PM_CONFIG.VENCEN||{})[u] || '') + '. Escribile a Matías si lo necesitás de nuevo.';
+      + String((window.PM_CONFIG.VENCEN||{})[u] || '').replace('T',' a las ') + '. Escribile a Matías si lo necesitás de nuevo.';
+    err.style.display = '';
+    pmLog('login_vencido', 'index');
+    return false;
+  }
+  // Acceso de prueba de una hora ya usado en este equipo
+  if (window.PM_CONFIG.USERS[u] && window.PM_CONFIG.USERS[u] === hash && pmUsoAgotado(u)){
+    err.textContent = 'Tu acceso de prueba era por ' + ((window.PM_CONFIG.UNA_VEZ||{})[u]) + ' minutos y ya terminó. Escribile a Matías si lo necesitás de nuevo.';
     err.style.display = '';
     pmLog('login_vencido', 'index');
     return false;
   }
   if (window.PM_CONFIG.USERS[u] && window.PM_CONFIG.USERS[u] === hash){
     pmSetSession(u);
+    { var solo = pmSoloDestino(u); if (solo){ pmLog('login', 'index'); location.href = solo[0]; return false; } }
     err.style.display = 'none';
     pmLog('login', 'index');
     // ¿venía de una plataforma? (pm_gate manda ?next=) — solo destinos internos
