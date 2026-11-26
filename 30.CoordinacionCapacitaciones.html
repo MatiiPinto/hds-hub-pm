@@ -43,6 +43,15 @@ main{max-width:1500px;margin:0 auto;padding:16px 22px 50px}
 .faltan .fn .h b{font-size:16px;font-weight:800}
 .faltan .fn .h span{font-size:9.5px;text-transform:uppercase;letter-spacing:.4px;opacity:.85}
 .faltan .fn .h+.h{border-top:1px solid rgba(255,255,255,.25);padding-top:1px}
+.faltan .fdet{flex:1 1 100%;font-size:12.5px}
+.faltan .fdet>summary{cursor:pointer;font-weight:600;padding:4px 2px;color:#fff}
+.faltan .fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:6px;margin-top:6px}
+.faltan .fsv{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);border-radius:8px;padding:5px 9px}
+.faltan .fsv>summary{cursor:pointer}.faltan .fsv>summary b{display:inline-block;min-width:22px;font-size:14px}
+.faltan .fsv ul{margin:6px 0 2px 16px;padding:0;line-height:1.45}
+.faltan .fp{opacity:.75;font-size:11px}
+.faltan .fe{font-size:10.5px;border-radius:9px;padding:0 6px;background:rgba(255,255,255,.2);white-space:nowrap}
+.faltan .fe.coordinada{background:#fde68a;color:#7f1d1d}.faltan .fe.en_progreso{background:#bfdbfe;color:#1e3a8a}
 .dash{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-bottom:16px}
 .kpi{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
 .kpi h3{font-size:11.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--tx2);margin-bottom:7px;font-weight:700}
@@ -494,7 +503,28 @@ function renderFaltan(){
   el.innerHTML='<div class="ft"><b>📊 Avance del Programa</b>Ejecutado o entregado vs total</div>'+
     tile(cc[DONE.capacitaciones]||0,cc.total,"Capacitaciones ejecutadas",par?'+ '+par+' parcial'+(par>1?'es':''):'')+
     tile(ci[DONE.instructivos]||0,ci.total,"Instructivos entregados","")+
-    tile(cq[DONE.instrumental]||0,cq.total,"Tipologías de instrumental","");
+    tile(cq[DONE.instrumental]||0,cq.total,"Tipologías de instrumental","")+faltanServicios();
+}
+// Desplegable bajo el avance: capacitaciones que faltan, agrupadas por servicio (el primero del detalle).
+var FDET_OPEN=false;
+function faltanServicios(){
+  var g={}, n=0;
+  D.capacitaciones.forEach(function(r){
+    var e=estadoOf("capacitaciones",r); if(e===DONE.capacitaciones) return;
+    var s=String(valOf(r,"detalle_servicios")||"Sin servicio").split(/[\n;\/]+/)[0].trim()||"Sin servicio";
+    (g[s]=g[s]||[]).push({r:r,e:e}); n++;
+  });
+  if(!n) return '';
+  var lbl={coordinada:"Coordinada",pendiente:"Por coordinar",en_progreso:"En curso",reprogramada:"Reprogramada"};
+  var serv=Object.keys(g).sort(function(a,b){return g[b].length-g[a].length||a.localeCompare(b);});
+  var h='<details class="fdet"'+(FDET_OPEN?' open':'')+' ontoggle="FDET_OPEN=this.open"><summary>Faltan '+n+' capacitaciones en '+serv.length+' servicios · ver detalle</summary><div class="fgrid">';
+  serv.forEach(function(s){
+    var L=g[s];
+    h+='<details class="fsv"><summary><b>'+L.length+'</b> '+esc(s)+'</summary><ul>'+
+      L.map(function(x){var r=x.r,f=x.e==="coordinada"?' · '+esc(String(valOf(r,"fecha")).replace(/^(\d{4})-(\d\d)-(\d\d).*/,"$3-$2"))+' '+esc(String(valOf(r,"hora")).slice(0,5)):'';
+        return '<li>['+esc(r.codigo)+'] '+esc(r.equipo)+' <span class="fp">'+esc(String(valOf(r,"proveedor")).split(/[\n\/]/)[0])+'</span> <span class="fe '+x.e+'">'+(lbl[x.e]||x.e)+f+'</span></li>';}).join('')+'</ul></details>';
+  });
+  return h+'</div></details>';
 }
 function renderLegend(){
   document.getElementById("legend").innerHTML=
