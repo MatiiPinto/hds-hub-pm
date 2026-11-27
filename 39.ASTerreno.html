@@ -825,6 +825,9 @@ body.view-only #dkPmCentral,body.view-only #dkPmDelta,body.view-only #backupBadg
 #navLegends>div{position:static!important;transform:none!important;inset:auto!important;box-shadow:none!important;max-width:100%!important;flex-shrink:1;white-space:nowrap!important;flex-wrap:wrap!important;align-items:center;gap:6px;padding:3px 10px!important;border-radius:var(--r-pill)!important;font-size:var(--fs-xs)!important;line-height:1.3!important;background:var(--surface-2,#f1f5f9)!important;border:1px solid var(--border)!important;z-index:auto!important}
 #navLegends #ccddLegend[style*="block"],#navLegends #ppLegend[style*="block"],#navLegends #lpLegend[style*="block"]{display:flex!important}
 #navLegends br{display:none}
+#accLegend{display:flex;align-items:center;gap:6px}
+#accLegend .cp-pt{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:3px;vertical-align:-1px}
+#accLegend button{border:1px solid var(--border);background:var(--surface);border-radius:var(--r-pill);padding:2px 10px;font-size:var(--fs-xs);font-weight:700;cursor:pointer;color:var(--text)}
 #navLegends #ccddLegend b,#navLegends .pp-tit,#navLegends #lpLegend label,#navLegends #ppLegend>div{display:inline-flex!important;align-items:center;gap:3px;margin:0 0 0 2px!important}
 #navLegends #ccddLegend>div,#navLegends #ppLegend>div[style*="color"],#navLegends #lpLegend>div{display:none!important}
 #navLegends #lpLegend>span{display:inline!important}
@@ -1317,6 +1320,7 @@ function _cargarJS(L){
         <div id="cpLegend" style="display:none"></div>
         <div id="dmLegend" style="display:none"></div>
         <div id="estLegend" style="display:none"></div>
+        <div id="accLegend" style="display:none"></div>
       </div>
     </div>
     <div id="editBar">
@@ -1475,6 +1479,7 @@ function _cargarJS(L){
           <button class="dk-btn tog" id="dkUbicPrinter" onclick="toggleUbic('printer')" title="Vista de planta: ocultar cajas y mostrar sólo dónde van las IMPRESORAS"><span class="ic">🖨</span><span class="lb">Impresoras</span></button>
           <button class="dk-btn tog" id="dkUbicCarro" onclick="toggleCarros()" title="Carros de paro: desfibrilador (130007 / 130008) + carro de paro (110032) del EMMC de cada recinto. Azul = completo · rojo = desfibrilador sin su carro · pastilla MP = con marcapaso externo. Se ve en todas las vistas y se exporta a Excel."><span class="ic">🚨</span><span class="lb">Carros de paro</span></button>
           <button class="dk-btn tog" id="dkUbicMed" onclick="toggleMedStation()" title="MedStation (BD Pyxis) de la tabla de Farmacia: cada equipo en su recinto, con su número de columnas (1 · 2 · 3) y los armarios de estupefacientes. Se ve en todas las vistas. En vista 2 y 3: arrastrar = mover (reubicación), clic derecho = rotar 90°, doble clic = volver a la posición de la tabla."><span class="ic">💊</span><span class="lb">MedStation</span></button>
+          <button class="dk-btn tog" id="dkUbicAcc" onclick="toggleAccesos()" title="Accesos y salidas del hospital, rampas vehiculares y estacionamientos de superficie: peatonales (público, visitas, urgencia), ambulancias, vehiculares al piso 1, rampas hacia los subterráneos (con la regla de cada calle según la PAPS de Estacionamiento), entradas de funcionarios, dársenas de carga y andén mortuorio. Se ve en todas las vistas."><span class="ic">🚪</span><span class="lb">Accesos</span></button>
           <button class="dk-btn tog" id="dkLabels" onclick="toggleRoomLabels()" title="Mostrar u ocultar el nombre y código de cada recinto sobre el plano"><span class="ic">🏷</span><span class="lb">Etiquetas de recintos</span></button>
         </div>
         <div class="dk-h">Apoyo TI</div>
@@ -2050,6 +2055,7 @@ function _cargarJS(L){
 <script src="SHARED_DATA/planos_jun2026.js"></script>
 <script src="SHARED_DATA/dwg_objetos_may2026.js"></script>
 <script src="SHARED_DATA/dispensadores_medicamentos.js"></script>
+<script src="SHARED_DATA/accesos_hds.js"></script>
 <script src="SHARED_DATA/planos_meta.js"></script>
 <script src="SHARED_DATA/recinto_mnc2.js"></script>
 <script src="SHARED_DATA/senaletica.js"></script>
@@ -4481,9 +4487,13 @@ const AREA_LOGOS=[
   {piso:'P1', area:'CASINO GENERAL', img:'CABIDA_DATA/logos/casa_y_cafe.png', ar:1400/707,
    nombre:'Casa y Café · «Sabores de siempre»', nota:'Cafetería del casino general · recinto 68.2.13 · BIM H2516 (letrero instalado, foto 15-10-2026)'},
 ];
-// ── 🟩 Líneas de piso de circulación general (20-10-2026) ────────────────────
-// SHARED_DATA/lineas_piso.js (_DEV/lineas_piso/build_lineas_piso.py): un color por destino, como en los
-// planos SEN-PL-EXT «Señalización de recorridos». Ancho = cinta de piso (~10 cm) con mínimo en pantalla.
+// ── 🟩 Líneas de piso de circulación general (20-10-2026 · actualizadas 27-11-2026) ─────────
+// SHARED_DATA/lineas_piso.js (_DEV/lineas_piso/build_lineas_piso_v2.py): cintas de vinilo de la actualización de
+// señalética del 17-11-2026 (planos SEN-PL-EXT S1–P4 + planilla «Cintas de Vinilo»). Un color por destino;
+// _meta.lineas trae inicio y remate de cada una. Ancho = cinta de piso (~10 cm) con mínimo en pantalla.
+const _LP_SIGLAS=/\b(inger|uci|uti|uih|uhi|cma|aa|hds)\b/gi;
+function _lpNom(d){ const t=String(d).toLowerCase().replace(_LP_SIGLAS,m=>m.toUpperCase()); return t.charAt(0).toUpperCase()+t.slice(1); }
+function _lpInfo(d){ const L=((_lpD()||{})._meta||{}).lineas||[]; const x=L.find(l=>l.nombre===d && l.piso===S.floorId)||L.find(l=>l.nombre===d); return x?('Inicio: '+x.inicio+'\nRemate: '+x.remate):''; }
 function _lpD(){ const D=window.LINEAS_PISO; return (D&&D.pisos)?D:null; }
 function toggleLineasPiso(){ S.showLineas=!S.showLineas; _lsPref('cabida_show_lineas', S.showLineas?'1':'0');
   const b=document.getElementById('btnLineas'); if(b) b.classList.toggle('active',!!S.showLineas); renderSVG(); }
@@ -4504,8 +4514,8 @@ function _lineasPisoLayer(){
     const todos=Object.keys(C), aqui=new Set(capas.map(c=>c.d));
     lg.innerHTML='<b>🟩 Líneas de piso · '+esc(curFloor()?curFloor().label:S.floorId)+'</b><br>'
       +(aqui.size?'':'<span style="color:#b45309">Este piso no tiene recorridos en los planos de señalización</span><br>')
-      +todos.filter(d=>aqui.has(d)).map(d=>'<label style="cursor:pointer;display:block"><input type="checkbox" '+(S.lpOff[d]?'':'checked')+' onchange="lpFiltro(\''+d.replace(/'/g,"\\'")+'\')"> <span class="lp-sw" style="background:'+C[d]+'"></span>'+esc(d.charAt(0)+d.slice(1).toLowerCase())+'</label>').join('')
-      +'<div style="color:var(--text-2);margin-top:3px">Planos SEN-PL-EXT · señalización de recorridos</div>'; }
+      +todos.filter(d=>aqui.has(d)).map(d=>'<label title="'+esc(_lpInfo(d))+'" style="cursor:pointer;display:block"><input type="checkbox" '+(S.lpOff[d]?'':'checked')+' onchange="lpFiltro(\''+d.replace(/'/g,"\\'")+'\')"> <span class="lp-sw" style="background:'+C[d]+'"></span>'+esc(_lpNom(d))+'</label>').join('')
+      +'<div style="color:var(--text-2);margin-top:3px">Cintas de vinilo · señalética 17-11-2026</div>'; }
 }
 function _areaLogo(area){ const f=(FLOORS.find(x=>x.areas.includes(area))||{}).id;
   return AREA_LOGOS.find(L=>L.piso===f && norm(aName(area.id)||area.name||'')===norm(L.area))||null; }
@@ -5684,6 +5694,9 @@ function renderSVG(){
   // MedStation y armarios de estupefacientes (tabla de Farmacia): todas las vistas
   { const lg=document.getElementById('dmLegend');
     if(_dmOn){ try{ _dmLayer(); }catch(e){ console.warn('medstation',e); } } else if(lg) lg.style.display='none'; }
+  // Accesos, rampas y estacionamientos de superficie (PAPS Estacionamiento + señalética 17-11): todas las vistas
+  { const lg=document.getElementById('accLegend');
+    if(_accOn){ try{ _accLayer(); }catch(e){ console.warn('accesos',e); } } else if(lg) lg.style.display='none'; }
   try{ _laminasFichaLayer(); }catch(e){ console.warn('ficha de lámina',e); }
   try{ _planJunLayer(); }catch(e){ console.warn('planos jun',e); }
   try{ _dwgObjLayer(); }catch(e){ console.warn('objetos dwg',e); }
@@ -7400,7 +7413,7 @@ function _cpLayer(){
   }
 }
 function _cpRescale(){
-  const ms=svg.querySelectorAll('.cp-mk,.dm-mk'); if(!ms.length) return;
+  const ms=svg.querySelectorAll('.cp-mk,.dm-mk,.acc-mk'); if(!ms.length) return;
   const k=_cpK();
   ms.forEach(m=>{ const t=m.getAttribute('transform')||''; m.setAttribute('transform', t.replace(/scale\([^)]*\)/,'scale('+k+')')); });
 }
@@ -7540,6 +7553,50 @@ function dmReporte(){
   m.classList.add('show');
 }
 function dmReporteCerrar(){ const m=document.getElementById('dmModal'); if(m) m.classList.remove('show'); }
+// ═══ 🚪 ACCESOS, RAMPAS Y ESTACIONAMIENTOS DE SUPERFICIE (27-11-2026) ═══════════════════════════════
+// SHARED_DATA/accesos_hds.js (_DEV/build_accesos_hds.py): marcas de los planos de circulación de la PAPS de
+// Estacionamiento (P1: accesos peatonales, de ambulancias, vehiculares al piso 1 y rampas hacia el -2; S1: rampas)
+// y rótulos del plano de señalética S1 del 17-11 (rampa desde el exterior, entradas de operadores, dársenas,
+// andén mortuorio, portería, estacionamientos). Sólo lectura; cada marca dice para quién es y por qué calle.
+var _accOn=false; try{ _accOn=localStorage.getItem('cabida_accesos')==='1'; }catch(e){}
+function toggleAccesos(){ _accOn=!_accOn; _lsPref('cabida_accesos', _accOn?'1':'0'); renderSVG(); try{ _dockSync(); }catch(e){} }
+const ACC_TIPO={peatonal:{ic:'🚶',col:'#16a34a',lbl:'Peatonal'}, ambulancias:{ic:'🚑',col:'#2563eb',lbl:'Ambulancias'},
+  vehicular:{ic:'🚗',col:'#0d9488',lbl:'Vehicular al piso'}, rampa:{ic:'⬇',col:'#dc2626',lbl:'Rampa vehicular'},
+  funcionarios:{ic:'👷',col:'#7c3aed',lbl:'Funcionarios'}, carga:{ic:'🚚',col:'#92400e',lbl:'Carga y descarga'},
+  mortuorio:{ic:'⚱',col:'#475569',lbl:'Mortuorio'}, control:{ic:'🛂',col:'#0f172a',lbl:'Portería'}, estacionamiento:{ic:'🅿',col:'#0284c7',lbl:'Estacionamiento'}};
+function _accD(){ return window.ACCESOS_HDS||{pisos:{}}; }
+function _accLayer(){
+  const D=_accD(), fl=curFloor(), L=(fl&&D.pisos[fl.id])||[], g=el('g',{class:'acc-layer'}), k=_cpK();
+  L.forEach(a=>{
+    const T=ACC_TIPO[a.tipo]||ACC_TIPO.peatonal;
+    const mk=el('g',{class:'acc-mk', transform:`translate(${a.x},${a.y}) scale(${k})`});
+    mk.appendChild(el('rect',{x:-15,y:-15,width:30,height:30,rx:8,fill:T.col,stroke:'#fff','stroke-width':2.5}));
+    mk.appendChild(txt(0,1,T.ic,{'font-size':16,fill:'#fff','pointer-events':'none'}));
+    const et=a.nombre.replace(/^Acceso /,'')+((a.tipo==='vehicular'||a.tipo==='rampa')&&a.calle?(' · '+a.calle):'');   // la calle sólo importa al vehículo
+    mk.appendChild(txt(0,27,et,{'font-size':11,'font-weight':800,fill:T.col,stroke:'#fff','stroke-width':3.5,'paint-order':'stroke fill','pointer-events':'none'}));
+    const t=el('title'); t.textContent=T.ic+' '+a.nombre+'\nPara: '+a.para+(a.calle?('\nCalle: '+a.calle+(D.regla_calles&&D.regla_calles[a.calle]&&a.tipo==='rampa'?(' — '+D.regla_calles[a.calle]):'')):'')+'\nFuente: '+a.fuente; mk.appendChild(t);
+    mk.addEventListener('mousedown',e=>e.stopPropagation());
+    g.appendChild(mk);
+  });
+  svg.appendChild(g);
+  const lg=document.getElementById('accLegend');
+  if(lg){ const c={}; L.forEach(a=>c[a.tipo]=(c[a.tipo]||0)+1);
+    lg.innerHTML='<span>🚪 <b>'+esc(fl?fl.label:'')+'</b></span>'+(L.length?Object.keys(ACC_TIPO).filter(t=>c[t]).map(t=>'<span><i class="cp-pt" style="background:'+ACC_TIPO[t].col+'"></i>'+ACC_TIPO[t].lbl+' <b>'+c[t]+'</b></span>').join(''):'<span style="color:#64748b">sin accesos registrados en este piso</span>')
+      +'<button type="button" onclick="accLista()">📋 Lista</button>';
+    lg.style.display=''; }
+}
+function accLista(){
+  const D=_accD(), pisos=FLOORS.map(f=>f.id).filter(p=>(D.pisos[p]||[]).length);
+  let m=document.getElementById('accModal');
+  if(!m){ m=document.createElement('div'); m.id='accModal'; m.className='modal-fondo'; m.onclick=e=>{ if(e.target===m) m.classList.remove('show'); }; document.body.appendChild(m); }
+  const fila=(p,a)=>{ const T=ACC_TIPO[a.tipo]||ACC_TIPO.peatonal; return '<tr><td>'+esc((FLOORS.find(f=>f.id===p)||{}).label||p)+'</td><td><span style="color:'+T.col+';font-weight:800">'+T.ic+' '+esc(T.lbl)+'</span></td><td><b>'+esc(a.nombre)+'</b><br><span style="color:#64748b">'+esc(a.para)+'</span></td><td>'+esc(a.calle||'')+(a.tipo==='rampa'&&D.regla_calles&&D.regla_calles[a.calle]?('<br><span style="color:#b45309">'+esc(D.regla_calles[a.calle])+'</span>'):'')+'</td></tr>'; };
+  m.innerHTML='<div style="max-width:860px;width:100%;max-height:86vh;overflow:auto;padding:18px 22px;background:var(--surface);border-radius:14px">'
+    +'<div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:17px;font-weight:800">🚪 Accesos, rampas y estacionamientos de superficie</div><button class="tb-btn" onclick="document.getElementById(\'accModal\').classList.remove(\'show\')">✕</button></div>'
+    +'<div style="font-size:12.5px;color:#475569;margin:4px 0 10px">'+esc(D.fuente||'')+'. Accesos vehiculares a los estacionamientos (PAPS): Av. Salvador '+esc((D.regla_calles||{})['Av. Salvador']||'')+'; J. M. Infante '+esc((D.regla_calles||{})['J. M. Infante']||'')+'; Alessandri '+esc((D.regla_calles||{})['Alessandri']||'')+'.</div>'
+    +'<table style="width:100%;border-collapse:collapse;font-size:12.5px"><thead><tr style="text-align:left;border-bottom:2px solid #1d5fa0"><th>Piso</th><th>Tipo</th><th>Acceso</th><th>Calle</th></tr></thead><tbody>'
+    +pisos.map(p=>(D.pisos[p]||[]).map(a=>fila(p,a)).join('')).join('')+'</tbody></table></div>';
+  m.classList.add('show');
+}
 function exportCarrosParo(){
   const hoy=new Date().toISOString().slice(0,10);
   const todos=_cpRecintos();
@@ -8542,7 +8599,7 @@ const CAPAS_BARRA=[
   ['btnBoxVis','Cajas'],['dkLabels','Etiquetas'],['btnSen','Señalética'],['btnPlanKind','Color'],'|',
   ['btnDotNames','Nombres'],['btnDotLista','En lista'],['btnAsigN','N° asig.'],['btnSoloReemp','Reemplazos'],'|',
   ['btnVert','Ascensores'],['btnReloj','Relojes'],['btnCorreoN','Correo N.'],['btnEstac','Estacion.'],['btnPuertasVis','Puertas'],['btnJardines','Jardines'],['btnLaminas','Láminas'],['btnOficinas','Oficinas'],'|',
-  ['dkUbicCarro','Carros paro'],['dkUbicMed','MedStation'],['dkUbicDea','DEA'],['dkUbicTotem','Tótems'],['dkUbicVend','Vendomática'],['btnImpresoras','Impresoras'],['btnShowPC','PC'],'|',
+  ['dkUbicCarro','Carros paro'],['dkUbicMed','MedStation'],['dkUbicAcc','Accesos'],['dkUbicDea','DEA'],['dkUbicTotem','Tótems'],['dkUbicVend','Vendomática'],['btnImpresoras','Impresoras'],['btnShowPC','PC'],'|',
   ['btnShowTomas','Tomas'],['btnShowGases','Gases'],['btnCcdd','C. débiles'],['btnPP','PINS'],['btnLineas','Líneas piso'],['btnPlanJun','Planos jun'],['btnDwgObj','Objetos DWG']
 ];
 const DOCK_MAPA=[
@@ -8803,6 +8860,7 @@ function _dockSync(){
   _UBIC().forEach(k=>on('dkUbic'+k.charAt(0).toUpperCase()+k.slice(1), S.ubic&&S.ubic.has(k)));
   on('dkUbicCarro', _cpOn);
   on('dkUbicMed', _dmOn);
+  on('dkUbicAcc', _accOn);
   on('dkTiReport', S.showTI);
   const ro=S.viewOnly&&!S.editPM;
   dis('dkDesk',ro||S.level<2); dis('dkTotem',ro||S.level<2); dis('dkDea',ro||S.level<2); dis('dkPrinter',ro||S.level<2); dis('dkPropDel',ro||!_propEnCtx().length);
@@ -20400,6 +20458,22 @@ async function runSelfTest(){
       S.estFil=new Set(['inger']); ok=ok && !_estVisible(it) && EST_CUPO['P-2'].dir_hds===12 && EST_CUPO['P-2'].dir_inger===11; }
     finally{ if(prev.inst) it.inst=prev.inst; else delete it.inst; it.cat=prev.cat; S.estFil=fPrev; S.estAsig=aPrev; }
     return ok;
+  });
+  T('Accesos y rampas: dato cargado, marcas en P1 y S1 con tipo, para quién y calle; lista', ()=>{
+    const D=_accD(), P1=D.pisos.P1||[], S1=D.pisos['P-1']||[]; if(!P1.length||!S1.length) return false;
+    if(![...P1,...S1].every(a=>ACC_TIPO[a.tipo] && a.para && isFinite(a.x) && isFinite(a.y))) return false;
+    if(!P1.some(a=>a.tipo==='peatonal') || !P1.some(a=>a.tipo==='rampa') || !S1.some(a=>a.tipo==='rampa')) return false;
+    const prev=_accOn, fP=S.floorId, lP=S.level; let n=0;
+    try{ _accOn=true; S.floorId='P1'; S.level=1; renderSVG(); n=svg.querySelectorAll('.acc-mk').length; }
+    finally{ _accOn=prev; S.floorId=fP; S.level=lP; renderSVG(); }
+    accLista(); const ok=document.querySelectorAll('#accModal tbody tr').length===P1.length+S1.length+Object.entries(D.pisos).filter(([p])=>p!=='P1'&&p!=='P-1').reduce((a,[,L])=>a+L.length,0);
+    document.getElementById('accModal').classList.remove('show');
+    return n===P1.length && ok;
+  });
+  T('Líneas de piso 17-11: 5 pisos (S1 a P4) con inicio y remate de cada línea', ()=>{
+    const D=_lpD(); if(!D) return false;
+    return ['P-1','P1','P2','P3','P4'].every(p=>(D.pisos[p]||[]).length) && (D._meta.lineas||[]).length>=45 && /Inicio:/.test(_lpInfo((D.pisos.P1[0]||{}).d||''))
+      && _lpNom('INGER · TOMA DE MUESTRAS')==='INGER · toma de muestras';
   });
   T('Respaldo a archivo: sólo desde el Atlas de trabajo (un preview en otro puerto no pisa el estado)', ()=>{
     return FBAK_PUERTOS.indexOf('8790')>=0 && FBAK_PUERTOS.length<=2
